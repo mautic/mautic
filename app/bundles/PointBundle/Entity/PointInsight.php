@@ -224,18 +224,12 @@ class PointInsight extends FormEntity
         return $this;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
     {
         return $this->category;
     }
 
-    /**
-     * @param Category|null $category
-     */
-    public function setCategory($category): static
+    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;

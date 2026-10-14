@@ -212,10 +212,7 @@ class Stat
         $this->dateSent = $dateSent;
     }
 
-    /**
-     * @return Notification|null
-     */
-    public function getNotification()
+    public function getNotification(): ?\Mautic\NotificationBundle\Entity\Notification
     {
         return $this->notification;
     }
@@ -256,10 +253,7 @@ class Stat
         $this->isClicked = $isClicked;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -285,18 +279,12 @@ class Stat
         $this->trackingHash = $trackingHash;
     }
 
-    /**
-     * @return LeadList|null
-     */
-    public function getList()
+    public function getList(): ?\Mautic\LeadBundle\Entity\LeadList
     {
         return $this->list;
     }
 
-    /**
-     * @param mixed $list
-     */
-    public function setList($list): void
+    public function setList(?\Mautic\LeadBundle\Entity\LeadList $list): void
     {
         $this->list = $list;
     }

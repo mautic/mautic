@@ -174,10 +174,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return (int) $this->id;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateTriggered()
+    public function getDateTriggered(): ?\DateTimeInterface
     {
         return $this->dateTriggered;
     }
@@ -265,10 +262,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->previousScheduledState;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getTriggerDate()
+    public function getTriggerDate(): ?\DateTimeInterface
     {
         return $this->triggerDate;
     }
@@ -426,10 +420,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this;
     }
 
-    /**
-     * @return FailedLeadEventLog|null
-     */
-    public function getFailedLog()
+    public function getFailedLog(): ?\Mautic\CampaignBundle\Entity\FailedLeadEventLog
     {
         return $this->failedLog;
     }
@@ -443,7 +434,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     public function isFailed(): bool
     {
-        return !empty($this->failedLog);
+        return $this->failedLog instanceof \Mautic\CampaignBundle\Entity\FailedLeadEventLog;
     }
 
     public function isSuccess(): bool

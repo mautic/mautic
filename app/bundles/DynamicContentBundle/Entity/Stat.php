@@ -144,10 +144,7 @@ class Stat
         $this->id = (string) $id;
     }
 
-    /**
-     * @return DynamicContent|null
-     */
-    public function getDynamicContent()
+    public function getDynamicContent(): ?\Mautic\DynamicContentBundle\Entity\DynamicContent
     {
         return $this->dynamicContent;
     }
@@ -157,18 +154,12 @@ class Stat
         $this->dynamicContent = $dynamicContent;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function setLead($lead): void
+    public function setLead(?\Mautic\LeadBundle\Entity\Lead $lead): void
     {
         $this->lead = $lead;
     }

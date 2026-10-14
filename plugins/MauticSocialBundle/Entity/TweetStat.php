@@ -168,18 +168,12 @@ class TweetStat
         return $this;
     }
 
-    /**
-     * @return \DateTime|null
-     */
-    public function getDateSent()
+    public function getDateSent(): ?\DateTime
     {
         return $this->dateSent;
     }
 
-    /**
-     * @param \DateTime|null $dateSent
-     */
-    public function setDateSent($dateSent): void
+    public function setDateSent(?\DateTime $dateSent): void
     {
         $this->dateSent = $dateSent;
     }
@@ -194,10 +188,7 @@ class TweetStat
         $this->tweet = $tweet;
     }
 
-    /**
-     * @return TheLead
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
