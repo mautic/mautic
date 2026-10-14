@@ -53,11 +53,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     private ?IpAddress $ipAddress = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[ORM\Column(name: 'date_triggered', type: 'datetime', nullable: true)]
-    private $dateTriggered;
+    private ?\DateTimeInterface $dateTriggered = null;
 
     /**
      * @var bool
@@ -65,11 +62,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     #[ORM\Column(name: 'is_scheduled', type: 'boolean')]
     private $isScheduled = false;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[ORM\Column(name: 'trigger_date', type: 'datetime', nullable: true)]
-    private $triggerDate;
+    private ?\DateTimeInterface $triggerDate = null;
 
     /**
      * @var bool
@@ -110,11 +104,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     #[ORM\Column(type: 'integer')]
     private $rotation = 1;
 
-    /**
-     * @var FailedLeadEventLog|null
-     */
     #[ORM\OneToOne(targetEntity: FailedLeadEventLog::class, mappedBy: 'log', cascade: ['all'], fetch: 'EXTRA_LAZY')]
-    private $failedLog;
+    private ?FailedLeadEventLog $failedLog = null;
 
     /**
      * Subscribers can fail log with custom reschedule interval.

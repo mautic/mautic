@@ -113,11 +113,8 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     #[Groups(['sms:read'])]
     private $sentCount = 0;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['sms:read', 'sms:write'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<int, LeadList>

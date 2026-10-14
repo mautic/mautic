@@ -35,31 +35,22 @@ class Stat
 
     private int|string|null $id = null;
 
-    /**
-     * @var Email|null
-     */
     #[ORM\ManyToOne(targetEntity: Email::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
-    private $email;
+    private ?Email $email = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var string
      */
     private $emailAddress;
 
-    /**
-     * @var LeadList|null
-     */
     #[ORM\ManyToOne(targetEntity: LeadList::class)]
     #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
-    private $list;
+    private ?LeadList $list = null;
 
     private ?IpAddress $ipAddress = null;
 
@@ -80,10 +71,7 @@ class Stat
      */
     private $viewedInBrowser = false;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $dateRead;
+    private ?\DateTimeInterface $dateRead = null;
 
     /**
      * @var string|null
@@ -110,12 +98,9 @@ class Stat
      */
     private $tokens = [];
 
-    /**
-     * @var Copy|null
-     */
     #[ORM\ManyToOne(targetEntity: Copy::class)]
     #[ORM\JoinColumn(name: 'copy_id', onDelete: 'SET NULL')]
-    private $storedCopy;
+    private ?Copy $storedCopy = null;
 
     /**
      * @var int|null

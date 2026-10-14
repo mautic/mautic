@@ -27,12 +27,9 @@ class StatDevice
     #[ORM\JoinColumn(name: 'stat_id', onDelete: 'CASCADE')]
     private ?Stat $stat = null;
 
-    /**
-     * @var LeadDevice|null
-     */
     #[ORM\ManyToOne(targetEntity: LeadDevice::class)]
     #[ORM\JoinColumn(name: 'device_id', onDelete: 'CASCADE')]
-    private $device;
+    private ?LeadDevice $device = null;
 
     private ?IpAddress $ipAddress = null;
 

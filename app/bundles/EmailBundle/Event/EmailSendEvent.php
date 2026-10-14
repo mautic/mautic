@@ -10,10 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class EmailSendEvent extends CommonEvent
 {
-    /**
-     * @var Email|null
-     */
-    private $email;
+    private ?Email $email = null;
 
     private string $content;
 

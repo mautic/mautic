@@ -116,17 +116,11 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     #[ORM\Column(type: 'array', nullable: true)]
     private $content = [];
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
-    private $publishUp;
+    private ?\DateTimeInterface $publishUp = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
-    private $publishDown;
+    private ?\DateTimeInterface $publishDown = null;
 
     /**
      * @var int
@@ -191,11 +185,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     #[ORM\Column(name: 'redirect_url', type: 'string', length: 2048, nullable: true)]
     private $redirectUrl;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var bool|null

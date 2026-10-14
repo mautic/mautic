@@ -84,11 +84,8 @@ class LeadList extends FormEntity implements UuidInterface
     #[ORM\Column(name: 'public_name', type: 'string', length: 191)]
     private $publicName;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var string|null

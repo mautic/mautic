@@ -42,8 +42,24 @@ final class SomeClass
      * @var IpAddress|null
      */
     protected $skipProtected;
+
+    /**
+     * @var ?IpAddress
+     */
+    private $prefixNullable;
 }
 
 final class IpAddress
 {
+}
+
+/**
+ * @template TEntity of object
+ */
+trait SomeGenericTrait
+{
+    /**
+     * @var TEntity|null
+     */
+    private $skipTemplateType;
 }

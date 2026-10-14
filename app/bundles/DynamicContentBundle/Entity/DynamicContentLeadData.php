@@ -22,12 +22,9 @@ class DynamicContentLeadData extends CommonEntity
      */
     private $dateAdded;
 
-    /**
-     * @var DynamicContent|null
-     */
     #[ORM\ManyToOne(targetEntity: DynamicContent::class)]
     #[ORM\JoinColumn(name: 'dynamic_content_id', onDelete: 'CASCADE')]
-    private $dynamicContent;
+    private ?DynamicContent $dynamicContent = null;
 
     /**
      * @var Lead

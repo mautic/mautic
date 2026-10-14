@@ -45,12 +45,9 @@ class MessageQueue
 
     private $channelId;
 
-    /**
-     * @var Event|null
-     */
     #[ORM\ManyToOne(targetEntity: Event::class)]
     #[ORM\JoinColumn(name: 'event_id', onDelete: 'CASCADE')]
-    private $event;
+    private ?Event $event = null;
 
     /**
      * @var Lead
@@ -89,20 +86,11 @@ class MessageQueue
      */
     private $datePublished;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $scheduledDate;
+    private ?\DateTimeInterface $scheduledDate = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $lastAttempt;
+    private ?\DateTimeInterface $lastAttempt = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $dateSent;
+    private ?\DateTimeInterface $dateSent = null;
 
     /**
      * @var mixed[][]

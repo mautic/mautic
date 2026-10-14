@@ -127,11 +127,8 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     #[Groups(['notification:read'])]
     private $sentCount = 0;
 
-    /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
-     */
     #[Groups(['notification:read', 'notification:write'])]
-    private $category;
+    private ?\Mautic\CategoryBundle\Entity\Category $category = null;
 
     /**
      * @var ArrayCollection<int, LeadList>

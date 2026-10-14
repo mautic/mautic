@@ -35,9 +35,6 @@ class FormEntity extends CommonEntity
     ])]
     private bool $isPublished = true;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups([
         'category:read', 'category:write',
         'notification:read', 'notification:write',
@@ -57,7 +54,7 @@ class FormEntity extends CommonEntity
         'form:read', 'form:write',
         'stage:read', 'stage:write',
     ])]
-    private $dateAdded;
+    private ?\DateTimeInterface $dateAdded = null;
 
     /**
      * @var int|null
@@ -69,9 +66,6 @@ class FormEntity extends CommonEntity
      */
     private $createdByUser;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups([
         'category:read', 'category:write',
         'notification:read', 'notification:write',
@@ -89,7 +83,7 @@ class FormEntity extends CommonEntity
         'segment:read', 'segment:write',
         'asset:read', 'asset:write',
     ])]
-    private $dateModified;
+    private ?\DateTimeInterface $dateModified = null;
 
     /**
      * @var int|null
@@ -101,10 +95,7 @@ class FormEntity extends CommonEntity
      */
     private $modifiedByUser;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $checkedOut;
+    private ?\DateTimeInterface $checkedOut = null;
 
     /**
      * @var int|null
