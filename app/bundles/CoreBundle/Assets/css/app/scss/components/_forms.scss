@@ -565,26 +565,6 @@ input[type="checkbox"] {
   }
 }
 
-.form-check-input[type="checkbox"] {
-  border-radius: clamp(2px, var(--border-radius-sm), 4px);
-}
-
-.form-check .form-check-input {
-  float: none;
-  margin-left: 0;
-  margin-top: 0;
-  color: var(--text-secondary);
-}
-
-.form-check {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding-left: 0;
-  min-height: 0;
-  margin-bottom: 8px;
-}
-
 // time input (3 select boxes hh:mm:ss)
 .time-input {
   select {
