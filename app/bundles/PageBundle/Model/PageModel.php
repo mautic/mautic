@@ -52,6 +52,7 @@ use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
+use Mautic\PageBundle\Event\PageOnTogglePublishEvent;
 use Mautic\PageBundle\Form\Type\PageType;
 use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
@@ -271,9 +272,6 @@ final class PageModel extends FormModel implements GlobalSearchInterface
                 break;
             case 'post_delete':
                 $name = PageEvents::PAGE_POST_DELETE;
-                break;
-            case 'on_toggle_publish':
-                $name = PageEvents::PAGE_ON_TOGGLE_PUBLISH;
                 break;
             default:
                 return null;

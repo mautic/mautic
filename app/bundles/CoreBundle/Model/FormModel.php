@@ -14,6 +14,8 @@ use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Event\PageOnTogglePublishEvent;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -231,7 +233,12 @@ class FormModel extends AbstractCommonModel
             $entity->setIsEnabled(!$entity->getIsEnabled());
         }
 
-        $this->dispatchEvent('on_toggle_publish', $entity);
+        if ($entity instanceof Page) {
+            $this->dispatcher->dispatch(new PageOnTogglePublishEvent($entity));
+        }
+
+//        new PageOnTogglePublishEvent($entity)
+//        $this->dispatchEvent('on_toggle_publish', $entity);
 
         // hit up event listeners
         $event = $this->dispatchEvent('pre_save', $entity);
