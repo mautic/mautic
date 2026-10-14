@@ -26,12 +26,9 @@ class StagesChangeLog
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
-    /**
-     * @var Stage|null
-     */
     #[ORM\ManyToOne(targetEntity: Stage::class)]
     #[ORM\JoinColumn(name: 'stage_id', onDelete: 'CASCADE')]
-    private $stage;
+    private ?Stage $stage = null;
 
     /**
      * @var string

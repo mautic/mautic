@@ -28,31 +28,19 @@ class Stat
      */
     private $id;
 
-    /**
-     * @var Sms|null
-     */
     #[ORM\ManyToOne(targetEntity: Sms::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'sms_id', onDelete: 'SET NULL')]
-    private $sms;
+    private ?Sms $sms = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
-    /**
-     * @var LeadList|null
-     */
     #[ORM\ManyToOne(targetEntity: LeadList::class)]
     #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
-    private $list;
+    private ?LeadList $list = null;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface

@@ -44,28 +44,19 @@ class Hit
     #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
     private ?Page $page = null;
 
-    /**
-     * @var Redirect|null
-     */
     #[ORM\ManyToOne(targetEntity: Redirect::class)]
     #[ORM\JoinColumn(name: 'redirect_id', onDelete: 'SET NULL')]
-    private $redirect;
+    private ?Redirect $redirect = null;
 
     #[ORM\ManyToOne(targetEntity: Email::class)]
     #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
     private ?Email $email = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var string|null
@@ -162,12 +153,9 @@ class Hit
      */
     private $query = [];
 
-    /**
-     * @var LeadDevice|null
-     */
     #[ORM\ManyToOne(targetEntity: LeadDevice::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'device_id', onDelete: 'SET NULL')]
-    private $device;
+    private ?LeadDevice $device = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

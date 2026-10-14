@@ -119,11 +119,8 @@ class Point extends FormEntity implements UuidInterface
     #[ORM\OneToMany(targetEntity: LeadPointLog::class, mappedBy: 'point', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['point:read', 'point:write'])]
-    private $category;
+    private ?Category $category = null;
 
     #[Groups(['point:read', 'point:write'])]
     #[ORM\ManyToOne(targetEntity: Group::class)]

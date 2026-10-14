@@ -37,17 +37,11 @@ class Submission
     #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
     private $form;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var string|null
@@ -64,12 +58,9 @@ class Submission
      */
     private $referer;
 
-    /**
-     * @var Page|null
-     */
     #[ORM\ManyToOne(targetEntity: Page::class, fetch: 'EXTRA_LAZY')]
     #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
-    private $page;
+    private ?Page $page = null;
 
     /**
      * @var array

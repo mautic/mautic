@@ -15,7 +15,7 @@ final class NullableObjectPropertyMustHaveNativeTypeRuleTest extends RuleTestCas
 {
     protected function getRule(): Rule
     {
-        return new NullableObjectPropertyMustHaveNativeTypeRule(self::getContainer()->getByType(\PHPStan\Type\FileTypeMapper::class));
+        return new NullableObjectPropertyMustHaveNativeTypeRule();
     }
 
     public function testRule(): void
@@ -28,6 +28,10 @@ final class NullableObjectPropertyMustHaveNativeTypeRuleTest extends RuleTestCas
             [
                 'Property "$createdAt" should declare native type "?DateTimeInterface = null" instead of a "@var" docblock only.',
                 17,
+            ],
+            [
+                'Property "$prefixNullable" should declare native type "?IpAddress = null" instead of a "@var" docblock only.',
+                49,
             ],
         ]);
     }

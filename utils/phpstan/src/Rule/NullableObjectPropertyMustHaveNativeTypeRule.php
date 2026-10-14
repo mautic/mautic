@@ -5,144 +5,151 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Rule;
 
 use PhpParser\Node;
-use PhpParser\Node\Stmt\Property;
+use PhpParser\Node\Stmt\ClassLike;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\Type\FileTypeMapper;
-use PHPStan\Type\NullType;
-use PHPStan\Type\Type;
-use PHPStan\Type\TypeWithClassName;
-use PHPStan\Type\UnionType;
 
 /**
- * A private property with no native type and no default value, whose only type is a "@var Object|null"
- * docblock, must declare the native nullable type instead, e.g. "private ?IpAddress $ipAddress = null".
+ * A private property with no native type and no default value, documented only with a nullable single
+ * object "@var" tag (e.g. "@var IpAddress|null" or "@var ?IpAddress"), must declare the native nullable
+ * type instead, e.g. "private ?IpAddress $ipAddress = null". Generic "@template" types are left alone,
+ * as they cannot be expressed as a native type.
  *
- * @implements Rule<Property>
+ * @implements Rule<ClassLike>
  *
  * @see \Utils\PHPStan\Tests\Rule\NullableObjectPropertyMustHaveNativeTypeRuleTest
  */
-final readonly class NullableObjectPropertyMustHaveNativeTypeRule implements Rule
+final class NullableObjectPropertyMustHaveNativeTypeRule implements Rule
 {
-    public function __construct(
-        private FileTypeMapper $fileTypeMapper
-    ) {
-    }
+    private const SCALAR_TYPES = ['array', 'string', 'int', 'integer', 'bool', 'boolean', 'float',
+        'double', 'mixed', 'object', 'callable', 'iterable', 'void', 'false', 'true', 'null',
+        'self', 'static', 'parent', 'resource', 'scalar', 'list', 'never'];
 
     public function getNodeType(): string
     {
-        return Property::class;
+        return ClassLike::class;
     }
 
     /**
-     * @param Property $node
+     * @param ClassLike $node
      *
      * @return list<\PHPStan\Rules\IdentifierRuleError>
      */
     public function processNode(Node $node, Scope $scope): array
     {
-        // only private, still untyped properties
-        if (!$node->isPrivate() || $node->type instanceof Node) {
-            return [];
-        }
-
-        $docComment = $node->getDocComment();
-        if (null === $docComment) {
-            return [];
-        }
-
-        $varTagTypes = $this->resolveVarTagTypes($node, $scope, $docComment->getText());
+        $classDocComment = $node->getDocComment();
+        $templateNames = $this->resolveTemplateNames(null === $classDocComment ? null : $classDocComment->getText());
 
         $ruleErrors = [];
 
-        foreach ($node->props as $propertyProperty) {
-            // a default value means the signature is intentional, leave it alone
-            if ($propertyProperty->default instanceof Node) {
+        foreach ($node->getProperties() as $property) {
+            if (!$property->isPrivate() || $property->type instanceof Node) {
                 continue;
             }
 
-            $propertyName = $propertyProperty->name->toString();
-            $varTagType = $varTagTypes[$propertyName] ?? (1 === count($varTagTypes) ? reset($varTagTypes) : null);
-            if (!$varTagType instanceof Type) {
+            $docComment = $property->getDocComment();
+            if (null === $docComment) {
                 continue;
             }
 
-            $className = $this->matchNullableObjectClassName($varTagType);
-            if (null === $className) {
+            $coreType = $this->matchNullableObjectType($docComment->getText(), $templateNames);
+            if (null === $coreType) {
                 continue;
             }
 
-            $shortClassName = $this->resolveShortClassName($className);
+            foreach ($property->props as $propertyProperty) {
+                // a default value means the signature is intentional, leave it alone
+                if ($propertyProperty->default instanceof Node) {
+                    continue;
+                }
 
-            $ruleErrors[] = RuleErrorBuilder::message(sprintf(
-                'Property "$%s" should declare native type "?%s = null" instead of a "@var" docblock only.',
-                $propertyName,
-                $shortClassName
-            ))
-                ->identifier('mautic.nullableObjectPropertyMustHaveNativeType')
-                ->line($propertyProperty->getStartLine())
-                ->build();
+                $ruleErrors[] = RuleErrorBuilder::message(sprintf(
+                    'Property "$%s" should declare native type "?%s = null" instead of a "@var" docblock only.',
+                    $propertyProperty->name->toString(),
+                    $this->resolveShortClassName($coreType)
+                ))
+                    ->identifier('mautic.nullableObjectPropertyMustHaveNativeType')
+                    ->line($propertyProperty->getStartLine())
+                    ->build();
+            }
         }
 
         return $ruleErrors;
     }
 
     /**
-     * @return array<string|int, Type>
+     * @return list<string>
      */
-    private function resolveVarTagTypes(Property $property, Scope $scope, string $docText): array
+    private function resolveTemplateNames(?string $docText): array
     {
-        $resolvedPhpDoc = $this->fileTypeMapper->getResolvedPhpDoc(
-            $scope->getFile(),
-            $scope->isInClass() ? $scope->getClassReflection()->getName() : null,
-            $scope->isInTrait() ? $scope->getTraitReflection()->getName() : null,
-            null,
-            $docText
-        );
-
-        $varTagTypes = [];
-        foreach ($resolvedPhpDoc->getVarTags() as $key => $varTag) {
-            $varTagTypes[$key] = $varTag->getType();
+        if (null === $docText) {
+            return [];
         }
 
-        return $varTagTypes;
+        if (preg_match_all('/@template(?:-covariant|-contravariant)?\s+([A-Za-z_]\w*)/', $docText, $matches)) {
+            return $matches[1];
+        }
+
+        return [];
     }
 
-    private function matchNullableObjectClassName(Type $type): ?string
+    /**
+     * @param list<string> $templateNames
+     */
+    private function matchNullableObjectType(string $docText, array $templateNames): ?string
     {
-        if (!$type instanceof UnionType) {
+        if (!preg_match('/@var\s+(\S+)/', $docText, $matches)) {
             return null;
         }
 
-        $innerTypes = $type->getTypes();
-        if (2 !== count($innerTypes)) {
+        $rawType = $matches[1];
+
+        // generics, arrays, intersections and callables are not a plain nullable object
+        if (preg_match('/[<>\[\]&(]/', $rawType)) {
             return null;
         }
 
         $hasNull = false;
-        $className = null;
+        if (str_starts_with($rawType, '?')) {
+            $hasNull = true;
+            $rawType = substr($rawType, 1);
+        }
 
-        foreach ($innerTypes as $innerType) {
-            if ($innerType instanceof NullType) {
+        $core = null;
+        foreach (explode('|', $rawType) as $part) {
+            $part = trim($part);
+            if ('' === $part) {
+                continue;
+            }
+
+            if ('null' === strtolower($part)) {
                 $hasNull = true;
                 continue;
             }
 
-            if ($innerType instanceof TypeWithClassName) {
-                $className = $innerType->getClassName();
-                continue;
+            if (null !== $core) {
+                // more than one non-null member
+                return null;
             }
 
-            // any other member (scalar, array, second object) disqualifies the match
+            $core = $part;
+        }
+
+        if (!$hasNull || null === $core) {
             return null;
         }
 
-        if (!$hasNull || null === $className) {
+        $bare = ltrim($core, '\\');
+        if (in_array(strtolower($bare), self::SCALAR_TYPES, true)) {
             return null;
         }
 
-        return $className;
+        if (in_array($bare, $templateNames, true)) {
+            return null;
+        }
+
+        return $core;
     }
 
     private function resolveShortClassName(string $className): string

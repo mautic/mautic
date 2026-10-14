@@ -21,10 +21,7 @@ final class ScheduledEvent extends Event
 
     private readonly ?Lead $lead;
 
-    /**
-     * @var CampaignEvent|null
-     */
-    private $event;
+    private ?CampaignEvent $event = null;
 
     private bool $systemTriggered = true;
 

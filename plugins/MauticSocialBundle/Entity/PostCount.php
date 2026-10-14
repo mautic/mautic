@@ -17,12 +17,9 @@ class PostCount
      */
     private $id;
 
-    /**
-     * @var Monitoring|null
-     */
     #[ORM\ManyToOne(targetEntity: Monitoring::class)]
     #[ORM\JoinColumn(name: 'monitor_id', onDelete: 'CASCADE')]
-    private $monitor;
+    private ?Monitoring $monitor = null;
 
     /**
      * @var \DateTimeInterface

@@ -86,17 +86,11 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     #[Groups(['campaign:read', 'campaign:write'])]
     private $description;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['campaign:read', 'campaign:write'])]
-    private $publishUp;
+    private ?\DateTimeInterface $publishUp = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['campaign:read', 'campaign:write'])]
-    private $publishDown;
+    private ?\DateTimeInterface $publishDown = null;
 
     #[Groups(['campaign:read', 'campaign:write'])]
     public ?\DateTimeInterface $deleted = null;
@@ -106,11 +100,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     #[ORM\Column(name: 'republish_behavior', type: Types::STRING, length: 32, nullable: true)]
     private ?string $republishBehavior = null;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['campaign:read', 'campaign:write'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var Collection<int, Event>|ArrayCollection<int, Event>
