@@ -251,45 +251,6 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
-    {
-        if (!$entity instanceof Page) {
-            throw new MethodNotAllowedHttpException(['Page']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = PageEvents::PAGE_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = PageEvents::PAGE_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = PageEvents::PAGE_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = PageEvents::PAGE_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new PageEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
-    }
-
-    /**
      * Get list of entities for autopopulate fields.
      */
     public function getLookupResults(string $type, string $filter = '', int $limit = 10): array
