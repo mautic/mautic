@@ -32,7 +32,7 @@
 
         <div class="{{ classes|join(' ') }}">
             <input
-                class="form-check-input"
+                class="form-check-input{{ item.className|default('') ? ' ' ~ item.className : '' }}"
                 type="checkbox"
                 name="{{ item_name }}"
                 id="{{ item_id }}"
@@ -45,9 +45,11 @@
                     {{ attr_key }}="{{ attr_value }}"
                 {% endfor %}
             >
+            {% if item_label %}
             <label class="form-check-label" for="{{ item_id }}">
                 {{ item_label|trans }}
             </label>
+            {% endif %}
         </div>
     {% endfor %}
 

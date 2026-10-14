@@ -5,7 +5,10 @@
 <th class="col-actions" {% if tooltip is defined and tooltip is not empty %} data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ tooltip|trans }}"{% endif %}>
     <div class="input-group input-group-sm">
         <span class="input-group-addon">
-            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="{{ target }}">
+        {% include '@MauticCore/Components/checkbox.html.twig' with {
+            name: 'customcheckbox-one',
+            items: [{ id: 'customcheckbox-one0', value: '1', className: 'checkall', attributes: { 'data-toggle': 'checkall', 'data-target': target } }]
+        } %}
         </span>
 
         {% if templateButtons is defined and templateButtons is not empty or customButtons is defined and customButtons is not empty %}
