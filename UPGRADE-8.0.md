@@ -962,6 +962,13 @@
 - `Mautic\CoreBundle\Model\FormModel::cleanAlias()` and `Mautic\FormBundle\Entity\SubmissionRepository` check a generated alias against `Mautic\CoreBundle\Doctrine\ReservedWords` instead of the platform's keyword list, which DBAL 4 deprecated with no replacement. The list is the union of the newest MySQL and MariaDB reserved words, so a handful of aliases that were left alone before are now prefixed.
 - `Mautic\CoreBundle\Entity\CommonRepository` and `Mautic\CoreBundle\Event\CommonEvent` are now `abstract`. They were only ever used as base classes; if you instantiate either directly, create your own subclass instead.
 - All class and interface constants now declare a native type (PHP 8.3 typed class constants), e.g. `public const string NAME = ...`. If a plugin class overrides one of them, add a compatible type to the overriding constant, otherwise PHP fails with "Type of X::NAME must be compatible with Y::NAME". `AbstractMauticMigration::TABLE_NAME` is `?string`, so migrations declare `protected const string TABLE_NAME`.
+- Base entity properties now declare native types. A plugin entity that redeclares either property without a compatible type causes a PHP fatal error. Add the matching type to the overriding property:
+
+    | Class | Property | Type |
+    | --- | --- | --- |
+    | `CoreBundle\Entity\CommonEntity` | `$changes` | `array` |
+    | `CoreBundle\Entity\FormEntity` | `$new` | `bool` |
+
 - `Mautic\DashboardBundle\Entity\Widget::getParams()` and `::getTemplateData()` now declare a native `array` return type instead of a `@return array` docblock. If a plugin class extends `Widget` and overrides either method, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::getParams() must be compatible with Widget::getParams(): array".
 - Methods in Core and shared base classes, interfaces and traits that documented `@return array` now declare a native return type. If a plugin class implements one of these interfaces or overrides one of these methods, add a compatible return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with Y::method(): array". The return type is `array` unless noted:
 
