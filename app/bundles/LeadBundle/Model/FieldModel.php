@@ -799,7 +799,7 @@ class FieldModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
@@ -857,7 +857,7 @@ class FieldModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);

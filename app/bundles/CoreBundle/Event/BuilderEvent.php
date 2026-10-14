@@ -20,12 +20,11 @@ class BuilderEvent extends Event
     protected string $tokenFilterTarget;
 
     /**
-     * @param object|null     $entity
      * @param string|string[] $requested
      */
     public function __construct(
         protected TranslatorInterface $translator,
-        protected $entity = null,
+        protected ?object $entity = null,
         protected string|array $requested = 'all',
         protected string $tokenFilter = '',
     ) {

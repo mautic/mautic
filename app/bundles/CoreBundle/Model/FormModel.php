@@ -88,10 +88,9 @@ class FormModel extends AbstractCommonModel
     /**
      * Unlock an entity that prevents multiple people from editing.
      *
-     * @param object $entity
      * @param mixed  $extra  Can be used by model to determine what to unlock
      */
-    public function unlockEntity($entity, $extra = null): void
+    public function unlockEntity(object $entity, $extra = null): void
     {
         // unlock the row if applicable
         if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {
@@ -239,10 +238,9 @@ class FormModel extends AbstractCommonModel
     /**
      * Set timestamps and user ids.
      *
-     * @param object $entity
      * @param bool   $isNew
      */
-    public function setTimestamps(&$entity, $isNew, bool $unlock = true): void
+    public function setTimestamps(object &$entity, $isNew, bool $unlock = true): void
     {
         // unlock the row if applicable
         if ($unlock && method_exists($entity, 'setCheckedOut')) {
@@ -366,7 +364,7 @@ class FormModel extends AbstractCommonModel
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         throw new NotFoundHttpException('Object does not support edits.');
     }
@@ -375,9 +373,8 @@ class FormModel extends AbstractCommonModel
      * Dispatches events for child classes.
      *
      * @param string $action
-     * @param object $entity
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         // ...
 
@@ -406,9 +403,8 @@ class FormModel extends AbstractCommonModel
      * Set default subject for user contact form.
      *
      * @param string $subject
-     * @param object $entity
      */
-    public function getUserContactSubject($subject, $entity): string
+    public function getUserContactSubject($subject, object $entity): string
     {
         $msg = match ($subject) {
             'locked' => 'mautic.user.user.contact.locked',

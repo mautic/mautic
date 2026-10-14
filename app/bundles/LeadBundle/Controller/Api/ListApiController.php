@@ -279,10 +279,9 @@ final class ListApiController extends CommonApiController
     /**
      * Checks if user has permission to access retrieved entity.
      *
-     * @param object $entity
      * @param string $action view|create|edit|publish|delete
      */
-    protected function checkEntityAccess($entity, $action = 'view'): bool
+    protected function checkEntityAccess(?object $entity, $action = 'view'): bool
     {
         if ('create' == $action || 'edit' == $action || 'view' == $action) {
             return $this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN);

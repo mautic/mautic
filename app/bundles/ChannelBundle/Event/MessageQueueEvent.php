@@ -26,7 +26,7 @@ final class MessageQueueEvent extends CommonEvent
     /**
      * @param MessageQueue $entity
      */
-    public function setMessageQueue($entity): void
+    public function setMessageQueue(object $entity): void
     {
         $this->entity = $entity;
     }

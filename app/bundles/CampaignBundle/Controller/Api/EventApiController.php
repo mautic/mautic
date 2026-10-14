@@ -58,7 +58,7 @@ final class EventApiController extends CommonApiController
     /**
      * @param Event|FormEntity $entity
      */
-    protected function checkEntityAccess($entity, $action = 'view'): bool|Response
+    protected function checkEntityAccess(?object $entity, $action = 'view'): bool|Response
     {
         // Use the campaign for permission checks
         return parent::checkEntityAccess($entity->getCampaign(), $action);

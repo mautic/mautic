@@ -1564,7 +1564,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param Lead|array $entity
      */
-    public function populateCompanyData($entity, $config = []): array
+    public function populateCompanyData(object|array $entity, $config = []): array
     {
         if (!isset($config['companyFields'])) {
             $config = $this->mergeConfigToFeatureSettings($config);
@@ -2268,7 +2268,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return bool|\DateTime|null
      */
-    protected function getLastSyncDate($entity = null, array $params = [], $ignoreEntityChanges = true)
+    protected function getLastSyncDate(?object $entity = null, array $params = [], $ignoreEntityChanges = true)
     {
         $isNew = ($entity instanceof FormEntity) && $entity->isNew();
         if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {

@@ -362,12 +362,11 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before populating the form.
      *
-     * @param object $entity
      * @param string $action
      *
      * @return mixed
      */
-    protected function prePopulateForm($entity, array $parameters, $action = 'edit')
+    protected function prePopulateForm(object $entity, array $parameters, $action = 'edit')
     {
     }
 
@@ -381,7 +380,7 @@ class CommonApiController extends FetchCommonApiController
      *
      * @return mixed
      */
-    protected function preSaveEntity(&$entity, $form, array $parameters, $action = 'edit')
+    protected function preSaveEntity(object &$entity, $form, array $parameters, $action = 'edit')
     {
     }
 
@@ -396,11 +395,10 @@ class CommonApiController extends FetchCommonApiController
     }
 
     /**
-     * @param object             $entity
      * @param mixed[][]          $errors
      * @param array<object|null> $entities
      */
-    protected function processBatchForm(Request $request, $key, $entity, ?array $params, $method, array &$errors, array &$entities)
+    protected function processBatchForm(Request $request, $key, object $entity, ?array $params, $method, array &$errors, array &$entities)
     {
         $this->inBatchMode = true;
         $formResponse      = $this->processForm($request, $entity, $params, $method);
@@ -607,10 +605,7 @@ class CommonApiController extends FetchCommonApiController
         return $this->handleView($view);
     }
 
-    /**
-     * @param object $entity
-     */
-    protected function saveEntity($entity, int $statusCode): int
+    protected function saveEntity(object $entity, int $statusCode): int
     {
         $this->model->saveEntity($entity);
 
@@ -618,12 +613,11 @@ class CommonApiController extends FetchCommonApiController
     }
 
     /**
-     * @param object $entity
      * @param int    $categoryId
      *
      * @throws \UnexpectedValueException
      */
-    protected function setCategory($entity, $categoryId)
+    protected function setCategory(object $entity, $categoryId)
     {
         if (!empty($categoryId) && method_exists($entity, 'setCategory')) {
             $category = $this->doctrine->getManager()->find(Category::class, $categoryId);

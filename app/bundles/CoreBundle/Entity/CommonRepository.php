@@ -73,9 +73,8 @@ abstract class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param string $alias
-     * @param object $entity
      */
-    public function checkUniqueAlias($alias, $entity = null): int
+    public function checkUniqueAlias($alias, ?object $entity = null): int
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as aliascount')

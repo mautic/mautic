@@ -295,7 +295,7 @@ final class AssetController extends AbstractStandardFormController
      *
      * @param Asset $entity
      */
-    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $entity = null): Response
+    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, ?object $entity = null): Response
     {
         if (null == $entity) {
             $entity = $model->getEntity();

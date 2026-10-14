@@ -224,7 +224,7 @@ class LeadModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
@@ -298,7 +298,7 @@ class LeadModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         return $this->dispatchLeadEvent($action, $entity, $isNew, false);
     }

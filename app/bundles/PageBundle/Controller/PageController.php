@@ -383,7 +383,7 @@ final class PageController extends AbstractStandardFormController
      *
      * @param Page|null $entity
      */
-    public function newAction(Request $request, PageConfig $pageConfig, ThemeHelper $themeHelper, PageModel $model, $entity = null): Response
+    public function newAction(Request $request, PageConfig $pageConfig, ThemeHelper $themeHelper, PageModel $model, ?object $entity = null): Response
     {
         if (!$entity instanceof Page) {
             $entity = $model->getEntity();

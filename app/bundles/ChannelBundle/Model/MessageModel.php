@@ -94,7 +94,7 @@ final class MessageModel extends FormModel implements AjaxLookupModelInterface, 
      *
      * @return FormInterface<mixed>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!empty($action)) {
             $options['action'] = $action;
@@ -227,7 +227,7 @@ final class MessageModel extends FormModel implements AjaxLookupModelInterface, 
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Message) {
             throw new MethodNotAllowedHttpException(['Message']);

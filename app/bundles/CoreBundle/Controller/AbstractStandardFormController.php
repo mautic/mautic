@@ -78,30 +78,24 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Modify the cloned entity prior to sending through editAction.
      *
-     * @param object $entity
-     *
      * @return array<int, mixed> of arguments for editAction
      */
-    protected function afterEntityClone($newEntity, $entity): array
+    protected function afterEntityClone($newEntity, object $entity): array
     {
         return [$newEntity, true];
     }
 
     /**
      * Called after the entity has been persisted allowing for custom preperation of $entity prior to viewAction.
-     *
-     * @param object $entity
      */
-    protected function afterEntitySave($entity, Form $form, $action, $pass = null): void
+    protected function afterEntitySave(object $entity, Form $form, $action, $pass = null): void
     {
     }
 
     /**
      * Called after the form is validated on POST.
-     *
-     * @param object $entity
      */
-    protected function afterFormProcessed($isValid, $entity, Form $form, $action, bool $isClone = false): void
+    protected function afterFormProcessed($isValid, object $entity, Form $form, $action, bool $isClone = false): void
     {
     }
 
@@ -179,30 +173,24 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Modify entity prior to persisting or perform custom validation on the form.
      *
-     * @param object $entity
-     *
      * @return mixed Whatever is returned will be passed into afterEntitySave; pass false to fail validation
      */
-    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, bool $isClone = false): bool
+    protected function beforeEntitySave(object $entity, Form $form, $action, $objectId = null, bool $isClone = false): bool
     {
         return true;
     }
 
     /**
      * Do anything necessary before the form is checked for POST and processed.
-     *
-     * @param object $entity
      */
-    protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, bool $isClone = false): void
+    protected function beforeFormProcessed(object $entity, Form $form, $action, $isPost, $objectId = null, bool $isClone = false): void
     {
     }
 
     /**
-     * @param object|null $entity
-     *
      * @return bool|mixed
      */
-    protected function checkActionPermission($action, $entity = null, $objectId = null)
+    protected function checkActionPermission($action, ?object $entity = null, $objectId = null)
     {
         $permissionUser = 0;
 
@@ -1159,10 +1147,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * If the $entity supports optimistic locking, entity's current version is set to the $form for a later comparison.
-     *
-     * @param object $entity
      */
-    protected function setOptimisticLockVersion($entity, FormInterface $form): void
+    protected function setOptimisticLockVersion(object $entity, FormInterface $form): void
     {
         if (!$entity instanceof OptimisticLockInterface) {
             return;
@@ -1174,10 +1160,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * If the $entity supports optimistic locking, entity's current version is compared to the value in the $form.
-     *
-     * @param object $entity
      */
-    protected function checkOptimisticLockVersion($entity, FormInterface $form, bool $isClone): bool
+    protected function checkOptimisticLockVersion(object $entity, FormInterface $form, bool $isClone): bool
     {
         if ($isClone || !$entity instanceof OptimisticLockInterface) {
             return true;

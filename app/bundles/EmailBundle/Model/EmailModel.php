@@ -320,7 +320,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return FormInterface<Email>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -374,7 +374,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -2346,11 +2346,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @param object $entity
-     *
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    protected function setCachedCount(mixed $entity): void
+    protected function setCachedCount(object $entity): void
     {
         $queued = $this->cacheProvider->getSimpleCache()->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
 
