@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\ApiBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;

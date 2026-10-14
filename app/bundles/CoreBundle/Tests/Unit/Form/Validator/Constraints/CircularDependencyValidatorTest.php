@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
-
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\LeadList;

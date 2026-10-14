@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Test\ReflectionHelper;
-
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormEvent;

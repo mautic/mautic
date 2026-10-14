@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Stat;
 
 use Mautic\CoreBundle\Test\ReflectionHelper;
-
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;

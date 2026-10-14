@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
-
 use GuzzleHttp\Psr7\Response;
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

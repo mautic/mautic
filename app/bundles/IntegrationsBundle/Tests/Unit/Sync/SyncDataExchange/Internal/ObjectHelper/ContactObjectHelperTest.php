@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 use Doctrine\DBAL\Connection;
-
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;

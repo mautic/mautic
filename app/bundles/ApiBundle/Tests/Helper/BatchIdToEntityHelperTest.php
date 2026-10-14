@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\ApiBundle\Tests\Helper;
 
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
-
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -14,11 +13,6 @@ use PHPUnit\Framework\TestCase;
 #[AllowMockObjectsWithoutExpectations]
 final class BatchIdToEntityHelperTest extends TestCase
 {
-    private function setLeadId(Lead $lead, int $id): void
-    {
-        ReflectionHelper::setEntityId($lead, $id);
-    }
-
     public function testIdsAreExtractedFromIdKeyArray(): void
     {
         $parameters = ['ids' => [1, 2, 3]];
@@ -101,11 +95,11 @@ final class BatchIdToEntityHelperTest extends TestCase
     public function testOriginalKeyOrderingForIdKeyArray(): void
     {
         $entityMock1 = new Lead();
-        $this->setLeadId($entityMock1, 1);
+        ReflectionHelper::setEntityId($entityMock1, 1);
         $entityMock2 = new Lead();
-        $this->setLeadId($entityMock2, 2);
+        ReflectionHelper::setEntityId($entityMock2, 2);
         $entityMock4 = new Lead();
-        $this->setLeadId($entityMock4, 4);
+        ReflectionHelper::setEntityId($entityMock4, 4);
         // Simulating ID 3 as not found
         $entities = [$entityMock4, $entityMock2, $entityMock1];
 
@@ -137,11 +131,11 @@ final class BatchIdToEntityHelperTest extends TestCase
     public function testOriginalKeyOrderingForSimpleArray(): void
     {
         $entityMock1 = new Lead();
-        $this->setLeadId($entityMock1, 1);
+        ReflectionHelper::setEntityId($entityMock1, 1);
         $entityMock2 = new Lead();
-        $this->setLeadId($entityMock2, 2);
+        ReflectionHelper::setEntityId($entityMock2, 2);
         $entityMock4 = new Lead();
-        $this->setLeadId($entityMock4, 4);
+        ReflectionHelper::setEntityId($entityMock4, 4);
         // Simulating ID 3 as not found
         $entities = [$entityMock4, $entityMock2, $entityMock1];
 
@@ -159,11 +153,11 @@ final class BatchIdToEntityHelperTest extends TestCase
     public function testOriginalKeyOrderingForAssociativeArray(): void
     {
         $entityMock1 = new Lead();
-        $this->setLeadId($entityMock1, 1);
+        ReflectionHelper::setEntityId($entityMock1, 1);
         $entityMock2 = new Lead();
-        $this->setLeadId($entityMock2, 2);
+        ReflectionHelper::setEntityId($entityMock2, 2);
         $entityMock4 = new Lead();
-        $this->setLeadId($entityMock4, 4);
+        ReflectionHelper::setEntityId($entityMock4, 4);
         // Simulating ID 3 as not found
         $entities = [$entityMock4, $entityMock2, $entityMock1];
 
@@ -191,13 +185,13 @@ final class BatchIdToEntityHelperTest extends TestCase
     public function testOriginalKeyOrderingForFullAssociativeArray(): void
     {
         $entityMock1 = new Lead();
-        $this->setLeadId($entityMock1, 1);
+        ReflectionHelper::setEntityId($entityMock1, 1);
         $entityMock2 = new Lead();
-        $this->setLeadId($entityMock2, 2);
+        ReflectionHelper::setEntityId($entityMock2, 2);
         $entityMock3 = new Lead();
-        $this->setLeadId($entityMock3, 3);
+        ReflectionHelper::setEntityId($entityMock3, 3);
         $entityMock4 = new Lead();
-        $this->setLeadId($entityMock4, 4);
+        ReflectionHelper::setEntityId($entityMock4, 4);
         $entities = [$entityMock4, $entityMock2, $entityMock1, $entityMock3];
 
         $parameters = [

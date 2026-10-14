@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler\Mode;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -34,10 +33,10 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $contacts = new ArrayCollection([$contact1]);
 
         $campaign = new Campaign();
-        $this->setEntityId($campaign, 1);
+        ReflectionHelper::setEntityId($campaign, 1);
 
         $event = new Event();
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event->setCampaign($campaign);
         if ($startTime) {
@@ -105,7 +104,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
     public function testRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, ?\DateTime $specifiedHour = null, ?\DateTime $startTime = null, ?\DateTime $endTime = null, array $restrictedDays = [], int $triggerInterval = 0, string $intervalUnit = 'H'): void
     {
         $event = new Event();
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event->setTriggerRestrictedDaysOfWeek($restrictedDays);
         $event->setTriggerInterval($triggerInterval);
@@ -167,7 +166,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $scheduledOnDate = new \DateTime('now');
 
         $event = new Event();
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event->setTriggerRestrictedDaysOfWeek([]);
         $event->setTriggerInterval(10);
@@ -182,14 +181,14 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
     public function testContactsAreGrouped(): void
     {
         $campaign = new Campaign();
-        $this->setEntityId($campaign, 1);
+        ReflectionHelper::setEntityId($campaign, 1);
 
         $event = new Event();
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event->setTriggerHour('1970-01-01 06:00:00');
         $event->setTriggerRestrictedDaysOfWeek([]);
         $event->setCampaign($campaign);
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
 
         $interval = $this->getInterval();
         $contact1 = new Lead();
@@ -268,7 +267,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $compareFromDateTime = new \DateTime('now');
 
         $event = new Event();
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event->setTriggerIntervalUnit('d');
         $event->setTriggerInterval(1);
@@ -297,7 +296,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $compareFromDateTime = new \DateTime('now');
 
         $event = new Event();
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event->setTriggerIntervalUnit('S');
         $event->setTriggerInterval(0);
@@ -323,10 +322,10 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
     public function testIsContactSpecificExecutionDateRequiredIsFalseWhenNotCorrectTriggerMode(): void
     {
         $event = new Event();
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setTriggerMode(Event::TRIGGER_MODE_DATE);
         $event2 = new Event();
-        $this->setEntityId($event2, 2);
+        ReflectionHelper::setEntityId($event2, 2);
         $event2->setTriggerMode(Event::TRIGGER_MODE_IMMEDIATE);
 
         $interval = $this->getInterval();
@@ -338,17 +337,17 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
     public function testIsContactSpecificExecutionDateRequiredIsFalseWhenNotCorrectIntervalUnit(): void
     {
         $event = new Event();
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event->setTriggerIntervalUnit('i');
 
         $event2 = new Event();
-        $this->setEntityId($event2, 1);
+        ReflectionHelper::setEntityId($event2, 1);
         $event2->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event2->setTriggerIntervalUnit('h');
 
         $event3 = new Event();
-        $this->setEntityId($event3, 1);
+        ReflectionHelper::setEntityId($event3, 1);
         $event3->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event3->setTriggerIntervalUnit('s');
 
@@ -362,7 +361,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
     public function testIsContactSpecificExecutionDateRequiredIsTrueWithValidTriggerHour(): void
     {
         $event = new Event();
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event->setTriggerIntervalUnit('d');
         $event->setTriggerHour('now');
@@ -375,7 +374,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
     public function testIsContactSpecificExecutionDateRequiredIsTrueWithDayOfWeekRestrictions(): void
     {
         $event = new Event();
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event->setTriggerIntervalUnit('d');
         $event->setTriggerHour(null);
@@ -389,7 +388,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
     public function testIsContactSpecificExecutionDateRequiredIsTrueWithStartAndStopHours(): void
     {
         $event = new Event();
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event->setTriggerIntervalUnit('d');
         $event->setTriggerHour(null);
@@ -411,15 +410,10 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         return new Interval(new NullLogger(), $coreParametersHelper);
     }
 
-    private function setEntityId(object $entity, int $id): void
-    {
-        ReflectionHelper::setEntityId($entity, $id);
-    }
-
     public function testExecutionDateIsValidatedAsExpectedWithStartHourAndDaylightSavingsTimeChange(): void
     {
         $campaign = new Campaign();
-        $this->setEntityId($campaign, 1);
+        ReflectionHelper::setEntityId($campaign, 1);
 
         $event = new Event();
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
@@ -456,7 +450,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $compareFromDateTime = new \DateTime('now');
 
         $event = new Event();
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event->setTriggerIntervalUnit('i');
         $event->setTriggerInterval(0);
@@ -483,7 +477,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $parentEvent = new Event();
         $parentEvent->setEventType(Event::TYPE_DECISION);
         $event = new Event();
-        $this->setEntityId($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
         $event->setTriggerIntervalUnit('i');
         $event->setTriggerInterval(5);

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
-
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\DetermineWinnerSubscriber;

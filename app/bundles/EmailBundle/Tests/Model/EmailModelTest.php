@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CacheBundle\Cache\CacheProviderInterface;

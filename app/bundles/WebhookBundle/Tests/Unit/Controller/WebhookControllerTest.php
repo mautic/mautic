@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Tests\Unit\Controller;
 
 use Doctrine\Common\Collections\Order;
-
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;

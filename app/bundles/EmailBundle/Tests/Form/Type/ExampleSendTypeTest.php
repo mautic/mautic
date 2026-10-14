@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-
 use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Helper\UserHelper;

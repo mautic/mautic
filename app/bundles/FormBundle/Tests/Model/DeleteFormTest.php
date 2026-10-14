@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

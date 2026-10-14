@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\OptionsAccessor;
 
 use Mautic\CoreBundle\Test\ReflectionHelper;
-
 use Mautic\EmailBundle\OptionsAccessor\EmailToUserAccessor;
 use Mautic\UserBundle\Entity\User;
 

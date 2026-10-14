@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\UserBundle\Entity\User;

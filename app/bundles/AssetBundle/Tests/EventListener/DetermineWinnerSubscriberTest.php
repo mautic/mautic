@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\EventListener;
 
 use Mautic\AssetBundle\Entity\DownloadRepository;
-
 use Mautic\AssetBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Test\ReflectionHelper;

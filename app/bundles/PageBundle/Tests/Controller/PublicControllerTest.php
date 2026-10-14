@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
@@ -138,27 +137,22 @@ final class PublicControllerTest extends TestCase
         $this->assertSame('pageA', $this->getVariantContent(6, 3, 3));
     }
 
-    private function setEntityId(Page $page, int $id): void
-    {
-        ReflectionHelper::setEntityId($page, $id);
-    }
-
     private function getVariantContent(int $aCount, int $bCount, int $cCount): string
     {
         $pageEntityA = new Page();
-        $this->setEntityId($pageEntityA, 1);
+        ReflectionHelper::setEntityId($pageEntityA, 1);
         $pageEntityA->setVariantHits($aCount);
         $pageEntityA->setCustomHtml('pageA');
 
         $pageEntityB = new Page();
-        $this->setEntityId($pageEntityB, 2);
+        ReflectionHelper::setEntityId($pageEntityB, 2);
         $pageEntityB->setVariantParent($pageEntityA);
         $pageEntityB->setVariantHits($bCount);
         $pageEntityB->setCustomHtml('pageB');
         $pageEntityB->setVariantSettings(['weight' => '25']);
 
         $pageEntityC = new Page();
-        $this->setEntityId($pageEntityC, 3);
+        ReflectionHelper::setEntityId($pageEntityC, 3);
         $pageEntityC->setVariantParent($pageEntityA);
         $pageEntityC->setVariantHits($cCount);
         $pageEntityC->setCustomHtml('pageC');

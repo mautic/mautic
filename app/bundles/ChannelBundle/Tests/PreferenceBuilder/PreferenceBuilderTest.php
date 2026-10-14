@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\ChannelBundle\Tests\PreferenceBuilder;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;

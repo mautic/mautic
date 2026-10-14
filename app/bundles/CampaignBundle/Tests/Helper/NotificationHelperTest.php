@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Helper;
 
 use Mautic\CampaignBundle\Entity\Campaign;
-
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

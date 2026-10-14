@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\MarketplaceBundle\Tests\Functional\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\ComposerHelper;

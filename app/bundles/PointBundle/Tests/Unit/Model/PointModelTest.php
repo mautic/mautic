@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
-
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;

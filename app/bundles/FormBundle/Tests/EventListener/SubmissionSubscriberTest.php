@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Doctrine\Persistence\Event\LifecycleEventArgs;
-
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;

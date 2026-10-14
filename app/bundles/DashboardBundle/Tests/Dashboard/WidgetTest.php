@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Tests\Dashboard;
 
 use Mautic\CoreBundle\Helper\UserHelper;
-
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Entity\Widget as WidgetEntity;

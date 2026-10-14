@@ -75,6 +75,7 @@ final class MauticWriteSubscriberTest extends TestCase
             ->willReturn(false);
         $userMock = new User();
         $userMock->setFirstName('Pepa');
+        $userMock->setLastName('Novak');
 
         $this->userHelperMock
             ->expects($this->exactly(1))
@@ -87,7 +88,7 @@ final class MauticWriteSubscriberTest extends TestCase
         $this->formEntityMock
             ->expects($this->exactly(1))
             ->method('setModifiedByUser')
-            ->with('Pepa');
+            ->with('Pepa Novak');
         $this->formEntityMock
             ->expects($this->exactly(1))
             ->method('setDateModified')

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Model;
 
 use Mautic\CoreBundle\Exception\FileUploadException;
-
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Test\ReflectionHelper;

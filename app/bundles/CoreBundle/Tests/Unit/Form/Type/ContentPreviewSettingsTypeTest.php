@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
-
 use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;

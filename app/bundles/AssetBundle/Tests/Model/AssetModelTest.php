@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
-
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
