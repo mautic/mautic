@@ -79,6 +79,8 @@ final class DashboardModel extends FormModel
 
     /**
      * Load widgets for the current user from database.
+     *
+     * @return iterable<Widget>
      */
     public function getWidgets(bool $ignorePaginator = false): iterable
     {
