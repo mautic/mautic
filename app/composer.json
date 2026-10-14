@@ -106,7 +106,7 @@
     "symfony/validator": "~7.4.0",
     "symfonycasts/sass-bundle": "^0.9",
     "twilio/sdk": "^5.25",
-    "twbs/bootstrap-sass": "3.4.1",
+    "twbs/bootstrap": "5.3.8",
     "twig/string-extra": "^3.21",
     "wikimedia/less.php": "^5.5"
   },

@@ -6246,7 +6246,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "5ec4b3f5cb40abf32dae4afcd2512c2d7988e4a3"
+                "reference": "f2bdab57e52228a4d159442a2d48d94fae669df9"
             },
             "require": {
                 "api-platform/core": "^4.1.0",
@@ -6338,7 +6338,7 @@
                 "symfony/twig-bundle": "~7.4.0",
                 "symfony/validator": "~7.4.0",
                 "symfonycasts/sass-bundle": "^0.9",
-                "twbs/bootstrap-sass": "3.4.1",
+                "twbs/bootstrap": "5.3.8",
                 "twig/string-extra": "^3.21",
                 "twilio/sdk": "^5.25",
                 "wikimedia/less.php": "^5.5"
@@ -14519,61 +14519,54 @@
             "time": "2025-11-29T13:44:16+00:00"
         },
         {
-            "name": "twbs/bootstrap-sass",
-            "version": "v3.4.1",
+            "name": "twbs/bootstrap",
+            "version": "v5.3.8",
             "source": {
                 "type": "git",
-                "url": "https://github.com/twbs/bootstrap-sass.git",
-                "reference": "b34765d8a6aa775816c59012b2d6b30c4c66a8e9"
+                "url": "https://github.com/twbs/bootstrap.git",
+                "reference": "25aa8cc0b32f0d1a54be575347e6d84b70b1acd7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twbs/bootstrap-sass/zipball/b34765d8a6aa775816c59012b2d6b30c4c66a8e9",
-                "reference": "b34765d8a6aa775816c59012b2d6b30c4c66a8e9",
+                "url": "https://api.github.com/repos/twbs/bootstrap/zipball/25aa8cc0b32f0d1a54be575347e6d84b70b1acd7",
+                "reference": "25aa8cc0b32f0d1a54be575347e6d84b70b1acd7",
                 "shasum": ""
             },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.4.x-dev"
-                }
+            "replace": {
+                "twitter/bootstrap": "self.version"
             },
+            "type": "library",
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
-                    "name": "Mark Otto"
+                    "name": "Mark Otto",
+                    "email": "markdotto@gmail.com"
                 },
                 {
-                    "name": "Thomas McDonald"
-                },
-                {
-                    "name": "Tristan Harward"
-                },
-                {
-                    "name": "Peter Gumeson"
-                },
-                {
-                    "name": "Gleb Mazovetskiy"
-                },
-                {
-                    "name": "Jacob Thornton"
+                    "name": "Jacob Thornton",
+                    "email": "jacobthornton@gmail.com"
                 }
             ],
-            "description": "bootstrap-sass is a Sass-powered version of Bootstrap 3, ready to drop right into your Sass powered applications.",
-            "homepage": "http://github.com/twbs/bootstrap-sass",
+            "description": "The most popular front-end framework for developing responsive, mobile first projects on the web.",
+            "homepage": "https://getbootstrap.com/",
             "keywords": [
-                "bootstrap",
+                "JS",
                 "css",
-                "sass"
+                "framework",
+                "front-end",
+                "mobile-first",
+                "responsive",
+                "sass",
+                "web"
             ],
             "support": {
-                "issues": "https://github.com/twbs/bootstrap-sass/issues",
-                "source": "https://github.com/twbs/bootstrap-sass/tree/v3.4.1"
+                "issues": "https://github.com/twbs/bootstrap/issues",
+                "source": "https://github.com/twbs/bootstrap/tree/v5.3.8"
             },
-            "time": "2019-02-13T18:58:58+00:00"
+            "time": "2025-08-26T02:01:02+00:00"
         },
         {
             "name": "twig/string-extra",
