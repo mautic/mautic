@@ -526,7 +526,7 @@ final class SsoAuthenticatorTest extends TestCase
             ->with($integration, ['sso_form'], false, null, true)
             ->willReturn($integrations);
 
-        $user = $this->createStub(User::class);
+        $user = new User();
         $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($username)

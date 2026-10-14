@@ -49,7 +49,7 @@ final class IpAddressModelTest extends TestCase
     public function testSaveIpAddressReferencesForContactThatHasIpsButNoChanges(): void
     {
         $contact      = new Lead();
-        $ipAddress    = $this->createStub(IpAddress::class);
+        $ipAddress    = new IpAddress();
         $contact->getIpAddresses()->set('1.2.3.4', $ipAddress);
 
         $this->entityManager->expects($this->never())

@@ -48,7 +48,7 @@ final class CampaignModelTest extends CampaignTestAbstract
     {
         $model    = $this->initCampaignModel();
         $campaign = new Campaign();
-        $leadList = $this->createStub(LeadList::class);
+        $leadList = new LeadList();
 
         $this->entityManager->expects($this->once())
             ->method('find')
@@ -78,7 +78,7 @@ final class CampaignModelTest extends CampaignTestAbstract
     {
         $model    = $this->initCampaignModel();
         $campaign = new Campaign();
-        $form     = $this->createStub(Form::class);
+        $form     = new Form();
 
         $this->entityManager->expects($this->once())
             ->method('find')
@@ -94,7 +94,7 @@ final class CampaignModelTest extends CampaignTestAbstract
     {
         $model    = $this->initCampaignModel();
         $campaign = new Campaign();
-        $leadList = $this->createStub(LeadList::class);
+        $leadList = new LeadList();
 
         $this->entityManager->expects($this->once())
             ->method('find')
@@ -110,7 +110,7 @@ final class CampaignModelTest extends CampaignTestAbstract
     {
         $model    = $this->initCampaignModel();
         $campaign = new Campaign();
-        $form     = $this->createStub(Form::class);
+        $form     = new Form();
 
         $this->entityManager->expects($this->once())
             ->method('find')

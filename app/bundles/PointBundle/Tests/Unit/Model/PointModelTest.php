@@ -80,26 +80,12 @@ final class PointModelTest extends TestCase
         $pointName       = 'Point name';
         $pointProperties = ['property' => 'value'];
         $pointDelta      = 7;
-        $pointGroup      = null;
-        $ip              = $this->createStub(IpAddress::class);
+        $ip              = new IpAddress();
         $this->security->expects($this->once())->method('isAnonymous')->willReturn(true);
         $this->ipLookupHelper->expects($this->once())->method('getIpAddress')->willReturn($ip);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('adjustPoints')
-            ->with($pointDelta);
-        $lead->expects($this->once())
-            ->method('addPointsChangeLogEntry')
-            ->with(
-                'url',
-                $pointId.': '.$pointName,
-                'hit',
-                $pointDelta,
-                $ip,
-                $pointGroup
-            );
-        $eventDetails = $this->createStub(Hit::class);
+        $lead         = new Lead();
+        $eventDetails = new Hit();
 
         $pointActionHelper = $this->createMock(PointActionHelper::class);
         $pointActionHelper->expects($this->once())
@@ -171,5 +157,14 @@ final class PointModelTest extends TestCase
             ->with($lead);
 
         $this->pointModel->triggerAction($type, $eventDetails, null, $lead);
+
+        $this->assertSame($pointDelta, $lead->getPoints());
+        $this->assertCount(1, $lead->getPointsChangeLog());
+
+        $pointsChangeLog = $lead->getPointsChangeLog()->first();
+        $this->assertSame('url', $pointsChangeLog->getType());
+        $this->assertSame($pointId.': '.$pointName, $pointsChangeLog->getEventName());
+        $this->assertSame('hit', $pointsChangeLog->getActionName());
+        $this->assertSame($pointDelta, $pointsChangeLog->getDelta());
     }
 }

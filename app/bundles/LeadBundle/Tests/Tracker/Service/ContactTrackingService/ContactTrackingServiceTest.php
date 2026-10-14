@@ -170,7 +170,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
         $requestMock = new Request(['mtc_id' => $leadId]);
-        $leadMock    = $this->createStub(Lead::class);
+        $leadMock    = new Lead();
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -217,7 +217,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
         $requestMock = new Request(['mtc_id' => $leadId]);
-        $leadMock    = $this->createStub(Lead::class);
+        $leadMock    = new Lead();
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -264,7 +264,7 @@ final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
         $requestMock = $this->createStub(Request::class);
         $trackingId  = 'randomTrackingId';
         $leadId      = 1;
-        $leadMock    = $this->createStub(Lead::class);
+        $leadMock    = new Lead();
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')

@@ -143,7 +143,7 @@ BODY;
     public function testCreateReplyByHash(): void
     {
         $trackingHash = '@Stat#';
-        $contact      = $this->createStub(Lead::class);
+        $contact      = new Lead();
         $stat         = new Stat();
         $stat->setLead($contact);
 

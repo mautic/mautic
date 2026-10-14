@@ -66,7 +66,7 @@ final class EmailSubscriberTest extends TestCase
 
         $event->expects($this->once())
             ->method('getCurrentEmail')
-            ->willReturn($this->createStub(Email::class));
+            ->willReturn(new Email());
 
         $event->expects($this->once())
             ->method('isSaveAsDraft')
@@ -91,7 +91,7 @@ final class EmailSubscriberTest extends TestCase
 
         $event->expects($this->once())
             ->method('getCurrentEmail')
-            ->willReturn($this->createStub(Email::class));
+            ->willReturn(new Email());
 
         $event->expects($this->once())
             ->method('isApplyDraft')

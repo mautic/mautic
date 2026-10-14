@@ -172,7 +172,7 @@ final class DashboardSubscriberTest extends TestCase
         $nonEntityHasNoGetter->expects($this->once())
             ->method('getEntity')
             ->with(345)
-            ->willReturn($this->createStub(FormEntity::class));
+            ->willReturn(new FormEntity());
         $notLead       = $this->createMock(FormModel::class);
         $anonymousUser = new class() extends User {
             public function getName(bool $lastFirst = false): string

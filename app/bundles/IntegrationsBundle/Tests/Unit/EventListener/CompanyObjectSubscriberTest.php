@@ -130,7 +130,7 @@ final class CompanyObjectSubscriberTest extends TestCase
     {
         $event = new InternalObjectCreateEvent(new Company(), [['somefield' => 'somevalue']]);
 
-        $objectMapping = $this->createStub(ObjectMapping::class);
+        $objectMapping = new ObjectMapping();
         $this->companyObjectHelper->expects($this->once())
             ->method('create')
             ->with([['somefield' => 'somevalue']])
@@ -335,7 +335,7 @@ final class CompanyObjectSubscriberTest extends TestCase
     {
         $event = new InternalObjectFindByIdEvent(new Company());
         $event->setId(1);
-        $companyObj = $this->createStub(CompanyEntity::class);
+        $companyObj = new CompanyEntity();
         $this->companyObjectHelper->expects($this->once())
             ->method('findObjectById')
             ->with(1)

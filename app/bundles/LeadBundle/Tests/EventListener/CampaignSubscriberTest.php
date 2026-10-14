@@ -237,9 +237,9 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $campaignEvent->setType('lead.updatecompany');
         $campaignEvent->setProperties($this->configTo);
 
-        $leadEventLog = $this->createStub(LeadEventLog::class);
-        $leadEventLog->method('getLead')->willReturn($lead);
-        $leadEventLog->method('getId')->willReturn(1);
+        $leadEventLog = new LeadEventLog();
+        $leadEventLog->setLead($lead);
+        ReflectionHelper::setValue($leadEventLog, 'id', 1);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);

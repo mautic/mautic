@@ -29,7 +29,7 @@ final class ImportCommandTest extends TestCase
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);
         $translatorMock->method('trans')->willReturnCallback(fn (string $id): string => $id);
-        $importMock       = $this->createStub(Import::class);
+        $importMock       = new Import();
         $importModelMock  = $this->createMock(ImportModel::class);
         $loggerMock       = $this->createStub(Logger::class);
         $notificationMock = $this->createStub(NotificationModel::class);

@@ -179,7 +179,7 @@ abstract class PageTestAbstract extends TestCase
 
         $mockRedirectModel
             ->method('createRedirectEntity')
-            ->willReturn($this->createStub(Redirect::class));
+            ->willReturn(new Redirect());
 
         $mockRedirectModel
             ->method('generateRedirectUrl')

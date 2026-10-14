@@ -28,7 +28,7 @@ final class PointActionHelperTest extends TestCase
         $this->hitRepository = $this->createMock(HitRepository::class);
         $this->eventDetails  = new Hit();
 
-        $this->eventDetails->setLead($this->createStub(Lead::class));
+        $this->eventDetails->setLead(new Lead());
     }
 
     /**

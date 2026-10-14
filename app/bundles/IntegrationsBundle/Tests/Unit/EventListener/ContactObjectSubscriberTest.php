@@ -130,7 +130,7 @@ final class ContactObjectSubscriberTest extends TestCase
     {
         $event = new InternalObjectCreateEvent(new Contact(), [['somefield' => 'somevalue']]);
 
-        $objectMapping = $this->createStub(ObjectMapping::class);
+        $objectMapping = new ObjectMapping();
         $this->contactObjectHelper->expects($this->once())
             ->method('create')
             ->with([['somefield' => 'somevalue']])
@@ -338,7 +338,7 @@ final class ContactObjectSubscriberTest extends TestCase
     {
         $event = new InternalObjectFindByIdEvent(new Contact());
         $event->setId(1);
-        $contactObj = $this->createStub(Lead::class);
+        $contactObj = new Lead();
         $this->contactObjectHelper->expects($this->once())
             ->method('findObjectById')
             ->with(1)
