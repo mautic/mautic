@@ -19,6 +19,7 @@ export function render(name, options = {}) {
 
 export async function load(page, name, options = {}, extra = '') {
   await page.setContent(`<style>${readFileSync(resolve(core, `css/99.${name}.css`), 'utf8')}</style>${render(name, options)}${extra}`);
+  await page.addScriptTag({ path: resolve(core, 'js/98.component-runtime.js') });
   const script = resolve(core, `js/99.${name}.js`);
   if (existsSync(script)) await page.addScriptTag({ path: script });
 }

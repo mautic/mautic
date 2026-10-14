@@ -1,6 +1,6 @@
 # AnimatedCheckbox
 
-Native Twig/JavaScript equivalent of the Acervo Animate UI Checkbox and its Radix primitive. No React runtime is shipped.
+Native Twig/JavaScript equivalent of the Acervo Animate UI Checkbox. The animation runs on Motion (`motion` package), loaded once globally for every page through the shared component runtime. Templates ship no scripts.
 
 ```twig
 {% include '@MauticCore/Components/animated-checkbox.html.twig' with {
@@ -21,20 +21,30 @@ checkbox.update({ checked: false, onCheckedChange: (checked) => {
 } });
 ```
 
-The bubbling `mautic:animated-checkbox:change` event contains `{ checked }`. Native input/change events and form submission work in uncontrolled mode. Space toggles; Enter is suppressed like Radix. Form reset restores the initial state. Disabled fields are omitted from form data. AJAX insertions initialize automatically; removed nodes release listeners and animation handles.
+The bubbling `mautic:animated-checkbox:change` event contains `{ checked }`. Native input/change events and form submission work in uncontrolled mode. Enter is suppressed like Radix. Form reset restores the initial state. Disabled fields are omitted from form data. AJAX insertions initialize automatically; removed nodes release listeners and animation handles.
 
 Styles are scoped; `.dark` selects the original dark colors. Override `--acervo-primary`, `--acervo-primary-foreground`, `--acervo-background`, `--acervo-input`, `--acervo-foreground` and `--acervo-ring` to supply another theme.
 
+## Shared component runtime
+
+Components do not bundle Motion themselves. The runtime lives in `Assets/components/src` and is compiled to one global file:
+
+- `src/runtime.ts` exports `animate`, `hover`, `press`, `visualElementStore`, `emit`, `mountComponent` (registers a selector with a `MutationObserver` for AJAX insertions), `springScale` (the original hover/press spring) and `drawStroke` (the check/indeterminate draw).
+- `src/runtime-global.ts` publishes that module as `window.MauticComponents`.
+- `build.mjs` builds `Assets/js/98.component-runtime.js` once, and each component to `Assets/js/99.<name>.js` with `@mautic/components` resolved to the global runtime. Mautic loads every `Assets/js` file from every bundle, sorted, so `98` loads before `99` on every page without a per-page include.
+
+To add a component in another branch, write `src/<name>.ts` that imports from `@mautic/components`, add its name to `build.mjs`, and use `mountComponent`, `springScale` and `drawStroke` instead of copying the motion code.
+
+## Implementation
+
+- `Resources/views/Components/animated-checkbox.html.twig`: markup. A single `path` (check) or `line` (indeterminate) is rendered; the script swaps it on state change.
+- `Assets/components/src/animated-checkbox.ts`: state, events, form integration, gestures.
+- `Assets/css/99.animated-checkbox.css`: static visuals and focus ring.
+
+The hover and press scale uses `stiffness: 550`, `damping: 30`, `restSpeed: 10`. The check draws over 200 ms with ease-out after a 200 ms delay when checked; the indeterminate line draws immediately. Interruptions continue from the current animated values. Hover is ignored for touch pointers; press applies to the primary button and Enter.
+
 ## Verification
 
-From `app/bundles/CoreBundle/Assets/components`, run `npm ci`, `npm run build`, `npx playwright install --with-deps chromium`, `npm test`. Run these through DDEV locally. Tests render the actual Twig using the installed Twig package, type-check strict TypeScript, exercise Chromium and run Mautic's PHP minifier. CI discovers the suite in `core-components.yml`.
+From `app/bundles/CoreBundle/Assets/components`, run `npm ci`, `npm run build`, `npx playwright install --with-deps chromium`, `npm test` through DDEV. The Playwright suite renders the Twig through PHP and checks keyboard, pointer, form and controlled-state behavior (12 tests, all passing). Generated `Assets/js/98.component-runtime.js` and `Assets/js/99.*.js` must be committed; CI fails if they drift from the build.
 
-The original React component was rendered separately with its source theme tokens. Eighteen stable-state screenshots (three sizes, unchecked/checked/indeterminate, light/dark) matched dimensions and had zero differing pixels under Pixelmatch threshold 0.05.
-
-The committed React reference also verifies the PHP-minified assets in Chromium and compares animation trajectories: 24 configurations (all three sizes, both variants, both themes and both system motion preferences), 21 interaction sequences and 135 sampled frames per configuration. Scale, stroke length, opacity and dash offset are compared to four decimal places; SVG bounds use the same numeric tolerance and computed colors match exactly. Screenshots use Pixelmatch threshold 0.05. Small rasterization differences below that perceptual threshold are not byte-identical PNGs.
-
-The native implementation uses Motion's DOM renderer without React. Hover/press use the original default scale spring (`stiffness: 550`, `damping: 30`, `restSpeed: 10`). Gesture helpers preserve hover/tap priority, Enter, cancellation and pointer filtering. The check draws with 200ms ease-out after a 200ms delay; the indeterminate line draws immediately over 200ms. Changing shape replaces the old geometry immediately instead of fading two shapes together. Interruptions continue from the existing animated values. Initial SVG motion values are explicitly seeded to prevent accelerated opacity from leaving invalid presentation attributes.
-
-The reference ignores the system reduced-motion preference by default, so these DOM animations explicitly preserve that behavior instead of silently using the imperative Motion default. Color transitions retain Tailwind's 500ms cubic-bezier(.4,0,.2,1). Focus uses the original white ring offset; invalid ring colors retain the light/dark opacity differences. `--acervo-ring-offset-color` can override the offset color.
-
-The comparison harness synchronizes RAF and browser/compositor timelines without changing the source's keyframes or easing. It checks intermediate opacity and stroke progress, not just final states. See `Assets/components/tests/reference/README.md` for reference provenance and timing details. Run `npx playwright test tests/checkbox-motion.spec.mjs` for the focused animation suite. These cases do not establish equivalence for arbitrary custom Motion props or application overrides.
+Dependencies: `motion` (bundled into the runtime), `esbuild` and `typescript` (build), `@playwright/test` (tests). Nothing else.
