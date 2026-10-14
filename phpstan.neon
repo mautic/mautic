@@ -78,9 +78,9 @@ parameters:
                 - symplify.noArrayMapWithArrayCallable
                 - symfony.noListenerWithoutContract
                 - symfony.noFindTaggedServiceIdsCall
-                - return.unusedType
-                - property.unusedType
-                - assign.propertyType
+#                - return.unusedType
+#                - property.unusedType
+#                - assign.propertyType
 
         # type-perfect no_mixed_caller: rule enabled, violations typed incrementally; ignored wholesale for now
         -
