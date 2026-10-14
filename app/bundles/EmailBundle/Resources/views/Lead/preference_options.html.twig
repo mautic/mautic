@@ -4,7 +4,8 @@
 
 <script>
     function togglePreferredChannel(channel){
-        const status = document.getElementById(channel).checked;
+        const checkbox = document.querySelector('input[name^="lead_contact_frequency_rules[lead_channels][subscribed_channels]"][value="' + channel + '"]');
+        const status = checkbox ? checkbox.checked : false;
 
         const fields = [
             'lead_contact_frequency_rules_lead_channels_frequency_number_' + channel,
