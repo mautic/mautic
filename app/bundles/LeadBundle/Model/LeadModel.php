@@ -15,6 +15,7 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Event\AbstractEntityEvent;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -298,7 +299,7 @@ class LeadModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
     {
         return $this->dispatchLeadEvent($action, $entity, $isNew, false);
     }
