@@ -400,7 +400,7 @@ class CommonApiController extends FetchCommonApiController
      * @param mixed[][]          $errors
      * @param array<object|null> $entities
      */
-    protected function processBatchForm(Request $request, $key, object $entity, ?array $params, $method, array &$errors, array &$entities)
+    protected function processBatchForm(Request $request, $key, object $entity, ?array $params, string $method, array &$errors, array &$entities)
     {
         $this->inBatchMode = true;
         $formResponse      = $this->processForm($request, $entity, $params, $method);
