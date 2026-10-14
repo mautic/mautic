@@ -16,6 +16,9 @@
 
     {% for item in items %}
         {% set item_label = item.label|default('') %}
+        {% if item is defined and item.label is defined and item.label is null %}
+            {% set item_label = (item.name|default(name))|replace({'[': ' ', ']': ' ', '_': ' '})|trim|humanize %}
+        {% endif %}
         {% set item_value = item.value is defined ? item.value : loop.index0 %}
         {% set item_id = item.id|default(base_id ~ '-' ~ loop.index0 ~ '-' ~ item_value|replace({' ': '-', '.': '-', '_': '-', '[': '-', ']': ''})|lower) %}
         {% set item_name = item.name|default(name) %}
