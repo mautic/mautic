@@ -82,3 +82,59 @@ Mautic.showAnonymizeWarningMessage = function(anonymize_ip) {
         mQuery('.anonymize_ip_address').removeClass('hide');
     }
 };
+
+/**
+ * Each configuration page is saved on its own, so warn before leaving a page with unsaved changes.
+ */
+Mautic.initConfigUnsavedChangesGuard = function(container) {
+    const form = mQuery(container + ' form[name="config"]');
+
+    if (!form.length) {
+        return;
+    }
+
+    // A page that failed validation was not saved, so its submitted values are unsaved too
+    const failedValidation = form.find('.has-error').length > 0;
+    const initialState = form.serialize();
+    const hasUnsavedChanges = () => failedValidation || form.serialize() !== initialState;
+
+    Mautic.configLeaveGuard = function(event) {
+        const link = event.target.closest('a[data-toggle="ajax"]');
+
+        if (!link || event.ctrlKey || event.metaKey || !hasUnsavedChanges()) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        Mautic.showConfirmation(mQuery('<a />').data({
+            'message': Mautic.translate('mautic.config.form.unsaved_changes'),
+            'confirm-text': Mautic.translate('mautic.core.form.confirm'),
+            'confirm-callback': 'leaveConfigPage',
+            'cancel-text': Mautic.translate('mautic.core.form.cancel'),
+            'link': link
+        }));
+    };
+
+    Mautic.configBeforeUnloadGuard = function(event) {
+        if (hasUnsavedChanges()) {
+            event.preventDefault();
+        }
+    };
+
+    // Capture phase so the guard runs before the ajax link handlers
+    document.addEventListener('click', Mautic.configLeaveGuard, true);
+    globalThis.addEventListener('beforeunload', Mautic.configBeforeUnloadGuard);
+};
+
+Mautic.removeConfigUnsavedChangesGuard = function() {
+    document.removeEventListener('click', Mautic.configLeaveGuard, true);
+    globalThis.removeEventListener('beforeunload', Mautic.configBeforeUnloadGuard);
+};
+
+Mautic.leaveConfigPage = function(route, el) {
+    Mautic.dismissConfirmation();
+    Mautic.removeConfigUnsavedChangesGuard();
+    mQuery(el).data('link').click();
+};

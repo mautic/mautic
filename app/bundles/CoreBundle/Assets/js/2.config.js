@@ -64,5 +64,11 @@ Mautic.configOnLoad = function(container) {
             }
         });
     });
+
+    Mautic.initConfigUnsavedChangesGuard(container);
+};
+
+Mautic.configOnUnload = function() {
+    Mautic.removeConfigUnsavedChangesGuard();
 };
 
