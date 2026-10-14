@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Model;
 
+use Mautic\CoreBundle\Event\AbstractEntityEvent;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
@@ -11,7 +12,6 @@ use MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -76,7 +76,7 @@ final class MonitoringModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
     {
         if (!$entity instanceof Monitoring) {
             throw new MethodNotAllowedHttpException(['Monitoring']);

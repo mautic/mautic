@@ -7,6 +7,7 @@ use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\ChannelBundle\Event\MessageQueueEvent;
 use Mautic\ChannelBundle\Event\MessageQueueProcessEvent;
+use Mautic\CoreBundle\Event\AbstractEntityEvent;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -313,7 +314,7 @@ final class MessageQueueModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
     {
         switch ($action) {
             case 'process_message_queue':
