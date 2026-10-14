@@ -433,7 +433,7 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         // mergePoints: the loser's points are added to the winner
         $this->assertSame(100, $winner->getPoints());
         // mergeOwners: neither contact had an owner so the winner stays without one
-        $this->assertNull($winner->getOwner());
+        $this->assertNotInstanceOf(\Mautic\UserBundle\Entity\User::class, $winner->getOwner());
     }
 
     public function testMergeFieldWithEmptyFieldData(): void

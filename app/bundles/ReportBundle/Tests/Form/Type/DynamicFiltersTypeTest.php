@@ -99,7 +99,7 @@ final class DynamicFiltersTypeTest extends TestCase
     }
 
     /**
-     * @return array{report: MockObject, filterDefinitions: \stdClass}
+     * @return array{report: Report, filterDefinitions: \stdClass}
      */
     private function getBasicOptions(): array
     {

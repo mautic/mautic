@@ -54,7 +54,7 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->getSubscriber()->onIdentifyContact($event);
 
-        $this->assertEquals($lead->getId(), $event->getIdentifiedContact()->getId());
+        $this->assertSame($lead->getId(), $event->getIdentifiedContact()->getId());
     }
 
     public function testChannelMismatchDoesNotIdentify(): void

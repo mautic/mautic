@@ -63,13 +63,13 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
     private string $details = 'details';
 
-    private string $createdBy = 'createdBy';
+    private int $createdBy = 1;
 
     private User $owner;
 
     private string $ownerEmail = 'toEmail';
 
-    private ?string $modifiedBy = null;
+    private ?int $modifiedBy = null;
 
     private WebhookNotificationSender $webhookNotificationSender;
 
@@ -142,7 +142,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
     public function testSendToModifier(): void
     {
         $this->ownerEmail     = 'ownerEmail';
-        $this->modifiedBy     = 'modifiedBy';
+        $this->modifiedBy     = 2;
         $modifier             = new User();
         $modifierEmail        = 'modifierEmail';
 

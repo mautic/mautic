@@ -98,7 +98,7 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$this->trackedContact, []]);
 
         $helper = $this->getContactRequestHelper();
-        $this->assertEquals($this->trackedContact->getId(), $helper->getContactFromQuery($query)->getId());
+        $this->assertSame($this->trackedContact->getId(), $helper->getContactFromQuery($query)->getId());
     }
 
     public function testEventIdentifiesContact(): void

@@ -78,7 +78,7 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
 
         (new \ReflectionProperty($childField, 'id'))->setValue($childField, $childId);
         $childField->setSessionId($childId);
-        $childField->setParent($parentId);
+        $childField->setParent((string) $parentId);
 
         $form->addField(1, $childField);
 

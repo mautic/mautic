@@ -121,7 +121,7 @@ final class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame('email', $this->frequencyRuleEmail->getChannel());
         $this->assertSame($this->contact, $this->frequencyRuleEmail->getLead());
-        $this->assertNotNull($this->frequencyRuleEmail->getDateAdded());
+        $this->assertInstanceOf(\DateTimeInterface::class, $this->frequencyRuleEmail->getDateAdded());
         $this->assertSame('2', $this->frequencyRuleEmail->getFrequencyNumber());
         $this->assertSame('WEEK', $this->frequencyRuleEmail->getFrequencyTime());
         $this->assertEquals(new \DateTime('2018-05-13T00:00:00.000000+0000'), $this->frequencyRuleEmail->getPauseFromDate());
@@ -130,7 +130,7 @@ final class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame('sms', $this->frequencyRuleSms->getChannel());
         $this->assertSame($this->contact, $this->frequencyRuleSms->getLead());
-        $this->assertNotNull($this->frequencyRuleSms->getDateAdded());
+        $this->assertInstanceOf(\DateTimeInterface::class, $this->frequencyRuleSms->getDateAdded());
         $this->assertNull($this->frequencyRuleSms->getFrequencyNumber());
         $this->assertNull($this->frequencyRuleSms->getFrequencyTime());
         $this->assertNull($this->frequencyRuleSms->getPauseFromDate());
