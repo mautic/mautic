@@ -1089,7 +1089,11 @@ final class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
+<<<<<<< HEAD
      * @throws MatchingKeyNotFoundException
+=======
+     * @throws \MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
+>>>>>>> 0ba9a2605b (Add rule requiring native array/iterable type for array/iterable docblocks)
      */
     private function consumeResponse(array $response, string $zObject, bool $createIntegrationEntity = false, ?Mapper $mapper = null): int
     {

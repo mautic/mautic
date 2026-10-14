@@ -1469,7 +1469,11 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     /**
      * @return array<int, int>
      */
+<<<<<<< HEAD
     private function processCompositeResponse(?array $response): array
+=======
+    private function processCompositeResponse(array $response): array
+>>>>>>> 0ba9a2605b (Add rule requiring native array/iterable type for array/iterable docblocks)
     {
         $created         = 0;
         $errored         = 0;

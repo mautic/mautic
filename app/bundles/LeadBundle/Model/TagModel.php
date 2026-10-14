@@ -103,7 +103,7 @@ class TagModel extends FormModel
      * @param Tag|array<string, mixed>   $entity
      * @param array $options
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);
