@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -137,11 +138,9 @@ final class WebhookControllerTest extends TestCase
         $changes = ['dateIdentified' => $isNew];
 
         // Now send the lead update event.
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())->method('isAnonymous')->willReturn(false);
-        $lead->expects($this->once())->method('getChanges')
-            ->with(true)
-            ->willReturn($changes);
+        $lead = new Lead();
+        $lead->setEmail('contact@example.com');
+        $lead->setChanges($changes);
 
         $event = new LeadEvent($lead, $isNew);
 
@@ -172,19 +171,14 @@ final class WebhookControllerTest extends TestCase
                 return $clientResponse;
             });
 
-        $webhook = $this->createMock(Webhook::class);
-        $webhook->method('getId')
-            ->willReturn($webhookId);
-        $webhook->expects($this->once())->method('getMarkedUnhealthyAt')
-            ->willReturn(null);
-        $webhook->expects($this->once())->method('getWebhookUrl')
-            ->willReturn($url);
-        $webhook->expects($this->exactly(2))->method('getSecret')
-            ->willReturn($secret);
+        $webhook = new Webhook();
+        ReflectionHelper::setEntityId($webhook, $webhookId);
+        $webhook->setWebhookUrl($url);
+        $webhook->setSecret($secret);
 
-        $webhookEvent = $this->createMock(Event::class);
-        $webhookEvent->expects($this->once())->method('getWebhook')->willReturn($webhook);
-        $webhookEvent->expects($this->once())->method('getEventType')->willReturn($eventUnderTest);
+        $webhookEvent = new Event();
+        $webhookEvent->setWebhook($webhook);
+        $webhookEvent->setEventType($eventUnderTest);
 
         $webhookEventRepository = $this->createMock(EventRepository::class);
         $webhookEventRepository->expects($this->once())

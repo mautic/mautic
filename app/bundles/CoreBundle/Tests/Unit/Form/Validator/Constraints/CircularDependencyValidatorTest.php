@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -99,39 +100,27 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $mockEntity1 = $this->createMock(LeadList::class);
-        $mockEntity1
-            ->method('getId')
-            ->willReturn(1);
-        $mockEntity1
-            ->method('getFilters')
-            ->willReturn($filters);
+        $leadList1 = new LeadList();
+        ReflectionHelper::setEntityId($leadList1, 1);
+        $leadList1->setFilters($filters);
 
-        $mockEntity2 = $this->createMock(LeadList::class);
-        $mockEntity2
-            ->method('getId')
-            ->willReturn(2);
-        $mockEntity2
-            ->method('getFilters')
-            ->willReturn($filters2);
+        $leadList2 = new LeadList();
+        ReflectionHelper::setEntityId($leadList2, 2);
+        $leadList2->setFilters($filters2);
 
-        $mockEntity3 = $this->createMock(LeadList::class);
-        $mockEntity3
-            ->method('getId')
-            ->willReturn(3);
-        $mockEntity3
-            ->method('getFilters')
-            ->willReturn($filters3);
+        $leadList3 = new LeadList();
+        ReflectionHelper::setEntityId($leadList3, 3);
+        $leadList3->setFilters($filters3);
 
         $entities = [
-            1 => $mockEntity1,
-            2 => $mockEntity2,
-            3 => $mockEntity3,
+            1 => $leadList1,
+            2 => $leadList2,
+            3 => $leadList3,
         ];
 
         $this->mockListModel
             ->method('getEntity')
-            ->willReturnCallback(fn ($id): LeadList&\PHPUnit\Framework\MockObject\MockObject => $entities[$id]);
+            ->willReturnCallback(fn ($id): LeadList => $entities[$id]);
 
         if (!empty($expectedMessage)) {
             $this->context->expects($this->once())

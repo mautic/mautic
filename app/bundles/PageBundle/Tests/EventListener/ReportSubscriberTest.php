@@ -122,10 +122,8 @@ final class ReportSubscriberTest extends TestCase
             ])
             ->getMock();
 
-        $reportMock = $this->createMock(Report::class);
-        $reportMock->expects($this->once())
-            ->method('getGroupBy')
-            ->willReturn([]);
+        $reportMock = new Report();
+        $reportMock->setGroupBy([]);
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
@@ -172,10 +170,8 @@ final class ReportSubscriberTest extends TestCase
             ])
             ->getMock();
 
-        $reportMock = $this->createMock(Report::class);
-        $reportMock->expects($this->once())
-            ->method('getGroupBy')
-            ->willReturn([]);
+        $reportMock = new Report();
+        $reportMock->setGroupBy([]);
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()

@@ -10,6 +10,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
@@ -80,10 +81,9 @@ final class EventRepositoryTest extends TestCase
         $this->connection->method('createQueryBuilder')
             ->willReturnCallback(fn (): \PHPUnit\Framework\MockObject\MockObject => $queryBuilderMock);
 
-        $eventMock       = $this->createMock(Event::class);
-        $eventMock->method('getId')
-            ->willReturn(42);
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 42);
 
-        $eventRepository->decreaseFailedCount($eventMock);
+        $eventRepository->decreaseFailedCount($event);
     }
 }

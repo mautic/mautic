@@ -50,10 +50,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $emailRepository;
 
-    /**
-     * @var MockObject&Report
-     */
-    private MockObject $report;
+    private Report $report;
 
     private ChannelListHelper $channelListHelper;
 
@@ -84,24 +81,20 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(DncReportService::class),
         );
 
-        $this->report             = $this->createMock(Report::class);
+        $this->report             = new Report();
         $this->channelListHelper  = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
         $this->queryBuilder       = new QueryBuilder($this->connectionMock);
     }
 
     public function testOnReportGenerateForEmailStatsWhenDncIsUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSource')
-            ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
+        $this->report->setSource(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn([
-                'es.email_address',
-                'bounced',
-                'es.date_read',
-            ]);
+        $this->report->setColumns([
+            'es.email_address',
+            'bounced',
+            'es.date_read',
+        ]);
 
         $event = new ReportGeneratorEvent(
             $this->report,
@@ -120,13 +113,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportGenerateForEmailStatsWhenVariantIsUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSource')
-            ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
+        $this->report->setSource(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['vp.subject']);
+        $this->report->setColumns(['vp.subject']);
 
         $event = new ReportGeneratorEvent(
             $this->report,
@@ -145,17 +134,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportGenerateForEmailStatsWhenClickIsUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSource')
-            ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
+        $this->report->setSource(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['unique_hits']);
-
-        $this->report
-            ->method('getFilters')
-            ->willReturn([]);
+        $this->report->setColumns(['unique_hits']);
 
         $this->connectionMock->expects($this->exactly(2))
             ->method('createQueryBuilder')->willReturn(new QueryBuilder($this->connectionMock));
@@ -177,17 +158,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportGenerateForEmailStatsWhenCampaignIsUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSource')
-            ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
+        $this->report->setSource(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['cmp.name']);
-
-        $this->report
-            ->method('getFilters')
-            ->willReturn([]);
+        $this->report->setColumns(['cmp.name']);
 
         $this->connectionMock->expects($this->exactly(2))
             ->method('createQueryBuilder')->willReturn(new QueryBuilder($this->connectionMock));

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Stat;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
@@ -27,27 +28,21 @@ final class StatHelperTest extends \PHPUnit\Framework\TestCase
 
         $statHelper = new StatHelper($emailStatmodel, $mockStatRepository);
 
-        $mockEmail = $this->createMock(Email::class);
-        $mockEmail->method('getId')
-            ->willReturn(15);
+        $mockEmail = new Email();
+        $mockEmail->setId(15);
 
         $counter = 1;
         while ($counter <= 5) {
-            $stat = $this->createMock(Stat::class);
+            $stat = new Stat();
 
-            $stat->method('getId')
-                ->willReturn((string) $counter);
+            ReflectionHelper::setEntityId($stat, (string) $counter);
 
-            $stat->method('getEmail')
-                ->willReturn($mockEmail);
+            $stat->setEmail($mockEmail);
 
-            $lead = $this->createMock(Lead::class);
+            $lead = new Lead();
+            $lead->setId($counter * 10);
 
-            $lead->method('getId')
-                ->willReturn($counter * 10);
-
-            $stat->method('getLead')
-                ->willReturn($lead);
+            $stat->setLead($lead);
 
             $emailAddress = "contact{$counter}@test.com";
             $statHelper->storeStat($stat, $emailAddress);

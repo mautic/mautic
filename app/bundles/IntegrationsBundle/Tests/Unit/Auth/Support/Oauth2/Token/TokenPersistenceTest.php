@@ -59,10 +59,8 @@ final class TokenPersistenceTest extends TestCase
             'expires_at'    => $expiresAt,
         ]);
 
-        $integration = $this->createMock(Integration::class);
-        $integration->expects($this->once())
-            ->method('getApiKeys')
-            ->willReturn($apiKeys);
+        $integration = new Integration();
+        $integration->setApiKeys($apiKeys);
 
         $this->tokenPersistence->setIntegration($integration);
 
@@ -98,16 +96,9 @@ final class TokenPersistenceTest extends TestCase
         ];
 
         $token       = new IntegrationToken($newApiKeys['access_token'], $newApiKeys['refresh_token'], $newApiKeys['expires_at'], $extraData);
-        $integration = $this->createMock(Integration::class);
+        $integration = new Integration();
+        $integration->setApiKeys($oldApiKeys);
         $newApiKeys  = array_merge($oldApiKeys, $extraData, $newApiKeys);
-
-        $integration->expects($this->exactly(2))
-            ->method('getApiKeys')
-            ->willReturnOnConsecutiveCalls($oldApiKeys, $newApiKeys);
-
-        $integration->expects($this->once())
-            ->method('setApiKeys')
-            ->with($newApiKeys);
 
         $this->tokenPersistence->setIntegration($integration);
 
@@ -116,6 +107,7 @@ final class TokenPersistenceTest extends TestCase
 
         $this->tokenPersistence->saveToken($token);
 
+        $this->assertEquals($newApiKeys, $integration->getApiKeys());
         $this->assertTrue($this->tokenPersistence->hasToken());
     }
 
@@ -174,15 +166,7 @@ final class TokenPersistenceTest extends TestCase
         $refreshToken = 'refresh_token';
         $expiresAt    = 10;
 
-        $apiKeys = [
-            'access_token'  => $accessToken,
-            'refresh_token' => $refreshToken,
-            'expires_at'    => $expiresAt,
-        ];
-
-        $integration = $this->createMock(Integration::class);
-        $integration->expects($this->exactly(5))->method('getApiKeys')
-            ->willReturnOnConsecutiveCalls(null, $apiKeys, ['access_token' => $accessToken], null, null);
+        $integration = new Integration();
 
         $this->tokenPersistence->setIntegration($integration);
         $this->assertFalse($this->tokenPersistence->hasToken());
@@ -213,10 +197,8 @@ final class TokenPersistenceTest extends TestCase
             'expires_at'    => $expiresAt,
         ]);
 
-        $integration = $this->createMock(Integration::class);
-        $integration->expects($this->once())
-            ->method('getApiKeys')
-            ->willReturn($apiKeys);
+        $integration = new Integration();
+        $integration->setApiKeys($apiKeys);
 
         $this->tokenPersistence->setIntegration($integration);
 
@@ -241,10 +223,8 @@ final class TokenPersistenceTest extends TestCase
             'refresh_token' => $refreshToken,
         ]);
 
-        $integration = $this->createMock(Integration::class);
-        $integration->expects($this->once())
-            ->method('getApiKeys')
-            ->willReturn($apiKeys);
+        $integration = new Integration();
+        $integration->setApiKeys($apiKeys);
 
         $this->tokenPersistence->setIntegration($integration);
 
@@ -272,10 +252,8 @@ final class TokenPersistenceTest extends TestCase
             'expires_at'    => $expiresAt,
         ]);
 
-        $integration = $this->createMock(Integration::class);
-        $integration->expects($this->once())
-            ->method('getApiKeys')
-            ->willReturn($apiKeys);
+        $integration = new Integration();
+        $integration->setApiKeys($apiKeys);
 
         $this->tokenPersistence->setIntegration($integration);
 

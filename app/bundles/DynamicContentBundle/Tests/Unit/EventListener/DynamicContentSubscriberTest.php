@@ -280,7 +280,7 @@ HTML;
     </body>
 </html>
 HTML;
-        $contact = $this->createMock(Lead::class);
+        $contact = new Lead();
         $event   = $this->createMock(TokenReplacementEvent::class);
 
         $event
@@ -302,16 +302,13 @@ HTML;
                 'lead'               => 1,
             ]);
 
-        $contact
-            ->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn([
-                'id'        => 1,
-                'firstname' => 'John',
-                'lastname'  => 'Doe',
-                'company'   => 'Doe Corp',
-                'email'     => 'john@doe.com',
-            ]);
+        $contact->setFields([
+            'id'        => 1,
+            'firstname' => 'John',
+            'lastname'  => 'Doe',
+            'company'   => 'Doe Corp',
+            'email'     => 'john@doe.com',
+        ]);
 
         $this->companyLeadRepositoryMock->expects($this->once())
             ->method('getPrimaryCompanyByLeadId')

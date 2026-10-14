@@ -25,29 +25,17 @@ final class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
 
     public function testHydratedLeadsFromRepositoryAreFoundAndPushedIntoLogs(): void
     {
-        $lead1 = $this->createMock(Lead::class);
-        $lead1->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(1);
+        $lead1 = new Lead();
+        $lead1->setId(1);
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(2);
+        $lead2 = new Lead();
+        $lead2->setId(2);
 
-        $log1 = $this->createMock(LeadEventLog::class);
-        $log1->expects($this->exactly(2))
-            ->method('getLead')
-            ->willReturn($lead1);
-        $log1->expects($this->once())
-            ->method('setLead');
+        $log1 = new LeadEventLog();
+        $log1->setLead($lead1);
 
-        $log2 = $this->createMock(LeadEventLog::class);
-        $log2->expects($this->exactly(2))
-            ->method('getLead')
-            ->willReturn($lead2);
-        $log2->expects($this->once())
-            ->method('setLead');
+        $log2 = new LeadEventLog();
+        $log2->setLead($lead2);
 
         /** @var Collection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(
@@ -69,33 +57,24 @@ final class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($contacs);
 
         $this->getContactFinder()->hydrateContacts($logs);
+
+        $this->assertSame($lead1, $log1->getLead());
+        $this->assertSame($lead2, $log2->getLead());
     }
 
     public function testHydratedLeadsFromRepositoryWithMissingLeadResultsLogBeingRemoved(): void
     {
-        $lead1 = $this->createMock(Lead::class);
-        $lead1->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(1);
+        $lead1 = new Lead();
+        $lead1->setId(1);
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(2);
+        $lead2 = new Lead();
+        $lead2->setId(2);
 
-        $log1 = $this->createMock(LeadEventLog::class);
-        $log1->expects($this->exactly(2))
-            ->method('getLead')
-            ->willReturn($lead1);
-        $log1->expects($this->once())
-            ->method('setLead');
+        $log1 = new LeadEventLog();
+        $log1->setLead($lead1);
 
-        $log2 = $this->createMock(LeadEventLog::class);
-        $log2->expects($this->exactly(2))
-            ->method('getLead')
-            ->willReturn($lead2);
-        $log2->expects($this->never())
-            ->method('setLead');
+        $log2 = new LeadEventLog();
+        $log2->setLead($lead2);
 
         /** @var Collection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(
@@ -118,6 +97,7 @@ final class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->getContactFinder()->hydrateContacts($logs);
 
         $this->assertCount(1, $logs);
+        $this->assertSame($lead1, $log1->getLead());
     }
 
     public function testNoContactsFoundExceptionIsThrownIfEntitiesAreNotFound(): void

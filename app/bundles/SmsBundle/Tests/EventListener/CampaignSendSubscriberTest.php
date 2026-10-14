@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\EventListener\CampaignSendSubscriber;
@@ -119,13 +120,9 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerBatchAction(): void
     {
-        $sms = $this->createMock(Sms::class);
-        $sms
-            ->method('getId')
-            ->willReturn(1);
-        $sms
-            ->method('isPublished')
-            ->willReturn(true);
+        $sms = new Sms();
+        ReflectionHelper::setEntityId($sms, 1);
+        $sms->setIsPublished(true);
 
         // Partial mock, mocks just getRepository
         $smsModel = $this->getMockBuilder(SmsModel::class)

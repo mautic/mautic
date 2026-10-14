@@ -62,14 +62,9 @@ final class ImportCommandTest extends TestCase
         $translatorMock->method('trans')->willReturnCallback(fn (string $id): string => $id);
 
         // Import entity
-        $importMock = $this->createMock(Import::class);
-        $importMock->expects($this->once())
-            ->method('getModifiedBy')
-            ->willReturn(42);
-        $importMock->method('getProcessedRows')->willReturn(1);
-        $importMock->method('getInsertedCount')->willReturn(1);
-        $importMock->method('getUpdatedCount')->willReturn(0);
-        $importMock->method('getIgnoredCount')->willReturn(0);
+        $importMock = new Import();
+        $importMock->setModifiedBy(42);
+        $importMock->setInsertedCount(1);
 
         // Import Model Mock
         $importModelMock = $this->createMock(ImportModel::class);
@@ -130,15 +125,10 @@ final class ImportCommandTest extends TestCase
         $translatorMock = $this->createMock(TranslatorInterface::class);
         $translatorMock->method('trans')->willReturnCallback(fn (string $id): string => $id);
 
-        $importMock = $this->createMock(Import::class);
-        $importMock->expects($this->once())
-            ->method('getModifiedBy')
-            ->willReturn(42);
-        $importMock->method('getStatusInfo')->willReturn('fail');
-        $importMock->method('getProcessedRows')->willReturn(1);
-        $importMock->method('getInsertedCount')->willReturn(0);
-        $importMock->method('getUpdatedCount')->willReturn(0);
-        $importMock->method('getIgnoredCount')->willReturn(1);
+        $importMock = new Import();
+        $importMock->setModifiedBy(42);
+        $importMock->setStatusInfo('fail');
+        $importMock->setIgnoredCount(1);
 
         $importModelMock = $this->createMock(ImportModel::class);
         $importModelMock->expects($this->once())

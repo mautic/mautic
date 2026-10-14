@@ -23,17 +23,14 @@ final class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $translator;
 
-    /**
-     * @var MockObject&Widget
-     */
-    private MockObject $widget;
+    private Widget $widget;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->translator            = $this->createMock(Translator::class);
-        $this->widget                = $this->createMock(Widget::class);
+        $this->widget                = new Widget();
 
         $this->widgetDetailEvent = new GenerateWidgetDetailEvent(
             $this->translator,
@@ -45,9 +42,7 @@ final class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCacheKey(): void
     {
-        $this->widget
-            ->method('getParams')
-            ->willReturn(['dateFrom' => '', 'dateTo' => '']);
+        $this->widget->setParams(['dateFrom' => '', 'dateTo' => '']);
 
         $this->translator->expects($this->once())
             ->method('getLocale')

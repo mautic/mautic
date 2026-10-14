@@ -19,6 +19,7 @@ use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -86,47 +87,31 @@ final class ScheduledExecutionerTest extends TestCase
 
     public function testSpecificEventsAreExecuted(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->method('isPublished')
-            ->willReturn(true);
+        $campaign = new Campaign();
+        $campaign->setIsPublished(true);
 
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getCampaign')
-            ->willReturn($campaign);
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setCampaign($campaign);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(1);
+        $lead = new Lead();
+        $lead->setId(1);
 
-        $log1 = $this->createMock(LeadEventLog::class);
-        $log1->method('getId')
-            ->willReturn(1);
-        $log1->method('getEvent')
-            ->willReturn($event);
-        $log1->method('getCampaign')
-            ->willReturn($campaign);
-        $log1->method('getLead')
-            ->willReturn($lead);
-        $log1->method('getDateTriggered')
-            ->willReturn(new \DateTime());
-        $log1->method('getRotation')
-            ->willReturn(9);
+        $log1 = new LeadEventLog();
+        ReflectionHelper::setEntityId($log1, 1);
+        $log1->setEvent($event);
+        $log1->setCampaign($campaign);
+        $log1->setLead($lead);
+        $log1->setDateTriggered(new \DateTime());
+        $log1->setRotation(9);
 
-        $log2 = $this->createMock(LeadEventLog::class);
-        $log2->method('getId')
-            ->willReturn(2);
-        $log2->method('getEvent')
-            ->willReturn($event);
-        $log2->method('getCampaign')
-            ->willReturn($campaign);
-        $log2->method('getLead')
-            ->willReturn($lead);
-        $log2->method('getDateTriggered')
-            ->willReturn(new \DateTime());
-        $log2->method('getRotation')
-            ->willReturn(10);
+        $log2 = new LeadEventLog();
+        ReflectionHelper::setEntityId($log2, 2);
+        $log2->setEvent($event);
+        $log2->setCampaign($campaign);
+        $log2->setLead($lead);
+        $log2->setDateTriggered(new \DateTime());
+        $log2->setRotation(10);
 
         $logs = new ArrayCollection([1 => $log1, 2 => $log2]);
 
@@ -161,48 +146,31 @@ final class ScheduledExecutionerTest extends TestCase
 
     public function testSpecificEventsWithUnpublishedCampaign(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(false);
+        $campaign = new Campaign();
+        $campaign->setIsPublished(false);
 
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getCampaign')
-            ->willReturn($campaign);
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setCampaign($campaign);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(3);
+        $lead = new Lead();
+        $lead->setId(3);
 
-        $log1 = $this->createMock(LeadEventLog::class);
-        $log1->method('getId')
-            ->willReturn(1);
-        $log1->method('getEvent')
-            ->willReturn($event);
-        $log1->method('getCampaign')
-            ->willReturn($campaign);
-        $log1->method('getLead')
-            ->willReturn($lead);
-        $log1->method('getDateTriggered')
-            ->willReturn(new \DateTime());
-        $log1->method('getRotation')
-            ->willReturn(15);
+        $log1 = new LeadEventLog();
+        ReflectionHelper::setEntityId($log1, 1);
+        $log1->setEvent($event);
+        $log1->setCampaign($campaign);
+        $log1->setLead($lead);
+        $log1->setDateTriggered(new \DateTime());
+        $log1->setRotation(15);
 
-        $log2 = $this->createMock(LeadEventLog::class);
-        $log2->method('getId')
-            ->willReturn(2);
-        $log2->method('getEvent')
-            ->willReturn($event);
-        $log2->method('getCampaign')
-            ->willReturn($campaign);
-        $log2->method('getLead')
-            ->willReturn($lead);
-        $log2->method('getDateTriggered')
-            ->willReturn(new \DateTime());
-        $log2->method('getRotation')
-            ->willReturn(16);
+        $log2 = new LeadEventLog();
+        ReflectionHelper::setEntityId($log2, 2);
+        $log2->setEvent($event);
+        $log2->setCampaign($campaign);
+        $log2->setLead($lead);
+        $log2->setDateTriggered(new \DateTime());
+        $log2->setRotation(16);
 
         $logs = new ArrayCollection([1 => $log1, 2 => $log2]);
 

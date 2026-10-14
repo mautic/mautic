@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -12,6 +11,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\IpAddressModel;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -48,13 +48,9 @@ final class IpAddressModelTest extends TestCase
 
     public function testSaveIpAddressReferencesForContactThatHasIpsButNoChanges(): void
     {
-        $contact      = $this->createMock(Lead::class);
+        $contact      = new Lead();
         $ipAddress    = $this->createStub(IpAddress::class);
-        $ipAddresses  = new ArrayCollection(['1.2.3.4' => $ipAddress]);
-
-        $contact->expects($this->exactly(1))
-            ->method('getIpAddresses')
-            ->willReturn($ipAddresses);
+        $contact->getIpAddresses()->set('1.2.3.4', $ipAddress);
 
         $this->entityManager->expects($this->never())
             ->method('getConnection');
@@ -64,39 +60,15 @@ final class IpAddressModelTest extends TestCase
 
     public function testSaveIpAddressReferencesForContactThatHasIpsWithSomeAdded(): void
     {
-        $contact        = $this->createMock(Lead::class);
-        $ipAddressAdded = $this->createMock(IpAddress::class);
-        $ipAddressOld   = $this->createMock(IpAddress::class);
-        $ipAddresses    = new ArrayCollection(['1.2.3.999' => $ipAddressOld, '1.2.3.4' => $ipAddressAdded]);
+        $contact        = new Lead();
+        $contact->setId(55);
+        $ipAddressOld   = new IpAddress('1.2.3.999');
+        $contact->getIpAddresses()->set('1.2.3.999', $ipAddressOld);
+        $ipAddressAdded = new IpAddress('1.2.3.4');
+        ReflectionHelper::setEntityId($ipAddressAdded, 44);
+        $contact->addIpAddress($ipAddressAdded);
         $connection     = $this->createMock(Connection::class);
         $queryBuilder   = $this->createMock(QueryBuilder::class);
-
-        $contact->expects($this->exactly(2))
-            ->method('getIpAddresses')
-            ->willReturn($ipAddresses);
-
-        $contact->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(55);
-
-        $contact->expects($this->exactly(2))
-            ->method('getChanges')
-            ->willReturn(['ipAddressList' => ['1.2.3.4' => $ipAddressAdded]]);
-
-        $ipAddressAdded->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(44);
-
-        $ipAddressAdded->expects($this->once())
-            ->method('getIpAddress')
-            ->willReturn('1.2.3.4');
-
-        $ipAddressOld->expects($this->never())
-            ->method('getId');
-
-        $ipAddressOld->expects($this->once())
-            ->method('getIpAddress')
-            ->willReturn('1.2.3.999');
 
         $queryBuilder->expects($this->once())
             ->method('executeStatement');
@@ -116,31 +88,13 @@ final class IpAddressModelTest extends TestCase
 
     public function testSaveIpAddressReferencesForContactWhenSomeIpsIfTheReferenceExistsAlready(): void
     {
-        $contact      = $this->createMock(Lead::class);
-        $ipAddress    = $this->createMock(IpAddress::class);
-        $ipAddresses  = new ArrayCollection(['1.2.3.4' => $ipAddress]);
+        $contact      = new Lead();
+        $contact->setId(55);
+        $ipAddress    = new IpAddress('1.2.3.4');
+        ReflectionHelper::setEntityId($ipAddress, 44);
+        $contact->addIpAddress($ipAddress);
         $connection   = $this->createMock(Connection::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
-
-        $contact->expects($this->exactly(2))
-            ->method('getIpAddresses')
-            ->willReturn($ipAddresses);
-
-        $contact->expects($this->exactly(3))
-            ->method('getId')
-            ->willReturn(55);
-
-        $contact->expects($this->once())
-            ->method('getChanges')
-            ->willReturn(['ipAddressList' => ['1.2.3.4' => $ipAddress]]);
-
-        $ipAddress->expects($this->exactly(3))
-            ->method('getId')
-            ->willReturn(44);
-
-        $ipAddress->expects($this->once())
-            ->method('getIpAddress')
-            ->willReturn('1.2.3.4');
 
         $queryBuilder->expects($this->once())
             ->method('executeStatement')

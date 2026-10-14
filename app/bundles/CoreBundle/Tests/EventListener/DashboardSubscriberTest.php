@@ -122,10 +122,8 @@ final class DashboardSubscriberTest extends TestCase
 
     public function testSubscriberGatherLogs(): void
     {
-        $widget = $this->createMock(Widget::class);
-        $widget->expects($this->once())
-            ->method('getHeight')
-            ->willReturn(1500);
+        $widget = new Widget();
+        $widget->setHeight(1500);
         $this->event->expects($this->once())
             ->method('getType')
             ->willReturn(DashboardSubscriber::TYPE_RECENT_ACTIVITY);
@@ -176,8 +174,12 @@ final class DashboardSubscriberTest extends TestCase
             ->with(345)
             ->willReturn($this->createStub(FormEntity::class));
         $notLead       = $this->createMock(FormModel::class);
-        $anonymousUser = $this->createMock(User::class);
-        $anonymousUser->method('getName')->willReturn('mautic.lead.lead.anonymous');
+        $anonymousUser = new class() extends User {
+            public function getName(bool $lastFirst = false): string
+            {
+                return 'mautic.lead.lead.anonymous';
+            }
+        };
         $notLead->expects($this->once())
             ->method('getEntity')
             ->with(456)
@@ -185,8 +187,12 @@ final class DashboardSubscriberTest extends TestCase
         $notLead->method('getNameGetter')
             ->willReturn('getName');
         $notAnonymous = $this->createMock(FormModel::class);
-        $adminUser    = $this->createMock(User::class);
-        $adminUser->method('getName')->willReturn('admin');
+        $adminUser = new class() extends User {
+            public function getName(bool $lastFirst = false): string
+            {
+                return 'admin';
+            }
+        };
         $notAnonymous->expects($this->once())
             ->method('getEntity')
             ->with(567)

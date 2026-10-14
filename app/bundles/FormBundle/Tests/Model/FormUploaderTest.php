@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Model;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileUploader;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Crate\UploadFileCrate;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -32,59 +33,30 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $formUploader             = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
         $file1Mock                = $this->createStub(UploadedFile::class);
         $file2Mock                = $this->createStub(UploadedFile::class);
-        $form1Mock                = $this->createMock(Form::class);
-        $field1Mock               = $this->createMock(Field::class);
-        $form2Mock                = $this->createMock(Form::class);
-        $field2Mock               = $this->createMock(Field::class);
+        $form1                    = new Form();
+        ReflectionHelper::setEntityId($form1, $this->formId1);
+
+        $field1 = new Field();
+        ReflectionHelper::setEntityId($field1, 'fieldId1');
+        $field1->setForm($form1);
+        $field1->setAlias('file1');
+
+        $form2 = new Form();
+        ReflectionHelper::setEntityId($form2, $this->formId2);
+
+        $field2 = new Field();
+        ReflectionHelper::setEntityId($field2, 'fieldId2');
+        $field2->setForm($form2);
+        $field2->setAlias('file2');
 
         $coreParametersHelperMock->expects($this->exactly(2))
             ->method('get')
             ->with('form_upload_dir')
             ->willReturn($this->uploadDir);
 
-        $form1Mock->expects($this->once())
-            ->method('getId')
-            ->with()
-            ->willReturn($this->formId1);
-
-        $field1Mock->expects($this->once())
-            ->method('getId')
-            ->with()
-            ->willReturn('fieldId1');
-
-        $field1Mock->expects($this->once())
-            ->method('getForm')
-            ->with()
-            ->willReturn($form1Mock);
-
-        $field1Mock->expects($this->once())
-            ->method('getAlias')
-            ->with()
-            ->willReturn('file1');
-
-        $form2Mock->expects($this->once())
-            ->method('getId')
-            ->with()
-            ->willReturn($this->formId2);
-
-        $field2Mock->expects($this->once())
-            ->method('getId')
-            ->with()
-            ->willReturn('fieldId2');
-
-        $field2Mock->expects($this->once())
-            ->method('getForm')
-            ->with()
-            ->willReturn($form2Mock);
-
-        $field2Mock->expects($this->once())
-            ->method('getAlias')
-            ->with()
-            ->willReturn('file2');
-
         $filesToUpload = new UploadFileCrate();
-        $filesToUpload->addFile($file1Mock, $field1Mock);
-        $filesToUpload->addFile($file2Mock, $field2Mock);
+        $filesToUpload->addFile($file1Mock, $field1);
+        $filesToUpload->addFile($file2Mock, $field2);
 
         $submission = new Submission();
         $submission->setResults(['key' => 'value']);
@@ -130,51 +102,30 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $formUploader             = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
         $file1Mock                = $this->createStub(UploadedFile::class);
         $file2Mock                = $this->createStub(UploadedFile::class);
-        $form1Mock                = $this->createMock(Form::class);
-        $field1Mock               = $this->createMock(Field::class);
-        $form2Mock                = $this->createMock(Form::class);
-        $field2Mock               = $this->createMock(Field::class);
+        $form1                    = new Form();
+        ReflectionHelper::setEntityId($form1, $this->formId1);
+
+        $field1 = new Field();
+        ReflectionHelper::setEntityId($field1, 'fieldId1');
+        $field1->setForm($form1);
+        $field1->setAlias('file1');
+
+        $form2 = new Form();
+        ReflectionHelper::setEntityId($form2, $this->formId2);
+
+        $field2 = new Field();
+        ReflectionHelper::setEntityId($field2, 'fieldId2');
+        $field2->setForm($form2);
+        $field2->setAlias('file2');
 
         $coreParametersHelperMock->expects($this->exactly(2))
             ->method('get')
             ->with('form_upload_dir')
             ->willReturn($this->uploadDir);
 
-        $form1Mock->expects($this->once())
-            ->method('getId')
-            ->willReturn($this->formId1);
-
-        $field1Mock->expects($this->once())
-            ->method('getId')
-            ->willReturn('fieldId1');
-
-        $field1Mock->expects($this->once())
-            ->method('getForm')
-            ->willReturn($form1Mock);
-
-        $field1Mock->expects($this->once())
-            ->method('getAlias')
-            ->willReturn('file1');
-
-        $form2Mock->expects($this->once())
-            ->method('getId')
-            ->willReturn($this->formId2);
-
-        $field2Mock->expects($this->once())
-            ->method('getId')
-            ->willReturn('fieldId2');
-
-        $field2Mock->expects($this->once())
-            ->method('getForm')
-            ->willReturn($form2Mock);
-
-        $field2Mock->expects($this->once())
-            ->method('getAlias')
-            ->willReturn('file2');
-
         $filesToUpload = new UploadFileCrate();
-        $filesToUpload->addFile($file1Mock, $field1Mock);
-        $filesToUpload->addFile($file2Mock, $field2Mock);
+        $filesToUpload->addFile($file1Mock, $field1);
+        $filesToUpload->addFile($file2Mock, $field2);
 
         $submission = new Submission();
         $submission->setResults(['key' => 'value']);
@@ -248,28 +199,16 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
             ->with('form_upload_dir')
             ->willReturn($this->uploadDir);
 
-        $formMock = $this->createMock(Form::class);
+        $form = new Form();
+        ReflectionHelper::setEntityId($form, $this->formId1);
 
-        $formMock->expects($this->once())
-            ->method('getId')
-            ->with()
-            ->willReturn($this->formId1);
-
-        $fieldMock = $this->createMock(Field::class);
-
-        $fieldMock->expects($this->once())
-            ->method('getId')
-            ->with()
-            ->willReturn('fieldId1');
-
-        $fieldMock->expects($this->once())
-            ->method('getForm')
-            ->with()
-            ->willReturn($formMock);
+        $field = new Field();
+        ReflectionHelper::setEntityId($field, 'fieldId1');
+        $field->setForm($form);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
 
-        $actual = $formUploader->getCompleteFilePath($fieldMock, 'fileName');
+        $actual = $formUploader->getCompleteFilePath($field, 'fileName');
 
         $this->assertSame($this->uploadDir.'/1/fieldId1/fileName', $actual);
     }
@@ -291,37 +230,21 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
 
-        $formMock = $this->createMock(Form::class);
+        $form = new Form();
+        ReflectionHelper::setEntityId($form, $this->formId1);
 
-        $formMock->expects($this->once())
-            ->method('getId')
-            ->with()
-            ->willReturn($this->formId1);
+        $field = new Field();
+        ReflectionHelper::setEntityId($field, 'fieldId1');
+        $field->setForm($form);
+        $field->setType('file');
 
-        $fieldMock = $this->createMock(Field::class);
-
-        $fieldMock->expects($this->once())
-            ->method('getId')
-            ->with()
-            ->willReturn('fieldId1');
-
-        $fieldMock->expects($this->once())
-            ->method('getForm')
-            ->with()
-            ->willReturn($formMock);
-
-        $fieldMock->expects($this->once())
-            ->method('isFileType')
-            ->with()
-            ->willReturn(true);
-
-        $formUploader->deleteAllFilesOfFormField($fieldMock);
+        $formUploader->deleteAllFilesOfFormField($field);
     }
 
     public function testDeleteFilesOfForm(): void
     {
         $fileUploaderMock         = $this->createMock(FileUploader::class);
-        $formMock                 = $this->createMock(Form::class);
+        $form                     = new Form();
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
 
         $fileUploaderMock
@@ -334,15 +257,15 @@ final class FormUploaderTest extends \PHPUnit\Framework\TestCase
             ->with('form_upload_dir')
             ->willReturn($this->uploadDir);
 
-        $formMock->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturnOnConsecutiveCalls($this->formId1, null);
+        ReflectionHelper::setEntityId($form, $this->formId1);
 
         $formUploader = new FormUploader($fileUploaderMock, $coreParametersHelperMock);
-        $formUploader->deleteFilesOfForm($formMock);
+        $formUploader->deleteFilesOfForm($form);
 
-        $formMock->deletedId = $this->formId1;
+        // emulate Doctrine wiping the id after deletion, leaving only deletedId
+        ReflectionHelper::setEntityId($form, null);
+        $form->deletedId = $this->formId1;
 
-        $formUploader->deleteFilesOfForm($formMock);
+        $formUploader->deleteFilesOfForm($form);
     }
 }

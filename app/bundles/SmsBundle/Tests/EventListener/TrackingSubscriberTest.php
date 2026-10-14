@@ -35,13 +35,11 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             'stat'    => 'abc123',
         ];
 
-        $email = $this->createMock(Email::class);
-        $email->method('getId')
-            ->willReturn(1);
+        $email = new Email();
+        $email->setId(1);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(2);
+        $lead = new Lead();
+        $lead->setId(2);
 
         $stat = new Stat();
         $stat->setEmail($email);
@@ -56,7 +54,7 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->getSubscriber()->onIdentifyContact($event);
 
-        $this->assertEquals($lead->getId(), $event->getIdentifiedContact()->getId());
+        $this->assertSame($lead->getId(), $event->getIdentifiedContact()->getId());
     }
 
     public function testChannelMismatchDoesNotIdentify(): void
@@ -86,13 +84,11 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             'stat'    => 'abc123',
         ];
 
-        $email = $this->createMock(Email::class);
-        $email->method('getId')
-            ->willReturn(1);
+        $email = new Email();
+        $email->setId(1);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(2);
+        $lead = new Lead();
+        $lead->setId(2);
 
         $stat = new Stat();
         $stat->setEmail($email);
@@ -120,9 +116,8 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             'stat'    => 'abc123',
         ];
 
-        $email = $this->createMock(Email::class);
-        $email->method('getId')
-            ->willReturn(1);
+        $email = new Email();
+        $email->setId(1);
 
         $stat = new Stat();
         $stat->setEmail($email);

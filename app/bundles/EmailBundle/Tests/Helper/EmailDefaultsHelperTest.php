@@ -57,7 +57,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
     public function testResolvePreferenceCenterReturnsExplicitPreferenceCenter(): void
     {
-        $existingPage = $this->createPreferenceCenterPageMock(true);
+        $existingPage = $this->createPreferenceCenterPage(true);
 
         $email = new Email();
         $email->setPreferenceCenter($existingPage);
@@ -141,7 +141,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
     public function testResolvePreferenceCenterReturnsConfiguredDefaultForEmailsWithoutExplicitPreferenceCenter(): void
     {
-        $page = $this->createPreferenceCenterPageMock(true);
+        $page = $this->createPreferenceCenterPage(true);
 
         $this->coreParametersHelper->expects($this->once())->method('get')->with('email_default_preference_center_id')->willReturn(42);
 
@@ -170,7 +170,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
     public function testResolvePreferenceCenterReturnsNullForUnpublishedDefault(): void
     {
-        $page = $this->createPreferenceCenterPageMock(false);
+        $page = $this->createPreferenceCenterPage(false);
 
         $this->coreParametersHelper->expects($this->once())->method('get')->with('email_default_preference_center_id')->willReturn(42);
 
@@ -185,7 +185,7 @@ final class EmailDefaultsHelperTest extends TestCase
 
     public function testResolvePreferenceCenterReturnsNullForPublishedNonPreferenceCenterDefault(): void
     {
-        $page = $this->createPreferenceCenterPageMock(true, false);
+        $page = $this->createPreferenceCenterPage(true, false);
 
         $this->coreParametersHelper->expects($this->once())->method('get')->with('email_default_preference_center_id')->willReturn(42);
 
@@ -218,11 +218,11 @@ final class EmailDefaultsHelperTest extends TestCase
         $this->assertSame(['utmSource' => 'src'], $email->getUtmTags());
     }
 
-    private function createPreferenceCenterPageMock(bool $published, bool $isPreferenceCenter = true): Page&MockObject
+    private function createPreferenceCenterPage(bool $published, bool $isPreferenceCenter = true): Page
     {
-        $page = $this->createMock(Page::class);
-        $page->method('getIsPreferenceCenter')->willReturn($isPreferenceCenter);
-        $page->method('isPublished')->willReturn($published);
+        $page = new Page();
+        $page->setIsPreferenceCenter($isPreferenceCenter);
+        $page->setIsPublished($published);
 
         return $page;
     }

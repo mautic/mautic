@@ -62,10 +62,7 @@ final class EmailControllerTest extends TestCase
      */
     private MockObject $modelMock;
 
-    /**
-     * @var MockObject&Email
-     */
-    private MockObject $emailMock;
+    private Email $email;
 
     private EmailController $controller;
 
@@ -99,7 +96,7 @@ final class EmailControllerTest extends TestCase
         $this->containerMock = $this->createMock(Container::class);
         $this->routerMock    = $this->createMock(Router::class);
         $this->modelMock     = $this->createMock(EmailModel::class);
-        $this->emailMock     = $this->createMock(Email::class);
+        $this->email         = new Email();
         $this->twigMock      = $this->createMock(Environment::class);
 
         $this->formFactoryMock            = $this->createMock(FormFactory::class);
@@ -152,9 +149,6 @@ final class EmailControllerTest extends TestCase
             ->method('generate')
             ->willReturn('https://some.url');
 
-        $this->emailMock->expects($this->never())
-            ->method('isPublished');
-
         $request = $this->createMock(Request::class);
         $request->expects($this->once())
             ->method('getSession')
@@ -174,18 +168,13 @@ final class EmailControllerTest extends TestCase
         $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(5)
-            ->willReturn($this->emailMock);
+            ->willReturn($this->email);
 
         $this->routerMock
             ->method('generate')
             ->willReturn('https://some.url');
 
-        $this->emailMock->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(false);
-
-        $this->emailMock->expects($this->never())
-            ->method('getEmailType');
+        $this->email->setIsPublished(false);
 
         $request = $this->createMock(Request::class);
         $request->expects($this->once())
@@ -198,10 +187,6 @@ final class EmailControllerTest extends TestCase
 
     public function testThatExampleEmailsHaveTestStringInTheirSubject(): void
     {
-        $this->emailMock->expects($this->once())
-            ->method('setSubject')
-            ->with($this->stringStartsWith(EmailController::EXAMPLE_EMAIL_SUBJECT_PREFIX));
-
         $services = [
             ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->routerMock],
             ['form.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->formFactoryMock],
@@ -216,7 +201,7 @@ final class EmailControllerTest extends TestCase
         $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(1)
-            ->willReturn($this->emailMock);
+            ->willReturn($this->email);
 
         $this->corePermissionsMock->expects($this->once())
             ->method('hasEntityAccess')
@@ -254,6 +239,8 @@ final class EmailControllerTest extends TestCase
         $request = new Request();
         $this->requestStack->push($request);
         $this->controller->sendExampleAction($request, 1, $this->corePermissionsMock, $this->modelMock, $this->createStub(FakeContactHelper::class));
+
+        $this->assertStringStartsWith(EmailController::EXAMPLE_EMAIL_SUBJECT_PREFIX, (string) $this->email->getSubject());
     }
 
     public function testWinnerActionForDispatchManualWinnerEvent(): void
@@ -280,18 +267,14 @@ final class EmailControllerTest extends TestCase
             ->method('getMethod')
             ->willReturn(Request::METHOD_POST);
 
-        $this->emailMock->expects($this->once())
-            ->method('getVariantParent')
-            ->willReturn($this->emailMock);
-
         $this->modelMock->expects($this->once())
             ->method('getEntity')
             ->with(5)
-            ->willReturn($this->emailMock);
+            ->willReturn($this->email);
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(new ManualWinnerEvent($this->emailMock));
+            ->with(new ManualWinnerEvent($this->email));
 
         $this->requestStack->push($request);
         $this->controller->winnerAction($request, 5);

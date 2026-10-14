@@ -225,13 +225,11 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $device = new LeadDevice();
         $device->setTrackingId('abc123');
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(1);
+        $lead = new Lead();
+        $lead->setId(1);
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->method('getId')
-            ->willReturn(2);
+        $lead2 = new Lead();
+        $lead2->setId(2);
 
         $leadDevice1 = new LeadDevice();
         $leadDevice2 = new LeadDevice();

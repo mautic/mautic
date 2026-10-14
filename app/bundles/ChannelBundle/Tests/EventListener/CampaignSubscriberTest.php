@@ -18,6 +18,7 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\EventListener\CampaignSubscriber;
 use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Form\Type\EmailListType;
@@ -262,9 +263,8 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 'marketingMessage'    => '1',
             ]
         );
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->method('getId')
-            ->willReturn(1);
+        $campaign = new Campaign();
+        ReflectionHelper::setEntityId($campaign, 1);
 
         $event->setCampaign($campaign);
 
@@ -276,21 +276,18 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private function getLogs(): Collection
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(1);
-        $lead->expects($this->once())
-            ->method('getChannelRules')
-            ->willReturn(
-                [
-                    'sms' => [
-                        'dnc' => DoNotContact::IS_CONTACTABLE,
-                    ],
-                    'email' => [
-                        'dnc' => DoNotContact::IS_CONTACTABLE,
-                    ],
-                ]
-            );
+        $lead = new Lead();
+        $lead->setId(1);
+        $lead->setChannelRules(
+            [
+                'sms' => [
+                    'dnc' => DoNotContact::IS_CONTACTABLE,
+                ],
+                'email' => [
+                    'dnc' => DoNotContact::IS_CONTACTABLE,
+                ],
+            ]
+        );
 
         $log = $this->getMockBuilder(LeadEventLog::class)
             ->onlyMethods(['getLead', 'getId'])
@@ -300,21 +297,18 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $log->method('getId')
             ->willReturn(1);
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->method('getId')
-            ->willReturn(2);
-        $lead2->expects($this->once())
-            ->method('getChannelRules')
-            ->willReturn(
-                [
-                    'email' => [
-                        'dnc' => DoNotContact::IS_CONTACTABLE,
-                    ],
-                    'sms' => [
-                        'dnc' => DoNotContact::UNSUBSCRIBED,
-                    ],
-                ]
-            );
+        $lead2 = new Lead();
+        $lead2->setId(2);
+        $lead2->setChannelRules(
+            [
+                'email' => [
+                    'dnc' => DoNotContact::IS_CONTACTABLE,
+                ],
+                'sms' => [
+                    'dnc' => DoNotContact::UNSUBSCRIBED,
+                ],
+            ]
+        );
 
         $log2 = $this->getMockBuilder(LeadEventLog::class)
             ->onlyMethods(['getLead', 'getId'])

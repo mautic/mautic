@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
@@ -305,10 +306,8 @@ final class CommonApiControllerTest extends CampaignTestAbstract
 
         $users = [];
         foreach ([3, 5, 4] as $userId) {
-            $user = $this->createMock(User::class);
-            $user
-                ->method('getId')
-                ->willReturn($userId);
+            $user     = new User();
+            ReflectionHelper::setEntityId($user, $userId);
             $users[] = $user;
         }
 

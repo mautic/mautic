@@ -27,6 +27,14 @@ final class ReflectionHelper
     }
 
     /**
+     * Sets the "id" property on an entity via reflection, bypassing visibility.
+     */
+    public static function setEntityId(object $entity, mixed $id): void
+    {
+        self::setValue($entity, 'id', $id);
+    }
+
+    /**
      * Sets a static property value on a class via reflection, bypassing visibility.
      */
     public static function setStaticValue(string $class, string $property, mixed $value): void

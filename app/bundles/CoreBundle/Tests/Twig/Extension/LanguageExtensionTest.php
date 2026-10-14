@@ -31,8 +31,8 @@ final class LanguageExtensionTest extends TestCase
 
     public function testGetLanguageNameUsesUserLocale(): void
     {
-        $user = $this->createMock(User::class);
-        $user->method('getLocale')->willReturn('fr');
+        $user = new User();
+        $user->setLocale('fr');
         $security = $this->createMock(Security::class);
         $security->method('getUser')->willReturn($user);
         $extension = new LanguageExtension($security);

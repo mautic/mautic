@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\MarketplaceBundle\Controller\AjaxController;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
@@ -204,8 +205,8 @@ final class AjaxControllerTest extends AbstractMauticTestCase
         $cacheHelper->method('clearSymfonyCache')->willReturn(0);
 
         $userHelper = $this->createMock(UserHelper::class);
-        $user       = $this->createMock(User::class);
-        $user->method('getId')->willReturn(1);
+        $user     = new User();
+        ReflectionHelper::setEntityId($user, 1);
         $userHelper->method('getUser')->willReturn($user);
 
         $this->requestStack      = $this->createMock(RequestStack::class);
