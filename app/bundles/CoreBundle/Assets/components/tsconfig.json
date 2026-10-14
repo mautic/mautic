@@ -6,7 +6,10 @@
     "strict": true,
     "lib": ["ES2019", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@mautic/components": ["./src/runtime.ts"]
+    }
   },
   "include": ["src/**/*.ts"]
 }
