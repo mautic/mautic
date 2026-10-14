@@ -188,7 +188,7 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
  * @param target
  */
 Mautic.resetModal = function (target) {
-    if (mQuery(target).hasClass('in')) {
+    if (mQuery(target).hasClass('show')) {
         return;
     }
 
