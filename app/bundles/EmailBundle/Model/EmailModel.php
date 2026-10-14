@@ -62,6 +62,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DNC;
@@ -1098,6 +1099,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $progress = new ProgressBar($output, $totalLeadCount);
         }
 
+        /** @var LeadList $list */
         foreach ($lists as $list) {
             if (!$batch && null !== $limit && $limit <= 0) {
                 // Hit the max for this batch
@@ -2260,6 +2262,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         );
 
         $ids = [];
+        /** @var Email $entity */
         foreach ($entities as $entity) {
             $ids[] = $entity->getId();
         }

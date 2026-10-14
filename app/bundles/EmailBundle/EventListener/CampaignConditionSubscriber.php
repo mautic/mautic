@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -39,6 +40,7 @@ final readonly class CampaignConditionSubscriber implements EventSubscriberInter
 
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
+        /** @var Lead $lead */
         $lead = $event->getLead();
 
         try {

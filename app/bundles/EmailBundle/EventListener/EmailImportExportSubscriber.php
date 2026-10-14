@@ -65,6 +65,7 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
             return;
         }
 
+        /** @var \DateTimeInterface|null $variantStartDate */
         $variantStartDate = $email->getVariantStartDate();
 
         $emailData = [
