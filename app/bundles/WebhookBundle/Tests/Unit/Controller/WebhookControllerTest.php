@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Tests\Unit\Controller;
 
 use Doctrine\Common\Collections\Order;
+
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
@@ -15,6 +16,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -171,8 +173,7 @@ final class WebhookControllerTest extends TestCase
             });
 
         $webhook = new Webhook();
-        $webhookIdProperty = new \ReflectionProperty($webhook, 'id');
-        $webhookIdProperty->setValue($webhook, $webhookId);
+        ReflectionHelper::setEntityId($webhook, $webhookId);
         $webhook->setWebhookUrl($url);
         $webhook->setSecret($secret);
 

@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+
 use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -85,8 +87,7 @@ final class ExampleSendTypeTest extends TestCase
             ->willReturn(false);
 
         $user             = new User();
-        $userIdProperty   = new \ReflectionProperty($user, 'id');
-        $userIdProperty->setValue($user, $userId);
+        ReflectionHelper::setEntityId($user, $userId);
 
         $this->userHelperMock->expects($this->once())
             ->method('getUser')
@@ -172,8 +173,7 @@ final class ExampleSendTypeTest extends TestCase
             ->willReturn(false);
 
         $user             = new User();
-        $userIdProperty   = new \ReflectionProperty($user, 'id');
-        $userIdProperty->setValue($user, $userId);
+        ReflectionHelper::setEntityId($user, $userId);
 
         $this->userHelperMock->expects($this->once())
             ->method('getUser')

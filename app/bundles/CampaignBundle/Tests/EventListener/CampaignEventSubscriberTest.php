@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
@@ -19,6 +20,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventListener\CampaignEventSubscriber;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -141,8 +143,7 @@ final class CampaignEventSubscriberTest extends TestCase
 
         $mockEvent = new Event();
         $mockEvent->setCampaign($mockCampaign);
-        $eventId = new \ReflectionProperty($mockEvent, 'id');
-        $eventId->setValue($mockEvent, 42);
+        ReflectionHelper::setEntityId($mockEvent, 42);
 
         $mockEventLog = new LeadEventLog();
         $mockEventLog->setEvent($mockEvent);
@@ -190,8 +191,7 @@ final class CampaignEventSubscriberTest extends TestCase
 
         $mockEvent = new Event();
         $mockEvent->setCampaign($mockCampaign);
-        $eventId = new \ReflectionProperty($mockEvent, 'id');
-        $eventId->setValue($mockEvent, 42);
+        ReflectionHelper::setEntityId($mockEvent, 42);
 
         $mockEventLog = new LeadEventLog();
         $mockEventLog->setEvent($mockEvent);
@@ -238,8 +238,7 @@ final class CampaignEventSubscriberTest extends TestCase
 
         $eventMock = new Event();
         $eventMock->setCampaign(new Campaign());
-        $eventId = new \ReflectionProperty($eventMock, 'id');
-        $eventId->setValue($eventMock, 42);
+        ReflectionHelper::setEntityId($eventMock, 42);
 
         $mockEventLog = new LeadEventLog();
         $mockEventLog->setEvent($eventMock);
@@ -271,8 +270,7 @@ final class CampaignEventSubscriberTest extends TestCase
 
         $eventMock = new Event();
         $eventMock->setCampaign(new Campaign());
-        $eventId = new \ReflectionProperty($eventMock, 'id');
-        $eventId->setValue($eventMock, 1);
+        ReflectionHelper::setEntityId($eventMock, 1);
 
         $mockEventLog = new LeadEventLog();
         $mockEventLog->setEvent($eventMock);
@@ -305,8 +303,7 @@ final class CampaignEventSubscriberTest extends TestCase
 
         $eventMock = new Event();
         $eventMock->setCampaign($campaignMock);
-        $eventId = new \ReflectionProperty($eventMock, 'id');
-        $eventId->setValue($eventMock, 1);
+        ReflectionHelper::setEntityId($eventMock, 1);
 
         $leadMock = new Lead();
         $leadMock->setId(1);

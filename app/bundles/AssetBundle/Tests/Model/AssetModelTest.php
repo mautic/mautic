@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
+
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
@@ -18,6 +19,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -156,9 +158,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
     public function testTrackDownload(): void
     {
         $asset = new Asset();
-        $reflection = new \ReflectionClass($asset);
-        $idProperty = $reflection->getProperty('id');
-        $idProperty->setValue($asset, 1);
+        ReflectionHelper::setEntityId($asset, 1);
 
         $lead  = new Lead();
 

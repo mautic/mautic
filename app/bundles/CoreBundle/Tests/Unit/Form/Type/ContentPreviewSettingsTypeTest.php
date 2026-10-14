@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
+
 use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -174,7 +176,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->willReturn(false);
 
         $user = new User();
-        new \ReflectionProperty($user, 'id')->setValue($user, $userId);
+        ReflectionHelper::setEntityId($user, $userId);
 
         $this->userHelperMock->expects($this->once())
             ->method('getUser')
@@ -263,7 +265,7 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->willReturn(false);
 
         $user = new User();
-        new \ReflectionProperty($user, 'id')->setValue($user, $userId);
+        ReflectionHelper::setEntityId($user, $userId);
 
         $this->userHelperMock->expects($this->once())
             ->method('getUser')

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
+
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\SmsBundle\Entity\Sms;
@@ -36,8 +38,7 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
 
         $sms = new Sms();
-        $smsId = new \ReflectionProperty($sms, 'id');
-        $smsId->setValue($sms, 1);
+        ReflectionHelper::setEntityId($sms, 1);
 
         $lead = new Lead();
         $lead->setId(2);
@@ -86,8 +87,7 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
 
         $sms = new Sms();
-        $smsId = new \ReflectionProperty($sms, 'id');
-        $smsId->setValue($sms, 1);
+        ReflectionHelper::setEntityId($sms, 1);
 
         $lead = new Lead();
         $lead->setId(2);
@@ -119,8 +119,7 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
 
         $sms = new Sms();
-        $smsId = new \ReflectionProperty($sms, 'id');
-        $smsId->setValue($sms, 1);
+        ReflectionHelper::setEntityId($sms, 1);
 
         $stat = new Stat();
         $stat->setSms($sms);

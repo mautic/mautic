@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
@@ -28,7 +30,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $form->addField(0, $parentField);
         $field->setForm($form);
         $field->setParent($parentFieldId);
-        new \ReflectionProperty($parentField, 'id')->setValue($parentField, $parentFieldId);
+        ReflectionHelper::setEntityId($parentField, $parentFieldId);
 
         $this->assertFalse($field->showForConditionalField([]));
     }
@@ -44,7 +46,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'notIn', 'values' => []]);
-        new \ReflectionProperty($parentField, 'id')->setValue($parentField, $parentFieldId);
+        ReflectionHelper::setEntityId($parentField, $parentFieldId);
         $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => 'value A'];
 
@@ -62,7 +64,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'notIn', 'values' => [1]]);
-        new \ReflectionProperty($parentField, 'id')->setValue($parentField, $parentFieldId);
+        ReflectionHelper::setEntityId($parentField, $parentFieldId);
         $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => 0];
 
@@ -80,7 +82,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'notIn', 'values' => ['value A']]);
-        new \ReflectionProperty($parentField, 'id')->setValue($parentField, $parentFieldId);
+        ReflectionHelper::setEntityId($parentField, $parentFieldId);
         $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => 'value A'];
 
@@ -98,7 +100,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => '', 'any' => true, 'values' => ['value A']]);
-        new \ReflectionProperty($parentField, 'id')->setValue($parentField, $parentFieldId);
+        ReflectionHelper::setEntityId($parentField, $parentFieldId);
         $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => 'value A'];
 
@@ -116,7 +118,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => '', 'any' => true, 'values' => [1]]);
-        new \ReflectionProperty($parentField, 'id')->setValue($parentField, $parentFieldId);
+        ReflectionHelper::setEntityId($parentField, $parentFieldId);
         $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => 0];
 
@@ -134,7 +136,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'in', 'values' => ['value A']]);
-        new \ReflectionProperty($parentField, 'id')->setValue($parentField, $parentFieldId);
+        ReflectionHelper::setEntityId($parentField, $parentFieldId);
         $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => ['value A']];
 
@@ -152,7 +154,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'in', 'values' => ['value B']]);
-        new \ReflectionProperty($parentField, 'id')->setValue($parentField, 55);
+        ReflectionHelper::setEntityId($parentField, 55);
         $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => ['value A']];
 
@@ -170,7 +172,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setForm($form);
         $field->setParent($parentFieldId);
         $field->setConditions(['expr' => 'in', 'values' => ['0']]);
-        new \ReflectionProperty($parentField, 'id')->setValue($parentField, $parentFieldId);
+        ReflectionHelper::setEntityId($parentField, $parentFieldId);
         $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => [0]];
 
@@ -189,7 +191,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setParent($parentFieldId);
         $specialValue = 'čé+äà>&"\'è';
         $field->setConditions(['expr' => 'in', 'values' => [InputHelper::clean($specialValue)]]);
-        new \ReflectionProperty($parentField, 'id')->setValue($parentField, $parentFieldId);
+        ReflectionHelper::setEntityId($parentField, $parentFieldId);
         $parentField->setAlias($parentFieldAlias);
         $data = [$parentFieldAlias => [$specialValue]];
 

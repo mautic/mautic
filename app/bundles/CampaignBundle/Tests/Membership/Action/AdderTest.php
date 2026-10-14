@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Membership\Action;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
@@ -35,8 +37,7 @@ final class AdderTest extends \PHPUnit\Framework\TestCase
     public function testNewMemberAdded(): void
     {
         $campaign   = new Campaign();
-        $campaignId = new \ReflectionProperty($campaign, 'id');
-        $campaignId->setValue($campaign, 1);
+        ReflectionHelper::setEntityId($campaign, 1);
         $campaign->setAllowRestart(true);
 
         $contact = new Lead();

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 use Doctrine\DBAL\Connection;
+
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
@@ -62,9 +64,7 @@ final class CompanyObjectHelperTest extends TestCase
             ->method('saveEntity')
             ->willReturnCallback(function (Company $company) use ($idMap): void {
                 // Set ID
-                $reflection = new \ReflectionClass($company);
-                $property   = $reflection->getProperty('id');
-                $property->setValue($company, $idMap[$company->getEmail()]);
+                ReflectionHelper::setEntityId($company, $idMap[$company->getEmail()]);
             });
 
         $this->repository
@@ -110,9 +110,7 @@ final class CompanyObjectHelperTest extends TestCase
             ->method('saveEntity')
             ->willReturnCallback(function (Company $company) use ($idMap): void {
                 // Set ID
-                $reflection = new \ReflectionClass($company);
-                $property   = $reflection->getProperty('id');
-                $property->setValue($company, $idMap[$company->getEmail() ?? '']);
+                ReflectionHelper::setEntityId($company, $idMap[$company->getEmail() ?? '']);
             });
 
         $this->repository
@@ -163,11 +161,9 @@ final class CompanyObjectHelperTest extends TestCase
         ];
 
         $company1 = new Company();
-        $company1Id = new \ReflectionProperty($company1, 'id');
-        $company1Id->setValue($company1, 0);
+        ReflectionHelper::setEntityId($company1, 0);
         $company2 = new Company();
-        $company2Id = new \ReflectionProperty($company2, 'id');
-        $company2Id->setValue($company2, 1);
+        ReflectionHelper::setEntityId($company2, 1);
         $this->model->expects($this->once())
             ->method('getEntities')
             ->willReturn(

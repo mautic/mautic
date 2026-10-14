@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Helper;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
@@ -233,8 +235,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     private function createUser(int $id): User
     {
         $user       = new User();
-        $reflection = new \ReflectionProperty($user, 'id');
-        $reflection->setValue($user, $id);
+        ReflectionHelper::setEntityId($user, $id);
 
         return $user;
     }

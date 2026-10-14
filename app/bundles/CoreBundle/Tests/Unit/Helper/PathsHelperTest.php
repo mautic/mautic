@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -157,7 +159,7 @@ final class PathsHelperTest extends TestCase
         /** @var UserHelper&MockObject $userHelper */
         $userHelper           = $this->createMock(UserHelper::class);
         $user                 = new User();
-        new \ReflectionProperty($user, 'id')->setValue($user, 1);
+        ReflectionHelper::setEntityId($user, 1);
         $userHelper->expects($this->once())->method('getUser')
             ->willReturn($user);
 

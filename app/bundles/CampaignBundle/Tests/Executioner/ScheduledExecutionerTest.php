@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -19,6 +20,7 @@ use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -90,14 +92,14 @@ final class ScheduledExecutionerTest extends TestCase
         $campaign->setIsPublished(true);
 
         $event = new Event();
-        new \ReflectionProperty($event, 'id')->setValue($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setCampaign($campaign);
 
         $lead = new Lead();
         $lead->setId(1);
 
         $log1 = new LeadEventLog();
-        new \ReflectionProperty($log1, 'id')->setValue($log1, 1);
+        ReflectionHelper::setEntityId($log1, 1);
         $log1->setEvent($event);
         $log1->setCampaign($campaign);
         $log1->setLead($lead);
@@ -105,7 +107,7 @@ final class ScheduledExecutionerTest extends TestCase
         $log1->setRotation(9);
 
         $log2 = new LeadEventLog();
-        new \ReflectionProperty($log2, 'id')->setValue($log2, 2);
+        ReflectionHelper::setEntityId($log2, 2);
         $log2->setEvent($event);
         $log2->setCampaign($campaign);
         $log2->setLead($lead);
@@ -149,14 +151,14 @@ final class ScheduledExecutionerTest extends TestCase
         $campaign->setIsPublished(false);
 
         $event = new Event();
-        new \ReflectionProperty($event, 'id')->setValue($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
         $event->setCampaign($campaign);
 
         $lead = new Lead();
         $lead->setId(3);
 
         $log1 = new LeadEventLog();
-        new \ReflectionProperty($log1, 'id')->setValue($log1, 1);
+        ReflectionHelper::setEntityId($log1, 1);
         $log1->setEvent($event);
         $log1->setCampaign($campaign);
         $log1->setLead($lead);
@@ -164,7 +166,7 @@ final class ScheduledExecutionerTest extends TestCase
         $log1->setRotation(15);
 
         $log2 = new LeadEventLog();
-        new \ReflectionProperty($log2, 'id')->setValue($log2, 2);
+        ReflectionHelper::setEntityId($log2, 2);
         $log2->setEvent($event);
         $log2->setCampaign($campaign);
         $log2->setLead($lead);

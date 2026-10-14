@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mautic\ChannelBundle\Tests\PreferenceBuilder;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\ChannelBundle\PreferenceBuilder\ChannelPreferences;
 use Mautic\ChannelBundle\PreferenceBuilder\PreferenceBuilder;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -34,8 +36,7 @@ final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 
         $log = new LeadEventLog();
         $log->setLead($lead);
-        $logId = new \ReflectionProperty($log, 'id');
-        $logId->setValue($log, 1);
+        ReflectionHelper::setEntityId($log, 1);
 
         $lead2 = new Lead();
         $lead2->setChannelRules(
@@ -51,8 +52,7 @@ final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 
         $log2 = new LeadEventLog();
         $log2->setLead($lead2);
-        $log2Id = new \ReflectionProperty($log2, 'id');
-        $log2Id->setValue($log2, 2);
+        ReflectionHelper::setEntityId($log2, 2);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$log, $log2]);
@@ -115,8 +115,7 @@ final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 
         $log = new LeadEventLog();
         $log->setLead($lead);
-        $logId = new \ReflectionProperty($log, 'id');
-        $logId->setValue($log, 1);
+        ReflectionHelper::setEntityId($log, 1);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$log]);

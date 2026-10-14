@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
+
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -100,15 +102,15 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $leadList1 = new LeadList();
-        new \ReflectionProperty($leadList1, 'id')->setValue($leadList1, 1);
+        ReflectionHelper::setEntityId($leadList1, 1);
         $leadList1->setFilters($filters);
 
         $leadList2 = new LeadList();
-        new \ReflectionProperty($leadList2, 'id')->setValue($leadList2, 2);
+        ReflectionHelper::setEntityId($leadList2, 2);
         $leadList2->setFilters($filters2);
 
         $leadList3 = new LeadList();
-        new \ReflectionProperty($leadList3, 'id')->setValue($leadList3, 3);
+        ReflectionHelper::setEntityId($leadList3, 3);
         $leadList3->setFilters($filters3);
 
         $entities = [

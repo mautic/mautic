@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ConditionEvent;
@@ -14,6 +15,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -195,13 +197,11 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnCampaignTriggerActiononUpdateCompany(): void
     {
         $companyEntityFrom   = new Company();
-        $reflectionCompanyFromId = new \ReflectionProperty($companyEntityFrom, 'id');
-        $reflectionCompanyFromId->setValue($companyEntityFrom, $this->configFrom['id']);
+        ReflectionHelper::setEntityId($companyEntityFrom, $this->configFrom['id']);
         $companyEntityFrom->setName($this->configFrom['companyname']);
 
         $companyEntityTo = new Company();
-        $reflectionCompanyToId = new \ReflectionProperty($companyEntityTo, 'id');
-        $reflectionCompanyToId->setValue($companyEntityTo, $this->configTo['id']);
+        ReflectionHelper::setEntityId($companyEntityTo, $this->configTo['id']);
         $companyEntityTo->setName($this->configTo['companyname']);
         $companyEntityTo->setFields($this->configTo);
 
@@ -481,8 +481,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $leadEventLog = new LeadEventLog();
         $leadEventLog->setLead($lead);
-        $reflectionLeadEventLogId = new \ReflectionProperty($leadEventLog, 'id');
-        $reflectionLeadEventLogId->setValue($leadEventLog, 6);
+        ReflectionHelper::setEntityId($leadEventLog, 6);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);

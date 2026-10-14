@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Doctrine\Persistence\Event\LifecycleEventArgs;
+
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\Submission;
@@ -60,7 +62,7 @@ final class SubmissionSubscriberTest extends TestCase
     private function submissionForForm(int $formId): Submission
     {
         $form = new Form();
-        new \ReflectionProperty($form, 'id')->setValue($form, $formId);
+        ReflectionHelper::setEntityId($form, $formId);
 
         $submission = new Submission();
         $submission->setForm($form);

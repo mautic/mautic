@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler\Mode;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -411,8 +413,7 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
     private function setEntityId(object $entity, int $id): void
     {
-        $reflection = new \ReflectionProperty($entity, 'id');
-        $reflection->setValue($entity, $id);
+        ReflectionHelper::setEntityId($entity, $id);
     }
 
     public function testExecutionDateIsValidatedAsExpectedWithStartHourAndDaylightSavingsTimeChange(): void

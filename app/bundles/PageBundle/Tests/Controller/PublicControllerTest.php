@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
@@ -19,6 +20,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
@@ -138,8 +140,7 @@ final class PublicControllerTest extends TestCase
 
     private function setEntityId(Page $page, int $id): void
     {
-        $property = new \ReflectionProperty($page, 'id');
-        $property->setValue($page, $id);
+        ReflectionHelper::setEntityId($page, $id);
     }
 
     private function getVariantContent(int $aCount, int $bCount, int $cCount): string

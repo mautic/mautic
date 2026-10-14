@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\CampaignSubscriber;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
@@ -55,8 +57,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $leadEventLog = new LeadEventLog();
         $leadEventLog->setLead($lead);
-        $logId = new \ReflectionProperty($leadEventLog, 'id');
-        $logId->setValue($leadEventLog, 6);
+        ReflectionHelper::setEntityId($leadEventLog, 6);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
@@ -77,8 +78,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $leadEventLog = new LeadEventLog();
         $leadEventLog->setLead($lead);
         $leadEventLog->setIsScheduled(true);
-        $logId = new \ReflectionProperty($leadEventLog, 'id');
-        $logId->setValue($leadEventLog, 0);
+        ReflectionHelper::setEntityId($leadEventLog, 0);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
@@ -99,8 +99,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $leadEventLog = new LeadEventLog();
         $leadEventLog->setLead($lead);
-        $logId = new \ReflectionProperty($leadEventLog, 'id');
-        $logId->setValue($leadEventLog, 0);
+        ReflectionHelper::setEntityId($leadEventLog, 0);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
@@ -137,8 +136,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $leadEventLog = new LeadEventLog();
         $leadEventLog->setLead($lead);
-        $logId = new \ReflectionProperty($leadEventLog, 'id');
-        $logId->setValue($leadEventLog, 6);
+        ReflectionHelper::setEntityId($leadEventLog, 6);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\ApiBundle\Tests\Helper;
 
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
+
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
@@ -14,8 +16,7 @@ final class BatchIdToEntityHelperTest extends TestCase
 {
     private function setLeadId(Lead $lead, int $id): void
     {
-        $property = new \ReflectionProperty($lead, 'id');
-        $property->setValue($lead, $id);
+        ReflectionHelper::setEntityId($lead, $id);
     }
 
     public function testIdsAreExtractedFromIdKeyArray(): void

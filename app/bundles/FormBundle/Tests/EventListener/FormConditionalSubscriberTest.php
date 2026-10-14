@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
+
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormEvent;
@@ -47,9 +49,9 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
         $childId     = 'new_child_id';
         $form        = new Form();
 
-        new \ReflectionProperty($parentField, 'id')->setValue($parentField, $parentId);
+        ReflectionHelper::setEntityId($parentField, $parentId);
         $parentField->setSessionId($parentId);
-        new \ReflectionProperty($childField, 'id')->setValue($childField, $childId);
+        ReflectionHelper::setEntityId($childField, $childId);
         $childField->setSessionId($childId);
         $childField->setParent($parentId);
 
@@ -76,7 +78,7 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
         $childId     = 456;
         $form        = new Form();
 
-        new \ReflectionProperty($childField, 'id')->setValue($childField, $childId);
+        ReflectionHelper::setEntityId($childField, $childId);
         $childField->setSessionId($childId);
         $childField->setParent((string) $parentId);
 

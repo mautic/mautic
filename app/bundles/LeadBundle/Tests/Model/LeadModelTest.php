@@ -444,8 +444,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $lead->setId(1);
         $lead->setFields(['all' => 'sth']);
         $stageMock = new Stage();
-        $reflectionStageId = new \ReflectionProperty($stageMock, 'id');
-        $reflectionStageId->setValue($stageMock, 1);
+        ReflectionHelper::setEntityId($stageMock, 1);
         $data = ['stage' => $stageMock];
 
         $this->stagesChangeLogRepositoryMock->expects($this->once())

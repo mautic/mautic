@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
+
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Form;
@@ -49,7 +51,7 @@ final class DeleteFormTest extends \PHPUnit\Framework\TestCase
         $dispatcher            = $this->createMock(EventDispatcher::class);
         $formRepository        = $this->createMock(FormRepository::class);
         $form                  = new Form();
-        new \ReflectionProperty($form, 'id')->setValue($form, 1);
+        ReflectionHelper::setEntityId($form, 1);
         $mappedObjectCollector = $this->createStub(MappedObjectCollectorInterface::class);
         $formModel             = new FormModel(
             $requestStack,

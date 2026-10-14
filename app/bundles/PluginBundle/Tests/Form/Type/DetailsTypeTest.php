@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\PluginBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
+
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Form\Type\DetailsType;
 use Mautic\PluginBundle\Form\Type\KeysType;
@@ -182,8 +184,7 @@ final class DetailsTypeTest extends TestCase
 
         $integration = new Integration();
         if (null !== $integrationId) {
-            $idProperty = new \ReflectionProperty($integration, 'id');
-            $idProperty->setValue($integration, $integrationId);
+            ReflectionHelper::setEntityId($integration, $integrationId);
         }
         $integration->setSupportedFeatures(['configured']);
 

@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\ORM\EntityManager;
+
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Event\CompanyEvent;
@@ -141,8 +143,7 @@ final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
         );
 
         $company = new Company();
-        $reflectionCompanyId = new \ReflectionProperty($company, 'id');
-        $reflectionCompanyId->setValue($company, $companyId);
+        ReflectionHelper::setEntityId($company, $companyId);
 
         $event = $this->createMock(CompanyEvent::class);
         $event->expects($this->once())

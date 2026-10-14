@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository;
@@ -17,6 +18,7 @@ use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -77,7 +79,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     {
         $decision = new Event();
         $decision->setEventType(Event::TYPE_DECISION);
-        new \ReflectionProperty($decision, 'id')->setValue($decision, 1);
+        ReflectionHelper::setEntityId($decision, 1);
         $campaign = new Campaign();
         $campaign->addEvent(0, $decision);
 
@@ -96,10 +98,10 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     {
         $decision = new Event();
         $decision->setEventType(Event::TYPE_DECISION);
-        new \ReflectionProperty($decision, 'id')->setValue($decision, 1);
+        ReflectionHelper::setEntityId($decision, 1);
         $campaign = new Campaign();
         $campaign->addEvent(0, $decision);
-        new \ReflectionProperty($campaign, 'id')->setValue($campaign, 1);
+        ReflectionHelper::setEntityId($campaign, 1);
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
@@ -154,7 +156,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     {
         $campaign = new Campaign();
         $campaign->setIsPublished(true);
-        new \ReflectionProperty($campaign, 'id')->setValue($campaign, 1);
+        ReflectionHelper::setEntityId($campaign, 1);
 
         $decision = new Event();
         $decision->setCampaign($campaign);

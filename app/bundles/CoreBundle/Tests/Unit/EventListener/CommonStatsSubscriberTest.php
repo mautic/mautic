@@ -65,7 +65,7 @@ final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
         ReflectionHelper::setValue($this->subscirber, 'repositories', [$this->repository]);
         ReflectionHelper::setValue($this->subscirber, 'permissions', ['emails_stats' => ['lead' => 'lead:leads']]);
 
-        new \ReflectionProperty($this->user, 'id')->setValue($this->user, 9);
+        ReflectionHelper::setEntityId($this->user, 9);
         $matcher = $this->exactly(2);
 
         $this->security->expects($matcher)

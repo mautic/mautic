@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\EventListener;
 
 use Mautic\AssetBundle\Entity\DownloadRepository;
+
 use Mautic\AssetBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -66,11 +68,9 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translator->method('trans')
             ->willReturnOnConsecutiveCalls($transDownloads, $transHits);
 
-        $parentId = new \ReflectionProperty($parent, 'id');
-        $parentId->setValue($parent, 1);
+        ReflectionHelper::setEntityId($parent, 1);
 
-        $childId = new \ReflectionProperty($child, 'id');
-        $childId->setValue($child, 2);
+        ReflectionHelper::setEntityId($child, 2);
 
         $parent->setVariantStartDate($startDate);
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
+
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
@@ -14,6 +15,7 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -122,8 +124,7 @@ final class EventModelTest extends TestCase
         ];
 
         $redirectEvent = new Event();
-        $reflection    = new \ReflectionProperty($redirectEvent, 'id');
-        $reflection->setValue($redirectEvent, 123);
+        ReflectionHelper::setEntityId($redirectEvent, 123);
 
         $deletedEvents = [
             ['id' => 'new1', 'redirectEvent' => null],

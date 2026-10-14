@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\OptionsAccessor;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
+
 use Mautic\EmailBundle\OptionsAccessor\EmailToUserAccessor;
 use Mautic\UserBundle\Entity\User;
 
@@ -56,8 +58,7 @@ final class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $mockOwner = new User();
-        $ownerId   = new \ReflectionProperty($mockOwner, 'id');
-        $ownerId->setValue($mockOwner, 5);
+        ReflectionHelper::setEntityId($mockOwner, 5);
 
         $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }
@@ -76,8 +77,7 @@ final class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
         ];
 
         $mockOwner = new User();
-        $ownerId   = new \ReflectionProperty($mockOwner, 'id');
-        $ownerId->setValue($mockOwner, 6);
+        ReflectionHelper::setEntityId($mockOwner, 6);
 
         $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }

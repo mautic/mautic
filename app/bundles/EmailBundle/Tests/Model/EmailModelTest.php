@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
@@ -20,6 +21,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -765,9 +767,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $contactDevice = new LeadDevice();
         $ipAddress     = new IpAddress();
 
-        $reflection = new \ReflectionClass($contactDevice);
-        $prop       = $reflection->getProperty('id');
-        $prop->setValue($contactDevice, 1);
+        ReflectionHelper::setEntityId($contactDevice, 1);
 
         $stat->setLead($contact);
 

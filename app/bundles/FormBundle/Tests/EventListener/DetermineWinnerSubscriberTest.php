@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\PageBundle\Entity\Page;
@@ -66,8 +68,8 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $parent->setIsPublished(true);
         $child->setIsPublished(true);
-        new \ReflectionProperty($parent, 'id')->setValue($parent, 1);
-        new \ReflectionProperty($child, 'id')->setValue($child, 2);
+        ReflectionHelper::setEntityId($parent, 1);
+        ReflectionHelper::setEntityId($child, 2);
         $parent->setVariantStartDate($startDate);
 
         $this->submissionRepository->expects($this->once())

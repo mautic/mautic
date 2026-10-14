@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
+
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -118,8 +120,7 @@ final class PointModelTest extends TestCase
         $point = new Point();
         $point->setRepeatable(true);
         $point->setType($type);
-        $pointIdProperty = new \ReflectionProperty($point, 'id');
-        $pointIdProperty->setValue($point, $pointId);
+        ReflectionHelper::setEntityId($point, $pointId);
         $point->setName($pointName);
         $point->setProperties($pointProperties);
         $point->setDelta($pointDelta);

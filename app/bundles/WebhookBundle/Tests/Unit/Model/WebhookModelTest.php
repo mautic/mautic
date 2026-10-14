@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
+
 use GuzzleHttp\Psr7\Response;
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\EventRepository;
@@ -123,8 +125,7 @@ final class WebhookModelTest extends TestCase
         $queue->setPayload('{"the": "payload"}');
         $queue->setEvent($event);
         $queue->setDateAdded(new \DateTime('2018-04-10T15:04:57+00:00'));
-        $queueIdProperty = new \ReflectionProperty($queue, 'id');
-        $queueIdProperty->setValue($queue, '12');
+        ReflectionHelper::setEntityId($queue, '12');
 
         $this->parametersHelperMock->expects($this->exactly(8))->method('get')
             ->willReturnCallback(function ($param): string|int|null {

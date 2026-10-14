@@ -60,8 +60,7 @@ final class CompanyModelTest extends \PHPUnit\Framework\TestCase
 
         $duplicatedCompany = new Company();
         $duplicatedCompany->setFields(['companyfield' => 'xxx']);
-        $reflectionCompanyId = new \ReflectionProperty($duplicatedCompany, 'id');
-        $reflectionCompanyId->setValue($duplicatedCompany, 1);
+        ReflectionHelper::setEntityId($duplicatedCompany, 1);
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
 
         ReflectionHelper::setValue($companyModel, 'companyDeduper', $companyDeduper);
@@ -75,8 +74,7 @@ final class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyModel = $this->getCompanyModelForImport();
 
         $duplicatedCompany = new Company();
-        $reflectionCompanyId = new \ReflectionProperty($duplicatedCompany, 'id');
-        $reflectionCompanyId->setValue($duplicatedCompany, 1);
+        ReflectionHelper::setEntityId($duplicatedCompany, 1);
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
 
         ReflectionHelper::setValue($companyModel, 'companyDeduper', $companyDeduper);
@@ -131,8 +129,7 @@ final class CompanyModelTest extends \PHPUnit\Framework\TestCase
         $companyModel->method('getFieldData')->willReturn($data);
 
         $duplicatedCompany = new Company();
-        $reflectionCompanyId = new \ReflectionProperty($duplicatedCompany, 'id');
-        $reflectionCompanyId->setValue($duplicatedCompany, 1);
+        ReflectionHelper::setEntityId($duplicatedCompany, 1);
 
         $companyDeduper = $this->getCompanyDeduperForImport($duplicatedCompany);
         ReflectionHelper::setValue($companyModel, 'companyDeduper', $companyDeduper);

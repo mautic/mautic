@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ChannelBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -18,6 +19,7 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\EventListener\CampaignSubscriber;
 use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Form\Type\EmailListType;
@@ -263,8 +265,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ]
         );
         $campaign = new Campaign();
-        $reflectionCampaignId = new \ReflectionProperty($campaign, 'id');
-        $reflectionCampaignId->setValue($campaign, 1);
+        ReflectionHelper::setEntityId($campaign, 1);
 
         $event->setCampaign($campaign);
 

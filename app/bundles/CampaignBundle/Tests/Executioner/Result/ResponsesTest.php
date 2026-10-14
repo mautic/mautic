@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner\Result;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -17,14 +19,13 @@ final class ResponsesTest extends \PHPUnit\Framework\TestCase
 {
     public function testExtractingResponsesFromLog(): void
     {
-        $idProperty = new \ReflectionProperty(Event::class, 'id');
         $campaign   = new Campaign();
 
         $actionEvent = new Event();
         $actionEvent->setCampaign($campaign);
         $actionEvent->setEventType(Event::TYPE_ACTION);
         $actionEvent->setType('actionEvent');
-        $idProperty->setValue($actionEvent, 1);
+        ReflectionHelper::setEntityId($actionEvent, 1);
 
         // BC should set response as just test
         $actionLog = new LeadEventLog();
@@ -35,7 +36,7 @@ final class ResponsesTest extends \PHPUnit\Framework\TestCase
         $action2Event->setCampaign($campaign);
         $action2Event->setEventType(Event::TYPE_ACTION);
         $action2Event->setType('action2Event');
-        $idProperty->setValue($action2Event, 2);
+        ReflectionHelper::setEntityId($action2Event, 2);
 
         // Response should be full array
         $action2Log = new LeadEventLog();
@@ -47,7 +48,7 @@ final class ResponsesTest extends \PHPUnit\Framework\TestCase
         $conditionEvent->setCampaign($campaign);
         $conditionEvent->setEventType(Event::TYPE_CONDITION);
         $conditionEvent->setType('conditionEvent');
-        $idProperty->setValue($conditionEvent, 3);
+        ReflectionHelper::setEntityId($conditionEvent, 3);
 
         $conditionLog = new LeadEventLog();
         $conditionLog->setEvent($conditionEvent);

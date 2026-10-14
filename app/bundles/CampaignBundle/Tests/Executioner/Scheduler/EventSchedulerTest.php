@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -19,6 +20,7 @@ use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Optimized;
 use Mautic\CampaignBundle\Service\PublishStateService;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Services\PeakInteractionTimer;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -138,7 +140,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     public function testEventDoesNotGetRescheduledForRelativeTimeWhenValidated(): void
     {
         $campaign = new Campaign();
-        new \ReflectionProperty($campaign, 'id')->setValue($campaign, 1);
+        ReflectionHelper::setEntityId($campaign, 1);
 
         $event = new Event();
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
@@ -147,7 +149,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $event->setTriggerHour('1970-01-01 09:00:00');
         $event->setTriggerRestrictedDaysOfWeek([]);
         $event->setCampaign($campaign);
-        new \ReflectionProperty($event, 'id')->setValue($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00', new \DateTimeZone('America/New_York'));
@@ -177,7 +179,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     public function testEventIsRescheduledForRelativeTimeIfAppropriate(): void
     {
         $campaign = new Campaign();
-        new \ReflectionProperty($campaign, 'id')->setValue($campaign, 1);
+        ReflectionHelper::setEntityId($campaign, 1);
 
         $event = new Event();
         $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
@@ -186,7 +188,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $event->setTriggerHour('1970-01-01 11:00:00');
         $event->setTriggerRestrictedDaysOfWeek([]);
         $event->setCampaign($campaign);
-        new \ReflectionProperty($event, 'id')->setValue($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00');
@@ -217,7 +219,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
     public function testEventDoesNotGetRescheduledForRelativeTimeWithDowWhenValidated(): void
     {
         $campaign = new Campaign();
-        new \ReflectionProperty($campaign, 'id')->setValue($campaign, 1);
+        ReflectionHelper::setEntityId($campaign, 1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00', new \DateTimeZone('America/New_York'));
@@ -237,7 +239,7 @@ final class EventSchedulerTest extends \PHPUnit\Framework\TestCase
         $event->setTriggerRestrictedDaysOfWeek([$dow]);
         $event->setCampaign($campaign);
         $event->setTriggerIntervalUnit('d');
-        new \ReflectionProperty($event, 'id')->setValue($event, 1);
+        ReflectionHelper::setEntityId($event, 1);
 
         $contact = new Lead();
         $contact->setId(1);

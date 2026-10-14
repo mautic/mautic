@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Tests\Dashboard;
 
 use Mautic\CoreBundle\Helper\UserHelper;
+
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Entity\Widget as WidgetEntity;
 use Mautic\DashboardBundle\Model\DashboardModel;
@@ -43,7 +45,7 @@ final class WidgetTest extends TestCase
         $this->userHelper     = $this->createMock(UserHelper::class);
 
         $this->user = new User();
-        new \ReflectionProperty($this->user, 'id')->setValue($this->user, self::USER_ID);
+        ReflectionHelper::setEntityId($this->user, self::USER_ID);
 
         $this->widget = new Widget(
             $this->dashboardModel,
@@ -56,7 +58,7 @@ final class WidgetTest extends TestCase
     {
         $widgetId = 2;
         $widget   = new WidgetEntity();
-        new \ReflectionProperty($widget, 'id')->setValue($widget, $widgetId);
+        ReflectionHelper::setEntityId($widget, $widgetId);
         $widget->setCreatedBy(self::USER_ID);
         $filter = [
             'dateFrom' => new \DateTime(),
@@ -116,7 +118,7 @@ final class WidgetTest extends TestCase
     {
         $widgetId = 2;
         $widget   = new WidgetEntity();
-        new \ReflectionProperty($widget, 'id')->setValue($widget, $widgetId);
+        ReflectionHelper::setEntityId($widget, $widgetId);
         $widget->setCreatedBy(self::USER_ID + 1);
 
         $this->dashboardModel->expects($this->once())

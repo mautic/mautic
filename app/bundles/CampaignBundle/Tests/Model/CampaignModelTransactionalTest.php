@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Model;
 
 use Doctrine\DBAL\Connection;
+
 use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
@@ -17,6 +18,7 @@ use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\FormBundle\Entity\FormRepository;
@@ -86,8 +88,7 @@ final class CampaignModelTransactionalTest extends TestCase
         bool $isPublished = true,
     ): Campaign {
         $campaign   = new Campaign();
-        $reflection = new \ReflectionProperty($campaign, 'id');
-        $reflection->setValue($campaign, $campaignId);
+        ReflectionHelper::setEntityId($campaign, $campaignId);
         $campaign->setVersion($version);
         $campaign->setIsPublished($isPublished);
 

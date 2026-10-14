@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\DBAL\Connection;
+
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\IpAddressModel;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -64,8 +66,7 @@ final class IpAddressModelTest extends TestCase
         $ipAddressOld   = new IpAddress('1.2.3.999');
         $contact->getIpAddresses()->set('1.2.3.999', $ipAddressOld);
         $ipAddressAdded = new IpAddress('1.2.3.4');
-        $reflectionIpAddressId = new \ReflectionProperty($ipAddressAdded, 'id');
-        $reflectionIpAddressId->setValue($ipAddressAdded, 44);
+        ReflectionHelper::setEntityId($ipAddressAdded, 44);
         $contact->addIpAddress($ipAddressAdded);
         $connection     = $this->createMock(Connection::class);
         $queryBuilder   = $this->createMock(QueryBuilder::class);
@@ -91,8 +92,7 @@ final class IpAddressModelTest extends TestCase
         $contact      = new Lead();
         $contact->setId(55);
         $ipAddress    = new IpAddress('1.2.3.4');
-        $reflectionIpAddressId = new \ReflectionProperty($ipAddress, 'id');
-        $reflectionIpAddressId->setValue($ipAddress, 44);
+        ReflectionHelper::setEntityId($ipAddress, 44);
         $contact->addIpAddress($ipAddress);
         $connection   = $this->createMock(Connection::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Helper;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
@@ -15,6 +16,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
 use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -93,8 +95,7 @@ final class InactiveHelperTest extends TestCase
             ->willReturnOnConsecutiveCalls(1, 0, 1);
 
         $campaign   = new Campaign();
-        $campaignId = new \ReflectionProperty($campaign, 'id');
-        $campaignId->setValue($campaign, 2);
+        ReflectionHelper::setEntityId($campaign, 2);
 
         /** @var Event&MockObject $parentEvent */
         $parentEvent = $this->createMock(Event::class);

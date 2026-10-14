@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner\Logger;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -15,6 +16,7 @@ use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -51,8 +53,7 @@ final class EventLoggerTest extends TestCase
         $logCollection = new ArrayCollection();
         while ($logCollection->count() < 60) {
             $log   = new LeadEventLog();
-            $logId = new \ReflectionProperty($log, 'id');
-            $logId->setValue($log, $logCollection->count() + 1);
+            ReflectionHelper::setEntityId($log, $logCollection->count() + 1);
 
             $logCollection->add($log);
         }

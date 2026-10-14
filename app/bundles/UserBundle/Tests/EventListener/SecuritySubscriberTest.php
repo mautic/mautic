@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\EventListener\SecuritySubscriber;
@@ -49,8 +51,7 @@ final class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('writeToLog')
             ->with($log);
         $user = new User();
-        $userIdProperty = new \ReflectionProperty($user, 'id');
-        $userIdProperty->setValue($user, $userId);
+        ReflectionHelper::setEntityId($user, $userId);
         $user->setUsername($userName);
         $event = $this->createMock(LoginEvent::class);
         $event->expects($this->exactly(2))
