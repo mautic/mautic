@@ -297,7 +297,7 @@ class LeadModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
     {
         return $this->dispatchEvent($action, $entity, $isNew, false);
     }

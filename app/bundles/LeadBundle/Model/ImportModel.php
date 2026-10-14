@@ -586,7 +586,7 @@ class ImportModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
     {
         if (!$entity instanceof Import) {
             throw new MethodNotAllowedHttpException(['Import']);

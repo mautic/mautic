@@ -371,7 +371,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
