@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Query;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\CoreBundle\Event\AbstractEntityEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -257,7 +258,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
