@@ -126,9 +126,8 @@ final class FieldApiController extends CommonApiController
      * @param LeadField            $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(object &$entity, $form, array $parameters, $action = 'edit'): Response|array|null
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): Response|array|null
     {
         if (isset($parameters['properties'])) {
             $result = $this->model->setFieldProperties($entity, $parameters['properties']);

@@ -371,8 +371,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Checks if user has permission to access retrieved entity.
      *
-     * @param FormEntity $entity
-     * @param string     $action view|create|edit|publish|delete
+     * @param FormEntity|null $entity
+     * @param string       $action view|create|edit|publish|delete
      */
     protected function checkEntityAccess(?object $entity, $action = 'view'): bool|Response
     {

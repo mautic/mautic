@@ -66,9 +66,8 @@ final class WebhookApiController extends CommonApiController
      * @param Webhook              $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(object &$entity, $form, array $parameters, $action = 'edit'): void
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): void
     {
         $eventsToKeep = [];
 
