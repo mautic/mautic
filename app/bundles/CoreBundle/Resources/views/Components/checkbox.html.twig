@@ -1,0 +1,57 @@
+{% set items = items|default([]) %}
+{% set name = name|default('checkbox') %}
+{% set legend = legend|default(null) %}
+{% set helpText = helpText|default(null) %}
+{% set wrapperClass = wrapperClass|default('') %}
+{% set inline = inline|default(false) %}
+{% set reverse = reverse|default(false) %}
+{% set required = required|default(false) %}
+{% set base_id = name|replace({'[': '-', ']': '', ' ': '-', '.': '-'}) %}
+{% set help_id = helpText ? base_id ~ '-help' : null %}
+
+<fieldset class="{{ [wrapperClass, 'border-0', 'p-0', 'm-0']|filter(value => value is not empty)|join(' ') }}">
+    {% if legend %}
+        <legend class="form-label mb-2">{{ legend|trans }}</legend>
+    {% endif %}
+
+    {% for item in items %}
+        {% set item_label = item.label|default('') %}
+        {% set item_value = item.value is defined ? item.value : loop.index0 %}
+        {% set item_id = item.id|default(base_id ~ '-' ~ loop.index0 ~ '-' ~ item_value|replace({' ': '-', '.': '-', '_': '-', '[': '-', ']': ''})|lower) %}
+        {% set item_name = item.name|default(name) %}
+        {% set item_attributes = item.attributes|default({}) %}
+        {% set classes = ['form-check'] %}
+
+        {% if inline %}
+            {% set classes = classes|merge(['form-check-inline']) %}
+        {% endif %}
+
+        {% if reverse %}
+            {% set classes = classes|merge(['form-check-reverse']) %}
+        {% endif %}
+
+        <div class="{{ classes|join(' ') }}">
+            <input
+                class="form-check-input"
+                type="checkbox"
+                name="{{ item_name }}"
+                id="{{ item_id }}"
+                value="{{ item_value }}"
+                {% if help_id %}aria-describedby="{{ help_id }}"{% endif %}
+                {% if item.checked|default(false) %}checked{% endif %}
+                {% if item.disabled|default(false) %}disabled{% endif %}
+                {% if required %}required{% endif %}
+                {% for attr_key, attr_value in item_attributes %}
+                    {{ attr_key }}="{{ attr_value }}"
+                {% endfor %}
+            >
+            <label class="form-check-label" for="{{ item_id }}">
+                {{ item_label|trans }}
+            </label>
+        </div>
+    {% endfor %}
+
+    {% if helpText %}
+        <div id="{{ help_id }}" class="form-text">{{ helpText|trans }}</div>
+    {% endif %}
+</fieldset>
