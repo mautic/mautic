@@ -460,7 +460,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      */
     private function processDependencies(array $dependencies): void
     {
-        foreach ($dependencies as &$dependencyGroup) {
+        foreach ($dependencies as $dependencyGroup) {
             foreach ($dependencyGroup as $key => $items) {
                 if (Form::ENTITY_NAME === $key) {
                     foreach ($items as &$dependency) {
@@ -480,7 +480,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
                 }
             }
         }
-        unset($dependencyGroup);
     }
 
     private function insertCampaignFormXref(int $campaignId, int $formId): void

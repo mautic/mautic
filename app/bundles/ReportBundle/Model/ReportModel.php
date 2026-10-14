@@ -488,7 +488,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
             $dataAggregatorColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']] = $aggregatorColumn['column'];
         }
         // Build a reference for column to data column (without table prefix)
-        foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
+        foreach ($tableDetails['columns'] as $dbColumn => $columnData) {
             $dataColumns[$columnData['alias']] = $dbColumn;
         }
 

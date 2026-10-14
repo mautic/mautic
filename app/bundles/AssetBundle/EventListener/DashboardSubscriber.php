@@ -104,7 +104,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $items  = [];
 
                 // Build table rows with links
-                foreach ($assets as &$asset) {
+                foreach ($assets as $asset) {
                     $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
                     $row      = [
                         [
@@ -148,7 +148,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $items  = [];
 
                 // Build table rows with links
-                foreach ($assets as &$asset) {
+                foreach ($assets as $asset) {
                     $assetUrl = $this->router->generate('mautic_asset_action', ['objectAction' => 'view', 'objectId' => $asset['id']]);
                     $row      = [
                         [

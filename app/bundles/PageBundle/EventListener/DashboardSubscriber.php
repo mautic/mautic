@@ -127,7 +127,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                foreach ($pages as &$page) {
+                foreach ($pages as $page) {
                     $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
                     $row     = [
                         [
@@ -171,7 +171,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                foreach ($pages as &$page) {
+                foreach ($pages as $page) {
                     $pageUrl = $this->router->generate('mautic_page_action', ['objectAction' => 'view', 'objectId' => $page['id']]);
                     $row     = [
                         [
