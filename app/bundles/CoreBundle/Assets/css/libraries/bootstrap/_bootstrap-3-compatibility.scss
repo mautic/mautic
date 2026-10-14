@@ -2563,10 +2563,19 @@ input[type="search"] {
   appearance: none;
 }
 
-input[type="radio"],
-input[type="checkbox"] {
+input[type="radio"] {
   margin: 4px 0 0;
   margin-top: 1px \9;
+  line-height: normal;
+
+  &[disabled],
+  &.disabled,
+  fieldset[disabled] & {
+    cursor: $cursor-disabled;
+  }
+}
+
+input[type="checkbox"] {
   line-height: normal;
 
   &[disabled],
@@ -2591,8 +2600,7 @@ select[size] {
 }
 
 input[type="file"]:focus,
-input[type="radio"]:focus,
-input[type="checkbox"]:focus {
+input[type="radio"]:focus {
   @include tab-focus;
 }
 
