@@ -261,7 +261,7 @@ Mautic.formFieldOnLoad = function (container, response) {
         Mautic.initHideItemButton(fieldContainer);
 
         //show fields panel
-        if (!mQuery('#fields-panel').hasClass('in')) {
+        if (!mQuery('#fields-panel').hasClass('show')) {
             mQuery('a[href="#fields-panel"]').trigger('click');
         }
 
@@ -338,7 +338,7 @@ Mautic.formActionOnLoad = function (container, response) {
         });
 
         //show actions panel
-        if (!mQuery('#actions-panel').hasClass('in')) {
+        if (!mQuery('#actions-panel').hasClass('show')) {
             mQuery('a[href="#actions-panel"]').trigger('click');
         }
 
