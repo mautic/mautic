@@ -99,7 +99,8 @@ trait LeadDetailsTrait
 
         $result['maxPages'] = ($limit <= 0) ? 1 : round(ceil($result['total'] / $limit));
 
-        usort($result['events'], [$this, 'cmp']); // sort events by
+        // sort events by
+        usort($result['events'], $this->cmp(...));
 
         // now all events are merged, let's limit to   $limit
         array_splice($result['events'], $limit);

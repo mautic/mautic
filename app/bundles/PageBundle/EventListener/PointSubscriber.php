@@ -32,7 +32,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
             'group'       => 'mautic.page.point.action',
             'label'       => 'mautic.page.point.action.pagehit',
             'description' => 'mautic.page.point.action.pagehit_descr',
-            'callback'    => [PointActionHelper::class, 'validatePageHit'],
+            'callback'    => PointActionHelper::validatePageHit(...),
             'formType'    => PointActionPageHitType::class,
         ];
 
