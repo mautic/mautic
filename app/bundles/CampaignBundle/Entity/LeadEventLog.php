@@ -201,10 +201,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
@@ -304,10 +301,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         ];
     }
 
-    /**
-     * @return Campaign|null
-     */
-    public function getCampaign()
+    public function getCampaign(): ?\Mautic\CampaignBundle\Entity\Campaign
     {
         return $this->campaign;
     }
