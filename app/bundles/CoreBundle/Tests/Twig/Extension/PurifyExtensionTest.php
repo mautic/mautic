@@ -37,8 +37,17 @@ final class PurifyExtensionTest extends TestCase
         $this->assertStringContainsString('Link', $result);
         $this->assertStringNotContainsString('<form', strtolower($result));
         $this->assertStringNotContainsString('<script', strtolower($result));
+        $this->assertStringNotContainsString('<img', strtolower($result));
         $this->assertStringNotContainsString('onerror', strtolower($result));
         $this->assertStringNotContainsString('javascript:', strtolower($result));
+        $this->assertStringNotContainsString('{"markup"', strtolower($result));
+
+        $reconstructedForm = $this->extension->purifyBuilderPreview(
+            '<fo<form>rm action=x><p>Keep this content.</p></form>'
+        );
+
+        $this->assertStringContainsString('<p>Keep this content.</p>', $reconstructedForm);
+        $this->assertStringNotContainsString('<form', strtolower($reconstructedForm));
     }
 
     /**

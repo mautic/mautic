@@ -12,15 +12,9 @@ final class PurifyExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('purify', $this->purify(...), ['is_safe' => ['html']]),
             new TwigFilter('purify_allow_target_blank', $this->purifyAllowTargetBlank(...), ['is_safe' => ['html']]),
             new TwigFilter('purify_builder_preview', $this->purifyBuilderPreview(...), ['is_safe' => ['html']]),
         ];
-    }
-
-    public function purify(?string $html): string
-    {
-        return $this->createPurifier()->purify($html ?? '');
     }
 
     public function purifyAllowTargetBlank(?string $html): string
