@@ -18,6 +18,21 @@ final class CheckboxComponentTest extends TestCase
         $loader = new FilesystemLoader(dirname(__DIR__, 2).'/Resources/views');
         $this->twig = new Environment($loader);
         $this->twig->addFilter(new TwigFilter('trans', static fn (string $value): string => $value));
+        $this->twig->addFilter(new TwigFilter('purify', static fn (string $value): string => $value, ['is_safe' => ['html']]));
+    }
+
+    public function testLabelHtmlIsRenderedOnlyWhenEnabled(): void
+    {
+        $html = $this->render([
+            'items' => [['id' => 'html_on', 'value' => '1', 'label' => 'Read <a href="/x">docs</a>', 'label_html' => true]],
+        ]);
+        $plain = $this->render([
+            'items' => [['id' => 'html_off', 'value' => '1', 'label' => 'Read <a href="/x">docs</a>', 'label_html' => false]],
+        ]);
+
+        $this->assertStringContainsString('<a href="/x">docs</a>', $html);
+        $this->assertStringNotContainsString('<a href', $plain);
+        $this->assertStringContainsString('&lt;a href=&quot;/x&quot;&gt;docs&lt;/a&gt;', $plain);
     }
 
     public function testItemsDoNotRequireInputsUnlessGroupIsRequired(): void

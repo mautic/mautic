@@ -56,7 +56,8 @@
             >
             {% if item_label %}
             <label class="form-check-label" for="{{ item_id|escape }}"{% for label_key, label_value in item.labelAttributes|default({}) %} {{ label_key|escape }}="{{ label_value|escape }}"{% endfor %}>
-                {{ item_label|trans(item.label_translation_parameters|default({}), item.translation_domain|default(null)) }}
+                {% set item_text = item_label|trans(item.label_translation_parameters|default({}), item.translation_domain|default(null)) %}
+                {% if item.label_html|default(false) %}{{ item_text|purify }}{% else %}{{ item_text }}{% endif %}
             </label>
             {% endif %}
         </div>
