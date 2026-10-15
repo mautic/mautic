@@ -15,6 +15,7 @@ use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * Forbid service location via the container, e.g. $container->get('some.service').
@@ -39,7 +40,7 @@ final class NoContainerGetRule implements Rule
 
     private const string TEST_ERROR_MESSAGE = 'Do not fetch a service from the container by a string name. Use a class constant, e.g. ->get(SomeService::class), to get a typed service.';
 
-    private const string SERVICE_LOCATOR_TYPE = \Symfony\Component\DependencyInjection\ServiceLocator::class;
+    private const string SERVICE_LOCATOR_TYPE = ServiceLocator::class;
 
     /**
      * Services that cannot be injected as a typed property and must be fetched by name.

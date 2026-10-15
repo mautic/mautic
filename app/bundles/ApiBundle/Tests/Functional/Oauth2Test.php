@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Mautic\ApiBundle\Tests\Functional;
 
 use Mautic\ApiBundle\Entity\oAuth2\AccessToken;
+use Mautic\ApiBundle\Entity\oAuth2\AccessTokenRepository;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
@@ -150,7 +152,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     public function testUserBoundBearerTokenAuthenticatesOnApiV1AndApiV2(): void
     {
-        $adminUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $adminUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $adminUser);
 
         $accessToken = $this->createUserBoundAccessToken($adminUser);
@@ -183,7 +185,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     private function createUserBoundAccessToken(User $user): AccessToken
     {
-        $existingToken = $this->getContainer()->get(\Mautic\ApiBundle\Entity\oAuth2\AccessTokenRepository::class)->findOneBy(['token' => 'test_user_bound_bearer_token']);
+        $existingToken = $this->getContainer()->get(AccessTokenRepository::class)->findOneBy(['token' => 'test_user_bound_bearer_token']);
         if ($existingToken instanceof AccessToken) {
             $this->em->remove($existingToken);
             $this->em->flush();
@@ -208,7 +210,7 @@ final class Oauth2Test extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $reloadedToken = $this->getContainer()->get(\Mautic\ApiBundle\Entity\oAuth2\AccessTokenRepository::class)->findOneBy(['token' => 'test_user_bound_bearer_token']);
+        $reloadedToken = $this->getContainer()->get(AccessTokenRepository::class)->findOneBy(['token' => 'test_user_bound_bearer_token']);
         $this->assertInstanceOf(AccessToken::class, $reloadedToken);
 
         return $reloadedToken;

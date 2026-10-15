@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\SummaryRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -23,14 +24,14 @@ final class CampaignSummarizationFunctionalTest extends MauticMysqlTestCase
     public function testExecuteCampaignEventWithoutSummarization(): void
     {
         $this->createDataAndExecuteCommand();
-        $campaignSummary = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\SummaryRepository::class)->findAll();
+        $campaignSummary = $this->getContainer()->get(SummaryRepository::class)->findAll();
         $this->assertCount(0, $campaignSummary);
     }
 
     public function testExecuteCampaignEventWithSummarization(): void
     {
         $this->createDataAndExecuteCommand();
-        $campaignSummary = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\SummaryRepository::class)->findAll();
+        $campaignSummary = $this->getContainer()->get(SummaryRepository::class)->findAll();
         $this->assertCount(1, $campaignSummary);
     }
 

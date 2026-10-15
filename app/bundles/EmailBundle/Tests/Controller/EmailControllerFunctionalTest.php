@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
@@ -23,6 +24,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -630,7 +632,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $emails = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->findBy([], ['id' => 'ASC']);
+        $emails = $this->getContainer()->get(EmailRepository::class)->findBy([], ['id' => 'ASC']);
         $this->assertCount(2, $emails);
 
         $firstEmail  = $emails[0];
@@ -702,7 +704,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->em->clear();
-        $emailRepository = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class);
+        $emailRepository = $this->getContainer()->get(EmailRepository::class);
         $emails          = $emailRepository->findBy([], ['id' => 'ASC']);
 
         $this->assertCount(8, $emails);
@@ -773,7 +775,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email->addList($secondSegment);
         $this->em->flush();
 
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'sales']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'sales']);
         $this->assertInstanceOf(User::class, $user);
 
         foreach ($user->getRole()->getPermissions() as $permission) {
@@ -829,7 +831,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         // Verify the parent email was updated with AB test settings
         $this->em->clear();
-        $updatedEmail = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->find($email->getId());
+        $updatedEmail = $this->getContainer()->get(EmailRepository::class)->find($email->getId());
         $this->assertInstanceOf(Email::class, $updatedEmail);
 
         $settings = $updatedEmail->getVariantSettings();
@@ -984,7 +986,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->findOneBy(['name' => 'Email publish test']);
+        $email = $this->getContainer()->get(EmailRepository::class)->findOneBy(['name' => 'Email publish test']);
         $this->assertInstanceOf(Email::class, $email);
         $this->assertTrue($email->getIsPublished());
     }
@@ -996,7 +998,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testPublishPermissionOnCreate(array $permissions, bool $expectDisabled, bool $publishedByDefault, bool $publishAfterSave): void
     {
         // Set user to be able to create emails, but not publish them.
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'sales']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'sales']);
         $this->assertInstanceOf(User::class, $user);
         $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
         $this->loginUser($user);
@@ -1029,7 +1031,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->findOneBy(['name' => 'Email publish test']);
+        $email = $this->getContainer()->get(EmailRepository::class)->findOneBy(['name' => 'Email publish test']);
         $this->assertInstanceOf(Email::class, $email);
         $this->assertSame($publishAfterSave, $email->getIsPublished());
     }
@@ -1083,14 +1085,14 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('editPermissionDataProvider')]
     public function testPublishPermissionOnEdit(string $owner, string $user, array $permissions, bool $expectDisabled, bool $publishAfterSave): void
     {
-        $ownerUser  = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => $owner]);
+        $ownerUser  = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => $owner]);
         $email      = $this->createEmail('Email A', 'Email A Subject', 'template', 'blank', 'Test html');
         $this->assertInstanceOf(User::class, $ownerUser);
         $email->setCreatedBy($ownerUser);
         $this->em->flush();
 
         // Set user to be able to create emails, but not publish them.
-        $loggedInUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => $user]);
+        $loggedInUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => $user]);
         $this->assertInstanceOf(User::class, $loggedInUser);
         $this->setPermission($loggedInUser->getRole(), ['email:emails' => $permissions]);
 
@@ -1127,7 +1129,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->findOneBy(['name' => 'Email publish test']);
+        $email = $this->getContainer()->get(EmailRepository::class)->findOneBy(['name' => 'Email publish test']);
         $this->assertInstanceOf(Email::class, $email);
         $this->assertSame($publishAfterSave, $email->getIsPublished());
     }
@@ -1256,7 +1258,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $commandTester = $this->testSymfonyCommand('mautic:broadcast:send', ['--channel' => 'email', '--id' => $email->getId()]);
 
-        $email = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->find($email->getId());
+        $email = $this->getContainer()->get(EmailRepository::class)->find($email->getId());
         $this->assertFalse($email->getIsPublished(), $commandTester->getDisplay());
     }
 
@@ -1303,7 +1305,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $commandTester = $this->testSymfonyCommand('mautic:broadcast:send', ['--channel' => 'email', '--id' => $email->getId()]);
 
-        $email = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->find($email->getId());
+        $email = $this->getContainer()->get(EmailRepository::class)->find($email->getId());
         $this->assertTrue($email->getIsPublished(), $commandTester->getDisplay());
     }
 
@@ -1330,7 +1332,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('schedule_send[buttons][apply]')->form();
         $this->client->submit($form);
 
-        $email = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->find($email->getId());
+        $email = $this->getContainer()->get(EmailRepository::class)->find($email->getId());
         $this->assertInstanceOf(Email::class, $email);
         $this->assertNotInstanceOf(\DateTimeInterface::class, $email->getPublishUp());
     }
@@ -1466,7 +1468,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->findOneBy(['name' => $name]);
+        $email = $this->getContainer()->get(EmailRepository::class)->findOneBy(['name' => $name]);
 
         if ($expectSaved) {
             $this->assertInstanceOf(Email::class, $email);
@@ -1549,7 +1551,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->findOneBy(['name' => $name]);
+        $email = $this->getContainer()->get(EmailRepository::class)->findOneBy(['name' => $name]);
 
         $this->assertNotInstanceOf(Email::class, $email);
         $this->assertStringContainsString('The email contains an invalid URL: ://example.com', $crawler->text());

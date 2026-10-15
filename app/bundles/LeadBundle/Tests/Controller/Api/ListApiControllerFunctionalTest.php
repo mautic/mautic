@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -853,7 +854,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(0, $commandTester->getStatusCode());
 
-        $members = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findBy(['list' => $segment->getId()]);
+        $members = $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment->getId()]);
 
         $this->assertCount($expected, $members);
 
@@ -914,7 +915,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(0, $commandTester->getStatusCode());
 
-        $members = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findBy(['list' => $segment->getId()]);
+        $members = $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment->getId()]);
 
         $this->assertCount($expectedCount, $members);
 
@@ -966,7 +967,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var CompanyRepository $companyRepo */
-        $companyRepo = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class);
+        $companyRepo = $this->getContainer()->get(CompanyRepository::class);
         $company     = new Company();
         $company->setName($name);
         $company->addUpdatedField('company_created_at', $timeStamp->format('Y-m-d H:i:s'));

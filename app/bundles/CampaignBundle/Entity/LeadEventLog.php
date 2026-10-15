@@ -301,7 +301,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         ];
     }
 
-    public function getCampaign(): ?\Mautic\CampaignBundle\Entity\Campaign
+    public function getCampaign(): ?Campaign
     {
         return $this->campaign;
     }

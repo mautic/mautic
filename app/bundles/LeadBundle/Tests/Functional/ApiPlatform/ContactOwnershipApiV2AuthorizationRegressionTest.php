@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Functional\ApiPlatform;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -45,7 +46,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->em->flush();
         $this->em->clear();
 
-        $attacker = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'attacker.user']);
+        $attacker = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'attacker.user']);
         $this->assertInstanceOf(User::class, $attacker);
         $this->client->getCookieJar()->clear();
         $this->client->setServerParameter('PHP_AUTH_USER', $attacker->getUserIdentifier());
@@ -106,7 +107,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->em->flush();
         $this->em->clear();
 
-        $attacker = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'attacker.collection.user']);
+        $attacker = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'attacker.collection.user']);
         $this->assertInstanceOf(User::class, $attacker);
 
         $this->client->getCookieJar()->clear();
@@ -336,7 +337,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->em->clear();
 
         // Test 1: newOwner (current owner) SHOULD see the contact
-        $newOwner = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'new.contact.owner']);
+        $newOwner = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'new.contact.owner']);
         $this->assertInstanceOf(User::class, $newOwner);
         $this->loginUser($newOwner);
         $this->client->setServerParameter('PHP_AUTH_USER', $newOwner->getUserIdentifier());
@@ -352,7 +353,7 @@ final class ContactOwnershipApiV2AuthorizationRegressionTest extends OwnershipSc
         $this->assertSame($contact->getId(), $data['member'][0]['id']);
 
         // Test 2: originalOwner (creator but no longer owner) should NOT see the contact
-        $originalOwner = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'original.contact.owner']);
+        $originalOwner = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'original.contact.owner']);
         $this->assertInstanceOf(User::class, $originalOwner);
         $this->loginUser($originalOwner);
         $this->client->setServerParameter('PHP_AUTH_USER', $originalOwner->getUserIdentifier());

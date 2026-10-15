@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tests\Fixtures\Model\ImportModelMock;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -165,7 +166,7 @@ final class ImportModelTest extends StandardImportTestHelper
 
     public function testBeginImportWhenParallelLimitHit(): void
     {
-        $model = $this->getMockBuilder(\Mautic\LeadBundle\Tests\Fixtures\Model\ImportModelMock::class)
+        $model = $this->getMockBuilder(ImportModelMock::class)
             ->onlyMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
@@ -201,7 +202,7 @@ final class ImportModelTest extends StandardImportTestHelper
 
     public function testBeginImportWhenDatabaseException(): void
     {
-        $model = $this->getMockBuilder(\Mautic\LeadBundle\Tests\Fixtures\Model\ImportModelMock::class)
+        $model = $this->getMockBuilder(ImportModelMock::class)
             ->onlyMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'logDebug', 'process'])
             ->disableOriginalConstructor()
             ->getMock();

@@ -18,6 +18,8 @@ use Mautic\LeadBundle\Controller\Api\FieldApiController;
 use Mautic\LeadBundle\EventListener\SearchSubscriber;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Mautic\LeadBundle\Validator\Constraints\Length;
+use MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber;
+use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -35,8 +37,8 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
         DynamicContentFilterEntryType::class,
         DynamicContentType::class,
         SearchSubscriber::class,
-        \MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber::class,
-        \MauticPlugin\MauticFullContactBundle\Helper\LookupHelper::class,
+        LeadSubscriber::class,
+        LookupHelper::class,
         'mautic.plugin.fullcontact.lookup_helper',
 
         // requires a running Redis/Memcached server or an optional package

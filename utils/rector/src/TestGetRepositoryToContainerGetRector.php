@@ -16,6 +16,7 @@ use PhpParser\NodeFinder;
 use PHPStan\Type\ObjectType;
 use Rector\PhpParser\AstResolver;
 use Rector\Rector\AbstractRector;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
  * In test cases, replaces getRepository(SomeEntity::class) with the concrete repository service
@@ -34,7 +35,7 @@ use Rector\Rector\AbstractRector;
  */
 final class TestGetRepositoryToContainerGetRector extends AbstractRector
 {
-    private const string KERNEL_TEST_CASE = \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase::class;
+    private const string KERNEL_TEST_CASE = KernelTestCase::class;
 
     public function __construct(
         private readonly AstResolver $astResolver,

@@ -173,7 +173,7 @@ final class RelativeDateFunctionalTest extends MauticMysqlTestCase
     private function createLead(string $name, string $initialTime, string $dateModifier): Lead
     {
         /** @var LeadRepository $leadRepository */
-        $leadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $leadRepository = $this->getContainer()->get(LeadRepository::class);
 
         $date = new \DateTime($initialTime, new \DateTimeZone('UTC'));
         $date->modify($dateModifier);

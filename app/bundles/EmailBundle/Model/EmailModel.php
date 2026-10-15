@@ -639,7 +639,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $data;
     }
 
-    public function getEmailStatus(string $idHash): ?\Mautic\EmailBundle\Entity\Stat
+    public function getEmailStatus(string $idHash): ?Stat
     {
         return $this->statRepository->getEmailStatus($idHash);
     }

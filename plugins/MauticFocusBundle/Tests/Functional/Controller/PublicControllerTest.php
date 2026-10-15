@@ -6,6 +6,7 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -53,7 +54,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/focus/%s.js', $focus->getId()));
         $content = $this->client->getResponse()->getContent();
 
-        $redirects = $this->getContainer()->get(\Mautic\PageBundle\Entity\RedirectRepository::class)->findAll();
+        $redirects = $this->getContainer()->get(RedirectRepository::class)->findAll();
         $this->assertCount(1, $redirects);
 
         /** @var Redirect $redirect */

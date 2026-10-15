@@ -7,12 +7,13 @@ namespace Mautic\LeadBundle\Tests\Command;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeduplicateIdsCommand;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 
 final class DeduplicateIdsCommandFunctionalTest extends MauticMysqlTestCase
 {
     public function testDeduplicateCommandWithContactIdsParam(): void
     {
-        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $contactRepository = $this->getContainer()->get(LeadRepository::class);
 
         $this->assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 

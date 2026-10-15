@@ -19,7 +19,7 @@ final class ScheduledEvent extends Event
      */
     private array $eventArray = [];
 
-    private ?Lead $lead;
+    private readonly ?Lead $lead;
 
     /**
      * @var CampaignEvent|null

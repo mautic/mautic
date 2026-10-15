@@ -199,7 +199,7 @@ abstract class AuthenticationEvent extends Event
     /**
      * Get the response if set by the listener.
      */
-    public function getResponse(): ?\Symfony\Component\HttpFoundation\Response
+    public function getResponse(): ?Response
     {
         return $this->response;
     }

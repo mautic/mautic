@@ -15,7 +15,7 @@ final class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
     /**
      * @var array
      */
-    protected $corsHeaders = [
+    private $corsHeaders = [
         'Access-Control-Allow-Origin'      => '*',
         'Access-Control-Allow-Headers'     => 'Origin, X-Requested-With, Content-Type, Authorization',
         'Access-Control-Allow-Methods'     => 'PUT, GET, POST, DELETE, OPTIONS',
@@ -26,22 +26,22 @@ final class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
     /**
      * @var bool
      */
-    protected $requestOriginIsValid = false;
+    private $requestOriginIsValid = false;
 
     /**
      * @var bool
      */
-    protected $restrictCORSDomains = true;
+    private $restrictCORSDomains = true;
 
     /**
      * @var array
      */
-    protected $validCORSDomains = [];
+    private $validCORSDomains = [];
 
     /**
      * @var HttpKernelInterface
      */
-    protected $app;
+    private $app;
 
     public function __construct(HttpKernelInterface $app)
     {

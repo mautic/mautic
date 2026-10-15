@@ -6,6 +6,7 @@ namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\SmsBundle\Integration\TwilioIntegration;
 use Mautic\SmsBundle\Tests\SmsTestHelperTrait;
 
@@ -21,7 +22,7 @@ final class TwilioConfigurationFunctionalTest extends MauticMysqlTestCase
         $integration = $this->getContainer()->get(TwilioIntegration::class);
         $this->assertInstanceOf(TwilioIntegration::class, $integration);
 
-        $integrationRepository = $this->getContainer()->get(\Mautic\PluginBundle\Entity\IntegrationRepository::class);
+        $integrationRepository = $this->getContainer()->get(IntegrationRepository::class);
 
         $integrationConfig = $integrationRepository->findOneBy(['name' => $integration->getName()]);
         $this->assertInstanceOf(Integration::class, $integrationConfig);

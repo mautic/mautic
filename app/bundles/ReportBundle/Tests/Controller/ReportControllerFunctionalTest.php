@@ -11,8 +11,10 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Entity\ReportRepository;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Model\ReportModel;
@@ -38,7 +40,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
         $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
 
-        $res = $this->getContainer()->get(\Mautic\PageBundle\Entity\HitRepository::class)->getMostVisited($query);
+        $res = $this->getContainer()->get(HitRepository::class)->getMostVisited($query);
 
         foreach ($res as $hit) {
             $this->assertNotNull($hit['id']);
@@ -112,7 +114,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
-        $report = $this->getContainer()->get(\Mautic\ReportBundle\Entity\ReportRepository::class)->findOneBy(['name' => 'Report ABC']);
+        $report = $this->getContainer()->get(ReportRepository::class)->findOneBy(['name' => 'Report ABC']);
         $this->assertInstanceOf(Report::class, $report);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
@@ -124,7 +126,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
-        $reportClone = $this->getContainer()->get(\Mautic\ReportBundle\Entity\ReportRepository::class)->findOneBy(['name' => 'Report ABC - cloned']);
+        $reportClone = $this->getContainer()->get(ReportRepository::class)->findOneBy(['name' => 'Report ABC - cloned']);
         $this->assertInstanceOf(Report::class, $reportClone);
 
         $this->assertSame($report->getId() + 1, $reportClone->getId());
@@ -410,7 +412,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $report   = $this->getContainer()->get(\Mautic\ReportBundle\Entity\ReportRepository::class)->find($report->getId());
+        $report   = $this->getContainer()->get(ReportRepository::class)->find($report->getId());
         $schedule = $report->getSchedule();
         $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 

@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Functional\Model;
 
 use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 
 final class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
 {
@@ -49,7 +51,7 @@ final class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Modify custom field (add trailing spaces)
-        $updatedField = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadFieldRepository::class)
+        $updatedField = $this->getContainer()->get(LeadFieldRepository::class)
           ->findOneBy(['alias' => 'industry_type']);
         $this->assertInstanceOf(LeadField::class, $updatedField);
 
@@ -68,7 +70,7 @@ final class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
         $eventModel = $this->getContainer()->get(EventModel::class);
 
         // Reload event after custom field change
-        $eventEntity = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\EventRepository::class)
+        $eventEntity = $this->getContainer()->get(EventRepository::class)
           ->findOneBy(['name' => 'Update Industry']);
         $this->assertInstanceOf(CampaignEvent::class, $eventEntity);
 
@@ -78,7 +80,7 @@ final class LeadModelSelectFieldTrimTest extends MauticMysqlTestCase
         $this->em->clear();
 
         // Validate result
-        $reloadedEvent = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\EventRepository::class)
+        $reloadedEvent = $this->getContainer()->get(EventRepository::class)
           ->findOneBy(['name' => 'Update Industry']);
         $this->assertInstanceOf(CampaignEvent::class, $reloadedEvent);
 

@@ -8,9 +8,11 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -114,8 +116,8 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $matchingSegment    = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class)->find($matchingSegment->getId());
-        $nonMatchingSegment = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class)->find($nonMatchingSegment->getId());
+        $matchingSegment    = $this->getContainer()->get(LeadListRepository::class)->find($matchingSegment->getId());
+        $nonMatchingSegment = $this->getContainer()->get(LeadListRepository::class)->find($nonMatchingSegment->getId());
 
         $this->assertSame('os', $matchingSegment?->getCategory()?->getAlias());
         $this->assertSame('hardware', $nonMatchingSegment?->getCategory()?->getAlias());
@@ -707,7 +709,7 @@ final class ListControllerPermissionFunctionalTest extends MauticMysqlTestCase
     private function loginOtherUser(string $name): void
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => $name]);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => $name]);
         $this->assertInstanceOf(User::class, $user);
 
         $this->loginUser($user);

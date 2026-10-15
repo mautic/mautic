@@ -15,6 +15,7 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Sync\SyncDataExchange\ExampleSyncDataExchange;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 
 final class NotifierTest extends MauticMysqlTestCase
 {
@@ -22,7 +23,7 @@ final class NotifierTest extends MauticMysqlTestCase
     {
         $this->installDatabaseFixtures([LoadLeadData::class]);
 
-        $leadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $leadRepository = $this->getContainer()->get(LeadRepository::class);
         /** @var Lead[] $leads */
         $leads = $leadRepository->findBy([], [], 2);
 

@@ -10,6 +10,7 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * A controller that defines its own constructor must not inject through a #[Required] method as well.
@@ -26,7 +27,7 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class NoRequiredMethodWithConstructorInControllerRule implements Rule
 {
-    private const string REQUIRED_ATTRIBUTE = \Symfony\Contracts\Service\Attribute\Required::class;
+    private const string REQUIRED_ATTRIBUTE = Required::class;
 
     private const string CONTROLLER_SUFFIX = 'Controller.php';
 

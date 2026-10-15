@@ -6,8 +6,10 @@ namespace Mautic\CampaignBundle\Tests\Command;
 
 use Mautic\CampaignBundle\Command\ResumeStuckCampaignCommand;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -1184,7 +1186,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
 
     private function createStuckContactsTestData(): void
     {
-        $campaign = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\CampaignRepository::class)->find(1);
+        $campaign = $this->getContainer()->get(CampaignRepository::class)->find(1);
         if (!$campaign) {
             $campaign = $this->createCampaign('Test Campaign');
             $campaign->setIsPublished(true);
@@ -1249,7 +1251,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
             $criteria['event'] = $eventId;
         }
 
-        return $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findBy($criteria);
+        return $this->getContainer()->get(LeadEventLogRepository::class)->findBy($criteria);
     }
     /**
      * The command prints a table, and matching a contact id anywhere in it also matches

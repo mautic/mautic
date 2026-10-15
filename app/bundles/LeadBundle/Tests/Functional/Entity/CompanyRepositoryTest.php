@@ -11,6 +11,7 @@ use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -77,7 +78,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         );
         $this->client->submit($form);
 
-        return $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findOneBy(
+        return $this->getContainer()->get(LeadRepository::class)->findOneBy(
             [
                 'firstname' => $firstName,
                 'email'     => $email,

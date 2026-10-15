@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -39,7 +40,7 @@ final class VideoHitRepository extends CommonRepository
         return $this->getTimelineResults($query, $options, 'h.url', 'h.date_hit', [], ['date_hit'], null, 'h.id');
     }
 
-    public function getHitForLeadByGuid(Lead $lead, string $guid): \Mautic\PageBundle\Entity\VideoHit
+    public function getHitForLeadByGuid(Lead $lead, string $guid): VideoHit
     {
         $result = $this->findOneBy(['guid' => $guid, 'lead' => $lead]);
 
@@ -92,7 +93,7 @@ final class VideoHitRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getReferers(\Doctrine\DBAL\Query\QueryBuilder $query, int $limit = 10, int $offset = 0): array
+    public function getReferers(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->select('h.referer, count(h.referer) as sessions')
             ->groupBy('h.referer')

@@ -499,7 +499,7 @@ final class QueryBuilderTest extends TestCase
     private function createConnectionFake(): Connection
     {
         return new class([], $this->createStub(Driver::class)) extends Connection {
-            public function getDatabasePlatform(): \Doctrine\DBAL\Platforms\MySQLPlatform
+            public function getDatabasePlatform(): MySQLPlatform
             {
                 return new MySQLPlatform();
             }

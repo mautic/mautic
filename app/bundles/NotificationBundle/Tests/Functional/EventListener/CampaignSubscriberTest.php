@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
@@ -579,7 +580,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
     private function findEventLog(CampaignEvent $event, Lead $leadOne): LeadEventLog
     {
-        $log = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findOneBy([
+        $log = $this->getContainer()->get(LeadEventLogRepository::class)->findOneBy([
             'event'    => $event->getId(),
             'lead'     => $leadOne,
             'rotation' => 1,

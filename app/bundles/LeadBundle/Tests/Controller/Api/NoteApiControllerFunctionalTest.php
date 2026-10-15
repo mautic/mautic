@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
+use Mautic\LeadBundle\Entity\LeadNoteRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -52,7 +53,7 @@ final class NoteApiControllerFunctionalTest extends MauticMysqlTestCase
         $createPayload = json_decode($createResponse->getContent(), true);
         $this->assertSame('Created from API', $createPayload['note']['text']);
 
-        $createdNote = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadNoteRepository::class)->find($createPayload['note']['id']);
+        $createdNote = $this->getContainer()->get(LeadNoteRepository::class)->find($createPayload['note']['id']);
         $this->assertInstanceOf(LeadNote::class, $createdNote);
         $this->assertSame($contact->getId(), $createdNote->getLead()->getId());
     }

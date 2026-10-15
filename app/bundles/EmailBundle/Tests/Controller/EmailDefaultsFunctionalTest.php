@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -48,7 +49,7 @@ final class EmailDefaultsFunctionalTest extends MauticMysqlTestCase
         // Reboot the kernel so CoreParametersHelper picks up the actual page ID.
         $this->setUpSymfony(array_merge($this->configParams, ['email_default_preference_center_id' => $pageId]));
 
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 

@@ -17,6 +17,7 @@ use PhpParser\NodeFinder;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ReflectionProvider;
+use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\ObjectType;
@@ -129,7 +130,7 @@ final readonly class BigIntIdParamMustBeIntOrStringRule implements Rule
         return $ruleErrors;
     }
 
-    private function createRuleError(ClassMethod $classMethod, string $paramName, int $line): \PHPStan\Rules\IdentifierRuleError
+    private function createRuleError(ClassMethod $classMethod, string $paramName, int $line): IdentifierRuleError
     {
         return RuleErrorBuilder::message(sprintf(
             'Param "$%s" of "%s()" must be "int|string", as the entity id is unsigned bigint hydrated as string.',

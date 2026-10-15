@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -51,7 +52,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
      */
     private function createTestEntities(): array
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
         $segment = new LeadList();
@@ -415,7 +416,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testImportCampaignActionJson(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
         $this->client->request(
@@ -443,7 +444,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testImportCampaignActionZip(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
         $systemTempDir = sys_get_temp_dir();
@@ -514,7 +515,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testImportCampaignNoFileUploaded(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -529,7 +530,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testEditCampaignAcceptsRoundTrippedIso8601PublishUp(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -565,7 +566,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testImportCampaignInvalidFile(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -588,7 +589,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testImportCampaignUnsupportedFileType(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -609,7 +610,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testImportCampaignMalformedJson(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
         // Create a temporary ZIP file with valid structure but malformed JSON

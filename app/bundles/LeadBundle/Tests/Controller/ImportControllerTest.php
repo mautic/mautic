@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
@@ -95,7 +96,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
             1,
             function () use ($expectedName): void {
                 /** @var LeadRepository $leadRepository */
-                $leadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+                $leadRepository = $this->getContainer()->get(LeadRepository::class);
 
                 /** @var Lead[] $contacts */
                 $contacts = $leadRepository->findBy(['email' => ['john@doe.email', 'ferda@mravenec.email']], ['email' => 'desc']);
@@ -144,7 +145,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
         $this->assertStringContainsString('Import process was successfully created.', $crawler->html());
 
-        $importRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ImportRepository::class);
+        $importRepository = $this->getContainer()->get(ImportRepository::class);
         $this->assertInstanceOf(ImportRepository::class, $importRepository);
         $importEntity = $importRepository->findOneBy(['originalFile' => $filename]);
 
@@ -165,7 +166,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->assertSame(1, $importEntity->getUpdatedCount(), 'There should be one update as the user has the permission to edit his own contacts.');
         $this->assertSame(Import::IMPORTED, $importEntity->getStatus());
 
-        $leadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $leadRepository = $this->getContainer()->get(LeadRepository::class);
         $this->assertInstanceOf(LeadRepository::class, $leadRepository);
 
         /** @var Lead[] $contacts */
@@ -174,7 +175,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->assertSame('Existing-other-before', $contacts[0]->getFirstname(), 'This contact should not be updated as the user does not have permission to edit others.');
         $this->assertSame('Existing-owned-after', $contacts[1]->getFirstname(), 'This contact should be updated as the user has permission to edit own.');
 
-        $eventLogRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadEventLogRepository::class);
+        $eventLogRepository = $this->getContainer()->get(LeadEventLogRepository::class);
         $this->assertInstanceOf(LeadEventLogRepository::class, $eventLogRepository);
 
         /** @var LeadEventLog[] $logs */
@@ -215,7 +216,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('The import process was successfully created. But it will not be processed as you do not have permission to publish.', $crawler->html());
 
         /** @var ImportRepository $importRepository */
-        $importRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ImportRepository::class);
+        $importRepository = $this->getContainer()->get(ImportRepository::class);
 
         /** @var Import $importEntity */
         $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts.csv']);
@@ -244,7 +245,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Import process was successfully created. You will be notified when finished.', $crawler->html(), $crawler->html());
 
         /** @var ImportRepository $importRepository */
-        $importRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ImportRepository::class);
+        $importRepository = $this->getContainer()->get(ImportRepository::class);
 
         /** @var Import $importEntity */
         $importEntity = $importRepository->findOneBy(['originalFile' => 'contacts.csv']);
@@ -356,7 +357,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
             1,
             function (): void {
                 /** @var LeadRepository $leadRepository */
-                $leadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+                $leadRepository = $this->getContainer()->get(LeadRepository::class);
 
                 /** @var Lead[] $contacts */
                 $contacts = $leadRepository->findBy(['email' => ['john@doe.email', 'ferda@mravenec.email']], ['email' => 'desc']);
@@ -371,7 +372,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
     private function setPhoneFieldIsRequired(bool $required): void
     {
         /** @var LeadFieldRepository $fieldRepository */
-        $fieldRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadFieldRepository::class);
+        $fieldRepository = $this->getContainer()->get(LeadFieldRepository::class);
 
         /** @var LeadField $phoneField */
         $phoneField = $fieldRepository->findOneBy(['alias' => 'phone']);
@@ -396,7 +397,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
         ?callable $afterAssertions = null,
     ): void {
         /** @var ImportRepository $importRepository */
-        $importRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ImportRepository::class);
+        $importRepository = $this->getContainer()->get(ImportRepository::class);
 
         /** @var Import $importEntity */
         $importEntity = $importRepository->findOneBy(['originalFile' => $originalFile]);
@@ -553,7 +554,7 @@ final class ImportControllerTest extends MauticMysqlTestCase
 
     private function createBooleanField(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)
+        $user = $this->getContainer()->get(UserRepository::class)
             ->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);

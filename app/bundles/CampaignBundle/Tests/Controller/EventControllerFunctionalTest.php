@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -484,7 +485,7 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $userTimezone = 'Europe/Berlin';
         $wallClock    = '2026-12-15 19:00';
 
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $user->setTimezone($userTimezone);
         $this->em->persist($user);

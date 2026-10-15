@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -77,7 +78,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             ) {
             }
 
-            public function getRepository(string $entityName): \Doctrine\ORM\EntityRepository
+            public function getRepository(string $entityName): EntityRepository
             {
                 Assert::assertSame(GrapesJsBuilder::class, $entityName);
 
@@ -184,7 +185,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             ) {
             }
 
-            public function getRepository(string $entityName): \Doctrine\ORM\EntityRepository
+            public function getRepository(string $entityName): EntityRepository
             {
                 Assert::assertSame(GrapesJsBuilder::class, $entityName);
 

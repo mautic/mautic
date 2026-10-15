@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Submission;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ServerBag;
 
@@ -232,7 +233,7 @@ final class SubmissionEvent extends CommonEvent
         return (null === $key) ? $this->callbackResponses : $this->callbackResponses[$key];
     }
 
-    public function setPostSubmitCallbackResponse(string $key, \Symfony\Component\HttpFoundation\RedirectResponse $callbackResponse): static
+    public function setPostSubmitCallbackResponse(string $key, RedirectResponse $callbackResponse): static
     {
         $this->callbackResponses[$key] = $callbackResponse;
 

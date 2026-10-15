@@ -26,14 +26,14 @@ use PHPStan\Rules\RuleErrorBuilder;
  *
  * @see \Utils\PHPStan\Tests\Rule\GenericTraitUseMustHaveGenericDocblockRuleTest
  */
-final class GenericTraitUseMustHaveGenericDocblockRule implements Rule
+final readonly class GenericTraitUseMustHaveGenericDocblockRule implements Rule
 {
-    private readonly Lexer $lexer;
+    private Lexer $lexer;
 
-    private readonly PhpDocParser $phpDocParser;
+    private PhpDocParser $phpDocParser;
 
     public function __construct(
-        private readonly ReflectionProvider $reflectionProvider,
+        private ReflectionProvider $reflectionProvider,
     ) {
         $parserConfig = new ParserConfig([]);
         $this->lexer = new Lexer($parserConfig);

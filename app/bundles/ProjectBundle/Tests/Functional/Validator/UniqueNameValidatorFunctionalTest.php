@@ -6,6 +6,7 @@ namespace Mautic\ProjectBundle\Tests\Functional\Validator;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
+use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 final class UniqueNameValidatorFunctionalTest extends MauticMysqlTestCase
@@ -17,7 +18,7 @@ final class UniqueNameValidatorFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($project);
         $this->em->flush();
 
-        $this->assertCount(1, $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findBy(['name' => $project->getName()]));
+        $this->assertCount(1, $this->getContainer()->get(ProjectRepository::class)->findBy(['name' => $project->getName()]));
 
         $crawler       = $this->client->request(Request::METHOD_GET, '/s/projects/new');
         $buttonCrawler = $crawler->selectButton('Save & Close');
@@ -31,6 +32,6 @@ final class UniqueNameValidatorFunctionalTest extends MauticMysqlTestCase
             (string) $this->client->getResponse()->getContent()
         );
 
-        $this->assertCount(1, $this->getContainer()->get(\Mautic\ProjectBundle\Entity\ProjectRepository::class)->findBy(['name' => $project->getName()]));
+        $this->assertCount(1, $this->getContainer()->get(ProjectRepository::class)->findBy(['name' => $project->getName()]));
     }
 }

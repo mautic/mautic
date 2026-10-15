@@ -8,6 +8,7 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Helper\IntHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PointBundle\Entity\Point;
+use Mautic\PointBundle\Entity\PointRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -108,7 +109,7 @@ final class PointEntityValidationTest extends MauticMysqlTestCase
         $response = $this->client->getResponse()->getContent();
         $this->assertStringContainsString($errorMessage, (string) $response);
 
-        $pointDetail = $this->getContainer()->get(\Mautic\PointBundle\Entity\PointRepository::class)->findOneBy(['delta' => $delta]);
+        $pointDetail = $this->getContainer()->get(PointRepository::class)->findOneBy(['delta' => $delta]);
         '' === $errorMessage ? $this->assertInstanceOf(Point::class, $pointDetail) : $this->assertNotInstanceOf(Point::class, $pointDetail);
     }
 }

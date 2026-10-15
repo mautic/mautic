@@ -7,6 +7,7 @@ namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
@@ -49,7 +50,7 @@ final class AssertCustomMjmlTest extends MauticMysqlTestCase
         // Create email using an API call and add GrapesJS into it.
         $responseData = $this->createEmailViaApi();
         $emailId      = $responseData['email']['id'];
-        $email        = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->find($emailId);
+        $email        = $this->getContainer()->get(EmailRepository::class)->find($emailId);
         $this->assertInstanceOf(Email::class, $email);
         $this->addToGrapesJsBuilder($email);
 
@@ -67,7 +68,7 @@ final class AssertCustomMjmlTest extends MauticMysqlTestCase
     private function getRepository(): GrapesJsBuilderRepository
     {
         /** @var GrapesJsBuilderRepository $repository */
-        $repository = $this->getContainer()->get(\MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository::class);
+        $repository = $this->getContainer()->get(GrapesJsBuilderRepository::class);
 
         $repository->autowireCommonRepository($this->getTranslatorMock());
 

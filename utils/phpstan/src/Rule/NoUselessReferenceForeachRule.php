@@ -24,9 +24,9 @@ use Utils\PHPStan\ByReference\ByReferenceParamAnalyzer;
  *
  * @see \Utils\PHPStan\Tests\Rule\NoUselessReferenceForeachRuleTest
  */
-final class NoUselessReferenceForeachRule implements Rule
+final readonly class NoUselessReferenceForeachRule implements Rule
 {
-    private readonly ByReferenceParamAnalyzer $byReferenceParamAnalyzer;
+    private ByReferenceParamAnalyzer $byReferenceParamAnalyzer;
 
     public function __construct(ReflectionProvider $reflectionProvider)
     {

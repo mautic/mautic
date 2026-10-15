@@ -8,6 +8,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -21,7 +22,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $lead->setEmail('john@his-site.com');
         $this->em->persist($lead);
 
-        $fieldRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadFieldRepository::class);
+        $fieldRepository = $this->getContainer()->get(LeadFieldRepository::class);
 
         /** @var LeadField[] $fields */
         $fields = $fieldRepository->findBy(['object' => 'lead', 'group' => 'core'], [

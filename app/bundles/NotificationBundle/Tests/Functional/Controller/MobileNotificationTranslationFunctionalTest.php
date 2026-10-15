@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Entity\NotificationRepository;
 use Mautic\NotificationBundle\Entity\Stat;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -32,7 +33,7 @@ final class MobileNotificationTranslationFunctionalTest extends MauticMysqlTestC
         $this->assertResponseIsSuccessful();
 
         // Assert
-        $childNotification = $this->getContainer()->get(\Mautic\NotificationBundle\Entity\NotificationRepository::class)->findOneBy(['name' => 'Child Notification']);
+        $childNotification = $this->getContainer()->get(NotificationRepository::class)->findOneBy(['name' => 'Child Notification']);
         $this->assertInstanceOf(Notification::class, $childNotification);
         $this->assertInstanceOf(Notification::class, $childNotification->getTranslationParent());
         $this->assertSame($parentNotification->getId(), $childNotification->getTranslationParent()->getId());

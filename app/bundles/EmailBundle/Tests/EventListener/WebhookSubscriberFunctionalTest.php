@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\EventListener;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -14,6 +15,7 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
+use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -111,10 +113,10 @@ final class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
         $emailModel = self::getContainer()->get(EmailModel::class);
         $emailModel->sendEmailToLists($email);
 
-        $stat = $this->getContainer()->get(\Mautic\EmailBundle\Entity\StatRepository::class)->findOneBy([]);
+        $stat = $this->getContainer()->get(StatRepository::class)->findOneBy([]);
         $emailModel->hitEmail($stat, new Request(), false, true, new \DateTimeImmutable());
 
-        $webHookQueues = $this->getContainer()->get(\Mautic\WebhookBundle\Entity\WebhookQueueRepository::class)->findAll();
+        $webHookQueues = $this->getContainer()->get(WebhookQueueRepository::class)->findAll();
 
         $this->assertCount(2, $webHookQueues);
 

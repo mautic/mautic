@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Utils\Rector;
 
+use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use PhpParser\Modifiers;
@@ -25,10 +26,12 @@ use PhpParser\Node\Stmt\Expression;
 use PhpParser\Node\Stmt\Property;
 use PhpParser\NodeFinder;
 use PHPStan\Type\ObjectType;
+use PHPUnit\Framework\TestCase;
 use Rector\NodeManipulator\ClassDependencyManipulator;
 use Rector\PhpParser\AstResolver;
 use Rector\PostRector\ValueObject\PropertyMetadata;
 use Rector\Rector\AbstractRector;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Replaces the argument-less $model->getRepository() service locator with the concrete repository service.
@@ -56,7 +59,7 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
     /**
      * Any class extending this is a test and is left alone.
      */
-    private const string TEST_CASE = \PHPUnit\Framework\TestCase::class;
+    private const string TEST_CASE = TestCase::class;
 
     private const string ABSTRACT_COMMON_MODEL = AbstractCommonModel::class;
 
@@ -65,7 +68,7 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
      * and there is no dedicated service to depend on.
      */
     private const array GENERIC_REPOSITORIES = [
-        \Doctrine\ORM\EntityRepository::class,
+        EntityRepository::class,
         CommonRepository::class,
     ];
 
@@ -283,7 +286,7 @@ final class ModelGetRepositoryToRepositoryServiceRector extends AbstractRector
 
         // Symfony calls every #[Required] method on service instantiation.
         $classMethod->attrGroups = [
-            new AttributeGroup([new Attribute(new FullyQualified(\Symfony\Contracts\Service\Attribute\Required::class))]),
+            new AttributeGroup([new Attribute(new FullyQualified(Required::class))]),
         ];
 
         return $classMethod;

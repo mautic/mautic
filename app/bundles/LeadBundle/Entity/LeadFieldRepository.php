@@ -200,7 +200,7 @@ final class LeadFieldRepository extends CommonRepository
         return new ArrayCollection($queryBuilder->getQuery()->execute());
     }
 
-    private function addCompanyLeftJoin(\Mautic\CoreBundle\Doctrine\Query\QueryBuilder $q): void
+    private function addCompanyLeftJoin(QueryBuilder $q): void
     {
         $q->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
         $q->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'company', 'companies_lead.company_id = company.id');

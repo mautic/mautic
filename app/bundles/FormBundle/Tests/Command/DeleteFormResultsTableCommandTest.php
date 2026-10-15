@@ -24,10 +24,10 @@ final class DeleteFormResultsTableCommandTest extends MauticMysqlTestCase
         $this->deleteAllFormResultsTable();
 
         /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class);
+        $submissionRepository = $this->getContainer()->get(SubmissionRepository::class);
 
         /** @var FormRepository $formRepository */
-        $formRepository = $this->getContainer()->get(\Mautic\FormBundle\Entity\FormRepository::class);
+        $formRepository = $this->getContainer()->get(FormRepository::class);
 
         $deletedForms = 20;
 

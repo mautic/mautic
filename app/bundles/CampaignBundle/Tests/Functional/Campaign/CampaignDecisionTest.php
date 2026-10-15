@@ -10,6 +10,7 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -124,12 +125,12 @@ final class CampaignDecisionTest extends MauticMysqlTestCase
         array $yesEventLeads,
         array $noEventLeads,
     ): void {
-        $campaignEventLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)
+        $campaignEventLogs = $this->getContainer()->get(LeadEventLogRepository::class)
             ->findBy(['campaign' => $campaign, 'event' => $yesEvent], ['event' => 'ASC']);
         $this->assertCount(count($yesEventLeads), $campaignEventLogs);
         $this->assertSame($yesEventLeads, $this->getLeadIds($campaignEventLogs));
 
-        $campaignEventLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)
+        $campaignEventLogs = $this->getContainer()->get(LeadEventLogRepository::class)
             ->findBy(['campaign' => $campaign, 'event' => $noEvent], ['event' => 'ASC']);
         $this->assertCount(count($noEventLeads), $campaignEventLogs);
         $this->assertSame($noEventLeads, $this->getLeadIds($campaignEventLogs));

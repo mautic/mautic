@@ -10,6 +10,8 @@ use Mautic\ApiBundle\EventListener\PreAuthorizationEventListener;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\EventListener\CampaignActionChangeMembershipSubscriber;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
+use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
+use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\CoreBundle\EventListener\AssetsSubscriber;
 use Mautic\CoreBundle\EventListener\ConfigThemeSubscriber;
 use Mautic\CoreBundle\EventListener\CoreSubscriber;
@@ -146,7 +148,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\PageBundle\EventListener\ReportSubscriber::class,
             \Mautic\PointBundle\EventListener\ReportSubscriber::class,
         ],
-        \Mautic\ConfigBundle\Event\ConfigBuilderEvent::class => [
+        ConfigBuilderEvent::class => [
             \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\AssetBundle\EventListener\ConfigSubscriber::class,
@@ -164,7 +166,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
             \Mautic\WebhookBundle\EventListener\ConfigSubscriber::class,
         ],
-        \Mautic\ConfigBundle\Event\ConfigPreSaveEvent::class => [
+        ConfigPreSaveEvent::class => [
             \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
