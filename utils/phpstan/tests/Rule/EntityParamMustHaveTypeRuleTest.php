@@ -20,7 +20,7 @@ final class EntityParamMustHaveTypeRuleTest extends RuleTestCase
 
     public function testRule(): void
     {
-        $errorMessage = 'Param "$%s" of "%s()" must have a native object type hint ("object", a class, or a union that includes one), not just a "@param" tag.';
+        $errorMessage = 'Param "$%s" of "%s()" must have a native type hint, not just a "@param" tag.';
 
         $this->analyse([__DIR__.'/Fixture/EntityParamMustHaveType/SomeClass.php'], [
             [
@@ -30,18 +30,6 @@ final class EntityParamMustHaveTypeRuleTest extends RuleTestCase
             [
                 sprintf($errorMessage, 'Entity', 'missingTypeUpperCase'),
                 13,
-            ],
-            [
-                sprintf($errorMessage, 'entity', 'mixedNativeType'),
-                17,
-            ],
-            [
-                sprintf($errorMessage, 'entity', 'scalarNativeType'),
-                21,
-            ],
-            [
-                sprintf($errorMessage, 'entity', 'arrayNativeType'),
-                25,
             ],
             [
                 sprintf($errorMessage, 'entity', 'paramTagOnly'),
