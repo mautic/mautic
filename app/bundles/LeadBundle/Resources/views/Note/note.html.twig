@@ -14,7 +14,7 @@ Variables:
 {% endif %}
 <li class="note-single mb-lg" id="LeadNote{{ note.id }}">
     <div class="note-body d-flex np mb-md">
-        <div class="height-auto icon text-right">
+        <div class="height-auto icon text-end">
             <div class="icon-wrapper d-flex ai-center jc-center"><i class="ri-lg fs-22 {{ icon }}"></i></div>
         </div>
         <div class="tile media-body pa-lg">
@@ -23,7 +23,7 @@ Variables:
                 <span class="fw-b ellipsis"><i class="ri-user-6-line mr-xs"></i>{{ note.createdByUser }}</span>
                 <div class="d-flex fg-1 ai-center jc-space-between jc-end-lg gap-sm">
                     <span class="small text-secondary">{{ dateToFullConcat(note.dateTime) }}</span>
-                    <div class="pull-right btn-group">
+                    <div class="float-end btn-group">
                         {% if permissions['edit'] %}
                         {% include '@MauticCore/Helper/button.html.twig' with {
                             buttons: [

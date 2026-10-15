@@ -28,27 +28,27 @@
 						<div class="col-sm-6{{ form.firstName.vars.errors|length ? ' has-error' : '' }}">
 							<h3 class="mb-lg mt-lg">{{ 'mautic.user.config.title.personal_information'|trans }}</h3>
 							<div class="form-group">
-								<label class="control-label mb-xs">{{ form_label(form.firstName) }}</label>
+								<label class="form-label mb-xs">{{ form_label(form.firstName) }}</label>
 								{{ form_widget(form.firstName, {'attr' : {'placeholder' : form.firstName.vars.label }}) }}
 								{{ form_errors(form.firstName) }}
 							</div>
 							<div class="form-group{{ form.lastName.vars.errors|length ? ' has-error' : '' }}">
-								<label class="control-label mb-xs">{{ form_label(form.lastName) }}</label>
+								<label class="form-label mb-xs">{{ form_label(form.lastName) }}</label>
 								{{ form_widget(form.lastName, {'attr' : {'placeholder' : form.lastName.vars.label }}) }}
 								{{ form_errors(form.lastName) }}
 							</div>
 							<div class="form-group{{ form.role.vars.errors|length ? ' has-error' : '' }}">
-								<label class="control-label mb-xs">{{ form_label(form.role) }}</label>
+								<label class="form-label mb-xs">{{ form_label(form.role) }}</label>
 								{{ form_widget(form.role, {'attr' : {'placeholder' : form.role.vars.label }}) }}
 								{{ form_errors(form.role) }}
 							</div>
 							<div class="form-group pb-lg{{ form.position.vars.errors|length ? ' has-error' : '' }}">
-								<label class="control-label mb-xs">{{ form_label(form.position) }}</label>
+								<label class="form-label mb-xs">{{ form_label(form.position) }}</label>
 								{{ form_widget(form.position, {'attr' : {'placeholder' : form.position.vars.label }}) }}
 								{{ form_errors(form.position) }}
 							</div>
 							<div class="form-group pt-md{{ form.signature.vars.errors|length ? ' has-error' : '' }}">
-								<label class="control-label mb-xs">{{ form_label(form.signature) }}</label>
+								<label class="form-label mb-xs">{{ form_label(form.signature) }}</label>
 								{{ form_widget(form.signature, {'attr' : {'placeholder' : form.signature.vars.label }}) }}
 								{{ form_errors(form.signature) }}
 								<p class="help-text">{{ 'mautic.user.config.signature.admin.helper'|trans }} </p>

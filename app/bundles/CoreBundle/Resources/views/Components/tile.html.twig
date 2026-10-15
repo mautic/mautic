@@ -45,8 +45,8 @@
     {% set randomId = random() %}
     <button type="button"
             class="tile tile--expandable collapsed {{ className|default('') }}"
-            data-toggle="collapse"
-            data-target="#collapse-{{ randomId }}"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse-{{ randomId }}"
             aria-expanded="false"
             aria-controls="collapse-{{ randomId }}"
             title="{{ 'mautic.core.interact_to_expand_tile'|trans }}"
@@ -82,8 +82,8 @@
                 </div>
             </div>
             <button type="button"
-                    data-toggle="collapse"
-                    data-target="#collapse-{{ randomId }}"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse-{{ randomId }}"
                     aria-expanded="false"
                     aria-controls="expandable-tile-interactive-{{ randomId }}"
                     aria-label="{{ 'mautic.core.interact_to_expand_tile'|trans }}"

@@ -50,7 +50,7 @@
                 </div>
                 <div class="col-xs-11">
                     {% if isWinner %}
-                        <div class="mr-xs pull-left" data-toggle="tooltip" title="{{ 'mautic.core.ab_test.make_winner'|trans }}">
+                        <div class="mr-xs float-start" data-bs-toggle="tooltip" title="{{ 'mautic.core.ab_test.make_winner'|trans }}">
                             {% include '@MauticCore/Helper/button.html.twig' with {
                                 buttons: [
                                     {
@@ -82,7 +82,7 @@
                             &nbsp;<span class="label label-warning">{{ 'mautic.core.parent'|trans }}</span>
                         {% endif %}
                         {% if variant is instanceof('\\Mautic\\CoreBundle\\Entity\\TranslationEntityInterface') and variant.isTranslation %}
-                            &nbsp;<span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
+                            &nbsp;<span data-bs-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
                                 <i class="ri-fw ri-translate"></i>
                             </span>
                         {% endif %}
@@ -93,7 +93,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 va-t text-right">
+        <div class="col-md-4 va-t text-end">
             <em class="text-white dark-sm">
                 {% if true == variants['configurationError'] %}
                     <div class="text-danger" data-toggle="label label-danger" title="{{ 'mautic.core.variant.misconfiguration'|trans }}">

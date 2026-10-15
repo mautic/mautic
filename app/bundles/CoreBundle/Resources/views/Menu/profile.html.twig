@@ -1,9 +1,9 @@
 {% set inline = menuRender('profile') %}
 <li class="dropdown">
-    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-label={{ 'mautic.lead.lead.social.profile'|trans }}>
+    <a class="dropdown-toggle" data-bs-toggle="dropdown" href="#" aria-label={{ 'mautic.lead.lead.social.profile'|trans }}>
         <i class="ri-account-circle-line ri-xl"></i>
     </a>
-    <ul class="dropdown-menu dropdown-menu-right">
+    <ul class="dropdown-menu dropdown-menu-end">
         <li>
             <div class="dropdown-menu-user row-no-gutters fw-nowrap ma-md">
                 <span class="img-wrapper"><img onerror="this.classList.add('hide')" src="{{ gravatarGetImage(app.getUser().getEmail()) }}"></span>

@@ -245,7 +245,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.blanks',
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'placeholder'       => false,
                     'required'          => false,
                 ]
@@ -275,7 +275,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                     YesNoButtonGroupType::class,
                     [
                         'label'      => 'mautic.plugin.config.push.activities',
-                        'label_attr' => ['class' => 'control-label'],
+                        'label_attr' => ['class' => 'form-label'],
                         'attr'       => [
                             'class' => 'form-control',
                         ],

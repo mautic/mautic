@@ -241,19 +241,19 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
             // Per call
             // ================================
             BsTooltip: function () {
-                $("[data-toggle~=tooltip]").tooltip();
+                $("[data-bs-toggle~=tooltip]").tooltip();
             },
 
             // @MISC: BsPopover - Bootstrap popover
             // Per call
             // ================================
             BsPopover: function () {
-                $("[data-toggle~=popover]").popover({
+                $("[data-bs-toggle~=popover]").popover({
                     sanitize: false
                 });
                 
                 var hideAllPopovers = function() {
-                    $("[data-toggle~=popover]").each(function() {
+                    $("[data-bs-toggle~=popover]").each(function() {
                         var popover = $(this).data('bs.popover');
                         if (popover && popover.tip().hasClass('in')) {
                             $(this).popover('hide');
@@ -263,12 +263,12 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                 
                 $(document).on('click', function(e) {
                     if (!$(e.target).closest('.popover').length && 
-                        !$(e.target).closest('[data-toggle="popover"]').length) {
+                        !$(e.target).closest('[data-bs-toggle="popover"]').length) {
                         hideAllPopovers();
                     }
                 });
                 
-                $(document).on('mouseenter', '[data-toggle="popover"][data-trigger="hover"]', function() {
+                $(document).on('mouseenter', '[data-bs-toggle="popover"][data-trigger="hover"]', function() {
                     hideAllPopovers();
                 });
             },
