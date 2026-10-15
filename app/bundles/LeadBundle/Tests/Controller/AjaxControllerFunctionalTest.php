@@ -481,6 +481,34 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotContains($tag, $updatedLead->getTags()->toArray());
     }
 
+    public function testRemoveTagFromCompanyAction(): void
+    {
+        $company = new Company();
+        $company->setName('Taggable company');
+
+        $tag = new Tag();
+        $tag->setTag('Enterprise');
+        $company->addTag($tag);
+
+        $this->em->persist($company);
+        $this->em->persist($tag);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_POST, '/s/ajax?action=lead:removeTagFromCompany', [
+            'companyId' => $company->getId(),
+            'tagId'     => $tag->getId(),
+        ]);
+        $clientResponse = $this->client->getResponse();
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertSame(1, $response['success']);
+
+        $updatedCompany = $this->em->getRepository(Company::class)->find($company->getId());
+        $this->assertInstanceOf(Company::class, $updatedCompany);
+        $this->assertNotContains($tag, $updatedCompany->getTags()->toArray());
+    }
+
     public function testContactListActionSuggestionsByAdminUser(): void
     {
         /** @var UserRepository $userRepository */

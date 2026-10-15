@@ -186,6 +186,7 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['Campaign A' => 22], $choicesForAliases['campaign']);
         $this->assertSame(['Segment B' => 33], $choicesForAliases['leadlist']);
         $this->assertSame(['Tag C' => 44], $choicesForAliases['tags']);
+        $this->assertSame(['Tag C' => 44], $choicesForAliases['company_tags']);
         $this->assertSame(['Stage D' => 55], $choicesForAliases['stage']);
         $this->assertSame(['Category E' => 66], $choicesForAliases['globalcategory']);
         $this->assertSame(['En' => ['Email F' => 77]], $choicesForAliases['lead_email_received']);
@@ -216,6 +217,46 @@ final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $alias    = 'tags';
         $object   = 'lead';
+        $operator = OperatorOptions::EQUAL_TO;
+        $details  = [
+            'properties' => [
+                'list' => [
+                    'Tag A' => 'Tag A',
+                ],
+            ],
+        ];
+        $event = new FormAdjustmentEvent($this->form, $alias, $object, $operator, $details);
+
+        $this->form->expects($this->once())
+            ->method('add')
+            ->with(
+                'filter',
+                ChoiceType::class,
+                [
+                    'label'                     => false,
+                    'data'                      => [],
+                    'choices'                   => ['Tag A' => 'Tag A'],
+                    'multiple'                  => true,
+                    'choice_translation_domain' => false,
+                    'disabled'                  => false,
+                    'constraints'               => [new NotBlank(message: 'mautic.core.value.required')],
+                    'attr'                      => [
+                        'class'                => 'form-control',
+                        'data-placeholder'     => 'mautic.lead.tags.select_or_create',
+                        'data-no-results-text' => 'mautic.lead.tags.enter_to_create',
+                        'data-allow-add'       => true,
+                        'onchange'             => 'Mautic.createLeadTag(this)',
+                    ],
+                ]
+            );
+
+        $this->subscriber->onSegmentFilterFormHandleTags($event);
+    }
+
+    public function testOnSegmentFilterFormHandleTagsIfCompanyTag(): void
+    {
+        $alias    = 'company_tags';
+        $object   = 'company';
         $operator = OperatorOptions::EQUAL_TO;
         $details  = [
             'properties' => [
