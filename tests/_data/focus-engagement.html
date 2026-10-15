@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Focus engagement</title>
+</head>
+<body>
+<h1>Focus engagement</h1>
+<script>
+    // Embeds the focus item given as ?focus=<id>, the way a website does.
+    var focusScript = document.createElement('script');
+    focusScript.src = '/focus/' + encodeURIComponent(new URLSearchParams(window.location.search).get('focus')) + '.js';
+    document.body.appendChild(focusScript);
+</script>
+</body>
+</html>

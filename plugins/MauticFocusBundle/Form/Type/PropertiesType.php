@@ -7,9 +7,13 @@ namespace MauticPlugin\MauticFocusBundle\Form\Type;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Range;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @extends AbstractType<array<string, mixed>>
@@ -140,6 +144,7 @@ final class PropertiesType extends AbstractType
                     'mautic.focus.form.frequency.q15m'      => 'q15min',
                     'mautic.focus.form.frequency.hourly'    => 'hourly',
                     'mautic.focus.form.frequency.daily'     => 'daily',
+                    'mautic.focus.form.frequency.days'      => 'days',
                 ],
                 'label'       => 'mautic.focus.form.frequency',
                 'label_attr'  => ['class' => 'control-label'],
@@ -150,6 +155,8 @@ final class PropertiesType extends AbstractType
                 'placeholder' => false,
             ]
         );
+
+        $this->addEngagementCountFields($builder);
 
         $builder->add(
             'stop_after_conversion',
@@ -176,6 +183,44 @@ final class PropertiesType extends AbstractType
         );
     }
 
+    /**
+     * The number of days between engagements and the page view to engage from.
+     */
+    private function addEngagementCountFields(FormBuilderInterface $builder): void
+    {
+        $builder->add(
+            'frequency_days',
+            IntegerType::class,
+            [
+                'label'      => 'mautic.focus.form.frequency_days',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'min'          => 1,
+                    'data-show-on' => '{"focus_properties_frequency": ["days"]}',
+                ],
+                'required'    => false,
+                'constraints' => [new Range(min: 1)],
+            ]
+        );
+
+        $builder->add(
+            'min_page_views',
+            IntegerType::class,
+            [
+                'label'      => 'mautic.focus.form.min_page_views',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'min'     => 1,
+                    'tooltip' => 'mautic.focus.form.min_page_views.tooltip',
+                ],
+                'required'    => false,
+                'constraints' => [new Range(min: 1)],
+            ]
+        );
+    }
+
     public function getBlockPrefix(): string
     {
         return 'focus_entity_properties';
@@ -185,8 +230,21 @@ final class PropertiesType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'label' => false,
+                'label'       => false,
+                'constraints' => [new Callback($this->validateFrequencyDays(...))],
             ]
         );
+    }
+
+    /**
+     * @param array<string, mixed>|null $properties
+     */
+    public function validateFrequencyDays(?array $properties, ExecutionContextInterface $context): void
+    {
+        if ('days' === ($properties['frequency'] ?? null) && empty($properties['frequency_days'])) {
+            $context->buildViolation('mautic.focus.frequency_days.notblank')
+                ->atPath('[frequency_days]')
+                ->addViolation();
+        }
     }
 }
