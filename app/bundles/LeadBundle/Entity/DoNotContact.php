@@ -42,12 +42,9 @@ class DoNotContact
      */
     private $id;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'doNotContact')]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'CASCADE')]
-    private $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var \DateTimeInterface
@@ -117,10 +114,7 @@ class DoNotContact
         return $this->id;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }

@@ -27,26 +27,17 @@ class Stat
      */
     private $id;
 
-    /**
-     * @var Notification|null
-     */
     #[ORM\ManyToOne(targetEntity: Notification::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'notification_id', onDelete: 'SET NULL')]
-    private $notification;
+    private ?Notification $notification = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
-    /**
-     * @var LeadList|null
-     */
     #[ORM\ManyToOne(targetEntity: LeadList::class)]
     #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
-    private $list;
+    private ?LeadList $list = null;
 
     private ?IpAddress $ipAddress = null;
 
@@ -221,10 +212,7 @@ class Stat
         $this->dateSent = $dateSent;
     }
 
-    /**
-     * @return Notification|null
-     */
-    public function getNotification()
+    public function getNotification(): ?\Mautic\NotificationBundle\Entity\Notification
     {
         return $this->notification;
     }
@@ -265,10 +253,7 @@ class Stat
         $this->isClicked = $isClicked;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -294,18 +279,12 @@ class Stat
         $this->trackingHash = $trackingHash;
     }
 
-    /**
-     * @return LeadList|null
-     */
-    public function getList()
+    public function getList(): ?\Mautic\LeadBundle\Entity\LeadList
     {
         return $this->list;
     }
 
-    /**
-     * @param mixed $list
-     */
-    public function setList($list): void
+    public function setList(?\Mautic\LeadBundle\Entity\LeadList $list): void
     {
         $this->list = $list;
     }

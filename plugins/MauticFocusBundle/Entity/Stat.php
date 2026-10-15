@@ -50,12 +50,9 @@ class Stat
      */
     private $dateAdded;
 
-    /**
-     * @var ?Lead
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -151,10 +148,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return ?Lead
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }

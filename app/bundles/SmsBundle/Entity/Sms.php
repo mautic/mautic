@@ -113,11 +113,8 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     #[Groups(['sms:read'])]
     private $sentCount = 0;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['sms:read', 'sms:write'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<int, LeadList>
@@ -324,15 +321,12 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this->id;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
     {
         return $this->category;
     }
 
-    public function setCategory($category): static
+    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
