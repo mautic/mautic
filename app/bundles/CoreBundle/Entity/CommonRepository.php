@@ -1037,7 +1037,7 @@ class CommonRepository extends ServiceEntityRepository
      *
      * @return mixed[]
      */
-    protected function addAdvancedSearchWhereClause($qb, $filters): array
+    protected function addAdvancedSearchWhereClause($qb, $filters, bool $containsOr = false): array
     {
         $parseFilters = [];
         if (isset($filters->root[0])) {
@@ -1056,11 +1056,13 @@ class CommonRepository extends ServiceEntityRepository
             $type = 'and';
         }
 
+        $containsOr = $containsOr || 'or' === $type;
+
         $parameters  = [];
         $expressions = $qb->expr()->{"{$type}X"}();
 
         if ($parseFilters) {
-        $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters, 'or' === $type);
+        $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters, $containsOr);
         }
 
         return [$expressions, $parameters];
@@ -1809,7 +1811,7 @@ class CommonRepository extends ServiceEntityRepository
         }
 
         if (isset($filter->children)) {
-            return $this->addAdvancedSearchWhereClause($qb, $filter);
+            return $this->addAdvancedSearchWhereClause($qb, $filter, (bool) ($filter->containsOr ?? false));
         }
 
         if (!empty($filter->command)) {

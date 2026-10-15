@@ -795,7 +795,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             case $this->translator->trans('mautic.lead.lead.searchcommand.list'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.list', [], null, 'en_US'):
                 $listIds       = $this->getListIdsByAlias($string) ?: [0];
-                $useExists = $filter->not || ($filter->containsOr ?? false);
+                $useExists = $filter->not || ($filter->containsOr ?? false) || count($listIds) > 1;
                 if ($useExists) {
                     $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
                     $sq->select('1')
@@ -812,7 +812,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         $q->resetQueryPart('from');
                         $q->add('from', ['hint' => 'USE INDEX FOR JOIN ('.MAUTIC_TABLE_PREFIX.'lead_date_added)'] + $from, true);
                     }
-                    $q->andWhere($this->getExistsExpression($filter->not).'('.$sq->getSQL().')');
+                    $existsExpression = $this->getExistsExpression($filter->not).'('.$sq->getSQL().')';
+                    if ($filter->containsOr ?? false) {
+                        $expr = $existsExpression;
+                    } else {
+                        $q->andWhere($existsExpression);
+                    }
                 } else {
                     $joinAlias     = $this->generateRandomParameterName();
                     $joinCondition = $q->expr()->and(
