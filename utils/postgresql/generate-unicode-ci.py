@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Generate the one-codepoint UCA 4 primary-weight mapping used by MySQL LIKE.
 
-Download https://www.unicode.org/Public/UCA/4.0.0/allkeys-4.0.0.txt first.
-Usage: python3 utils/postgresql/generate-unicode-ci.py allkeys-4.0.0.txt output.json
+Usage: curl -fsSL https://www.unicode.org/Public/UCA/4.0.0/allkeys-4.0.0.txt |
+    python3 utils/postgresql/generate-unicode-ci.py
+Only the pinned Unicode source is accepted; the repository resource is overwritten.
 Unicode source data is covered by CoreBundle/Resources/unicode/LICENSE.txt.
 """
 
@@ -13,7 +14,16 @@ import re
 import sys
 from pathlib import Path
 
-source = Path(sys.argv[1]).read_bytes()
+if len(sys.argv) != 1:
+    sys.exit("No path arguments are accepted; pipe the Unicode source to stdin.")
+
+output = Path(__file__).resolve().parents[2] / "app/bundles/CoreBundle/Resources/unicode/utf8mb4_unicode_ci.json"
+if output.resolve() != output:
+    sys.exit("The resource path must not contain symbolic links.")
+
+source = sys.stdin.buffer.read()
+if hashlib.sha256(source).hexdigest() != "e97345da79baf2ab6a72304fe84732b5d0c4b4c6adc888679fd17a6a546ec195":
+    sys.exit("Expected the unmodified Unicode UCA 4.0.0 allkeys source.")
 groups = collections.defaultdict(list)
 for line in source.decode().splitlines():
     if ";" not in line:
@@ -52,4 +62,4 @@ result = {
 }
 assert len(result["from"]) == len(result["to"])
 assert "\0" not in result["from"] + result["to"]
-Path(sys.argv[2]).write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")
+output.write_text(json.dumps(result, ensure_ascii=True, indent=2) + "\n", encoding="ascii")
