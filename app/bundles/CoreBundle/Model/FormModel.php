@@ -5,10 +5,19 @@ namespace Mautic\CoreBundle\Model;
 use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Doctrine\ReservedWords;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
+use Mautic\CoreBundle\Event\AbstractEntityEvent;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreDelete;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Event\EmailOnTogglePublishEvent;
+use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Event\PageOnTogglePublishEvent;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -151,7 +160,7 @@ class FormModel extends AbstractCommonModel
             $this->setTimestamps($entity, $isNew, $unlock);
 
             // Pre save single dispatcher
-            $preEvent                = $this->dispatchEventFromBatch('pre_save', $entity, $isNew);
+            $preEvent                = $this->dispatchEvent('pre_save', $entity, $isNew);
             $entitiesPreSaveParams[] = ['entity' => $entity, 'isNew' => $isNew, 'event' => $preEvent];
         }
 
@@ -174,7 +183,7 @@ class FormModel extends AbstractCommonModel
         $entitiesPostSaveParams = [];
         foreach ($entitiesPreSaveParams as &$entityParams) {
             // Post save single dispatcher after flush
-            $postEvent                = $this->dispatchEventFromBatch('post_save', $entityParams['entity'], $entityParams['isNew'], $entityParams['event']);
+            $postEvent                = $this->dispatchEvent('post_save', $entityParams['entity'], $entityParams['isNew'], $entityParams['event']);
             $entitiesPostSaveParams[] = ['entity' => $entityParams['entity'], 'isNew' => $entityParams['isNew'], 'event' => $postEvent];
         }
 
@@ -226,7 +235,11 @@ class FormModel extends AbstractCommonModel
             $entity->setIsEnabled(!$entity->getIsEnabled());
         }
 
-        $this->dispatchEvent('on_toggle_publish', $entity);
+        if ($entity instanceof Page) {
+            $this->dispatcher->dispatch(new PageOnTogglePublishEvent($entity));
+        } elseif ($entity instanceof Email) {
+            $this->dispatcher->dispatch(new EmailOnTogglePublishEvent($entity));
+        }
 
         // hit up event listeners
         $event = $this->dispatchEvent('pre_save', $entity);
@@ -374,12 +387,30 @@ class FormModel extends AbstractCommonModel
     /**
      * Dispatches events for child classes.
      *
-     * @param string $action
+     * @param "pre_save"|"post_save"|"pre_delete"|"post_delete" $action
      * @param object $entity
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent(string $action, &$entity, bool $isNew = false, ?AbstractEntityEvent $entityEvent = null): ?AbstractEntityEvent
     {
-        // ...
+        $eventClass = match ($action) {
+            'pre_save'    => EntityPreSave::class,
+            'post_save'   => EntityPostSave::class,
+            'pre_delete'  => EntityPreDelete::class,
+            'post_delete' => EntityPostDelete::class,
+            default       => null,
+        };
+
+        if (null === $eventClass) {
+            return null;
+        }
+
+        if (!$this->dispatcher->hasListeners($eventClass)) {
+            return null;
+        }
+
+        $event = new $eventClass($entity, $isNew);
+
+        $this->dispatcher->dispatch($event);
 
         return $event;
     }

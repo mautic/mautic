@@ -191,45 +191,6 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
     }
 
     /**
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Trigger) {
-            throw new MethodNotAllowedHttpException(['Trigger']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = PointEvents::TRIGGER_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = PointEvents::TRIGGER_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = PointEvents::TRIGGER_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = PointEvents::TRIGGER_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new Events\TriggerEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
-    }
-
-    /**
      * @param array $sessionEvents
      */
     public function setEvents(Trigger $entity, $sessionEvents): void

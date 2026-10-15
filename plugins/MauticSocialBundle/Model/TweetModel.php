@@ -9,11 +9,9 @@ use MauticPlugin\MauticSocialBundle\Entity\Tweet;
 use MauticPlugin\MauticSocialBundle\Entity\TweetRepository;
 use MauticPlugin\MauticSocialBundle\Entity\TweetStat;
 use MauticPlugin\MauticSocialBundle\Entity\TweetStatRepository;
-use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -161,31 +159,6 @@ final class TweetModel extends FormModel implements AjaxLookupModelInterface
         return parent::getEntity($id);
     }
 
-    /**
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Tweet) {
-            throw new MethodNotAllowedHttpException(['Tweet']);
-        }
-
-        $event = match ($action) {
-            'pre_save'    => new Events\TweetPreSaveEvent($entity, $isNew),
-            'post_save'   => new Events\TweetPostSaveEvent($entity, $isNew),
-            'pre_delete'  => new Events\TweetPreDeleteEvent($entity, $isNew),
-            'post_delete' => new Events\TweetPostDeleteEvent($entity, $isNew),
-            default       => null,
-        };
-
-        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
-            return null;
-        }
-
-        $this->dispatcher->dispatch($event);
-
-        return $event;
-    }
 
     public function getRepository(): TweetRepository
     {

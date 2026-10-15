@@ -13,12 +13,9 @@ use Mautic\StageBundle\Entity\LeadStageLogRepository;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\StageBundle\Event\StageBuilderEvent;
-use Mautic\StageBundle\Event\StageEvent;
 use Mautic\StageBundle\Form\Type\StageType;
-use Mautic\StageBundle\StageEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -84,45 +81,6 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         return parent::getEntity($id);
-    }
-
-    /**
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Stage) {
-            throw new MethodNotAllowedHttpException(['Stage']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = StageEvents::STAGE_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = StageEvents::STAGE_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = StageEvents::STAGE_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = StageEvents::STAGE_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new StageEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
     }
 
     /**

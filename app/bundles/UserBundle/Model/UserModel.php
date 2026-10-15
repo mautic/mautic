@@ -19,10 +19,6 @@ use Mautic\UserBundle\Entity\UserInviteRepository;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Enum\UserTokenAuthorizator;
-use Mautic\UserBundle\Event\PostDeleteUserEvent;
-use Mautic\UserBundle\Event\PostSaveUserEvent;
-use Mautic\UserBundle\Event\PreDeleteUserEvent;
-use Mautic\UserBundle\Event\PreSaveUserEvent;
 use Mautic\UserBundle\Exception\PasswordResetTokenCreationFailedException;
 use Mautic\UserBundle\Form\Type\UserType;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
@@ -32,7 +28,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
 
 /**
@@ -164,36 +159,6 @@ final class UserModel extends FormModel implements GlobalSearchInterface
                 'isPublished' => true,
             ]
         );
-    }
-
-    /**
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof User) {
-            throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));
-        }
-
-        $event = match ($action) {
-            'pre_save'    => new PreSaveUserEvent($entity, $isNew),
-            'post_save'   => new PostSaveUserEvent($entity, $isNew),
-            'pre_delete'  => new PreDeleteUserEvent($entity, $isNew),
-            'post_delete' => new PostDeleteUserEvent($entity, $isNew),
-            default       => null,
-        };
-
-        if (!$event instanceof Event) {
-            return null;
-        }
-
-        if ($this->dispatcher->hasListeners($event::class)) {
-            $this->dispatcher->dispatch($event);
-
-            return $event;
-        }
-
-        return null;
     }
 
     /**

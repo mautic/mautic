@@ -22,12 +22,10 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\ReportRepository;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
-use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Event\ReportQueryEvent;
 use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
-use Mautic\ReportBundle\ReportEvents;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -142,45 +140,6 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         }
 
         return parent::getEntity($id);
-    }
-
-    /**
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Report) {
-            throw new MethodNotAllowedHttpException(['Report']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = ReportEvents::REPORT_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = ReportEvents::REPORT_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = ReportEvents::REPORT_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = ReportEvents::REPORT_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new ReportEvent($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
     }
 
     /**

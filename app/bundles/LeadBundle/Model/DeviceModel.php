@@ -5,14 +5,9 @@ namespace Mautic\LeadBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
-use Mautic\LeadBundle\Event\DevicePostDeleteEvent;
-use Mautic\LeadBundle\Event\DevicePostSaveEvent;
-use Mautic\LeadBundle\Event\DevicePreDeleteEvent;
-use Mautic\LeadBundle\Event\DevicePreSaveEvent;
 use Mautic\LeadBundle\Form\Type\DeviceType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -72,29 +67,4 @@ final class DeviceModel extends FormModel
         return $this->formFactory->create(DeviceType::class, $entity, $options);
     }
 
-    /**
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof LeadDevice) {
-            throw new MethodNotAllowedHttpException(['LeadDevice']);
-        }
-
-        $event = match ($action) {
-            'pre_save'    => new DevicePreSaveEvent($entity, $isNew),
-            'post_save'   => new DevicePostSaveEvent($entity, $isNew),
-            'pre_delete'  => new DevicePreDeleteEvent($entity, $isNew),
-            'post_delete' => new DevicePostDeleteEvent($entity, $isNew),
-            default       => null,
-        };
-
-        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
-            return null;
-        }
-
-        $this->dispatcher->dispatch($event);
-
-        return $event;
-    }
 }

@@ -5,13 +5,11 @@ namespace MauticPlugin\MauticSocialBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
-use MauticPlugin\MauticSocialBundle\Event as Events;
 use MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -71,32 +69,6 @@ final class MonitoringModel extends FormModel
     public function getEntity($id = null): ?Monitoring
     {
         return $id ? parent::getEntity($id) : new Monitoring();
-    }
-
-    /**
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Monitoring) {
-            throw new MethodNotAllowedHttpException(['Monitoring']);
-        }
-
-        $event = match ($action) {
-            'pre_save'    => new Events\MonitorPreSaveEvent($entity, $isNew),
-            'post_save'   => new Events\MonitorPostSaveEvent($entity, $isNew),
-            'pre_delete'  => new Events\MonitorPreDeleteEvent($entity, $isNew),
-            'post_delete' => new Events\MonitorPostDeleteEvent($entity, $isNew),
-            default       => null,
-        };
-
-        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
-            return null;
-        }
-
-        $this->dispatcher->dispatch($event);
-
-        return $event;
     }
 
     /**
