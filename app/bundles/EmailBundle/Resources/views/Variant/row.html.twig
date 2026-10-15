@@ -53,7 +53,7 @@
                aria-label="{{ 'mautic.core.ab_test.make_winner'|trans }}"
                title="{{ 'mautic.core.ab_test.make_winner'|trans }}"
                data-toggle="confirmation"
-               data-message="{{ ('mautic.core.ab_test.confirm_make_winner'|trans({'%name%': attribute(variant, nameGetter)})|e) }}"
+               data-message="{{ ('mautic.core.ab_test.confirm_make_winner'|trans({'%name%': attribute(variant, nameGetter)})|e('html_attr')) }}"
                data-confirm-text="{{ 'mautic.core.ab_test.make_winner'|trans|escape }}"
                data-confirm-callback="executeAction"
                data-cancel-text="{{ 'mautic.core.form.cancel'|trans|escape }}">
