@@ -630,8 +630,11 @@ class LeadModel extends FormModel
 
     /**
      * Get list of entities for autopopulate fields.
+     *
+     * @param positive-int|null $limit
+     * @param non-negative-int $start
      */
-    public function getLookupResults($type, string|array|null $filter = '', int|string|null $limit = 10, int $start = 0): array
+    public function getLookupResults($type, string|array|null $filter = '', ?int $limit = 10, int $start = 0): array
     {
         $results    = [];
 
@@ -665,7 +668,7 @@ class LeadModel extends FormModel
      */
     public function getOwnerList(): array
     {
-        return $this->userRepository->getUserList('', 0);
+        return $this->userRepository->getUserList('', null);
     }
 
     /**
