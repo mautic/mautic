@@ -328,14 +328,12 @@ final class FormApiController extends CommonApiController
     /**
      * Creates the form instance.
      *
-     * @param array<string, mixed>|Form $entity
-     *
      * @return FormInterface<mixed>
      */
-    private function createFieldEntityForm(Form|array $entity): FormInterface
+    private function createFieldEntityForm(array $entityArray): FormInterface
     {
         return $this->fieldModel->createForm(
-            $entity,
+            $entityArray,
             null,
             [
                 'csrf_protection'    => false,
