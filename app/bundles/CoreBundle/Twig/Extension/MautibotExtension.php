@@ -19,6 +19,7 @@ final class MautibotExtension extends AbstractExtension
     {
         return [
             new TwigFunction('mautibotGetImage', $this->getImage(...), ['is_safe' => ['all']]),
+            new TwigFunction('mautibotGetName', $this->getName(...), ['is_safe' => ['all']]),
         ];
     }
 
@@ -28,5 +29,13 @@ final class MautibotExtension extends AbstractExtension
     public function getImage(string $image): string
     {
         return $this->mautibotHelper->getImage($image);
+    }
+
+    /**
+     * @retrun bot name
+     */
+    public function getName(): string
+    {
+        return $this->mautibotHelper->getName();
     }
 }
