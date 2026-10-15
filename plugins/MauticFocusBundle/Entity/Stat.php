@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
@@ -26,6 +25,9 @@ class Stat
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -38,16 +40,19 @@ class Stat
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $type;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'type_id', type: 'integer', nullable: true)]
     private $typeId;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
@@ -56,20 +61,6 @@ class Stat
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
     private $lead;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->addField('type', 'string');
-
-        $builder->addNamedField('typeId', 'integer', 'type_id', true);
-
-        $builder->addNamedField('dateAdded', 'datetime', 'date_added');
-
-    }
 
     /**
      * @return mixed

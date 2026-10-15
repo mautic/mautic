@@ -6,7 +6,6 @@ namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
@@ -28,6 +27,9 @@ class Submission
     /**
      * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -40,6 +42,8 @@ class Submission
     /**
      * @var IpAddress|null
      */
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private $ipAddress;
 
     /**
@@ -52,16 +56,19 @@ class Submission
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191, nullable: true)]
     private $trackingId;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_submitted', type: 'datetime')]
     private $dateSubmitted;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'text')]
     private $referer;
 
     /**
@@ -75,26 +82,6 @@ class Submission
      * @var array
      */
     private $results = [];
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('trackingId', 'string')
-            ->columnName('tracking_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateSubmitted', 'datetime')
-            ->columnName('date_submitted')
-            ->build();
-
-        $builder->addField('referer', 'text');
-    }
 
     /**
      * Prepares the metadata for API usage.

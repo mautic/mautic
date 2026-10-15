@@ -13,9 +13,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\ClassMetadata as OrmClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -53,19 +51,25 @@ class Project extends FormEntity implements UuidInterface
     public const string TABLE_NAME = 'projects';
 
     #[Groups(['project:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private ?int $id = null;
 
     #[Groups(['project:read', 'project:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
     #[Groups(['project:read', 'project:write'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private ?string $name = null;
 
     /**
      * @var mixed[]
      */
     #[Groups(['project:read', 'project:write'])]
+    #[ORM\Column(type: Types::JSON)]
     private array $properties = [];
 
     /**
@@ -79,16 +83,6 @@ class Project extends FormEntity implements UuidInterface
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(OrmClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->addField('properties', Types::JSON);
-
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
