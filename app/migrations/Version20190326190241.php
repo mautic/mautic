@@ -24,6 +24,7 @@ final class Version20190326190241 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}campaign_events ADD failed_count INT NOT NULL;");
+        $this->addSql("ALTER TABLE {$this->prefix}campaign_events ADD failed_count INT DEFAULT 0 NOT NULL");
+        $this->addSql("ALTER TABLE {$this->prefix}campaign_events ALTER COLUMN failed_count DROP DEFAULT");
     }
 }

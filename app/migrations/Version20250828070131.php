@@ -28,24 +28,31 @@ final class Version20250828070131 extends PreUpAssertionMigration
                 'notnull'  => false,
             ]);
 
-            $table->addIndex(['translation_parent_id'], 'IDX_SMS_TRANSLATION_PARENT');
+            $table->addIndex(['translation_parent_id'], $this->generatePropertyName(self::TABLE_NAME, 'idx', ['translation_parent_id']));
 
             $table->addForeignKeyConstraint(
                 $table,
                 ['translation_parent_id'],
                 ['id'],
                 ['onDelete' => 'CASCADE'],
-                'FK_SMS_TRANSLATION_PARENT'
+                $this->generatePropertyName(self::TABLE_NAME, 'fk', ['translation_parent_id'])
             );
         }
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP FOREIGN KEY FK_SMS_TRANSLATION_PARENT');
-
-        $this->addSql('DROP INDEX IDX_SMS_TRANSLATION_PARENT ON '.$this->getPrefixedTableName());
-
-        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP COLUMN translation_parent_id');
+        $table = $schema->getTable($this->getPrefixedTableName());
+        foreach ([$this->generatePropertyName(self::TABLE_NAME, 'fk', ['translation_parent_id']), 'FK_SMS_TRANSLATION_PARENT'] as $name) {
+            if ($table->hasForeignKey($name)) {
+                $table->removeForeignKey($name);
+            }
+        }
+        foreach ([$this->generatePropertyName(self::TABLE_NAME, 'idx', ['translation_parent_id']), 'IDX_SMS_TRANSLATION_PARENT'] as $name) {
+            if ($table->hasIndex($name)) {
+                $table->dropIndex($name);
+            }
+        }
+        $table->dropColumn('translation_parent_id');
     }
 }

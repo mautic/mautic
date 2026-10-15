@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
@@ -329,10 +330,12 @@ class LeadListRepository extends CommonRepository
 
     private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
     {
-        $fromPart             = $qb->getQueryPart('from');
-        $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], $indexName);
-        $qb->resetQueryPart('from');
-        $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
+        if (DatabasePlatform::allowsIndexHint($this->getEntityManager()->getConnection()->getDatabasePlatform())) {
+            $fromPart             = $qb->getQueryPart('from');
+            $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], $indexName);
+            $qb->resetQueryPart('from');
+            $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
+        }
 
         return $qb;
     }
@@ -445,13 +448,13 @@ class LeadListRepository extends CommonRepository
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr            = $q->expr()->like('l.name', ':'.$unique);
+                $expr            = DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'l.name', ':'.$unique);
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.lead.list.searchcommand.filters_field'):
             case $this->translator->trans('mautic.lead.list.searchcommand.filters_field', [], null, 'en_US'):
                 $pattern         = sprintf('%%s:5:"field";s:%d:"%s"%%', strlen($filter->string), $filter->string);
-                $expr            = $q->expr()->like('l.filters', ':'.$unique);
+                $expr            = DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'l.filters', ':'.$unique);
                 $forceParameters = [$unique => $pattern];
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):

@@ -67,8 +67,9 @@ final class ContactManagementCest
         // Scroll back to the top of the page
         $I->executeJS('window.scrollTo(0, 0);');
 
-        // Click the actual form save button to ensure submit persists.
-        $I->executeJS("document.querySelector('button[name=\"lead[buttons][save]\"]').click();");
+        // Submit through the visible toolbar, as a user does.
+        $I->waitForElementClickable(ContactPage::$saveAndCloseButton, AcceptanceTester::TIMEOUT);
+        $I->click(ContactPage::$saveAndCloseButton);
 
         // Confirm the contact is created
         $I->waitForElementVisible('.page-header-title .span-block', AcceptanceTester::TIMEOUT);
@@ -507,7 +508,7 @@ final class ContactManagementCest
 
         // Wait for the import page to load
         $I->waitForText('Import Contacts', AcceptanceTester::TIMEOUT, 'h1.page-header-title');
-        $I->seeElement(ContactPage::$importModal);
+        $I->waitForElementVisible(ContactPage::$chooseFileButton, AcceptanceTester::TIMEOUT);
 
         // Click 'Choose file' and select a file
         $I->attachFile(ContactPage::$chooseFileButton, '10contacts.csv');

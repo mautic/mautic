@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 trait ExpressionHelperTrait
 {
@@ -25,13 +26,22 @@ trait ExpressionHelperTrait
             $includeIsNull = in_array($operator, ['neq', 'notLike', 'notIn']);
         }
 
+        $expression = in_array($operator, ['like', 'notLike'], true)
+            ? DatabasePlatform::getCaseInsensitiveLike(
+                $this->getEntityManager()->getConnection()->getDatabasePlatform(),
+                $column,
+                $parameter,
+                'notLike' === $operator ? DatabasePlatform::FLAG_NEGATIVE : 0
+            )
+            : $q->expr()->{$operator}($column, $parameter);
+
         if ($includeIsNull) {
             $expr = $q->expr()->or(
-                $q->expr()->{$operator}($column, $parameter),
+                $expression,
                 $q->expr()->isNull($column)
             );
         } else {
-            $expr = $q->expr()->{$operator}($column, $parameter);
+            $expr = $expression;
         }
 
         if ($appendTo) {

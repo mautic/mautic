@@ -4,6 +4,7 @@ namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -78,7 +79,7 @@ final class NotificationRepository extends CommonRepository
                 ];
                 $expr = $q->expr()->or(
                     $q->expr()->eq('e.language', ":{$unique}"),
-                    $q->expr()->like('e.language', ":{$langUnique}")
+                    DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'e.language', ":{$langUnique}")
                 );
                 $returnParameter = true;
                 break;
@@ -171,7 +172,7 @@ final class NotificationRepository extends CommonRepository
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                     ->setParameter('search', $search);
             } else {
-                $q->andWhere($q->expr()->like('e.name', ':search'))
+                $q->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'e.name', ':search'))
                     ->setParameter('search', "%{$search}%");
             }
         }
@@ -216,7 +217,7 @@ final class NotificationRepository extends CommonRepository
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                     ->setParameter('search', $search);
             } else {
-                $q->andWhere($q->expr()->like('e.name', ':search'))
+                $q->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'e.name', ':search'))
                     ->setParameter('search', "%{$search}%");
             }
         }

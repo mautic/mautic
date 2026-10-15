@@ -3,6 +3,7 @@
 namespace Mautic\CategoryBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -61,7 +62,7 @@ class CategoryRepository extends CommonRepository
                 $q->andWhere($q->expr()->in('c.id', ':search'))
                     ->setParameter('search', $search);
             } else {
-                $q->andWhere($q->expr()->like('c.title', ':search'))
+                $q->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'c.title', ':search'))
                     ->setParameter('search', "{$search}%");
             }
         }

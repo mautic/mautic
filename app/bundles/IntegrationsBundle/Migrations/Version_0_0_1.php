@@ -23,24 +23,25 @@ final class Version_0_0_1 extends AbstractMigration
 
     protected function up(): void
     {
-        $this->addSql("
-            ALTER TABLE `{$this->concatPrefix($this->table)}`
-            DROP INDEX `{$this->concatPrefix('integration_object')}`
-        ");
+        $connection    = $this->entityManager->getConnection();
+        $schemaManager = $connection->createSchemaManager();
+        $currentTable  = $schemaManager->introspectTable($this->concatPrefix($this->table));
+        $updatedTable  = clone $currentTable;
 
-        $this->addSql("
-            ALTER TABLE `{$this->concatPrefix($this->table)}`
-            ADD `integration_reference_id` varchar(191) NULL AFTER `internal_object_name`
-        ");
+        $updatedTable->dropIndex($this->concatPrefix('integration_object'));
+        $updatedTable->addColumn('integration_reference_id', 'string', ['length' => 191, 'notnull' => false]);
+        $updatedTable->addIndex(
+            ['integration', 'integration_object_name', 'integration_object_id', 'integration_reference_id'],
+            $this->concatPrefix('integration_object')
+        );
+        $updatedTable->addIndex(
+            ['integration', 'integration_object_name', 'integration_reference_id', 'integration_object_id'],
+            $this->concatPrefix('integration_reference')
+        );
 
-        $this->addSql("
-            CREATE INDEX {$this->concatPrefix('integration_object')}
-            ON {$this->concatPrefix($this->table)}(integration, integration_object_name, integration_object_id, integration_reference_id);
-        ");
-
-        $this->addSql("
-            CREATE INDEX {$this->concatPrefix('integration_reference')}
-            ON {$this->concatPrefix($this->table)}(integration, integration_object_name, integration_reference_id, integration_object_id);
-        ");
+        $tableDiff = $schemaManager->createComparator()->compareTables($currentTable, $updatedTable);
+        foreach ($connection->getDatabasePlatform()->getAlterTableSQL($tableDiff) as $sql) {
+            $this->addSql($sql);
+        }
     }
 }

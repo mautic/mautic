@@ -27,11 +27,11 @@ final class Version20200513162918 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}email_copies ADD COLUMN `body_text` LONGTEXT NULL DEFAULT NULL AFTER `body`");
+        $schema->getTable($this->getPrefixedTableName('email_copies'))->addColumn('body_text', 'text', ['notnull' => false]);
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}email_copies DROP COLUMN `body_text`");
+        $schema->getTable($this->getPrefixedTableName('email_copies'))->dropColumn('body_text');
     }
 }

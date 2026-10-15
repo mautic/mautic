@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
@@ -62,7 +63,6 @@ trait CustomFieldRepositoryTrait
             } else {
                 $statement = $dq->executeQuery();
             }
-
             $result = $statement->fetchAllAssociative();
             $total  = ($result) ? $result[0]['count'] : 0;
         } else {
@@ -233,7 +233,7 @@ trait CustomFieldRepositoryTrait
         );
 
         if (!empty($search)) {
-            $q->andWhere("{$col} LIKE :search")
+            $q->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->getEntityManager()->getConnection()->getDatabasePlatform(), $col, ':search'))
                 ->setParameter('search', "{$search}%");
         }
 

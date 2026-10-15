@@ -23,16 +23,18 @@ final class Version20250512114846 extends PreUpAssertionMigration
     {
         $tableName = $this->getTableName();
 
-        $this->addSql("ALTER TABLE {$tableName} ADD COLUMN redirect_event_id INT UNSIGNED NULL AFTER deleted");
-        $this->addSql("ALTER TABLE {$tableName} ADD CONSTRAINT {$this->getForeignKeyName()} FOREIGN KEY (redirect_event_id) REFERENCES {$tableName} (id) ON DELETE SET NULL");
+        $table = $schema->getTable($tableName);
+        $table->addColumn('redirect_event_id', 'integer', ['unsigned' => $table->getColumn('id')->getUnsigned(), 'notnull' => false]);
+        $table->addForeignKeyConstraint($tableName, ['redirect_event_id'], ['id'], ['onDelete' => 'SET NULL'], $this->getForeignKeyName());
     }
 
     public function down(Schema $schema): void
     {
         $tableName = $this->getTableName();
 
-        $this->addSql("ALTER TABLE {$tableName} DROP FOREIGN KEY {$this->getForeignKeyName()}");
-        $this->addSql("ALTER TABLE {$tableName} DROP COLUMN redirect_event_id");
+        $table = $schema->getTable($tableName);
+        $table->removeForeignKey($this->getForeignKeyName());
+        $table->dropColumn('redirect_event_id');
     }
 
     private function getTableName(): string

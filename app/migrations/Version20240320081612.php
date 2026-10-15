@@ -19,11 +19,11 @@ final class Version20240320081612 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}campaign_events ADD COLUMN `trigger_window` INT NULL DEFAULT NULL AFTER `trigger_restricted_dow`");
+        $schema->getTable($this->getPrefixedTableName('campaign_events'))->addColumn('trigger_window', 'integer', ['notnull' => false]);
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}campaign_events DROP COLUMN `trigger_window`");
+        $schema->getTable($this->getPrefixedTableName('campaign_events'))->dropColumn('trigger_window');
     }
 }

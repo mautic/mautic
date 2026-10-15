@@ -6,6 +6,8 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20220223072252 extends PreUpAssertionMigration
@@ -21,6 +23,8 @@ final class Version20220223072252 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE `{$this->getPrefixedTableName(self::TABLE)}` MODIFY `channel_id` VARCHAR(64) DEFAULT NULL;");
+        $schema->getTable($this->getPrefixedTableName(self::TABLE))->modifyColumn('channel_id', [
+            'type' => Type::getType(Types::STRING), 'length' => 64, 'notnull' => false, 'default' => null,
+        ]);
     }
 }

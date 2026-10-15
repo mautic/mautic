@@ -80,6 +80,7 @@ final class CustomFieldSubscriberFunctionalTest extends MauticMysqlTestCase
             'type'       => 'select',
             'group'      => 'core',
             'object'     => 'lead',
+            'order'      => $this->getOrder(),
             'properties' => [
                 'list' => [
                     ['label' => 'Option 1', 'value' => 'option1'],
@@ -174,5 +175,13 @@ final class CustomFieldSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->client->request('PATCH', "/api/fields/contact/{$customFieldId}/edit", $updatePayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+    }
+
+    private function getOrder(string $group = 'core', string $object = 'lead'): ?int
+    {
+        $orderField = $this->em->getRepository(\Mautic\LeadBundle\Entity\LeadField::class)
+            ->findOneBy(['group' => $group, 'object' => $object, 'isFixed' => false], ['order' => 'DESC']);
+
+        return $orderField ? $orderField->getId() : null;
     }
 }

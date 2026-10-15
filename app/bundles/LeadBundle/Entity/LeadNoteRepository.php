@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -45,9 +46,11 @@ class LeadNoteRepository extends CommonRepository
         }
 
         if (null != $filter) {
-            $q->andWhere(
-                $q->expr()->like('n.text', ':filter')
-            )->setParameter('filter', '%'.$filter.'%');
+            $q->andWhere(DatabasePlatform::getCaseInsensitiveLike(
+                $this->_em->getConnection()->getDatabasePlatform(),
+                'n.text',
+                ':filter'
+            ))->setParameter('filter', '%'.$filter.'%');
         }
 
         if (null != $noteTypes) {

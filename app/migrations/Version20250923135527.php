@@ -10,7 +10,10 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 final class Version20250923135527 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME  = 'push_notifications';
-    private const COLUMN_NAME   = 'translation_parent_id';
+    protected const INDEX_NAME  = 'IDX_PUSH_NOTIFICATIONS_TRANSLATION_PARENT';
+
+    protected const COLUMN_NAME     = 'translation_parent_id';
+    protected const CONSTRAINT_NAME = 'FK_PUSH_NOTIFICATIONS_TRANSLATION_PARENT';
 
     protected function preUpAssertions(): void
     {
@@ -27,24 +30,31 @@ final class Version20250923135527 extends PreUpAssertionMigration
                 'notnull'  => false,
             ]);
 
-            $table->addIndex([self::COLUMN_NAME], 'IDX_PUSH_NOTIFICATIONS_TRANSLATION_PARENT');
+            $table->addIndex([self::COLUMN_NAME], $this->generatePropertyName(self::TABLE_NAME, 'idx', [self::COLUMN_NAME]));
 
             $table->addForeignKeyConstraint(
                 $table,
                 [self::COLUMN_NAME],
                 ['id'],
                 ['onDelete' => 'CASCADE'],
-                'FK_PUSH_NOTIFICATIONS_TRANSLATION_PARENT'
+                $this->generatePropertyName(self::TABLE_NAME, 'fk', [self::COLUMN_NAME])
             );
         }
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP FOREIGN KEY FK_PUSH_NOTIFICATIONS_TRANSLATION_PARENT');
-
-        $this->addSql('DROP INDEX IDX_PUSH_NOTIFICATIONS_TRANSLATION_PARENT ON '.$this->getPrefixedTableName());
-
-        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP COLUMN translation_parent_id');
+        $table = $schema->getTable($this->getPrefixedTableName());
+        foreach ([$this->generatePropertyName(self::TABLE_NAME, 'fk', [self::COLUMN_NAME]), self::CONSTRAINT_NAME] as $name) {
+            if ($table->hasForeignKey($name)) {
+                $table->removeForeignKey($name);
+            }
+        }
+        foreach ([$this->generatePropertyName(self::TABLE_NAME, 'idx', [self::COLUMN_NAME]), self::INDEX_NAME] as $name) {
+            if ($table->hasIndex($name)) {
+                $table->dropIndex($name);
+            }
+        }
+        $table->dropColumn(self::COLUMN_NAME);
     }
 }

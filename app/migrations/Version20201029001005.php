@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\PageBundle\Entity\PageDraft;
@@ -23,29 +26,23 @@ final class Version20201029001005 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $idDataType = $this->getColumnTypeSignedOrUnsigned($schema, 'pages', 'id');
-        $fkName     = $this->generatePropertyName('pages_draft', 'fk', ['page_id']);
-        $ukName     = $this->generatePropertyName('pages_draft', 'uniq', ['page_id']);
+        $table = new Table($this->getPrefixedTableName(PageDraft::TABLE_NAME));
+        $table->addColumn('id', Types::INTEGER, ['unsigned' => true, 'autoincrement' => true]);
+        $table->addColumn('page_id', Types::INTEGER, ['unsigned' => $schema->getTable($this->getPrefixedTableName('pages'))->getColumn('id')->getUnsigned()]);
+        $table->addColumn('html', Types::TEXT, ['length' => 4294967295, 'notnull' => false]);
+        $table->addColumn('template', Types::STRING, ['length' => 191, 'notnull' => false]);
+        $table->addColumn('public_preview', Types::BOOLEAN, ['default' => true]);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['page_id'], $this->generatePropertyName('pages_draft', 'uniq', ['page_id']));
+        $table->addForeignKeyConstraint($this->getPrefixedTableName('pages'), ['page_id'], ['id'], [], $this->generatePropertyName('pages_draft', 'fk', ['page_id']));
+        $table->addOption('charset', 'utf8mb4');
+        $table->addOption('collation', 'utf8mb4_unicode_ci');
+        $table->addOption('engine', 'InnoDB');
+        $table->addOption('row_format', 'DYNAMIC');
 
-        $this->addSql(
-            sprintf(
-                'CREATE TABLE `%s` (
-                  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                  `page_id` int(10) %s NOT NULL,
-                  `html` longtext,
-                  `template` varchar(191) DEFAULT NULL,
-                  `public_preview` tinyint(1) NOT NULL DEFAULT 1,
-                  PRIMARY KEY (`id`),
-                  UNIQUE KEY `%s` (`page_id`),
-                  CONSTRAINT `%s` FOREIGN KEY (`page_id`) REFERENCES `%s` (`id`)
-                )DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB ROW_FORMAT = DYNAMIC;',
-                $this->getPrefixedTableName(PageDraft::TABLE_NAME),
-                $idDataType,
-                $ukName,
-                $fkName,
-                $this->getPrefixedTableName('pages')
-            )
-        );
+        foreach ($this->platform->getCreateTableSQL($table, AbstractPlatform::CREATE_INDEXES | AbstractPlatform::CREATE_FOREIGNKEYS) as $sql) {
+            $this->addSql($sql);
+        }
     }
 
     public function down(Schema $schema): void

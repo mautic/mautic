@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper;
 use Mautic\InstallBundle\Command\InstallCommand;
 use Mautic\InstallBundle\Install\InstallService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
@@ -61,6 +62,31 @@ final class InstallCommandTest extends TestCase
         $this->command->run($input, $output);
 
         $this->assertSame('Mautic already installed'.PHP_EOL, $output->fetch());
+    }
+
+    #[DataProvider('provideCharsets')]
+    public function testInstallerPreservesConfiguredCharset(?string $configuredCharset, string $expectedCharset): void
+    {
+        $this->installer->method('localConfigParameters')->willReturn(array_filter([
+            'db_driver' => 'pdo_mysql', 'db_charset' => $configuredCharset,
+        ], static fn (?string $value): bool => null !== $value));
+        $connection = $this->createMock(ConnectionWrapper::class);
+        $connection->expects($this->once())->method('initConnection')->willReturnCallback(
+            function (array $params) use ($expectedCharset): void {
+                $this->assertSame('pdo_pgsql', $params['driver']);
+                $this->assertSame($params['charset'], $expectedCharset);
+            }
+        );
+        $this->doctrineRegistry->method('getConnection')->willReturn($connection);
+
+        $this->assertSame(Command::SUCCESS, $this->command->run(new ArrayInput(['site_url' => 'localhost', '--db_driver' => 'pdo_pgsql']), new BufferedOutput()));
+    }
+
+    public static function provideCharsets(): iterable
+    {
+        yield 'default PostgreSQL charset' => [null, 'UTF8'];
+        yield 'MySQL default charset' => ['utf8mb4', 'UTF8'];
+        yield 'configured charset' => ['LATIN1', 'LATIN1'];
     }
 
     public function testCommandWhenSiteNotInstalled(): void

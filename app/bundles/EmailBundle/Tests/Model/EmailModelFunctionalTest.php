@@ -10,6 +10,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
@@ -34,6 +35,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
+
+    public const IP_ADDRESS      = '127.0.0.1';
 
     private const EMAILS_A_MONTH = 2;
 
@@ -299,10 +302,22 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
      */
     private function emulateClick(Lead $lead, Email $email, int $hits, int $uniqueHits): void
     {
-        $ipAddress = new IpAddress();
-        $ipAddress->setIpAddress('127.0.0.1');
-        $this->em->persist($ipAddress);
-        $this->em->flush();
+        /** @var IpAddressRepository $ipRepo */
+        $ipRepo = $this->em->getRepository(IpAddress::class);
+
+        // IP Address is added when the session is created in parent class.
+        // Doctrine\DBAL\Exception\UniqueConstraintViolationException:
+        // An exception occurred while executing a query:
+        // SQLSTATE[23505]: Unique violation: 7
+        // ERROR:  duplicate key value violates unique constraint "idx_ip_address"
+        // DETAIL:  Key (ip_address)=(127.0.0.1) already exists.
+        $ipAddress = $ipRepo->findOneBy(['ipAddress' => self::IP_ADDRESS]);
+        if (!$ipAddress) {
+            $ipAddress = new IpAddress();
+            $ipAddress->setIpAddress(self::IP_ADDRESS);
+            $this->em->persist($ipAddress);
+            $this->em->flush();
+        }
 
         $redirect = new Redirect();
         $redirect->setRedirectId(uniqid());

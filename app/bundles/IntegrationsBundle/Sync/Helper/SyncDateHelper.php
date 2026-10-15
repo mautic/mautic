@@ -140,7 +140,7 @@ class SyncDateHelper
 
         // We should compare in UTC timezone
         if (method_exists($syncToDateTime, 'setTimezone')) {
-            $syncToDateTime->setTimezone(new \DateTimeZone('UTC'));
+            $syncToDateTime = $syncToDateTime->setTimezone(new \DateTimeZone('UTC'));
         }
 
         // If syncToDate is less than now then use syncToDate, because otherwise we may delete

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20230927055621 extends AbstractMauticMigration
@@ -14,8 +16,9 @@ final class Version20230927055621 extends AbstractMauticMigration
         $table = $schema->getTable($this->prefix.'emails');
 
         if (!$table->hasColumn('continue_sending')) {
-            $this->addSql("ALTER TABLE {$this->prefix}emails ADD `continue_sending` TINYINT(1) DEFAULT 0 NOT NULL");
-            $this->addSql("UPDATE {$this->prefix}emails SET `continue_sending`= 1 WHERE publish_up IS NOT NULL");
+            $definition = $this->platform->getColumnDeclarationSQL('continue_sending', ['type' => Type::getType(Types::BOOLEAN), 'default' => false]);
+            $this->addSql("ALTER TABLE {$this->prefix}emails ADD {$definition}");
+            $this->addSql("UPDATE {$this->prefix}emails SET continue_sending = TRUE WHERE publish_up IS NOT NULL");
         }
     }
 

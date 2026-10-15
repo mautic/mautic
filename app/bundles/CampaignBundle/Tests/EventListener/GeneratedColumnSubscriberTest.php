@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\CampaignBundle\EventListener\GeneratedColumnSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnInterface;
@@ -47,16 +48,40 @@ final class GeneratedColumnSubscriberTest extends TestCase
         $this->assertCount(0, $generatedColumns);
     }
 
+    public function testOnGeneratedColumnsBuildWithPostgreSql(): void
+    {
+        $generatedColumns = $this->buildGeneratedColumns(false, true);
+        $this->assertCount(5, $generatedColumns);
+        $expected = [
+            'hour' => ['H', 'TIMESTAMP(0) WITHOUT TIME ZONE', "date_trunc('hour', date_added)"],
+            'day' => ['d', 'DATE', 'date_added::date'],
+            'week' => ['W', 'CHAR(7) COLLATE mautic_unicode_ci', "EXTRACT(YEAR FROM date_added)::int::text || ' ' || LPAD(((EXTRACT(DOY FROM date_added)::int + 6 - EXTRACT(DOW FROM date_added)::int) / 7)::text, 2, '0')"],
+            'month' => ['m', 'CHAR(7) COLLATE mautic_unicode_ci', "EXTRACT(YEAR FROM date_added)::int::text || '-' || LPAD(EXTRACT(MONTH FROM date_added)::int::text, 2, '0')"],
+            'year' => ['Y', 'INTEGER', 'EXTRACT(YEAR FROM date_added)::int'],
+        ];
+        $platform = new PostgreSQLPlatform();
+        foreach ($generatedColumns as $generatedColumn) {
+            $name = substr($generatedColumn->getColumnName(), strlen('generated_date_added_'));
+            [$unit, $type, $expression] = $expected[$name];
+            $this->assertSame($type.' GENERATED ALWAYS AS ('.$expression.') STORED', $generatedColumn->getColumnDefinition($platform));
+            $this->assertSame('date_added', $generatedColumn->getOriginalDateColumn());
+            $this->assertSame($unit, $generatedColumn->getTimeUnit());
+            $this->assertSame('day' === $name ? $generatedColumn->getColumnName() : null, $generatedColumn->getFilterDateColumn());
+            $this->assertSame('day' === $name ? ['campaign_id', $generatedColumn->getColumnName()] : ['campaign_id', $generatedColumn->getColumnName(), 'date_added'], $generatedColumn->getIndexColumns());
+        }
+    }
+
     private function assertAlterTableSql(string $expectedSql, GeneratedColumnInterface $generatedColumn): void
     {
         $this->assertSame($expectedSql, $generatedColumn->getAlterTableSql());
     }
 
-    private function createVersionProvider(bool $isMySql): VersionProviderInterface
+    private function createVersionProvider(bool $isMySql, bool $isPostgreSql = false): VersionProviderInterface
     {
-        return new class($isMySql) implements VersionProviderInterface {
+        return new class($isMySql, $isPostgreSql) implements VersionProviderInterface {
             public function __construct(
                 private readonly bool $isMySql,
+                private readonly bool $isPostgreSql,
             ) {
             }
 
@@ -67,23 +92,28 @@ final class GeneratedColumnSubscriberTest extends TestCase
 
             public function isMariaDb(): bool
             {
-                return !$this->isMySql;
+                return !$this->isMySql && !$this->isPostgreSql;
             }
 
             public function isMySql(): bool
             {
                 return $this->isMySql;
             }
+
+            public function isPostgreSql(): bool
+            {
+                return $this->isPostgreSql;
+            }
         };
     }
 
-    private function buildGeneratedColumns(bool $isMySql): GeneratedColumns
+    private function buildGeneratedColumns(bool $isMySql, bool $isPostgreSql = false): GeneratedColumns
     {
         $generatedColumnsEvent = new GeneratedColumnsEvent();
         $generatedColumns      = $generatedColumnsEvent->getGeneratedColumns();
         $this->assertEmpty($generatedColumns);
 
-        $columnSubscriber = new GeneratedColumnSubscriber($this->createVersionProvider($isMySql));
+        $columnSubscriber = new GeneratedColumnSubscriber($this->createVersionProvider($isMySql, $isPostgreSql));
         $columnSubscriber->onGeneratedColumnsBuild($generatedColumnsEvent);
 
         return $generatedColumns;

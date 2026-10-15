@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20220429091934 extends PreUpAssertionMigration
 {
-    private const SIGNED   = 'SIGNED';
-
-    private const UNSIGNED = 'UNSIGNED';
-
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(function (Schema $schema) {
@@ -23,44 +21,24 @@ final class Version20220429091934 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $userIdFK = $this->generatePropertyName('users', 'fk', ['user_id']);
+        $table = new Table($this->getPrefixedTableName('contact_export_scheduler'));
+        $table->addColumn('id', Types::INTEGER, ['autoincrement' => true]);
+        $table->addColumn('user_id', Types::INTEGER, ['unsigned' => $schema->getTable($this->getPrefixedTableName('users'))->getColumn('id')->getUnsigned()]);
+        $table->addColumn('scheduled_datetime', Types::DATETIME_IMMUTABLE);
+        $table->addColumn('data', 'array', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
+        $table->addForeignKeyConstraint($this->getPrefixedTableName('users'), ['user_id'], ['id'], [], $this->generatePropertyName('users', 'fk', ['user_id']));
+        $table->addOption('charset', 'utf8mb4');
+        $table->addOption('collation', 'utf8mb4_unicode_ci');
+        $table->addOption('engine', 'InnoDB');
 
-        $contactExportSchedulerTableName = "{$this->prefix}contact_export_scheduler";
-        $usersTableName                  = "{$this->prefix}users";
-
-        $usersIdDataType = $this->getColumnDataType($schema->getTable($usersTableName), 'id');
-
-        $this->addSql(
-            "# Creating table {$this->prefix}contact_export_scheduler
-            # ------------------------------------------------------------
-            CREATE TABLE {$contactExportSchedulerTableName} (
-                id INT AUTO_INCREMENT NOT NULL,
-                user_id INT {$usersIdDataType} NOT NULL,
-                scheduled_datetime DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
-                data LONGTEXT DEFAULT NULL COMMENT '(DC2Type:array)',
-                PRIMARY KEY(id)
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;"
-        );
-
-        $this->addSql("ALTER TABLE {$contactExportSchedulerTableName} ADD CONSTRAINT {$userIdFK} FOREIGN KEY (user_id) REFERENCES {$usersTableName} (id)");
+        foreach ($this->platform->getCreateTableSQL($table, AbstractPlatform::CREATE_INDEXES | AbstractPlatform::CREATE_FOREIGNKEYS) as $sql) {
+            $this->addSql($sql);
+        }
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql(
-            "# Dropping table {$this->prefix}contact_export_scheduler
-            # ------------------------------------------------------------
-            DROP TABLE {$this->prefix}contact_export_scheduler"
-        );
-    }
-
-    /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
-     */
-    private function getColumnDataType(Table $table, string $columnName): string
-    {
-        $column = $table->getColumn($columnName);
-
-        return $column->getUnsigned() ? self::UNSIGNED : self::SIGNED;
+        $this->addSql($this->platform->getDropTableSQL($this->getPrefixedTableName('contact_export_scheduler')));
     }
 }

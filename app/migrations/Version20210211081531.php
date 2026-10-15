@@ -6,6 +6,7 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 final class Version20210211081531 extends AbstractMauticMigration
 {
@@ -52,20 +53,13 @@ final class Version20210211081531 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        if (0 === count($this->tableList)) {
-            return;
-        }
+        $column = $this->platform->quoteIdentifier($this->uuidColumn);
+        $uuid   = DatabasePlatform::isPostgreSQL($this->platform) ? 'gen_random_uuid()::text' : 'UUID()';
 
-        $statements = [];
         foreach ($this->tableList as $table) {
-            // When we migrate to MySql 8.0.13+,
-            // the below commented statement would suffice for settings default values using expression
-            // ALTER TABLE `{$this->prefix}{$table}` ALTER `{$this->uuidColumn}` SET DEFAULT bin_to_uuid(UUID());
-
-            $statements[] = "ALTER TABLE `{$this->prefix}{$table}` ADD COLUMN `{$this->uuidColumn}` char(36) default NULL;";
-            $statements[] = "UPDATE `{$this->prefix}{$table}` SET `{$this->uuidColumn}` = UUID() WHERE `{$this->uuidColumn}` IS NULL;";
+            $tableName = $this->platform->quoteIdentifier($this->getPrefixedTableName($table));
+            $this->addSql("ALTER TABLE {$tableName} ADD COLUMN {$column} CHAR(36) DEFAULT NULL");
+            $this->addSql("UPDATE {$tableName} SET {$column} = {$uuid} WHERE {$column} IS NULL");
         }
-        $batchSql = implode(' ', $statements);
-        $this->addSql($batchSql);
     }
 }

@@ -19,11 +19,11 @@ final class Version20201007003589 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}lead_fields ADD column_is_not_removed TINYINT(1) NOT NULL DEFAULT 0");
+        $schema->getTable($this->getPrefixedTableName('lead_fields'))->addColumn('column_is_not_removed', 'boolean', ['default' => false]);
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}lead_fields DROP column_is_not_removed");
+        $schema->getTable($this->getPrefixedTableName('lead_fields'))->dropColumn('column_is_not_removed');
     }
 }

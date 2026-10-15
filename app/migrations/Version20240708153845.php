@@ -27,9 +27,9 @@ final class Version20240708153845 extends AbstractMauticMigration
         foreach ($emailsResult as $email) {
             $totalCountResult = $this->connection
               ->executeQuery(
-                  "SELECT email_id, SUM(is_read) as total_read_count 
-                        FROM {$this->emailStatsTableName} 
-                        WHERE email_id = :email_id 
+                  "SELECT email_id, SUM(CASE WHEN is_read THEN 1 ELSE 0 END) as total_read_count
+                        FROM {$this->emailStatsTableName}
+                        WHERE email_id = :email_id
                         GROUP BY email_id",
                   ['email_id' => $email['id']]
               )
@@ -37,8 +37,8 @@ final class Version20240708153845 extends AbstractMauticMigration
             if (is_array($totalCountResult) && $email['id'] === $totalCountResult['email_id'] && (int) $email['read_count'] < $totalCountResult['total_read_count']) {
                 $this
                   ->addSql(
-                      "UPDATE {$this->emailsTableName} 
-                            SET read_count = '{$totalCountResult['total_read_count']}' 
+                      "UPDATE {$this->emailsTableName}
+                            SET read_count = '{$totalCountResult['total_read_count']}'
                             WHERE id = '{$email['id']}'"
                   );
             }

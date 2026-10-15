@@ -242,9 +242,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $queryBuilderMock->expects($this->once())
             ->method('select')
             ->with('SUM(DISTINCT e.sent_count) as sent_count,
-                        SUM(DISTINCT e.read_count) as read_count,
-                        count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
-                        count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
+                         SUM(DISTINCT e.read_count) as read_count,
+                         COUNT(DISTINCT CASE WHEN dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN dnc.lead_id END) as unsubscribed,
+                         COUNT(DISTINCT CASE WHEN dnc.reason = '.DoNotContact::BOUNCED.' THEN dnc.lead_id END) as bounced'
             );
 
         // Expect the DNC table has not been joined yet.
@@ -453,13 +453,13 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'alias'   => 'unsubscribed',
                 'label'   => '',
                 'type'    => 'bool',
-                'formula' => 'IF(dnc.id IS NOT NULL AND dnc.reason=1, 1, 0)',
+                'formula' => 'CASE WHEN dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END',
             ],
             'bounced' => [
                 'alias'   => 'bounced',
                 'label'   => '',
                 'type'    => 'bool',
-                'formula' => 'IF(dnc.id IS NOT NULL AND dnc.reason=2, 1, 0)',
+                'formula' => 'CASE WHEN dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE 0 END',
             ],
             'vp.id' => [
                 'label' => '',
@@ -474,26 +474,26 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             'hits' => [
                 'alias'   => 'hits',
                 'label'   => '',
-                'type'    => 'string',
-                'formula' => 'IFNULL(cut.hits, 0)',
+                'type'    => 'int',
+                'formula' => 'COALESCE(cut.hits, 0)',
             ],
             'unique_hits' => [
                 'alias'   => 'unique_hits',
                 'label'   => '',
-                'type'    => 'string',
-                'formula' => 'IFNULL(cut.unique_hits, 0)',
+                'type'    => 'int',
+                'formula' => 'COALESCE(cut.unique_hits, 0)',
             ],
             'is_hit' => [
                 'alias'   => 'is_hit',
                 'label'   => '',
                 'type'    => 'bool',
-                'formula' => 'IF(cut.hits is NULL, 0, 1)',
+                'formula' => 'CASE WHEN cut.hits IS NOT NULL THEN 1 ELSE 0 END',
             ],
             'read_delay' => [
                 'alias'   => 'read_delay',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IF(es.date_read IS NOT NULL, TIMEDIFF(es.date_read, es.date_sent), \'-\')',
+                'formula' => "CASE WHEN es.date_read IS NOT NULL THEN TIMEDIFF(es.date_read, es.date_sent) ELSE '-' END",
             ],
             'es.email_address' => [
                 'label' => '',
@@ -590,7 +590,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'alias'   => 'read_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND((e.read_count/e.sent_count)*100, 1), \'0.0\')',
+                'formula' => 'COALESCE(ROUND((e.read_count * 100.0) / NULLIF(e.sent_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
             'e.sent_count' => [
@@ -632,27 +632,27 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             'unsubscribed' => [
                 'alias'   => 'unsubscribed',
                 'label'   => '',
-                'type'    => 'string',
-                'formula' => 'IFNULL((SELECT SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=1 , 1, 0)) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+                'type'    => 'int',
+                'formula' => 'COALESCE(SUM(CASE WHEN dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END), 0)',
             ],
             'unsubscribed_ratio' => [
                 'alias'   => 'unsubscribed_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND((SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=1 , 1, 0))/e.sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+                'formula' => 'COALESCE(ROUND((SUM(CASE WHEN dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE 0 END) * 100.0) / NULLIF(e.sent_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
             'bounced' => [
                 'alias'   => 'bounced',
                 'label'   => '',
-                'type'    => 'string',
-                'formula' => 'IFNULL((SELECT SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=2 , 1, 0)) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+                'type'    => 'int',
+                'formula' => 'COALESCE(SUM(CASE WHEN dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE 0 END), 0)',
             ],
             'bounced_ratio' => [
                 'alias'   => 'bounced_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL((SELECT ROUND((SUM(IF(dnc.id IS NOT NULL AND dnc.channel_id=e.id AND dnc.reason=2 , 1, 0))/e.sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+                'formula' => 'COALESCE(ROUND((SUM(CASE WHEN dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE 0 END) * 100.0) / NULLIF(e.sent_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
             'vp.id' => [
@@ -668,27 +668,27 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             'hits' => [
                 'alias'   => 'hits',
                 'label'   => '',
-                'type'    => 'string',
-                'formula' => 'IFNULL(cut.hits, 0)',
+                'type'    => 'int',
+                'formula' => 'COALESCE(cut.hits, 0)',
             ],
             'unique_hits' => [
                 'alias'   => 'unique_hits',
                 'label'   => '',
-                'type'    => 'string',
-                'formula' => 'IFNULL(cut.unique_hits, 0)',
+                'type'    => 'int',
+                'formula' => 'COALESCE(cut.unique_hits, 0)',
             ],
             'hits_ratio' => [
                 'alias'   => 'hits_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND(cut.hits/(e.sent_count)*100, 1), \'0.0\')',
+                'formula' => 'COALESCE(ROUND(cut.hits * 100.0 / NULLIF(e.sent_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
             'unique_ratio' => [
                 'alias'   => 'unique_ratio',
                 'label'   => '',
                 'type'    => 'string',
-                'formula' => 'IFNULL(ROUND(cut.unique_hits/(e.sent_count)*100, 1), \'0.0\')',
+                'formula' => 'COALESCE(ROUND(cut.unique_hits * 100.0 / NULLIF(e.sent_count, 0), 1), \'0.0\')',
                 'suffix'  => '%',
             ],
         ];

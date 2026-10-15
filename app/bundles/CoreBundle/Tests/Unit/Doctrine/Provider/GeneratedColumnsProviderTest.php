@@ -77,4 +77,13 @@ final class GeneratedColumnsProviderTest extends TestCase
         $generatedColumns = $this->provider->getGeneratedColumns();
         $this->assertCount(1, $generatedColumns);
     }
+
+    public function testPostgreSqlStoredGeneratedColumnsAreSupportedBeforeVersion18(): void
+    {
+        $this->versionProvider->method('isPostgreSql')->willReturn(true);
+        $this->versionProvider->method('getVersion')->willReturn('PostgreSQL 16.11');
+
+        $this->assertTrue($this->provider->generatedColumnsAreSupported());
+        $this->assertSame('12.0.0', $this->provider->getMinimalSupportedVersion());
+    }
 }

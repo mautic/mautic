@@ -7,9 +7,12 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Validator\Constraints\Choice;
 
 /**
@@ -25,6 +28,20 @@ final class DoctrineStepType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, static function (FormEvent $event): void {
+            $data = $event->getData();
+            if ('pdo_pgsql' === ($data['driver'] ?? null)) {
+                $data['port'] ??= '';
+                if ('' === $data['port']) {
+                    $data['port'] = '5432';
+                }
+                if (empty($data['charset']) || 'utf8mb4' === $data['charset']) {
+                    $data['charset'] = 'UTF8';
+                }
+                $event->setData($data);
+            }
+        });
+
         $builder->add(
             'driver',
             ChoiceType::class,
@@ -37,7 +54,8 @@ final class DoctrineStepType extends AbstractType
                 'placeholder'       => false,
                 'required'          => true,
                 'attr'              => [
-                    'class' => 'form-control',
+                    'class'     => 'form-control',
+                    'onchange'  => 'MauticInstaller.autoCompletePortAndCharset();',
                 ],
                 'constraints'       => [
                     new Choice(
@@ -112,6 +130,14 @@ final class DoctrineStepType extends AbstractType
                     'class'    => 'form-control',
                     'preaddon' => 'ri-lock-fill',
                 ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'charset',
+            HiddenType::class,
+            [
                 'required' => false,
             ]
         );

@@ -8,8 +8,10 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
+use Ramsey\Uuid\Uuid;
 
 /**
  * @extends CommonRepository<Asset>
@@ -49,7 +51,7 @@ class AssetRepository extends CommonRepository
         $q->select('partial a.{id, title, path, alias, language}');
 
         if (!empty($search)) {
-            $q->andWhere($q->expr()->like('a.title', ':search'))
+            $q->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'a.title', ':search'))
                 ->setParameter('search', "%{$search}%");
         }
 
@@ -116,7 +118,7 @@ class AssetRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr            = '('.$q->expr()->eq('a.language', ":{$unique}").' OR '.$q->expr()->like('a.language', ":{$langUnique}").')';
+                $expr            = '('.$q->expr()->eq('a.language', ":{$unique}").' OR '.DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'a.language', ":{$langUnique}").')';
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -245,6 +247,12 @@ class AssetRepository extends CommonRepository
      */
     public function findOneByUuid(string $slug): Asset
     {
+        // Throw not found execption on invalid UUIDs (e.g. legacy "74:" format)
+        // This prevents the PostgreSQL exception and lets the legacy fallback run.
+        if (empty($slug) || !Uuid::isValid($slug)) {
+            throw EntityNotFoundException::fromClassNameAndIdentifier(Asset::class, ['uuid' => $slug]);
+        }
+
         $asset = $this->createQueryBuilder('a')
             ->where('a.uuid = :uuid')
             ->setParameter('uuid', $slug)

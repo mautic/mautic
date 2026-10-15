@@ -233,6 +233,9 @@
     "patches": {
       "twig/twig": {
         "Make IntegrationTestCase data providers static for PHPUnit 11": "patches/twig-integration-testcase-static-data-providers.patch"
+      },
+      "doctrine/dbal": {
+        "PostgreSQL index introspection and PDO compatibility": "patches/doctrine-dbal-3.7.3-pgsql.patch"
       }
     }
   }

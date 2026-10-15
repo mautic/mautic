@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\Entity;
 
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
@@ -141,7 +142,7 @@ class StatRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $q->andWhere($q->expr()->or(
-                $q->expr()->like('f.name', $q->expr()->literal($options['search'].'%')),
+                DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'f.name', $q->expr()->literal($options['search'].'%')),
                 $q->expr()->eq('s.type', $q->expr()->literal($options['search']))
             ));
         }

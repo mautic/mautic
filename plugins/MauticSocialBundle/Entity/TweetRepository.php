@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -28,7 +29,7 @@ final class TweetRepository extends CommonRepository
                 $qb->andWhere($qb->expr()->in('t.id', ':search'))
                     ->setParameter('search', $search);
             } else {
-                $qb->andWhere($qb->expr()->like('t.name', ':search'))
+                $qb->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 't.name', ':search'))
                     ->setParameter('search', "%{$search}%");
             }
         }

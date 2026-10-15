@@ -2,10 +2,13 @@
 
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Schema\TableDiff;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 
@@ -191,8 +194,97 @@ class ColumnSchemaHelper
         $diff       = $comparator->compareTables($this->fromTable, $this->toTable);
 
         if (!$diff->isEmpty()) {
-            $this->sm->alterTable($diff);
+            if (DatabasePlatform::isPostgreSQL($this->db->getDatabasePlatform())) {
+                $this->alterPostgreSqlTable($diff);
+            } else {
+                $this->sm->alterTable($diff);
+            }
         }
+    }
+
+    private function alterPostgreSqlTable(TableDiff $diff): void
+    {
+        $changedColumns = [];
+        foreach ($diff->getModifiedColumns() as $column) {
+            if ($column->hasTypeChanged() || $column->hasLengthChanged() || $column->hasPrecisionChanged() || $column->hasScaleChanged() || $column->hasFixedChanged()) {
+                $changedColumns[] = $column->getOldColumn()?->getName() ?? $column->getNewColumn()->getName();
+            }
+        }
+        if (!$changedColumns) {
+            $this->sm->alterTable($diff);
+
+            return;
+        }
+
+        $generatedColumns = $this->db->fetchAllAssociative(
+            <<<'SQL'
+                SELECT DISTINCT generated.attnum, generated.attname,
+                    format_type(generated.atttypid, generated.atttypmod) AS type,
+                    pg_get_expr(definition.adbin, definition.adrelid) AS expression,
+                    generated.attnotnull, generated.attgenerated,
+                    col_description(generated.attrelid, generated.attnum) AS comment
+                FROM pg_attribute source
+                JOIN pg_depend dependency ON dependency.refobjid = source.attrelid AND dependency.refobjsubid = source.attnum
+                    AND dependency.classid = 'pg_attrdef'::regclass
+                JOIN pg_attrdef definition ON definition.oid = dependency.objid
+                JOIN pg_attribute generated ON generated.attrelid = definition.adrelid AND generated.attnum = definition.adnum
+                WHERE source.attrelid = to_regclass(:table) AND source.attname IN (:columns) AND generated.attgenerated <> ''
+                SQL,
+            ['table' => $this->tableName, 'columns' => $changedColumns],
+            ['columns' => ArrayParameterType::STRING]
+        );
+        if (!$generatedColumns) {
+            $this->sm->alterTable($diff);
+
+            return;
+        }
+
+        $parameters = ['table' => $this->tableName, 'columns' => array_column($generatedColumns, 'attnum')];
+        $types      = ['columns' => ArrayParameterType::INTEGER];
+        $indexes    = $this->db->fetchFirstColumn(
+            <<<'SQL'
+                SELECT DISTINCT pg_get_indexdef(index.indexrelid)
+                FROM pg_index index
+                JOIN pg_depend dependency ON dependency.objid = index.indexrelid AND dependency.classid = 'pg_class'::regclass
+                    AND dependency.refobjid = index.indrelid
+                WHERE index.indrelid = to_regclass(:table) AND dependency.refobjsubid IN (:columns)
+                    AND NOT EXISTS (SELECT 1 FROM pg_constraint c WHERE c.conindid = index.indexrelid AND c.contype IN ('p', 'u', 'x'))
+                SQL,
+            $parameters,
+            $types
+        );
+        $constraints = $this->db->fetchAllAssociative(
+            <<<'SQL'
+                SELECT conname, pg_get_constraintdef(oid) AS definition
+                FROM pg_constraint
+                WHERE conrelid = to_regclass(:table) AND EXISTS (SELECT 1 FROM unnest(conkey) AS column_number WHERE column_number IN (:columns))
+                SQL,
+            $parameters,
+            $types
+        );
+        $table = $this->db->quoteIdentifier($this->tableName);
+
+        // PostgreSQL forbids changing a generated column's source type; rebuilding dependencies must be atomic.
+        $this->db->transactional(function () use ($diff, $generatedColumns, $indexes, $constraints, $table): void {
+            foreach ($generatedColumns as $column) {
+                $this->db->executeStatement('ALTER TABLE '.$table.' DROP COLUMN '.$this->db->quoteIdentifier($column['attname']));
+            }
+            $this->sm->alterTable($diff);
+            foreach ($generatedColumns as $column) {
+                $name    = $this->db->quoteIdentifier($column['attname']);
+                $storage = 's' === $column['attgenerated'] ? 'STORED' : 'VIRTUAL';
+                $this->db->executeStatement("ALTER TABLE {$table} ADD COLUMN {$name} {$column['type']} GENERATED ALWAYS AS ({$column['expression']}) {$storage}".($column['attnotnull'] ? ' NOT NULL' : ''));
+                if (null !== $column['comment']) {
+                    $this->db->executeStatement("COMMENT ON COLUMN {$table}.{$name} IS ".$this->db->quote($column['comment']));
+                }
+            }
+            foreach ($constraints as $constraint) {
+                $this->db->executeStatement('ALTER TABLE '.$table.' ADD CONSTRAINT '.$this->db->quoteIdentifier($constraint['conname']).' '.$constraint['definition']);
+            }
+            foreach ($indexes as $sql) {
+                $this->db->executeStatement($sql);
+            }
+        });
     }
 
     /**

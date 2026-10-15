@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception as DBALException;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -30,7 +31,11 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('id', $lead->getId());
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details LIKE :search')
+            $query->andWhere(DatabasePlatform::getCaseInsensitiveLike(
+                $this->_em->getConnection()->getDatabasePlatform(),
+                'al.details',
+                ':search'
+            ))
                 ->setParameter('search', '%'.$filters['search'].'%');
         }
 
@@ -63,7 +68,11 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('id', $lead->getId());
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details LIKE :search')
+            $query->andWhere(DatabasePlatform::getCaseInsensitiveLike(
+                $this->_em->getConnection()->getDatabasePlatform(),
+                'al.details',
+                ':search'
+            ))
                 ->setParameter('search', '%'.$filters['search'].'%');
         }
 
@@ -116,7 +125,11 @@ class AuditLogRepository extends CommonRepository
             ->setParameter('listOfContacts', $listOfContacts, ArrayParameterType::INTEGER);
 
         if (is_array($filters) && !empty($filters['search'])) {
-            $query->andWhere('al.details LIKE :search')
+            $query->andWhere(DatabasePlatform::getCaseInsensitiveLike(
+                $this->_em->getConnection()->getDatabasePlatform(),
+                'al.details',
+                ':search'
+            ))
                 ->setParameter('search', '%'.$filters['search'].'%');
         }
 
@@ -214,7 +227,7 @@ class AuditLogRepository extends CommonRepository
                     $sqb->expr()->eq('l.action', $sqb->expr()->literal('ipadded'))
                 )
             )
-            ->groupBy('l.ip_address');
+            ->groupBy('l.ip_address', 'l.object_id');
 
         if ($lead instanceof Lead) {
             $dateTimeFormat = 'Y-m-d H:i:s';

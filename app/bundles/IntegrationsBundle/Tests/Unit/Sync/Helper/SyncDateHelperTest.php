@@ -68,6 +68,22 @@ final class SyncDateHelperTest extends TestCase
         $this->assertSame($fiveSecondsBefore->getTimestamp(), $internalSyncStartDateTime->getTimestamp());
     }
 
+    public function testPastMutableAndImmutableSyncBoundsAreNormalizedToUtc(): void
+    {
+        foreach ([\DateTime::class, \DateTimeImmutable::class] as $dateClass) {
+            $date = new $dateClass('2000-01-02 03:04:05', new \DateTimeZone('America/Sao_Paulo'));
+            $helper = $this->getMockBuilder(SyncDateHelper::class)->disableOriginalConstructor()->onlyMethods(['getLastSyncDateForObject'])->getMock();
+            $helper->setSyncDateTimes(null, $date);
+            $helper->setInternalSyncStartDateTime();
+
+            $result = $helper->getInternalSyncStartDateTime();
+            $this->assertInstanceOf(\DateTimeInterface::class, $result);
+            $this->assertSame($date->getTimestamp(), $result->getTimestamp());
+            $this->assertSame('UTC', $result->getTimezone()->getName());
+            $this->assertSame('America/Sao_Paulo', $date->getTimezone()->getName());
+        }
+    }
+
     public function testThatSetInternalSyncStartDateTimeMethodUsesNowIfItIsEarlier(): void
     {
         // Although $fiveSecondsAfter value is expected to be in UTC timezone let's use another timezone

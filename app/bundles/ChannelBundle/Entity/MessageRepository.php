@@ -3,6 +3,7 @@
 namespace Mautic\ChannelBundle\Entity;
 
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
@@ -53,7 +54,7 @@ final class MessageRepository extends CommonRepository
                 $q->andWhere($q->expr()->in($alias.'.id', ':search'))
                     ->setParameter('search', $search);
             } else {
-                $q->andWhere($q->expr()->like($alias.'.name', ':search'))
+                $q->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), $alias.'.name', ':search'))
                     ->setParameter('search', "%{$search}%");
             }
         }

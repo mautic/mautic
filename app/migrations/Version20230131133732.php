@@ -22,19 +22,13 @@ final class Version20230131133732 extends AbstractMauticMigration
         }
     }
 
-    private function getTable(): string
-    {
-        return $this->prefix.'lead_lists';
-    }
-
     public function up(Schema $schema): void
     {
-        $table = $this->getTable();
-        $this->addSql(sprintf('ALTER TABLE `%s` ADD COLUMN `last_built_time` FLOAT NULL DEFAULT NULL AFTER `last_built_date`', $table));
+        $schema->getTable($this->getPrefixedTableName('lead_lists'))->addColumn('last_built_time', 'float', ['notnull' => false]);
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql(sprintf('ALTER TABLE `%s` DROP COLUMN `last_built_time`', $this->getTable()));
+        $schema->getTable($this->getPrefixedTableName('lead_lists'))->dropColumn('last_built_time');
     }
 }

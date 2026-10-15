@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
@@ -23,6 +26,8 @@ final class GeneratedColumnSubscriberTest extends TestCase
 
     private GeneratedColumnSubscriber $generatedColumnSubscriber;
 
+    private ListModel $segmentModel;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -31,7 +36,7 @@ final class GeneratedColumnSubscriberTest extends TestCase
             ->method('trans')
             ->willReturnArgument(0);
 
-        $segmentModel = new class($modelTranslator) extends ListModel {
+        $this->segmentModel = new class($modelTranslator) extends ListModel {
             public function __construct(Translator $translator)
             {
                 $this->translator = $translator;
@@ -39,7 +44,9 @@ final class GeneratedColumnSubscriberTest extends TestCase
         };
 
         $this->translator                = $this->createMock(TranslatorInterface::class);
-        $this->generatedColumnSubscriber = new GeneratedColumnSubscriber($segmentModel, $this->translator);
+        $connection = $this->createStub(Connection::class);
+        $connection->method('getDatabasePlatform')->willReturn(new MySQLPlatform());
+        $this->generatedColumnSubscriber = new GeneratedColumnSubscriber($this->segmentModel, $this->translator, $connection);
     }
 
     public function testInGeneratedColumnsBuild(): void
@@ -52,7 +59,22 @@ final class GeneratedColumnSubscriberTest extends TestCase
 
         $this->assertSame(MAUTIC_TABLE_PREFIX.'leads', $generatedColumn->getTableName());
         $this->assertSame('generated_email_domain', $generatedColumn->getColumnName());
-        $this->assertSame('VARCHAR(255) AS (SUBSTRING(email, LOCATE("@", email) + 1)) COMMENT \'(DC2Type:generated)\'', $generatedColumn->getColumnDefinition());
+        $this->assertSame("VARCHAR(255) AS (SUBSTRING(email, POSITION('@' IN email) + 1)) COMMENT '(DC2Type:generated)'", $generatedColumn->getColumnDefinition());
+    }
+
+    public function testPostgreSqlGeneratedExpressionUsesDeterministicCollationForPosition(): void
+    {
+        $connection = $this->createStub(Connection::class);
+        $connection->method('getDatabasePlatform')->willReturn(new PostgreSQLPlatform());
+        $subscriber = new GeneratedColumnSubscriber($this->segmentModel, $this->translator, $connection);
+        $event = new GeneratedColumnsEvent();
+
+        $subscriber->onGeneratedColumnsBuild($event);
+
+        $this->assertSame(
+            "VARCHAR(255) COLLATE mautic_unicode_ci GENERATED ALWAYS AS (SUBSTRING(email, POSITION('@' IN (email COLLATE \"C\")) + 1)) STORED",
+            $event->getGeneratedColumns()->current()->getColumnDefinition(new PostgreSQLPlatform())
+        );
     }
 
     public function testOnGenerateSegmentFilters(): void

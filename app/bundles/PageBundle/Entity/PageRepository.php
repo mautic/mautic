@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
@@ -79,7 +80,7 @@ class PageRepository extends CommonRepository
         $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));
 
         if (!empty($search)) {
-            $q->andWhere($q->expr()->like('p.title', ':search'))
+            $q->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'p.title', ':search'))
                 ->setParameter('search', "{$search}%");
         }
 
@@ -162,7 +163,7 @@ class PageRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr            = '('.$q->expr()->eq('p.language', ":{$unique}").' OR '.$q->expr()->like('p.language', ":{$langUnique}").')';
+                $expr            = '('.$q->expr()->eq('p.language', ":{$unique}").' OR '.DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'p.language', ":{$langUnique}").')';
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.page.searchcommand.isprefcenter'):

@@ -20,10 +20,14 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class ThemeHelperSandboxTest extends MauticMysqlTestCase
 {
+    private const DB_PASSWORD = 'sandbox-db-password-741d2a';
+
     private string $themesDir;
 
     protected function setUp(): void
     {
+        $this->configParams['db_password'] = self::DB_PASSWORD;
+
         parent::setUp();
         $this->themesDir = self::getContainer()->getParameter('kernel.project_dir').'/themes';
 
@@ -74,7 +78,13 @@ final class ThemeHelperSandboxTest extends MauticMysqlTestCase
 
         $this->assertStringNotContainsString('uid=', $content, 'RCE output must not appear in response');
         $this->assertStringNotContainsString('root:', $content, 'File read output must not appear in response');
-        $this->assertStringNotContainsString('db_password', $content, 'DB password must not be leaked');
+        $this->assertResponseStatusCodeSame(500);
+        $this->assertStringContainsString('not allowed in theme templates', $content);
+        $this->assertSame(self::DB_PASSWORD, self::getContainer()->getParameter('mautic.db_password'));
+        $secretKey = self::getContainer()->getParameter('mautic.secret_key');
+        $this->assertNotEmpty($secretKey);
+        $this->assertStringNotContainsString(self::DB_PASSWORD, $content, 'DB password must not be leaked');
+        $this->assertStringNotContainsString($secretKey, $content, 'Secret key must not be leaked');
     }
 
     public function testSafeThemeTemplateRendersSuccessfully(): void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\PointBundle\Entity\Group;
 
@@ -22,7 +23,11 @@ final class Version20250805095503 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE `{$this->getPrefixedTableName()}` ADD `uuid` CHAR(36) NULL DEFAULT NULL");
-        $this->addSql("UPDATE `{$this->getPrefixedTableName()}` SET `uuid` = UUID() WHERE `uuid` IS NULL");
+        $table  = $this->platform->quoteIdentifier($this->getPrefixedTableName());
+        $column = $this->platform->quoteIdentifier('uuid');
+        $uuid   = DatabasePlatform::isPostgreSQL($this->platform) ? 'gen_random_uuid()::text' : 'UUID()';
+
+        $this->addSql("ALTER TABLE {$table} ADD COLUMN {$column} CHAR(36) DEFAULT NULL");
+        $this->addSql("UPDATE {$table} SET {$column} = {$uuid} WHERE {$column} IS NULL");
     }
 }

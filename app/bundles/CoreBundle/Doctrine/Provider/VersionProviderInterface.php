@@ -11,4 +11,6 @@ interface VersionProviderInterface
     public function isMariaDb(): bool;
 
     public function isMySql(): bool;
+
+    public function isPostgreSql(): bool;
 }

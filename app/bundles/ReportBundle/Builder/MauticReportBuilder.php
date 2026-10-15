@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -17,6 +18,8 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 final class MauticReportBuilder implements ReportBuilderInterface
 {
+    public const IDENTIFIER_PATTERN =  '/([`"]?[a-z_][a-z0-9_]*[`"]?\.[`"]?[a-z_][a-z0-9_]*[`"]?)/i';
+
     /**
      * @var array
      */
@@ -88,22 +91,47 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * SQL tokens that may appear inside report expressions but are never column
      * references; used by extractBaseColumns(). Function names are already
      * excluded by the not-followed-by-parenthesis check.
+     *
+     * Covers both MySQL and PostgreSQL so the same builder works on either platform.
      */
     private const SQL_KEYWORD_TOKENS = [
+        // Core SQL
         'SELECT', 'FROM', 'WHERE', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'AND',
         'OR', 'NOT', 'NULL', 'IS', 'IN', 'LIKE', 'BETWEEN', 'EXISTS', 'DISTINCT',
-        'AS', 'ASC', 'DESC', 'INTERVAL', 'DAY', 'DAYOFWEEK', 'DAYOFMONTH',
-        'DAYOFYEAR', 'HOUR', 'MINUTE', 'SECOND', 'WEEK', 'MONTH', 'QUARTER',
-        'YEAR', 'TRUE', 'FALSE',
+        'AS', 'ASC', 'DESC', 'GROUP', 'ORDER', 'BY', 'HAVING', 'LIMIT', 'OFFSET',
+        'FETCH', 'ONLY', 'UNION', 'ALL', 'INTERSECT', 'EXCEPT',
+        // Window / analytic
+        'OVER', 'PARTITION', 'ROWS', 'RANGE', 'UNBOUNDED', 'PRECEDING',
+        'FOLLOWING', 'CURRENT', 'ROW', 'FILTER', 'WITHIN',
+        // Date / time parts (used in INTERVAL and extract expressions)
+        'INTERVAL', 'DAY', 'DAYOFWEEK', 'DAYOFMONTH', 'DAYOFYEAR',
+        'HOUR', 'MINUTE', 'SECOND', 'WEEK', 'MONTH', 'QUARTER', 'YEAR',
+        // Literals / null-handling
+        'TRUE', 'FALSE', 'UNKNOWN', 'COALESCE', 'NULLIF', 'GREATEST', 'LEAST',
+        // Collation / casting helpers that can appear as bare tokens
+        'COLLATE', 'USING',
+        // PostgreSQL-specific
+        'ILIKE', 'SIMILAR', 'LATERAL', 'RETURNING',
     ];
 
     /**
      * Aggregate functions whose arguments never need to appear in GROUP BY.
+     * Includes MySQL and PostgreSQL names used in report formulas.
      */
     private const AGGREGATE_FUNCTIONS = [
-        'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'GROUP_CONCAT', 'BIT_AND',
-        'BIT_OR', 'BIT_XOR', 'JSON_ARRAYAGG', 'JSON_OBJECTAGG', 'STD',
-        'STDDEV', 'VARIANCE',
+        // Common
+        'COUNT', 'SUM', 'AVG', 'MIN', 'MAX',
+        // MySQL
+        'GROUP_CONCAT', 'BIT_AND', 'BIT_OR', 'BIT_XOR',
+        'JSON_ARRAYAGG', 'JSON_OBJECTAGG',
+        'STD', 'STDDEV', 'VARIANCE',
+        // PostgreSQL
+        'STRING_AGG', 'ARRAY_AGG', 'BOOL_AND', 'BOOL_OR', 'EVERY',
+        'XMLAGG', 'JSON_AGG', 'JSONB_AGG', 'JSON_OBJECT_AGG', 'JSONB_OBJECT_AGG',
+        'MODE', 'PERCENTILE_CONT', 'PERCENTILE_DISC',
+        'STDDEV_POP', 'STDDEV_SAMP', 'VAR_POP', 'VAR_SAMP',
+        'CORR', 'COVAR_POP', 'COVAR_SAMP',
+        'REGR_SLOPE', 'REGR_INTERCEPT', 'REGR_COUNT', 'REGR_R2',
     ];
 
     private ?string $contentTemplate = null;
@@ -156,6 +184,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Build the QUERY
         $queryBuilder = $event->getQueryBuilder();
+
+        // Get Platform
+        $platform = $this->db->getDatabasePlatform();
 
         // Set Content Template
         $this->contentTemplate = $event->getContentTemplate();
@@ -212,33 +243,36 @@ final class MauticReportBuilder implements ReportBuilderInterface
         if (!empty($options['order'])) {
             if (is_array($options['order'])) {
                 if (isset($options['order']['column'])) {
-                    $queryBuilder->orderBy($options['order']['column'], $options['order']['direction']);
-                    $orderByColumns[] = $options['order']['column'];
+                    $orderColumn = $this->resolveOrderColumn($options['order']['column'], $options);
+                    $queryBuilder->orderBy($orderColumn, $options['order']['direction']);
+                    $orderByColumns[] = $orderColumn;
                 } elseif (!empty($options['order'][0][1])) {
                     [$column, $dir] = $options['order'];
+                    $column = $this->resolveOrderColumn($column, $options);
                     $queryBuilder->orderBy($column, $dir);
                     $orderByColumns[] = $column;
                 } else {
                     foreach ($options['order'] as $order) {
-                        $queryBuilder->orderBy($order);
-
                         if (is_string($order)) {
-                            $orderByColumns[] = $order;
+                            preg_match('/^(.+?)(?:\s+(ASC|DESC))?$/i', $order, $parts);
+                            $column = $this->resolveOrderColumn($parts[1], $options);
+                            $queryBuilder->orderBy($column, $parts[2] ?? null);
+                            $orderByColumns[] = $column;
                         }
                     }
                 }
             } else {
-                $queryBuilder->orderBy($options['order']);
-                $orderByColumns[] = $options['order'];
+                preg_match('/^(.+?)(?:\s+(ASC|DESC))?$/i', $options['order'], $parts);
+                $orderColumn = $this->resolveOrderColumn($parts[1], $options);
+                $queryBuilder->orderBy($orderColumn, $parts[2] ?? null);
+                $orderByColumns[] = $orderColumn;
             }
         } elseif ($order = $this->entity->getTableOrder()) {
             foreach ($order as $o) {
-                if (!empty($options['columns'][$o['column']]['formula'])) {
-                    $queryBuilder->orderBy($options['columns'][$o['column']]['formula'], $o['direction']);
-                    $orderByColumns[] = $options['columns'][$o['column']]['formula'];
-                } elseif (!empty($o['column'])) {
-                    $queryBuilder->orderBy($o['column'], $o['direction']);
-                    $orderByColumns[] = $o['column'];
+                if (!empty($o['column'])) {
+                    $orderColumn = $this->resolveOrderColumn($o['column'], $options);
+                    $queryBuilder->orderBy($orderColumn, $o['direction']);
+                    $orderByColumns[] = $orderColumn;
                 }
             }
         }
@@ -290,7 +324,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             ? array_flip(array_column($aggregators, 'column'))
             : [];
         $ungroupedSelectColumns   = [];
-        $expressionSelectColumns = [];
+        $expressionSelectColumns  = [];
 
         // Build SELECT clause
         if (!$event->getSelectColumns()) {
@@ -322,20 +356,20 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             // completion pass below groups its base columns instead.
                             $expressionSelectColumns[] = $selectText;
                         } else {
-                            $selectText                = $this->sanitizeColumnName($field);
+                            $selectText               = DatabasePlatform::quoteColumn($platform, $field);
                             $ungroupedSelectColumns[] = $field;
                         }
                     }
 
                     // support for prefix and suffix to value in query
-                    $prefix     = $fieldOptions['prefix'] ?? '';
-                    $suffix     = $fieldOptions['suffix'] ?? '';
+                    $prefix = $fieldOptions['prefix'] ?? '';
+                    $suffix = $fieldOptions['suffix'] ?? '';
                     if ($prefix || $suffix) {
                         $selectText = 'CONCAT(\''.$prefix.'\', '.$selectText.',\''.$suffix.'\')';
                     }
 
                     if (isset($fieldOptions['alias'])) {
-                        $selectText .= ' AS '.$fieldOptions['alias'];
+                        $selectText .= ' AS '.DatabasePlatform::quoteIdentifier($platform, $fieldOptions['alias']);
                     }
 
                     $selectColumns[] = $selectText;
@@ -373,11 +407,18 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
 
             foreach ([...$ungroupedSelectColumns, ...$expressionSelectColumns, ...$orderByColumns] as $column) {
-                if (str_contains($column, '{{count}}')) {
+                if (str_contains($column, '{{count}}') || in_array($this->normalizeColumnIdentifier($column), $normalizedGroupBy, true)) {
                     continue;
                 }
 
-                foreach ($this->extractBaseColumns($column) as $baseColumn) {
+                // Group scalar formulas by their result; grouping their inputs would split DATE timestamps into individual hits.
+                $groupColumns = $this->isComplexExpression($column)
+                    && $this->removeAggregateCalls($column) === $column
+                    && $this->removeSubqueries($column) === $column
+                    ? [$column]
+                    : $this->extractBaseColumns($column);
+
+                foreach ($groupColumns as $baseColumn) {
                     $normalized = $this->normalizeColumnIdentifier($baseColumn);
 
                     if ('' === $normalized
@@ -388,7 +429,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
 
                     $normalizedGroupBy[] = $normalized;
-                    $dedupedGroupBy[]    = $baseColumn;
+                    // Quote simple table.column identifiers for PostgreSQL/MySQL safety
+                    $dedupedGroupBy[] = !$this->isComplexExpression($baseColumn) && str_contains($baseColumn, '.')
+                        ? DatabasePlatform::quoteColumn($platform, $baseColumn)
+                        : $baseColumn;
                 }
             }
 
@@ -424,15 +468,34 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     $columnSelect = $aggregator['column'];
                 }
 
-                $selectText = sprintf('%s(%s)', $aggregator['function'], $columnSelect);
+                // Sanitize simple column references for the platform
+                $innerExpression = $this->sanitizeExpression($columnSelect);
 
-                $aggregatorSelect[] = sprintf("%s AS '%s %s'", $selectText, $aggregator['function'], $aggregator['column']);
+                $selectText = DatabasePlatform::getAggregatorExpression(
+                    $platform,
+                    $aggregator['function'],
+                    $innerExpression
+                );
+
+                $alias              = sprintf('%s %s', $aggregator['function'], $aggregator['column']);
+                $quotedAlias        = DatabasePlatform::quoteIdentifier($platform, $alias);
+                $aggregatorSelect[] = sprintf('%s AS %s', $selectText, $quotedAlias);
             }
 
             $queryBuilder->addSelect($aggregatorSelect);
         }
 
         return $queryBuilder;
+    }
+
+    private function resolveOrderColumn(string $column, array $options): string
+    {
+        $definition = $options['columns'][$column] ?? [];
+        if (in_array($column, $this->entity->getGroupBy(), true) && isset($definition['groupByFormula'])) {
+            return $definition['groupByFormula'];
+        }
+
+        return $definition['formula'] ?? $column;
     }
 
     /**
@@ -487,10 +550,15 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Remove the names of the remaining scalar function calls (DATE, CONCAT, …)
         // so only their arguments are scanned for column references.
-        $expression = (string) preg_replace('/\b[A-Za-z_][A-Za-z0-9_]*\s*(?=\()/', ' ', $expression);
+        $expression = (string) preg_replace('/\b[A-Za-z_]\w*\s*(?=\()/', ' ', $expression);
 
-        // Match optionally qualified, optionally backtick-quoted identifiers.
-        if (!preg_match_all('/`?([A-Za-z_][A-Za-z0-9_]*)`?(?:\.`?([A-Za-z_][A-Za-z0-9_]*)`?)?/', $expression, $matches)) {
+        // Match optionally qualified, optionally backtick- or double-quote-quoted identifiers.
+        // Accepts both MySQL-style backticks and PostgreSQL-style double quotes.
+        if (!preg_match_all(
+            '/[`"]?([A-Za-z_]\w*)[`"]?(?:\.[`"]?([A-Za-z_]\w*)[`"]?)?/',
+            $expression,
+            $matches
+        )) {
             return [];
         }
 
@@ -500,7 +568,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 continue;
             }
 
-            $columns[] = '' !== $matches[2][$index]
+            $columns[] = '' !== ($matches[2][$index] ?? '')
                 ? $matches[1][$index].'.'.$matches[2][$index]
                 : $matches[1][$index];
         }
@@ -579,11 +647,50 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
     /**
      * Reduces a column reference to a comparable key: quoting, whitespace and
-     * letter case are ignored, so `ph`.`url` matches ph.URL.
+     * letter case are ignored, so `ph`.`url` / "ph"."url" matches ph.URL.
      */
     private function normalizeColumnIdentifier(string $column): string
     {
         return strtolower((string) preg_replace('/[`"\s]+/', '', $column));
+    }
+
+    /**
+     * Sanitizes expressions recursively.
+     * - If the expression starts with a function (AVG(, IF(, ROUND(, etc.) or contains SELECT,
+     *   it recurses into the arguments and sanitizes only real column references (table.column).
+     * - Simple labels/aliases that are not expressions are left untouched.
+     */
+    private function sanitizeExpression(string $expression): string
+    {
+        $trimmed  = trim($expression);
+        $platform = $this->db->getDatabasePlatform();
+
+        // If it's a simple label/alias (no function, no parentheses, no SELECT), leave it as-is
+        if (!$this->isComplexExpression($trimmed)) {
+            if (preg_match(self::IDENTIFIER_PATTERN, $trimmed)) {
+                return DatabasePlatform::quoteColumn($platform, $trimmed);
+            }
+
+            return $trimmed;
+        }
+
+        // Recursively sanitize all column references inside the expression
+        return (string) preg_replace_callback(
+            self::IDENTIFIER_PATTERN,
+            fn ($matches): string => DatabasePlatform::quoteColumn($platform, $matches[1]),
+            $trimmed
+        );
+    }
+
+    /**
+     * Returns true if the string looks like a complex SQL expression (function call or SELECT).
+     */
+    private function isComplexExpression(string $expression): bool
+    {
+        $expr = trim($expression);
+
+        // Starts with a function name followed by '(' or contains SELECT
+        return (bool) preg_match('/^\w+\s*\(/i', $expr) || 0 === stripos($expr, 'SELECT');
     }
 
     private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions): void
@@ -632,7 +739,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
                     }
                     if (RelativeDateHelper::isAnniversary($filter['value'])) {
                         if (!in_array($exprFunction, ['empty', 'notEmpty'], true)) {
-                            $filter['column'] = sprintf("DATE_FORMAT(%s, '%%m-%%d')", $filter['column']);
+                            $filter['column'] = DatabasePlatform::isPostgreSQL($this->db->getDatabasePlatform())
+                                ? sprintf("TO_CHAR(%s, 'MM-DD')", $filter['column'])
+                                : sprintf("DATE_FORMAT(%s, '%%m-%%d')", $filter['column']);
                             $filter['value']  = RelativeDateHelper::resolveAnniversary($filter['value']);
                         }
                     } else {
@@ -739,7 +848,14 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             default:
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
-                        $andGroup[] = $expr->{$exprFunction}($filter['column'], $columnValue);
+                        $andGroup[] = in_array($exprFunction, ['like', 'notLike'], true)
+                            ? DatabasePlatform::getCaseInsensitiveLike(
+                                $this->db->getDatabasePlatform(),
+                                $filter['column'],
+                                $columnValue,
+                                'notLike' === $exprFunction ? DatabasePlatform::FLAG_NEGATIVE : 0
+                            )
+                            : $expr->{$exprFunction}($filter['column'], $columnValue);
                 }
             }
         }
@@ -852,18 +968,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
         $operator = 'in' === $filter['condition'] ? 'IN' : 'NOT IN';
 
         return sprintf('l.id %s (%s)', $operator, $dncSubQuery->getSQL());
-    }
-
-    /**
-     * We must sanitize the table aliases as they might be auto generated.
-     * Aliases like "8e296a06" makes MySql to think it is a number.
-     * Expects param in format "table_alias.column_name".
-     */
-    private function sanitizeColumnName(string $fullColumnName): string
-    {
-        [$tableAlias, $columnName] = explode('.', $fullColumnName);
-
-        return "`{$tableAlias}`.`{$columnName}`";
     }
 
     /**

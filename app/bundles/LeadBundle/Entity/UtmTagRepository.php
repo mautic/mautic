@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -27,12 +28,14 @@ class UtmTagRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
+            $connection = $this->getEntityManager()->getConnection();
+            $pattern    = $qb->expr()->literal('%'.$options['search'].'%');
             $qb->andWhere($qb->expr()->or(
-                $qb->expr()->like('ut.utm_campaign', $qb->expr()->literal('%'.$options['search'].'%')),
-                $qb->expr()->like('ut.utm_content', $qb->expr()->literal('%'.$options['search'].'%')),
-                $qb->expr()->like('ut.utm_medium', $qb->expr()->literal('%'.$options['search'].'%')),
-                $qb->expr()->like('ut.utm_source', $qb->expr()->literal('%'.$options['search'].'%')),
-                $qb->expr()->like('ut.utm_term', $qb->expr()->literal('%'.$options['search'].'%'))
+                DatabasePlatform::getCaseInsensitiveLike($connection->getDatabasePlatform(), 'ut.utm_campaign', $pattern),
+                DatabasePlatform::getCaseInsensitiveLike($connection->getDatabasePlatform(), 'ut.utm_content', $pattern),
+                DatabasePlatform::getCaseInsensitiveLike($connection->getDatabasePlatform(), 'ut.utm_medium', $pattern),
+                DatabasePlatform::getCaseInsensitiveLike($connection->getDatabasePlatform(), 'ut.utm_source', $pattern),
+                DatabasePlatform::getCaseInsensitiveLike($connection->getDatabasePlatform(), 'ut.utm_term', $pattern)
             ));
         }
 
