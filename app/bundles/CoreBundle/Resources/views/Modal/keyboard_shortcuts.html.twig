@@ -3,9 +3,7 @@
   <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="{{ 'mautic.core.close' | trans }}">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="{{ 'mautic.core.btn-close' | trans }}"></button>
         <h4 class="modal-title" id="keyboardShortcutsModalLabel">
           {{ "mautic.keyboard.shortcuts" | trans }}
         </h4>
@@ -48,7 +46,7 @@
                 <td class="shortcut-description">
                   {{ description | trans }}
                 </td>
-                <td class="shortcut-keys text-right">
+                <td class="shortcut-keys text-end">
                   {% set parts = key|split(' / ') %}
                   {% for part in parts %}
                     {% if not loop.first %}
@@ -62,7 +60,7 @@
                       {% elseif k == '⌘' %}
                         {% set title = 'mautic.keyboard.command'|trans %}
                      {% endif %}
-                  <kbd{% if title %} title="{{ title }}" data-toggle="tooltip" {% endif %}>{{ k }}</kbd>
+                  <kbd{% if title %} title="{{ title }}" data-bs-toggle="tooltip" {% endif %}>{{ k }}</kbd>
                     {% endfor %}
                   {% endfor %}
                 </td>

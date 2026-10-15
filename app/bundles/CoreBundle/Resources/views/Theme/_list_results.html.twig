@@ -65,7 +65,7 @@
                             {% set item = item|merge({id: item.key}) %}
                             {% set previewButtonSettings = {
                                 'attr': {
-                                    'data-toggle': 'modal',
+                                    'data-bs-toggle': 'modal',
                                     'data-target': '#theme-' ~ k,
                                 },
                                 'btnText': 'mautic.asset.asset.preview'|trans,
@@ -111,8 +111,7 @@
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span></button>
+                                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             <h4 class="modal-title" id="{{ k }}">{{ item['name']|e }}</h4>
                                         </div>
                                         <div class="modal-body">

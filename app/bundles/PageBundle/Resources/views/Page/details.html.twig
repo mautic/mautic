@@ -101,7 +101,7 @@
     {% endif %}
 
     {% if activePage.language is defined and activePage.language is not empty %}
-        {% set grayTags = grayTags|merge([{ label: activePage.language|language_name, icon: 'ri-translate-2', color: 'warm-gray', attributes: { 'data-toggle': 'tooltip', 'data-placement': 'top', 'title': 'mautic.core.language'|trans } }]) %}
+        {% set grayTags = grayTags|merge([{ label: activePage.language|language_name, icon: 'ri-translate-2', color: 'warm-gray', attributes: { 'data-bs-toggle': 'tooltip', 'data-placement': 'top', 'title': 'mautic.core.language'|trans } }]) %}
     {% endif %}
 
     {% set allTags = blueTags|merge(grayTags) %}
@@ -161,8 +161,8 @@
           <div>
               <!-- page detail collapseable toggler -->
               <div class="hr-expand nm">
-                  <span data-toggle="tooltip" title="Detail">
-                      <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#page-details">
+                  <span data-bs-toggle="tooltip" title="Detail">
+                      <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#page-details">
                           <span class="caret"></span> {{ 'mautic.core.details'|trans }}
                       </a>
                   </span>
@@ -182,7 +182,7 @@
                                       </h5>
                                   </div>
                                   <div class="col-md-9 va-m">
-                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
+                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'float-end'}) }}
                                   </div>
                               </div>
                               <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
@@ -200,14 +200,14 @@
               <ul class="nav nav-tabs nav-tabs-contained">
                   {% if showVariants %}
                       <li class="active">
-                          <a href="#variants-container" role="tab" data-toggle="tab">
+                          <a href="#variants-container" role="tab" data-bs-toggle="tab" class="nav-link">
                               {{- 'mautic.core.variants'|trans -}}
                           </a>
                       </li>
                   {% endif %}
                   {% if showTranslations %}
                       <li class="{% if not showVariants %}active{% endif %}">
-                          <a href="#translation-container" role="tab" data-toggle="tab">
+                          <a href="#translation-container" role="tab" data-bs-toggle="tab" class="nav-link">
                               {{- 'mautic.core.translations'|trans -}}
                           </a>
                       </li>
@@ -285,7 +285,7 @@
                   {% if previewSettingsForm.translation is defined %}
                       <div class="row">
                           <div class="form-group col-xs-12 ">
-                              <div class="control-label">{{ 'mautic.email.preview.show.translation'|trans }}</div>
+                              <div class="form-label">{{ 'mautic.email.preview.show.translation'|trans }}</div>
                               {{ form_widget(previewSettingsForm.translation) }}
                           </div>
                       </div>
@@ -293,7 +293,7 @@
                   {% if previewSettingsForm.variant is defined %}
                       <div class="row">
                           <div class="form-group col-xs-12 ">
-                              <div class="control-label">{{ 'mautic.email.preview.show.ab.variant'|trans }}</div>
+                              <div class="form-label">{{ 'mautic.email.preview.show.ab.variant'|trans }}</div>
                               {{ form_widget(previewSettingsForm.variant) }}
                           </div>
                       </div>
@@ -301,7 +301,7 @@
                   {% if previewSettingsForm.contact is defined %}
                       <div class="row">
                           <div class="form-group col-xs-12 ">
-                              <div class="control-label">{{ 'mautic.page.preview.show.contact'|trans }}</div>
+                              <div class="form-label">{{ 'mautic.page.preview.show.contact'|trans }}</div>
                               {{ form_widget(previewSettingsForm.contact) }}
                           </div>
                       </div>
