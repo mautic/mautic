@@ -12,8 +12,10 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
 {
     /**

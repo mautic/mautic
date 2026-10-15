@@ -13,9 +13,11 @@ use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
 {
     /**

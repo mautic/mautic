@@ -12,9 +12,11 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
+#[Group('non-parallel')]
 final class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTestCase
 {
     public function testWithEventIds(): void

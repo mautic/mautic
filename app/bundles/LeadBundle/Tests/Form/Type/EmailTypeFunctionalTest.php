@@ -8,9 +8,11 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 final class EmailTypeFunctionalTest extends MauticMysqlTestCase
 {
     /**

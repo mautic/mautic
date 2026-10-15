@@ -10,6 +10,7 @@ use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 #[PreserveGlobalState(false)]
 #[RunTestsInSeparateProcesses]
+#[Group('non-parallel')]
 final class InstallWorkflowTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;

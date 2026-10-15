@@ -8,10 +8,12 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Group('non-parallel')]
 final class AutoFillTopLevelFieldVisibilityFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
