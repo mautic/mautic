@@ -1878,7 +1878,7 @@ final class EmailController extends AbstractStandardFormController
         foreach ($cloningEmail->getTranslationChildren() as $translationChild) {
             $clonedEmail->addTranslationChild($translationChild);
         }
-        $clonedEmail->setVariantParent($cloningEmail->getVariantParent()); // @phpstan-ignore argument.type
+        $clonedEmail->setVariantParent($cloningEmail->getVariantParent());
         foreach ($cloningEmail->getVariantChildren() as $variantChild) {
             $clonedEmail->addVariantChild($variantChild);
         }
