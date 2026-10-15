@@ -153,10 +153,9 @@ final readonly class ByReferenceParamAnalyzer
 
                 if ($node instanceof AssignRef) {
                     $this->markWrittenTarget($node->var);
-                    // right-hand side is aliased out and may be changed through the new name
-                    if ($node->expr instanceof Variable && is_string($node->expr->name)) {
-                        $this->markEscaped($node->expr->name);
-                    }
+                    // right-hand side is aliased out and may be changed through the new name,
+                    // including when an element is aliased, e.g. $alias = &$param['key']
+                    $this->escapeIfCandidate($node->expr);
                 }
 
                 if ($node instanceof PreInc || $node instanceof PreDec || $node instanceof PostInc || $node instanceof PostDec) {

@@ -51,6 +51,12 @@ final class NeededReferenceParam
         $this->consume($dependency);
     }
 
+    public function aliasesElementByReference(array &$payload): void
+    {
+        $inner = &$payload['settings'];
+        $inner['touched'] = true;
+    }
+
     public function mutateViaForeach(array &$rows): void
     {
         foreach ($rows as &$row) {

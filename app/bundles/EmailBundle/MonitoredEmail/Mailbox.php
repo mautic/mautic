@@ -662,7 +662,7 @@ final class Mailbox
     {
         $mails = imap_fetch_overview($this->getImapStream(), implode(',', $mailsIds), FT_UID);
         if (is_array($mails) && count($mails)) {
-            foreach ($mails as &$mail) {
+            foreach ($mails as $mail) {
                 if (isset($mail->subject)) {
                     $mail->subject = $this->decodeMimeStr($mail->subject, $this->serverEncoding);
                 }
