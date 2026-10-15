@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Event\SearchCommandEvent;
 use Mautic\CoreBundle\Event\SearchQueryEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
+use Mautic\EmailBundle\DTO\Repository\EmailPendingQueryOptions;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -170,18 +171,20 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param int            $emailId
-     * @param int[]|null     $variantIds
-     * @param int[]|null     $listIds
-     * @param bool           $countOnly
-     * @param int|null       $limit
-     * @param int|null       $minContactId
-     * @param int|null       $maxContactId
-     * @param bool           $countWithMaxMin
-     * @param \DateTime|null $maxDate
+     * Using an instance of EmailPendingQueryOptions is encouraged.
+     *
+     * @param int|EmailPendingQueryOptions $emailIdOrOptions
+     * @param int[]|null                   $variantIds
+     * @param int[]|null                   $listIds
+     * @param bool                         $countOnly
+     * @param int|null                     $limit
+     * @param int|null                     $minContactId
+     * @param int|null                     $maxContactId
+     * @param bool                         $countWithMaxMin
+     * @param \DateTime|null               $maxDate
      */
     public function getEmailPendingQuery(
-        $emailId,
+        $emailIdOrOptions,
         $variantIds = null,
         $listIds = null,
         $countOnly = false,
@@ -194,6 +197,23 @@ class EmailRepository extends CommonRepository
         ?int $threadId = null,
         ?\DateTimeInterface $sendStopDate = null,
     ): array|int|QueryBuilder {
+        if ($emailIdOrOptions instanceof EmailPendingQueryOptions) {
+            $emailId         = $emailIdOrOptions->getEmailId();
+            $variantIds      = $emailIdOrOptions->getVariantIds();
+            $listIds         = $emailIdOrOptions->getListIds();
+            $countOnly       = $emailIdOrOptions->isCountOnly();
+            $limit           = $emailIdOrOptions->getLimit();
+            $minContactId    = $emailIdOrOptions->getMinContactId();
+            $maxContactId    = $emailIdOrOptions->getMaxContactId();
+            $countWithMaxMin = $emailIdOrOptions->isCountWithMaxMin();
+            $maxDate         = $emailIdOrOptions->getMaxDate();
+            $maxThreads      = $emailIdOrOptions->getMaxThreads();
+            $threadId        = $emailIdOrOptions->getThreadId();
+            $sendStopDate    = $emailIdOrOptions->getSendStopDate();
+        } else {
+            $emailId = $emailIdOrOptions;
+        }
+
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $dncQb->select('dnc.lead_id')
@@ -263,30 +283,6 @@ class EmailRepository extends CommonRepository
         // Main query
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        // Only include those in associated segments
-        $segmentQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $segmentQb->select('ll.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
-            ->where(
-                $segmentQb->expr()->and(
-                    $segmentQb->expr()->eq('ll.lead_id', 'l.id'),
-                    $segmentQb->expr()->in('ll.leadlist_id', ':listIds'),
-                    $segmentQb->expr()->eq('ll.manually_removed', ':false')
-                )
-            )
-            ->setParameter('listIds', $listIds, ArrayParameterType::INTEGER)
-            ->setParameter('false', false, Types::BOOLEAN);
-
-        if (null !== $maxDate) {
-            $segmentQb->andWhere($segmentQb->expr()->lte('ll.date_added', ':max_date'));
-            $segmentQb->setParameter('max_date', $maxDate, Types::DATETIME_MUTABLE);
-        }
-
-        if ($sendStopDate) {
-            $segmentQb->andWhere($segmentQb->expr()->lt('ll.date_added', ':sendStopDate'));
-            $q->setParameter('sendStopDate', (new DateTimeHelper($sendStopDate))->toUtcString());
-        }
-
         if ($countOnly) {
             $q->select('count(*) as count');
             if ($countWithMaxMin) {
@@ -297,12 +293,16 @@ class EmailRepository extends CommonRepository
         }
 
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->andWhere(sprintf('l.id IN (%s)', $segmentQb->getSQL()))
             ->andWhere(sprintf('l.id NOT IN (%s)', $dncQb->getSQL()))
             ->andWhere(sprintf('NOT EXISTS (%s)', $statQb->getSQL()))
             ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()));
 
-        $this->copyParams($segmentQb, $q);
+        if ($emailIdOrOptions instanceof EmailPendingQueryOptions && $emailIdOrOptions->isSegmentMembershipViaJoin()) {
+            $this->emailPendingSegmentMembershipViaJoin($q, $listIds, $maxDate, $sendStopDate);
+        } else {
+            $this->emailPendingSegmentMembershipViaSubQuery($q, $listIds, $maxDate, $sendStopDate);
+        }
+
         $this->copyParams($dncQb, $q);
         $this->copyParams($statQb, $q);
         $this->copyParams($mqQb, $q);
@@ -352,11 +352,12 @@ class EmailRepository extends CommonRepository
     public function getBatchMaxContactId(Email $email, int $minId, int $batchSize): int
     {
         $pq = $this->getEmailPendingQuery(
-            $email->getId(),
-            $email->getRelatedEntityIds()
+            (new EmailPendingQueryOptions($email->getId()))
+                ->setVariantIds($email->getRelatedEntityIds())
+                ->setSegmentMembershipViaJoin(true)
         );
 
-        $pq->select('l.id');
+        $pq->select('DISTINCT l.id');
         $pq->andWhere('l.id >= :minId');
         $pq->setParameter('minId', $minId);
         $pq->orderBy('l.id', 'ASC');
@@ -365,7 +366,7 @@ class EmailRepository extends CommonRepository
         $outerQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $outerQb->select('MAX(id)');
         $outerQb->from("({$pq->getSQL()})", 'subquery');
-        $outerQb->setParameters($pq->getParameters());
+        $this->copyParams($pq, $outerQb);
 
         return (int) $outerQb->executeQuery()->fetchOne();
     }
@@ -1035,5 +1036,63 @@ class EmailRepository extends CommonRepository
         $this->dispatcher->dispatch($searchQueryEvent);
 
         return [$searchQueryEvent->getExpr(), $searchQueryEvent->getParameters()];
+    }
+
+    /**
+     * @param \DateTimeInterface $maxDate
+     * @param int[]|null         $listIds
+     */
+    private function emailPendingSegmentMembershipViaJoin(QueryBuilder $q, $listIds = null, $maxDate = null, ?\DateTimeInterface $sendStopDate = null): void
+    {
+        $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', $q->expr()->and(
+            $q->expr()->eq('l.id', 'll.lead_id'),
+            $q->expr()->in('ll.leadlist_id', ':listIds'),
+            $q->expr()->eq('ll.manually_removed', '0')
+        ));
+
+        $this->emailPendingSegmentMembershipQueryApplyParameters($q, $listIds, $maxDate, $sendStopDate);
+    }
+
+    /**
+     * @param \DateTimeInterface $maxDate
+     * @param int[]|null         $listIds
+     */
+    private function emailPendingSegmentMembershipViaSubQuery(QueryBuilder $q, $listIds = null, $maxDate = null, ?\DateTimeInterface $sendStopDate = null): void
+    {
+        $subQuery = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $subQuery->select('ll.lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
+            ->where(
+                $subQuery->expr()->and(
+                    $subQuery->expr()->eq('ll.lead_id', 'l.id'),
+                    $subQuery->expr()->in('ll.leadlist_id', ':listIds'),
+                    $subQuery->expr()->eq('ll.manually_removed', '0')
+                )
+            );
+
+        $this->emailPendingSegmentMembershipQueryApplyParameters($subQuery, $listIds, $maxDate, $sendStopDate);
+
+        $q->andWhere(sprintf('l.id IN (%s)', $subQuery->getSQL()));
+
+        $this->copyParams($subQuery, $q);
+    }
+
+    /**
+     * @param \DateTimeInterface $maxDate
+     * @param int[]|null         $listIds
+     */
+    private function emailPendingSegmentMembershipQueryApplyParameters(QueryBuilder $q, $listIds = null, $maxDate = null, ?\DateTimeInterface $sendStopDate = null): void
+    {
+        $q->setParameter('listIds', $listIds, ArrayParameterType::INTEGER);
+
+        if (null !== $maxDate) {
+            $q->andWhere($q->expr()->lte('ll.date_added', ':max_date'))
+                ->setParameter('max_date', $maxDate, Types::DATETIME_MUTABLE);
+        }
+
+        if ($sendStopDate) {
+            $q->andWhere($q->expr()->lt('ll.date_added', ':sendStopDate'))
+                ->setParameter('sendStopDate', (new DateTimeHelper($sendStopDate))->toUtcString());
+        }
     }
 }
