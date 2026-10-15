@@ -5,7 +5,6 @@ namespace Mautic\FormBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
-use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -142,9 +141,8 @@ final class FormApiController extends CommonApiController
      * @param Form                 $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, array $parameters, $action = 'edit'): Response|array|null
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): Response|array|null
     {
         $method = $this->getCurrentRequest()->getMethod();
         $isNew  = false;
@@ -332,10 +330,10 @@ final class FormApiController extends CommonApiController
      *
      * @return FormInterface<mixed>
      */
-    protected function createFieldEntityForm($entity): FormInterface
+    private function createFieldEntityForm(array $entityArray): FormInterface
     {
         return $this->fieldModel->createForm(
-            $entity,
+            $entityArray,
             null,
             [
                 'csrf_protection'    => false,
@@ -345,12 +343,12 @@ final class FormApiController extends CommonApiController
     }
 
     /**
-     * @param CommonEntity $entity
+     * @param Form $entity
      * @param array<mixed> $parameters
      *
      * @return mixed
      */
-    protected function processForm(Request $request, $entity, ?array $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, object $entity, ?array $parameters = null, string $method = 'PUT')
     {
         $parameters['postAction'] ??= 'return';
 

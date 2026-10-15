@@ -215,7 +215,10 @@ final class PageModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    /**
+     * @param Page|array<string, mixed> $entity
+     */
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -250,9 +253,11 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Page $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -315,7 +320,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
      *
      * @return string
      */
-    public function generateUrl($entity, bool $absolute = true, $clickthrough = [])
+    public function generateUrl(object $entity, bool $absolute = true, $clickthrough = [])
     {
         // If this is a variant, then get the parent's URL
         $parent = $entity->getVariantParent();
@@ -330,8 +335,10 @@ final class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Generates slug string.
+     *
+     * @param Page $entity
      */
-    public function generateSlug($entity): string
+    public function generateSlug(object $entity): string
     {
         $pageSlug = $entity->getAlias();
 

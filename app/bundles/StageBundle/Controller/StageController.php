@@ -139,7 +139,7 @@ final class StageController extends AbstractFormController
      *
      * @param Stage $entity
      */
-    public function newAction(Request $request, $entity = null): Response
+    public function newAction(Request $request, ?object $entity = null): Response
     {
         if (!$entity instanceof Stage) {
             /** @var Stage $entity */

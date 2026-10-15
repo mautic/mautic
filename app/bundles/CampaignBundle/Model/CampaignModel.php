@@ -89,10 +89,11 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
 
     /**
      * @param object      $entity
+     * @param Campaign|array<string, mixed>    $entity
      * @param string|null $action
      * @param array       $options
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Campaign) {
             throw new MethodNotAllowedHttpException(['Campaign']);
@@ -138,6 +139,9 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
         return $entities;
     }
 
+    /**
+     * @param Campaign $entity
+     */
     public function deleteEntity(object $entity): void
     {
         // Null all the event parents for this campaign to avoid database constraints
@@ -156,9 +160,11 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
     }
 
     /**
+     * @param Campaign $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?\Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?\Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
     {
         if ($entity instanceof CampaignLead) {
             return null;
@@ -717,11 +723,9 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
     }
 
     /**
-     * @param Campaign $entity
-     * @param string   $root
      * @param Event[]  $events
      */
-    private function buildOrder(array $hierarchy, array &$events, $entity, int|string $root = 'null', int $order = 1): void
+    private function buildOrder(array $hierarchy, array &$events, Campaign $entity, int|string $root = 'null', int $order = 1): void
     {
         $count = count($hierarchy);
         if (1 === $count && 'null' === array_unique(array_values($hierarchy))[0]) {

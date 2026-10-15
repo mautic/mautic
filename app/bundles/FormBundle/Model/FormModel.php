@@ -95,7 +95,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         return 'getName';
     }
 
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    /**
+     * @param Form|array<string, mixed> $entity
+     */
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -129,9 +132,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Form $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -319,6 +324,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
+    /**
+     * @param Form $entity
+     */
     public function saveEntity(object $entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
@@ -550,6 +558,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
+    /**
+     * @param Form $entity
+     */
     public function deleteEntity(object $entity): void
     {
         /** @var Form $entity */

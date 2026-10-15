@@ -436,7 +436,7 @@ trait CustomFieldRepositoryTrait
     /**
      * Inherit and use in class if required to do something with the entity after persisting.
      */
-    protected function postSaveEntity($entity): void
+    protected function postSaveEntity(object $entity): void
     {
         // Inherit and use if required
     }

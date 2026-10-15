@@ -584,7 +584,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      * @param array<string, mixed>             $data
      * @param array<int, array<string, mixed>> $dependencies
      */
-    private function updateFormRelatedData(array &$data, array $dependencies, string $entity): void
+    private function updateFormRelatedData(array &$data, array $dependencies, string $entityName): void
     {
         if (empty($data[Form::ENTITY_NAME])) {
             return;
@@ -595,9 +595,9 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             return;
         }
 
-        foreach ($data[$entity] as &$item) {
+        foreach ($data[$entityName] as &$item) {
             foreach ($formDependencies as $dependency) {
-                if (isset($dependency[$entity]) && isset($item['id']) && $item['id'] === $dependency[$entity]) {
+                if (isset($dependency[$entityName]) && isset($item['id']) && $item['id'] === $dependency[$entityName]) {
                     if (isset($item['form']) && isset($dependency[Form::ENTITY_NAME])) {
                         $item['form'] = $dependency[Form::ENTITY_NAME];
                     }
@@ -769,11 +769,11 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      *
      * @return array<int, array<string, mixed>>
      */
-    private function getSubDependencies(array $dependencies, string $entity): array
+    private function getSubDependencies(array $dependencies, string $entityName): array
     {
         foreach ($dependencies as $dependencyGroup) {
-            if (isset($dependencyGroup[$entity])) {
-                return $dependencyGroup[$entity];
+            if (isset($dependencyGroup[$entityName])) {
+                return $dependencyGroup[$entityName];
             }
         }
 

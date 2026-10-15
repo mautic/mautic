@@ -216,7 +216,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead        $entity
+     * @param Lead|array<string, mixed>        $entity
      * @param string|null $action
      * @param array       $options
      *
@@ -224,7 +224,7 @@ class LeadModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
@@ -294,13 +294,18 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @param Lead $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         return $this->dispatchLeadEvent($action, $entity, $isNew, false);
     }
 
+    /**
+     * @param Lead $entity
+     */
     protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         return $this->dispatchLeadEvent($action, $entity, $isNew, true);
@@ -341,12 +346,8 @@ class LeadModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    private function dispatchLeadEvent(string $action, object $entity, bool $isNew, bool $alreadyProcessedInBatch): ?LeadEvent
+    private function dispatchLeadEvent(string $action, Lead $entity, bool $isNew, bool $alreadyProcessedInBatch): ?LeadEvent
     {
-        if (!$entity instanceof Lead) {
-            throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
-        }
-
         $event = match ($action) {
             'pre_save'    => new LeadPreSaveEvent($entity, $isNew),
             'post_save'   => new LeadPostSaveEvent($entity, $isNew),

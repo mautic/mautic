@@ -78,9 +78,6 @@ parameters:
                 - symplify.noArrayMapWithArrayCallable
                 - symfony.noListenerWithoutContract
                 - symfony.noFindTaggedServiceIdsCall
-#                - return.unusedType
-#                - property.unusedType
-#                - assign.propertyType
 
         # type-perfect no_mixed_caller: rule enabled, violations typed incrementally; ignored wholesale for now
         -
@@ -89,6 +86,14 @@ parameters:
                 - app/config
                 - app/bundles
                 - plugins
+
+        -
+            path: utils/phpstan/src/Rule/EntityParamMustHaveTypeRule.php
+            identifier: phpstanApi.method
+
+        -
+            path: utils/phpstan/src/Rule/EntityParamConcreteTypeRule.php
+            identifier: phpstanApi.method
 
         # final classes mocked in tests make the Class&MockObject intersection unresolvable, the mock works via dg/bypass-finals
         -
@@ -450,6 +455,7 @@ rules:
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
     - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
     - Utils\PHPStan\Rule\SingleArgumentDispatchRule
+    - Utils\PHPStan\Rule\NativeUnionParamMustHaveUnionDocblockRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
@@ -460,6 +466,14 @@ services:
         arguments:
             variableNameToType:
                 parameters: array
+    -
+        class: Utils\PHPStan\Rule\EntityParamMustHaveTypeRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Utils\PHPStan\Rule\EntityParamConcreteTypeRule
+        tags:
+            - phpstan.rules.rule
     -
         class: Utils\PHPStan\Type\ConnectionQueryBuilderReturnTypeExtension
         tags:

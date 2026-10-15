@@ -82,9 +82,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
 
             $this->notificationRepository->saveEntity($entity, false);
 
-            if ($dispatchEvent) {
-                $this->dispatchEvent('post_save', $entity, $isNew, $event);
-            }
+            $this->dispatchEvent('post_save', $entity, $isNew, $event);
 
             if (0 === ++$i % $batchSize) {
                 $this->em->flush();
@@ -94,14 +92,14 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     }
 
     /**
-     * @param Notification|null $entity
+     * @param Notification|array<string, mixed>      $entity
      * @param string|null       $action
      * @param array             $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Notification) {
             throw new MethodNotAllowedHttpException(['Notification']);
@@ -127,6 +125,9 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         return parent::getEntity($id);
     }
 
+    /**
+     * @param Notification $entity
+     */
     public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
@@ -151,9 +152,11 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     }
 
     /**
+     * @param Notification $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Notification) {
             throw new MethodNotAllowedHttpException(['Notification']);

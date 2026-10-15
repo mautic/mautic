@@ -147,12 +147,12 @@ final class WebhookModel extends FormModel
     }
 
     /**
-     * @param Webhook      $entity
+     * @param Webhook|array<string, mixed>      $entity
      * @param array<mixed> $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook']);
@@ -586,9 +586,11 @@ final class WebhookModel extends FormModel
     }
 
     /**
+     * @param Webhook $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?SymfonyEvent $event = null): ?SymfonyEvent
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?SymfonyEvent $event = null): ?SymfonyEvent
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook'], 'Entity must be of class Webhook()');

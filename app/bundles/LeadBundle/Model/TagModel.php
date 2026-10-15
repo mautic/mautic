@@ -100,10 +100,10 @@ class TagModel extends FormModel
     }
 
     /**
-     * @param Tag   $entity
+     * @param Tag|array<string, mixed>   $entity
      * @param array $options
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);
@@ -117,9 +117,11 @@ class TagModel extends FormModel
     }
 
     /**
+     * @param Tag $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);
