@@ -37,9 +37,9 @@ final class EntityExportEvent extends Event
     /**
      * Add a single entity to the collection.
      *
-     * @param object|array<string, mixed> $entity
+     * @param array<string, mixed> $entity
      */
-    public function addEntity(string $entityName, object|array $entity): void
+    public function addEntity(string $entityName, array $entity): void
     {
         $this->entities[$entityName][] = $entity;
     }
