@@ -15,10 +15,9 @@ final readonly class PointActionHelper
     }
 
     /**
-     * @param Hit                  $eventDetails
      * @param array<string, mixed> $action
      */
-    public static function validatePageHit($eventDetails, array $action): bool
+    public static function validatePageHit(Hit $eventDetails, array $action): bool
     {
         $pageHit = $eventDetails->getPage();
 
@@ -40,10 +39,9 @@ final readonly class PointActionHelper
     }
 
     /**
-     * @param Hit                  $eventDetails
      * @param array<string, mixed> $action
      */
-    public function validateUrlHit($eventDetails, array $action): bool
+    public function validateUrlHit(Hit $eventDetails, array $action): bool
     {
         $changePoints = [];
         $url          = $eventDetails->getUrl();

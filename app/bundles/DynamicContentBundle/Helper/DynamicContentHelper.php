@@ -204,10 +204,7 @@ final readonly class DynamicContentHelper
         );
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function convertLeadToArray($lead): array
+    public function convertLeadToArray(Lead $lead): array
     {
         return array_merge(
             $lead->getProfileFields(),

@@ -268,10 +268,9 @@ abstract class MonitorTwitterBaseCommand extends Command
      * Prints a summary of the search query.
      * Only shows stats if explicitly requested or if we're in verbose mode.
      *
-     * @param Monitoring           $monitor
      * @param array<string, mixed> $results
      */
-    protected function printInformation($monitor, array $results): void
+    protected function printInformation(Monitoring $monitor, array $results): void
     {
         if (!$this->input->getOption('show-stats') && $this->output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
             return;
