@@ -16,9 +16,8 @@ final class Client implements ClientInterface
 
     public function __construct(
         private readonly ClientBridgeInterface $client,
-        private readonly string $mappingField
-    )
-    {
+        private readonly string $mappingField,
+    ) {
     }
 
     public function isAuthenticated(): bool
