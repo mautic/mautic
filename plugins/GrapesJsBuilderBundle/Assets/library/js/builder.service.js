@@ -731,8 +731,8 @@ export default class BuilderService {
       }
     });
 
-    const triggerBuilderHide = (result) => {
-      if (false === result) {
+    const triggerBuilderHide = (event) => {
+      if (false === event?.result) {
         return;
       }
 
@@ -760,7 +760,11 @@ export default class BuilderService {
     this.editor.on('run:mautic-editor-page-html-close', triggerBuilderHide);
     this.editor.on('run:mautic-editor-email-html-close', triggerBuilderHide);
     this.editor.on('run:mautic-editor-email-mjml-close', triggerBuilderHide);
-    this.editor.on('run:preset-mautic:apply-form', () => this.persistEditorState());
+    this.editor.on('run:preset-mautic:apply-form', (event) => {
+      if (false !== event?.result) {
+        this.persistEditorState();
+      }
+    });
 
     this.editor.on('load', () => {
       if (this.isPageContext()) {
