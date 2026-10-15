@@ -75,7 +75,7 @@ final class EmailController extends FormController
      */
     private function getEmailListForceFilters(string $search): array
     {
-        return empty($search) ? [['column' => 'e.translationParent', 'expr' => 'isNull']] : [];
+        return '' === $search ? [['column' => 'e.translationParent', 'expr' => 'isNull']] : [];
     }
 
     /**
@@ -130,7 +130,7 @@ final class EmailController extends FormController
 
         $filter = [
             'string' => $search,
-            'force'  => $this->getEmailListForceFilters($search),
+            'force'  => [],
         ];
         if (!$permissions['email:emails:viewother']) {
             $filter['force'][] =
@@ -228,6 +228,10 @@ final class EmailController extends FormController
                 $filter['force'][] = ['column' => 'e.template', 'expr' => 'in', 'value' => $templates];
             }
         }
+
+        // Apply the grouping constraint after quick-filter tokens have been
+        // removed from the free-text search.
+        $filter['force'] = array_merge($this->getEmailListForceFilters($search), $filter['force']);
 
         $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
         $orderByDir = $session->get('mautic.email.orderbydir', $this->getDefaultOrderDirection());

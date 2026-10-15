@@ -108,6 +108,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $segmentOther  = $this->createSegment('Other', 'other');
 
         $matchingEmail    = $this->createEmail('Email For People', self::SUBJECT_A, 'list', 'blank', 'Test html', $segmentPeople);
+        $matchingTranslation = $this->createEmail('Translated Email For People', self::SUBJECT_A, 'list', 'blank', 'Test html', $segmentPeople);
+        $matchingTranslation->setTranslationParent($matchingEmail);
+        $matchingEmail->addTranslationChild($matchingTranslation);
         $nonMatchingEmail = $this->createEmail('Email For Other', self::SUBJECT_B, 'list', 'blank', 'Test html', $segmentOther);
 
         $this->em->flush();
@@ -128,6 +131,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $response = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertStringContainsString($matchingEmail->getName(), (string) $response['newContent']);
+        $this->assertStringNotContainsString($matchingTranslation->getName(), (string) $response['newContent']);
         $this->assertStringNotContainsString($nonMatchingEmail->getName(), (string) $response['newContent']);
         $this->assertStringNotContainsString('No Results Found', (string) $response['newContent']);
     }
