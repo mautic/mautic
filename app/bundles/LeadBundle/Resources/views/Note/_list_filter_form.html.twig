@@ -13,11 +13,13 @@
     </div>
     <input type="hidden" name="leadId" id="leadId" value="{{ lead.id|e }}" />
     <div class="panel-footer text-secondary">
+        {% set noteItems = [] %}
         {% for typeKey, typeName in noteTypes %}
-            {% include '@MauticCore/Components/checkbox.html.twig' with {
-                inline: true,
-                items: [{ name: 'noteTypes[]', value: typeKey, checked: typeKey in noteType, label: typeName }]
-            } %}
+            {% set noteItems = noteItems|merge([{ name: 'noteTypes[]', value: typeKey, checked: typeKey in noteType, label: typeName }]) %}
         {% endfor %}
+        {% include '@MauticCore/Components/checkbox.html.twig' with {
+            inline: true,
+            items: noteItems
+        } %}
     </div>
 </form>
