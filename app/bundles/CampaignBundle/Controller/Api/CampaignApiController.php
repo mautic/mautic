@@ -486,8 +486,13 @@ final class CampaignApiController extends CommonApiController
                 );
             }
 
-            /** @var UploadedFile $uploadedFile */
             $uploadedFile = array_values($files)[0];
+
+            if (!$uploadedFile instanceof UploadedFile) {
+                return $this->handleView(
+                    $this->view(['error' => $this->translator->trans('mautic.campaign.api.import.incorrect_zip_file', [], 'messages')], Response::HTTP_BAD_REQUEST)
+                );
+            }
 
             if (!$uploadedFile->isValid()) {
                 return $this->handleView(
