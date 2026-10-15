@@ -272,10 +272,8 @@ class ChartQuery extends AbstractChart
 
     /**
      * Loads data from prepared query and builds the chart data.
-     *
-     * @param QueryBuilder $query
      */
-    public function loadAndBuildTimeData($query): array
+    public function loadAndBuildTimeData(QueryBuilder $query): array
     {
         $rawData =  $query->executeQuery()->fetchAllAssociative();
 
@@ -518,10 +516,8 @@ class ChartQuery extends AbstractChart
 
     /**
      * Count how many rows is between a range of date diff in seconds.
-     *
-     * @param QueryBuilder $query
      */
-    public function fetchCountDateDiff($query): int
+    public function fetchCountDateDiff(QueryBuilder $query): int
     {
         $data = $query->executeQuery()->fetchAssociative();
 
