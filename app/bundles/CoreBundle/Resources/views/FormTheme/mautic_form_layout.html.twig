@@ -86,7 +86,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 <div class="row">
     <div class="form-group col-xs-12{{ feedbackClass }}">
         {% include '@MauticCore/Components/checkbox.html.twig' with {
-            items: [{ id: form.vars.id, name: form.vars.full_name, value: form.vars.value, checked: form.vars.checked, disabled: form.vars.disabled, label: form.vars.label|default(null) ? form.vars.label : (form.vars.name|humanize), attributes: form.vars.attr }]
+            items: [{ id: form.vars.id, name: form.vars.full_name, value: form.vars.value, checked: form.vars.checked, disabled: form.vars.disabled, label: form.vars.label is null ? form.vars.name|humanize : form.vars.label, translation_domain: form.vars.translation_domain, label_translation_parameters: form.vars.label_translation_parameters, attributes: form.vars.attr }]
         } %}
         {{ form_errors(form) }}
     </div>
@@ -130,9 +130,10 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
             {% if expanded and multiple %}
             {% set checkboxItems = [] %}
             {% for child in form.children %}
-                {% set checkboxItems = checkboxItems|merge([{ id: child.vars.id, name: child.vars.full_name, value: child.vars.value, checked: child.vars.checked, disabled: child.vars.disabled, label: child.vars.label, attributes: child.vars.attr }]) %}
+                {% do child.setRendered() %}
+                {% set checkboxItems = checkboxItems|merge([{ id: child.vars.id, name: child.vars.full_name, value: child.vars.value, checked: child.vars.checked, disabled: child.vars.disabled, label: child.vars.label, translation_domain: child.vars.translation_domain, label_translation_parameters: child.vars.label_translation_parameters, attributes: attr|merge(child.vars.attr) }]) %}
             {% endfor %}
-            {% include '@MauticCore/Components/checkbox.html.twig' with { items: checkboxItems } %}
+            {% include '@MauticCore/Components/checkbox.html.twig' with { items: checkboxItems } only %}
             {% else %}
             {{ form_widget(form) }}
             {% endif %}
