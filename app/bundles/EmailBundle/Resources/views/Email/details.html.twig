@@ -196,7 +196,7 @@
                     icon: 'ri-translate-2',
                     color: 'warm-gray',
                     attributes: {
-                        'data-toggle': 'tooltip',
+                        'data-bs-toggle': 'tooltip',
                         'data-placement': 'top',
                         'title': 'mautic.core.language'|trans
                     }
@@ -300,7 +300,7 @@
                               {% endif %}
                               <tr>
                                   <td width="20%">
-                                      <span class="fw-b" data-toggle="tooltip" data-placement="right" title="{{ 'mautic.email.stat.sent.details'|trans }}">{{ 'mautic.email.stat.sent'|trans }} <i class="ri-question-line"></i></span>
+                                      <span class="fw-b" data-bs-toggle="tooltip" data-bs-placement="right" title="{{ 'mautic.email.stat.sent.details'|trans }}">{{ 'mautic.email.stat.sent'|trans }} <i class="ri-question-line"></i></span>
                                   </td>
                                   <td>{{ email.sentCount }}</td>
                               </tr>
@@ -327,8 +327,8 @@
           <div>
               <!-- email detail collapseable toggler -->
               <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
-                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#email-details">
+                <span data-bs-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#email-details">
                       <span class="caret"></span> {{ 'mautic.core.details'|trans }}
                     </a>
                 </span>
@@ -388,12 +388,12 @@
                   <!-- tabs controls -->
                   <ul class="nav nav-tabs nav-tabs-contained">
                       <li class="active">
-                          <a href="#stats-container" role="tab" data-toggle="tab">
+                          <a href="#stats-container" role="tab" data-bs-toggle="tab" class="nav-link">
                               {{ 'mautic.email.thead.stats'|trans }}
                           </a>
                       </li>
                       <li>
-                          <a href="#reads-map-container" role="tab" data-toggle="tab" data-load="map">
+                          <a href="#reads-map-container" role="tab" data-bs-toggle="tab" data-load="map" class="nav-link">
                               {{ 'mautic.email.thead.maps'|trans }}
                           </a>
                       </li>
@@ -432,18 +432,18 @@
               <!-- tabs controls -->
               <ul class="nav nav-tabs nav-tabs-contained">
                   <li class="active">
-                      <a href="#clicks-container" role="tab" data-toggle="tab">
+                      <a href="#clicks-container" role="tab" data-bs-toggle="tab" class="nav-link">
                           {{ 'mautic.trackable.click_counts'|trans }}
                       </a>
                   </li>
                   <li>
-                      <a href="#contacts-container" role="tab" data-toggle="tab">
+                      <a href="#contacts-container" role="tab" data-bs-toggle="tab" class="nav-link">
                           {{ 'mautic.email.associated.contacts'|trans }}
                       </a>
                   </li>
                   {% if showTranslations %}
                       <li>
-                          <a href="#translation-container" role="tab" data-toggle="tab">
+                          <a href="#translation-container" role="tab" data-bs-toggle="tab" class="nav-link">
                               {{ 'mautic.core.translations'|trans }}
                           </a>
                       </li>
@@ -505,7 +505,7 @@
                   {% if previewSettingsForm.translation is defined %}
                   <div class="row">
                       <div class="form-group col-xs-12 ">
-                          <div class="control-label">{{ 'mautic.email.preview.show.translation'|trans }}</div>
+                          <div class="form-label">{{ 'mautic.email.preview.show.translation'|trans }}</div>
                           {{ form_widget(previewSettingsForm.translation) }}
                       </div>
                   </div>
@@ -513,7 +513,7 @@
                   {% if previewSettingsForm.variant is defined %}
                   <div class="row">
                       <div class="form-group col-xs-12 ">
-                          <div class="control-label">{{ 'mautic.email.preview.show.ab.variant'|trans }}</div>
+                          <div class="form-label">{{ 'mautic.email.preview.show.ab.variant'|trans }}</div>
                           {{ form_widget(previewSettingsForm.variant) }}
                       </div>
                   </div>
@@ -521,7 +521,7 @@
                   {% if previewSettingsForm.contact is defined %}
                       <div class="row">
                           <div class="form-group col-xs-12 ">
-                              <div class="control-label">{{ 'mautic.email.preview.show.contact'|trans }}</div>
+                              <div class="form-label">{{ 'mautic.email.preview.show.contact'|trans }}</div>
                               {{ form_widget(previewSettingsForm.contact) }}
                           </div>
                       </div>

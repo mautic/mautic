@@ -36,20 +36,20 @@ final class StageType extends AbstractType
 
         $builder->add('description', TextareaType::class, [
             'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => ['class' => 'form-control editor'],
             'required'   => false,
         ]);
         $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
             'label_attr' => [
-                'class' => 'control-label',
+                'class' => 'form-label',
             ], 'attr' => [
                 'class' => 'form-control',
             ], ]);
         $builder->add('weight', NumberType::class, [
             'label'      => 'mautic.stage.action.weight',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.stage.action.weight.help',

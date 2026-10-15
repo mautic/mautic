@@ -405,8 +405,7 @@ Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, onlyDestroy)
             return;
         }
 
-        $tooltip.tooltip('hide');
-        $tooltip.tooltip('destroy');
+        $tooltip.each((index, element) => bootstrap.Tooltip.getInstance(element)?.dispose());
     });
     $select.data(dataAttribute, []);
 
@@ -420,7 +419,7 @@ Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, onlyDestroy)
             // Initiate a tooltip on each option since chosen doesn't copy over the data attributes
             const chosenOption = '#' + theSelect + '_chosen .option_' + mQuery(this).attr('id');
 
-            const $tooltip = mQuery(chosenOption).tooltip({html: true, container: 'body', placement: 'left'});
+            const $tooltip = mQuery(chosenOption).each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true, container: 'body', placement: 'left'}));
             $select.data(dataAttribute).push($tooltip);
         }
     });
@@ -573,7 +572,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
             });
 
         //initialize tooltips
-        mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
+        mQuery(eventId + " *[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true}));
 
         // Connect into last anchor clicked
         Mautic.campaignBuilderInstance.connect({
@@ -763,7 +762,7 @@ Mautic.campaignSourceOnLoad = function (container, response) {
             });
 
         //initialize tooltipslist-campaign-event
-        mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
+        mQuery(eventId + " *[data-bs-toggle='tooltip']").each((index, element) => bootstrap.Tooltip.getOrCreateInstance(element, {html: true}));
         if (autoConnect) {
             // Connect into last anchor clicked
             if (Mautic.campaignBuilderAnchorClicked.search('left') !== -1) {
@@ -1251,7 +1250,7 @@ Mautic.initCampaignCanvasPan = function () {
                 return;
             }
 
-            if (mQuery('.modal.in').length > 0) {
+            if (mQuery('.modal.show').length > 0) {
                 return;
             }
 

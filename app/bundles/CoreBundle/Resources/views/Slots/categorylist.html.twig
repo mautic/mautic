@@ -1,13 +1,13 @@
 {% set labelText = categorylist['label-text']|default('mautic.lead.form.categories'|trans) %}
 {% if form is defined %}
     {% if showContactCategories is defined and showContactCategories and form.global_categories is defined and form.global_categories|length > 0 %}
-<div class="global-categories text-left">
+<div class="global-categories text-start">
     <div>
-        <label class="control-label">{{ labelText }}</label>
+        <label class="form-label">{{ labelText }}</label>
     </div>
         {% set categoryNumber = form.global_categories.vars.choices|length %}
         {% for temp in form.global_categories %}
-            <div id="category-{{ loop.revindex0 }}" class="text-left">
+            <div id="category-{{ loop.revindex0 }}" class="text-start">
                 {{ form_widget(form.global_categories[loop.revindex0]) }}
                 {{ form_label(form.global_categories[loop.revindex0]) }}
             </div>
@@ -18,11 +18,11 @@
         {#unset($form['global_categories']);#}
     {% endif %}
 {% else %}
-    <div class="global-categories text-left">
+    <div class="global-categories text-start">
         <div>
-            <label class="control-label">{{ labelText }}</label>
+            <label class="form-label">{{ labelText }}</label>
         </div>
-        <div id="category-1" class="text-left">
+        <div id="category-1" class="text-start">
             <input type="checkbox" id="lead_contact_frequency_rules_global_categories_1" name="lead_contact_frequency_rules[global_categories][]" autocomplete="false" value="1" checked="checked">
             <label for="lead_contact_frequency_rules_global_categories_1">{{ 'mautic.core.category'|trans }}</label>
         </div>
