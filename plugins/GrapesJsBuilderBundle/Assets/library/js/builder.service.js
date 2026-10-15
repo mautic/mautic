@@ -418,7 +418,12 @@ export default class BuilderService {
       }
 
       try {
-        return originalRun(...args);
+        const result = originalRun(...args);
+        if (false === result && typeof MauticVars !== 'undefined') {
+          MauticVars.formSubmitInProgress = false;
+        }
+
+        return result;
       } catch (error) {
         if (typeof MauticVars !== 'undefined') {
           MauticVars.formSubmitInProgress = false;
@@ -731,7 +736,11 @@ export default class BuilderService {
       }
     });
 
-    const triggerBuilderHide = () => {
+    const triggerBuilderHide = (result) => {
+      if (false === result) {
+        return;
+      }
+
       this.persistEditorState();
       // trigger hide event on DOM element
       mQuery('.builder').trigger('builder:hide', [this.editor]);
