@@ -216,7 +216,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Page $entity
+     * @param Page|array<string, mixed> $entity
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {

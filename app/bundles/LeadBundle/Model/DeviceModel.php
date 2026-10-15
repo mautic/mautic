@@ -57,7 +57,7 @@ final class DeviceModel extends FormModel
     }
 
     /**
-     * @param LeadDevice $entity
+     * @param LeadDevice|array<string, mixed> $entity
      * @param array      $options
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface

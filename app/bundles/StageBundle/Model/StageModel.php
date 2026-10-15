@@ -63,7 +63,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Stage $entity
+     * @param Stage|array<string, mixed> $entity
      *
      * @throws MethodNotAllowedHttpException
      */

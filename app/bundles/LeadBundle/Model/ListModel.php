@@ -216,7 +216,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param LeadList    $entity
+     * @param LeadList|array<string, mixed>    $entity
      * @param string|null $action
      * @param array       $options
      *

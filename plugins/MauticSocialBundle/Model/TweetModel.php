@@ -131,7 +131,7 @@ final class TweetModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param Tweet        $entity
+     * @param Tweet|array<string, mixed>        $entity
      * @param array<mixed> $options
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface

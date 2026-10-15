@@ -48,7 +48,7 @@ final class MonitoringModel extends FormModel
     ];
 
     /**
-     * @param Monitoring  $entity
+     * @param Monitoring|array<string, mixed>  $entity
      * @param string|null $action
      * @param mixed[]     $options
      */

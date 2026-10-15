@@ -216,7 +216,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead        $entity
+     * @param Lead|array<string, mixed>        $entity
      * @param string|null $action
      * @param array       $options
      *

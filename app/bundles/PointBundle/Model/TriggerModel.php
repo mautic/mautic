@@ -80,7 +80,7 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
     }
 
     /**
-     * @param Trigger $entity
+     * @param Trigger|array<string, mixed> $entity
      *
      * @throws MethodNotAllowedHttpException
      */

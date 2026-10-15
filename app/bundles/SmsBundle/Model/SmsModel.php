@@ -131,7 +131,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
     }
 
     /**
-     * @param Sms     $entity
+     * @param Sms|array<string, mixed>     $entity
      * @param mixed[] $options
      *
      * @throws MethodNotAllowedHttpException

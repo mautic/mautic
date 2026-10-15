@@ -368,7 +368,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Creates the appropriate form per the model.
      *
-     * @param TEntity      $entity
+     * @param TEntity|array<string, mixed>      $entity
      * @param string|null $action
      * @param array       $options
      *

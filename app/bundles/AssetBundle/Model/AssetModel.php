@@ -317,7 +317,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Asset $entity
+     * @param Asset|array<string, mixed> $entity
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {

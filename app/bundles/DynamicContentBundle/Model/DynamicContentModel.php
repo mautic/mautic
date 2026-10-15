@@ -114,7 +114,7 @@ final class DynamicContentModel extends FormModel implements AjaxLookupModelInte
     }
 
     /**
-     * @param DynamicContent $entity
+     * @param DynamicContent|array<string, mixed> $entity
      * @param string|null    $action
      * @param array          $options
      *

@@ -63,7 +63,7 @@ final class NoteModel extends FormModel
     }
 
     /**
-     * @param LeadNote    $entity
+     * @param LeadNote|array<string, mixed>    $entity
      * @param string|null $action
      * @param array       $options
      */

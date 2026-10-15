@@ -96,7 +96,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Form $entity
+     * @param Form|array<string, mixed> $entity
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {

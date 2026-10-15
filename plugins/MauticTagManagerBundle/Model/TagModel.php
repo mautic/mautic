@@ -33,7 +33,7 @@ final class TagModel extends BaseTagModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Tag         $entity
+     * @param Tag|array<string, mixed>         $entity
      * @param string|null $action
      * @param array       $options
      */

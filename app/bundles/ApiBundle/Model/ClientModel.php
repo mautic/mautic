@@ -75,7 +75,7 @@ final class ClientModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Client $entity
+     * @param Client|array<string, mixed> $entity
      *
      * @throws MethodNotAllowedHttpException
      */

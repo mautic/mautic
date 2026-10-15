@@ -48,7 +48,7 @@ final class ActionModel extends CommonFormModel
     }
 
     /**
-     * @param Action $entity
+     * @param Action|array<string, mixed> $entity
      * @param array  $options
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface

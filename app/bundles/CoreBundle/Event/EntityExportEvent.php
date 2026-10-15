@@ -39,7 +39,7 @@ final class EntityExportEvent extends Event
      *
      * @param array<string, mixed> $entity
      */
-    public function addEntity(string $entityName, object|array $entity): void
+    public function addEntity(string $entityName, array $entity): void
     {
         $this->entities[$entityName][] = $entity;
     }
@@ -73,7 +73,7 @@ final class EntityExportEvent extends Event
     /**
      * Add a single entity to the dependencies.
      *
-     * @param array<string, mixed> $entity
+     * @param object|array<string, mixed> $entity
      */
     public function addDependencyEntity(string $entityName, object|array $entity): void
     {
