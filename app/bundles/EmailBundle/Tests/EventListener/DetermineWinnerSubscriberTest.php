@@ -47,7 +47,9 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $parent       = new Email();
         $variantChild = new Email();
-        $children     = [2 => $this->createStub(Email::class)];
+        $child        = new Email();
+        $child->setId(2);
+        $children     = [2 => $child];
         $ids          = [1, 2];
         $parameters   = ['parent' => $parent, 'children' => $children];
         $event        = new DetermineWinnerEvent($parameters);
@@ -98,7 +100,9 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $parent        = new Email();
         $variantChild  = new Email();
-        $children      = [2 => $this->createStub(Email::class)];
+        $child         = new Email();
+        $child->setId(2);
+        $children      = [2 => $child];
         $ids           = [1, 2];
         $parameters    = ['parent' => $parent, 'children' => $children];
         $event         = new DetermineWinnerEvent($parameters);

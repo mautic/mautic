@@ -75,7 +75,7 @@ final class ScheduledExecutionerTest extends TestCase
         $this->repository->expects($this->never())
             ->method('getScheduled');
 
-        $campaign = $this->createStub(Campaign::class);
+        $campaign = new Campaign();
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 

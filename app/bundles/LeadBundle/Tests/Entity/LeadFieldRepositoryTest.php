@@ -370,7 +370,7 @@ final class LeadFieldRepositoryTest extends TestCase
             ->method('getQuery')
             ->willReturn($query);
 
-        $leadField = $this->createStub(LeadField::class);
+        $leadField = new LeadField();
         $query->expects($this->once())
             ->method('getOneOrNullResult')
             ->willReturn($leadField);

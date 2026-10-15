@@ -151,7 +151,7 @@ final class FormSubscriberTest extends TestCase
 
         $action = new Action();
         $action->setProperties(['email' => 1]);
-        $action->setForm($this->createStub(Form::class));
+        $action->setForm(new Form());
 
         $event->expects($this->exactly(2))
             ->method('getAction')

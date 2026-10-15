@@ -29,7 +29,7 @@ final class NotifyOfFailureSubscriberTest extends TestCase
     public function testNotifyOfFailure(): void
     {
         $lead  = new Lead();
-        $event = $this->createStub(Event::class);
+        $event = new Event();
 
         $notifyEvent = new NotifyOfFailureEvent($lead, $event);
 

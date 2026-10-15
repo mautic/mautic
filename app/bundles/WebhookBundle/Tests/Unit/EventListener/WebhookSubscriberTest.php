@@ -43,7 +43,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnWebhookKill(): void
     {
-        $webhookMock = $this->createStub(Webhook::class);
+        $webhookMock = new Webhook();
         $reason      = 'reason';
 
         $eventMock = $this->createMock(WebhookEvent::class);

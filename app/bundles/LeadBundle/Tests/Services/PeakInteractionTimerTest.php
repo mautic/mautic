@@ -221,7 +221,7 @@ final class PeakInteractionTimerTest extends TestCase
     #[DataProvider('getOptimalTimeDataProvider')]
     public function testGetOptimalTime(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
-        $contactMock = $this->createStub(Lead::class);
+        $contactMock = new Lead();
 
         $this->statRepositoryMock
             ->method('getLeadStats')
@@ -317,7 +317,7 @@ final class PeakInteractionTimerTest extends TestCase
     #[DataProvider('getOptimalTimeAndDayDataProvider')]
     public function testGetOptimalTimeAndDay(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
-        $contactMock = $this->createStub(Lead::class);
+        $contactMock = new Lead();
 
         $this->statRepositoryMock
             ->method('getLeadStats')

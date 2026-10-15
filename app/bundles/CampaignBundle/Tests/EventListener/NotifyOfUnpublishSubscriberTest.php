@@ -27,7 +27,7 @@ final class NotifyOfUnpublishSubscriberTest extends TestCase
 
     public function testNotifyOfUnpublish(): void
     {
-        $event = $this->createStub(Event::class);
+        $event = new Event();
 
         $notifyEvent = new NotifyOfUnpublishEvent($event);
 

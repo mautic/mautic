@@ -13,21 +13,17 @@ use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 final class TransportCallbackTest extends TestCase
 {
     public function testStatSave(): void
     {
-        $dncStub = $this->createStub(DNC::class);
+        $dncStub = new DNC();
 
         $dncModel = new class($dncStub) extends DoNotContact {
-            /**
-             * @param Stub&DNC $dncStub
-             */
             public function __construct(
-                private readonly Stub $dncStub,
+                private readonly DNC $dncStub,
             ) {
             }
 

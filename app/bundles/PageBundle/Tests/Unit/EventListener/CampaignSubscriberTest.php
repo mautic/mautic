@@ -67,7 +67,7 @@ final class CampaignSubscriberTest extends TestCase
     private function createPendingEvent(array $properties): PendingEvent
     {
         $log = new LeadEventLog();
-        $log->setLead($this->createStub(Lead::class));
+        $log->setLead(new Lead());
 
         $event = new Event();
         $event->setCampaign(new Campaign());

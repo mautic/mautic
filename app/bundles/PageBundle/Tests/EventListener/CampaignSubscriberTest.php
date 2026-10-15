@@ -101,9 +101,8 @@ final class CampaignSubscriberTest extends TestCase
         $campaignEvent->setProperties($properties);
         $campaignEvent->setCampaign($campaign);
 
-        $log = $this->createStub(LeadEventLog::class);
-        $log->method('getEvent')->willReturn($campaignEvent);
-        $log->method('getLead')->willReturn(null);
+        $log = new LeadEventLog();
+        $log->setEvent($campaignEvent);
 
         $config = $this->createStub(DecisionAccessor::class);
         $config->method('getConfig')->willReturn([]);

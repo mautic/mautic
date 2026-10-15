@@ -122,7 +122,7 @@ final class UserModelTest extends TestCase
     {
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->createStub(UserToken::class));
+            ->willReturn(new UserToken());
 
         $this->mailHelper
             ->method('getMailer')
@@ -133,7 +133,7 @@ final class UserModelTest extends TestCase
 
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->createStub(UserToken::class));
+            ->willReturn(new UserToken());
 
         $this->router->expects($this->once())
             ->method('generate')
@@ -154,7 +154,7 @@ final class UserModelTest extends TestCase
 
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->createStub(UserToken::class));
+            ->willReturn(new UserToken());
 
         $this->entityManager->expects($this->once())
             ->method('flush')

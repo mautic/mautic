@@ -75,8 +75,8 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnEmailSend(): void
     {
         $event   = $this->createMock(EmailSendEvent::class);
-        $contact = $this->createStub(Lead::class);
-        $email   = $this->createStub(Email::class);
+        $contact = new Lead();
+        $email   = new Email();
         $tokens  = ['{unsubscribe_text}' => '<a href=\"https://...'];
         $headers = ['List-Unsubscribe' => '<a href=\"https://...'];
         $source  = ['List-Unsubscribe' => '<a href=\"https://...']; // todo find out real source example

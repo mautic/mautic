@@ -84,9 +84,8 @@ final class CampaignSubscriberTest extends TestCase
 
     private function createPendingEvent(string $type = 'campaign.sendwebhook'): PendingEvent
     {
-        $contact = $this->createStub(Lead::class);
-        $contact->method('getProfileFields')->willReturn(['email' => 'john@doe.email']);
-        $contact->method('getIpAddresses')->willReturn(new ArrayCollection());
+        $contact = new Lead();
+        $contact->setFields(['email' => 'john@doe.email']);
 
         $log = new LeadEventLog();
         $log->setLead($contact);
