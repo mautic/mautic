@@ -48,15 +48,15 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->assertSearchResult('segment%3AnonExistent', [], [$leadOne, $leadTwo, $leadThree, $leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = 'nonexistent'",
-            "SELECT COUNT(l.id) as count FROM {$prefix}leads l INNER JOIN {$prefix}lead_lists_leads parN ON (l.id = parN.lead_id) AND (parN.manually_removed = 0) AND (parN.leadlist_id IN (0)) WHERE l.date_identified IS NOT NULL",
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN (0)))) AND (l.date_identified IS NOT NULL)",
         ], $previousQueries);
 
         // first-list segment search
         $this->assertSearchResult('segment%3A'.$listOne->getAlias(), [$leadOne, $leadTwo, $leadThree], [$leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listOne->getAlias()}'",
-            "SELECT COUNT(l.id) as count FROM {$prefix}leads l INNER JOIN {$prefix}lead_lists_leads parN ON (l.id = parN.lead_id) AND (parN.manually_removed = 0) AND (parN.leadlist_id IN ('{$listOne->getId()}')) WHERE l.date_identified IS NOT NULL",
-            "SELECT l.* FROM {$prefix}leads l INNER JOIN {$prefix}lead_lists_leads parN ON (l.id = parN.lead_id) AND (parN.manually_removed = 0) AND (parN.leadlist_id IN ('{$listOne->getId()}')) WHERE l.date_identified IS NOT NULL ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$prefix}leads l WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listOne->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
         $this->assertSearchResult('!segment%3A'.$listOne->getAlias(), [$leadFour, $leadFive, $leadSix], [$leadOne, $leadTwo, $leadThree]);
         $this->assertQueries([
@@ -69,9 +69,17 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->assertSearchResult('segment%3A'.$listTwo->getAlias(), [$leadOne, $leadFour, $leadFive, $leadSix], [$leadTwo, $leadThree]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listTwo->getAlias()}'",
-            "SELECT COUNT(l.id) as count FROM {$prefix}leads l INNER JOIN {$prefix}lead_lists_leads parN ON (l.id = parN.lead_id) AND (parN.manually_removed = 0) AND (parN.leadlist_id IN ('{$listTwo->getId()}')) WHERE l.date_identified IS NOT NULL",
-            "SELECT l.* FROM {$prefix}leads l INNER JOIN {$prefix}lead_lists_leads parN ON (l.id = parN.lead_id) AND (parN.manually_removed = 0) AND (parN.leadlist_id IN ('{$listTwo->getId()}')) WHERE l.date_identified IS NOT NULL ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
+            "SELECT COUNT(l.id) as count FROM {$prefix}leads l WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL)",
+            "SELECT l.* FROM {$prefix}leads l WHERE (EXISTS(SELECT 1 FROM {$prefix}lead_lists_leads lla WHERE (l.id = lla.lead_id) AND (lla.manually_removed = 0) AND (lla.leadlist_id IN ('{$listTwo->getId()}')))) AND (l.date_identified IS NOT NULL) ORDER BY l.last_active DESC, l.id DESC LIMIT 30",
         ], $previousQueries);
+
+        // A segment condition in an OR expression must not filter the rows
+        // before the other branch is evaluated.
+        $this->assertSearchResult(
+            'segment%3A'.$listOne->getAlias().'%20OR%20email%3A'.$leadFour->getEmail(),
+            [$leadOne, $leadTwo, $leadThree, $leadFour],
+            [$leadFive, $leadSix]
+        );
         $this->assertSearchResult('!segment%3A'.$listTwo->getAlias(), [$leadTwo, $leadThree], [$leadOne, $leadFour, $leadFive, $leadSix]);
         $this->assertQueries([
             "SELECT list.id FROM {$prefix}lead_lists list WHERE list.alias = '{$listTwo->getAlias()}'",
