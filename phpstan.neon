@@ -72,15 +72,12 @@ parameters:
                 - phpunit.noMockObjectAndRealObjectProperty
                 - method.notFound
                 - symplify.forbiddenFuncCall
-                - symplify.forbiddenArrayMethodCall
+#                - symplify.forbiddenArrayMethodCall
                 - symplify.forbiddenStaticClassConstFetch
-                - symplify.newOverSetters
-                - symplify.noArrayMapWithArrayCallable
-                - symfony.noListenerWithoutContract
+#                - symplify.newOverSetters
+#                - symplify.noArrayMapWithArrayCallable
+#                - symfony.noListenerWithoutContract
                 - symfony.noFindTaggedServiceIdsCall
-#                - return.unusedType
-#                - property.unusedType
-#                - assign.propertyType
 
         # type-perfect no_mixed_caller: rule enabled, violations typed incrementally; ignored wholesale for now
         -
