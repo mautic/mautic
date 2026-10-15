@@ -49,7 +49,7 @@ export default class MjmlService {
   static mjmlToHtml(mjml, endpoint = '') {
     let html = '';
 
-    if (typeof mjml !== 'string' || !mjml.includes('<mjml>')) {
+      if (typeof mjml !== 'string' || !/<mjml(?:\s[^>]*)?>/i.test(mjml)) {
       throw new Error('No valid MJML provided');
     }
 

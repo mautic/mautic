@@ -48,7 +48,7 @@ export default class ButtonCloseCommands {
     const mjmlCode = MjmlService.getEditorMjmlContent(editor); // Update textarea for save
 
     if (!htmlCode || !mjmlCode) {
-      return;
+      return false;
     }
 
     if (mauticEditorFonts) {
@@ -57,6 +57,8 @@ export default class ButtonCloseCommands {
 
     ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode); // Reset HTML
     ButtonCloseCommands.resetHtml(editor);
+
+    return true;
   }
 
   /**
