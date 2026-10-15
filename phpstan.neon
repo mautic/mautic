@@ -418,6 +418,14 @@ rules:
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
     -
+        class: Utils\PHPStan\Rule\MoveObjectParamDocblockToNativeTypeRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Utils\PHPStan\Collector\ObjectParamDocblockCollector
+        tags:
+            - phpstan.collector
+    -
         class: Utils\PHPStan\Rule\ParamTypeByVariableNameRule
         tags:
             - phpstan.rules.rule
