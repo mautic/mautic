@@ -18,7 +18,7 @@
     <span class="input-group-addon">
         {% include '@MauticCore/Components/checkbox.html.twig' with {
             name: 'cb' ~ id,
-            items: [{ value: id|escape, className: 'list-checkbox', attributes: { 'data-target': 'tbody', 'data-toggle': 'selectrow' } }]
+            items: [{ value: id, className: 'list-checkbox', attributes: { 'data-target': 'tbody', 'data-toggle': 'selectrow' } }]
         } %}
     </span>
 

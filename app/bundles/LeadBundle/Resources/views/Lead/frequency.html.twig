@@ -33,7 +33,7 @@
                 <tr>
                     <th style="vertical-align: top" class="col-md-1">
                         {% include '@MauticCore/Components/checkbox.html.twig' with {
-                                items: [{ id: channel.value, name: 'lead_contact_frequency_rules[lead_channels][subscribed_channels][]', value: channel.value|e, checked: isChecked, attributes: { onclick: 'Mautic.togglePreferredChannel(this.value);' } }]
+                                items: [{ id: channel.value, name: 'lead_contact_frequency_rules[lead_channels][subscribed_channels][]', value: channel.value, checked: isChecked, attributes: { onclick: 'Mautic.togglePreferredChannel(this.value);' } }]
                             } %}
                     </th>
                     <td class="col-md-1" style="vertical-align: top">

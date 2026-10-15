@@ -32,7 +32,7 @@
         <tr>
             <th style="vertical-align: top" class="col-md-1">
                 {% include '@MauticCore/Components/checkbox.html.twig' with {
-                    items: [{ id: channel.value, name: 'contact_channels[subscribed_channels][]', value: channel.value|e, checked: contactMe, attributes: { onclick: 'Mautic.togglePreferredChannel(this.value);' } }]
+                    items: [{ id: channel.value, name: 'contact_channels[subscribed_channels][]', value: channel.value, checked: contactMe, attributes: { onclick: 'Mautic.togglePreferredChannel(this.value);' } }]
                 } %}
             </th>
             <td class="col-md-1" style="vertical-align: top">

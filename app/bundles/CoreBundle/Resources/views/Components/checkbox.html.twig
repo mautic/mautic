@@ -1,24 +1,21 @@
 {% set items = items|default([]) %}
-{% set name = name|default('checkbox') %}
+{% set name = name|default('') %}
 {% set legend = legend|default(null) %}
 {% set helpText = helpText|default(null) %}
 {% set wrapperClass = wrapperClass|default('') %}
 {% set inline = inline|default(false) %}
 {% set reverse = reverse|default(false) %}
 {% set required = required|default(false) %}
-{% set base_id = name|replace({'[': '-', ']': '', ' ': '-', '.': '-'}) %}
+{% set base_id = (name ?: 'checkbox')|replace({'[': '-', ']': '', ' ': '-', '.': '-'}) %}
 {% set help_id = helpText ? base_id ~ '-help' : null %}
 
-<fieldset class="{{ [wrapperClass, 'border-0', 'p-0', 'm-0']|filter(value => value is not empty)|join(' ') }}">
+<fieldset class="{{ [wrapperClass, 'border-0', 'p-0', 'm-0']|filter(value => value is not empty)|join(' ') }}" style="min-width: 0; border: 0; padding: 0; margin: 0;">
     {% if legend %}
         <legend class="form-label mb-2">{{ legend|trans }}</legend>
     {% endif %}
 
     {% for item in items %}
         {% set item_label = item.label|default('') %}
-        {% if item is defined and item.label is defined and item.label is null %}
-            {% set item_label = (item.name|default(name))|replace({'[': ' ', ']': ' ', '_': ' '})|trim|humanize %}
-        {% endif %}
         {% set item_value = item.value is defined ? item.value : loop.index0 %}
         {% set item_id = item.id|default(base_id ~ '-' ~ loop.index0 ~ '-' ~ item_value|replace({' ': '-', '.': '-', '_': '-', '[': '-', ']': ''})|lower) %}
         {% set item_name = item.name|default(name) %}
@@ -44,7 +41,7 @@
             <input
                 class="{{ input_classes|join(' ')|escape }}"
                 type="checkbox"
-                name="{{ item_name|escape }}"
+                {% if item_name %}name="{{ item_name|escape }}"{% endif %}
                 id="{{ item_id|escape }}"
                 value="{{ item_value|escape }}"
                 {% if help_id %}aria-describedby="{{ help_id|escape }}"{% endif %}
@@ -58,8 +55,8 @@
                 {% endfor %}
             >
             {% if item_label %}
-            <label class="form-check-label" for="{{ item_id }}"{% for label_key, label_value in item.labelAttributes|default({}) %} {{ label_key }}="{{ label_value }}"{% endfor %}>
-                {{ item_label|trans }}
+            <label class="form-check-label" for="{{ item_id|escape }}"{% for label_key, label_value in item.labelAttributes|default({}) %} {{ label_key|escape }}="{{ label_value|escape }}"{% endfor %}>
+                {{ item_label|trans(item.label_translation_parameters|default({}), item.translation_domain|default(null)) }}
             </label>
             {% endif %}
         </div>

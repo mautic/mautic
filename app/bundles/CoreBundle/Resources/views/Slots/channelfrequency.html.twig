@@ -12,7 +12,7 @@
                            name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
                            value="">
                     {% include '@MauticCore/Components/checkbox.html.twig' with {
-                        items: [{ id: channel.value, name: 'lead_contact_frequency_rules[lead_channels][subscribed_channels][' ~ key ~ ']', value: channel.value|e, checked: contactMe, label: 'mautic.lead.contact.me.label'|trans({'%channel%': channelName}), attributes: { onclick: 'togglePreferredChannel(this.value);' }, labelAttributes: { id: 'is-contactable-' ~ channel.value, 'data-channel': channelName } }]
+                        items: [{ id: channel.value, name: 'lead_contact_frequency_rules[lead_channels][subscribed_channels][' ~ key ~ ']', value: channel.value, checked: contactMe, label: 'mautic.lead.contact.me.label'|trans({'%channel%': channelName}), attributes: { onclick: 'togglePreferredChannel(this.value);' }, labelAttributes: { id: 'is-contactable-' ~ channel.value, 'data-channel': channelName } }]
                     } %}
                 </div>
             </td>
