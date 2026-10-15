@@ -1060,7 +1060,7 @@ class CommonRepository extends ServiceEntityRepository
         $expressions = $qb->expr()->{"{$type}X"}();
 
         if ($parseFilters) {
-            $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters);
+        $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters, 'or' === $type);
         }
 
         return [$expressions, $parameters];
@@ -1780,9 +1780,13 @@ class CommonRepository extends ServiceEntityRepository
      * @param \StdClass                     $parseFilters
      * @param QueryBuilder|DbalQueryBuilder $qb
      */
-    protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters)
+    protected function parseSearchFilters($parseFilters, $qb, $expressions, &$parameters, bool $containsOr = false)
     {
         foreach ($parseFilters as $f) { /** @phpstan-ignore-line we are iterating over StdClass. We should refactor this into a collection of DTO objects in M6 */
+            if ($containsOr) {
+                $f->containsOr = true;
+            }
+
             [$expr, $params] = $this->getSearchFilterExpression($qb, $f);
 
             if ([] !== $params) {
