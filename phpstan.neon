@@ -79,6 +79,13 @@ parameters:
 #                - symfony.noListenerWithoutContract
                 - symfony.noFindTaggedServiceIdsCall
 
+        # registered manually
+        -
+            identifier: symfony.noListenerWithoutContract
+            paths:
+                - app/bundles/CoreBundle/EventListener/ConsoleErrorListener.php
+                - app/bundles/CoreBundle/EventListener/ConsoleTerminateListener.php
+
         # type-perfect no_mixed_caller: rule enabled, violations typed incrementally; ignored wholesale for now
         -
             identifier: typePerfect.noMixedMethodCaller
