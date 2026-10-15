@@ -92,6 +92,19 @@ final class OpenIDConnectBridge extends OpenIDConnectClient implements ClientBri
         $this->session->remove($key);
     }
 
+    public function testConnection(): ?string
+    {
+        try {
+            // Test the connection by fetching the OIDC discovery document
+            // This is the proper way to test OIDC connectivity without user interaction
+            $this->getProviderConfigValue('issuer');
+
+            return null;
+        } catch (OpenIDConnectClientException $e) {
+            return $e->getMessage();
+        }
+    }
+
     private function requireSession(): void
     {
         if (null === $this->session) {

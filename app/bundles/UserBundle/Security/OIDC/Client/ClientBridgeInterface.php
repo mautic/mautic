@@ -31,4 +31,11 @@ interface ClientBridgeInterface
      * @throws OidcAuthorizationException
      */
     public function requestUserInfo($claim = null);
+
+    /**
+     * Test the connection to the OIDC provider by checking the discovery endpoint.
+     *
+     * @return string|null Returns null on success, error message on failure
+     */
+    public function testConnection(): ?string;
 }

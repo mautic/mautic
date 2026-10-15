@@ -14,7 +14,10 @@ final class Client implements ClientInterface
 {
     private bool $hasBeenAuthenticated = false;
 
-    public function __construct(private readonly ClientBridgeInterface $client, private readonly string $mappingField)
+    public function __construct(
+        private readonly ClientBridgeInterface $client,
+        private readonly string $mappingField
+    )
     {
     }
 
@@ -45,14 +48,10 @@ final class Client implements ClientInterface
                 return null;
             }
 
-            $url    = $this->client->getAuthorizationUrl();
-            $client = new \GuzzleHttp\Client(['cookies' => true, 'timeout' => 10, 'connect_timeout' => 5]);
-            $client->request('GET', $url);
+            return $this->client->testConnection();
         } catch (GuzzleException|OidcAuthorizationException $e) {
             return $e->getMessage();
         }
-
-        return null;
     }
 
     public function getVerifiedClaims(array $claims): array
