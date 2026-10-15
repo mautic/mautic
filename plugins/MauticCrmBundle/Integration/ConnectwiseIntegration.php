@@ -221,10 +221,9 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @param Form|FormBuilder $builder
-     * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -552,11 +551,10 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @param array|Lead $lead
-     * @param array      $config
      *
      * @throws ApiErrorException
      */
-    public function pushLead($lead, $config = []): bool
+    public function pushLead($lead, array $config = []): bool
     {
         $config      = $this->mergeConfigToFeatureSettings($config);
         $personFound = false;
@@ -653,7 +651,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * Match lead data with integration fields.
      */
-    public function populateLeadData($lead, $config = []): array
+    public function populateLeadData($lead, array $config = []): array
     {
         if ($lead instanceof Lead) {
             $fields = $lead->getFields(true);

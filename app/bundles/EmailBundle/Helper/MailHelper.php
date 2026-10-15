@@ -481,7 +481,7 @@ final class MailHelper
      *
      * @return bool
      */
-    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
+    public function flushQueue(array $resetEmailTypes = ['To', 'Cc', 'Bcc'])
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
         $flushed = empty($this->fatal);
@@ -589,11 +589,8 @@ final class MailHelper
 
     /**
      * Adapted from \Swift_Plugins_DecoratorPlugin.
-     *
-     * @param array $search
-     * @param array $replace
      */
-    public static function searchReplaceTokens($search, $replace, MauticMessage $message): void
+    public static function searchReplaceTokens(array $search, array $replace, MauticMessage $message): void
     {
         // Body
         $body         = $message->getHtmlBody();
@@ -1131,10 +1128,7 @@ final class MailHelper
         return $this->source;
     }
 
-    /**
-     * @param array $source
-     */
-    public function setSource($source): void
+    public function setSource(array $source): void
     {
         $this->source = $source;
     }
@@ -1151,7 +1145,7 @@ final class MailHelper
      *
      * @return bool Returns false if there were errors with the email configuration
      */
-    public function setEmail(Email $email, bool $allowBcc = true, $assetAttachments = [], bool $ignoreTrackingPixel = false): bool
+    public function setEmail(Email $email, bool $allowBcc = true, array $assetAttachments = [], bool $ignoreTrackingPixel = false): bool
     {
         if ($this->coreParametersHelper->get(ConfigType::MINIFY_EMAIL_HTML)) {
             $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));

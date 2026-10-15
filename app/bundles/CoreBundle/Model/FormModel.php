@@ -139,7 +139,7 @@ class FormModel extends AbstractCommonModel
      *
      * @param iterable<T> $entities
      */
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize             = 20;
@@ -360,13 +360,12 @@ class FormModel extends AbstractCommonModel
      *
      * @param object      $entity
      * @param string|null $action
-     * @param array       $options
      *
      * @return FormInterface<mixed>
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, array $options = []): FormInterface
     {
         throw new NotFoundHttpException('Object does not support edits.');
     }

@@ -460,7 +460,7 @@ class VideoHit
     /**
      * @param array<string> $browserLanguages
      */
-    public function setBrowserLanguages($browserLanguages): static
+    public function setBrowserLanguages(array $browserLanguages): static
     {
         $this->browserLanguages = $browserLanguages;
 
@@ -546,10 +546,7 @@ class VideoHit
         return $this->query;
     }
 
-    /**
-     * @param array $query
-     */
-    public function setQuery($query): static
+    public function setQuery(array $query): static
     {
         $this->query = $query;
 

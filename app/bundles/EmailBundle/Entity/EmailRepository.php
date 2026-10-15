@@ -36,10 +36,8 @@ class EmailRepository extends CommonRepository
 
     /**
      * Get an array of do not email.
-     *
-     * @param array $leadIds
      */
-    public function getDoNotEmailList($leadIds = []): array
+    public function getDoNotEmailList(array $leadIds = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id, l.email')

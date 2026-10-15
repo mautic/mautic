@@ -53,11 +53,10 @@ final class FieldModel extends CommonFormModel
     /**
      * @param object|array<mixed> $entity
      * @param string|null         $action
-     * @param array               $options
      *
      * @return FormInterface<mixed>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, array $options = []): FormInterface
     {
         if ($action) {
             $options['action'] = $action;

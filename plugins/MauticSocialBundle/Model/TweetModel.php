@@ -134,7 +134,7 @@ final class TweetModel extends FormModel implements AjaxLookupModelInterface
      * @param Tweet        $entity
      * @param array<mixed> $options
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Tweet) {
             throw new MethodNotAllowedHttpException(['Tweet']);

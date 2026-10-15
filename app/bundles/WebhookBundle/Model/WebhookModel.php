@@ -152,7 +152,7 @@ final class WebhookModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook']);
@@ -611,10 +611,7 @@ final class WebhookModel extends FormModel
         return $event;
     }
 
-    /**
-     * @param array $groups
-     */
-    public function serializeData($payload, $groups = [], array $customExclusionStrategies = []): string
+    public function serializeData($payload, array $groups = [], array $customExclusionStrategies = []): string
     {
         $context = SerializationContext::create();
         if (!empty($groups)) {

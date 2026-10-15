@@ -275,10 +275,8 @@ class Monitoring extends FormEntity implements UuidInterface
 
     /**
      * Set the statistics.
-     *
-     * @param array $stats
      */
-    public function setStats($stats): static
+    public function setStats(array $stats): static
     {
         $this->isChanged('stats', $stats);
         $this->stats = $stats;
@@ -299,10 +297,7 @@ class Monitoring extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;

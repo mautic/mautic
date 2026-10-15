@@ -94,7 +94,7 @@ final class MessageModel extends FormModel implements AjaxLookupModelInterface, 
      *
      * @return FormInterface<mixed>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, array $options = []): FormInterface
     {
         if (!empty($action)) {
             $options['action'] = $action;

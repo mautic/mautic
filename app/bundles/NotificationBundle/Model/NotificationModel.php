@@ -65,7 +65,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         return 'notification:notifications';
     }
 
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -96,12 +96,11 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     /**
      * @param Notification|null $entity
      * @param string|null       $action
-     * @param array             $options
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Notification) {
             throw new MethodNotAllowedHttpException(['Notification']);

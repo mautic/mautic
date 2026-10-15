@@ -104,7 +104,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @param array $entities
      */
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         // Update leads primary company name
         foreach ($entities as $entity) {
@@ -144,7 +144,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Company) {
             throw new MethodNotAllowedHttpException(['Company']);
@@ -895,10 +895,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array                $fields
      * @param array<string, mixed> $data
      */
-    protected function getFieldData($fields, array $data): array
+    protected function getFieldData(array $fields, array $data): array
     {
         // Set profile data using the form so that values are validated
         $fieldData = [];

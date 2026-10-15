@@ -520,7 +520,7 @@ class LeadField extends FormEntity implements CacheInvalidateInterface, UuidInte
     /**
      * @param mixed[] $properties
      */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;

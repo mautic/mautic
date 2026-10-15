@@ -56,10 +56,7 @@ final class DeviceModel extends FormModel
         return parent::getEntity($id);
     }
 
-    /**
-     * @param array $options
-     */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm($entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof LeadDevice) {
             throw new MethodNotAllowedHttpException(['LeadDevice']);

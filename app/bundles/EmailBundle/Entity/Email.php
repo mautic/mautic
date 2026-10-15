@@ -637,10 +637,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->utmTags;
     }
 
-    /**
-     * @param array $utmTags
-     */
-    public function setUtmTags($utmTags): static
+    public function setUtmTags(array $utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;
@@ -1121,10 +1118,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->headers;
     }
 
-    /**
-     * @param array $headers
-     */
-    public function setHeaders($headers): static
+    public function setHeaders(array $headers): static
     {
         $this->headers = $headers;
 

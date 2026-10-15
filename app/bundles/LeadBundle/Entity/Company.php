@@ -180,7 +180,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     /**
      * @param mixed[] $cache
      */
-    public function setSocialCache($cache): void
+    public function setSocialCache(array $cache): void
     {
         $this->socialCache = $cache;
     }

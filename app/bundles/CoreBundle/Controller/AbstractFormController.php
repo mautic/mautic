@@ -73,13 +73,12 @@ abstract class AbstractFormController extends CommonController
     /**
      * Returns view to index with a locked out message.
      *
-     * @param array  $postActionVars
      * @param object $entity
      * @param bool   $batch          Flag if a batch action is being performed
      *
      * @return ($batch is true ? array : \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse)
      */
-    protected function isLocked($postActionVars, $entity, string $modelName, bool $batch = false)
+    protected function isLocked(array $postActionVars, $entity, string $modelName, bool $batch = false)
     {
         $date                   = $entity->getCheckedOut();
         $postActionVars         = $this->refererPostActionVars($postActionVars);

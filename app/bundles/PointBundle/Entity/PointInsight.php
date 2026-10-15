@@ -219,7 +219,7 @@ class PointInsight extends FormEntity
     /**
      * @param array<int> $pointGroups
      */
-    public function setPointGroups($pointGroups): static
+    public function setPointGroups(array $pointGroups): static
     {
         $this->isChanged('pointGroups', $pointGroups);
         $this->pointGroups = $pointGroups;

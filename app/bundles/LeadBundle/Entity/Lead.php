@@ -1233,7 +1233,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @param FrequencyRule[] $frequencyRules
      */
-    public function setFrequencyRules($frequencyRules): static
+    public function setFrequencyRules(array $frequencyRules): static
     {
         $this->frequencyRules = new ArrayCollection($frequencyRules);
 

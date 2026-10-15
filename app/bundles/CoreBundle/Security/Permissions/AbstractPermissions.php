@@ -331,7 +331,7 @@ abstract class AbstractPermissions
     /**
      * Adds the standard permission set of view, edit, create, delete, publish and full.
      *
-     * @param array $permissionNames
+     * @param string|array $permissionNames
      */
     protected function addStandardPermissions($permissionNames, bool $includePublish = true)
     {
@@ -404,7 +404,7 @@ abstract class AbstractPermissions
     /**
      * Add a single full permission.
      *
-     * @param array $permissionNames
+     * @param string|array $permissionNames
      */
     protected function addManagePermission($permissionNames)
     {
