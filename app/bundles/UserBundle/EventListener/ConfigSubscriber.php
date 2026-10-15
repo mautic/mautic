@@ -71,15 +71,17 @@ final class ConfigSubscriber implements EventSubscriberInterface
 
     private function validateOidcConnection(ConfigEvent $event): void
     {
-        if (1 !== $event->getConfig()['userconfig']['open_id_is_enabled']) {
+        $config = $event->getConfig();
+
+        if (!isset($config['userconfig']['open_id_is_enabled']) || 1 !== $config['userconfig']['open_id_is_enabled']) {
             return;
         }
 
         $credentials = new ClientCredentials(
-            $event->getConfig()['userconfig']['open_id_client_url'],
-            $event->getConfig()['userconfig']['open_id_client_id'],
-            $event->getConfig()['userconfig']['open_id_client_secret'],
-            $event->getConfig()['userconfig']['open_id_mapping_field']
+            $config['userconfig']['open_id_client_url'],
+            $config['userconfig']['open_id_client_id'],
+            $config['userconfig']['open_id_client_secret'],
+            $config['userconfig']['open_id_mapping_field']
         );
         $client = $this->clientFactory->create($credentials);
 
