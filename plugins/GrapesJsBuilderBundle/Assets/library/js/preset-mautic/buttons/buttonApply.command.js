@@ -20,33 +20,37 @@ export default class ButtonApplyCommand {
     ButtonApplyCommand.prepareDynamicContentForSubmit(editor);
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
 
-    if (ContentService.isMjmlMode(editor)) {
-      let htmlCode = MjmlService.getEditorHtmlContent(editor);
-      const mjmlCode = MjmlService.getEditorMjmlContent(editor);
+    try {
+      if (ContentService.isMjmlMode(editor)) {
+        let htmlCode = MjmlService.getEditorHtmlContent(editor);
+        const mjmlCode = MjmlService.getEditorMjmlContent(editor);
 
-      if (!htmlCode || !mjmlCode) {
-        return;
+        if (!htmlCode || !mjmlCode) {
+          return;
+        }
+
+        if (mauticEditorFonts) {
+          htmlCode = EditorFontsService.addFontLinksToHtml(htmlCode);
+        }
+
+        ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode);
+      } else {
+        let html = ContentService.getEditorHtmlContent(editor);
+
+        if (mauticEditorFonts) {
+          html = EditorFontsService.addFontLinksToHtml(html);
+        }
+
+        ButtonCloseCommands.returnContentToTextarea(editor, html);
       }
 
-      if (mauticEditorFonts) {
-        htmlCode = EditorFontsService.addFontLinksToHtml(htmlCode);
-      }
-
-      ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode);
-    } else {
-      let html = ContentService.getEditorHtmlContent(editor);
-
-      if (mauticEditorFonts) {
-        html = EditorFontsService.addFontLinksToHtml(html);
-      }
-
-      ButtonCloseCommands.returnContentToTextarea(editor, html);
+      ButtonApplyCommand.postForm(editor, sender);
+    } finally {
+      // Tokens are captured in the textarea; always restore human-readable
+      // content on the canvas, including failed MJML conversion.
+      editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
     }
 
-    // Tokens are captured in the textarea; restore human readable content on the canvas
-    editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
-
-    ButtonApplyCommand.postForm(editor, sender);
   }
 
   /**
