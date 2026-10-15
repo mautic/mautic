@@ -37,4 +37,43 @@ final class UserControllerTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('user[plainPassword][password]', (string) $clientResponse->getContent());
         $this->assertStringNotContainsString('user[plainPassword][confirm]', (string) $clientResponse->getContent());
     }
+
+    public function testEditUserPageShowsPasswordInChangePasswordModal(): void
+    {
+        $admin      = $this->createUser($this->createRole(true), 'admin@example.com');
+        $user       = $this->createUser($this->createRole(), 'test2@example.com');
+        $this->em->flush();
+        $this->em->clear();
+        $this->loginUser($admin);
+
+        $this->client->request(Request::METHOD_GET, 's/users/edit/'.$user->getId());
+
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('data-target="#changePasswordModal"', $content);
+        $this->assertStringContainsString('data-staged-message="mautic.user.user.password.change.pending"', $content);
+        $this->assertStringContainsString('user[plainPassword][password]', $content);
+        $this->assertStringContainsString('user[plainPassword][confirm]', $content);
+
+        preg_match('/<input[^>]*id="user_plainPassword_password"[^>]*>/', $content, $passwordInput);
+        $this->assertNotEmpty($passwordInput);
+        $this->assertStringNotContainsString('value=', $passwordInput[0]);
+        $this->assertStringContainsString('autocomplete="new-password"', $passwordInput[0]);
+        $this->assertSame(1, substr_count($passwordInput[0], 'autocomplete='));
+    }
+
+    public function testNewUserPageKeepsRequiredPasswordFieldsInline(): void
+    {
+        $admin = $this->createUser($this->createRole(true), 'admin@example.com');
+        $this->em->flush();
+        $this->em->clear();
+        $this->loginUser($admin);
+
+        $this->client->request(Request::METHOD_GET, 's/users/new');
+
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('user[plainPassword][password]', $content);
+        $this->assertStringNotContainsString('id="changePasswordModal"', $content);
+    }
 }

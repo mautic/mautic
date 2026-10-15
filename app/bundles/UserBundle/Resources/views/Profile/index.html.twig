@@ -82,8 +82,15 @@
                             {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound) }}
                             {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
                             {% if not isSamlUser %}
-                                {{ form_row(userForm.plainPassword.password) }}
-                                {{ form_row(userForm.plainPassword.confirm) }}
+                                <div class="form-group mb-md">
+                                    <label class="control-label">{{ 'mautic.core.password'|trans }}</label>
+                                    <div class="text-secondary small mb-xs">{{ 'mautic.user.config.account.password.change.helper'|trans }}</div>
+                                    {% include '@MauticUser/User/change_password_modal.html.twig' with {
+                                        passwordForm: userForm.plainPassword,
+                                        saveWarningContent: 'mautic.user.config.account.password.save.warning.content',
+                                        stagedMessage: 'mautic.user.config.account.password.change.pending',
+                                    } %}
+                                </div>
                             {% endif %}
                             <h3 id="learning" class="pt-20 mb-xs">{{ 'mautic.user.config.title.experience_and_learning'|trans }}</h3>
                             <div class="text-secondary small pb-20">{{ 'mautic.user.config.title.experience_and_learning.description'|trans }}</div>
