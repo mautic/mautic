@@ -83,6 +83,7 @@ parameters:
         -
             identifier: symfony.noListenerWithoutContract
             paths:
+                - app/bundles/ApiBundle/ApiPlatform/EventListener/MauticDenyAccessListener.php
                 - app/bundles/CoreBundle/EventListener/ConsoleErrorListener.php
                 - app/bundles/CoreBundle/EventListener/ConsoleTerminateListener.php
 
