@@ -153,9 +153,11 @@ final class FieldType extends AbstractType
             }
         }
 
-        // disable progressing profiling  for conditional fields
+        $addProgressiveProfilingFields = $addBehaviorFields;
+
+        // Progressive profiling does not apply to conditional fields, but auto-fill does.
         if (!empty($options['data']['parent'])) {
-            $addBehaviorFields = false;
+            $addProgressiveProfilingFields = false;
             $builder->add(
                 'conditions',
                 FormFieldConditionType::class,
@@ -391,49 +393,52 @@ final class FieldType extends AbstractType
         }
 
         if ($addBehaviorFields) {
-            $alwaysDisplay = $options['data']['alwaysDisplay'] ?? false;
             $isAutoFillFeatureEnabled = (bool) $this->coreParametersHelper->get('form_field_autofill', false);
-            $builder->add(
-                'alwaysDisplay',
-                YesNoButtonGroupType::class,
-                [
-                    'label' => 'mautic.form.field.form.always_display',
-                    'attr'  => [
-                        'tooltip' => 'mautic.form.field.form.always_display.tooltip',
-                    ],
-                    'data'  => $alwaysDisplay,
-                ]
-            );
 
-            $default = !isset($options['data']['showWhenValueExists']) ? true
-                : (bool) $options['data']['showWhenValueExists'];
-            $builder->add(
-                'showWhenValueExists',
-                YesNoButtonGroupType::class,
-                [
-                    'label' => 'mautic.form.field.form.show.when.value.exists',
-                    'data'  => $default,
-                    'attr'  => [
-                        'tooltip'      => 'mautic.form.field.help.show.when.value.exists',
-                        'data-show-on' => '{"formfield_alwaysDisplay_0": "checked"}',
-                    ],
-                ]
-            );
+            if ($addProgressiveProfilingFields) {
+                $alwaysDisplay = $options['data']['alwaysDisplay'] ?? false;
+                $builder->add(
+                    'alwaysDisplay',
+                    YesNoButtonGroupType::class,
+                    [
+                        'label' => 'mautic.form.field.form.always_display',
+                        'attr'  => [
+                            'tooltip' => 'mautic.form.field.form.always_display.tooltip',
+                        ],
+                        'data'  => $alwaysDisplay,
+                    ]
+                );
 
-            $builder->add(
-                'showAfterXSubmissions',
-                TextType::class,
-                [
-                    'label'      => 'mautic.form.field.form.show.after.x.submissions',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class'        => 'form-control',
-                        'tooltip'      => 'mautic.form.field.help.show.after.x.submissions',
-                        'data-show-on' => '{"formfield_alwaysDisplay_0": "checked"}',
-                    ],
-                    'required' => false,
-                ]
-            );
+                $default = !isset($options['data']['showWhenValueExists']) ? true
+                    : (bool) $options['data']['showWhenValueExists'];
+                $builder->add(
+                    'showWhenValueExists',
+                    YesNoButtonGroupType::class,
+                    [
+                        'label' => 'mautic.form.field.form.show.when.value.exists',
+                        'data'  => $default,
+                        'attr'  => [
+                            'tooltip'      => 'mautic.form.field.help.show.when.value.exists',
+                            'data-show-on' => '{"formfield_alwaysDisplay_0": "checked"}',
+                        ],
+                    ]
+                );
+
+                $builder->add(
+                    'showAfterXSubmissions',
+                    TextType::class,
+                    [
+                        'label'      => 'mautic.form.field.form.show.after.x.submissions',
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class'        => 'form-control',
+                            'tooltip'      => 'mautic.form.field.help.show.after.x.submissions',
+                            'data-show-on' => '{"formfield_alwaysDisplay_0": "checked"}',
+                        ],
+                        'required' => false,
+                    ]
+                );
+            }
 
             if ($isAutoFillFeatureEnabled) {
                 $isAutoFillValue = (!isset($options['data']['isAutoFill'])) ? false : (bool) $options['data']['isAutoFill'];
@@ -460,7 +465,7 @@ final class FieldType extends AbstractType
                     'data'  => $isReadOnlyValue,
                     'attr'  => [
                         'class'           => 'read-only-data',
-                        'tooltip'         => 'mautic.form.field.help.auto_fill',
+                        'tooltip'         => 'mautic.form.field.help.read_only',
                         'data-disable-on' => '{"formfield_isAutoFill_0": "checked"}',
                         'data-enable-on'  => '{"formfield_isAutoFill_1": "checked"}',
                     ],
