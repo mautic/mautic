@@ -104,4 +104,39 @@ class FocusRepository extends CommonRepository
 
         return $q->getQuery()->getArrayResult();
     }
+
+    /**
+     * Published, filter-based focus items. Only id + filters are fetched as the
+     * focus table carries heavy LONGTEXT columns and this runs on every page view.
+     *
+     * @return array<int, array{id: string, filters: string}>
+     */
+    public function getPublishedWithFilters(): array
+    {
+        return $this->getPublishedWithFiltersQuery()
+            ->select('f.id, f.filters')
+            ->executeQuery()
+            ->fetchAllAssociative();
+    }
+
+    public function hasPublishedWithFilters(): bool
+    {
+        return (bool) $this->getPublishedWithFiltersQuery()
+            ->select('f.id')
+            ->setMaxResults(1)
+            ->executeQuery()
+            ->fetchOne();
+    }
+
+    private function getPublishedWithFiltersQuery(): \Doctrine\DBAL\Query\QueryBuilder
+    {
+        $qb = $this->_em->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX.'focus', 'f');
+
+        // 'N;' and 'a:0:{}' are how the array column type serializes null/empty filters
+        return $qb
+            ->where($this->getPublishedByDateExpression($qb, 'f'))
+            ->andWhere('f.filters IS NOT NULL')
+            ->andWhere("f.filters NOT IN ('a:0:{}', 'N;')");
+    }
 }
