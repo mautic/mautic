@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\MappedObjectCollector;
+use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
@@ -725,6 +726,7 @@ class FormController extends CommonFormController
         $fieldMap         = [];
         $submitButton     = false;
 
+        /** @var Field $formField */
         foreach ($existingFields as $fieldId => $formField) {
             // Check to see if the field still exists
 
@@ -793,6 +795,7 @@ class FormController extends CommonFormController
         $modifiedActions = [];
         $existingActions = $entity->getActions()->toArray();
 
+        /** @var Action $formAction */
         foreach ($existingActions as $formAction) {
             // Check to see if the action still exists
             if (!isset($customComponents['actions'][$formAction->getType()])) {

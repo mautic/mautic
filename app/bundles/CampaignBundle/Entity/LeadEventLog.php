@@ -43,24 +43,15 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     #[ORM\JoinColumn(name: 'event_id', nullable: false)]
     private $event;
 
-    /**
-     * @var LeadEntity
-     */
     #[ORM\ManyToOne(targetEntity: LeadEntity::class)]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
-    private $lead;
+    private ?LeadEntity $lead = null;
 
-    /**
-     * @var Campaign|null
-     */
     #[ORM\ManyToOne(targetEntity: Campaign::class)]
     #[ORM\JoinColumn(name: 'campaign_id')]
-    private $campaign;
+    private ?Campaign $campaign = null;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface|null
@@ -210,10 +201,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
@@ -225,10 +213,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this;
     }
 
-    /**
-     * @return LeadEntity|null
-     */
-    public function getLead()
+    public function getLead(): LeadEntity|null
     {
         return $this->lead;
     }
@@ -316,10 +301,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         ];
     }
 
-    /**
-     * @return Campaign|null
-     */
-    public function getCampaign()
+    public function getCampaign(): ?\Mautic\CampaignBundle\Entity\Campaign
     {
         return $this->campaign;
     }

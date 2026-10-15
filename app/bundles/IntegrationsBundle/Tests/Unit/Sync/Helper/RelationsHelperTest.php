@@ -134,6 +134,7 @@ final class RelationsHelperTest extends TestCase
         $objectsToSynchronize = $this->relationsHelper->getObjectsToSynchronize();
 
         $this->assertCount(0, $objectsToSynchronize);
+        /** @var ReferenceValueDAO $normalizedValue */
         $normalizedValue = $objectDao->getField($relFieldName)->getValue()->getNormalizedValue();
         $this->assertEquals($internalRelObjectId, $normalizedValue->getValue());
         $this->assertEquals(MauticSyncDataExchange::OBJECT_COMPANY, $normalizedValue->getType());

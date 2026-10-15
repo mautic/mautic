@@ -3,6 +3,7 @@
 namespace Mautic\ChannelBundle\Controller;
 
 use Mautic\ChannelBundle\Entity\Channel;
+use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Helper\MessageSearchScopeProvider;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
@@ -115,6 +116,7 @@ final class MessageController extends AbstractStandardFormController
 
                 break;
             case 'view':
+                /** @var Message $message */
                 $message = $args['viewParameters']['item'];
 
                 // Init the date range filter form
@@ -129,9 +131,11 @@ final class MessageController extends AbstractStandardFormController
                 [$dateFrom, $dateTo]     = $this->getViewDateRange($this->requestStack->getCurrentRequest(), $message->getId(), $returnUrl, 'local', $dateRangeForm);
                 $chart                   = new LineChart(null, $dateFrom, $dateTo);
 
-                /** @var Channel[] $channels */
                 $channels        = $this->messageModel->getChannels();
+
+                /** @var Channel[] $messageChannels */
                 $messageChannels = $message->getChannels();
+
                 $chart->setDataset(
                     $this->translator->trans('mautic.core.all'),
                     $this->messageModel->getLeadStatsPost($message->getId(), $dateFrom, $dateTo)
@@ -149,23 +153,23 @@ final class MessageController extends AbstractStandardFormController
                     )->getContent(),
                 ];
 
-                foreach ($messageChannels as $channel) {
-                    if ($channel->isEnabled() && isset($channels[$channel->getChannel()])) {
+                foreach ($messageChannels as $messageChannel) {
+                    if ($messageChannel->isEnabled() && isset($channels[$messageChannel->getChannel()])) {
                         $chart->setDataset(
-                            $channels[$channel->getChannel()]['label'],
-                            $this->messageModel->getLeadStatsPost($message->getId(), $dateFrom, $dateTo, $channel->getChannel())
+                            $channels[$messageChannel->getChannel()]['label'],
+                            $this->messageModel->getLeadStatsPost($message->getId(), $dateFrom, $dateTo, $messageChannel->getChannel())
                         );
 
-                        $messagedLeads[$channel->getChannel()] = $this->forward(
+                        $messagedLeads[$messageChannel->getChannel()] = $this->forward(
                             'Mautic\ChannelBundle\Controller\MessageController::contactsAction',
                             [
                                 'objectId' => $message->getId(),
                                 'page'     => $this->requestStack->getCurrentRequest()->getSession()->get(
-                                    'mautic.'.$this->getSessionBase($channel->getChannel()).'.contact.page',
+                                    'mautic.'.$this->getSessionBase($messageChannel->getChannel()).'.contact.page',
                                     1
                                 ),
                                 'ignoreAjax' => true,
-                                'channel'    => $channel->getChannel(),
+                                'channel'    => $messageChannel->getChannel(),
                             ]
                         )->getContent();
                     }

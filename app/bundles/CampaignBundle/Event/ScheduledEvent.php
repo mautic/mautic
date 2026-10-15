@@ -7,6 +7,7 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
 final class ScheduledEvent extends Event
@@ -18,10 +19,7 @@ final class ScheduledEvent extends Event
      */
     private array $eventArray = [];
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead
-     */
-    private $lead;
+    private ?Lead $lead;
 
     /**
      * @var CampaignEvent|null
@@ -66,10 +64,7 @@ final class ScheduledEvent extends Event
         return $this->isReschedule;
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\Lead
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }

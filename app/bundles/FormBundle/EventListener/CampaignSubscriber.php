@@ -16,6 +16,7 @@ use Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignSubscriber implements EventSubscriberInterface
@@ -97,6 +98,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
+        /** @var Lead|null $lead */
         $lead = $event->getLead();
 
         if (!$lead || !$lead->getId()) {
