@@ -340,7 +340,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      *
      * @param array<string,mixed> $args
      *
-     * @return object[]|array<int,mixed>|iterable<object>|Paginator<object>|SimplePaginator<mixed>
+     * @return iterable<T>|Paginator<T>|SimplePaginator<T>
      */
     public function getEntities(array $args = []): iterable
     {

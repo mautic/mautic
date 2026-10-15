@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -63,6 +64,7 @@ final class ThemeController extends AbstractFormController
         if ('POST' === $request->getMethod()) {
             if (!$this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
+                    /** @var UploadedFile|null $fileData */
                     $fileData = $form['file']->getData();
 
                     if (!$fileData) {
