@@ -6,7 +6,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
-use Mautic\PageBundle\Entity\VideoHit;
 
 /**
  * @extends CommonRepository<VideoHit>

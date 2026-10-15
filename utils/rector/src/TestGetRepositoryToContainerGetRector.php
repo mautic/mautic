@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Utils\Rector;
 
-use PHPStan\Type\ObjectType;
 use PhpParser\Node;
-use PhpParser\NodeFinder;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
@@ -14,6 +12,8 @@ use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\Stmt\Class_;
+use PhpParser\NodeFinder;
+use PHPStan\Type\ObjectType;
 use Rector\PhpParser\AstResolver;
 use Rector\Rector\AbstractRector;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

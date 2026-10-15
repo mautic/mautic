@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use GuzzleHttp\Psr7\Response;
-use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -32,6 +31,7 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\DomCrawler\Crawler;

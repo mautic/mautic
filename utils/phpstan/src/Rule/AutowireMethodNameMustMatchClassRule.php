@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
+use PhpParser\Node;
+use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PhpParser\Node;
-use PhpParser\Node\Stmt\ClassMethod;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**

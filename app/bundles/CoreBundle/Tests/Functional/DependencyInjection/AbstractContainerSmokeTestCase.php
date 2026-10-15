@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection;
 
-use MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber;
-use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 use Mautic\AssetBundle\Controller\UploadController;
 use Mautic\CacheBundle\Cache\Adapter\MemcachedTagAwareAdapter;
 use Mautic\CacheBundle\Cache\Adapter\RedisAdapter;
@@ -20,6 +18,8 @@ use Mautic\LeadBundle\Controller\Api\FieldApiController;
 use Mautic\LeadBundle\EventListener\SearchSubscriber;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Mautic\LeadBundle\Validator\Constraints\Length;
+use MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber;
+use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
