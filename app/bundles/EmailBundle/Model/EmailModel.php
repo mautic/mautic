@@ -1037,10 +1037,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead lists.
      *
-<<<<<<< HEAD
      * @param LeadList[]|null $lists
-=======
->>>>>>> 60131a4be5 (Add rule requiring native array/iterable type for array/iterable docblocks)
+     *
      * @param int|null $limit
      * @param int|null $batch        True to process and batch all pending leads
      * @param int      $minContactId
