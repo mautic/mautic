@@ -154,7 +154,7 @@ trait VariantEntityTrait
         return $this->variantStartDate;
     }
 
-    public function setVariantStartDate(?\DateTime $variantStartDate): static
+    public function setVariantStartDate(?\DateTimeInterface $variantStartDate): static
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('variantStartDate', $variantStartDate);
