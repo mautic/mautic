@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnInterface;
+use Mautic\CoreBundle\Doctrine\PostgreSqlCompatibilityFunctions;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -27,8 +30,24 @@ final readonly class MigrationCommandSubscriber implements EventSubscriberInterf
     public static function getSubscribedEvents(): array
     {
         return [
+            ConsoleEvents::COMMAND  => ['prepareMigrationMetadataStorage', 1000],
             ConsoleEvents::TERMINATE => ['addGeneratedColumns'],
         ];
+    }
+
+    public function prepareMigrationMetadataStorage(ConsoleCommandEvent $event): void
+    {
+        $commandName = $event->getCommand()->getName();
+        if (null === $commandName || !str_starts_with($commandName, 'doctrine:migrations:')) {
+            return;
+        }
+
+        $platform = $this->connection->getDatabasePlatform();
+        if (DatabasePlatform::isPostgreSQL($platform)) {
+            foreach (PostgreSqlCompatibilityFunctions::getSql() as $sql) {
+                $this->connection->executeStatement($sql);
+            }
+        }
     }
 
     public function addGeneratedColumns(ConsoleTerminateEvent $event): void
@@ -36,7 +55,7 @@ final readonly class MigrationCommandSubscriber implements EventSubscriberInterf
         $command = $event->getCommand();
         $output  = $event->getOutput();
 
-        if ('doctrine:migrations:migrate' !== $command->getName()) {
+        if (0 !== $event->getExitCode() || 'doctrine:migrations:migrate' !== $command->getName()) {
             return;
         }
 
@@ -66,9 +85,19 @@ final readonly class MigrationCommandSubscriber implements EventSubscriberInterf
         }
 
         foreach ($groupedByTableName as $tableName => $generatedColumns) {
-            $query = "ALTER TABLE {$tableName} ".implode(', '.PHP_EOL, array_map(fn (GeneratedColumnInterface $generatedColumn): string => $generatedColumn->getAddColumnSql(), $generatedColumns));
+            $query = "ALTER TABLE {$tableName} ".implode(', '.PHP_EOL, array_map(fn (GeneratedColumnInterface $generatedColumn): string => $generatedColumn->getAddColumnSql($this->connection->getDatabasePlatform()), $generatedColumns));
 
             $this->executeAlterQuery($query, $tableName, 'adding generated columns', $output);
+
+            $platform = $this->connection->getDatabasePlatform();
+            if (DatabasePlatform::isPostgreSQL($platform)) {
+                foreach ($generatedColumns as $generatedColumn) {
+                    $this->connection->executeStatement($platform->getCommentOnColumnSQL($tableName, $generatedColumn->getColumnName(), '(DC2Type:generated)'));
+                    $query = DatabasePlatform::getCreateIndexSql($platform, $tableName, $generatedColumn->getIndexName(), $generatedColumn->getIndexColumns());
+                    $this->executeAlterQuery($query, $tableName, 'adding indices', $output);
+                }
+                continue;
+            }
 
             $query = "ALTER TABLE {$tableName} ".implode(', '.PHP_EOL, array_map(fn (GeneratedColumnInterface $generatedColumn): string => $generatedColumn->getAddIndexSql(), $generatedColumns));
 

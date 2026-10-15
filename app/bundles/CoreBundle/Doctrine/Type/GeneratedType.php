@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Doctrine\Type;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 /**
  * Type that creates a read-only generated (virtual) column.
@@ -21,6 +22,11 @@ final class GeneratedType extends Type
     {
         // Must be defined in `columnDefinition` option when adding the column in the subscriber
         return '';
+    }
+
+    public function requiresSQLCommentHint(AbstractPlatform $platform): bool
+    {
+        return DatabasePlatform::isPostgreSQL($platform);
     }
 
     /**

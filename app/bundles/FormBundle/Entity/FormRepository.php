@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
@@ -70,7 +71,7 @@ class FormRepository extends CommonRepository
         $q->select('partial f.{id, name, alias}');
 
         if (!empty($search)) {
-            $q->andWhere($q->expr()->like('f.name', ':search'))
+            $q->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'f.name', ':search'))
                 ->setParameter('search', "{$search}%");
         }
 
@@ -153,7 +154,7 @@ class FormRepository extends CommonRepository
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr            = $q->expr()->like('f.name', ':'.$unique);
+                $expr            = DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'f.name', ':'.$unique);
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):

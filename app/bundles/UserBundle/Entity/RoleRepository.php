@@ -4,6 +4,7 @@ namespace Mautic\UserBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 
@@ -68,7 +69,7 @@ class RoleRepository extends CommonRepository
             ->from(Role::class, 'r');
 
         if (!empty($search)) {
-            $q->where('r.name LIKE :search')
+            $q->where(DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'r.name', ':search'))
                 ->setParameter('search', "{$search}%");
         }
 
@@ -108,7 +109,7 @@ class RoleRepository extends CommonRepository
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr            = $q->expr()->like('r.name', ':'.$unique);
+                $expr            = DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'r.name', ':'.$unique);
                 $returnParameter = true;
                 break;
         }
@@ -150,7 +151,8 @@ class RoleRepository extends CommonRepository
             $q->expr()->in('u.role_id', ':ids')
         )
             ->setParameter('ids', $roleIds, ArrayParameterType::INTEGER)
-            ->groupBy('u.role_id');
+            ->groupBy('u.role_id')
+            ->orderBy('u.role_id'); // make sure order is same in PostgreSQL
 
         $result = $q->executeQuery()->fetchAllAssociative();
 

@@ -24,22 +24,17 @@ final class Version20250618134002 extends PreUpAssertionMigration
         $targetIdDataType  = $this->getColumnTypeSignedOrUnsigned($schema, 'points', 'id');
         $projectIdDataType = $this->getColumnTypeSignedOrUnsigned($schema, 'projects', 'id');
 
-        $table = $schema->createTable($this->prefix.'point_projects_xref');
+        $table = $schema->createTable($this->getPrefixedTableName(self::TABLE_NAME));
         $table->addColumn('point_id', 'integer', ['unsigned' => 'UNSIGNED' === $targetIdDataType, 'notnull' => true]);
         $table->addColumn('project_id', 'integer', ['unsigned' => 'UNSIGNED' === $projectIdDataType, 'notnull' => true]);
         $table->setPrimaryKey(['point_id', 'project_id']);
         $table->addForeignKeyConstraint($this->prefix.'points', ['point_id'], ['id'], ['onDelete' => 'CASCADE']);
         $table->addForeignKeyConstraint($this->prefix.'projects', ['project_id'], ['id'], ['onDelete' => 'CASCADE']);
-    }
-
-    public function postUp(Schema $schema): void
-    {
-        $index = $this->generatePropertyName('point_projects_xref', 'idx', ['point_id']);
-        $this->connection->executeStatement(sprintf('DROP INDEX %s ON %s', $index, $this->prefix.'point_projects_xref'));
+        $table->dropIndex($this->generatePropertyName(self::TABLE_NAME, 'idx', ['point_id']));
     }
 
     public function down(Schema $schema): void
     {
-        $schema->dropTable($this->prefix.'point_projects_xref');
+        $schema->dropTable($this->getPrefixedTableName(self::TABLE_NAME));
     }
 }

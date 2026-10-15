@@ -19,11 +19,19 @@ define('MAUTIC_ROOT_DIR', realpath(__DIR__.'/..'));
 
 require_once __DIR__.'/../autoload.php';
 
+use Mautic\InstallBundle\Command\InstallCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\ErrorHandler\Debug;
 
 $input = new ArgvInput();
+
+if (InstallCommand::COMMAND === $input->getFirstArgument()) {
+    defined('MAUTIC_INSTALLER') or define('MAUTIC_INSTALLER', 1);
+    if (null !== $prefix = $input->getParameterOption('--db_table_prefix', null, true)) {
+        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', (string) $prefix);
+    }
+}
 
 if (null !== $env = $input->getParameterOption(['--env', '-e'], null, true)) {
     putenv('APP_ENV='.$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $env);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Mapping\GeneratedColumn;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 
 final class GeneratedColumnTest extends \PHPUnit\Framework\TestCase
@@ -26,5 +27,15 @@ final class GeneratedColumnTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('date_hit', $generatedColumn->getOriginalDateColumn());
         $this->assertSame(MAUTIC_TABLE_PREFIX.'page_hits', $generatedColumn->getTableName());
         $this->assertSame('d', $generatedColumn->getTimeUnit());
+    }
+
+    public function testPostgreSqlUsesStoredColumnsAndStandaloneIndexes(): void
+    {
+        $generatedColumn = new GeneratedColumn('leads', 'generated_email_domain', 'VARCHAR(255)', "SUBSTRING(email, POSITION('@' IN email) + 1)");
+        $platform = new PostgreSQLPlatform();
+
+        $this->assertSame("VARCHAR(255) COLLATE mautic_unicode_ci GENERATED ALWAYS AS (SUBSTRING(email, POSITION('@' IN email) + 1)) STORED", $generatedColumn->getColumnDefinition($platform));
+        $this->assertStringContainsString('CREATE INDEX '.MAUTIC_TABLE_PREFIX.'generated_email_domain ON '.MAUTIC_TABLE_PREFIX.'leads', $generatedColumn->getAlterTableSql($platform));
+        $this->assertStringContainsString('COMMENT ON COLUMN '.MAUTIC_TABLE_PREFIX."leads.generated_email_domain IS '(DC2Type:generated)'", $generatedColumn->getAlterTableSql($platform));
     }
 }

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
@@ -24,24 +27,23 @@ final class Version20201019100000 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $emailsTable = $schema->getTable($this->getPrefixedTableName('emails'));
-        $idColumn    = $emailsTable->getColumn('id');
-        $idDataType  = $idColumn->getUnsigned() ? 'UNSIGNED' : 'SIGNED';
-        $fkName      = $this->generatePropertyName('emails_draft', 'fk', ['email_id']);
-        $ukName      = $this->generatePropertyName('emails_draft', 'uniq', ['email_id']);
+        $table = new Table($this->getPrefixedTableName());
+        $table->addColumn('id', Types::INTEGER, ['unsigned' => true, 'autoincrement' => true]);
+        $table->addColumn('email_id', Types::INTEGER, ['unsigned' => $schema->getTable($this->getPrefixedTableName('emails'))->getColumn('id')->getUnsigned()]);
+        $table->addColumn('html', Types::TEXT, ['length' => 4294967295, 'notnull' => false]);
+        $table->addColumn('template', Types::STRING, ['length' => 191, 'notnull' => false]);
+        $table->addColumn('public_preview', Types::BOOLEAN, ['default' => true]);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['email_id'], $this->generatePropertyName('emails_draft', 'uniq', ['email_id']));
+        $table->addForeignKeyConstraint($this->getPrefixedTableName('emails'), ['email_id'], ['id'], [], $this->generatePropertyName('emails_draft', 'fk', ['email_id']));
+        $table->addOption('charset', 'utf8mb4');
+        $table->addOption('collation', 'utf8mb4_unicode_ci');
+        $table->addOption('engine', 'InnoDB');
+        $table->addOption('row_format', 'DYNAMIC');
 
-        $this->addSql(
-            "CREATE TABLE `{$this->getPrefixedTableName()}` (
-                `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                `email_id` int(10) {$idDataType} NOT NULL,
-                `html` longtext,
-                `template` varchar(191) DEFAULT NULL,
-                `public_preview` tinyint(1) DEFAULT 1 NOT NULL,
-                PRIMARY KEY (`id`),
-                UNIQUE KEY `{$ukName}` (`email_id`),
-                CONSTRAINT `{$fkName}` FOREIGN KEY (`email_id`) REFERENCES `{$this->getPrefixedTableName('emails')}` (`id`)
-            )DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB ROW_FORMAT = DYNAMIC;"
-        );
+        foreach ($this->platform->getCreateTableSQL($table, AbstractPlatform::CREATE_INDEXES | AbstractPlatform::CREATE_FOREIGNKEYS) as $sql) {
+            $this->addSql($sql);
+        }
     }
 
     public function down(Schema $schema): void

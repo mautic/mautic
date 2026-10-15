@@ -6,22 +6,67 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 final class Version20230307083702 extends AbstractMauticMigration
 {
     public function up(Schema $schema): void
     {
-        $old = $this->connection->quote('Swaziland');
-        $new = $this->connection->quote('Eswatini');
+        $oldCountry = $this->connection->quote('Swaziland');
+        $newCountry = $this->connection->quote('Eswatini');
 
-        $this->addSql("UPDATE `{$this->prefix}leads` SET `country` = {$new} WHERE `country` = {$old}");
-        $this->addSql("UPDATE `{$this->prefix}companies` SET `companycountry` = {$new} WHERE `companycountry` = {$old}");
+        $leadsTable     = $this->getPrefixedTableName('leads');
+        $companiesTable = $this->getPrefixedTableName('companies');
 
-        $old = $this->connection->quote('s:6:"filter";s:9:"Swaziland";');
-        $new = $this->connection->quote('s:6:"filter";s:8:"Eswatini";');
+        // Update country in leads
+        $this->addSql(sprintf(
+            'UPDATE %s SET %s = %s WHERE %s = %s',
+            $leadsTable,
+            $this->connection->quoteIdentifier('country'),
+            $newCountry,
+            $this->connection->quoteIdentifier('country'),
+            $oldCountry
+        ));
 
-        $this->addSql("UPDATE `{$this->prefix}dynamic_content` SET `filters` = REPLACE(`filters`, {$old}, {$new})");
-        $this->addSql("UPDATE `{$this->prefix}lead_lists` SET `filters` = REPLACE(`filters`, {$old}, {$new})");
-        $this->addSql("UPDATE `{$this->prefix}emails` SET `dynamic_content` = REPLACE(`dynamic_content`, {$old}, {$new})");
+        // Update companycountry in companies
+        $this->addSql(sprintf(
+            'UPDATE %s SET %s = %s WHERE %s = %s',
+            $companiesTable,
+            $this->connection->quoteIdentifier('companycountry'),
+            $newCountry,
+            $this->connection->quoteIdentifier('companycountry'),
+            $oldCountry
+        ));
+
+        // Serialized filter updates (safe REPLACE with WHERE)
+        $oldSerialized = 's:6:"filter";s:9:"Swaziland";';
+        $newSerialized = $this->connection->quote('s:6:"filter";s:8:"Eswatini";');
+
+        $tables = [
+            'dynamic_content' => 'filters',
+            'lead_lists'      => 'filters',
+            'emails'          => 'dynamic_content',
+        ];
+
+        foreach ($tables as $table => $column) {
+            $fullTable  = $this->getPrefixedTableName($table);
+            $columnName = $this->connection->quoteIdentifier($column);
+            $platform   = $this->connection->getDatabasePlatform();
+            $like       = DatabasePlatform::getCaseInsensitiveLike(
+                $platform,
+                $columnName,
+                ':serializedPattern'
+            );
+
+            $this->addSql(sprintf(
+                'UPDATE %s SET %s = REPLACE(%s, %s, %s) WHERE %s',
+                $fullTable,
+                $columnName,
+                DatabasePlatform::isPostgreSQL($platform) ? $columnName.' COLLATE "C"' : $columnName,
+                $this->connection->quote($oldSerialized),
+                $newSerialized,
+                $like
+            ), ['serializedPattern' => '%'.$oldSerialized.'%']);
+        }
     }
 }

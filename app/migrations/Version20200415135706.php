@@ -7,6 +7,7 @@ namespace Mautic\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 final class Version20200415135706 extends AbstractMauticMigration
 {
@@ -25,11 +26,17 @@ final class Version20200415135706 extends AbstractMauticMigration
 
         // All field that starts with company belongs to the company object.
         // Except the company field itself that belongs to the contact (lead) object.
+        $leadField = $this->connection->quoteIdentifier('lead_field');
+        $like      = DatabasePlatform::getCaseInsensitiveLike(
+            $this->connection->getDatabasePlatform(),
+            $leadField,
+            ':companyPattern'
+        );
         $this->addSql("UPDATE {$this->prefix}form_fields 
             SET mapped_object = CASE
-                WHEN lead_field LIKE 'company%' AND lead_field != 'company' THEN 'company'
+                WHEN {$like} AND lead_field != 'company' THEN 'company'
                 ELSE 'contact'
             END, mapped_field = lead_field 
-            WHERE lead_field IS NOT NULL");
+            WHERE lead_field IS NOT NULL", ['companyPattern' => 'company%']);
     }
 }

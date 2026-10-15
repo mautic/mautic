@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\Query\Filter\Exception\UnsupportedFilterOperatorException;
@@ -47,6 +48,8 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 .$filter->getRelationJoinTableField());
         }
 
+        $platform = $this->getConnection()->getDatabasePlatform();
+
         switch ($filterOperator) {
             case 'empty':
                 $expression = new CompositeExpression(CompositeExpression::TYPE_OR,
@@ -74,26 +77,39 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
                     )
                 );
                 break;
-            case 'startsWith':
-            case 'endsWith':
             case 'gt':
             case 'eq':
             case 'gte':
-            case 'like':
             case 'lt':
             case 'lte':
             case 'in':
             case 'between':   // Used only for date with week combination (EQUAL [this week, next week, last week])
-            case 'regexp':
-            case 'notRegexp': // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
-            case 'inLast':
-            case 'inNext':
-                $expression = $queryBuilder->expr()->{$filterOperator}(
+                $expression = $queryBuilder->expr()->$filterOperator(
                     $tableAlias.'.'.$filter->getField(),
                     $filterParametersHolder
                 );
                 break;
+            case 'startsWith':
+            case 'endsWith':
+            case 'regexp':
+            case 'notRegexp': // Different behaviour from 'notLike' because of BC (do not use condition for NULL). Could be changed in Mautic 3.
+            case 'inLast':
+            case 'inNext':
+            case 'like':
+                $expression = $queryBuilder->expr()->{$filterOperator}(
+                    DatabasePlatform::castIfStrict($platform, $tableAlias.'.'.$filter->getField()),
+                    $filterParametersHolder
+                );
+                break;
             case 'notLike':
+                $expression = $queryBuilder->expr()->or(
+                    $queryBuilder->expr()->$filterOperator(
+                        DatabasePlatform::castIfStrict($platform, $tableAlias.'.'.$filter->getField()),
+                        $filterParametersHolder
+                    ),
+                    $queryBuilder->expr()->isNull($tableAlias.'.'.$filter->getField())
+                );
+                break;
             case 'notBetween': // Used only for date with week combination (NOT EQUAL [this week, next week, last week])
             case 'notIn':
                 $expression = $queryBuilder->expr()->or(
@@ -128,7 +144,10 @@ class ComplexRelationValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $expressions = [];
                 foreach ($filterParametersHolder as $parameter) {
-                    $expressions[] = $queryBuilder->expr()->{$operator}($tableAlias.'.'.$filter->getField(), $parameter);
+                    $expressions[] = $queryBuilder->expr()->{$operator}(
+                        DatabasePlatform::castIfStrict($platform, $tableAlias.'.'.$filter->getField()),
+                        $parameter
+                    );
                 }
 
                 if ([] === $expressions) {

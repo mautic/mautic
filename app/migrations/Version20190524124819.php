@@ -22,15 +22,15 @@ final class Version20190524124819 extends PreUpAssertionMigration
     {
         $this->addSql("
             ALTER TABLE {$this->prefix}lead_fields
-	        ADD `is_index` TINYINT(1) DEFAULT 0 NOT NULL,
-	        ADD `char_length_limit` INT(3) NULL;
+	        ADD is_index BOOLEAN DEFAULT FALSE NOT NULL,
+	        ADD char_length_limit INT NULL;
         ");
 
         $this->addSql("
             UPDATE {$this->prefix}lead_fields
-	        SET `char_length_limit` = 255 
-	        WHERE `type` IN ('text', 'select', 'multiselect', 'phone', 'url', 'email')
-	        AND `char_length_limit` IS NULL;
+	        SET char_length_limit = 255
+	        WHERE type IN ('text', 'select', 'multiselect', 'phone', 'url', 'email')
+	        AND char_length_limit IS NULL;
         ");
 
         $indexHelper    = $this->container->get(IndexHelper::class);
@@ -38,8 +38,8 @@ final class Version20190524124819 extends PreUpAssertionMigration
 
         $this->addSql("
             UPDATE {$this->prefix}lead_fields
-	        SET `is_index` = TRUE 
-	        WHERE `alias` IN ('{$indexedColumns}');
+	        SET is_index = TRUE
+	        WHERE alias IN ('{$indexedColumns}');
         ");
     }
 }

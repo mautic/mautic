@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 use Mautic\SmsBundle\Entity\Sms;
 
@@ -21,8 +23,8 @@ final class Version20230301051300 extends PreUpAssertionMigration
     {
         $tableName = $this->getPrefixedTableName(Sms::TABLE_NAME);
 
-        $this->addSql(sprintf('ALTER TABLE %s add media JSON DEFAULT NULL;', $tableName));
-        $this->addSql(sprintf("UPDATE %s SET media = '{}' WHERE media IS NULL;", $tableName));
-        $this->addSql(sprintf('ALTER TABLE %s MODIFY media JSON NOT NULL;', $tableName));
+        $definition = $this->platform->getColumnDeclarationSQL('media', ['type' => Type::getType(Types::JSON), 'notnull' => true]);
+        $this->addSql(sprintf("ALTER TABLE %s ADD %s DEFAULT ('{}')", $tableName, $definition));
+        $this->addSql(sprintf('ALTER TABLE %s ALTER COLUMN media DROP DEFAULT', $tableName));
     }
 }

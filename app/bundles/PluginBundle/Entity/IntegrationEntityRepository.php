@@ -4,6 +4,7 @@ namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -309,12 +310,18 @@ class IntegrationEntityRepository extends CommonRepository
      */
     public function findLeadsToCreate($integration, $leadFields, $limit = 25, $fromDate = null, $toDate = null, $internalEntity = 'lead'): int|array
     {
+        $connection = $this->_em->getConnection();
         if ('company' == $internalEntity) {
             $joinTable = 'companies';
         } else {
             $joinTable = 'leads';
         }
-        $q = $this->_em->getConnection()->createQueryBuilder()
+        $internalEntityLike = DatabasePlatform::getCaseInsensitiveLike(
+            $connection->getDatabasePlatform(),
+            'i.internal_entity',
+            ':internalEntityPrefix'
+        );
+        $q = $connection->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.$joinTable, 'l');
 
         if (false === $limit) {
@@ -324,16 +331,17 @@ class IntegrationEntityRepository extends CommonRepository
         }
         if ('company' == $internalEntity) {
             $q->where('not exists (select null from '.MAUTIC_TABLE_PREFIX
-                .'integration_entity i where i.integration = :integration and i.internal_entity LIKE "'.$internalEntity.'%" and i.internal_entity_id = l.id)')
+                .'integration_entity i where i.integration = :integration and '.$internalEntityLike.' and i.internal_entity_id = l.id)')
                 ->setParameter('integration', $integration);
         } else {
             $q->where('l.date_identified is not null')
                 ->andWhere(
                     'not exists (select null from '.MAUTIC_TABLE_PREFIX
-                    .'integration_entity i where i.integration = :integration and i.internal_entity LIKE "'.$internalEntity.'%" and i.internal_entity_id = l.id)'
+                    .'integration_entity i where i.integration = :integration and '.$internalEntityLike.' and i.internal_entity_id = l.id)'
                 )
                 ->setParameter('integration', $integration);
         }
+        $q->setParameter('internalEntityPrefix', $internalEntity.'%');
 
         if ('company' == $internalEntity) {
             $q->andWhere('l.companyname is not null');
@@ -429,7 +437,14 @@ class IntegrationEntityRepository extends CommonRepository
             $q->select('i.integration, i.integration_entity, i.integration_entity_id, i.date_added, i.last_sync_date, i.internal');
         }
 
-        $q->where('i.internal not like \'%error%\' and i.integration_entity_id is not null');
+        $q->where(DatabasePlatform::getCaseInsensitiveLike(
+            $this->_em->getConnection()->getDatabasePlatform(),
+            'i.internal',
+            ':internalErrorPattern',
+            DatabasePlatform::FLAG_NEGATIVE
+        ))
+            ->andWhere('i.integration_entity_id is not null')
+            ->setParameter('internalErrorPattern', '%error%');
         $q->orderBy('i.last_sync_date', 'DESC');
 
         if (empty($integration)) {
@@ -503,7 +518,11 @@ class IntegrationEntityRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity');
 
         $q->where('internal_entity_id = :leadId')
-            ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
+            ->andWhere(DatabasePlatform::getCaseInsensitiveLike(
+                $this->_em->getConnection()->getDatabasePlatform(),
+                'internal_entity',
+                ':internalEntity'
+            ))
             ->setParameter('leadId', $leadId)
             ->setParameter('internalEntity', $internalEntity)
             ->executeStatement();
@@ -528,7 +547,11 @@ class IntegrationEntityRepository extends CommonRepository
 
         $z->where('internal_entity_id = :leadId')
             ->andWhere($q->expr()->isNull('integration_entity_id'))
-            ->andWhere($q->expr()->like('internal_entity', ':internalEntity'))
+            ->andWhere(DatabasePlatform::getCaseInsensitiveLike(
+                $this->_em->getConnection()->getDatabasePlatform(),
+                'internal_entity',
+                ':internalEntity'
+            ))
             ->setParameter('leadId', $leadId)
             ->setParameter('internalEntity', $internalEntity)
             ->executeStatement();

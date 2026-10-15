@@ -12,12 +12,23 @@ final class CommonRepositoryUpsertTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {
-        $this->connection->executeStatement('ALTER TABLE '.MAUTIC_TABLE_PREFIX.'ip_addresses ADD UNIQUE INDEX idx_ip_address (ip_address)');
+        $this->createTestIndex(
+            MAUTIC_TABLE_PREFIX.'ip_addresses',
+            'idx_ip_address',
+            ['ip_address'],
+            true,
+            true,
+            true
+        );
     }
 
     protected function afterRollback(): void
     {
-        $this->connection->executeStatement('ALTER TABLE '.MAUTIC_TABLE_PREFIX.'ip_addresses DROP INDEX idx_ip_address');
+        $this->dropTestIndex(
+            MAUTIC_TABLE_PREFIX.'ip_addresses',
+            'idx_ip_address',
+            true
+        );
     }
 
     public function testUpsert(): void
@@ -34,5 +45,23 @@ final class CommonRepositoryUpsertTest extends MauticMysqlTestCase
         $ipAddress3 = new IpAddress('10.10.10.10');
         $ipAddressRepository->upsert($ipAddress3);
         $this->assertEquals($ipAddress1->getId(), $ipAddress3->getId());
+    }
+
+    public function testUpsertUpdatesAnExistingEntityWhenItsUniqueValueChanges(): void
+    {
+        /** @var IpAddressRepository $repository */
+        $repository = $this->getContainer()->get(IpAddressRepository::class);
+        $ipAddress  = new IpAddress('10.10.10.20');
+        $repository->upsert($ipAddress);
+        $id = $ipAddress->getId();
+
+        $ipAddress->setIpAddress('10.10.10.21');
+        $repository->upsert($ipAddress);
+
+        $this->assertSame($id, $ipAddress->getId());
+        $this->assertSame('10.10.10.21', $this->connection->fetchOne(
+            'SELECT ip_address FROM '.MAUTIC_TABLE_PREFIX.'ip_addresses WHERE id = ?',
+            [$id]
+        ));
     }
 }

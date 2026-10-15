@@ -34,21 +34,23 @@ final class LoadRoleData extends AbstractFixture implements OrderedFixtureInterf
             $this->addReference('admin-role', $role);
         }
 
-        $role = new Role();
-        $role->setName('Sales Team');
-        $role->setDescription('Has access to sales');
-        $role->setIsAdmin(0);
+        if (!$this->hasReference('sales-role')) {
+            $role = new Role();
+            $role->setName('Sales Team');
+            $role->setDescription('Has access to sales');
+            $role->setIsAdmin(0);
 
-        $permissions = [
-            'user:profile' => ['editname'],
-            'lead:leads'   => ['full'],
-        ];
-        $this->roleModel->setRolePermissions($role, $permissions);
+            $permissions = [
+                'user:profile' => ['editname'],
+                'lead:leads'   => ['full'],
+            ];
+            $this->roleModel->setRolePermissions($role, $permissions);
 
-        $manager->persist($role);
-        $manager->flush();
+            $manager->persist($role);
+            $manager->flush();
 
-        $this->addReference('sales-role', $role);
+            $this->addReference('sales-role', $role);
+        }
     }
 
     public function getOrder(): int

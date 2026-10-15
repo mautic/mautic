@@ -15,9 +15,9 @@ final class RequirementsPass implements CompilerPassInterface
             return;
         }
 
-        if (!class_exists('PDO') || !in_array('mysql', \PDO::getAvailableDrivers(), true)) {
+        if (!class_exists('PDO') || [] === array_intersect(['mysql', 'pgsql'], \PDO::getAvailableDrivers())) {
             // We need to check this on boot, as later in the process is too late to show a message that makes the issue clear.
-            throw new MessageOnlyErrorHandlerException('Mautic requires the PHP pdo_mysql extension to work. Please ensure this extension is installed and enabled');
+            throw new MessageOnlyErrorHandlerException('Mautic requires the PHP pdo_mysql or pdo_pgsql extension to work. Please ensure a supported extension is installed and enabled');
         }
     }
 }

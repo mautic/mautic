@@ -57,7 +57,7 @@ final readonly class DoctrineSubscriber
                         $table->addColumn($columnDef['name'], $columnDef['type'], $columnDef['options']);
                     }
 
-                    if (!empty($field['is_unique']) || !empty($field['is_index'])) {
+                    if ((!empty($field['is_unique']) || !empty($field['is_index'])) && !$table->hasIndex(MAUTIC_TABLE_PREFIX.$field['alias'].'_search')) {
                         $table->addIndex([$columnDef['name']], MAUTIC_TABLE_PREFIX.$field['alias'].'_search');
                     }
                 }
@@ -78,18 +78,22 @@ final readonly class DoctrineSubscriber
                     // Only use three to prevent max key length errors
                     asort($uniqueFields);
                     $uniqueFields = array_slice($uniqueFields, 0, 3);
-                    $table->addIndex($uniqueFields, MAUTIC_TABLE_PREFIX.'unique_identifier_search');
+                    if (!$table->hasIndex(MAUTIC_TABLE_PREFIX.$object.'_unique_identifier_search')) {
+                        $table->addIndex($uniqueFields, MAUTIC_TABLE_PREFIX.$object.'_unique_identifier_search');
+                    }
                 }
 
-                switch ($object) {
-                    case 'lead':
-                        $table->addIndex(['attribution', 'attribution_date'], MAUTIC_TABLE_PREFIX.'contact_attribution');
-                        $table->addIndex(['date_added', 'country'], MAUTIC_TABLE_PREFIX.'date_added_country_index');
-                        break;
-                    case 'company':
-                        $table->addIndex(['companyname', 'companyemail'], MAUTIC_TABLE_PREFIX.'company_filter');
-                        $table->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], MAUTIC_TABLE_PREFIX.'company_match');
-                        break;
+                $indexes = 'lead' === $object ? [
+                    'contact_attribution'      => ['attribution', 'attribution_date'],
+                    'date_added_country_index' => ['date_added', 'country'],
+                ] : [
+                    'company_filter' => ['companyname', 'companyemail'],
+                    'company_match'  => ['companyname', 'companycity', 'companycountry', 'companystate'],
+                ];
+                foreach ($indexes as $indexName => $columns) {
+                    if (!$table->hasIndex(MAUTIC_TABLE_PREFIX.$indexName)) {
+                        $table->addIndex($columns, MAUTIC_TABLE_PREFIX.$indexName);
+                    }
                 }
             }
         } catch (\Exception $e) {

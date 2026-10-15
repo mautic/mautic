@@ -164,7 +164,7 @@ final class InstallCommand extends Command
             '',
         ]);
 
-        if (!defined('IS_PHPUNIT')) {
+        if (!defined('IS_PHPUNIT') && !defined('MAUTIC_INSTALLER')) {
             // Prevents querying of database tables that do not exist during the installation process
             define('MAUTIC_INSTALLER', 1);
         }
@@ -187,6 +187,7 @@ final class InstallCommand extends Command
             'name'          => null,
             'user'          => null,
             'password'      => null,
+            'charset'       => null,
             'table_prefix'  => null,
             'backup_tables' => true,
             'backup_prefix' => 'bak_',
@@ -225,6 +226,12 @@ final class InstallCommand extends Command
             $siteUrl               = $input->getArgument('site_url');
             $allParams['site_url'] = $siteUrl;
         }
+
+        // Make sure charset is correct for PostgreSQL DB
+        if (empty($dbParams['charset']) || ('pdo_pgsql' === $dbParams['driver'] && 'utf8mb4' === $dbParams['charset'])) {
+            $dbParams['charset'] = ('pdo_pgsql' === $dbParams['driver']) ? 'UTF8' : 'utf8mb4';
+        }
+        $allParams['db_charset'] = $dbParams['charset'];
 
         $step = (float) $input->getArgument('step');
 

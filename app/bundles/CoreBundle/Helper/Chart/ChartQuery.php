@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Helper\Chart;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -17,43 +18,6 @@ class ChartQuery extends AbstractChart
     private readonly DateTimeHelper $dateTimeHelper;
 
     private ?GeneratedColumnsProviderInterface $generatedColumnProvider = null;
-
-    /**
-     * Match date/time unit to a SQL datetime format
-     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}.
-     *
-     * @var array
-     */
-    protected $sqlFormats = [
-        's' => 'Y-m-d H:i:s',
-        'i' => 'Y-m-d H:i:00',
-        'H' => 'Y-m-d H:00:00',
-        'd' => 'Y-m-d 00:00:00',
-        'D' => 'Y-m-d 00:00:00', // ('D' is BC. Can be removed when all charts use this class)
-        'W' => 'Y-m-d 00:00:00',
-        'm' => 'Y-m-01 00:00:00',
-        'M' => 'Y-m-00 00:00:00', // ('M' is BC. Can be removed when all charts use this class)
-        'Y' => 'Y-01-01 00:00:00',
-    ];
-
-    /**
-     * Match date/time unit to a MySql datetime format
-     * {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * {@link dev.mysql.com/doc/refman/5.5/en/date-and-time-functions.html#function_date-format}.
-     *
-     * @var array
-     */
-    protected $mysqlTimeUnits = [
-        's' => '%Y-%m-%d %H:%i:%s',
-        'i' => '%Y-%m-%d %H:%i',
-        'H' => '%Y-%m-%d %H:00',
-        'd' => '%Y-%m-%d',
-        'D' => '%Y-%m-%d', // ('D' is BC. Can be removed when all charts use this class)
-        'W' => '%Y %U',
-        'm' => '%Y-%m',
-        'M' => '%Y-%m', // ('M' is BC. Can be removed when all charts use this class)
-        'Y' => '%Y',
-    ];
 
     /**
      * Possible values are 'd'/'H'/'i'/'i'/'W'/'m'/'Y'.
@@ -184,20 +148,16 @@ class ChartQuery extends AbstractChart
      * Get the right unit for current database platform.
      *
      * @param string $unit {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     *
-     * @return string
      */
-    public function translateTimeUnit($unit = null)
+    public function translateTimeUnit($unit = null): string
     {
         if (null === $unit) {
             $unit = $this->unit;
         }
 
-        if (!isset($this->mysqlTimeUnits[$unit])) {
-            throw new \UnexpectedValueException('Date/Time unit "'.$unit.'" is not available for MySql.');
-        }
+        $platform = $this->connection->getDatabasePlatform();
 
-        return $this->mysqlTimeUnits[$unit];
+        return DatabasePlatform::getTimeUnitFormat($platform, $unit);
     }
 
     /**
@@ -532,12 +492,19 @@ class ChartQuery extends AbstractChart
      */
     public function modifyCountDateDiffQuery(QueryBuilder &$query, $dateColumn1, $dateColumn2, $startSecond = 0, $endSecond = 60, $tablePrefix = 't'): void
     {
-        $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count');
-        $query->where('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') >= :startSecond');
-        $query->andWhere('TIMESTAMPDIFF(SECOND, '.$tablePrefix.'.'.$dateColumn1.', '.$tablePrefix.'.'.$dateColumn2.') < :endSecond');
+        $platform = $this->getConnection()->getDatabasePlatform();
 
-        $query->setParameter('startSecond', $startSecond);
-        $query->setParameter('endSecond', $endSecond);
+        $diffExpr = DatabasePlatform::getDateDiffInSeconds(
+            $platform,
+            $tablePrefix.'.'.$dateColumn1,
+            $tablePrefix.'.'.$dateColumn2
+        );
+
+        $query->select('COUNT('.$tablePrefix.'.'.$dateColumn1.') AS count')
+            ->where($diffExpr.' >= :startSecond')
+            ->andWhere($diffExpr.' < :endSecond')
+            ->setParameter('startSecond', $startSecond)
+            ->setParameter('endSecond', $endSecond);
     }
 
     /**
@@ -550,6 +517,12 @@ class ChartQuery extends AbstractChart
         $data = $query->executeQuery()->fetchAssociative();
 
         return (int) $data['count'];
+    }
+
+    /** Expose connection variable to Unit Test to support multiple database type testing via mock objects */
+    public function getConnection(): Connection
+    {
+        return $this->connection;
     }
 
     /**
@@ -580,12 +553,13 @@ class ChartQuery extends AbstractChart
             return $tablePrefix.'.'.$generatedColumn->getColumnName();
         }
 
-        $dbUnit                = $this->translateTimeUnit($this->unit);
-        $columnName            = $tablePrefix.'.'.$column;
-        $defaultTimezoneOffset = $this->dateTimeHelper->getLocalTimezoneOffset();
-        $columnName            = "CONVERT_TZ({$columnName}, '+00:00', '{$defaultTimezoneOffset}')";
-
-        return 'DATE_FORMAT('.$columnName.', \''.$dbUnit.'\')';
+        return DatabasePlatform::getDateConstructExpression(
+            $this->connection->getDatabasePlatform(),
+            $tablePrefix.'.'.$column,
+            $this->unit,
+            false,
+            $this->dateTimeHelper->getLocalTimezoneOffset()
+        );
     }
 
     private function getGeneratedColumnForDateColumn(QueryBuilder $query, string $dateColumn, string $tablePrefix): ?GeneratedColumn

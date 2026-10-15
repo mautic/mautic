@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Tests\Builder;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -245,6 +246,34 @@ final class MauticReportBuilderTest extends TestCase
         yield 'less than or equal' => ['lte', '<='];
     }
 
+    #[DataProvider('providePostgreSqlAnniversaryFilters')]
+    public function testRelativeAnniversaryOnPostgreSql(string $condition, string $sqlOperator, bool $useFormula): void
+    {
+        $this->connection = $this->createMock(Connection::class);
+        $this->connection->method('getDatabasePlatform')->willReturn(new PostgreSQLPlatform());
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
+        $this->connection->method('getExpressionBuilder')->willReturn(new ExpressionBuilder($this->connection));
+
+        $report           = $this->buildReportWithFilters([$this->buildFilter('a.createdAt', $condition, 'birthday +2days')]);
+        $filterDefinition = $this->buildFilterDefinition('Created at', 'datetime', 'createdAt');
+        if ($useFormula) {
+            $filterDefinition['formula'] = 'DATE(a.createdAt)';
+        }
+        $query  = $this->buildQueryWithFilters($report, ['a.createdAt' => $filterDefinition]);
+        $column = $useFormula ? 'DATE(a.createdAt)' : 'a.createdAt';
+
+        $this->assertStringContainsString("TO_CHAR({$column}, 'MM-DD') {$sqlOperator} :i0cacreatedAt", $query->getSQL());
+        $this->assertSame(RelativeDateHelper::resolveAnniversary('birthday +2days'), $query->getParameters()['i0cacreatedAt']);
+    }
+
+    public static function providePostgreSqlAnniversaryFilters(): \Generator
+    {
+        foreach (self::provideAnniversaryOperators() as $name => [$condition, $sqlOperator]) {
+            yield $name => [$condition, $sqlOperator, false];
+            yield $name.' with formula' => [$condition, $sqlOperator, true];
+        }
+    }
+
     #[DataProvider('provideEmptyAnniversaryOperators')]
     public function testEmptyAnniversaryOperatorsUseTheUnderlyingColumn(string $condition, string $sql): void
     {
@@ -305,10 +334,10 @@ final class MauticReportBuilderTest extends TestCase
             'groupBy' => ['ph.url', 'ph.url_title'],
         ]);
 
-        $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url_title`, `ph`.`url`, COUNT(ph.id) AS \'COUNT ph.id\' GROUP BY ph.url, ph.url_title
-        ')), $query->getSql());
-        $this->assertStringNotContainsString('`ph`.`id`', $query->getSql());
+        $groupBy = $query->getQueryPart('groupBy') ?? [];
+
+        $this->assertNotContains('ph.id', $groupBy);
+        $this->assertNotContains('`ph`.`id`', $groupBy);
     }
 
     public function testGroupByCompletesMissingSelectColumnInsteadOfDroppingIt(): void
@@ -327,7 +356,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url`, `p`.`title` GROUP BY ph.url, p.title
+            SELECT `ph`.`url`, `p`.`title` GROUP BY ph.url, `p`.`title`
         ')), $query->getSql());
     }
 
@@ -347,7 +376,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `e`.`id`, `e`.`subject` GROUP BY e.id, e.subject
+            SELECT `e`.`id`, `e`.`subject` GROUP BY e.id, `e`.`subject`
         ')), $query->getSql());
     }
 
@@ -367,7 +396,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url` GROUP BY ph.url, p.title ORDER BY p.title DESC
+            SELECT `ph`.`url` GROUP BY ph.url, `p`.`title` ORDER BY p.title DESC
         ')), $query->getSql());
     }
 
@@ -393,7 +422,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url`, COUNT(ph.id) AS \'COUNT ph.id\' GROUP BY ph.url ORDER BY ph.id DESC
+            SELECT `ph`.`url`, COUNT(`ph`.`id`) AS `COUNT ph.id` GROUP BY ph.url ORDER BY ph.id DESC
         ')), $query->getSql());
     }
 
@@ -427,7 +456,7 @@ final class MauticReportBuilderTest extends TestCase
         ')), $query->getSql());
     }
 
-    public function testGroupByCompletesBaseColumnsOfFormulaSelect(): void
+    public function testGroupByCompletesScalarFormulaWithoutSplittingItsInputValues(): void
     {
         $report = new Report();
         $report->setColumns(['ph.url', 'ph.date_hit']);
@@ -442,10 +471,41 @@ final class MauticReportBuilderTest extends TestCase
             'groupBy' => ['ph.url'],
         ]);
 
-        // The formula stays in SELECT; its base column is what gets grouped.
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url`, DATE(ph.date_hit) GROUP BY ph.url, ph.date_hit
+            SELECT `ph`.`url`, DATE(ph.date_hit) GROUP BY ph.url, DATE(ph.date_hit)
         ')), $query->getSql());
+    }
+
+    #[DataProvider('provideGroupedDateOrder')]
+    public function testGroupedDateOrderingPreservesTheDateGroup(string $source): void
+    {
+        $report = new Report();
+        $report->setColumns(['ph.date_hit', 'ph.id']);
+        $report->setGroupBy(['ph.date_hit']);
+        $report->setAggregators([['column' => 'ph.id', 'function' => 'COUNT']]);
+        $options = ['columns' => ['ph.date_hit' => ['groupByFormula' => 'DATE(ph.date_hit)'], 'ph.id' => []]];
+        if ('report' === $source) {
+            $report->setTableOrder([['column' => 'ph.date_hit', 'direction' => 'DESC']]);
+        } else {
+            $options['order'] = match ($source) {
+                'pair' => ['ph.date_hit', 'DESC'],
+                'named' => ['column' => 'ph.date_hit', 'direction' => 'DESC'],
+                'string' => 'ph.date_hit DESC',
+                default => throw new \InvalidArgumentException('Unknown report order source: '.$source),
+            };
+        }
+
+        $query = $this->buildBuilder($report)->getQuery($options);
+
+        $this->assertSame('SELECT DATE(ph.date_hit), COUNT(`ph`.`id`) AS `COUNT ph.id` GROUP BY DATE(ph.date_hit) ORDER BY DATE(ph.date_hit) DESC', $query->getSQL());
+    }
+
+    public static function provideGroupedDateOrder(): iterable
+    {
+        yield ['report'];
+        yield ['pair'];
+        yield ['named'];
+        yield ['string'];
     }
 
     public function testGroupByDoesNotDuplicateQuotedVariantOfGroupedColumn(): void
@@ -465,7 +525,7 @@ final class MauticReportBuilderTest extends TestCase
 
         // ORDER BY ph.url is already covered by the (quoted) GROUP BY expression.
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url` GROUP BY `ph`.`url` ORDER BY ph.url ASC
+            SELECT `ph`.`url` GROUP BY `ph`.`url` ORDER BY `ph`.`url` ASC
         ')), $query->getSql());
     }
 
@@ -494,7 +554,7 @@ final class MauticReportBuilderTest extends TestCase
         // MAX(t.hits) is already aggregated, so t.hits must not be grouped; the
         // COUNT(ph.id) sort column is an aggregator expression, not a column.
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `ph`.`url`, MAX(t.hits), COUNT(ph.id) AS \'COUNT ph.id\' GROUP BY ph.url ORDER BY COUNT(ph.id) DESC
+            SELECT `ph`.`url`, MAX(t.hits), COUNT(`ph`.`id`) AS `COUNT ph.id` GROUP BY ph.url ORDER BY COUNT(ph.id) DESC
         ')), $query->getSql());
     }
 
@@ -548,7 +608,7 @@ final class MauticReportBuilderTest extends TestCase
         // a column: only the CASE's real column reference may be completed into
         // the outer GROUP BY.
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', "
-            SELECT `e`.`id`, $formula GROUP BY e.id, fs.type
+            SELECT `e`.`id`, $formula GROUP BY e.id, `fs`.`type`
         ")), $query->getSql());
     }
 
@@ -587,7 +647,7 @@ final class MauticReportBuilderTest extends TestCase
         // The CASE's base column is completed; nothing from the subquery scope is.
         $this->assertSame(
             trim(preg_replace('/\s{2,}/', ' ', "
-            SELECT `e`.`id`, $formula GROUP BY e.id, fs.type
+            SELECT `e`.`id`, $formula GROUP BY e.id, `fs`.`type`
         ")),
             trim(preg_replace('/\s{2,}/', ' ', $sql))
         );
@@ -624,7 +684,7 @@ final class MauticReportBuilderTest extends TestCase
         ]);
 
         $this->assertSame(trim(preg_replace('/\s{2,}/', ' ', '
-            SELECT `a`.`id`, AVG(IF(dnc.id IS NOT NULL AND dnc.reason=2, 1, 0)) AS \'AVG a.bounced\' GROUP BY a.id
+            SELECT `a`.`id`, AVG(IF(`dnc`.`id` IS NOT NULL AND `dnc`.`reason`=2, 1, 0)) AS `AVG a.bounced` GROUP BY a.id
         ')), $query->getSql());
     }
 

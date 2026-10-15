@@ -7,6 +7,7 @@ namespace Mautic\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 final class Version20251204081531 extends AbstractMauticMigration
 {
@@ -22,13 +23,18 @@ final class Version20251204081531 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $sql = "ALTER TABLE `{$this->getPrefixedTableName()}` ADD COLUMN `{$this->uuidColumn}` char(36) default NULL; ";
-        $sql .= "UPDATE `{$this->getPrefixedTableName()}` SET `{$this->uuidColumn}` = UUID() WHERE `{$this->uuidColumn}` IS NULL;";
-        $this->addSql($sql);
+        $table  = $this->platform->quoteIdentifier($this->getPrefixedTableName());
+        $column = $this->platform->quoteIdentifier('uuid');
+        $uuid   = DatabasePlatform::isPostgreSQL($this->platform) ? 'gen_random_uuid()::text' : 'UUID()';
+
+        $this->addSql("ALTER TABLE {$table} ADD COLUMN {$column} CHAR(36) DEFAULT NULL");
+        $this->addSql("UPDATE {$table} SET {$column} = {$uuid} WHERE {$column} IS NULL");
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE `{$this->getPrefixedTableName()}` DROP COLUMN `{$this->uuidColumn}`");
+        $table  = $this->platform->quoteIdentifier($this->getPrefixedTableName());
+        $column = $this->platform->quoteIdentifier($this->uuidColumn);
+        $this->addSql("ALTER TABLE {$table} DROP COLUMN {$column}");
     }
 }

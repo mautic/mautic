@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Functional;
 
+use Doctrine\ORM\Query\Expr\Andx;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Event\SearchCommandEvent;
 use Mautic\CoreBundle\Event\SearchQueryEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -97,7 +99,11 @@ final class CustomSearchCommandTest extends MauticMysqlTestCase
             $q     = $event->getQuery();
             $alias = $event->getAlias();
 
-            $event->setExpr($q->expr()->like($alias.'.customHtml', ':specialMarker'));
+            $event->setExpr(new Andx([DatabasePlatform::getCaseInsensitiveLike(
+                $this->connection->getDatabasePlatform(),
+                $alias.'.customHtml',
+                ':specialMarker'
+            )]));
             $event->setParameters(['specialMarker' => '%FINDME%']);
         };
 

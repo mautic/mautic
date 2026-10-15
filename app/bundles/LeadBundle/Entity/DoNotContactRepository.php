@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
@@ -117,7 +118,8 @@ class DoNotContactRepository extends CommonRepository
      */
     public function getTimelineStats($leadId = null, array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection = $this->getEntityManager()->getConnection();
+        $query      = $connection->createQueryBuilder();
 
         $query->select('dnc.id, dnc.channel, dnc.channel_id, dnc.date_added, dnc.reason, dnc.comments, dnc.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc');
@@ -128,7 +130,7 @@ class DoNotContactRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('dnc.channel', $query->expr()->literal('%'.$options['search'].'%'))
+                DatabasePlatform::getCaseInsensitiveLike($connection->getDatabasePlatform(), 'dnc.channel', $query->expr()->literal('%'.$options['search'].'%'))
             );
         }
 

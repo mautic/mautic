@@ -30,12 +30,7 @@ final class Version20250430104345 extends PreUpAssertionMigration
         $table->setPrimaryKey(['focus_id', 'project_id']);
         $table->addForeignKeyConstraint($this->prefix.'focus', ['focus_id'], ['id'], ['onDelete' => 'CASCADE']);
         $table->addForeignKeyConstraint($this->prefix.'projects', ['project_id'], ['id'], ['onDelete' => 'CASCADE']);
-    }
-
-    public function postUp(Schema $schema): void
-    {
-        $index = $this->generatePropertyName('focus_projects_xref', 'idx', ['focus_id']);
-        $this->connection->executeStatement(sprintf('DROP INDEX %s ON %s', $index, $this->prefix.'focus_projects_xref'));
+        $table->dropIndex($this->generatePropertyName('focus_projects_xref', 'idx', ['focus_id']));
     }
 
     public function down(Schema $schema): void

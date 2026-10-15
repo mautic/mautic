@@ -153,9 +153,9 @@ $connectionSettings = [
     'dbname'                => '%mautic.db_name%',
     'user'                  => '%mautic.db_user%',
     'password'              => '%mautic.db_password%',
-    'charset'               => 'utf8mb4',
+    'charset'               => '%mautic.db_charset%',
     'default_table_options' => [
-        'charset'    => 'utf8mb4',
+        'charset'    => '%mautic.db_charset%',
         'row_format' => 'DYNAMIC',
     ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
@@ -166,7 +166,7 @@ $connectionSettings = [
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
     'wrapper_class'  => Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
-    'options'        => [PDO::ATTR_STRINGIFY_FETCHES => true], // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
+    'options'        => [PDO::ATTR_STRINGIFY_FETCHES => true],
 ];
 
 if (!empty($localConfigParameterBag->get('db_host_ro'))) {
@@ -179,13 +179,17 @@ if (!empty($localConfigParameterBag->get('db_host_ro'))) {
             'dbname'                => '%mautic.db_name%',
             'user'                  => '%mautic.db_user%',
             'password'              => '%mautic.db_password%',
-            'charset'               => 'utf8mb4',
+            'charset'               => '%mautic.db_charset%',
         ],
     ];
 }
 
-// Use the new Pdo\Mysql namespace for PHP 8.4+, fallback to legacy constant for older versions
-$unbufferedQueryConstant = class_exists('Pdo\Mysql') ? Pdo\Mysql::ATTR_USE_BUFFERED_QUERY : PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
+// PostgreSQL has no MySQL buffered-query PDO option.
+$unbufferedOptions = $connectionSettings['options'];
+if ('pdo_mysql' === $configParameterBag->get('db_driver')) {
+    $unbufferedQueryConstant = class_exists('Pdo\Mysql') ? Pdo\Mysql::ATTR_USE_BUFFERED_QUERY : PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
+    $unbufferedOptions[$unbufferedQueryConstant] = false;
+}
 
 $container->loadFromExtension('doctrine', [
     'dbal' => [
@@ -193,14 +197,12 @@ $container->loadFromExtension('doctrine', [
         'connections'        => [
             'default'    => $connectionSettings,
             'unbuffered' => array_merge($connectionSettings, [
-                'options' => [
-                    $unbufferedQueryConstant    => false,
-                    PDO::ATTR_STRINGIFY_FETCHES => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
-                ],
+                'options' => $unbufferedOptions,
             ]),
         ],
         'types'    => [
             Types::ARRAY                  => Type\ArrayType::class,
+            Types::BOOLEAN                => Type\BooleanType::class,
             Types::DATETIME_MUTABLE       => Type\UTCDateTimeType::class,
             Types::DATETIME_IMMUTABLE     => Type\UTCDateTimeImmutableType::class,
             Type\GeneratedType::GENERATED => Type\GeneratedType::class,
@@ -213,6 +215,9 @@ $container->loadFromExtension('doctrine', [
         'dql'                         => [
             'string_functions' => [
                 'match' => DoctrineExtensions\Query\Mysql\MatchAgainst::class,
+                'cast'  => DoctrineExtensions\Query\Mysql\Cast::class,
+                'mautic_like'       => Mautic\CoreBundle\Doctrine\DQL\CaseInsensitiveLike::class,
+                'mautic_unicode_ci' => Mautic\CoreBundle\Doctrine\DQL\UnicodeCi::class,
             ],
         ],
         'result_cache_driver' => [

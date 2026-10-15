@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -65,10 +66,28 @@ class HitRepository extends CommonRepository
      */
     public function getLeadHits($leadId = null, array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection = $this->getEntityManager()->getConnection();
+        $query      = $connection->createQueryBuilder();
 
-        $query->select('h.id as hitId, h.page_id, h.user_agent as userAgent, h.date_hit as dateHit, h.date_left as dateLeft, h.referer, h.source, h.source_id as sourceId, h.url, h.url_title as urlTitle, h.query, ds.client_info as clientInfo, ds.device, ds.device_os_name as deviceOsName, ds.device_brand as deviceBrand, ds.device_model as deviceModel, h.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+        $query->select(
+            'h.id AS '.$connection->quoteIdentifier('hitId'),
+            'h.page_id',
+            'h.user_agent AS '.$connection->quoteIdentifier('userAgent'),
+            'h.date_hit AS '.$connection->quoteIdentifier('dateHit'),
+            'h.date_left AS '.$connection->quoteIdentifier('dateLeft'),
+            'h.referer',
+            'h.source',
+            'h.source_id AS '.$connection->quoteIdentifier('sourceId'),
+            'h.url',
+            'h.url_title AS '.$connection->quoteIdentifier('urlTitle'),
+            'h.query',
+            'ds.client_info AS '.$connection->quoteIdentifier('clientInfo'),
+            'ds.device',
+            'ds.device_os_name AS '.$connection->quoteIdentifier('deviceOsName'),
+            'ds.device_brand AS '.$connection->quoteIdentifier('deviceBrand'),
+            'ds.device_model AS '.$connection->quoteIdentifier('deviceModel'),
+            'h.lead_id'
+        )->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
             ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id');
 
         if ($leadId) {
@@ -78,7 +97,7 @@ class HitRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('p.title', ':search')
+                DatabasePlatform::getCaseInsensitiveLike($this->getEntityManager()->getConnection()->getDatabasePlatform(), 'p.title', ':search')
             )->setParameter('search', '%'.$options['search'].'%');
         }
 
@@ -243,7 +262,7 @@ class HitRepository extends CommonRepository
         if (isset($options['urls']) && $options['urls']) {
             $inUrls = (!is_array($options['urls'])) ? [$options['urls']] : $options['urls'];
             foreach ($inUrls as $k => $u) {
-                $sq->andWhere($sq->expr()->like('h.url', ':url_'.$k))
+                $sq->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->getEntityManager()->getConnection()->getDatabasePlatform(), 'h.url', ':url_'.$k))
                     ->setParameter('url_'.$k, $u);
             }
         }
@@ -417,7 +436,7 @@ class HitRepository extends CommonRepository
             ->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id')
             ->select('ph.id, ph.page_id, ph.date_hit, ph.date_left, ph.tracking_id, ph.page_language, p.title')
             ->orderBy('ph.date_hit', 'ASC')
-            ->andWhere($q->expr()->like('ph.url', ':url'))
+            ->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->getEntityManager()->getConnection()->getDatabasePlatform(), 'ph.url', ':url'))
             ->setParameter('url', $url);
 
         if (isset($options['leadId']) && $options['leadId']) {

@@ -3,6 +3,7 @@
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
@@ -63,7 +64,7 @@ final class DynamicContentRepository extends CommonRepository
                 ];
                 $expr = $q->expr()->or(
                     $q->expr()->eq('e.language', ":{$unique}"),
-                    $q->expr()->like('e.language', ":{$langUnique}")
+                    DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'e.language', ":{$langUnique}")
                 );
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
@@ -160,7 +161,7 @@ final class DynamicContentRepository extends CommonRepository
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                   ->setParameter('search', $search);
             } else {
-                $q->andWhere($q->expr()->like('e.name', ':search'))
+                $q->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'e.name', ':search'))
                   ->setParameter('search', "%{$search}%");
             }
         }
@@ -204,7 +205,7 @@ final class DynamicContentRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'ce')
             ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = ce.campaign_id')
             ->andWhere($qb->expr()->eq('ce.type', $qb->expr()->literal('dwc.decision')))
-            ->andWhere($qb->expr()->like('ce.properties', ':slot'))
+            ->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'ce.properties', ':slot'))
             ->setParameter('slot', '%'.$slot.'%')
             ->orderBy('c.is_published');
 

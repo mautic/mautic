@@ -57,6 +57,13 @@ final class DoctrineStep implements StepInterface
     public $password;
 
     /**
+     * Database charset.
+     *
+     * @var string
+     */
+    public $charset = 'utf8mb4';
+
+    /**
      * Backup tables if they exist; otherwise drop them.
      * Required in step.
      *
@@ -76,7 +83,7 @@ final class DoctrineStep implements StepInterface
 
     public function __construct(Configurator $configurator)
     {
-        $parameters = $configurator->getParameters();
+        $parameters = $this->normalizeParameters($configurator->getParameters());
 
         foreach ($parameters as $key => $value) {
             if (str_starts_with($key, 'db_')) {
@@ -99,7 +106,7 @@ final class DoctrineStep implements StepInterface
         if (!class_exists('\PDO')) {
             $messages[] = 'mautic.install.pdo.mandatory';
         } else {
-            if (!in_array('mysql', \PDO::getAvailableDrivers(), true)) {
+            if ([] === self::getDrivers()) {
                 $messages[] = 'mautic.install.pdo.drivers';
             }
         }
@@ -121,6 +128,30 @@ final class DoctrineStep implements StepInterface
 
         foreach ($data as $key => $value) {
             $parameters['db_'.$key] = $value;
+        }
+
+        return $this->normalizeParameters($parameters);
+    }
+
+    /**
+     * @param array<string, mixed> $parameters
+     *
+     * @return array<string, mixed>
+     */
+    private function normalizeParameters(array $parameters): array
+    {
+        if (empty($parameters['db_driver'])) {
+            $drivers                 = self::getDriverKeys();
+            $parameters['db_driver'] = in_array('pdo_mysql', $drivers, true) ? 'pdo_mysql' : ($drivers[0] ?? 'pdo_mysql');
+        }
+
+        $isPostgres = 'pdo_pgsql' === $parameters['db_driver'];
+        if (null === ($parameters['db_port'] ?? null) || '' === $parameters['db_port']) {
+            $parameters['db_port'] = $isPostgres ? 5432 : 3306;
+        }
+
+        if (empty($parameters['db_charset']) || ($isPostgres && 'utf8mb4' === $parameters['db_charset'])) {
+            $parameters['db_charset'] = $isPostgres ? 'UTF8' : 'utf8mb4';
         }
 
         return $parameters;
@@ -149,6 +180,7 @@ final class DoctrineStep implements StepInterface
     {
         $mauticSupported = [
             'pdo_mysql' => 'MySQL PDO (Recommended)',
+            'pdo_pgsql' => 'PostgreSQL PDO (Experimental)',
         ];
 
         $supported = [];

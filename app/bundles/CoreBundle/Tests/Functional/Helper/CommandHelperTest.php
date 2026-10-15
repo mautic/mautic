@@ -19,7 +19,7 @@ final class CommandHelperTest extends MauticMysqlTestCase
 
     public function testRunCommandWithParam(): void
     {
-        $response = $this->commandHelper->runCommand('help', ['--version']);
+        $response = $this->commandHelper->runCommand('help', ['--version', '--verbose']);
         $this->assertSame(0, $response->getStatusCode());
         $this->assertStringContainsString('(env: test, debug: false)', $response->getMessage());
     }

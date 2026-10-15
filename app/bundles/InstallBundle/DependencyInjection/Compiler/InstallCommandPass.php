@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\DependencyInjection\Compiler;
 
+use Mautic\CoreBundle\EventListener\DoctrineEventsSubscriber;
 use Mautic\InstallBundle\Command\InstallCommand;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -20,16 +21,10 @@ final class InstallCommandPass implements CompilerPassInterface
         }
 
         $input       = new ArgvInput($args);
-        $tablePrefix = $input->hasOption('db_table_prefix')
-            ? $input->getOption('db_table_prefix')
-            : MAUTIC_TABLE_PREFIX;
-
-        if (!$tablePrefix) {
-            return;
-        }
+        $tablePrefix = $input->getParameterOption('--db_table_prefix', MAUTIC_TABLE_PREFIX, true);
 
         $container->setParameter('mautic.db_table_prefix', $tablePrefix);
-        $container->getDefinition('mautic.tblprefix_subscriber')->setArgument('$tablePrefix', $tablePrefix);
+        $container->getDefinition(DoctrineEventsSubscriber::class)->setArgument('$tablePrefix', $tablePrefix);
         $container->getDefinition('mautic.schema.helper.column')->setArgument('$prefix', $tablePrefix);
         $container->getDefinition('mautic.schema.helper.index')->setArgument('$prefix', $tablePrefix);
     }

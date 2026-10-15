@@ -18,6 +18,6 @@ final class Version20240416112112 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql("ALTER TABLE {$this->prefix}campaigns ADD version INT UNSIGNED DEFAULT 1 NOT NULL");
+        $schema->getTable($this->getPrefixedTableName('campaigns'))->addColumn('version', 'integer', ['unsigned' => true, 'default' => 1]);
     }
 }

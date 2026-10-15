@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -102,7 +103,13 @@ class SubmissionRepository extends CommonRepository
         $fieldAliases = array_map($databasePlatform->quoteIdentifier(...), $fieldAliases);
 
         $fieldAliasSql = ([] !== $fieldAliases) ? ', r.'.implode(',r.', $fieldAliases) : '';
-        $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
+        $dq->select(
+            'r.submission_id, '.
+            's.date_submitted as '.$databasePlatform->quoteIdentifier('dateSubmitted').', '.
+            's.lead_id as '.$databasePlatform->quoteIdentifier('leadId').', '.
+            's.referer, '.
+            'i.ip_address as '.$databasePlatform->quoteIdentifier('ipAddress').
+            $fieldAliasSql);
         $results = $dq->executeQuery()->fetchAllAssociative();
 
         // loop over results to put form submission results in something that can be assigned to the entities
@@ -214,6 +221,8 @@ class SubmissionRepository extends CommonRepository
      */
     public function getEntitiesByPage(array $args = []): array
     {
+        $databasePlatform = $this->_em->getConnection()->getDatabasePlatform();
+
         $activePage = $args['activePage'];
 
         $dq = $this->_em->getConnection()->createQueryBuilder();
@@ -236,7 +245,13 @@ class SubmissionRepository extends CommonRepository
         $this->buildLimiterClauses($dq, $args);
 
         $dq->resetQueryPart('select');
-        $dq->select('s.id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.form_id as formId, s.referer, i.ip_address as ipAddress');
+        $dq->select(
+            's.id',
+            's.date_submitted as '.$databasePlatform->quoteIdentifier('dateSubmitted'),
+            's.lead_id as '.$databasePlatform->quoteIdentifier('leadId'),
+            's.form_id as '.$databasePlatform->quoteIdentifier('formId'),
+            's.referer',
+            'i.ip_address as '.$databasePlatform->quoteIdentifier('ipAddress'));
         $results = $dq->executeQuery()->fetchAllAssociative();
 
         return [
@@ -284,8 +299,11 @@ class SubmissionRepository extends CommonRepository
      */
     public function getSubmissions(array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select('fs.id, f.name, fs.form_id, fs.page_id, fs.date_submitted AS "dateSubmitted", fs.lead_id')
+        $connection       = $this->_em->getConnection();
+        $databasePlatform = $connection->getDatabasePlatform();
+
+        $query = $connection->createQueryBuilder();
+        $query->select('fs.id, f.name, fs.form_id, fs.page_id, fs.date_submitted AS '.$databasePlatform->quoteIdentifier('dateSubmitted').', fs.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs')
             ->leftJoin('fs', MAUTIC_TABLE_PREFIX.'forms', 'f', 'f.id = fs.form_id');
 
@@ -300,9 +318,11 @@ class SubmissionRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere(
-                $query->expr()->like('f.name', ':search')
-            )->setParameter('search', '%'.$options['search'].'%');
+            $query->andWhere(DatabasePlatform::getCaseInsensitiveLike(
+                $this->_em->getConnection()->getDatabasePlatform(),
+                'f.name',
+                ':search'
+            ))->setParameter('search', '%'.$options['search'].'%');
         }
 
         return $this->getTimelineResults($query, $options, 'f.name', 'fs.date_submitted', [], ['dateSubmitted'], null, 'fs.id');
@@ -364,12 +384,12 @@ class SubmissionRepository extends CommonRepository
 
         if (is_array($pageId)) {
             $q->where($q->expr()->in('s.page_id', ':pageIds'))
-                ->setParameter('pageIds', array_map(intval(...), $pageId), ArrayParameterType::INTEGER)
-                ->groupBy('s.page_id, p.title, p.variant_hits');
+                ->setParameter('pageIds', array_map(intval(...), $pageId), ArrayParameterType::INTEGER);
         } else {
             $q->where($q->expr()->eq('s.page_id', ':page'))
                 ->setParameter('page', (int) $pageId);
         }
+        $q->groupBy('s.page_id, p.title, p.variant_hits');
 
         if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
@@ -397,12 +417,12 @@ class SubmissionRepository extends CommonRepository
 
         if (is_array($emailId)) {
             $q->where($q->expr()->in('e.id', ':ids'))
-                ->setParameter('ids', array_map(intval(...), $emailId), ArrayParameterType::INTEGER)
-                ->groupBy('e.id, e.subject, e.variant_sent_count');
+                ->setParameter('ids', array_map(intval(...), $emailId), ArrayParameterType::INTEGER);
         } else {
             $q->where($q->expr()->eq('e.id', ':id'))
                 ->setParameter('id', (int) $emailId);
         }
+        $q->groupBy('e.id, e.subject, e.variant_sent_count');
 
         if (null != $fromDate) {
             $dh = new DateTimeHelper($fromDate);
@@ -498,11 +518,20 @@ class SubmissionRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('form', (int) $form);
 
-        match ($type) {
-            'boolean', 'number' => $q->andWhere($q->expr()->{$operatorExpr}('r.'.$field, $value)),
-            default => $q->andWhere($q->expr()->{$operatorExpr}('r.'.$field, ':value'))
-                ->setParameter('value', $value),
-        };
+        if (in_array($operatorExpr, ['like', 'notLike'], true)) {
+            $q->andWhere(DatabasePlatform::getCaseInsensitiveLike(
+                $this->getEntityManager()->getConnection()->getDatabasePlatform(),
+                'r.'.$field,
+                ':value',
+                'notLike' === $operatorExpr ? DatabasePlatform::FLAG_NEGATIVE : 0
+            ))->setParameter('value', $value);
+        } else {
+            match ($type) {
+                'boolean', 'number' => $q->andWhere($q->expr()->{$operatorExpr}('r.'.$field, $value)),
+                default => $q->andWhere($q->expr()->{$operatorExpr}('r.'.$field, ':value'))
+                    ->setParameter('value', $value),
+            };
+        }
 
         $result = $q->executeQuery()->fetchAssociative();
 
@@ -514,8 +543,12 @@ class SubmissionRepository extends CommonRepository
      */
     public function getSubmissionCounts($form)
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $query->select('COUNT(fs.id) AS `total`, COUNT(DISTINCT (fs.lead_id)) AS `unique`')
+        $connection = $this->getEntityManager()->getConnection();
+        $query      = $connection->createQueryBuilder();
+        $totalCol   = $connection->quoteIdentifier('total');
+        $uniqueCal  = $connection->quoteIdentifier('unique');
+
+        $query->select("COUNT(fs.id) AS $totalCol, COUNT(DISTINCT (fs.lead_id)) AS $uniqueCal")
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 'fs');
         $query->where($query->expr()->eq('fs.form_id', ':id'))
                 ->setParameter('id', $form->getId());

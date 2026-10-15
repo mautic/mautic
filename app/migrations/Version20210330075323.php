@@ -21,13 +21,11 @@ final class Version20210330075323 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $tableName = $this->getPrefixedTableName(Page::TABLE_NAME);
-        $this->addSql("ALTER TABLE {$tableName} ADD public_preview TINYINT(1) DEFAULT 1 NOT NULL;");
+        $schema->getTable($this->getPrefixedTableName('pages'))->addColumn('public_preview', 'boolean', ['default' => true]);
     }
 
     public function down(Schema $schema): void
     {
-        $tableName = $this->getPrefixedTableName(Page::TABLE_NAME);
-        $this->addSql("ALTER TABLE {$tableName} DROP public_preview;");
+        $schema->getTable($this->getPrefixedTableName('pages'))->dropColumn('public_preview');
     }
 }

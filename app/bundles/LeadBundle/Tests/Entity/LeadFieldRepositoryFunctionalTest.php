@@ -107,6 +107,33 @@ final class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse($repository->compareValue($lead->getId(), 'email', 'Unicorn', 'contains'));
     }
 
+    public function testBooleanPatternOperatorsUseMysqlNumericRepresentation(): void
+    {
+        $field = new LeadField();
+        $field->setType('boolean');
+        $field->setObject('lead');
+        $field->setGroup('core');
+        $field->setLabel('Boolean pattern');
+        $field->setAlias('boolean_pattern');
+        $field->setDefaultValue('0');
+        $field->setProperties(['no' => 'No', 'yes' => 'Yes']);
+        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $fieldModel->saveEntity($field);
+        $leadModel = self::getContainer()->get(LeadModel::class);
+        $repository = $fieldModel->getRepository();
+
+        foreach (['1', '0'] as $value) {
+            $lead = new Lead();
+            $lead->addUpdatedField('boolean_pattern', $value);
+            $leadModel->saveEntity($lead);
+
+            $this->assertTrue($repository->compareValue($lead->getId(), 'boolean_pattern', $value, 'startsWith'));
+            $this->assertTrue($repository->compareValue($lead->getId(), 'boolean_pattern', $value, 'contains'));
+            $this->assertFalse($repository->compareValue($lead->getId(), 'boolean_pattern', '%'.$value.'%', 'notLike'));
+            $this->assertTrue($repository->compareValue($lead->getId(), 'boolean_pattern', '%'.('1' === $value ? '0' : '1').'%', 'notLike'));
+        }
+    }
+
     public function testCompareValueInOperator(): void
     {
         $lead = new Lead();

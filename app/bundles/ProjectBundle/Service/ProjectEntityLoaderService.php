@@ -6,6 +6,7 @@ namespace Mautic\ProjectBundle\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -132,7 +133,11 @@ final class ProjectEntityLoaderService
 
         // Add filter if provided
         if (!empty($filter)) {
-            $qb->andWhere('e.'.$labelColumn.' LIKE :filter')
+            $qb->andWhere(DatabasePlatform::getCaseInsensitiveLike(
+                $this->em->getConnection()->getDatabasePlatform(),
+                'e.'.$labelColumn,
+                ':filter'
+            ))
                 ->setParameter('filter', '%'.$filter.'%');
         }
 

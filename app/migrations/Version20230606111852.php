@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20230606111852 extends PreUpAssertionMigration
@@ -18,8 +19,17 @@ final class Version20230606111852 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(function (Schema $schema) {
-            $sql         = sprintf("select id from %s where properties like '%s' limit 1", $this->getPrefixedTableName(), '%'.self::OLD_STRING.'%');
-            $recordCount = $this->connection->executeQuery($sql)->fetchAllAssociative();
+            $column = $this->connection->quoteIdentifier('properties');
+            $like   = DatabasePlatform::getCaseInsensitiveLike(
+                $this->connection->getDatabasePlatform(),
+                $column,
+                ':pattern'
+            );
+            $sql    = sprintf('select id from %s where %s limit 1', $this->getPrefixedTableName(), $like);
+            $recordCount = $this->connection->executeQuery(
+                $sql,
+                ['pattern' => '%'.self::OLD_STRING.'%']
+            )->fetchAllAssociative();
 
             return !$recordCount;
         }, 'Migration is not required.');
@@ -27,8 +37,17 @@ final class Version20230606111852 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $sql            = sprintf("select id, properties from %s where properties like '%s'", $this->getPrefixedTableName(), '%'.self::OLD_STRING.'%');
-        $results        = $this->connection->executeQuery($sql)->fetchAllAssociative();
+        $column         = $this->connection->quoteIdentifier('properties');
+        $like           = DatabasePlatform::getCaseInsensitiveLike(
+            $this->connection->getDatabasePlatform(),
+            $column,
+            ':pattern'
+        );
+        $sql            = sprintf('select id, properties from %s where %s', $this->getPrefixedTableName(), $like);
+        $results        = $this->connection->executeQuery(
+            $sql,
+            ['pattern' => '%'.self::OLD_STRING.'%']
+        )->fetchAllAssociative();
         $updatedRecords = 0;
         foreach ($results as $row) {
             $propertiesArray                            = unserialize($row['properties']);

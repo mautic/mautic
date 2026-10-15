@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
@@ -49,6 +52,11 @@ final class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\Test
 
         $generatedColumnsProvider->method('getGeneratedColumns')->willReturn($generatedColumns);
         $this->event->method('getSchema')->willReturn($this->schema);
+        $connection = $this->createStub(Connection::class);
+        $connection->method('getDatabasePlatform')->willReturn(new MySQLPlatform());
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $entityManager->method('getConnection')->willReturn($connection);
+        $this->event->method('getEntityManager')->willReturn($entityManager);
     }
 
     public function testPostGenerateSchemaWhenTableDoesNotExist(): void

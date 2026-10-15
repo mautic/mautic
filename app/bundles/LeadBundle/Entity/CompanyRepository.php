@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Event\CompanyBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -200,7 +201,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         }
 
         if (in_array($command, $this->availableSearchFields)) {
-            $expr = $q->expr()->like($this->getTableAlias().".{$command}", ":{$unique}");
+            $expr = DatabasePlatform::getCaseInsensitiveLike(
+                $this->_em->getConnection()->getDatabasePlatform(),
+                $this->getTableAlias().".{$command}",
+                ":{$unique}"
+            );
         }
 
         if ($this->dispatcher) {
@@ -597,7 +602,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $q->select('id, companyname, companycity, companystate')
             ->from(MAUTIC_TABLE_PREFIX.Company::TABLE_NAME)
             ->where($q->expr()->eq('is_published', true))
-            ->andWhere($q->expr()->like('companyname', ':filterVar'))
+            ->andWhere(DatabasePlatform::getCaseInsensitiveLike(
+                $this->_em->getConnection()->getDatabasePlatform(),
+                'companyname',
+                ':filterVar'
+            ))
             ->setParameter('filterVar', '%'.$filterVal.'%')
             ->andWhere($q->expr()->isNull('deleted'))
             ->orderBy('companyname')

@@ -3,8 +3,11 @@
 namespace Mautic\InstallBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use Doctrine\ORM\Tools\ToolEvents;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
+use Mautic\CoreBundle\Doctrine\PostgreSqlCompatibilityFunctions;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Model\FieldModel;
 
@@ -27,26 +30,69 @@ final class DoctrineEventSubscriber
             $table = $args->getSchema()->getTable($fullTableName);
 
             foreach ($fields as $alias => $field) {
-                if (!$table->hasColumn($alias)) {
-                    $type       = $field['type'] ?? 'text';
+                $type          = $field['type'] ?? 'text';
+                $columnMissing = !$table->hasColumn($alias);
+                if ($columnMissing) {
                     $definition = SchemaDefinition::getSchemaDefinition($alias, $type, !empty($field['unique']));
                     $table->addColumn($definition['name'], $definition['type'], $definition['options']);
+                }
 
-                    if ('textarea' !== $type) {
-                        $table->addIndex([$definition['name']], $definition['name'].'_search');
-                    }
+                $indexName = MAUTIC_TABLE_PREFIX.$alias.'_search';
+                if ('textarea' !== $type && ($columnMissing || !empty($field['unique'])) && !$table->hasIndex($indexName)) {
+                    $table->addIndex([$alias], $indexName);
                 }
             }
 
-            if ('leads' === $tableName) {
-                // Add an attribution index
-                $table->addIndex(['attribution', 'attribution_date'], 'contact_attribution');
-                // Add date added and country index
-                $table->addIndex(['date_added', 'country'], 'date_added_country_index');
-            } else {
-                $table->addIndex(['companyname', 'companyemail'], 'company_filter');
-                $table->addIndex(['companyname', 'companycity', 'companycountry', 'companystate'], 'company_match');
+            $indexes = 'leads' === $tableName ? [
+                'contact_attribution'      => ['attribution', 'attribution_date'],
+                'date_added_country_index' => ['date_added', 'country'],
+            ] : [
+                'company_filter' => ['companyname', 'companyemail'],
+                'company_match'  => ['companyname', 'companycity', 'companycountry', 'companystate'],
+            ];
+            foreach ($indexes as $indexName => $columns) {
+                if (!$table->hasIndex(MAUTIC_TABLE_PREFIX.$indexName)) {
+                    $table->addIndex($columns, MAUTIC_TABLE_PREFIX.$indexName);
+                }
             }
+        }
+
+        // Add MySQL missing functions + operators to PostgreSQL
+        if ($args->getEntityManager()->getConnection() instanceof Connection) {
+            // only run when real connetion exists
+            $this->postgreSqlMySqlCompact($args->getEntityManager()->getConnection());
+        }
+    }
+
+    public function postgreSqlMySqlCompact(Connection $conn): void
+    {
+        if (!DatabasePlatform::isPostgreSQL($conn->getDatabasePlatform())) {
+            return;
+        }
+
+        // Functions and operator helpers
+        foreach (PostgreSqlCompatibilityFunctions::getSql() as $sql) {
+            $conn->executeStatement($sql);
+        }
+
+        // Operators – DROP IF EXISTS + CREATE (NO CREATE OR REPLACE OPTION)
+        $operators = [
+            '= (boolean, integer)'  => ['left' => 'boolean', 'right' => 'integer', 'proc' => 'pg_bool_eq_int', 'comm' => '=', 'neg' => '<>'],
+            '= (integer, boolean)'  => ['left' => 'integer', 'right' => 'boolean', 'proc' => 'pg_int_eq_bool', 'comm' => '=', 'neg' => '<>'],
+            '<> (boolean, integer)' => ['left' => 'boolean', 'right' => 'integer', 'proc' => 'pg_bool_neq_int', 'comm' => '<>', 'neg' => '='],
+            '<> (integer, boolean)' => ['left' => 'integer', 'right' => 'boolean', 'proc' => 'pg_int_neq_bool', 'comm' => '<>', 'neg' => '='],
+        ];
+
+        foreach ($operators as $signature => $def) {
+            $conn->executeStatement("DROP OPERATOR IF EXISTS {$signature}");
+            $conn->executeStatement("
+                CREATE OPERATOR {$def['comm']} (
+                    PROCEDURE = {$def['proc']},
+                    LEFTARG   = {$def['left']},
+                    RIGHTARG  = {$def['right']},
+                    COMMUTATOR = {$def['comm']},
+                    NEGATOR    = {$def['neg']}
+                    )");
         }
     }
 }

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService;
 
-use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncService;
 use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples\Integration\ExampleIntegration;
@@ -27,11 +27,6 @@ final class SyncServiceTest extends MauticMysqlTestCase
 
     public function testSync(): void
     {
-        $this->markTestSkipped('disabled for now');
-
-        // @phpstan-ignore-next-line deadCode.unreachable
-        sleep(1);
-
         $prefix             = $this->getContainer()->getParameter('mautic.db_table_prefix');
         $dataExchange       = new ExampleSyncDataExchange();
         $exampleIntegration = new ExampleIntegration($dataExchange);
@@ -42,44 +37,62 @@ final class SyncServiceTest extends MauticMysqlTestCase
         $exampleIntegration->setIntegrationConfiguration($settings);
 
         /** @var SyncIntegrationsHelper $syncIntegrationsHelper */
-        $syncIntegrationsHelper = $this->getContainer()->get('mautic.integrations.helper.sync_integrations');
+        $syncIntegrationsHelper = $this->getContainer()->get(SyncIntegrationsHelper::class);
         $syncIntegrationsHelper->addIntegration($exampleIntegration);
 
         /** @var SyncService $syncService */
         $syncService = $this->getContainer()->get(SyncService::class);
 
-        $syncService->processIntegrationSync(ExampleIntegration::NAME);
+        $syncService->processIntegrationSync(new InputOptionsDAO([
+            'integration'      => ExampleIntegration::NAME,
+            'first-time-sync'  => true,
+            'end-datetime'     => new \DateTimeImmutable('+1 day', new \DateTimeZone('UTC')),
+        ]));
         $payload = $dataExchange->getOrderPayload();
 
         // Created the 48 known contacts already in Mautic
         $this->assertCount(48, $payload['create']);
-        $this->assertCount(2, $payload['update']);
+        $this->assertCount(4, $payload['update']);
 
         $this->assertEquals(
             [
                 4 => [
                     'id'         => 4,
                     'object'     => ExampleSyncDataExchange::OBJECT_LEAD,
-                    'first_name' => 'Lewis',
-                    'last_name'  => 'Syed',
+                    'first_name' => 'Overwrite',
+                    'last_name'  => 'Me',
                     'email'      => 'LewisTSyed@gustr.com',
                     'street1'    => '107 Yorkie Lane',
                 ],
                 3 => [
                     'id'         => 3,
                     'object'     => ExampleSyncDataExchange::OBJECT_LEAD,
-                    'first_name' => 'Nellie',
-                    'last_name'  => 'Baird',
+                    'first_name' => 'Overwrite',
+                    'last_name'  => 'Me',
                     'email'      => 'NellieABaird@armyspy.com',
                     'street1'    => '1930 Uitsig St',
+                ],
+                1 => [
+                    'id'         => 1,
+                    'object'     => ExampleSyncDataExchange::OBJECT_LEAD,
+                    'first_name' => 'John',
+                    'last_name'  => 'Contact',
+                    'email'      => 'john.contact@test.com',
+                    'street1'    => null,
+                ],
+                2 => [
+                    'id'         => 2,
+                    'object'     => ExampleSyncDataExchange::OBJECT_LEAD,
+                    'first_name' => 'Jane',
+                    'last_name'  => 'Contact',
+                    'email'      => 'jane.contact@test.com',
+                    'street1'    => null,
                 ],
             ],
             $payload['update']
         );
 
         // Validate mapping table
-        /** @var Connection $connection */
-
         // All should be mapped to the OBJECT_LEAD object
         $qb      = $this->connection->createQueryBuilder();
         $results = $qb->select('count(*) as the_count, m.integration_object_name, m.integration')
@@ -104,12 +117,12 @@ final class SyncServiceTest extends MauticMysqlTestCase
         $this->assertEquals(ExampleIntegration::NAME, $results[0]['integration']);
         $this->assertEquals(Contact::NAME, $results[0]['internal_object_name']);
 
-        // There should be 50 entries
+        // The 48 outbound creates and four mapped updates should all have a mapping.
         $qb      = $this->connection->createQueryBuilder();
         $results = $qb->select('count(*) as the_count')
             ->from($prefix.'sync_object_mapping', 'm')
             ->executeQuery()
             ->fetchAllAssociative();
-        $this->assertEquals(50, $results[0]['the_count']);
+        $this->assertEquals(52, $results[0]['the_count']);
     }
 }

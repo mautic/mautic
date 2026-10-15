@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20240226114528 extends PreUpAssertionMigration
@@ -28,32 +31,22 @@ final class Version20240226114528 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
-        $tableName = $this->getTableName();
+        $table = new Table($this->getTableName());
+        $table->addColumn('email_id', Types::INTEGER, ['unsigned' => $schema->getTable($this->getPrefixedTableName('emails'))->getColumn('id')->getUnsigned()]);
+        $table->addColumn('leadlist_id', Types::INTEGER, ['unsigned' => $schema->getTable($this->getPrefixedTableName('lead_lists'))->getColumn('id')->getUnsigned()]);
+        $table->addIndex(['email_id'], $this->getIndexName('email_id'));
+        $table->addIndex(['leadlist_id'], $this->getIndexName('leadlist_id'));
+        $table->setPrimaryKey(['email_id', 'leadlist_id']);
+        $table->addForeignKeyConstraint($this->getPrefixedTableName('emails'), ['email_id'], ['id'], ['onDelete' => 'CASCADE'], $this->getForeignKeyName('email_id'));
+        $table->addForeignKeyConstraint($this->getPrefixedTableName('lead_lists'), ['leadlist_id'], ['id'], ['onDelete' => 'CASCADE'], $this->getForeignKeyName('leadlist_id'));
+        $table->addOption('charset', 'utf8mb4');
+        $table->addOption('collation', 'utf8mb4_unicode_ci');
+        $table->addOption('engine', 'InnoDB');
+        $table->addOption('row_format', 'DYNAMIC');
 
-        $this->addSql(sprintf('
-            CREATE TABLE %s (
-                email_id INT %s NOT NULL,
-                leadlist_id INT %s NOT NULL,
-                INDEX %s (email_id),
-                INDEX %s (leadlist_id),
-                PRIMARY KEY(email_id, leadlist_id)
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB ROW_FORMAT = DYNAMIC',
-            $tableName,
-            $this->getIntegerRange($schema, 'emails'),
-            $this->getIntegerRange($schema, 'lead_lists'),
-            $this->getIndexName('email_id'),
-            $this->getIndexName('leadlist_id')
-        ));
-        $this->addSql(sprintf('ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (email_id) REFERENCES %semails (id) ON DELETE CASCADE',
-            $tableName,
-            $this->getForeignKeyName('email_id'),
-            $this->prefix
-        ));
-        $this->addSql(sprintf('ALTER TABLE %s ADD CONSTRAINT %s FOREIGN KEY (leadlist_id) REFERENCES %slead_lists (id) ON DELETE CASCADE',
-            $tableName,
-            $this->getForeignKeyName('leadlist_id'),
-            $this->prefix
-        ));
+        foreach ($this->platform->getCreateTableSQL($table, AbstractPlatform::CREATE_INDEXES | AbstractPlatform::CREATE_FOREIGNKEYS) as $sql) {
+            $this->addSql($sql);
+        }
     }
 
     private function getTableName(): string
@@ -74,14 +67,5 @@ final class Version20240226114528 extends PreUpAssertionMigration
     private function getForeignKeyName(string $column): string
     {
         return $this->generatePropertyName($this->getBareTableName(), 'fk', [$column]);
-    }
-
-    private function getIntegerRange(Schema $schema, string $bareTableName): string
-    {
-        $unsigned = $schema->getTable("{$this->prefix}{$bareTableName}")
-            ->getColumn('id')
-            ->getUnsigned();
-
-        return $unsigned ? 'UNSIGNED' : '';
     }
 }

@@ -38,8 +38,8 @@ final readonly class DoctrineGeneratedColumnsListener
                     $generatedColumn->getColumnName(),
                     GeneratedType::GENERATED,
                     [
-                        'columnDefinition' => $generatedColumn->getColumnDefinition(),
-                        'notNull'          => false,
+                        'columnDefinition' => $generatedColumn->getColumnDefinition($args->getEntityManager()->getConnection()->getDatabasePlatform()),
+                        'notnull'          => false,
                     ]
                 );
 

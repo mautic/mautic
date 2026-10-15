@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
@@ -21,6 +23,7 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
     public function __construct(
         private ListModel $segmentModel,
         private TranslatorInterface $translator,
+        private Connection $connection,
     ) {
     }
 
@@ -34,11 +37,12 @@ final class GeneratedColumnSubscriber implements EventSubscriberInterface
 
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
+        $email = DatabasePlatform::isPostgreSQL($this->connection->getDatabasePlatform()) ? '(email COLLATE "C")' : 'email';
         $emailDomain = new GeneratedColumn(
             'leads',
             'generated_email_domain',
             'VARCHAR(255)',
-            'SUBSTRING(email, LOCATE("@", email) + 1)'
+            "SUBSTRING(email, POSITION('@' IN {$email}) + 1)"
         );
 
         $event->addGeneratedColumn($emailDomain);

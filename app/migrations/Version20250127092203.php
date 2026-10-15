@@ -32,11 +32,11 @@ final class Version20250127092203 extends PreUpAssertionMigration
         $table->addColumn('role_id', Types::INTEGER, ['unsigned' => true, 'notnull' => true]);
 
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['token_selector'], 'UNIQ_USER_INVITES_TOKEN_SELECTOR');
-        $table->addIndex(['email'], 'IDX_USER_INVITES_EMAIL');
-        $table->addIndex(['expiration'], 'IDX_USER_INVITES_EXPIRATION');
-        $table->addIndex(['used'], 'IDX_USER_INVITES_USED');
-        $table->addIndex(['role_id'], 'IDX_USER_INVITES_ROLE');
+        $table->addUniqueIndex(['token_selector'], $this->getPrefixedIndexName('UNIQ_USER_INVITES_TOKEN_SELECTOR'));
+        $table->addIndex(['email'], $this->getPrefixedIndexName('IDX_USER_INVITES_EMAIL'));
+        $table->addIndex(['expiration'], $this->getPrefixedIndexName('IDX_USER_INVITES_EXPIRATION'));
+        $table->addIndex(['used'], $this->getPrefixedIndexName('IDX_USER_INVITES_USED'));
+        $table->addIndex(['role_id'], $this->getPrefixedIndexName('IDX_USER_INVITES_ROLE'));
         $table->addForeignKeyConstraint(
             $this->getPrefixedTableName('roles'),
             ['role_id'],

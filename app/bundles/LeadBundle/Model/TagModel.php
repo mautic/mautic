@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
 use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\ActionRepository;
@@ -182,11 +183,11 @@ class TagModel extends FormModel
         $connection = $this->em->getConnection();
 
         $connection->executeStatement(
-            sprintf('UPDATE IGNORE %slead_tags_xref SET tag_id = :primaryTagId WHERE tag_id = :secondaryTagId', MAUTIC_TABLE_PREFIX),
-            [
-                'primaryTagId'   => (int) $primaryTag->getId(),
-                'secondaryTagId' => (int) $secondaryTag->getId(),
-            ],
+            DatabasePlatform::getUpdateLeadTagAssociationSql(
+                $connection->getDatabasePlatform(),
+                $primaryTag,
+                $secondaryTag
+            )
         );
 
         $connection->executeStatement(
@@ -248,7 +249,7 @@ class TagModel extends FormModel
     {
         /** @var LeadList $segment */
         foreach ($this->leadListRepository->createQueryBuilder('l')
-            ->where('l.filters LIKE :tagFilter')
+            ->where(DatabasePlatform::getCaseInsensitiveLike($this->em->getConnection()->getDatabasePlatform(), 'l.filters', ':tagFilter'))
             ->setParameter('tagFilter', '%"tags"%')
             ->getQuery()
             ->getResult() as $segment) {
@@ -268,7 +269,7 @@ class TagModel extends FormModel
     {
         /** @var Report $report */
         foreach ($this->reportRepository->createQueryBuilder('r')
-            ->where('r.filters LIKE :tagFilter')
+            ->where(DatabasePlatform::getCaseInsensitiveLike($this->em->getConnection()->getDatabasePlatform(), 'r.filters', ':tagFilter'))
             ->setParameter('tagFilter', '%tag"%')
             ->getQuery()
             ->getResult() as $report) {

@@ -5,32 +5,41 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20230424083829 extends AbstractMauticMigration
 {
+    protected const TABLE_NAME = 'focus';
+    protected const INDEX_NAME = 'focus_name';
+
     /**
      * @throws SkipMigration
-     * @throws SchemaException
      */
     public function preUp(Schema $schema): void
     {
-        $table = $schema->getTable($this->prefix.'focus');
+        $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
+        $indexName = $this->getPrefixedIndexName(self::INDEX_NAME);
 
-        if ($table->hasIndex($this->prefix.'focus_name')) {
-            throw new SkipMigration('Schema includes this migration');
+        if ($this->indexExists($tableName, $indexName)) {
+            throw new SkipMigration(sprintf('Index %s already exists', $indexName));
         }
     }
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE INDEX '.$this->prefix.'focus_name ON '.$this->prefix.'focus (name)');
+        $this->createIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            $this->getPrefixedIndexName(self::INDEX_NAME),
+            ['name']
+        );
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('DROP INDEX '.$this->prefix.'focus_name ON '.$this->prefix.'focus');
+        $this->dropIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            $this->getPrefixedIndexName(self::INDEX_NAME),
+        );
     }
 }

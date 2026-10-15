@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\MySQLSchemaManager;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
+use Mautic\CoreBundle\Doctrine\PostgreSqlCompatibilityFunctions;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\EventListener\MigrationCommandSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -66,6 +70,43 @@ final class MigrationCommandSubscriberTest extends TestCase
             ->method('generatedColumnsAreSupported');
 
         $this->subscriber->addGeneratedColumns($this->event);
+    }
+
+    public function testPostgreSqlMigrationCommandsCreateTheCollationBeforeMetadataStorageInitialization(): void
+    {
+        $this->command->expects($this->once())
+            ->method('getName')
+            ->willReturn('doctrine:migrations:status');
+        $this->connection->method('getDatabasePlatform')->willReturn(new PostgreSQLPlatform());
+        $sql = PostgreSqlCompatibilityFunctions::getSql();
+        $executedSql = [];
+        $this->connection->expects($this->exactly(count($sql)))
+            ->method('executeStatement')
+            ->willReturnCallback(static function (string $statement) use (&$executedSql): int {
+                $executedSql[] = $statement;
+
+                return 0;
+            });
+
+        $event = new ConsoleCommandEvent($this->command, $this->createStub(InputInterface::class), $this->createStub(OutputInterface::class));
+        $this->subscriber->prepareMigrationMetadataStorage($event);
+
+        $this->assertSame($sql, $executedSql);
+        $this->assertStringContainsString('mautic_like', $executedSql[array_key_last($executedSql)]);
+    }
+
+    public function testCollationPreparationSkipsNonMigrationCommandsAndNonPostgreSqlPlatforms(): void
+    {
+        $this->command->expects($this->exactly(2))
+            ->method('getName')
+            ->willReturnOnConsecutiveCalls('cache:clear', 'doctrine:migrations:status');
+        $this->connection->method('getDatabasePlatform')->willReturn(new MySQLPlatform());
+        $this->connection->expects($this->never())->method('executeStatement');
+        $input  = $this->createStub(InputInterface::class);
+        $output = $this->createStub(OutputInterface::class);
+
+        $this->subscriber->prepareMigrationMetadataStorage(new ConsoleCommandEvent($this->command, $input, $output));
+        $this->subscriber->prepareMigrationMetadataStorage(new ConsoleCommandEvent($this->command, $input, $output));
     }
 
     public function testAddGeneratedColumnsWhenNotSupported(): void
@@ -130,5 +171,14 @@ final class MigrationCommandSubscriberTest extends TestCase
             ->method('executeStatement');
 
         $this->subscriber->addGeneratedColumns($this->event);
+    }
+
+    public function testFailedMigrationDoesNotTryToAddGeneratedColumns(): void
+    {
+        $this->command->expects($this->never())->method('getName');
+        $this->generatedColumnsProvider->expects($this->never())->method('generatedColumnsAreSupported');
+
+        $failedEvent = new ConsoleTerminateEvent($this->command, $this->createStub(InputInterface::class), $this->createStub(OutputInterface::class), 1);
+        $this->subscriber->addGeneratedColumns($failedEvent);
     }
 }

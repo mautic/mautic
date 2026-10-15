@@ -4,6 +4,7 @@ namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
@@ -128,7 +129,7 @@ class SmsRepository extends CommonRepository
                 ];
                 $expr = $q->expr()->or(
                     $q->expr()->eq('e.language', ":{$unique}"),
-                    $q->expr()->like('e.language', ":{$langUnique}")
+                    DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'e.language', ":{$langUnique}")
                 );
                 $returnParameter = true;
                 break;
@@ -235,7 +236,7 @@ class SmsRepository extends CommonRepository
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                   ->setParameter('search', $search);
             } else {
-                $q->andWhere($q->expr()->like('e.name', ':search'))
+                $q->andWhere(DatabasePlatform::getCaseInsensitiveLike($this->_em->getConnection()->getDatabasePlatform(), 'e.name', ':search'))
                   ->setParameter('search', "%{$search}%");
             }
         }

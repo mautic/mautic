@@ -3,6 +3,7 @@
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -111,9 +112,17 @@ final class StatRepository extends CommonRepository
      */
     public function getLeadStats($leadId = null, array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection       = $this->getEntityManager()->getConnection();
+        $databasePlatform = $connection->getDatabasePlatform();
+        $query            = $connection->createQueryBuilder();
 
-        $query->select('dc.id AS dynamic_content_id, s.id, s.date_sent as dateSent, dc.name, s.sent_details as sentDetails, s.lead_id')
+        $query->select(
+            'dc.id AS '.$databasePlatform->quoteIdentifier('dynamic_content_id'),
+            's.id',
+            's.date_sent as '.$databasePlatform->quoteIdentifier('dateSent'),
+            'dc.name',
+            's.sent_details as '.$databasePlatform->quoteIdentifier('sentDetails'),
+            's.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's')
             ->leftJoin('s', MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc', 'dc.id = s.dynamic_content_id');
 
@@ -123,7 +132,7 @@ final class StatRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere('dc.name LIKE :search')
+            $query->andWhere(DatabasePlatform::getCaseInsensitiveLike($connection->getDatabasePlatform(), 'dc.name', ':search'))
                 ->setParameter('search', '%'.$options['search'].'%');
         }
 

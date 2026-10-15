@@ -81,6 +81,9 @@ The GitHub version is recommended for both development and testing. The producti
 Check out the [requirements for installation][requirements] and [supported versions][supported-versions].
 
 ### Installation
+
+For this fork’s PostgreSQL requirements, compatibility limits and validation results, see [PostgreSQL support](POSTGRESQL.md).
+
 > [!WARNING]
 > <sub>*Install from GitHub only if you are comfortable using the command line and are working locally. You'll be required to use various CLI commands to get Mautic working and keep it working. If the source/database schema gets out of sync with Mautic releases, the release updater may not work and will require manual updates. For production, we recommend installing with Composer, or using the pre-packaged Mautic which is available at [mautic.org/download][download-mautic].*
 *Also note that source code outside of a [tagged release][tagged-release] should be considered ‘alpha’. It may contain bugs, cause unexpected results, data corruption or loss, and is not recommended for use in a production environment. Use at your own risk.*</sub>
