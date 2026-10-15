@@ -36,7 +36,7 @@ interface VariantEntityInterface
      */
     public function getVariantSettings(): array;
 
-    public function getVariantStartDate(): ?\DateTime;
+    public function getVariantStartDate(): ?\DateTimeInterface;
 
     public function setVariantStartDate(?\DateTime $variantStartDate): static;
 
