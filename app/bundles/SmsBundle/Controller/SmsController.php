@@ -9,7 +9,9 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
+use Mautic\SmsBundle\Broadcast\BroadcastQuery;
 use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Form\Type\ScheduleSendType;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,13 +28,17 @@ final class SmsController extends FormController
 
     private SmsModel $smsModel;
 
+    private BroadcastQuery $broadcastQuery;
+
     #[Required]
     public function autowireSmsController(
         SmsModel $smsModel,
         AuditLogModel $auditLogModel,
+        BroadcastQuery $broadcastQuery,
     ): void {
         $this->smsModel = $smsModel;
         $this->auditLogModel = $auditLogModel;
+        $this->broadcastQuery = $broadcastQuery;
     }
 
     /**
@@ -210,6 +216,15 @@ final class SmsController extends FormController
 
         [$translationParent, $translationChildren] = $translations;
 
+        $scheduleSms = $sms->getTranslationParent();
+        if (!$scheduleSms instanceof Sms) {
+            $scheduleSms = $sms;
+        }
+
+        if ('list' === $scheduleSms->getSmsType()) {
+            $scheduleSms->setPendingCount($this->broadcastQuery->getPendingCount($scheduleSms));
+        }
+
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $sms->getId()]),
             'viewParameters' => [
@@ -243,11 +258,114 @@ final class SmsController extends FormController
                     'parent'   => $translationParent,
                     'children' => $translationChildren,
                 ],
+                'scheduleSms' => $scheduleSms,
             ],
             'contentTemplate' => '@MauticSms/Sms/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_sms_index',
                 'mauticContent' => 'sms',
+            ],
+        ]);
+    }
+
+    public function scheduleSendAction(Request $request, int $objectId): JsonResponse|RedirectResponse|Response
+    {
+        $entity = $this->smsModel->getEntity($objectId);
+        if (!$entity instanceof Sms) {
+            return $this->closeScheduleModal();
+        }
+
+        $scheduleSms = $entity->getTranslationParent();
+        if (!$scheduleSms instanceof Sms) {
+            $scheduleSms = $entity;
+        }
+
+        if ('list' !== $scheduleSms->getSmsType()
+            || !$this->security->hasEntityAccess(
+                'sms:smses:publishown',
+                'sms:smses:publishother',
+                $scheduleSms->getCreatedBy()
+            )
+        ) {
+            return $this->closeScheduleModal();
+        }
+
+        if ($scheduleSms !== $entity) {
+            return new RedirectResponse($this->generateUrl('mautic_sms_action', [
+                'objectAction' => 'scheduleSend',
+                'objectId'     => $scheduleSms->getId(),
+            ]));
+        }
+
+        $action = $this->generateUrl('mautic_sms_action', [
+            'objectAction' => 'scheduleSend',
+            'objectId'     => $objectId,
+        ]);
+        $data = [
+            'publishUp'       => $entity->getPublishUp(),
+            'publishDown'     => $entity->getPublishDown(),
+            'continueSending' => $entity->isContinueSending(),
+        ];
+        $form = $this->createForm(ScheduleSendType::class, $data, [
+            'action'       => $action,
+            'is_scheduled' => null !== $entity->getPublishUp(),
+        ]);
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            $isCancelled = $this->isFormCancelled($form);
+            $isValid     = $this->isFormValid($form);
+
+            if (!$isCancelled && $isValid) {
+                $data = $form->getData();
+                if ($form->get('buttons')->has('apply') && $this->getFormButton($form, ['buttons', 'apply'])->isClicked()) {
+                    $entity->setPublishUp(null);
+                    $entity->setPublishDown(null);
+                    $entity->setContinueSending(false);
+                    $this->addFlashMessage('mautic.sms.notice.schedule.cancel');
+                } else {
+                    $continueSending = (bool) ($data['continueSending'] ?? false);
+                    $entity->setPublishUp($data['publishUp']);
+                    $entity->setContinueSending($continueSending);
+                    $entity->setPublishDown($continueSending ? ($data['publishDown'] ?? null) : null);
+                    $entity->setIsPublished(true);
+                    $this->addFlashMessage('mautic.sms.notice.schedule.sent');
+                }
+
+                $this->smsModel->saveEntity($entity);
+            }
+
+            if ($isValid || $isCancelled) {
+                $viewParameters = [
+                    'objectAction' => 'view',
+                    'objectId'     => $objectId,
+                ];
+
+                return $this->postActionRedirect([
+                    'returnUrl'       => $this->generateUrl('mautic_sms_action', $viewParameters),
+                    'viewParameters'  => $viewParameters,
+                    'contentTemplate' => 'Mautic\SmsBundle\Controller\SmsController::viewAction',
+                    'passthroughVars' => [
+                        'mauticContent' => 'sms',
+                        'closeModal'    => 1,
+                    ],
+                ]);
+            }
+        }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form' => $form->createView(),
+            ],
+            'contentTemplate' => '@MauticSms/Sms/schedule.html.twig',
+        ]);
+    }
+
+    private function closeScheduleModal(): JsonResponse|RedirectResponse|Response
+    {
+        return $this->postActionRedirect([
+            'passthroughVars' => [
+                'closeModal' => 1,
+                'route'      => false,
             ],
         ]);
     }
@@ -284,7 +402,10 @@ final class SmsController extends FormController
         }
 
         // create the form
-        $form = $this->smsModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $this->smsModel->createForm($entity, $this->formFactory, $action, [
+            'update_select'                    => $updateSelect,
+            'disable_segment_schedule_fields' => true,
+        ]);
 
         // /Check for a submitted form and process it
         if ('POST' === $method) {
@@ -445,7 +566,10 @@ final class SmsController extends FormController
             ? ($sms['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
 
-        $form = $this->smsModel->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
+        $form = $this->smsModel->createForm($entity, $this->formFactory, $action, [
+            'update_select'                    => $updateSelect,
+            'disable_segment_schedule_fields' => true,
+        ]);
 
         // /Check for a submitted form and process it
         if (!$ignorePost && 'POST' === $method) {

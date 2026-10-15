@@ -8,6 +8,7 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -17,6 +18,7 @@ use Mautic\SmsBundle\Sms\TransportChain;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -108,5 +110,15 @@ final class SmsApiController extends CommonApiController
         );
 
         return $this->handleView($view);
+    }
+
+    protected function prepareParametersFromRequest(FormInterface $form, array &$params, ?object $entity = null, array $masks = [], array $fields = []): void
+    {
+        if (array_key_exists('continueSending', $params) && $entity instanceof Sms) {
+            $entity->setContinueSending(InputHelper::boolean($params['continueSending']) ?? false);
+            unset($params['continueSending']);
+        }
+
+        parent::prepareParametersFromRequest($form, $params, $entity, $masks, $fields);
     }
 }
