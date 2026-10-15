@@ -14,7 +14,6 @@ use Mautic\CoreBundle\Shortener\ShortenerServiceInterface;
 use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -49,8 +48,6 @@ final class ConfigType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('last_shown_tab', HiddenType::class);
-
         $builder->add(
             'site_url',
             UrlType::class,
