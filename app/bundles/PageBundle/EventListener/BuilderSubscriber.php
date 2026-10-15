@@ -491,7 +491,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
     private function getFirstParentNodeThatContainsAllFormInputs(\DOMNode $node): \DOMNode
     {
-        $content = implode('', array_map([$node->ownerDocument, 'saveHTML'], iterator_to_array($node->childNodes)));
+        $content = implode('', array_map($node->ownerDocument->saveHTML(...), iterator_to_array($node->childNodes)));
 
         // Check if the save button exists in the content. If not, try again with the parentNode.
         if (!str_contains($content, self::saveButtonContainerClass)) {

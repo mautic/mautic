@@ -679,12 +679,6 @@ parameters:
 			path: app/bundles/ChannelBundle/Model/MessageQueueModel.php
 
 		-
-			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageQueueModel\:\:reschedule\(\) has parameter \$message with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageQueueModel.php
-
-		-
 			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageQueueModel\:\:sendMessages\(\) has parameter \$channel with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
