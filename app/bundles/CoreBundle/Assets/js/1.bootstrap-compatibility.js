@@ -821,6 +821,9 @@ window.MauticInstallLegacyAffix = function (jQuery) {
                 }
                 return;
             }
+            if ('target' === name && !isBootstrapToggle) {
+                return;
+            }
             mirrorAttribute(element, 'data-' + name, 'data-bs-' + name);
         });
         if ('collapse' === legacyToggle) {
