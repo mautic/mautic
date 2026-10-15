@@ -7,7 +7,7 @@ namespace Mautic\StageBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\StageBundle\Entity\Stage;
 
-final class StageEvent extends CommonEvent
+abstract class StageEvent extends CommonEvent
 {
     public function __construct(Stage &$stage, bool $isNew = false)
     {
