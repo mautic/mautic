@@ -1731,6 +1731,7 @@ Mautic.handleAssetDownloadSearch = function(filterNum, fieldObject, fieldAlias, 
 
 Mautic.listOnLoad = function(container, response) {
     Mautic.loadAndProcessPageContent('#contacts-container');
+    Mautic.loadAndProcessPageContent('#segment-stats');
 
     const segmentDependenciesTab = mQuery('a#segment-dependencies');
     let segmentDependenciesLoaded = false;
