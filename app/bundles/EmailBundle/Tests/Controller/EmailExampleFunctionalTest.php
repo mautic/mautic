@@ -18,6 +18,41 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
     protected $useCleanupRollback = false;
 
+    public function testBatchSendExampleEmailsToCurrentUser(): void
+    {
+        $firstEmail  = $this->createEmail();
+        $secondEmail = $this->createEmail();
+        $this->em->flush();
+
+        $ids = json_encode([$firstEmail->getId(), $secondEmail->getId()]);
+        $this->client->request(Request::METHOD_POST, '/s/emails/batchSendExample?ids='.urlencode($ids));
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('2 test emails were sent', $content);
+        $messages = self::getMailerMessages();
+        $this->assertCount(2, $messages);
+        $this->assertInstanceOf(MauticMessage::class, $messages[0]);
+        $this->assertInstanceOf(MauticMessage::class, $messages[1]);
+        $this->assertSame('[TEST] Email subject', $messages[0]->getSubject());
+        $this->assertSame('[TEST] Email subject', $messages[1]->getSubject());
+        $this->assertStringContainsString('2 test emails were sent to', $content);
+    }
+
+    public function testEmailListOffersBatchExampleSendingWithExplicitRecipient(): void
+    {
+        $this->createEmail();
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/emails');
+
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString('/batchSendExample', $content);
+        $this->assertStringContainsString('Send tests to me', $content);
+        $this->assertStringContainsString('Send one test of each selected email to admin@yoursite.com?', $content);
+    }
+
     public function testSendExampleEmailWithContact(): void
     {
         $company = $this->createCompany('Mautic', 'hello@mautic.org');
