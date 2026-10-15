@@ -805,23 +805,21 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         }
     }
 
-    var bootstrapToggleValues = ['collapse', 'dropdown', 'modal', 'popover', 'tab', 'tooltip'];
+    var mauticToggleValues = ['ajax', 'ajaxmodal', 'asset', 'cancel', 'checkall', 'confirmation', 'email', 'field', 'handler', 'heatmap', 'label', 'listfilter', 'livesearch', 'menu', 'panelremove', 'searchscope', 'selectrow', 'sidebar', 'sortablelist', 'submenu'];
 
     function mirrorBootstrapAttributes(element) {
         var legacyToggle = element.getAttribute('data-toggle');
-        var isBootstrapToggle = bootstrapToggleValues.indexOf(legacyToggle) !== -1;
+        var isMauticMarker = mauticToggleValues.indexOf(legacyToggle) !== -1;
 
         dataAttributes.forEach(function (name) {
-            if ('toggle' === name && !isBootstrapToggle) {
+            if (isMauticMarker && ('toggle' === name || 'target' === name)) {
                 var owned = mirroredAttributes.get(element) || {};
-                if (owned['data-bs-toggle'] !== undefined && owned['data-bs-toggle'] === element.getAttribute('data-bs-toggle')) {
-                    element.removeAttribute('data-bs-toggle');
-                    delete owned['data-bs-toggle'];
+                var bootstrapName = 'data-bs-' + name;
+                if (owned[bootstrapName] !== undefined && owned[bootstrapName] === element.getAttribute(bootstrapName)) {
+                    element.removeAttribute(bootstrapName);
+                    delete owned[bootstrapName];
                     mirroredAttributes.set(element, owned);
                 }
-                return;
-            }
-            if ('target' === name && !isBootstrapToggle) {
                 return;
             }
             mirrorAttribute(element, 'data-' + name, 'data-bs-' + name);
