@@ -7,7 +7,7 @@ namespace Mautic\PluginBundle\Event;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Psr\Http\Message\ResponseInterface;
 
-class PluginIntegrationResponseEvent extends AbstractPluginIntegrationEvent
+final class PluginIntegrationResponseEvent extends AbstractPluginIntegrationEvent
 {
     public function __construct(
         AbstractIntegration $integration,
