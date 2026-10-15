@@ -455,6 +455,7 @@ rules:
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
     - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
     - Utils\PHPStan\Rule\SingleArgumentDispatchRule
+    - Utils\PHPStan\Rule\NativeUnionParamMustHaveUnionDocblockRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
