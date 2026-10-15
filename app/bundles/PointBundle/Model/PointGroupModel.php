@@ -61,7 +61,7 @@ final class PointGroupModel extends CommonFormModel implements GlobalSearchInter
      * @param object               $entity
      * @param string|null          $action
      * @param array<string,string> $options
-     * @param Group $entity
+     * @param Group|array<string, mixed> $entity
      *
      * @throws MethodNotAllowedHttpException
      */

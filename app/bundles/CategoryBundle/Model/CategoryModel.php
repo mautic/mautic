@@ -97,7 +97,7 @@ final class CategoryModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param Category    $entity
+     * @param Category|array<string, mixed>    $entity
      * @param string|null $action
      * @param array       $options
      */

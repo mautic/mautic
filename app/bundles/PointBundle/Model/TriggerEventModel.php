@@ -49,7 +49,7 @@ final class TriggerEventModel extends CommonFormModel
     }
 
     /**
-     * @param TriggerEvent $entity
+     * @param TriggerEvent|array<string, mixed> $entity
      *
      * @throws MethodNotAllowedHttpException
      */

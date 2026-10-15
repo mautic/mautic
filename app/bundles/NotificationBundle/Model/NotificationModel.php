@@ -92,7 +92,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     }
 
     /**
-     * @param Notification      $entity
+     * @param Notification|array<string, mixed>      $entity
      * @param string|null       $action
      * @param array             $options
      *

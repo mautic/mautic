@@ -89,7 +89,7 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
 
     /**
      * @param object      $entity
-     * @param Campaign    $entity
+     * @param Campaign|array<string, mixed>    $entity
      * @param string|null $action
      * @param array       $options
      */

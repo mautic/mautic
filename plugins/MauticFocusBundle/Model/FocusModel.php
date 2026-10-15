@@ -84,7 +84,7 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
      * @param object      $entity
      * @param string|null $action
      * @param array       $options
-     * @param Focus $entity
+     * @param Focus|array<string, mixed> $entity
      *
      * @throws NotFoundHttpException
      */

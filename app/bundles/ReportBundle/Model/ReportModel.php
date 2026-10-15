@@ -109,7 +109,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Report $entity
+     * @param Report|array<string, mixed> $entity
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */

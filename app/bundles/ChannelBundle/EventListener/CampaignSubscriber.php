@@ -140,7 +140,6 @@ final class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param string               $channel
      * @param array<string, mixed> $messageChannel
      *
      * @return bool|Collection<int, LeadEventLog>

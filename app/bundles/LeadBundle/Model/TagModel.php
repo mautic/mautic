@@ -100,7 +100,7 @@ class TagModel extends FormModel
     }
 
     /**
-     * @param Tag   $entity
+     * @param Tag|array<string, mixed>   $entity
      * @param array $options
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface

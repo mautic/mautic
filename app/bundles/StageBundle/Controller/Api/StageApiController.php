@@ -56,7 +56,7 @@ final class StageApiController extends CommonApiController
      * Adds a contact to a list.
      *
      * @param int $id        Stage ID
-     * @param int $contactId Lead ID
+     * @param int|string $contactId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
@@ -99,7 +99,7 @@ final class StageApiController extends CommonApiController
      * Removes given contact from a list.
      *
      * @param int $id        Stage ID
-     * @param int $contactId Lead ID
+     * @param int|string $contactId Lead ID
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */

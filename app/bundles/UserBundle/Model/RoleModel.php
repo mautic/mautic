@@ -120,7 +120,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Role $entity
+     * @param Role|array<string, mixed> $entity
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {

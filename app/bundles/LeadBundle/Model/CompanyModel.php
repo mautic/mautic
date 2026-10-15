@@ -142,7 +142,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param Company $entity
+     * @param Company|array<string, mixed> $entity
      *
      * @throws MethodNotAllowedHttpException
      */

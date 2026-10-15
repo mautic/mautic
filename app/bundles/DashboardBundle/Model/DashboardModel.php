@@ -259,7 +259,7 @@ final class DashboardModel extends FormModel
     }
 
     /**
-     * @param Widget      $entity
+     * @param Widget|array<string, mixed>      $entity
      * @param string|null $action
      * @param array       $options
      *

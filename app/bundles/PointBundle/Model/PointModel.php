@@ -77,7 +77,7 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
     }
 
     /**
-     * @param Point $entity
+     * @param Point|array<string, mixed> $entity
      *
      * @throws MethodNotAllowedHttpException
      */

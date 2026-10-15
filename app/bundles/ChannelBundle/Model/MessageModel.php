@@ -89,7 +89,7 @@ final class MessageModel extends FormModel implements AjaxLookupModelInterface, 
     }
 
     /**
-     * @param Message $entity
+     * @param Message|array<string, mixed> $entity
      * @param mixed[] $options
      *
      * @return FormInterface<mixed>

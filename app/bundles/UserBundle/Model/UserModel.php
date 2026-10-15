@@ -124,7 +124,7 @@ final class UserModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param User $entity
+     * @param User|array<string, mixed> $entity
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
@@ -207,7 +207,6 @@ final class UserModel extends FormModel implements GlobalSearchInterface
      * Get list of entities for autopopulate fields.
      *
      * @param string $type
-     * @param int    $limit
      */
     public function getLookupResults($type, ?string $filter = '', int|string|null $limit = 10): array
     {

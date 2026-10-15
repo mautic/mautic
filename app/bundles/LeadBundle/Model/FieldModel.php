@@ -794,7 +794,7 @@ class FieldModel extends FormModel
     }
 
     /**
-     * @param LeadField $entity
+     * @param LeadField|array<string, mixed> $entity
      * @param array     $options
      *
      * @throws MethodNotAllowedHttpException

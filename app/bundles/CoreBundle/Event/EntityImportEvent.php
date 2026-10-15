@@ -85,7 +85,7 @@ final class EntityImportEvent extends Event
     /**
      * Add a single entity to the dependencies.
      *
-     * @param array<string, mixed> $entity
+     * @param object|array<string, mixed> $entity
      */
     public function addDependencyEntity(string $entityName, object|array $entity): void
     {
