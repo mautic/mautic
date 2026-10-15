@@ -87,7 +87,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     <div class="form-group col-xs-12{{ feedbackClass }}">
         {% include '@MauticCore/Components/checkbox.html.twig' with {
             items: [{ id: form.vars.id, name: form.vars.full_name, value: form.vars.value, checked: form.vars.checked, disabled: form.vars.disabled, label: form.vars.label is null ? form.vars.name|humanize : form.vars.label, label_html: form.vars.label_html, translation_domain: form.vars.translation_domain, label_translation_parameters: form.vars.label_translation_parameters, attributes: form.vars.attr }]
-        } %}
+        } only %}
         {{ form_errors(form) }}
     </div>
 </div>

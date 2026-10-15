@@ -54,9 +54,9 @@
                     {% endif %}
                 {% endfor %}
             >
-            {% if item_label %}
+            {% if item_label is not same as('') %}
             <label class="form-check-label" for="{{ item_id|escape }}"{% for label_key, label_value in item.labelAttributes|default({}) %} {{ label_key|escape }}="{{ label_value|escape }}"{% endfor %}>
-                {% set item_text = item_label|trans(item.label_translation_parameters|default({}), item.translation_domain|default(null)) %}
+                {% set item_text = item_label|trans(item.label_translation_parameters|default({}), item.translation_domain is defined ? item.translation_domain : null) %}
                 {% if item.label_html|default(false) %}{{ item_text|purify }}{% else %}{{ item_text }}{% endif %}
             </label>
             {% endif %}

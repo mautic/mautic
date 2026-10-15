@@ -63,6 +63,15 @@ final class CheckboxComponentTest extends TestCase
         $this->assertSame(2, substr_count($output, 'required'));
     }
 
+    public function testLabelZeroIsRendered(): void
+    {
+        $output = $this->render([
+            'items' => [['id' => 'zero', 'value' => '1', 'label' => '0']],
+        ]);
+
+        $this->assertStringContainsString('>0</label>', str_replace(["\n", ' '], '', $output));
+    }
+
     public function testFalseLabelRendersNoLabel(): void
     {
         $output = $this->render([

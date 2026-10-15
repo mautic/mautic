@@ -29,8 +29,8 @@
           {% for child in form.children %}
               {% if child.vars.value not in builtin %}
                 {% include '@MauticCore/Components/checkbox.html.twig' with {
-                    items: [{ id: child.vars.id, name: child.vars.full_name, value: child.vars.value, checked: child.vars.checked, disabled: child.vars.disabled, label: child.vars.label, attributes: attr }]
-                } %}
+                    items: [{ id: child.vars.id, name: child.vars.full_name, value: child.vars.value, checked: child.vars.checked, disabled: child.vars.disabled, label: child.vars.label, label_html: child.vars.label_html, translation_domain: child.vars.translation_domain, label_translation_parameters: child.vars.label_translation_parameters, attributes: attr|default({})|merge(child.vars.attr) }]
+                } only %}
               {% else %}
                   {{ child.isRendered() }}
                   <input type="hidden" id="{{ child.vars['id'] }}" name="{{ child.vars['full_name'] }}" value="{{ child.vars['value']|e }}" />
