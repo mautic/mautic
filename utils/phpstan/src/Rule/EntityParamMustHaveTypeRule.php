@@ -10,13 +10,10 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
-use PHPStan\Type\ParserNodeTypeToPHPStanType;
-use PHPStan\Type\UnionType;
 
 /**
- * A param named "$entity" must have a native object type hint, either "object", a class/interface,
- * or a union that includes one (e.g. "object|array"). A docblock "@param" tag is not enough.
- * Test methods are exempt.
+ * A param named "$entity" must have a native type hint; any type is fine (e.g. "object", a class,
+ * "array" or a scalar). A docblock "@param" tag alone is not enough. Test methods are exempt.
  *
  * @implements Rule<ClassMethod>
  *
@@ -53,12 +50,12 @@ final readonly class EntityParamMustHaveTypeRule implements Rule
                 continue;
             }
 
-            if ($this->hasNativeObjectType($param, $scope)) {
+            if ($param->type instanceof Node) {
                 continue;
             }
 
             $ruleErrors[] = RuleErrorBuilder::message(sprintf(
-                'Param "$%s" of "%s()" must have a native object type hint ("object", a class, or a union that includes one), not just a "@param" tag.',
+                'Param "$%s" of "%s()" must have a native type hint, not just a "@param" tag.',
                 $param->var->name,
                 $node->name->toString()
             ))
@@ -68,29 +65,6 @@ final readonly class EntityParamMustHaveTypeRule implements Rule
         }
 
         return $ruleErrors;
-    }
-
-    private function hasNativeObjectType(Node\Param $param, Scope $scope): bool
-    {
-        if (!$param->type instanceof Node) {
-            return false;
-        }
-
-        $nativeType = ParserNodeTypeToPHPStanType::resolve(
-            $param->type,
-            $scope->isInClass() ? $scope->getClassReflection() : null
-        );
-
-        // a union like "object|array" is fine as long as one member is an object
-        $innerTypes = $nativeType instanceof UnionType ? $nativeType->getTypes() : [$nativeType];
-
-        foreach ($innerTypes as $innerType) {
-            if ($innerType->isObject()->yes()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private function isTestMethod(ClassMethod $classMethod, Scope $scope): bool
