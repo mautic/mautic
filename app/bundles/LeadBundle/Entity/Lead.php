@@ -137,13 +137,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     #[Groups(['contact:read', 'contact:write'])]
     private $country;
 
-    /**
-     * @var User|null
-     */
     #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     #[ORM\ManyToOne(targetEntity: User::class, fetch: 'LAZY')]
     #[ORM\JoinColumn(name: 'owner_id', onDelete: 'SET NULL')]
-    private $owner;
+    private ?User $owner = null;
 
     /**
      * @var int
@@ -274,13 +271,10 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     #[ORM\OrderBy(value: ['tag' => 'ASC'])]
     private $tags;
 
-    /**
-     * @var Stage|null
-     */
     #[Groups(['contact:read', 'contact:write', 'segment:read', 'campaign:read', 'email:read', 'sms:read'])]
     #[ORM\ManyToOne(targetEntity: Stage::class, cascade: ['persist', 'detach'])]
     #[ORM\JoinColumn(name: 'stage_id', onDelete: 'SET NULL')]
-    private $stage;
+    private ?Stage $stage = null;
 
     /**
      * @var Collection<int, StagesChangeLog>
@@ -531,10 +525,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return User|null
-     */
-    public function getOwner()
+    public function getOwner(): ?\Mautic\UserBundle\Entity\User
     {
         return $this->owner;
     }
@@ -1222,10 +1213,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    /**
-     * @return Stage|null
-     */
-    public function getStage()
+    public function getStage(): ?\Mautic\StageBundle\Entity\Stage
     {
         return $this->stage;
     }

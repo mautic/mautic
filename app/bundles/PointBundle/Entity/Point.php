@@ -119,11 +119,8 @@ class Point extends FormEntity implements UuidInterface
     #[ORM\OneToMany(targetEntity: LeadPointLog::class, mappedBy: 'point', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['point:read', 'point:write'])]
-    private $category;
+    private ?Category $category = null;
 
     #[Groups(['point:read', 'point:write'])]
     #[ORM\ManyToOne(targetEntity: Group::class)]
@@ -341,18 +338,12 @@ class Point extends FormEntity implements UuidInterface
         return $this->publishDown;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
     {
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category): void
+    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category): void
     {
         $this->category = $category;
     }

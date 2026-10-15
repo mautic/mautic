@@ -28,31 +28,19 @@ class Stat
      */
     private $id;
 
-    /**
-     * @var Sms|null
-     */
     #[ORM\ManyToOne(targetEntity: Sms::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'sms_id', onDelete: 'SET NULL')]
-    private $sms;
+    private ?Sms $sms = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
-    /**
-     * @var LeadList|null
-     */
     #[ORM\ManyToOne(targetEntity: LeadList::class)]
     #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
-    private $list;
+    private ?LeadList $list = null;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
@@ -155,10 +143,7 @@ class Stat
         return (int) $this->id;
     }
 
-    /**
-     * @return Sms|null
-     */
-    public function getSms()
+    public function getSms(): ?\Mautic\SmsBundle\Entity\Sms
     {
         return $this->sms;
     }
@@ -170,10 +155,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -185,10 +167,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return LeadList|null
-     */
-    public function getList()
+    public function getList(): ?\Mautic\LeadBundle\Entity\LeadList
     {
         return $this->list;
     }
@@ -200,10 +179,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
     {
         return $this->ipAddress;
     }

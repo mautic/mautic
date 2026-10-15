@@ -44,28 +44,19 @@ class Hit
     #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
     private ?Page $page = null;
 
-    /**
-     * @var Redirect|null
-     */
     #[ORM\ManyToOne(targetEntity: Redirect::class)]
     #[ORM\JoinColumn(name: 'redirect_id', onDelete: 'SET NULL')]
-    private $redirect;
+    private ?Redirect $redirect = null;
 
     #[ORM\ManyToOne(targetEntity: Email::class)]
     #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
     private ?Email $email = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var string|null
@@ -162,12 +153,9 @@ class Hit
      */
     private $query = [];
 
-    /**
-     * @var LeadDevice|null
-     */
     #[ORM\ManyToOne(targetEntity: LeadDevice::class, cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'device_id', onDelete: 'SET NULL')]
-    private $device;
+    private ?LeadDevice $device = null;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -480,10 +468,7 @@ class Hit
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
     {
         return $this->ipAddress;
     }
@@ -542,10 +527,7 @@ class Hit
         return $this->browserLanguages;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -593,10 +575,7 @@ class Hit
         return $this;
     }
 
-    /**
-     * @return ?Redirect
-     */
-    public function getRedirect()
+    public function getRedirect(): ?\Mautic\PageBundle\Entity\Redirect
     {
         return $this->redirect;
     }
@@ -633,10 +612,7 @@ class Hit
         return $this;
     }
 
-    /**
-     * @return LeadDevice
-     */
-    public function getDeviceStat()
+    public function getDeviceStat(): ?\Mautic\LeadBundle\Entity\LeadDevice
     {
         return $this->device;
     }

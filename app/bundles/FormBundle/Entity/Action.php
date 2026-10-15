@@ -84,13 +84,10 @@ class Action implements UuidInterface
     #[Groups(['action:read', 'action:write', 'form:read'])]
     private $properties = [];
 
-    /**
-     * @var Form|null
-     */
     #[Groups(['action:read', 'action:write', 'form:read'])]
     #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'actions')]
     #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
-    private $form;
+    private ?Form $form = null;
 
     /**
      * @var array
@@ -203,10 +200,7 @@ class Action implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return Form|null
-     */
-    public function getForm()
+    public function getForm(): ?\Mautic\FormBundle\Entity\Form
     {
         return $this->form;
     }

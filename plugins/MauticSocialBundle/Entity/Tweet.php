@@ -85,24 +85,15 @@ class Tweet extends FormEntity
      */
     private $retweetCount = 0;
 
-    /**
-     * @var Page|null
-     */
     #[ORM\ManyToOne(targetEntity: Page::class)]
     #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
-    private $page;
+    private ?Page $page = null;
 
-    /**
-     * @var Asset|null
-     */
     #[ORM\ManyToOne(targetEntity: Asset::class)]
     #[ORM\JoinColumn(name: 'asset_id', onDelete: 'SET NULL')]
-    private $asset;
+    private ?Asset $asset = null;
 
-    /**
-     * @var Category|null
-     */
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<int, TweetStat>
@@ -371,10 +362,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    /**
-     * @return Asset|null
-     */
-    public function getAsset()
+    public function getAsset(): ?\Mautic\AssetBundle\Entity\Asset
     {
         return $this->asset;
     }
@@ -386,10 +374,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    /**
-     * @return Page|null
-     */
-    public function getPage()
+    public function getPage(): ?\Mautic\PageBundle\Entity\Page
     {
         return $this->page;
     }
@@ -401,10 +386,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
     {
         return $this->category;
     }
