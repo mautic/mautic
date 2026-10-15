@@ -1262,7 +1262,12 @@ export default class BuilderService {
   initEmailMjml() {
     const components = MjmlService.getOriginalContentMjml();
     // validate
-    MjmlService.mjmlToHtml(components);
+    try {
+      MjmlService.mjmlToHtml(components);
+    } catch (error) {
+      console.warn(error.message);
+      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')}\n${error.message}`);
+    }
 
     const mjHeadContent = extractMjHeadContent(components);
 
