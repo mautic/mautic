@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,7 +62,7 @@ final class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('flashes', $response);
 
         $this->em->clear();
-        $updatedCompany = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class)->find($company->getId());
+        $updatedCompany = $this->getContainer()->get(CompanyRepository::class)->find($company->getId());
         $this->assertInstanceOf(Company::class, $updatedCompany);
         $this->assertSame($owner->getId(), $updatedCompany->getOwner()->getId());
     }

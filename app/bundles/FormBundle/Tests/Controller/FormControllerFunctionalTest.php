@@ -12,6 +12,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\ProjectBundle\Entity\Project;
@@ -662,7 +663,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $forms = $this->getContainer()->get(\Mautic\FormBundle\Entity\FormRepository::class)->findBy([], ['id' => 'ASC']);
+        $forms = $this->getContainer()->get(FormRepository::class)->findBy([], ['id' => 'ASC']);
         $this->assertCount(2, $forms);
 
         $originalForm = $forms[0];

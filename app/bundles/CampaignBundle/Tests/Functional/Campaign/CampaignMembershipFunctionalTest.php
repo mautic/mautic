@@ -7,6 +7,7 @@ namespace Mautic\CampaignBundle\Tests\Functional\Campaign;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -82,7 +83,7 @@ final class CampaignMembershipFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $adder              = self::getContainer()->get(Adder::class);
-        $campaignLeadEntity = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class)->findOneBy([
+        $campaignLeadEntity = $this->getContainer()->get(LeadRepository::class)->findOneBy([
             'lead'     => $contactId,
             'campaign' => $campaignId,
         ]);

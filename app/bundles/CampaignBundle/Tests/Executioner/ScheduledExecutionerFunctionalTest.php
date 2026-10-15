@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
@@ -444,7 +445,7 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($initialRotation + 1, $campaignMember->getRotation(),
             'Campaign member rotation should be incremented during redirection.');
 
-        $updatedLog = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findOneBy([
+        $updatedLog = $this->getContainer()->get(LeadEventLogRepository::class)->findOneBy([
             'lead'     => $contact,
             'campaign' => $campaign,
         ]);

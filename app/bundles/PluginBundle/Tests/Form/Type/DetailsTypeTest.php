@@ -10,13 +10,14 @@ use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Form\Type\DetailsType;
 use Mautic\PluginBundle\Form\Type\KeysType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class DetailsTypeTest extends TestCase
 {
     public function testBuildFormRemovesHiddenKeys(): void

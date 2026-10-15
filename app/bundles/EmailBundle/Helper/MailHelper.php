@@ -1139,7 +1139,7 @@ final class MailHelper
         $this->source = $source;
     }
 
-    public function getEmail(): ?\Mautic\EmailBundle\Entity\Email
+    public function getEmail(): ?Email
     {
         return $this->email;
     }

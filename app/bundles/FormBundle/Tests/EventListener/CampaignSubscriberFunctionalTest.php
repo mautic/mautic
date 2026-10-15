@@ -7,11 +7,12 @@ namespace Mautic\FormBundle\Tests\EventListener;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -105,7 +106,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($campaignEvent);
         $this->em->detach($campaign);
 
-        $contact = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findOneBy(['email' => 'testing@ampersand.select']);
+        $contact = $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => 'testing@ampersand.select']);
         $this->assertInstanceOf(Lead::class, $contact);
         $log = new LeadEventLog();
         $log->setLead($contact);

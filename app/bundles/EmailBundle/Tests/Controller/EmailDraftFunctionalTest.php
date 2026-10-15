@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailDraft;
+use Mautic\EmailBundle\Entity\EmailDraftRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailDraftFunctionalTest extends MauticMysqlTestCase
@@ -75,7 +76,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $email = $this->createNewEmail();
         $this->saveDraft($email);
         $this->client->request(Request::METHOD_POST, "/s/emails/delete/{$email->getId()}");
-        $emailDraft = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailDraftRepository::class)->findOneBy(['email' => $email]);
+        $emailDraft = $this->getContainer()->get(EmailDraftRepository::class)->findOneBy(['email' => $email]);
         $this->assertNotInstanceOf(EmailDraft::class, $emailDraft);
     }
 
@@ -87,7 +88,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $emailDraft = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailDraftRepository::class)->findOneBy(['email' => $email]);
+        $emailDraft = $this->getContainer()->get(EmailDraftRepository::class)->findOneBy(['email' => $email]);
 
         $this->assertNotInstanceOf(EmailDraft::class, $emailDraft);
         $this->assertSame('Test html Draft', $email->getCustomHtml());
@@ -101,7 +102,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $emailDraft = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailDraftRepository::class)->findOneBy(['email' => $email]);
+        $emailDraft = $this->getContainer()->get(EmailDraftRepository::class)->findOneBy(['email' => $email]);
 
         $this->assertNotInstanceOf(EmailDraft::class, $emailDraft);
         $this->assertSame('Test html', $email->getCustomHtml());
@@ -116,7 +117,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $emailDraft = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailDraftRepository::class)->findOneBy(['email' => $email]);
+        $emailDraft = $this->getContainer()->get(EmailDraftRepository::class)->findOneBy(['email' => $email]);
         $this->assertInstanceOf(EmailDraft::class, $emailDraft);
         $this->assertSame('Test html Draft', $emailDraft->getHtml());
         $this->assertSame('Test html', $email->getCustomHtml());

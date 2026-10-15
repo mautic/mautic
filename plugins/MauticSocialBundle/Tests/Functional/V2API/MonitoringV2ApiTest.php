@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticSocialBundle\Tests\Functional\V2API;
 
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
+use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 final class MonitoringV2ApiTest extends MauticMysqlTestCase
@@ -122,7 +123,7 @@ final class MonitoringV2ApiTest extends MauticMysqlTestCase
         $this->assertSame('type', $responseData['networkType']);
 
         $this->em->clear();
-        $monitorings = $this->getContainer()->get(\MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository::class)->findAll();
+        $monitorings = $this->getContainer()->get(MonitoringRepository::class)->findAll();
         $this->assertCount(1, $monitorings);
         $this->assertSame($originalId, $monitorings[0]->getId());
         $this->assertSame('Updated Monitoring', $monitorings[0]->getTitle());
@@ -165,7 +166,7 @@ final class MonitoringV2ApiTest extends MauticMysqlTestCase
         $this->assertSame('type', $responseData['networkType']);
 
         $this->em->clear();
-        $monitoring = $this->getContainer()->get(\MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository::class)->find($responseData['id']);
+        $monitoring = $this->getContainer()->get(MonitoringRepository::class)->find($responseData['id']);
         $this->assertInstanceOf(Monitoring::class, $monitoring);
         $this->assertSame('New Monitoring', $monitoring->getTitle());
     }
@@ -197,7 +198,7 @@ final class MonitoringV2ApiTest extends MauticMysqlTestCase
         }
 
         $this->em->clear();
-        $updatedMonitoring = $this->getContainer()->get(\MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository::class)->find($originalId);
+        $updatedMonitoring = $this->getContainer()->get(MonitoringRepository::class)->find($originalId);
         $this->assertInstanceOf(Monitoring::class, $updatedMonitoring);
         $this->assertSame('Updated Monitoring Title Only', $updatedMonitoring->getTitle());
         $this->assertNull($updatedMonitoring->getDescription());
@@ -213,7 +214,7 @@ final class MonitoringV2ApiTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->em->clear();
-        $monitoring = $this->getContainer()->get(\MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository::class)->find($monitoringId);
+        $monitoring = $this->getContainer()->get(MonitoringRepository::class)->find($monitoringId);
         $this->assertNotInstanceOf(Monitoring::class, $monitoring);
     }
 
@@ -244,7 +245,7 @@ final class MonitoringV2ApiTest extends MauticMysqlTestCase
         $this->assertSame('Original Description', $responseData['description']);
 
         $this->em->clear();
-        $updatedMonitoring = $this->getContainer()->get(\MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository::class)->find($originalId);
+        $updatedMonitoring = $this->getContainer()->get(MonitoringRepository::class)->find($originalId);
         $this->assertInstanceOf(Monitoring::class, $updatedMonitoring);
         $this->assertSame('Updated Monitoring Title Only', $updatedMonitoring->getTitle());
         $this->assertSame('Original Description', $updatedMonitoring->getDescription());

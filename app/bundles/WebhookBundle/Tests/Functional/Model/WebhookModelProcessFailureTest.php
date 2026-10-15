@@ -7,8 +7,10 @@ namespace Mautic\WebhookBundle\Tests\Functional\Model;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Log;
+use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -114,7 +116,7 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
 
     private function createWebhook(): Webhook
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy([]);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy([]);
 
         $webhook = new Webhook();
         $webhook->setCreatedBy($user);
@@ -156,6 +158,6 @@ final class WebhookModelProcessFailureTest extends MauticMysqlTestCase
 
     private function assertNumberOfLogs(int $expectedNumberOfLogs): void
     {
-        $this->assertSame($expectedNumberOfLogs, $this->getContainer()->get(\Mautic\WebhookBundle\Entity\LogRepository::class)->count([]));
+        $this->assertSame($expectedNumberOfLogs, $this->getContainer()->get(LogRepository::class)->count([]));
     }
 }

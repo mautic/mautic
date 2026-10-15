@@ -43,7 +43,7 @@ abstract class CampaignLeadChangeEvent extends Event
     /**
      * Returns the Lead entity.
      */
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }

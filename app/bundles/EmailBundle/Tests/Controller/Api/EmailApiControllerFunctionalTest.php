@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -823,7 +824,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getUser(string $userName): ?User
     {
-        $repository = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class);
+        $repository = $this->getContainer()->get(UserRepository::class);
 
         return $repository->findOneBy(['username' => $userName]);
     }

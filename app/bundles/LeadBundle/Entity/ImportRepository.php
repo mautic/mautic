@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -72,7 +73,7 @@ final class ImportRepository extends CommonRepository
         return $this->countImportsWithStatuses([Import::IN_PROGRESS]);
     }
 
-    public function getQueryForStatuses(array $statuses): \Doctrine\ORM\QueryBuilder
+    public function getQueryForStatuses(array $statuses): QueryBuilder
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
 

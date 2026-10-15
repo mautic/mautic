@@ -13,8 +13,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Proxy\DefaultProxyClassNameResolver;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\Expr\Andx;
+use Doctrine\ORM\Query\Expr\Composite;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
@@ -1602,7 +1603,7 @@ abstract class CommonRepository extends ServiceEntityRepository
     /**
      * @param array $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
      */
-    protected function buildWhereClauseFromArray(QueryBuilder|DbalQueryBuilder $query, array $clauses, ?\Doctrine\ORM\Query\Expr\Composite $expr = null)
+    protected function buildWhereClauseFromArray(QueryBuilder|DbalQueryBuilder $query, array $clauses, ?Composite $expr = null)
     {
         $parts = $this->buildWhereClausePartsFromArray($query, $clauses);
 

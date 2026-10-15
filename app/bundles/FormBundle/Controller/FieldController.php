@@ -19,6 +19,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -424,7 +425,7 @@ final class FieldController extends CommonFormController
      * @param int                  $formId
      * @param array<string, mixed> $formField
      */
-    private function getFieldForm($formId, array $formField): \Symfony\Component\Form\FormInterface
+    private function getFieldForm($formId, array $formField): FormInterface
     {
         $customComponents = $this->formModel->getCustomComponents();
         $customParams     = $customComponents['fields'][$formField['type']] ?? false;

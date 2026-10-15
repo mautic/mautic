@@ -19,6 +19,7 @@ use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\Expression;
 use Rector\PHPStan\ScopeFetcher;
 use Rector\Rector\AbstractRector;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector extends AbstractRector
 {
@@ -225,6 +226,6 @@ final class AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector extends Abs
         $classReflection = ScopeFetcher::fetch($node)->getClassReflection();
 
         return null !== $classReflection
-            && $classReflection->is(\Symfony\Bundle\FrameworkBundle\Test\WebTestCase::class);
+            && $classReflection->is(WebTestCase::class);
     }
 }

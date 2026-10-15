@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
+use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -12,9 +16,6 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Model\EmailModel;
-use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
-use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
-use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use PHPUnit\Framework\Assert;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -77,7 +78,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             ) {
             }
 
-            public function getRepository(string $entityName): \Doctrine\ORM\EntityRepository
+            public function getRepository(string $entityName): EntityRepository
             {
                 Assert::assertSame(GrapesJsBuilder::class, $entityName);
 
@@ -184,7 +185,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             ) {
             }
 
-            public function getRepository(string $entityName): \Doctrine\ORM\EntityRepository
+            public function getRepository(string $entityName): EntityRepository
             {
                 Assert::assertSame(GrapesJsBuilder::class, $entityName);
 

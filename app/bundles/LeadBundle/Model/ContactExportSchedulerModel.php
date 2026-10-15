@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use Mautic\LeadBundle\Entity\ContactExportSchedulerRepository;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -144,7 +145,7 @@ final class ContactExportSchedulerModel extends AbstractCommonModel
     {
         $data            = $contactExportScheduler->getData();
         $fileType        = $data['fileType'];
-        $resultsCallback = (fn(\Mautic\LeadBundle\Entity\Lead $contact): array => $contact->getProfileFields());
+        $resultsCallback = (fn(Lead $contact): array => $contact->getProfileFields());
         $iterator        = new IteratorExportDataModel(
             $this->leadModel,
             $contactExportScheduler->getData(),

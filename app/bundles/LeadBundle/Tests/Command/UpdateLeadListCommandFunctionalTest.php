@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -78,7 +79,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $assert($segment, $output->getDisplay());
 
         /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
 
         $this->assertSame(1, $leadListRepository->getLeadCount([$segment->getId()]));
     }
@@ -184,7 +185,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($segment->needsRebuild());
 
         /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
         $this->assertSame(1, $leadListRepository->getLeadCount([$segmentId]));
 
         /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
@@ -252,7 +253,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
         /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
         $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
 
@@ -489,7 +490,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $segment->setLastBuiltTime(1.0);
 
         foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
-            $contact = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findOneBy(['email' => $email]);
+            $contact = $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => $email]);
             $this->createListLead($segment, $contact);
         }
 
@@ -519,7 +520,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         /** @var LeadList $segment */
         $segment = $this->em->find(LeadList::class, $segmentId);
         /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
 
         $this->assertSame(4, $leadListRepository->getLeadCount([$segmentId]));
         $this->assertNotInstanceOf(\DateTimeInterface::class, $segment->getLastBuiltDate());
@@ -586,7 +587,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         }
 
         foreach (['one@example.com', 'two@example.com', 'three@example.com'] as $email) {
-            $contact = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findOneBy(['email' => $email]);
+            $contact = $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => $email]);
             $this->createListLead($baseSegment, $contact);
             $this->createListLead($dependentSegment, $contact);
         }
@@ -614,7 +615,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         /** @var LeadList $baseSegment */
         $baseSegment = $this->em->find(LeadList::class, $baseSegmentId);
         /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
 
         $this->assertSame(4, $leadListRepository->getLeadCount([$baseSegmentId]));
         $this->assertNotInstanceOf(\DateTimeInterface::class, $baseSegment->getLastBuiltDate());
@@ -713,7 +714,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
         /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
 
         $this->assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
     }
@@ -834,7 +835,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
         /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
 
         $this->assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
     }
@@ -942,7 +943,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
         /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
 
         $this->assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
     }
@@ -1047,7 +1048,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
         /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
 
         $this->assertSame($expected, $leadListRepository->getLeadCount([$segment->getId()]));
     }
@@ -1139,7 +1140,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
         /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
 
         $this->assertSame($expected, (int) $leadListRepository->getLeadCount([$segment->getId()]));
     }
@@ -1214,7 +1215,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Command::SUCCESS, $output->getStatusCode());
 
         /** @var LeadListRepository $leadListRepository */
-        $leadListRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $leadListRepository = $this->getContainer()->get(LeadListRepository::class);
 
         $this->assertSame($expected, $leadListRepository->getLeadCount([$segmentD->getId()]));
     }

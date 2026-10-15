@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadGetCurrentEvent;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\PageBundle\Entity\Page;
@@ -88,7 +89,7 @@ final class ContactTrackerFunctionalLastActiveTest extends MauticMysqlTestCase
 
     private function isLastActiveDateSet(int $id): bool
     {
-        return (bool) $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->createQueryBuilder('l')
+        return (bool) $this->getContainer()->get(LeadRepository::class)->createQueryBuilder('l')
             ->select('l.lastActive')
             ->where('l.id = :id')
             ->setParameter('id', $id)

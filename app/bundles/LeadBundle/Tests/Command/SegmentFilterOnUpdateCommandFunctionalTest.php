@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 
 final class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCase
 {
@@ -19,13 +20,13 @@ final class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCa
 
         // Run segments update command.
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentAId]);
-        $this->assertCount(5, $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findBy(['list' => $segmentAId]));
+        $this->assertCount(5, $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segmentAId]));
 
         $segmentB   = $this->saveSegmentB($segmentAId);
         $segmentBId = $segmentB->getId();
         // Run segments update command.
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentBId]);
-        $this->assertCount(3, $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findBy(['list' => $segmentBId]));
+        $this->assertCount(3, $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segmentBId]));
     }
 
     /**
@@ -35,7 +36,7 @@ final class SegmentFilterOnUpdateCommandFunctionalTest extends MauticMysqlTestCa
     {
         // Add 10 contacts
         /** @var LeadRepository $contactRepo */
-        $contactRepo = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $contactRepo = $this->getContainer()->get(LeadRepository::class);
         $contacts    = [];
 
         for ($i = 0; $i <= 10; ++$i) {

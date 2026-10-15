@@ -6,12 +6,14 @@ namespace Mautic\FormBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
@@ -200,7 +202,7 @@ final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
         $response = json_decode($this->client->getResponse()->getContent(), true);
         $formId   = $response['form']['id'];
 
-        return $this->getContainer()->get(\Mautic\FormBundle\Entity\FormRepository::class)->find($formId);
+        return $this->getContainer()->get(FormRepository::class)->find($formId);
     }
 
     /**

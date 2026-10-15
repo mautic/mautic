@@ -4,16 +4,44 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use FOS\OAuthServerBundle\Controller\AuthorizeController;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Translation\Translator;
-use PhpParser\Node;
-use PhpParser\Node\Name;
-use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use PHPUnit\Framework\TestCase;
+use PhpParser\Node;
+use PhpParser\Node\Name;
+use PhpParser\Node\Stmt\ClassMethod;
+use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\Service\Attribute\Required;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
 
 /**
  * A shared service must be injected, not passed around as a method parameter.
@@ -39,28 +67,28 @@ final readonly class NoServiceInMethodParameterRule implements Rule
      * @var string[]
      */
     private const array SERVICE_TYPES = [
-        \Doctrine\ORM\EntityManagerInterface::class,
-        \Doctrine\Persistence\ManagerRegistry::class,
-        \Psr\Cache\CacheItemPoolInterface::class,
-        \Psr\Log\LoggerInterface::class,
-        \Symfony\Component\Filesystem\Filesystem::class,
-        \Symfony\Component\Form\FormFactoryInterface::class,
-        \Symfony\Component\HttpFoundation\RequestStack::class,
-        \Symfony\Component\HttpKernel\KernelInterface::class,
-        \Symfony\Component\Mailer\MailerInterface::class,
-        \Symfony\Component\Messenger\MessageBusInterface::class,
-        \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface::class,
-        \Symfony\Component\Routing\Generator\UrlGeneratorInterface::class,
-        \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class,
-        \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface::class,
-        \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface::class,
-        \Symfony\Component\Serializer\SerializerInterface::class,
-        \Symfony\Component\Validator\Validator\ValidatorInterface::class,
-        \Symfony\Contracts\Cache\CacheInterface::class,
-        \Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class,
-        \Symfony\Contracts\HttpClient\HttpClientInterface::class,
-        \Symfony\Contracts\Translation\TranslatorInterface::class,
-        \Twig\Environment::class,
+        EntityManagerInterface::class,
+        ManagerRegistry::class,
+        CacheItemPoolInterface::class,
+        LoggerInterface::class,
+        Filesystem::class,
+        FormFactoryInterface::class,
+        RequestStack::class,
+        KernelInterface::class,
+        MailerInterface::class,
+        MessageBusInterface::class,
+        UserPasswordHasherInterface::class,
+        UrlGeneratorInterface::class,
+        TokenStorageInterface::class,
+        AuthorizationCheckerInterface::class,
+        CsrfTokenManagerInterface::class,
+        SerializerInterface::class,
+        ValidatorInterface::class,
+        CacheInterface::class,
+        EventDispatcherInterface::class,
+        HttpClientInterface::class,
+        TranslatorInterface::class,
+        Environment::class,
     ];
 
     /**
@@ -71,7 +99,7 @@ final readonly class NoServiceInMethodParameterRule implements Rule
      * @var string[]
      */
     private const array SKIPPED_TYPES = [
-        \Symfony\Component\DependencyInjection\ContainerBuilder::class,
+        ContainerBuilder::class,
         Translator::class,
     ];
 
@@ -87,7 +115,7 @@ final readonly class NoServiceInMethodParameterRule implements Rule
      * A test case has no container to inject from - it fetches services itself and hands them to its own data
      * builders and helper methods.
      */
-    private const string TEST_CASE_CLASS = \PHPUnit\Framework\TestCase::class;
+    private const string TEST_CASE_CLASS = TestCase::class;
 
     /**
      * An event or an entity is created by the code that uses it, never by the container, so a service it needs can
@@ -98,11 +126,11 @@ final readonly class NoServiceInMethodParameterRule implements Rule
      * @var string[]
      */
     private const array SKIPPED_CLASS_TYPES = [
-        \Symfony\Contracts\EventDispatcher\Event::class,
+        Event::class,
         'Symfony\\Component\\EventDispatcher\\Event',
         CommonEntity::class,
-        \Twig\Extension\AbstractExtension::class,
-        \FOS\OAuthServerBundle\Controller\AuthorizeController::class,
+        AbstractExtension::class,
+        AuthorizeController::class,
     ];
 
     /**
@@ -121,7 +149,7 @@ final readonly class NoServiceInMethodParameterRule implements Rule
 
     private const string AUTOWIRE_PREFIX = 'autowire';
 
-    private const string REQUIRED_ATTRIBUTE = \Symfony\Contracts\Service\Attribute\Required::class;
+    private const string REQUIRED_ATTRIBUTE = Required::class;
 
     public function __construct(
         private ReflectionProvider $reflectionProvider,

@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -518,7 +519,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testGetEntitiesReturnsContactsForViewOwnUserBasedOnPermissionUser(): void
     {
         /** @var User $adminUser */
-        $adminUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $adminUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
 
         $role = new Role();
         $role->setName('View own contacts');
@@ -580,7 +581,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var User $apiUser */
-        $apiUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'api-owner']);
+        $apiUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'api-owner']);
 
         $this->loginUser($apiUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $apiUser->getUserIdentifier());

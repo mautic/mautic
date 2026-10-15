@@ -6,6 +6,7 @@ namespace Mautic\PageBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\PageEvents;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -49,7 +50,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseIsSuccessful();
 
-        $page = $this->getContainer()->get(\Mautic\PageBundle\Entity\PageRepository::class)->find($page->getId());
+        $page = $this->getContainer()->get(PageRepository::class)->find($page->getId());
         $this->assertInstanceOf(Page::class, $page);
         $this->assertFalse($page->isPublished(), 'The page should not be published.');
         $this->assertInstanceOf(PageEvent::class, $dispatchedEvent, 'The event should have been dispatched.');

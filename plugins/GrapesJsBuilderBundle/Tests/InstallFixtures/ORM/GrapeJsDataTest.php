@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\InstallFixtures\ORM;
 
+use MauticPlugin\GrapesJsBuilderBundle\InstallFixtures\ORM\GrapesJsData;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PluginBundle\Entity\Integration;
+use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Mautic\PluginBundle\Entity\Plugin;
-use MauticPlugin\GrapesJsBuilderBundle\InstallFixtures\ORM\GrapesJsData;
+use Mautic\PluginBundle\Entity\PluginRepository;
 
 final class GrapeJsDataTest extends MauticMysqlTestCase
 {
@@ -27,15 +29,15 @@ final class GrapeJsDataTest extends MauticMysqlTestCase
             'author'      => 'Mautic Community',
             'bundle'      => 'GrapesJsBuilderBundle',
         ];
-        $plugin = $this->getContainer()->get(\Mautic\PluginBundle\Entity\PluginRepository::class)->findOneBy($findOneByCriteria);
+        $plugin = $this->getContainer()->get(PluginRepository::class)->findOneBy($findOneByCriteria);
         $this->assertNotInstanceOf(Plugin::class, $plugin);
 
         $this->loadFixtures([GrapesJsData::class]);
 
-        $plugin = $this->getContainer()->get(\Mautic\PluginBundle\Entity\PluginRepository::class)->findOneBy($findOneByCriteria);
+        $plugin = $this->getContainer()->get(PluginRepository::class)->findOneBy($findOneByCriteria);
         $this->assertInstanceOf(Plugin::class, $plugin);
 
-        $integration = $this->getContainer()->get(\Mautic\PluginBundle\Entity\IntegrationRepository::class)->findOneBy(
+        $integration = $this->getContainer()->get(IntegrationRepository::class)->findOneBy(
             [
                 'isPublished' => true,
                 'name'        => 'GrapesJsBuilder',

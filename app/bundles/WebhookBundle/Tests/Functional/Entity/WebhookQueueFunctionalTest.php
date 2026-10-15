@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
+use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 
 final class WebhookQueueFunctionalTest extends MauticMysqlTestCase
 {
@@ -26,7 +27,7 @@ final class WebhookQueueFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($payload, gzuncompress($payloadDbValues['payload_compressed']));
 
         $this->em->clear();
-        $webhookQueue = $this->getContainer()->get(\Mautic\WebhookBundle\Entity\WebhookQueueRepository::class)
+        $webhookQueue = $this->getContainer()->get(WebhookQueueRepository::class)
             ->find($webhookQueue->getId());
         $this->assertInstanceOf(WebhookQueue::class, $webhookQueue);
 

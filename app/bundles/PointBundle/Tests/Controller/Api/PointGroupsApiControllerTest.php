@@ -7,6 +7,7 @@ namespace Mautic\PointBundle\Tests\Controller\Api;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\PointBundle\Entity\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -193,7 +194,7 @@ final class PointGroupsApiControllerTest extends MauticMysqlTestCase
      */
     private function assertPointsChangeLogEntries(Lead $contact, array $expectedEntries): void
     {
-        $logs = $this->getContainer()->get(\Mautic\LeadBundle\Entity\PointsChangeLogRepository::class)->findBy(['lead' => $contact->getId()]);
+        $logs = $this->getContainer()->get(PointsChangeLogRepository::class)->findBy(['lead' => $contact->getId()]);
         $this->assertCount(count($expectedEntries), $logs);
         foreach ($expectedEntries as $index => $expectedEntry) {
             $this->assertEquals($expectedEntry['delta'], $logs[$index]->getDelta());

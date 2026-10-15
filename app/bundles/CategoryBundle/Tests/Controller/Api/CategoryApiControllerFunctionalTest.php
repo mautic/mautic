@@ -8,6 +8,7 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
+use Mautic\LeadBundle\Entity\LeadCategoryRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
@@ -93,7 +94,7 @@ final class CategoryApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Debug: Verify the entity was actually persisted
-        $repository        = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadCategoryRepository::class);
+        $repository        = $this->getContainer()->get(LeadCategoryRepository::class);
         $allLeadCategories = $repository->findAll();
         $this->assertGreaterThanOrEqual(1, count($allLeadCategories), 'LeadCategory should be in database');
 

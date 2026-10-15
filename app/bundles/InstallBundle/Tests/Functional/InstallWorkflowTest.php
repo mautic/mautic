@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -102,7 +103,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Mautic is installed', $successText);
 
         // Assert that the fixtures were loaded
-        $fieldRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadFieldRepository::class);
+        $fieldRepository = $this->getContainer()->get(LeadFieldRepository::class);
 
         $emailField = $fieldRepository->findOneBy(['alias' => 'email']);
         $this->assertInstanceOf(LeadField::class, $emailField);

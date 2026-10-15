@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Functional\EventListener;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\UserEntityTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -42,7 +43,7 @@ final class OwnerSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $lead = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->find($lead->getId());
+        $lead = $this->getContainer()->get(LeadRepository::class)->find($lead->getId());
         $this->assertInstanceOf(Lead::class, $lead);
 
         $event = new UrlTokenReplaceEvent('https://example.mautic/author/{ownerfield=firstname}/', $lead);
@@ -60,7 +61,7 @@ final class OwnerSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $lead = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->find($lead->getId());
+        $lead = $this->getContainer()->get(LeadRepository::class)->find($lead->getId());
         $this->assertInstanceOf(Lead::class, $lead);
 
         $event = new UrlTokenReplaceEvent('https://example.mautic/author/{ownerfield=firstname}/', $lead);

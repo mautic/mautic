@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Event\NotifyOfUnpublishEvent;
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -48,7 +49,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         $dispatcher->dispatch($unpublishEvent);
 
         // Check for notifications - use a more general query
-        $notifications = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class)
+        $notifications = $this->getContainer()->get(NotificationRepository::class)
             ->findBy(
                 [
                     'type'    => 'error',
@@ -62,7 +63,7 @@ final class CampaignEventSubscriberFunctionalTest extends MauticMysqlTestCase
         $dispatcher->dispatch($unpublishEvent);
 
         // Query for all notifications
-        $notifications = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class)
+        $notifications = $this->getContainer()->get(NotificationRepository::class)
             ->findBy([
                 'type'    => 'error',
                 'message' => "{$campaign->getName()} / Send email to user",

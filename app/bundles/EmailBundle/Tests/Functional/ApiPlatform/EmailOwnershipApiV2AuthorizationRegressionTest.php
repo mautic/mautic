@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Functional\ApiPlatform;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Tests\Functional\ApiPlatform\OwnershipScopedApiAuthorizationTestBase;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScopedApiAuthorizationTestBase
@@ -47,7 +48,7 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
         $this->em->flush();
         $this->em->clear();
 
-        $restrictedUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'restricted.user']);
+        $restrictedUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'restricted.user']);
         $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
@@ -108,7 +109,7 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
         $this->em->flush();
         $this->em->clear();
 
-        $restrictedUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'restricted.user']);
+        $restrictedUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'restricted.user']);
         $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());

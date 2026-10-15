@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Command;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CoreBundle\Command\EntityExportCommand;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
@@ -68,7 +69,7 @@ final class EntityExportCommandTest extends MauticMysqlTestCase
 
     private function getTestCampaignId(): int
     {
-        $campaign = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\CampaignRepository::class)->findOneBy(['name' => 'Test Campaign']);
+        $campaign = $this->getContainer()->get(CampaignRepository::class)->findOneBy(['name' => 'Test Campaign']);
 
         return $campaign->getId();
     }

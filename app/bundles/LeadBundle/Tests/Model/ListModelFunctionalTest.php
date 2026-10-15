@@ -11,19 +11,20 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 
 final class ListModelFunctionalTest extends MauticMysqlTestCase
 {
     public function testPublicSegmentsInContactPreferences(): void
     {
-        $user           = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findBy([], [], 1)[0];
+        $user           = $this->getContainer()->get(UserRepository::class)->findBy([], [], 1)[0];
         $firstLeadList  = $this->createLeadList($user, 'First', true);
         $secondLeadList = $this->createLeadList($user, 'Second', false);
         $thirdLeadList  = $this->createLeadList($user, 'Third', true);
         $this->em->flush();
 
         /** @var LeadListRepository $repo */
-        $repo  = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $repo  = $this->getContainer()->get(LeadListRepository::class);
         $lists = $repo->getGlobalLists();
 
         $this->assertCount(2, $lists);
@@ -38,7 +39,7 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
         $segmentModel = self::getContainer()->get(ListModel::class);
 
         /** @var LeadRepository $contactRepository */
-        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $contactRepository = $this->getContainer()->get(LeadRepository::class);
 
         $segment = new LeadList();
         $segment->setName('Segment A');
@@ -93,7 +94,7 @@ final class ListModelFunctionalTest extends MauticMysqlTestCase
         $segmentModel = self::getContainer()->get(ListModel::class);
 
         /** @var LeadRepository $contactRepository */
-        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $contactRepository = $this->getContainer()->get(LeadRepository::class);
 
         $segment = new LeadList();
         $segment->setName('Segment A');

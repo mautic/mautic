@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -123,7 +124,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $this->setUpSymfony($configParams);
 
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 

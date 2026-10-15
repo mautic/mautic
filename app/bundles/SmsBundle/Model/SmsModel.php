@@ -480,7 +480,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
         return $chart->render();
     }
 
-    public function getSmsStatus(string $idHash): ?\Mautic\SmsBundle\Entity\Stat
+    public function getSmsStatus(string $idHash): ?Stat
     {
         return $this->statRepository->getSmsStatus($idHash);
     }

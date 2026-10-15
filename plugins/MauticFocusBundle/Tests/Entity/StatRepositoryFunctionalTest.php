@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Entity;
 
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
+use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
-use MauticPlugin\MauticFocusBundle\Entity\Focus;
-use MauticPlugin\MauticFocusBundle\Entity\Stat;
-use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 
 final class StatRepositoryFunctionalTest extends MauticMysqlTestCase
 {
@@ -25,12 +26,12 @@ final class StatRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testGetStatsViewByLead(): void
     {
-        $this->assertCount(5, $this->getContainer()->get(\MauticPlugin\MauticFocusBundle\Entity\StatRepository::class)->getStatsViewByLead());
+        $this->assertCount(5, $this->getContainer()->get(StatRepository::class)->getStatsViewByLead());
     }
 
     public function testGetStatsClickByLead(): void
     {
-        $this->assertCount(2, $this->getContainer()->get(\MauticPlugin\MauticFocusBundle\Entity\StatRepository::class)->getStatsClickByLead());
+        $this->assertCount(2, $this->getContainer()->get(StatRepository::class)->getStatsClickByLead());
     }
 
     private function createLead(): Lead

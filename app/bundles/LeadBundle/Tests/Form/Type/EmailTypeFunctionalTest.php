@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Copy;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,7 +50,7 @@ final class EmailTypeFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Check the email has correct text
-        $copy = $this->getContainer()->get(\Mautic\EmailBundle\Entity\CopyRepository::class)->findOneBy(['subject' => 'Test Jap Mautic']);
+        $copy = $this->getContainer()->get(CopyRepository::class)->findOneBy(['subject' => 'Test Jap Mautic']);
         $this->assertInstanceOf(Copy::class, $copy);
         $this->assertStringContainsString('<p style="font-family: メイリオ">Test</p>', (string) $copy->getBody());
     }

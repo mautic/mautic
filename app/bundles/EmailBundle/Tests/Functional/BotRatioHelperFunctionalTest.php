@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -59,7 +60,7 @@ final class BotRatioHelperFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/email/'.$stat->getTrackingHash().'.gif', [], [], $server);
         $this->assertResponseIsSuccessful();
 
-        $updatedStat = $this->getContainer()->get(\Mautic\EmailBundle\Entity\StatRepository::class)->findOneBy(['id'=>$statId]);
+        $updatedStat = $this->getContainer()->get(StatRepository::class)->findOneBy(['id'=>$statId]);
         $this->assertSame($isRead, $updatedStat->getIsRead());
         if ($isRead) {
             $this->assertInstanceOf(\DateTimeInterface::class, $updatedStat->getLastOpened());

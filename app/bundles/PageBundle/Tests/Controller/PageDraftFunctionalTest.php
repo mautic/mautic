@@ -7,6 +7,7 @@ namespace Mautic\PageBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageDraft;
+use Mautic\PageBundle\Entity\PageDraftRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -81,7 +82,7 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $pageDraft = $this->getContainer()->get(\Mautic\PageBundle\Entity\PageDraftRepository::class)->findOneBy(['page' => $page]);
+        $pageDraft = $this->getContainer()->get(PageDraftRepository::class)->findOneBy(['page' => $page]);
 
         $this->assertNotInstanceOf(PageDraft::class, $pageDraft);
         $this->assertSame('Test html Draft', $page->getCustomHtml());
@@ -94,7 +95,7 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $pageDraft = $this->getContainer()->get(\Mautic\PageBundle\Entity\PageDraftRepository::class)->findOneBy(['page' => $page]);
+        $pageDraft = $this->getContainer()->get(PageDraftRepository::class)->findOneBy(['page' => $page]);
 
         $this->assertNotInstanceOf(PageDraft::class, $pageDraft);
         $this->assertSame('Test html', $page->getCustomHtml());
@@ -109,7 +110,7 @@ final class PageDraftFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $pageDraft = $this->getContainer()->get(\Mautic\PageBundle\Entity\PageDraftRepository::class)->findOneBy(['page' => $page]);
+        $pageDraft = $this->getContainer()->get(PageDraftRepository::class)->findOneBy(['page' => $page]);
         $this->assertInstanceOf(PageDraft::class, $pageDraft);
         $this->assertSame('Test html Draft', $pageDraft->getHtml());
         $this->assertSame('Test html', $page->getCustomHtml());

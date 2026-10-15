@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -231,7 +232,7 @@ final class UserApiControllerFunctionalTest extends MauticMysqlTestCase
             $this->assertArrayHasKey('username', $responseData);
 
             // Verify the user was actually created in the database
-            $userRepository = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class);
+            $userRepository = $this->getContainer()->get(UserRepository::class);
             $user           = $userRepository->find($responseData['id']);
 
             $this->assertInstanceOf(User::class, $user);

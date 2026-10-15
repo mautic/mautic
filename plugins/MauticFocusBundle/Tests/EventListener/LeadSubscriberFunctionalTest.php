@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\EventListener;
 
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
+use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
-use MauticPlugin\MauticFocusBundle\Entity\Focus;
-use MauticPlugin\MauticFocusBundle\Entity\Stat;
-use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 
 final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 {
@@ -45,8 +46,8 @@ final class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function searchPhrase(string $phrase, Lead $lead): array
     {
-        $searchViewStats  = $this->getContainer()->get(\MauticPlugin\MauticFocusBundle\Entity\StatRepository::class)->getStatsViewByLead($lead->getId(), ['search'=>$phrase]);
-        $searchClickStats = $this->getContainer()->get(\MauticPlugin\MauticFocusBundle\Entity\StatRepository::class)->getStatsClickByLead($lead->getId(), ['search'=>$phrase]);
+        $searchViewStats  = $this->getContainer()->get(StatRepository::class)->getStatsViewByLead($lead->getId(), ['search'=>$phrase]);
+        $searchClickStats = $this->getContainer()->get(StatRepository::class)->getStatsClickByLead($lead->getId(), ['search'=>$phrase]);
 
         return array_merge($searchViewStats, $searchClickStats);
     }

@@ -5,6 +5,7 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
@@ -301,7 +302,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         ];
     }
 
-    public function getCampaign(): ?\Mautic\CampaignBundle\Entity\Campaign
+    public function getCampaign(): ?Campaign
     {
         return $this->campaign;
     }

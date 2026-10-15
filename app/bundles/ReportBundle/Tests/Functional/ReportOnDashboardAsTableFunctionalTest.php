@@ -9,13 +9,14 @@ use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\DomCrawler\Crawler;
 
 final class ReportOnDashboardAsTableFunctionalTest extends MauticMysqlTestCase
 {
     public function testReportOnDashboardAsTable(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy([]);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy([]);
 
         $report = $this->createReport();
         $this->em->persist($report);

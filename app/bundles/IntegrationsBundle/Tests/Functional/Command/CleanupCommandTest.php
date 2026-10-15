@@ -7,6 +7,7 @@ namespace Mautic\IntegrationsBundle\Tests\Functional\Command;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Command\CleanupCommand;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
+use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Console\Command\Command;
 
@@ -21,9 +22,9 @@ final class CleanupCommandTest extends MauticMysqlTestCase
         $this->assertSame(Command::SUCCESS, $response->getStatusCode());
         $this->assertStringContainsString('1 records deleted.', $response->getDisplay());
 
-        $fieldChangeRecordDeleted = $this->getContainer()->get(\Mautic\IntegrationsBundle\Entity\FieldChangeRepository::class)->findOneBy(['id' => $fieldChangeNonExistLead->getId()]);
+        $fieldChangeRecordDeleted = $this->getContainer()->get(FieldChangeRepository::class)->findOneBy(['id' => $fieldChangeNonExistLead->getId()]);
         $this->assertNotInstanceOf(FieldChange::class, $fieldChangeRecordDeleted);
-        $fieldChangeRecordShouldNotDeleted = $this->getContainer()->get(\Mautic\IntegrationsBundle\Entity\FieldChangeRepository::class)->findOneBy(['id' => $fieldChangeExistLead->getId()]);
+        $fieldChangeRecordShouldNotDeleted = $this->getContainer()->get(FieldChangeRepository::class)->findOneBy(['id' => $fieldChangeExistLead->getId()]);
         $this->assertInstanceOf(FieldChange::class, $fieldChangeRecordShouldNotDeleted);
     }
 

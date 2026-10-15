@@ -18,7 +18,7 @@ final class StatRepositoryFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         /** @var StatRepository $repository */
-        $repository           = $this->getContainer()->get(\Mautic\EmailBundle\Entity\StatRepository::class);
+        $repository           = $this->getContainer()->get(StatRepository::class);
         $this->statRepository = $repository;
     }
 

@@ -2,6 +2,7 @@
 
 namespace Mautic\SmsBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
@@ -53,7 +54,7 @@ final class SmsRepository extends CommonRepository
         return $qb->getQuery();
     }
 
-    public function getSegmentsContactsQuery(int $smsId): \Doctrine\DBAL\Query\QueryBuilder
+    public function getSegmentsContactsQuery(int $smsId): QueryBuilder
     {
         // Main query
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();

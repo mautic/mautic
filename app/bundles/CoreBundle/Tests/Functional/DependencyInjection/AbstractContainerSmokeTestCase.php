@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection;
 
+use MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber;
+use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 use Mautic\AssetBundle\Controller\UploadController;
 use Mautic\CacheBundle\Cache\Adapter\MemcachedTagAwareAdapter;
 use Mautic\CacheBundle\Cache\Adapter\RedisAdapter;
@@ -35,8 +37,8 @@ abstract class AbstractContainerSmokeTestCase extends TestCase
         DynamicContentFilterEntryType::class,
         DynamicContentType::class,
         SearchSubscriber::class,
-        \MauticPlugin\MauticFullContactBundle\EventListener\LeadSubscriber::class,
-        \MauticPlugin\MauticFullContactBundle\Helper\LookupHelper::class,
+        LeadSubscriber::class,
+        LookupHelper::class,
         'mautic.plugin.fullcontact.lookup_helper',
 
         // requires a running Redis/Memcached server or an optional package

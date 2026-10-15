@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
 use Mautic\AssetBundle\Tests\RemoteFileServerTrait;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
@@ -13,6 +14,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -66,7 +68,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $createErrors = $crawlerAfterSubmit->filter('div.has-error')->each(static fn ($node): string => trim($node->text()));
         $this->assertCount(0, $createErrors, 'Expected no validation errors for valid remote image URL with query string, got: '.implode(' | ', $createErrors));
 
-        $asset = $this->getContainer()->get(\Mautic\AssetBundle\Entity\AssetRepository::class)->findOneBy(['title' => $title]);
+        $asset = $this->getContainer()->get(AssetRepository::class)->findOneBy(['title' => $title]);
         $this->assertInstanceOf(Asset::class, $asset, 'Asset should be created successfully');
 
         $crawlerEdit = $this->client->request(Request::METHOD_GET, '/s/assets/edit/'.$asset->getId());
@@ -136,7 +138,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
             (string) $this->client->getResponse()->getContent()
         );
 
-        $asset = $this->getContainer()->get(\Mautic\AssetBundle\Entity\AssetRepository::class)->findOneBy(['title' => $assetTitle]);
+        $asset = $this->getContainer()->get(AssetRepository::class)->findOneBy(['title' => $assetTitle]);
         $this->assertInstanceOf(Asset::class, $asset);
         $this->assertSame('zip', strtolower((string) $asset->getExtension()));
 
@@ -391,7 +393,7 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
 
     private function getUser(string $username): User
     {
-        $repository = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class);
+        $repository = $this->getContainer()->get(UserRepository::class);
 
         return $repository->findOneBy(['username' => $username]);
     }
