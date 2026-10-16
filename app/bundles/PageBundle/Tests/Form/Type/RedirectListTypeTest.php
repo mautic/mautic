@@ -41,9 +41,6 @@ final class RedirectListTypeTest extends TestCase
             'expanded'   => false,
             'multiple'   => false,
             'label'      => 'mautic.page.form.redirecttype',
-            'label_attr' => [
-                'class' => 'form-label',
-            ],
             'placeholder' => false,
             'required'    => false,
             'attr'        => [

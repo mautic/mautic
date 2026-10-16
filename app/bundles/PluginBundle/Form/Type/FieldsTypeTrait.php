@@ -193,7 +193,6 @@ trait FieldsTypeTrait
                             'choices'    => $mauticFields,
                             'label'      => false,
                             'data'       => $matched && isset($fieldData[$fieldsName][$field]) ? $fieldData[$fieldsName][$field] : '',
-                            'label_attr' => ['class' => 'form-label'],
                             'attr'       => [
                                 'class'            => 'field-selector',
                                 'data-placeholder' => ' ',

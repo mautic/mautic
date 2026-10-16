@@ -21,7 +21,6 @@ final class DncType extends AbstractType
             [
                 'label'      => 'mautic.lead.batch.dnc_reason',
                 'required'   => false,
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );

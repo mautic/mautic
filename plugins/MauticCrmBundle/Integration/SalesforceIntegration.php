@@ -524,7 +524,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.salesforce.form.sandbox',
-                    'label_attr'        => ['class' => 'form-label'],
                     'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
@@ -543,7 +542,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.salesforce.form.updateOwner',
-                    'label_attr'        => ['class' => 'form-label'],
                     'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
@@ -561,7 +559,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.blanks',
-                    'label_attr'        => ['class' => 'form-label'],
                     'placeholder'       => false,
                     'required'          => false,
                 ]
@@ -576,7 +573,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'expanded'          => true,
                     'multiple'          => true,
                     'label'             => 'mautic.integrations.form.update.dnc.by.date.label',
-                    'label_attr'        => ['class' => 'form-label'],
                     'placeholder'       => false,
                     'required'          => false,
                 ]
@@ -608,7 +604,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     'choices'           => array_flip($this->leadModel->getEngagementTypes()), // Choice type expects labels as keys
                     'label'             => 'mautic.salesforce.form.activity_included_events',
                     'label_attr'        => [
-                        'class'       => 'form-label',
                         'data-bs-toggle' => 'tooltip',
                         'title'       => $this->translator->trans('mautic.salesforce.form.activity.events.tooltip'),
                     ],
@@ -623,7 +618,6 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 TextType::class,
                 [
                     'label'      => 'mautic.salesforce.form.namespace_prefix',
-                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => ['class' => 'form-control'],
                     'required'   => false,
                 ]

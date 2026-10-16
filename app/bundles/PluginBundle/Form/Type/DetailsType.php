@@ -111,7 +111,6 @@ final class DetailsType extends AbstractType
                 [
                     'choices'     => $choices,
                     'expanded'    => true,
-                    'label_attr'  => ['class' => 'form-label'],
                     'multiple'    => true,
                     'label'       => 'mautic.integration.form.features',
                     'required'    => false,
@@ -137,7 +136,6 @@ final class DetailsType extends AbstractType
                 'label'              => 'mautic.integration.form.feature.settings',
                 'required'           => true,
                 'data'               => $integration->getFeatureSettings(),
-                'label_attr'         => ['class' => 'form-label'],
                 'integration'        => $options['integration'],
                 'integration_object' => $integrationObject,
                 'lead_fields'        => $options['lead_fields'],

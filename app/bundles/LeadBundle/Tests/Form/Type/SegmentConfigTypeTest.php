@@ -37,9 +37,6 @@ final class SegmentConfigTypeTest extends TestCase
     {
         $rebuildParameters = [
             'label'      => 'mautic.lead.list.form.config.segment_rebuild_time_warning',
-            'label_attr' => [
-                'class' => 'form-label',
-            ],
             'attr' => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.lead.list.form.config.segment_rebuild_time_warning.tooltip',
@@ -49,9 +46,6 @@ final class SegmentConfigTypeTest extends TestCase
 
         $buildParameters = [
             'label'      => 'mautic.lead.list.form.config.segment_build_time_warning',
-            'label_attr' => [
-                'class' => 'form-label',
-            ],
             'attr' => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.lead.list.form.config.segment_build_time_warning.tooltip',

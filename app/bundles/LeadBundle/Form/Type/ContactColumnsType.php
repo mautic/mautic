@@ -25,7 +25,6 @@ final class ContactColumnsType extends AbstractType
             [
                 'choices'    => array_flip($this->columnsDictionary->getFields()),
                 'label'      => false,
-                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'multiple'   => true,
                 'expanded'   => false,

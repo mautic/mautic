@@ -15,7 +15,6 @@ final class RepublishBehaviorType extends AbstractType
     {
         $resolver->setDefaults([
             'label'                 => 'mautic.campaignconfig.campaign_republish_behavior',
-            'label_attr'            => ['class' => 'form-label'],
             'required'              => false,
             'include_global_option' => false,
             'attr'                  => [

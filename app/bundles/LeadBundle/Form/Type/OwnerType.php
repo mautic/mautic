@@ -31,7 +31,6 @@ final class OwnerType extends AbstractType
                 'multiple'          => false,
                 'choices'           => $choices,
                 'required'          => false,
-                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => ['class' => 'form-control'],
             ]
         );

@@ -150,7 +150,6 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
                 RoleListType::class,
                 [
                     'label'      => 'mautic.integration.sso.new_user_role',
-                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.integration.sso.new_user_role.tooltip',

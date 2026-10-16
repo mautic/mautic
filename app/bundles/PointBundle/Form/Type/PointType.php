@@ -40,7 +40,6 @@ final class PointType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.name',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -50,7 +49,6 @@ final class PointType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control editor'],
                 'required'   => false,
             ]
@@ -63,7 +61,6 @@ final class PointType extends AbstractType
                 'choices'           => $options['pointActions']['choices'],
                 'placeholder'       => '',
                 'label'             => 'mautic.point.form.type',
-                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.getPointActionPropertiesForm(this.value);',
@@ -76,7 +73,6 @@ final class PointType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.point.action.delta',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.point.action.delta.help',

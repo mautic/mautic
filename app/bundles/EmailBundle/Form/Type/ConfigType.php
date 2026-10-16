@@ -56,7 +56,6 @@ final class ConfigType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.email.config.unsubscribe_text',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.unsubscribe_text.tooltip',
@@ -76,7 +75,6 @@ final class ConfigType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.email.config.webview_text',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.webview_text.tooltip',
@@ -96,7 +94,6 @@ final class ConfigType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.email.config.unsubscribe_message',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.unsubscribe_message.tooltip',
@@ -119,7 +116,6 @@ final class ConfigType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.email.config.resubscribe_message',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.resubscribe_message.tooltip',
@@ -142,7 +138,6 @@ final class ConfigType extends AbstractType
             PreferenceCenterListType::class,
             [
                 'label'      => 'mautic.email.config.default_preference_center_id',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'            => 'form-control',
                     'tooltip'          => 'mautic.email.config.default_preference_center_id.tooltip',
@@ -159,7 +154,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.config.default_utm_source',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.default_utm_source.tooltip',
@@ -173,7 +167,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.config.default_utm_medium',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.default_utm_medium.tooltip',
@@ -187,7 +180,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.config.default_utm_campaign',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.default_utm_campaign.tooltip',
@@ -201,7 +193,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.config.default_utm_content',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.default_utm_content.tooltip',
@@ -215,7 +206,6 @@ final class ConfigType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.email.config.default_signature_text',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.default_signature_text.tooltip',
@@ -237,7 +227,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.email.config.mailer.from.name',
-                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.config.mailer.from.name.tooltip',
@@ -256,7 +245,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.email.config.mailer.from.email',
-                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.config.mailer.from.email.tooltip',
@@ -276,7 +264,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.email.reply_to_email',
-                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.reply_to_email.tooltip',
@@ -294,7 +281,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.email.reply_to_email',
-                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.reply_to_email.tooltip',
@@ -314,7 +300,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.config.mailer.return.path',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.config.mailer.return.path.tooltip',
@@ -330,7 +315,6 @@ final class ConfigType extends AbstractType
             [
                 'scale'      => 0,
                 'label'      => 'mautic.email.config.mailer.address.length.limit',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.email.config.mailer.address.length.limit.tooltip',
@@ -356,7 +340,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.mailer.convert.embed.images',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.convert.embed.images.tooltip',
@@ -371,7 +354,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.mailer.append.tracking.pixel',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.append.tracking.pixel.tooltip',
@@ -386,7 +368,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.mailer.disable.trackable.urls',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.disable.trackable.urls.tooltip',
@@ -401,7 +382,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.mailer.minify.html',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.minify.html.tooltip',
@@ -442,7 +422,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.mailer.disable.unsubscribe.link',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.disable.unsubscribe.link.tooltip',
@@ -457,7 +436,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.mailer.is.owner',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.mailer.is.owner.tooltip',
@@ -473,7 +451,6 @@ final class ConfigType extends AbstractType
             [
                 'scale'      => 0,
                 'label'      => 'mautic.lead.list.frequency.number',
-                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class' => 'form-control frequency',
@@ -490,7 +467,6 @@ final class ConfigType extends AbstractType
                     'month' => 'MONTH',
                 ],
                 'label'      => 'mautic.lead.list.frequency.times',
-                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'multiple'   => false,
                 'attr'       => [
@@ -503,7 +479,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.contact.segments',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.segments.tooltip',
@@ -517,7 +492,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.preference.options',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.preference.options.tooltip',
@@ -531,7 +505,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.contact.frequency',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.frequency.tooltip',
@@ -545,7 +518,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.contact.pause.dates',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.pause.dates.tooltip',
@@ -559,7 +531,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.contact.categories',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.categories.tooltip',
@@ -573,7 +544,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.show.contact.preferred.channels',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.show.contact.preferred.channels',
@@ -588,7 +558,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.enable.draft',
-                'label_attr' => ['class' => 'form-label'],
                 'data'       => $options['data']['email_draft_enabled'] ?? false,
                 'required'   => false,
                 'attr'       => [
@@ -603,7 +572,6 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.email.config.validate_unsubscribe_emails',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.config.validate_unsubscribe_emails.tooltip',

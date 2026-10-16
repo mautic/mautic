@@ -44,7 +44,6 @@ final class GroupListType extends AbstractType
                 return $choices;
             },
             'label'             => 'mautic.point.group.form.group',
-            'label_attr'        => ['class' => 'form-label'],
             'multiple'          => false,
             'required'          => false,
             'return_entity'     => true,

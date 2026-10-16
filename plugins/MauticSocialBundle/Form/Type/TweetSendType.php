@@ -28,7 +28,6 @@ final class TweetSendType extends AbstractType
             TweetListType::class,
             [
                 'label'      => 'mautic.integration.Twitter.send.selecttweet',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.integration.Twitter.send.selecttweet.desc',

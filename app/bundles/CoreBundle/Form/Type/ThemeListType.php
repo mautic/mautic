@@ -33,7 +33,6 @@ final class ThemeListType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.core.form.theme',
-                'label_attr'        => ['class' => 'form-label'],
                 'placeholder'       => false,
                 'required'          => false,
                 'attr'              => ['class' => 'form-control'],

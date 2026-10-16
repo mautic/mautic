@@ -22,7 +22,6 @@ final class CompanyChangeScoreActionType extends AbstractType
             [
                 'label'       => 'mautic.lead.lead.events.changecompanyscore',
                 'attr'        => ['class' => 'form-control'],
-                'label_attr'  => ['class' => 'form-label'],
                 'scale'       => 0,
                 'data'        => $options['data']['score'] ?? 0,
                 'constraints' => [

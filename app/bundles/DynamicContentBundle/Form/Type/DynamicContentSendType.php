@@ -28,7 +28,6 @@ class DynamicContentSendType extends AbstractType
             DynamicContentListType::class,
             [
                 'label'      => 'mautic.dynamicContent.send.selectDynamicContents',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.dynamicContent.choose.dynamicContents',

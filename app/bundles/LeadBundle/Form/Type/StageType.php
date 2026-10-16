@@ -24,7 +24,6 @@ final class StageType extends AbstractType
                 'multiple'          => false,
                 'choices'           => $options['items'],
                 'required'          => false,
-                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => ['class' => 'form-control'],
             ]
         );

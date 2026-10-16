@@ -24,7 +24,6 @@ final class BatchType extends AbstractType
                 'multiple'          => true,
                 'choices'           => $options['items'],
                 'required'          => false,
-                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => ['class' => 'form-control'],
             ]
         );
@@ -37,7 +36,6 @@ final class BatchType extends AbstractType
                 'multiple'          => true,
                 'choices'           => $options['items'],
                 'required'          => false,
-                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => ['class' => 'form-control'],
             ]
         );

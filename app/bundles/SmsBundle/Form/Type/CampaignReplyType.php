@@ -20,7 +20,6 @@ final class CampaignReplyType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.sms.reply_pattern',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.sms.reply_pattern.tooltip',

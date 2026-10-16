@@ -19,7 +19,6 @@ final class LocaleType extends AbstractType
         $resolver->setDefaults([
             'choices_as_values' => true,
             'choices'           => FormFieldHelper::getLocaleChoices(),
-            'label_attr'        => ['class' => 'form-label'],
             'attr'              => ['class' => 'form-control'],
             'multiple'          => false,
             'expanded'          => false,

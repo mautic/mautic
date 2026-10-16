@@ -39,7 +39,6 @@ final class IntegrationConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.integration.enabled',
-                'label_attr' => ['class' => 'form-label'],
             ]
         );
 
@@ -63,7 +62,6 @@ final class IntegrationConfigType extends AbstractType
                 ChoiceType::class,
                 [
                     'label'      => 'mautic.integration.features',
-                    'label_attr' => ['class' => 'form-label'],
                     'choices'    => array_flip($integrationObject->getSupportedFeatures()),
                     'expanded'   => true,
                     'multiple'   => true,

@@ -220,6 +220,10 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:form_label.html.php #}
 {% block form_label %}
 {% if label is not same as false %}
+{% set labelClass = label_attr.class|default('')|trim %}
+{% if 'form-label' not in labelClass|split(' ') %}
+    {% set label_attr = label_attr|merge({'class': (labelClass ~ ' form-label')|trim}) %}
+{% endif %}
 {% if required %}
     {% set label_attr = label_attr|merge({'class': (label_attr.class is defined ? label_attr.class : '')|trim ~ ' required'}) %}
 {% endif %}

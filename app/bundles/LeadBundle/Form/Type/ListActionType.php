@@ -19,7 +19,6 @@ final class ListActionType extends AbstractType
             LeadListType::class,
             [
                 'label'      => 'mautic.lead.lead.events.addtolists',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -33,7 +32,6 @@ final class ListActionType extends AbstractType
             LeadListType::class,
             [
                 'label'      => 'mautic.lead.lead.events.removefromlists',
-                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],

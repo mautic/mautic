@@ -622,7 +622,6 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     'expanded'    => true,
                     'multiple'    => true,
                     'label'       => 'mautic.integrations.form.blanks',
-                    'label_attr'  => ['class' => 'form-label'],
                     'placeholder' => false,
                     'required'    => false,
                 ]
