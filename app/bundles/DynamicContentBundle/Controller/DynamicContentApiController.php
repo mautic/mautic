@@ -51,7 +51,7 @@ final class DynamicContentApiController extends CommonController
         string $objectAlias,
     ): Response {
         $lead          = $contactRequestHelper->getContactFromQuery($this->pageModel->getHitQuery($request));
-        $content       = $helper->getDynamicContentForLead($objectAlias, $lead);
+        $content       = $helper->getDynamicContentForLead($objectAlias, $lead, null, $this->extractSourceUri($request));
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
         $deviceId      = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
@@ -65,5 +65,21 @@ final class DynamicContentApiController extends CommonController
                     'device_id' => $deviceId,
                 ]
             );
+    }
+
+    /**
+     * @return array{uri?: string}
+     */
+    private function extractSourceUri(Request $request): array
+    {
+        $uri = $request->query->get('page_url');
+
+        if ($uri && is_string($uri)) {
+            return [
+                'uri' => $uri,
+            ];
+        }
+
+        return [];
     }
 }

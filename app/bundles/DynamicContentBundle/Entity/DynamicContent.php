@@ -135,6 +135,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
     private $slotName;
 
+    /**
+     * @Groups({"dynamicContent:read", "dynamicContent:write"})
+     */
+    private ?int $displayOrder = null;
+
     public function __construct()
     {
         $this->stats               = new ArrayCollection();
@@ -189,6 +194,13 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
             ->columnName('sent_count')
             ->build();
 
+        $builder->addNamedField(
+            'displayOrder',
+            Types::INTEGER,
+            'display_order',
+            true
+        );
+
         $builder->createField('content', 'text')
             ->columnName('content')
             ->nullable()
@@ -234,8 +246,10 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
         $metadata->addPropertyConstraint('content', new NoNesting());
 
-        $metadata->addPropertyConstraint('type', new NotBlank(message: 'mautic.core.type.required'));
+        $metadata->addPropertyConstraint('type', new NotBlank(message: 'mautic.core.name.required'));
         $metadata->addPropertyConstraint('type', new Choice(choices: (new TypeList())->getChoices()));
+
+        $metadata->addConstraint(new SlotNameType());
 
         $metadata->addConstraint(new SlotNameType());
 
@@ -267,6 +281,22 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                                 ->atPath('filters')
                                 ->addViolation();
                     }
+
+                    $violations = $validator->validate(
+                        $dwc->getDisplayOrder(),
+                        [
+                            new NotBlank(
+                                message: 'mautic.dynamicContent.order.required'
+                            ),
+                        ]
+                    );
+                    if (count($violations) > 0) {
+                        foreach ($violations as $violation) {
+                            $context->buildViolation($violation->getMessage())
+                                ->atPath('displayOrder')
+                                ->addViolation();
+                        }
+                    }
                 }
             },
         ));
@@ -280,6 +310,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'name',
                 'category',
                 'type',
+                'displayOrder',
             ])
             ->addProperties([
                 'publishUp',
@@ -292,6 +323,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                 'filters',
                 'isCampaignBased',
                 'slotName',
+                'displayOrder',
             ])
             ->setMaxDepth(1, 'variantParent')
             ->setMaxDepth(1, 'variantChildren')
@@ -502,6 +534,19 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         if ($this->isCampaignBased) {
             $this->setSlotName('');
         }
+    }
+
+    public function getDisplayOrder(): ?int
+    {
+        return $this->displayOrder;
+    }
+
+    public function setDisplayOrder(?int $displayOrder = null): self
+    {
+        $this->isChanged('displayOrder', $displayOrder);
+        $this->displayOrder = $displayOrder;
+
+        return $this;
     }
 
     public function setUtmTags(array $utmTags): static

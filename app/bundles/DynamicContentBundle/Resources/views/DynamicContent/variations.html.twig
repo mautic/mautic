@@ -1,0 +1,83 @@
+{#
+    Variations Tab on DWC detail page.
+#}
+<div class="page-list">
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered dwctable-list" id="dwcVariationsTable">
+            <thead>
+                <tr>
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true',
+                        'target': '#dwcVariationsTable',
+                        'routeBase': 'dynamicContent',
+                        'actionRoute': 'mautic_dynamicContent_action',
+                        'templateButtons': {
+                            'delete': permissions['dynamiccontent:dynamiccontents:deleteown']
+                                or permissions['dynamiccontent:dynamiccontents:deleteother'],
+                        },
+                    }) }}
+                    <th class="col-dwc-order">
+                        <span>{{ 'mautic.dynamicContent.variations.order'|trans }}</span>
+                    </th>
+                    <th class="col-dwc-name">
+                        <span>{{ 'mautic.core.name'|trans }}</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for variation in variations %}
+                <tr{{ variation.id == entity.id ? ' class="info"' : '' }}>
+                    <td>
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                            'item': variation,
+                            'templateButtons': {
+                                'edit': securityHasEntityAccess(
+                                    permissions['dynamiccontent:dynamiccontents:editown'],
+                                    permissions['dynamiccontent:dynamiccontents:editother'],
+                                    variation.createdBy
+                                ),
+                                'clone': permissions['dynamiccontent:dynamiccontents:create'],
+                                'delete': securityHasEntityAccess(
+                                    permissions['dynamiccontent:dynamiccontents:deleteown'],
+                                    permissions['dynamiccontent:dynamiccontents:deleteother'],
+                                    variation.createdBy
+                                ),
+                            },
+                            'routeBase': 'dynamicContent',
+                            'nameGetter': 'getName',
+                            'translationBase': 'mautic.dynamicContent',
+                        }) }}
+                    </td>
+                    <td>
+                        {% if variation.id == entity.id %}
+                            {{ variation.displayOrder }}
+                        {% else %}
+                            <a href="{{ path(
+                                'mautic_dynamicContent_action',
+                                {'objectAction': 'view', 'objectId': variation.id}
+                            ) }}" data-toggle="ajax">
+                                {{ variation.displayOrder }}
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if variation.id == entity.id %}
+                            <span class="name"> {{ variation.name }} </span>
+                            <span class="label label-info">
+                                {{ 'mautic.core.current'|trans }}
+                            </span>
+                        {% else %}
+                            <a href="{{ path(
+                                'mautic_dynamicContent_action',
+                                {'objectAction': 'view', 'objectId': variation.id}
+                            ) }}" data-toggle="ajax">
+                                {{ variation.name }}
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
