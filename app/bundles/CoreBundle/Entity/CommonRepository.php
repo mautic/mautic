@@ -1056,13 +1056,23 @@ class CommonRepository extends ServiceEntityRepository
             $type = 'and';
         }
 
+        // SearchStringHelper stores the operator on the filter following it.
+        // Inspect all filters as well so sparse or nested parser output cannot
+        // accidentally turn an OR group into an AND group.
+        foreach ($parseFilters as $filter) {
+            if ('or' === ($filter->type ?? null)) {
+                $type = 'or';
+                break;
+            }
+        }
+
         $containsOr = $containsOr || 'or' === $type;
 
         $parameters  = [];
         $expressions = $qb->expr()->{"{$type}X"}();
 
         if ($parseFilters) {
-        $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters, $containsOr);
+            $this->parseSearchFilters($parseFilters, $qb, $expressions, $parameters, $containsOr);
         }
 
         return [$expressions, $parameters];
