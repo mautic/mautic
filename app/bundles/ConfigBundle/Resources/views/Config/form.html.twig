@@ -6,6 +6,8 @@
     - formThemes
     - formConfigs
     - isWritable
+    - tabs
+    - activeTab
 #}
 {% if formThemes is not empty and formThemes is iterable %}
   {% form_theme form with formThemes %}
@@ -31,14 +33,15 @@
                  {% if not isWritable %}
                      <div class="alert alert-danger">{{ 'mautic.config.notwritable'|trans }}</div>
                  {% endif %}
-                 <!-- Nav tabs -->
-                 <ul class="list-group list-group-tabs" role="tablist">
-                     {% for key in form.children|keys|filter(v => formConfigs[v] is defined and form[v].children|length > 0) %}
-                         <li role="presentation" class="list-group-item {% if loop.first %}in active{% endif %}">
-                             {% set containsErrors = formContainsErrors(form[key]) %}
-                             <a href="#{{ key }}" aria-controls="{{ key }}" role="tab" data-toggle="tab" class="list-group-item-text steps {% if formContainsErrors(form[key]) %}text-danger{% endif %}">
+                 <!-- Nav -->
+                 <ul class="list-group list-group-tabs">
+                     {% for key in tabs %}
+                         {% set isActive = key == activeTab %}
+                         {% set containsErrors = isActive and form[key] is defined and formContainsErrors(form[key]) %}
+                         <li class="list-group-item {% if isActive %}in active{% endif %}">
+                             <a href="{{ path('mautic_config_edit', {'activeTabId': key}) }}" data-toggle="ajax" {% if isActive %}aria-current="page"{% endif %} class="list-group-item-text steps {% if containsErrors %}text-danger{% endif %}">
                                  {{ ('mautic.config.tab.' ~ key)|trans }}
-                                 {% if formContainsErrors(form[key]) %}
+                                 {% if containsErrors %}
                                      <i class="ri-alert-line"></i>
                                  {% endif %}
                              </a>
@@ -51,11 +54,13 @@
          <!-- container -->
          <div class="col-md-9 height-auto">
              {{ form_start(form) }}
-             <!-- Tab panes -->
+             {% if activeTab and form[activeTab] is defined and formContainsErrors(form[activeTab]) %}
+                 <div class="alert alert-danger">{{ 'mautic.config.form.has_errors'|trans }}</div>
+             {% endif %}
              <div class="tab-content">
                  {% for key in form.children|keys|filter(v => formConfigs[v] is defined) %}
                      {% if form[key].children|length > 0 %}
-                       <div role="tabpanel" class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ key }}">
+                       <div class="tab-pane in active bdr-w-0" id="{{ key }}">
                            <div>
                             <div class="row pa-md bdr-b">
                                 <h4 class="fw-sb">{{ ('mautic.config.tab.' ~ key)|trans }}</h4>

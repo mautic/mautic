@@ -43,30 +43,6 @@ Mautic.parseUrlHashParameter = function(url) {
     return false;
 }
 
-Mautic.observeConfigTabs = function() {
-
-    if (!mQuery('#config_coreconfig_last_shown_tab').length) {
-        return;
-    }
-
-    var parameters = Mautic.parseQuery(window.location.search.substr(1));
-    if ('undefined' != typeof parameters['tab']) {
-        mQuery('#config_coreconfig_last_shown_tab').val(parameters['tab']);
-        mQuery('a[data-toggle="tab"]').each(function (i, tab) {
-            if (mQuery(tab).attr('href') == ('#' + parameters['tab'])) {
-                mQuery(tab).tab('show');
-            }
-        });
-    }
-
-    mQuery('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
-        var tab = Mautic.parseUrlHashParameter(e.target.href);
-        if (tab) {
-            mQuery('#config_coreconfig_last_shown_tab').val(tab);
-        }
-    });
-}
-
 Mautic.resetEmailsToNotification = function(obj) {
     const send_to_owner = obj.value;
     if (parseInt(send_to_owner, 10) === 1)
@@ -107,4 +83,61 @@ Mautic.showAnonymizeWarningMessage = function(anonymize_ip) {
     }
 };
 
-mQuery(Mautic.observeConfigTabs);
+/**
+ * Each configuration page is saved on its own, so warn before leaving a page with unsaved changes.
+ */
+Mautic.initConfigUnsavedChangesGuard = function(container) {
+    const form = mQuery(container + ' form[name="config"]');
+
+    if (!form.length) {
+        return;
+    }
+
+    // A page that failed validation was not saved, so its submitted values are unsaved too
+    const failedValidation = form.find('.has-error').length > 0;
+    const initialState = form.serialize();
+    const hasUnsavedChanges = () => failedValidation || form.serialize() !== initialState;
+
+    Mautic.configLeaveGuard = function(event) {
+        const link = event.target.closest('a[data-toggle="ajax"]');
+
+        if (!link || event.ctrlKey || event.metaKey || !hasUnsavedChanges()) {
+            return;
+        }
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        Mautic.showConfirmation(mQuery('<a />').data({
+            'message': Mautic.translate('mautic.config.form.unsaved_changes'),
+            'confirm-text': Mautic.translate('mautic.core.form.confirm'),
+            'confirm-callback': 'leaveConfigPage',
+            'cancel-text': Mautic.translate('mautic.core.form.cancel'),
+            'link': link
+        }));
+    };
+
+    Mautic.configBeforeUnloadGuard = function(event) {
+        if (hasUnsavedChanges()) {
+            event.preventDefault();
+        }
+    };
+
+    // Capture phase so the guard runs before the ajax link handlers
+    document.addEventListener('click', Mautic.configLeaveGuard, true);
+    globalThis.addEventListener('beforeunload', Mautic.configBeforeUnloadGuard);
+
+    // Saving, applying or cancelling may reload the whole page, which must not trigger the guard
+    form.on('submit', Mautic.removeConfigUnsavedChangesGuard);
+};
+
+Mautic.removeConfigUnsavedChangesGuard = function() {
+    document.removeEventListener('click', Mautic.configLeaveGuard, true);
+    globalThis.removeEventListener('beforeunload', Mautic.configBeforeUnloadGuard);
+};
+
+Mautic.leaveConfigPage = function(route, el) {
+    Mautic.dismissConfirmation();
+    Mautic.removeConfigUnsavedChangesGuard();
+    mQuery(el).data('link').click();
+};

@@ -65,6 +65,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             'description'            => 'mautic.channel.message.send.marketing.message.descr',
             'batchEventName'         => ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
             'formType'               => MessageSendType::class,
+            'formTheme'              => '@MauticChannel/FormTheme/MessageSend/message_send_row.html.twig',
             'channel'                => 'channel.message',
             'channelIdField'         => 'marketingMessage',
             'connectionRestrictions' => [
