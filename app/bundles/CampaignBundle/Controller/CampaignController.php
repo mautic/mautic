@@ -135,7 +135,7 @@ class CampaignController extends AbstractStandardFormController
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
 
         /** @var EventRepository $legacyEventRepository */
-        $legacyEventRepository = call_user_func([$eventModel, 'getRepository']);
+        $legacyEventRepository = call_user_func($eventModel->getRepository(...));
         $this->eventRepository = $eventRepository ?? $legacyEventRepository;
     }
 
