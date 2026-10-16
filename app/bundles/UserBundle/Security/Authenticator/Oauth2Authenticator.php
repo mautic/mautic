@@ -53,8 +53,9 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
             /** @var AccessToken $accessToken */
             $accessToken = $this->serverService->verifyAccessToken($tokenString);
 
-            $user   = $accessToken->getUser();
-            $client = $accessToken->getClient();
+            $tokenUser = $accessToken->getUser();
+            $user      = $tokenUser;
+            $client    = $accessToken->getClient();
 
             if (null === $user && null !== $this->tokenPermissions) {
                 $user = $this->tokenPermissions->setActivePermissionsOnAuthToken($accessToken);
@@ -81,7 +82,7 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
 
             $accessTokenBadge = new AccessTokenBadge($accessToken, $roles);
             $userLoader = null;
-            if (null !== $user) {
+            if (null === $tokenUser && null !== $user) {
                 $userLoader = fn (): UserInterface => $user;
             }
 
