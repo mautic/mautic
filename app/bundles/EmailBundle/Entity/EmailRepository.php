@@ -66,7 +66,7 @@ class EmailRepository extends CommonRepository
         if (null !== $reasons) {
             $q->andWhere(
                 $q->expr()->in('dnc.reason', ':reasons')
-            )->setParameter('reasons', $reasons, Connection::PARAM_INT_ARRAY);
+            )->setParameter('reasons', $reasons, ArrayParameterType::INTEGER);
         }
 
         if ($leadIds) {
@@ -420,6 +420,9 @@ class EmailRepository extends CommonRepository
                 ->setMinContactId($minContactId)
                 ->setMaxContactId($maxContactId)
                 ->setCountWithMaxMin($countWithMaxMin)
+                ->setMaxThreads($maxThreads)
+                ->setThreadId($threadId)
+                ->setSendStopDate($sendStopDate)
                 ->setSentToDnc($sendToDnc)
         );
 

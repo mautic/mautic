@@ -793,8 +793,8 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
     public function testContactWhenSendToDncIsNo(): void
     {
-        $contact       = $this->createContact();
-        $email         = $this->createEmail();
+        $contact = $this->createContact();
+        $email   = $this->createTransactionalEmail();
         $this->em->flush();
 
         $this->sendEmail($email, $contact);
@@ -803,8 +803,8 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
     public function testContactWhenSendToDncIsYes(): void
     {
-        $contact       = $this->createContact();
-        $email         = $this->createEmail();
+        $contact = $this->createContact();
+        $email   = $this->createTransactionalEmail();
         $email->setSendToDnc(true);
         $this->em->persist($email);
         $this->em->flush();
@@ -814,12 +814,12 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider DataDNCContactWhenSendToDncIsNo
+     * @dataProvider dataDNCContactWhenSendToDncIsNo
      */
     public function testDNCContactWhenSendToDncIsNo(int $reason): void
     {
-        $contact       = $this->createContact();
-        $email         = $this->createEmail();
+        $contact = $this->createContact();
+        $email   = $this->createTransactionalEmail();
         $this->addDNC($contact, $reason);
         $this->em->flush();
 
@@ -830,7 +830,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<mixed[]>
      */
-    public function DataDNCContactWhenSendToDncIsNo(): iterable
+    public static function dataDNCContactWhenSendToDncIsNo(): iterable
     {
         yield [DoNotContact::UNSUBSCRIBED];
         yield [DoNotContact::BOUNCED];
@@ -838,12 +838,12 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @dataProvider DataDNCContactWhenSendToDncIsYes
+     * @dataProvider dataDNCContactWhenSendToDncIsYes
      */
     public function testDNCContactWhenSendToDncIsYes(int $reason, bool $send): void
     {
-        $contact       = $this->createContact();
-        $email         = $this->createEmail();
+        $contact = $this->createContact();
+        $email   = $this->createTransactionalEmail();
         $email->setSendToDnc(true);
         $this->em->persist($email);
         $this->addDNC($contact, $reason);
@@ -860,11 +860,22 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
     /**
      * @return iterable<mixed[]>
      */
-    public function DataDNCContactWhenSendToDncIsYes(): iterable
+    public static function dataDNCContactWhenSendToDncIsYes(): iterable
     {
         yield [DoNotContact::UNSUBSCRIBED, true];
         yield [DoNotContact::BOUNCED, false];
         yield [DoNotContact::MANUAL, true];
+    }
+
+    private function createTransactionalEmail(): Email
+    {
+        $email = new Email();
+        $email->setName('Transactional Email');
+        $email->setSubject('Transactional Email Subject');
+        $email->setCustomHtml('Email content');
+        $this->em->persist($email);
+
+        return $email;
     }
 
     private function createContact(): Lead
@@ -1017,7 +1028,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         \assert($statRepository instanceof StatRepository);
 
         $stat = $statRepository->findBy([]);
-        Assert::assertCount(0, $stat);
+        $this->assertCount(0, $stat);
     }
 
     private function assertEmailIsSend(Email $email, Lead $contact): void
@@ -1026,12 +1037,12 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         \assert($statRepository instanceof StatRepository);
 
         $stat = $statRepository->findBy([]);
-        Assert::assertCount(1, $stat);
+        $this->assertCount(1, $stat);
 
         $stat = reset($stat);
-        Assert::assertInstanceOf(Stat::class, $stat);
+        $this->assertInstanceOf(Stat::class, $stat);
 
-        Assert::assertSame($stat->getEmail()->getId(), $email->getId());
-        Assert::assertSame($stat->getLead()->getId(), $contact->getId());
+        $this->assertSame($stat->getEmail()->getId(), $email->getId());
+        $this->assertSame($stat->getLead()->getId(), $contact->getId());
     }
 }

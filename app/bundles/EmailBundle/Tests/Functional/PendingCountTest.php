@@ -66,7 +66,7 @@ final class PendingCountTest extends MauticMysqlTestCase
 
         $doNotContact1 = new DoNotContact();
         $doNotContact1->setLead($contact1);
-        $doNotContact1->setDateAdded(new DateTime());
+        $doNotContact1->setDateAdded(new \DateTime());
         $doNotContact1->setChannel('email');
         $doNotContact1->setReason(DoNotContact::UNSUBSCRIBED);
         $this->em->persist($doNotContact1);
@@ -76,7 +76,7 @@ final class PendingCountTest extends MauticMysqlTestCase
 
         $doNotContact2 = new DoNotContact();
         $doNotContact2->setLead($contact2);
-        $doNotContact2->setDateAdded(new DateTime());
+        $doNotContact2->setDateAdded(new \DateTime());
         $doNotContact2->setChannel('email');
         $doNotContact2->setReason(DoNotContact::BOUNCED);
         $this->em->persist($doNotContact2);
@@ -86,7 +86,7 @@ final class PendingCountTest extends MauticMysqlTestCase
 
         $doNotContact3 = new DoNotContact();
         $doNotContact3->setLead($contact3);
-        $doNotContact3->setDateAdded(new DateTime());
+        $doNotContact3->setDateAdded(new \DateTime());
         $doNotContact3->setChannel('email');
         $doNotContact3->setReason(DoNotContact::MANUAL);
         $this->em->persist($doNotContact3);
@@ -99,17 +99,17 @@ final class PendingCountTest extends MauticMysqlTestCase
         $segmentRef1 = new ListLead();
         $segmentRef1->setLead($contact1);
         $segmentRef1->setList($segment);
-        $segmentRef1->setDateAdded(new DateTime());
+        $segmentRef1->setDateAdded(new \DateTime());
 
         $segmentRef2 = new ListLead();
         $segmentRef2->setLead($contact2);
         $segmentRef2->setList($segment);
-        $segmentRef2->setDateAdded(new DateTime());
+        $segmentRef2->setDateAdded(new \DateTime());
 
         $segmentRef3 = new ListLead();
         $segmentRef3->setLead($contact3);
         $segmentRef3->setList($segment);
-        $segmentRef3->setDateAdded(new DateTime());
+        $segmentRef3->setDateAdded(new \DateTime());
 
         $email = new Email();
         $email->setName('Email A');
@@ -132,9 +132,9 @@ final class PendingCountTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // The counts are loaded via ajax call after the email list page loads, so checking the ajax request instead of the HTML.
-        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:getEmailCountStats', ['id' => $email->getId()]);
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=email:getEmailCountStats', ['id' => $email->getId()]);
 
-        Assert::assertSame(
+        $this->assertSame(
             '{"id":'.$email->getId().',"pending":"2 Pending","queued":0,"sentCount":"0 Sent","readCount":"0 Read","readPercent":"0% Read"}',
             $this->client->getResponse()->getContent()
         );

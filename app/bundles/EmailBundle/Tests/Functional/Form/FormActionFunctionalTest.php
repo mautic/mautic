@@ -88,7 +88,7 @@ final class FormActionFunctionalTest extends MauticMysqlTestCase
 
         // email send to contact
         /** @var EmailModel $emailModel */
-        $emailModel = self::$container->get('mautic.email.model.email');
+        $emailModel = self::getContainer()->get('mautic.email.model.email');
         $emailModel->sendEmail($emailToSendForm, [[
             'id'           => $lead->getId(),
             'email'        => $lead->getEmail(),
