@@ -125,9 +125,9 @@ class CampaignController extends AbstractStandardFormController
         private CampaignModel $campaignModel,
         private EventModel $eventModel,
         private readonly CampaignRepository $campaignRepository,
-        private readonly EventRepository $eventRepository,
         private readonly SummaryRepository $summaryRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
+        private readonly ?EventRepository $eventRepository = null,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
@@ -1254,7 +1254,7 @@ class CampaignController extends AbstractStandardFormController
 
         $existingEvents = $entity->getEvents()->toArray();
         if (!$isClone && null !== $entity->getId()) {
-            $existingEvents = $this->eventRepository->getCampaignEventsWithBuilderRelations($entity->getId());
+            $existingEvents = ($this->eventRepository ?? $this->eventModel->getRepository())->getCampaignEventsWithBuilderRelations($entity->getId());
         }
         foreach ($existingEvents as $e) {
             // remove deleted events from existing events

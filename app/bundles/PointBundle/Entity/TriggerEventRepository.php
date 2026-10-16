@@ -100,9 +100,10 @@ class TriggerEventRepository extends CommonRepository
                 Expr\Join::WITH,
                 $joinCondition
             )
-            ->orderBy('IDENTITY(r.group)')
+            ->orderBy('CASE WHEN r.group IS NULL THEN 0 ELSE 1 END')
             ->addOrderBy('a.order')
             ->addOrderBy('r.points')
+            ->addOrderBy('IDENTITY(r.group)')
             ->setParameter('points', $points)
             ->setParameter('leadId', $leadId);
 
