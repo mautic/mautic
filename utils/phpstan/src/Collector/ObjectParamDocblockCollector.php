@@ -6,8 +6,6 @@ namespace Utils\PHPStan\Collector;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\Instanceof_;
-use PhpParser\Node\Expr\MethodCall;
-use PhpParser\Node\Expr\NullsafeMethodCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\ClassMethod;
 use PhpParser\NodeFinder;
@@ -16,10 +14,9 @@ use PHPStan\Collectors\Collector;
 use PHPStan\Type\FileTypeMapper;
 
 /**
- * Collects, for every method, the untyped parameters whose only type is an object-type param docblock and that
- * have a method called on them in the body. The override family is judged later by
- * MoveObjectParamDocblockToNativeTypeRule, so a parameter is only narrowed when no method in the family stands
- * in the way.
+ * Collects, for every method, the untyped parameters whose only type is an object-type param docblock. The
+ * override family is judged later by MoveObjectParamDocblockToNativeTypeRule, so a parameter is only narrowed
+ * when no method in the family stands in the way.
  *
  * @phpstan-type CandidateParam array{name: string, type: string, line: int}
  *
@@ -108,10 +105,6 @@ final readonly class ObjectParamDocblockCollector implements Collector
                 continue;
             }
 
-            if (!$this->hasMethodCallOnVariable($node->stmts, $parameterName)) {
-                continue;
-            }
-
             // the docblock type is not trusted when the body itself checks the variable against it
             if ($this->hasInstanceofOnVariable($node->stmts, $parameterName)) {
                 continue;
@@ -125,22 +118,6 @@ final readonly class ObjectParamDocblockCollector implements Collector
         }
 
         return $entry;
-    }
-
-    /**
-     * @param Node\Stmt[] $stmts
-     */
-    private function hasMethodCallOnVariable(array $stmts, string $parameterName): bool
-    {
-        $methodCalls = (new NodeFinder())->find($stmts, static function (Node $subNode) use ($parameterName): bool {
-            if (!$subNode instanceof MethodCall && !$subNode instanceof NullsafeMethodCall) {
-                return false;
-            }
-
-            return $subNode->var instanceof Variable && $subNode->var->name === $parameterName;
-        });
-
-        return [] !== $methodCalls;
     }
 
     /**

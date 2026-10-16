@@ -13,11 +13,11 @@ use PHPStan\Rules\RuleErrorBuilder;
 use Utils\PHPStan\Collector\ObjectParamDocblockCollector;
 
 /**
- * An untyped parameter whose only type is an object-type param docblock, and that has a method called on it
- * in the body, must declare that object as a native type instead.
+ * An untyped parameter whose only type is an object-type param docblock must declare that object as a native
+ * type instead.
  *
- * The method call proves the value is used as that object, so the docblock type is safe to promote to a native
- * type. That restores static checks and lets the redundant docblock tag be dropped.
+ * Promoting the docblock type to a native type restores static checks and lets the redundant docblock tag be
+ * dropped.
  *
  * Adding a native type changes the whole override family at once, so a parameter is only reported when the
  * method neither overrides a parent nor is overridden by a child in the analysed code. That leaves the loose,
@@ -70,7 +70,7 @@ final class MoveObjectParamDocblockToNativeTypeRule implements Rule
 
                 foreach ($entry['candidates'] as $candidate) {
                     $ruleErrors[] = RuleErrorBuilder::message(sprintf(
-                        'Parameter "$%s" has a method called on it and an "@param %s" docblock. Declare "%s" as a native type and drop the "@param" tag.',
+                        'Parameter "$%s" has an "@param %s" docblock. Declare "%s" as a native type and drop the "@param" tag.',
                         $candidate['name'],
                         $candidate['type'],
                         $candidate['type']
