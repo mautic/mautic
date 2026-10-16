@@ -89,6 +89,10 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
             $roles = array_unique($roles, SORT_REGULAR);
 
             $accessTokenBadge = new AccessTokenBadge($accessToken, $roles);
+            $userLoader = null;
+            if (null !== $user) {
+                $userLoader = fn (): ?UserInterface => $user;
+            }
 
             // Parent uses $client->getUserIdentifier() here, which breaks
             // user-bound bearer tokens on /api/v2 because the client identifier
@@ -96,7 +100,7 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
             return new SelfValidatingPassport(
                 new UserBadge(
                     $user?->getUserIdentifier() ?? $client->getUserIdentifier(),
-                    fn (): ?UserInterface => $user,
+                    $userLoader,
                 ),
                 [$accessTokenBadge]
             );
