@@ -23,7 +23,7 @@ Every page must be built using components.
 - **content-section**: Use on settings-style pages where a heading sits on the left and its content on the right.
 - **list--styled**: Use for numbered steps or ordered lists.
 - **list-unordered**: Use for bulleted lists, including nested ones.
-- **modal**: Use to confirm an action or show focused content without leaving the page (variant: expressive).
+- **modal**: Use to confirm an action or show focused content without leaving the page. Variants: `productive` for functionality (actions, forms, confirmations); `expressive` for content (text, media, reading).
 - **pictogram**: Use for decorative illustrations, such as empty states, by name and size.
 - **tile**: Use for a compact block of content with an optional button or click target (types: base, clickable, expandable, expandable-interactive, mini).
 - **toggletip**: Use to reveal a short explanation from an icon or label next to a control.
