@@ -145,7 +145,7 @@ abstract class ModeratedCommand extends Command
     /**
      * @param array<int, string> $moderationKeys
      */
-    protected function checkAdditionalRunStatus(InputInterface $input, OutputInterface $output, array $moderationKeys, string $conflictMessage): bool
+    protected function checkAdditionalRunStatus(InputInterface $input, OutputInterface $output, array $moderationKeys): bool
     {
         if ((bool) $input->getOption('bypass-locking') || (bool) $input->getOption('force')) {
             return true;
@@ -162,7 +162,7 @@ abstract class ModeratedCommand extends Command
 
             if (!$this->checkStatus($fullKey, false)) {
                 $this->releaseLocksFrom($lockCount, $lockFileCount);
-                $output->writeln('<error>'.$conflictMessage.'</error>');
+                $output->writeln('<error>Script in progress. Can force execution by using --bypass-locking.</error>');
 
                 return false;
             }

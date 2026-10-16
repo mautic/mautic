@@ -321,8 +321,7 @@ final class TriggerCampaignCommand extends ModeratedCommand
         return $this->checkAdditionalRunStatus(
             $input,
             $output,
-            $moderationKeys,
-            $this->translator->trans('mautic.campaign.trigger.marketing_email_in_progress')
+            $moderationKeys
         );
     }
 
