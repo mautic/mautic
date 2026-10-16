@@ -34,7 +34,6 @@ final class WidgetType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.dashboard.widget.form.name',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control form-control-widget'],
                 'required'   => false,
             ]
@@ -52,7 +51,6 @@ final class WidgetType extends AbstractType
             [
                 'label'             => 'mautic.dashboard.widget.form.type',
                 'choices'           => $types,
-                'label_attr'        => ['class' => 'control-label'],
                 'placeholder'       => 'mautic.core.select',
                 'attr'              => [
                     'class'    => 'form-control form-control-widget',
@@ -73,7 +71,6 @@ final class WidgetType extends AbstractType
                     '100%' => '100',
                 ],
                 'empty_data'        => '100',
-                'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['class' => 'form-control form-control-widget'],
                 'required'          => false,
             ]
@@ -92,7 +89,6 @@ final class WidgetType extends AbstractType
                     'mautic.dashboard.widget.size.extra_large' => '675',
                 ],
                 'empty_data'        => '330',
-                'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['class' => 'form-control form-control-widget'],
                 'required'          => false,
             ]

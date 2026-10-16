@@ -35,7 +35,6 @@ final class ConfigType extends AbstractType
             [
                 'choices'    => array_combine($samlEntityIdChoices, $samlEntityIdChoices),
                 'label'      => 'mautic.user.config.form.saml.idp_entity_id_label',
-                'label_attr' => ['class' => 'control-label'],
                 'required'   => true,
                 'multiple'   => false,
                 'attr'       => [
@@ -48,7 +47,6 @@ final class ConfigType extends AbstractType
             ConfigFileType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.metadata',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.user.config.form.saml.idp.metadata.tooltip',
@@ -66,7 +64,6 @@ final class ConfigType extends AbstractType
             ConfigFileType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.own_certificate',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.user.config.form.saml.idp.own_certificate.tooltip',
@@ -83,7 +80,6 @@ final class ConfigType extends AbstractType
             ConfigFileType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.own_private_key',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.user.config.form.saml.idp.own_private_key.tooltip',
@@ -100,7 +96,6 @@ final class ConfigType extends AbstractType
             PasswordType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.own_password',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.user.config.form.saml.idp.own_password.tooltip',
@@ -114,7 +109,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.attribute_email',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -127,7 +121,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.attribute_username',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -140,7 +133,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.attribute_firstname',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -153,7 +145,6 @@ final class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.attribute_lastname',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -166,7 +157,6 @@ final class ConfigType extends AbstractType
             RoleListType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.default_role',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'            => 'form-control',
                     'data-placeholder' => $this->translator->trans('mautic.user.config.form.saml.idp.disable_creation'),

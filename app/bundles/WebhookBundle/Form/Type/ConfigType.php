@@ -68,7 +68,6 @@ final class ConfigType extends AbstractType
                 TextareaType::class,
                 [
                     'label'      => 'mautic.webhook.config.allowed_private_addresses',
-                    'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.webhook.config.allowed_private_addresses.tooltip',

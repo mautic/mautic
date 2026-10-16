@@ -29,7 +29,6 @@ final class PreferenceChannelsType extends AbstractType
                 'choices'     => fn (Options $options): array => $model->getPreferenceChannels(),
                 'placeholder' => '',
                 'attr'        => ['class' => 'form-control'],
-                'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
                 'expanded'    => false,
                 'required'    => false,

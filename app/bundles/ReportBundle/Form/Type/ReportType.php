@@ -43,7 +43,6 @@ final class ReportType extends AbstractType
                 TextType::class,
                 [
                     'label'      => 'mautic.core.name',
-                    'label_attr' => ['class' => 'control-label'],
                     'attr'       => ['class' => 'form-control'],
                     'required'   => true,
                 ]
@@ -54,7 +53,6 @@ final class ReportType extends AbstractType
                 TextareaType::class,
                 [
                     'label'      => 'mautic.core.description',
-                    'label_attr' => ['class' => 'control-label'],
                     'attr'       => ['class' => 'form-control editor'],
                     'required'   => false,
                 ]
@@ -83,7 +81,6 @@ final class ReportType extends AbstractType
                 UserListType::class,
                 [
                     'label'      => 'mautic.report.report.form.owner',
-                    'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class' => 'form-control',
                     ],
@@ -96,7 +93,6 @@ final class ReportType extends AbstractType
                 ReportSettingsType::class,
                 [
                     'label'      => false,
-                    'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.email.utm_tags.tooltip',
@@ -118,7 +114,6 @@ final class ReportType extends AbstractType
                     'expanded'          => false,
                     'multiple'          => false,
                     'label'             => 'mautic.report.report.form.source',
-                    'label_attr'        => ['class' => 'control-label'],
                     'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
@@ -156,7 +151,6 @@ final class ReportType extends AbstractType
                     [
                         'choices'           => array_flip($columns->choices),
                         'label'             => false,
-                        'label_attr'        => ['class' => 'control-label'],
                         'required'          => false,
                         'multiple'          => true,
                         'expanded'          => false,
@@ -175,7 +169,6 @@ final class ReportType extends AbstractType
                     [
                         'choices'           => array_flip($groupByColumns->choices),
                         'label'             => false,
-                        'label_attr'        => ['class' => 'control-label'],
                         'required'          => false,
                         'multiple'          => true,
                         'expanded'          => false,
@@ -280,7 +273,6 @@ final class ReportType extends AbstractType
                     [
                         'choices'           => array_flip($graphList->choices),
                         'label'             => 'mautic.report.report.form.graphs',
-                        'label_attr'        => ['class' => 'control-label'],
                         'required'          => false,
                         'multiple'          => true,
                         'expanded'          => false,
@@ -299,7 +291,6 @@ final class ReportType extends AbstractType
                 YesNoButtonGroupType::class,
                 [
                     'label'      => 'mautic.report.schedule.isScheduled',
-                    'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'                => 'form-control',
                         'data-report-schedule' => 'isScheduled',
@@ -313,7 +304,6 @@ final class ReportType extends AbstractType
                 TextType::class,
                 [
                     'label'      => 'mautic.report.schedule.toAddress.label',
-                    'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
                     'attr'       => [
                         'class'    => 'form-control',
@@ -331,7 +321,6 @@ final class ReportType extends AbstractType
                     'expanded'          => false,
                     'multiple'          => false,
                     'label'             => 'mautic.report.schedule.every',
-                    'label_attr'        => ['class' => 'control-label'],
                     'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
@@ -349,7 +338,6 @@ final class ReportType extends AbstractType
                     'expanded'          => false,
                     'multiple'          => false,
                     'label'             => 'mautic.report.schedule.day',
-                    'label_attr'        => ['class' => 'control-label'],
                     'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
@@ -367,7 +355,6 @@ final class ReportType extends AbstractType
                     'expanded'          => false,
                     'multiple'          => false,
                     'label'             => 'mautic.report.schedule.month_frequency',
-                    'label_attr'        => ['class' => 'control-label'],
                     'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [

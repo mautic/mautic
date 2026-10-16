@@ -44,7 +44,6 @@ final class MobileNotificationType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.notification.form.internal.name',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -54,7 +53,6 @@ final class MobileNotificationType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.notification.form.internal.description',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
@@ -65,7 +63,6 @@ final class MobileNotificationType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.notification.form.mobile.heading',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -75,7 +72,6 @@ final class MobileNotificationType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.notification.form.message',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class' => 'form-control',
                     'rows'  => 6,
@@ -88,7 +84,6 @@ final class MobileNotificationType extends AbstractType
             UrlType::class,
             [
                 'label'      => 'mautic.notification.form.mobile.url',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.notification.form.mobile.url.tooltip',
@@ -102,7 +97,6 @@ final class MobileNotificationType extends AbstractType
             EmailUtmTagsType::class,
             [
                 'label'      => 'mautic.email.utm_tags',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.utm_tags.tooltip',
@@ -129,7 +123,6 @@ final class MobileNotificationType extends AbstractType
             LocaleType::class,
             [
                 'label'      => 'mautic.core.language',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -150,7 +143,6 @@ final class MobileNotificationType extends AbstractType
             MobileNotificationListType::class,
             [
                 'label'      => 'mautic.core.form.translation_parent',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.form.translation_parent.help',

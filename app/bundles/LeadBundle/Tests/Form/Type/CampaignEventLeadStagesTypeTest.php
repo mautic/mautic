@@ -31,7 +31,6 @@ final class CampaignEventLeadStagesTypeTest extends AbstractMauticTestCase
     {
         $parameters = [
             'label'       => 'mautic.lead.lead.field.stage',
-            'label_attr'  => ['class' => 'control-label'],
             'multiple'    => true,
             'required'    => false,
         ];

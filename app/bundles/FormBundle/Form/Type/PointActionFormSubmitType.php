@@ -16,7 +16,6 @@ final class PointActionFormSubmitType extends AbstractType
     {
         $builder->add('forms', FormListType::class, [
             'label'      => 'mautic.form.point.action.forms',
-            'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
                 'class'   => 'form-control',

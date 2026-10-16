@@ -33,7 +33,6 @@ final class NullableYesNoButtonGroupType extends AbstractType
                 },
                 'expanded'          => true,
                 'multiple'          => false,
-                'label_attr'        => ['class' => 'control-label'],
                 'attr'              => [
                     'class'           => 'form-control',
                 ],

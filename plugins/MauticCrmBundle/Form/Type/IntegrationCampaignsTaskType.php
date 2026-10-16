@@ -31,7 +31,6 @@ final class IntegrationCampaignsTaskType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.connectwise.activity.name',
-                'label_attr'  => ['class' => 'control-label'],
                 'attr'        => ['class' => 'form-control'],
                 'constraints' => [
                     new Callback(

@@ -27,7 +27,6 @@ final class ButtonGroupType extends AbstractType
             'multiple'           => false,
             'placeholder'        => false,
             'required'           => false,
-            'label_attr'         => ['class' => 'control-label'],
             'button_group_class' => 'btn-block',
         ]);
     }

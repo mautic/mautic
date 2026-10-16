@@ -38,7 +38,6 @@ final class TweetType extends AbstractType
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.name',
                 'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'tooltip' => 'mautic.social.monitoring.twitter.tweet.name.tooltip',
                     'class'   => 'form-control',
@@ -57,7 +56,6 @@ final class TweetType extends AbstractType
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.description',
                 'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'tooltip' => 'mautic.social.monitoring.twitter.tweet.description.tooltip',
                     'class'   => 'form-control',
@@ -71,7 +69,6 @@ final class TweetType extends AbstractType
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.text',
                 'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'tooltip' => 'mautic.social.monitoring.twitter.tweet.text.tooltip',
                     'class'   => 'form-control tweet-message',
@@ -92,7 +89,6 @@ final class TweetType extends AbstractType
                 [
                     'label'       => 'mautic.social.monitoring.twitter.assets',
                     'placeholder' => 'mautic.social.monitoring.list.choose',
-                    'label_attr'  => ['class' => 'control-label'],
                     'multiple'    => false,
                     'attr'        => [
                         'class'   => 'form-control tweet-insert-asset',
@@ -110,7 +106,6 @@ final class TweetType extends AbstractType
                 [
                     'label'       => 'mautic.social.monitoring.twitter.pages',
                     'placeholder' => 'mautic.social.monitoring.list.choose',
-                    'label_attr'  => ['class' => 'control-label'],
                     'multiple'    => false,
                     'attr'        => [
                         'class'   => 'form-control tweet-insert-page',

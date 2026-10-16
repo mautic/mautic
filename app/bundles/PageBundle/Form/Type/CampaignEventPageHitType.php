@@ -17,7 +17,6 @@ final class CampaignEventPageHitType extends AbstractType
     {
         $builder->add('pages', PageListType::class, [
             'label'      => 'mautic.page.campaign.event.form.pages',
-            'label_attr' => ['class' => 'control-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.page.campaign.event.form.pages.descr',
@@ -26,7 +25,6 @@ final class CampaignEventPageHitType extends AbstractType
 
         $builder->add('url', TextType::class, [
             'label'      => 'mautic.page.campaign.event.form.url',
-            'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
                 'class'   => 'form-control',
@@ -36,7 +34,6 @@ final class CampaignEventPageHitType extends AbstractType
 
         $builder->add('referer', TextType::class, [
             'label'      => 'mautic.page.campaign.event.form.referer',
-            'label_attr' => ['class' => 'control-label'],
             'required'   => false,
             'attr'       => [
                 'class'   => 'form-control',

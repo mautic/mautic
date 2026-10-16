@@ -105,7 +105,6 @@ trait EntityFieldsBuildFormTrait
                         [
                             'required'      => $required,
                             'label'         => $field['label'],
-                            'label_attr'    => ['class' => 'control-label'],
                             'attr'          => $attr,
                             'data'          => (null !== $value) ? (float) $value : $value,
                             'mapped'        => $mapped,
@@ -121,7 +120,6 @@ trait EntityFieldsBuildFormTrait
                     $opts                = [
                         'required'    => $required,
                         'label'       => $field['label'],
-                        'label_attr'  => ['class' => 'control-label'],
                         'attr'        => $attr,
                         'mapped'      => $mapped,
                         'constraints' => $constraints,
@@ -286,7 +284,6 @@ trait EntityFieldsBuildFormTrait
                         [
                             'required'    => $field['isRequired'],
                             'label'       => $field['label'],
-                            'label_attr'  => ['class' => 'control-label'],
                             'attr'        => $attr,
                             'data'        => $value,
                             'mapped'      => $mapped,

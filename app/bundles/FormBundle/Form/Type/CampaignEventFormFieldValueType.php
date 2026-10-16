@@ -28,7 +28,6 @@ final class CampaignEventFormFieldValueType extends AbstractType
             FormListType::class,
             [
                 'label'       => 'mautic.form.campaign.event.forms',
-                'label_attr'  => ['class' => 'control-label'],
                 'multiple'    => false,
                 'placeholder' => 'mautic.core.select',
                 'attr'        => [
@@ -134,7 +133,6 @@ final class CampaignEventFormFieldValueType extends AbstractType
                     TextType::class,
                     [
                         'label'      => 'mautic.form.field.form.value',
-                        'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
                             'class' => 'form-control',
                         ],
@@ -153,7 +151,6 @@ final class CampaignEventFormFieldValueType extends AbstractType
                     [
                         'choices'    => array_flip($options[$data['field']]),
                         'label'      => 'mautic.form.field.form.value',
-                        'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
                             'class' => 'form-control not-chosen',
                         ],

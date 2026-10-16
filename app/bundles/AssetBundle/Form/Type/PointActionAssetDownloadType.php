@@ -21,7 +21,6 @@ final class PointActionAssetDownloadType extends AbstractType
                 'expanded'    => false,
                 'multiple'    => true,
                 'label'       => 'mautic.asset.point.action.assets',
-                'label_attr'  => ['class' => 'control-label'],
                 'placeholder' => false,
                 'required'    => false,
                 'attr'        => [

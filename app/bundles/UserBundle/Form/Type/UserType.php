@@ -47,7 +47,6 @@ final class UserType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.username',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'preaddon'     => 'ri-user-6-fill',
@@ -61,7 +60,6 @@ final class UserType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.firstname',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -71,7 +69,6 @@ final class UserType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.lastname',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -82,7 +79,6 @@ final class UserType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.position',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'data-options' => json_encode($positions),
@@ -96,7 +92,6 @@ final class UserType extends AbstractType
             EmailType::class,
             [
                 'label'      => 'mautic.core.type.email',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'preaddon' => 'ri-mail-line',
@@ -115,7 +110,6 @@ final class UserType extends AbstractType
                 'first_name'    => 'password',
                 'first_options' => [
                     'label'      => 'mautic.core.password',
-                    'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'        => 'form-control',
                         'placeholder'  => $placeholder,
@@ -129,7 +123,6 @@ final class UserType extends AbstractType
                 'second_name'    => 'confirm',
                 'second_options' => [
                     'label'      => 'mautic.user.user.form.passwordconfirm',
-                    'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'        => 'form-control',
                         'placeholder'  => $placeholder,
@@ -152,7 +145,6 @@ final class UserType extends AbstractType
             TimezoneType::class,
             [
                 'label'      => 'mautic.core.timezone',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -167,7 +159,6 @@ final class UserType extends AbstractType
             [
                 'choices'           => $this->getSupportedLanguageChoices(),
                 'label'             => 'mautic.core.language',
-                'label_attr'        => ['class' => 'control-label'],
                 'attr'              => [
                     'class' => 'form-control',
                 ],
@@ -196,7 +187,6 @@ final class UserType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.email.token.signature',
-                'label_attr' => ['class' => 'control-label'],
                 'required'   => false,
                 'attr'       => [
                     'class' => 'form-control',
@@ -213,7 +203,6 @@ final class UserType extends AbstractType
                     EntityType::class,
                     [
                         'label'      => 'mautic.user.role',
-                        'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
                             'class' => 'form-control',
                         ],

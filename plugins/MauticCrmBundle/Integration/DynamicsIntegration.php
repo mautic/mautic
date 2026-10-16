@@ -75,7 +75,6 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                 'expanded'          => true,
                 'multiple'          => true,
                 'label'             => 'mautic.integrations.form.blanks',
-                'label_attr'        => ['class' => 'control-label'],
                 'placeholder'       => false,
                 'required'          => false,
             ]

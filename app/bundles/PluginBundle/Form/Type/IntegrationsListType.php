@@ -44,7 +44,6 @@ final class IntegrationsListType extends AbstractType
             [
                 'choices'    => $integrations,
                 'expanded'   => false,
-                'label_attr' => ['class' => 'control-label'],
                 'multiple'   => false,
                 'label'      => 'mautic.integration.integration',
                 'attr'       => [

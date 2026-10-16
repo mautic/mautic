@@ -31,7 +31,6 @@ final class OwnerType extends AbstractType
                 'multiple'          => false,
                 'choices'           => $choices,
                 'required'          => false,
-                'label_attr'        => ['class' => 'control-label'],
                 'attr'              => ['class' => 'form-control'],
             ]
         );
@@ -46,7 +45,7 @@ final class OwnerType extends AbstractType
                 'save_text'      => 'mautic.core.form.save',
                 'cancel_onclick' => 'javascript:void(0);',
                 'cancel_attr'    => [
-                    'data-dismiss' => 'modal',
+                    'data-bs-dismiss' => 'modal',
                 ],
             ]
         );

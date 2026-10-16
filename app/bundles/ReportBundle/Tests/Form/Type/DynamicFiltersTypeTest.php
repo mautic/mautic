@@ -155,7 +155,6 @@ final class DynamicFiltersTypeTest extends TestCase
                 $this->callback(function (array $args): bool {
                     $expectedOptions = [
                         'label'      => 'Test Label (Equals)',
-                        'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
                             'class'       => 'form-control',
                             'onchange'    => "Mautic.filterTableData('report.1','test_column',mQuery(this).val(),'list','.report-content');",
@@ -187,7 +186,6 @@ final class DynamicFiltersTypeTest extends TestCase
                 $this->callback(function (array $args): bool {
                     $expectedOptions = [
                         'label'      => 'Test Label (Equals)',
-                        'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
                             'class'       => 'form-control',
                             'onchange'    => "Mautic.filterTableData('report.1','test_column',mQuery(this).val(),'list','.report-content');",
@@ -249,7 +247,6 @@ final class DynamicFiltersTypeTest extends TestCase
                 $this->callback(function (array $args): bool {
                     $expectedOptions = [
                         'label'      => 'Test Label (Equals)',
-                        'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
                             'class'       => 'form-control datepicker',
                             'onchange'    => "Mautic.filterTableData('report.1','test_column',mQuery(this).val(),'list','.report-content');",
@@ -285,7 +282,6 @@ final class DynamicFiltersTypeTest extends TestCase
                 $this->callback(function (array $args): bool {
                     $expectedOptions = [
                         'label'      => 'Test Label (Equals)',
-                        'label_attr' => ['class' => 'control-label'],
                         'attr'       => [
                             'class'       => 'form-control datetimepicker',
                             'onchange'    => "Mautic.filterTableData('report.1','test_column',mQuery(this).val(),'list','.report-content');",

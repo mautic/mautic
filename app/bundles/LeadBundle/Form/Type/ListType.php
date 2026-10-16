@@ -49,7 +49,6 @@ final class ListType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.name',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -59,7 +58,6 @@ final class ListType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.lead.list.form.publicname',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'       => 'form-control',
                     'tooltip'     => 'mautic.lead.list.form.publicname.tooltip',
@@ -74,7 +72,6 @@ final class ListType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.alias',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'       => 'form-control',
                     'length'      => 25,
@@ -90,7 +87,6 @@ final class ListType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control editor'],
                 'required'   => false,
             ]

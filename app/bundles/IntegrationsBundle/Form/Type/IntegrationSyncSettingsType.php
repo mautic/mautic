@@ -38,7 +38,6 @@ final class IntegrationSyncSettingsType extends AbstractType
                 'expanded'    => true,
                 'multiple'    => true,
                 'label'       => 'mautic.integration.sync_objects',
-                'label_attr'  => ['class' => 'control-label'],
                 'placeholder' => [],
                 'required'    => false,
             ]
@@ -51,7 +50,6 @@ final class IntegrationSyncSettingsType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'       => 'mautic.integration.sync.update_blanks',
-                'label_attr'  => ['class' => 'control-label'],
                 'placeholder' => false,
                 'required'    => false,
                 'data'        => !empty($options['data']['updateBlanks'])

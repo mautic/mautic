@@ -20,9 +20,6 @@ final class ConfigThemeType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.config.form.brand_name',
-                'label_attr' => [
-                    'class' => 'control-label',
-                ],
                 'attr'  => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.brand_name.tooltip',
@@ -37,9 +34,6 @@ final class ConfigThemeType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.config.form.primary_brand_color',
-                'label_attr' => [
-                    'class' => 'control-label',
-                ],
                 'attr'  => [
                     'class'        => 'form-control minicolors-input',
                     'tooltip'      => 'mautic.core.config.form.primary_brand_color.tooltip',
@@ -69,7 +63,6 @@ final class ConfigThemeType extends AbstractType
             HiddenType::class,
             [
                 'label'      => 'mautic.user.preferences.accent',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -95,9 +88,6 @@ final class ConfigThemeType extends AbstractType
                 TextType::class,
                 [
                     'label'      => 'mautic.core.config.form.theme.import.allowed.extensions',
-                    'label_attr' => [
-                        'class' => 'control-label',
-                    ],
                     'attr'       => [
                         'class' => 'form-control',
                     ],

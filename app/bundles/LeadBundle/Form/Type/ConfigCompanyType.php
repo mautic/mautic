@@ -51,7 +51,6 @@ final class ConfigCompanyType extends AbstractType
                 CompanyColumnsType::class,
                 [
                     'label'       => 'mautic.config.tab.columns',
-                    'label_attr'  => ['class' => 'control-label'],
                     'attr'        => [
                         'class'         => 'form-control multiselect',
                         'data-sortable' => 'true',

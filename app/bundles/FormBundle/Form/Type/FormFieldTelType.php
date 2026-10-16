@@ -36,7 +36,6 @@ final class FormFieldTelType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.validationmsg',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'tooltip'      => $this->translator->trans('mautic.core.form.default').': '.$this->translator->trans('mautic.form.submission.phone.invalid', [], 'validators'),

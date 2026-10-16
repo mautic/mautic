@@ -29,7 +29,6 @@ final class UserInviteRegistrationType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.username',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'preaddon'     => 'ri-user-6-fill',
@@ -44,7 +43,6 @@ final class UserInviteRegistrationType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.firstname',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => true,
             ]
@@ -55,7 +53,6 @@ final class UserInviteRegistrationType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.lastname',
-                'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => true,
             ]
@@ -68,7 +65,6 @@ final class UserInviteRegistrationType extends AbstractType
                 'first_name'    => 'password',
                 'first_options' => [
                     'label'      => 'mautic.core.password',
-                    'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'        => 'form-control',
                         'tooltip'      => 'mautic.user.user.form.help.passwordrequirements',
@@ -81,7 +77,6 @@ final class UserInviteRegistrationType extends AbstractType
                 'second_name'    => 'confirm',
                 'second_options' => [
                     'label'      => 'mautic.user.user.form.passwordconfirm',
-                    'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'        => 'form-control',
                         'preaddon'     => 'ri-lock-fill',
@@ -103,7 +98,6 @@ final class UserInviteRegistrationType extends AbstractType
             [
                 'choices'           => $this->getSupportedLanguageChoices(),
                 'label'             => 'mautic.core.language',
-                'label_attr'        => ['class' => 'control-label'],
                 'attr'              => [
                     'class' => 'form-control',
                 ],
