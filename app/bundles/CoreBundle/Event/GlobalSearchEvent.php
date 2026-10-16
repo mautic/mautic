@@ -18,7 +18,7 @@ final class GlobalSearchEvent extends Event
      */
     public function __construct(
         $searchString,
-        private Translator $translator,
+        private readonly Translator $translator,
     ) {
         $this->searchString = strtolower(trim(strip_tags($searchString)));
     }

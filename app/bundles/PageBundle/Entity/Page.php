@@ -423,7 +423,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->content;
     }
 
-    public function setPublishUp(\DateTime $publishUp): static
+    public function setPublishUp(?\DateTime $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -439,7 +439,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->publishUp;
     }
 
-    public function setPublishDown(\DateTime $publishDown): static
+    public function setPublishDown(?\DateTime $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;

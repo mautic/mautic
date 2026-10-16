@@ -77,7 +77,7 @@ class LeadPointLog
         return $this->ipAddress;
     }
 
-    public function setIpAddress(IpAddress $ipAddress): void
+    public function setIpAddress(?IpAddress $ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }

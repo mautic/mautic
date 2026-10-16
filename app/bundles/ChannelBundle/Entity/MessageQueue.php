@@ -286,7 +286,7 @@ class MessageQueue
         return $this->dateSent;
     }
 
-    public function setDateSent(\DateTime $dateSent): void
+    public function setDateSent(?\DateTime $dateSent): void
     {
         $this->dateSent = $dateSent;
     }
@@ -299,7 +299,7 @@ class MessageQueue
         return $this->lastAttempt;
     }
 
-    public function setLastAttempt(\DateTime $lastAttempt): void
+    public function setLastAttempt(?\DateTime $lastAttempt): void
     {
         $this->lastAttempt = $lastAttempt;
     }

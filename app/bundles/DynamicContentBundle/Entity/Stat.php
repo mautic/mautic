@@ -171,7 +171,7 @@ class Stat
         return $this->lead;
     }
 
-    public function setLead(Lead $lead): void
+    public function setLead(?Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -184,7 +184,7 @@ class Stat
         return $this->dateSent;
     }
 
-    public function setDateSent(\DateTime $dateSent): void
+    public function setDateSent(?\DateTime $dateSent): void
     {
         $this->dateSent = $dateSent;
     }

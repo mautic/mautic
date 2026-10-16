@@ -237,7 +237,7 @@ class LeadEventLog
         return $this->properties;
     }
 
-    public function setDateAdded(\DateTime $dateAdded): static
+    public function setDateAdded(?\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 

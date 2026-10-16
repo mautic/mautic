@@ -90,7 +90,7 @@ class DynamicContentLeadData extends CommonEntity
         return $this->dynamicContent;
     }
 
-    public function setDynamicContent(DynamicContent $dynamicContent): static
+    public function setDynamicContent(?DynamicContent $dynamicContent): static
     {
         $this->dynamicContent = $dynamicContent;
 

@@ -208,7 +208,7 @@ class VideoHit
         return $this->id;
     }
 
-    public function setDateHit(\DateTime $dateHit): static
+    public function setDateHit(?\DateTime $dateHit): static
     {
         $this->dateHit = $dateHit;
 
@@ -231,7 +231,7 @@ class VideoHit
         return $this->dateLeft;
     }
 
-    public function setDateLeft(\DateTime $dateLeft): static
+    public function setDateLeft(?\DateTime $dateLeft): static
     {
         $this->dateLeft = $dateLeft;
 

@@ -236,7 +236,7 @@ class FormEntity extends CommonEntity
         return $this->isPublished;
     }
 
-    public function setDateAdded(\DateTime $dateAdded): static
+    public function setDateAdded(?\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -251,7 +251,7 @@ class FormEntity extends CommonEntity
         return $this->dateAdded;
     }
 
-    public function setDateModified(\DateTime $dateModified): static
+    public function setDateModified(?\DateTime $dateModified): static
     {
         $this->isChanged('dateModified', $dateModified);
         $this->dateModified = $dateModified;
@@ -267,7 +267,7 @@ class FormEntity extends CommonEntity
         return $this->dateModified;
     }
 
-    public function setCheckedOut(\DateTime $checkedOut): static
+    public function setCheckedOut(?\DateTime $checkedOut): static
     {
         $this->checkedOut = $checkedOut;
 
