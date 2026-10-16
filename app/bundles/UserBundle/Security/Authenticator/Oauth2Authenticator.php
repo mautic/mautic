@@ -21,23 +21,21 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\Oauth2Authenticator
 {
-    /**
-     * @deprecated since Mautic 7.2, will be removed in 8.0. Pass TokenPermissions as the third argument.
-     */
+    private ?TokenPermissions $tokenPermissions = null;
+
     public function __construct(
         OAuth2 $serverService,
         UserCheckerInterface $userChecker,
-        private readonly ?TokenPermissions $tokenPermissions = null,
     ) {
-        if (null === $tokenPermissions) {
-            trigger_deprecation(
-                'mautic/mautic',
-                '7.2',
-                'Passing only OAuth2 and UserCheckerInterface to Oauth2Authenticator is deprecated and will be removed in 8.0. Pass TokenPermissions as the third argument.',
-            );
-        }
-
         parent::__construct($serverService, $userChecker);
+    }
+
+    /**
+     * @internal Used by the service container to keep the legacy constructor contract intact.
+     */
+    public function setTokenPermissions(TokenPermissions $tokenPermissions): void
+    {
+        $this->tokenPermissions = $tokenPermissions;
     }
 
     public function supports(Request $request): bool
