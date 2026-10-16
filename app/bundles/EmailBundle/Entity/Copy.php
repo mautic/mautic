@@ -76,7 +76,7 @@ class Copy
         return $this->dateCreated;
     }
 
-    public function setDateCreated(\DateTime $dateCreated): static
+    public function setDateCreated(?\DateTime $dateCreated): static
     {
         $this->dateCreated = $dateCreated;
 

@@ -10,15 +10,9 @@ final class ReportExportOptions
 
     private int $page = 1;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateFrom;
+    private ?\DateTime $dateFrom = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateTo;
+    private ?\DateTime $dateTo = null;
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
