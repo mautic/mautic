@@ -1,6 +1,6 @@
 {% block _report_aggregators_entry_column_row %}
 <div class="choice-wrapper col-xs-6" data-form-block="_report_aggregators_entry_column_row">
-    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+    <label class="{{ form.vars.label_attr.class|default('form-label') }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
     <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}">
         {% for column in form.vars.choices %}
             <option value="{{ column.value|e }}" {% if column.value == form.vars.data %}selected{% endif %}>
@@ -13,7 +13,7 @@
 
 {% block _report_aggregators_entry_function_row %}
 <div class="choice-wrapper col-xs-4" data-form-block="_report_aggregators_entry_function_row">
-    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+    <label class="{{ form.vars.label_attr.class|default('form-label') }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
     <select id="{{ form.vars.id }}"
             name="{{ form.vars.full_name }}"
             class="{{ form.vars.attr.class }}"
@@ -45,7 +45,7 @@
 {% endblock %}
 
 {% block _report_filters_entry_column_row %}
-<label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+<label class="{{ form.vars.label_attr.class|default('form-label') }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
 <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}">
     {% for column in form.vars.choices %}
       <option value="{{ column.value|e }}" {% if column.value == form.vars.data %}selected{% endif %}>
@@ -56,7 +56,7 @@
 {% endblock %}
 
 {% block _report_filters_entry_condition_row %}
-<label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+<label class="{{ form.vars.label_attr.class|default('form-label') }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
 <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}" onchange="Mautic.checkReportCondition('{{ form.vars.id }}')">
     {% for condition in form.vars.choices %}
     <option value="{{ condition.value|e }}" {% if condition.value == form.vars.data %}selected{% endif %}>
@@ -69,7 +69,7 @@
 {% block _report_filters_entry_value_row %}
 {%- set condition = form.parent.children.condition.vars.value -%}
 <div class="form-group mb-0" data-form-block="_report_filters_entry_value_row">
-    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+    <label class="{{ form.vars.label_attr.class|default('form-label') }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
     <input type="text" id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}"
     value="{% if form.vars.data is iterable %}{{ form.vars.data|join(', ')|e }}{% else %}{{ form.vars.data|e }}{% endif %}"
     {% if condition in ['empty', 'notEmpty'] %}disabled{% endif %} />
@@ -91,7 +91,7 @@
 
 {% block _report_tableOrder_entry_column_row %}
 <div class="choice-wrapper col-xs-6" data-form-block="_report_tableOrder_entry_column_row">
-    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+    <label class="{{ form.vars.label_attr.class|default('form-label') }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
     <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}">
         {% for column in form.vars.choices %}
           <option value="{{ column.value|e }}" {% if column.value == form.vars.data %}selected{% endif %}>
@@ -104,7 +104,7 @@
 
 {% block _report_tableOrder_entry_direction_row %}
 <div class="choice-wrapper col-xs-4" data-form-block="_report_tableOrder_entry_direction_row">
-    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+    <label class="{{ form.vars.label_attr.class|default('form-label') }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
     <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}">
         {% for direction in form.vars.choices %}
         <option value="{{ direction.value|e }}" {% if direction.value == form.vars.data %}selected{% endif %}>
