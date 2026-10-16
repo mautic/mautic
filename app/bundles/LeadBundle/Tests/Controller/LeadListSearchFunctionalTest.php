@@ -76,7 +76,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         // A segment condition in an OR expression must not filter the rows
         // before the other branch is evaluated.
         $this->assertSearchResult(
-            'segment%3A'.$listOne->getAlias().'%20OR%20email%3A'.$leadFour->getEmail(),
+            urlencode('segment:'.$listOne->getAlias().' OR email:'.$leadFour->getEmail()),
             [$leadOne, $leadTwo, $leadThree, $leadFour],
             [$leadFive, $leadSix]
         );
