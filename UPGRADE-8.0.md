@@ -410,6 +410,7 @@
 - Class `Mautic\PluginBundle\Integration\AbstractSsoFormIntegration` removed. Extend `Mautic\PluginBundle\Integration\AbstractSsoServiceIntegration` instead and reproduce the two overrides the removed class provided, otherwise form authentication breaks: `getSupportedFeatures()` must return `['sso_form']` (so `SsoAuthenticator::authenticate()` still selects the integration), and `getFormSettings()` must return `['requires_callback' => false, 'requires_authorization' => false]`.
 - Trait `Mautic\CoreBundle\Tests\Twig\TwigIntegrationTestTrait` removed; it was never used.
 - Trait `Mautic\IntegrationsBundle\Integration\DefaultConfigFormTrait` removed; each method only returned `null`. Implement `getConfigFormName()` and `getConfigFormContentTemplate()` directly on your integration (return `null` to keep the default).
+- Method `Mautic\CampaignBundle\Entity\CampaignRepository::getCampaignLeads()` removed as dead code. Nothing in Mautic calls it, and its `$limit` parameter was typed `bool`, so any truthy limit (such as `50`) became `setMaxResults(1)`, while `false` or `0` returned every row. `CampaignModel::getCampaignLeads()` is unrelated and unchanged.
 
 ## Changed code
 
