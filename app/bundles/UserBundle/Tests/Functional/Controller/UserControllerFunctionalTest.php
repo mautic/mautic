@@ -26,6 +26,35 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    public function testEditPageWithCreatedRoleActivity(): void
+    {
+        $role = new Role();
+        $role->setName('Created activity role');
+        $role->setDescription('Created activity role description');
+        $this->em->persist($role);
+
+        $actor = $this->userSetter($role);
+        $this->em->persist($actor);
+        $this->em->flush();
+
+        $log = $this->auditLogSetter(
+            $actor->getId(),
+            'Historical actor',
+            'user',
+            'role',
+            $role->getId(),
+            'create',
+            ['name' => ['', $role->getName()]],
+        );
+        $this->em->persist($log);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/s/users/edit/'.$actor->getId());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString($role->getName(), $crawler->filter('.media-list-feed')->text());
+    }
+
     #[DataProvider('unmatchedActivityProvider')]
     public function testEditPageWithUnmatchedActivity(string $object, string $action): void
     {
