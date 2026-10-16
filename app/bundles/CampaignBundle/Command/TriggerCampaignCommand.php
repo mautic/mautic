@@ -238,6 +238,7 @@ final class TriggerCampaignCommand extends ModeratedCommand
                     $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
                     $statusCode = ExitCode::FAILURE;
                 }
+
                 return (int) $statusCode;
             }
             // All published campaigns
