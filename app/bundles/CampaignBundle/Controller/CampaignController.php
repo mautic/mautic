@@ -7,6 +7,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\SummaryRepository;
@@ -124,6 +125,7 @@ class CampaignController extends AbstractStandardFormController
         private CampaignModel $campaignModel,
         private EventModel $eventModel,
         private readonly CampaignRepository $campaignRepository,
+        private readonly EventRepository $eventRepository,
         private readonly SummaryRepository $summaryRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
@@ -1252,7 +1254,7 @@ class CampaignController extends AbstractStandardFormController
 
         $existingEvents = $entity->getEvents()->toArray();
         if (!$isClone && null !== $entity->getId()) {
-            $existingEvents = $this->eventModel->getRepository()->getCampaignEventsWithBuilderRelations($entity->getId());
+            $existingEvents = $this->eventRepository->getCampaignEventsWithBuilderRelations($entity->getId());
         }
         foreach ($existingEvents as $e) {
             // remove deleted events from existing events
