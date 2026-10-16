@@ -80,4 +80,20 @@ trait DashboardWidgetPermissionTrait
 
         return (string) $data['widgetHtml'];
     }
+
+    /**
+     * Sums the values of a widget rendered through @MauticCore/Helper/chart.html.twig.
+     */
+    private function sumChartData(string $widgetHtml): int
+    {
+        // The template renders a "no data" placeholder instead of the canvas when every value is 0.
+        if (!preg_match('#<canvas[^>]*>(.*?)</canvas>#s', $widgetHtml, $matches)) {
+            return 0;
+        }
+
+        $chartData = json_decode(html_entity_decode(trim($matches[1])), true);
+        $this->assertIsArray($chartData);
+
+        return (int) array_sum($chartData['datasets'][0]['data']);
+    }
 }

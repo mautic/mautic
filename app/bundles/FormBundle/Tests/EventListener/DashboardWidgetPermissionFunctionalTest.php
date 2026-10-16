@@ -24,6 +24,9 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
     private const string OWN_SUBMITTER   = 'submitter-own@mautic-test.com';
     private const string OTHER_SUBMITTER = 'submitter-other@mautic-test.com';
 
+    private const string OWN_REFERRER    = 'https://own-referrer.mautic-test.com/page';
+    private const string OTHER_REFERRER  = 'https://other-referrer.mautic-test.com/page';
+
     private User $withoutViewOther;
 
     private User $withViewOther;
@@ -38,8 +41,8 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
         // Form::setCreatedBy() stores the user's id, so the users must exist first.
         $this->em->flush();
 
-        $this->createSubmission('own', $this->withoutViewOther, self::OWN_SUBMITTER);
-        $this->createSubmission('other', $this->withViewOther, self::OTHER_SUBMITTER);
+        $this->createSubmission('own', $this->withoutViewOther, self::OWN_SUBMITTER, self::OWN_REFERRER);
+        $this->createSubmission('other', $this->withViewOther, self::OTHER_SUBMITTER, self::OTHER_REFERRER);
 
         $this->em->flush();
     }
@@ -60,7 +63,37 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString(self::OTHER_SUBMITTER, $html);
     }
 
-    private function createSubmission(string $suffix, User $formOwner, string $submitterEmail): void
+    public function testSubmissionsInTimeCountsOnlyOwnFormsWithoutViewOther(): void
+    {
+        $html = $this->renderWidgetAsUser($this->withoutViewOther, 'submissions.in.time');
+
+        $this->assertSame(1, $this->sumChartData($html), 'Without form:forms:viewother the chart must count only submissions to the user\'s own form.');
+    }
+
+    public function testSubmissionsInTimeCountsEveryFormWithViewOther(): void
+    {
+        $html = $this->renderWidgetAsUser($this->withViewOther, 'submissions.in.time');
+
+        $this->assertSame(2, $this->sumChartData($html));
+    }
+
+    public function testTopReferrersHidesOtherPeoplesFormsWithoutViewOther(): void
+    {
+        $html = $this->renderWidgetAsUser($this->withoutViewOther, 'top.submission.referrers');
+
+        $this->assertStringContainsString(self::OWN_REFERRER, $html, 'Referrers of the user\'s own form should still be listed.');
+        $this->assertStringNotContainsString(self::OTHER_REFERRER, $html, 'Without form:forms:viewother the widget must not list referrers of another user\'s form.');
+    }
+
+    public function testTopReferrersListsEveryFormWithViewOther(): void
+    {
+        $html = $this->renderWidgetAsUser($this->withViewOther, 'top.submission.referrers');
+
+        $this->assertStringContainsString(self::OWN_REFERRER, $html);
+        $this->assertStringContainsString(self::OTHER_REFERRER, $html);
+    }
+
+    private function createSubmission(string $suffix, User $formOwner, string $submitterEmail, string $referrer): void
     {
         $form = new Form();
         $form->setName('Widget form '.$suffix);
@@ -77,7 +110,7 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
         $submission->setForm($form);
         $submission->setLead($contact);
         $submission->setDateSubmitted(new \DateTime());
-        $submission->setReferer('');
+        $submission->setReferer($referrer);
         $this->em->persist($submission);
     }
 }
