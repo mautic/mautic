@@ -172,10 +172,7 @@ class Download
         return (int) $this->id;
     }
 
-    /**
-     * @param \DateTime $dateDownload
-     */
-    public function setDateDownload($dateDownload): static
+    public function setDateDownload(\DateTime $dateDownload): static
     {
         $this->dateDownload = $dateDownload;
 

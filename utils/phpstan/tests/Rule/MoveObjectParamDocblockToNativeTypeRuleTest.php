@@ -10,6 +10,7 @@ use PHPStan\Testing\RuleTestCase;
 use PHPStan\Type\FileTypeMapper;
 use Utils\PHPStan\Collector\ObjectParamDocblockCollector;
 use Utils\PHPStan\Rule\MoveObjectParamDocblockToNativeTypeRule;
+use Utils\PHPStan\ServiceTypeDetector;
 
 /**
  * @extends RuleTestCase<MoveObjectParamDocblockToNativeTypeRule>
@@ -18,7 +19,10 @@ final class MoveObjectParamDocblockToNativeTypeRuleTest extends RuleTestCase
 {
     protected function getRule(): Rule
     {
-        return new MoveObjectParamDocblockToNativeTypeRule($this->createReflectionProvider());
+        return new MoveObjectParamDocblockToNativeTypeRule(
+            $this->createReflectionProvider(),
+            new ServiceTypeDetector($this->createReflectionProvider()),
+        );
     }
 
     /**

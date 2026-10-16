@@ -60,4 +60,12 @@ final class ObjectParamDocblock
             $item->doThing();
         }
     }
+
+    /**
+     * @param \Psr\Log\LoggerInterface $logger
+     */
+    public function serviceParam($logger): void
+    {
+        $logger->info('skipped: a service is injected, not promoted');
+    }
 }

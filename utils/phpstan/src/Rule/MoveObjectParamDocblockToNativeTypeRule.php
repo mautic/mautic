@@ -11,6 +11,7 @@ use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use Utils\PHPStan\Collector\ObjectParamDocblockCollector;
+use Utils\PHPStan\ServiceTypeDetector;
 
 /**
  * An untyped parameter whose only type is an object-type param docblock must declare that object as a native
@@ -31,6 +32,7 @@ final class MoveObjectParamDocblockToNativeTypeRule implements Rule
 {
     public function __construct(
         private readonly ReflectionProvider $reflectionProvider,
+        private readonly ServiceTypeDetector $serviceTypeDetector,
     ) {
     }
 
@@ -69,6 +71,12 @@ final class MoveObjectParamDocblockToNativeTypeRule implements Rule
                 }
 
                 foreach ($entry['candidates'] as $candidate) {
+                    // a shared service must be injected, not promoted to a native parameter type; that is
+                    // NoServiceInMethodParameterRule's domain
+                    if ($this->serviceTypeDetector->isServiceType($candidate['type'])) {
+                        continue;
+                    }
+
                     $ruleErrors[] = RuleErrorBuilder::message(sprintf(
                         'Parameter "$%s" has an "@param %s" docblock. Declare "%s" as a native type and drop the "@param" tag.',
                         $candidate['name'],

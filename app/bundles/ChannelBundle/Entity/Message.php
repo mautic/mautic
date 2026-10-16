@@ -233,10 +233,7 @@ class Message extends FormEntity implements UuidInterface
         return $this->channels;
     }
 
-    /**
-     * @param ArrayCollection<int,Channel> $channels
-     */
-    public function setChannels($channels): static
+    public function setChannels(ArrayCollection $channels): static
     {
         $this->isChanged('channels', $channels);
         $this->channels = $channels;

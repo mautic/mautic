@@ -372,10 +372,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->publishUp;
     }
 
-    /**
-     * @param \DateTime $publishUp
-     */
-    public function setPublishUp($publishUp): static
+    public function setPublishUp(\DateTime $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -391,10 +388,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->publishDown;
     }
 
-    /**
-     * @param \DateTime $publishDown
-     */
-    public function setPublishDown($publishDown): static
+    public function setPublishDown(\DateTime $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;

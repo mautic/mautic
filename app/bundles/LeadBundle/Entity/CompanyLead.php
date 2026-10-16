@@ -56,10 +56,7 @@ class CompanyLead
         return $this->dateAdded;
     }
 
-    /**
-     * @param \DateTime $date
-     */
-    public function setDateAdded($date): void
+    public function setDateAdded(\DateTime $date): void
     {
         $this->dateAdded = $date;
     }
@@ -96,10 +93,7 @@ class CompanyLead
         return $this->company;
     }
 
-    /**
-     * @param Company $company
-     */
-    public function setCompany($company): void
+    public function setCompany(Company $company): void
     {
         $this->company = $company;
     }

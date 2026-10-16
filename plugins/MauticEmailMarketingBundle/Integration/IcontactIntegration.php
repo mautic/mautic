@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
+use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
 
 final class IcontactIntegration extends EmailAbstractIntegration
@@ -169,10 +170,9 @@ final class IcontactIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     * @param array                          $config
+     * @param array $config
      */
-    public function pushLead($lead, $config = []): bool
+    public function pushLead(Lead $lead, $config = []): bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 

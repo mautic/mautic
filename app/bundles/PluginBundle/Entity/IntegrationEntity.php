@@ -174,10 +174,7 @@ class IntegrationEntity extends CommonEntity
         return $this->dateAdded;
     }
 
-    /**
-     * @param \DateTime $dateAdded
-     */
-    public function setDateAdded($dateAdded): static
+    public function setDateAdded(\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -192,10 +189,7 @@ class IntegrationEntity extends CommonEntity
         return $this->lastSyncDate;
     }
 
-    /**
-     * @param \DateTime $lastSyncDate
-     */
-    public function setLastSyncDate($lastSyncDate): static
+    public function setLastSyncDate(\DateTime $lastSyncDate): static
     {
         $this->lastSyncDate = $lastSyncDate;
 

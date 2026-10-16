@@ -76,10 +76,7 @@ class Copy
         return $this->dateCreated;
     }
 
-    /**
-     * @param \DateTime $dateCreated
-     */
-    public function setDateCreated($dateCreated): static
+    public function setDateCreated(\DateTime $dateCreated): static
     {
         $this->dateCreated = $dateCreated;
 
