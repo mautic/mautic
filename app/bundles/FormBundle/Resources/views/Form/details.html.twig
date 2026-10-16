@@ -75,8 +75,10 @@
     {% set showNoIndex  = activeForm.noIndex is defined and activeForm.noIndex == 1 %}
     {% set showKiosk    = activeForm.inKioskMode is defined and activeForm.inKioskMode == 1 %}
     {% set showLanguage = activeForm.language is defined and activeForm.language is not empty %}
+    {% set showTranslationParent = activeForm.isTranslation(true) %}
+    {% set showTranslationGroup  = activeForm.isTranslation and not showTranslationParent %}
 
-    {% if showNoIndex or showKiosk or showLanguage %}
+    {% if showNoIndex or showKiosk or showLanguage or showTranslationParent or showTranslationGroup %}
         <div class="label__divider"></div>
     {% endif %}
 
@@ -100,6 +102,27 @@
         }]) %}
     {% endif %}
 
+    {% if showTranslationGroup %}
+        {% set tags = tags|merge([{
+            color: 'blue',
+            label: 'mautic.core.icon_tooltip.translation'|trans,
+            icon: 'ri-translate',
+            icon_only: true
+        }]) %}
+    {% endif %}
+
+    {% if showTranslationParent %}
+        {% set tags = tags|merge([{
+            color: 'warm-gray',
+            label: 'mautic.core.translation_of'|trans({'%parent%': translations.parent.name}),
+            icon: 'ri-translate',
+            icon_only: true,
+            attributes: {
+                'href': path('mautic_form_action', {'objectAction': 'view', 'objectId': translations.parent.id})
+            }
+        }]) %}
+    {% endif %}
+
     {% if showLanguage %}
         {% set tags = tags|merge([{
             label: activeForm.language()|language_name,
@@ -119,6 +142,13 @@
 {% endblock %}
 
 {% block content %}
+{% set translationContent = include('@MauticCore/Translation/index.html.twig', {
+    'activeEntity': activeForm,
+    'translations': translations,
+    'model': 'form',
+    'actionRoute': 'mautic_form_action'
+})|trim %}
+{% set showTranslations = translationContent is not empty %}
 {% set showActions = activeFormActions|length %}
 {% set previewUrl = url('mautic_form_action', {'objectAction': 'preview', 'objectId': activeForm.id}) %}
 <!-- start: box layout -->
@@ -205,7 +235,12 @@
                         <a href="#actions-container" role="tab" data-toggle="tab">{{ 'mautic.form.tab.actions'|trans }}</a>
                     </li>
                 {% endif %}
-                <li class="{% if not showActions %}active{% endif %}">
+                {% if showTranslations %}
+                    <li class="{% if not showActions %}active{% endif %}">
+                        <a href="#translation-container" role="tab" data-toggle="tab">{{ 'mautic.core.translations'|trans }}</a>
+                    </li>
+                {% endif %}
+                <li class="{% if not showActions and not showTranslations %}active{% endif %}">
                     <a href="#fields-container" role="tab" data-toggle="tab">{{ 'mautic.form.tab.fields'|trans }}</a>
                 </li>
             </ul>
@@ -250,9 +285,14 @@
                 </div>
                 <!--/ #actions-container -->
             {% endif %}
+            {% if showTranslations %}
+            <div class="tab-pane {% if not showActions %}active{% endif %} bdr-w-0" id="translation-container">
+                {{ translationContent|raw }}
+            </div>
+            {% endif %}
 
             <!-- #fields-container -->
-            <div class="tab-pane fade {% if not showActions %}active in{% endif %} bdr-w-0" id="fields-container">
+            <div class="tab-pane fade {% if not showActions and not showTranslations %}active in{% endif %} bdr-w-0" id="fields-container">
                 <h5 class="fw-sb mb-xs">{{ 'mautic.form.field'|trans }}</h5>
                 <ul class="list-group mb-xs">
                     {# @var \Mautic\FormBundle\Entity\Field $field #}
