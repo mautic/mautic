@@ -23,15 +23,8 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
 {
     private ?TokenPermissions $tokenPermissions = null;
 
-    public function __construct(
-        OAuth2 $serverService,
-        UserCheckerInterface $userChecker,
-    ) {
-        parent::__construct($serverService, $userChecker);
-    }
-
     /**
-     * @internal Used by the service container to keep the legacy constructor contract intact.
+     * @internal used by the service container to keep the legacy constructor contract intact
      */
     public function setTokenPermissions(TokenPermissions $tokenPermissions): void
     {
@@ -89,7 +82,7 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
             $accessTokenBadge = new AccessTokenBadge($accessToken, $roles);
             $userLoader = null;
             if (null !== $user) {
-                $userLoader = fn (): ?UserInterface => $user;
+                $userLoader = fn (): UserInterface => $user;
             }
 
             // Parent uses $client->getUserIdentifier() here, which breaks
