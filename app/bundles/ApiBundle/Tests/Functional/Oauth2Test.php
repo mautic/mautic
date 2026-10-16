@@ -136,6 +136,9 @@ final class Oauth2Test extends MauticMysqlTestCase
         $accessToken = $payload['access_token'];
         $this->assertNotEmpty($accessToken);
 
+        // Exercise the bearer token across independent stateless HTTP requests.
+        $this->client->enableReboot();
+
         // Test that the access token works by fetching users via API.
         $this->client->request(
             Request::METHOD_GET,
