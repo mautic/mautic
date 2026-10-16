@@ -202,6 +202,9 @@ abstract class ModeratedCommand extends Command
             if (file_exists($lockFile)) {
                 unlink($lockFile);
             }
+            if ($lockFile === $this->lockFile) {
+                $this->lockFile = null;
+            }
         }
     }
 
