@@ -46,6 +46,10 @@ final readonly class PointSubscriber implements EventSubscriberInterface
      */
     public function onFormSubmit(SubmissionEvent $event): void
     {
+        if (null === $event->getLead()) {
+            return;
+        }
+
         $this->pointModel->triggerAction('form.submit', $event->getSubmission());
     }
 }
