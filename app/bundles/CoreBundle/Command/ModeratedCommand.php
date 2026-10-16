@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\RedisStore;
 
@@ -33,6 +34,10 @@ abstract class ModeratedCommand extends Command
     protected $runDirectory;
 
     protected $lockExpiration;
+
+    protected $lockFile;
+
+    private ?LockInterface $lock = null;
 
     private array $locks = [];
 
@@ -130,6 +135,10 @@ abstract class ModeratedCommand extends Command
         foreach (array_reverse($this->locks) as $lock) {
             $lock->release();
         }
+        if (null !== $this->lock && !in_array($this->lock, $this->locks, true)) {
+            $this->lock->release();
+        }
+        $this->lock = null;
         $this->locks = [];
         $this->heldKeys = [];
 
@@ -140,6 +149,11 @@ abstract class ModeratedCommand extends Command
             }
         }
         $this->lockFiles = [];
+
+        if ($this->lockFile && file_exists($this->lockFile)) {
+            unlink($this->lockFile);
+        }
+        $this->lockFile = null;
     }
 
     /**
@@ -238,6 +252,7 @@ abstract class ModeratedCommand extends Command
 
         flock($fp, LOCK_UN);
         fclose($fp);
+        $this->lockFile = $lockFile;
         $this->lockFiles[] = $lockFile;
 
         return true;
@@ -264,6 +279,7 @@ abstract class ModeratedCommand extends Command
             return false;
         }
 
+        $this->lock = $lock;
         $this->locks[] = $lock;
 
         return true;
