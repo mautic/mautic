@@ -322,7 +322,7 @@ final class TriggerCampaignCommand extends ModeratedCommand
             $input,
             $output,
             $moderationKeys,
-            'Script with same marketing email id in progress. Can force execution by using --bypass-locking. (not recommended)'
+            $this->translator->trans('mautic.campaign.trigger.marketing_email_in_progress')
         );
     }
 

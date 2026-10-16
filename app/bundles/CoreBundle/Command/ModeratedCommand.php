@@ -38,6 +38,9 @@ abstract class ModeratedCommand extends Command
 
     private array $lockFiles = [];
 
+    /** @var array<string, true> */
+    private array $heldKeys = [];
+
     /**
      * @var OutputInterface
      */
@@ -128,6 +131,7 @@ abstract class ModeratedCommand extends Command
             $lock->release();
         }
         $this->locks = [];
+        $this->heldKeys = [];
 
         // Attempt to keep things tidy
         foreach ($this->lockFiles as $lockFile) {
@@ -149,13 +153,25 @@ abstract class ModeratedCommand extends Command
 
         $lockCount     = count($this->locks);
         $lockFileCount = count($this->lockFiles);
+        $newKeys = [];
         foreach (array_unique($moderationKeys) as $moderationKey) {
-            if (!$this->checkStatus($this->getName().$moderationKey, false)) {
+            $fullKey = $this->getName().$moderationKey;
+            if (isset($this->heldKeys[$fullKey])) {
+                continue;
+            }
+
+            if (!$this->checkStatus($fullKey, false)) {
                 $this->releaseLocksFrom($lockCount, $lockFileCount);
                 $output->writeln('<error>'.$conflictMessage.'</error>');
 
                 return false;
             }
+
+            $newKeys[] = $fullKey;
+        }
+
+        foreach ($newKeys as $key) {
+            $this->heldKeys[$key] = true;
         }
 
         return true;
