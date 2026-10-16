@@ -6,7 +6,6 @@ namespace Mautic\DynamicContentBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Mautic\DynamicContentBundle\EventListener\GeneratedColumnSubscriber;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class GeneratedColumnSubscriberTest extends TestCase
