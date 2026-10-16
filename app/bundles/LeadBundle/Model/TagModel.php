@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
 use Mautic\CampaignBundle\Entity\EventRepository;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\ActionRepository;
@@ -182,11 +183,11 @@ class TagModel extends FormModel
         $connection = $this->em->getConnection();
 
         $connection->executeStatement(
-            sprintf('UPDATE IGNORE %slead_tags_xref SET tag_id = :primaryTagId WHERE tag_id = :secondaryTagId', MAUTIC_TABLE_PREFIX),
-            [
-                'primaryTagId'   => (int) $primaryTag->getId(),
-                'secondaryTagId' => (int) $secondaryTag->getId(),
-            ],
+            DatabasePlatform::getUpdateLeadTagAssociationSql(
+                $connection->getDatabasePlatform(),
+                $primaryTag,
+                $secondaryTag
+            )
         );
 
         $connection->executeStatement(

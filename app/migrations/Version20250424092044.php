@@ -24,7 +24,7 @@ final class Version20250424092044 extends PreUpAssertionMigration
         $targetIdDataType  = $this->getColumnTypeSignedOrUnsigned($schema, 'campaigns', 'id');
         $projectIdDataType = $this->getColumnTypeSignedOrUnsigned($schema, 'projects', 'id');
 
-        $table = $schema->createTable($this->prefix.'campaign_projects_xref');
+        $table = $schema->createTable($this->getPrefixedTableName(self::TABLE_NAME));
         $table->addColumn('campaign_id', 'integer', ['unsigned' => 'UNSIGNED' === $targetIdDataType, 'notnull' => true]);
         $table->addColumn('project_id', 'integer', ['unsigned' => 'UNSIGNED' === $projectIdDataType, 'notnull' => true]);
         $table->setPrimaryKey(['campaign_id', 'project_id']);
@@ -34,12 +34,16 @@ final class Version20250424092044 extends PreUpAssertionMigration
 
     public function postUp(Schema $schema): void
     {
-        $index = $this->generatePropertyName('campaign_projects_xref', 'idx', ['campaign_id']);
-        $this->connection->executeStatement(sprintf('DROP INDEX %s ON %s', $index, $this->prefix.'campaign_projects_xref'));
+        $index = $this->generatePropertyName(self::TABLE_NAME, 'idx', ['campaign_id']);
+
+        $this->dropIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            $index
+        );
     }
 
     public function down(Schema $schema): void
     {
-        $schema->dropTable($this->prefix.'campaign_projects_xref');
+        $schema->dropTable($this->getPrefixedTableName(self::TABLE_NAME));
     }
 }

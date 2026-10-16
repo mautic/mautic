@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{subject}</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.5;
+            color: #333;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            min-height: 30px;
+            padding: 20px 0;
+        }
+        @media only screen and (max-width: 480px) {
+            .email-container {
+                padding: 10px;
+            }
+            .mobile-block {
+                display: block !important;
+                width: 100% !important;
+            }
+        }
+    </style>
+</head>
+<body class="ui-sortable">
+<div data-section-wrapper="1" class="email-container">
+    <div data-slot-container="1" class="content ui-sortable" >
+        <div data-slot="text">
+            <br />
+            <h2>Hello there!</h2>
+            <br />
+            We haven't heard from you for a while...
+            <br />
+            <br />
+            {unsubscribe_text} | {webview_text}
+            <br />
+        </div>
+    </div>
+</div>
+</body>
+</html>
