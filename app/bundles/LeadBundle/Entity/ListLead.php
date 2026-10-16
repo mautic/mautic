@@ -64,10 +64,7 @@ class ListLead
         return $this->dateAdded;
     }
 
-    /**
-     * @param \DateTime $date
-     */
-    public function setDateAdded($date): void
+    public function setDateAdded(\DateTime $date): void
     {
         $this->dateAdded = $date;
     }
@@ -96,10 +93,7 @@ class ListLead
         return $this->list;
     }
 
-    /**
-     * @param LeadList $leadList
-     */
-    public function setList($leadList): void
+    public function setList(LeadList $leadList): void
     {
         $this->list = $leadList;
     }

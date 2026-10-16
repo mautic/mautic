@@ -108,10 +108,7 @@ class LeadCategory
         return $this->dateAdded;
     }
 
-    /**
-     * @param \DateTime $date
-     */
-    public function setDateAdded($date): void
+    public function setDateAdded(\DateTime $date): void
     {
         $this->dateAdded = $date;
     }
@@ -140,10 +137,7 @@ class LeadCategory
         return $this->category;
     }
 
-    /**
-     * @param Category $category
-     */
-    public function setCategory($category): void
+    public function setCategory(Category $category): void
     {
         $this->category = $category;
     }

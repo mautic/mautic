@@ -273,10 +273,7 @@ class MessageQueue
         return $this->datePublished;
     }
 
-    /**
-     * @param \DateTime $datePublished
-     */
-    public function setDatePublished($datePublished): void
+    public function setDatePublished(\DateTime $datePublished): void
     {
         $this->datePublished = $datePublished;
     }
@@ -289,10 +286,7 @@ class MessageQueue
         return $this->dateSent;
     }
 
-    /**
-     * @param \DateTime $dateSent
-     */
-    public function setDateSent($dateSent): void
+    public function setDateSent(?\DateTime $dateSent): void
     {
         $this->dateSent = $dateSent;
     }
@@ -305,10 +299,7 @@ class MessageQueue
         return $this->lastAttempt;
     }
 
-    /**
-     * @param \DateTime $lastAttempt
-     */
-    public function setLastAttempt($lastAttempt): void
+    public function setLastAttempt(?\DateTime $lastAttempt): void
     {
         $this->lastAttempt = $lastAttempt;
     }

@@ -1359,10 +1359,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
             ->fetchOne();
     }
 
-    /**
-     * @param Lead $entity
-     */
-    protected function postSaveEntity($entity): void
+    protected function postSaveEntity(Lead $entity): void
     {
         // Check if points need to be appended
         if ($entity->getPointChanges()) {

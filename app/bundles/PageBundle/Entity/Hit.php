@@ -226,10 +226,7 @@ class Hit
         return (int) $this->id;
     }
 
-    /**
-     * @param \DateTime $dateHit
-     */
-    public function setDateHit($dateHit): static
+    public function setDateHit(?\DateTime $dateHit): static
     {
         $this->dateHit = $dateHit;
 
@@ -252,10 +249,7 @@ class Hit
         return $this->dateLeft;
     }
 
-    /**
-     * @param \DateTime $dateLeft
-     */
-    public function setDateLeft($dateLeft): static
+    public function setDateLeft(?\DateTime $dateLeft): static
     {
         $this->dateLeft = $dateLeft;
 

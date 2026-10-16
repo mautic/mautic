@@ -310,12 +310,11 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Generate URL for a page.
      *
-     * @param Page  $entity
      * @param array $clickthrough
      *
      * @return string
      */
-    public function generateUrl($entity, bool $absolute = true, $clickthrough = [])
+    public function generateUrl(Page $entity, bool $absolute = true, $clickthrough = [])
     {
         // If this is a variant, then get the parent's URL
         $parent = $entity->getVariantParent();

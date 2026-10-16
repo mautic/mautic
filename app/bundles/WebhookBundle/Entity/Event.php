@@ -103,10 +103,7 @@ class Event
         return $this;
     }
 
-    /**
-     * @param ArrayCollection $queues
-     */
-    public function setQueues($queues): static
+    public function setQueues(ArrayCollection $queues): static
     {
         $this->queues = $queues;
 

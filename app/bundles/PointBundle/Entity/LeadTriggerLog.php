@@ -77,10 +77,7 @@ class LeadTriggerLog
         return $this->ipAddress;
     }
 
-    /**
-     * @param IpAddress $ipAddress
-     */
-    public function setIpAddress($ipAddress): void
+    public function setIpAddress(?IpAddress $ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }

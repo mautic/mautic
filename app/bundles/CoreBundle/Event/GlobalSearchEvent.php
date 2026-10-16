@@ -14,12 +14,11 @@ final class GlobalSearchEvent extends Event
     private readonly string $searchString;
 
     /**
-     * @param string     $searchString
-     * @param Translator $translator
+     * @param string $searchString
      */
     public function __construct(
         $searchString,
-        private $translator,
+        private readonly Translator $translator,
     ) {
         $this->searchString = strtolower(trim(strip_tags($searchString)));
     }

@@ -310,10 +310,7 @@ class Monitoring extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @param \DateTime $publishDown
-     */
-    public function setPublishDown($publishDown): static
+    public function setPublishDown(?\DateTime $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -321,10 +318,7 @@ class Monitoring extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @param \DateTime $publishUp
-     */
-    public function setPublishUp($publishUp): static
+    public function setPublishUp(?\DateTime $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
