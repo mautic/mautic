@@ -58,10 +58,7 @@ final class ReportExportOptions
         return $this->dateFrom;
     }
 
-    /**
-     * @param \DateTime $dateFrom
-     */
-    public function setDateFrom($dateFrom): void
+    public function setDateFrom(\DateTime $dateFrom): void
     {
         $this->dateFrom = $dateFrom;
     }
@@ -74,10 +71,7 @@ final class ReportExportOptions
         return $this->dateTo;
     }
 
-    /**
-     * @param \DateTime $dateTo
-     */
-    public function setDateTo($dateTo): void
+    public function setDateTo(\DateTime $dateTo): void
     {
         $this->dateTo = $dateTo;
     }

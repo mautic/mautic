@@ -1919,11 +1919,9 @@ class LeadModel extends FormModel
      * Get leads count per country name.
      * Can't use entity, because country is a custom field.
      *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
      * @param mixed[]   $filters
      */
-    public function getLeadMapData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
+    public function getLeadMapData(\DateTime $dateFrom, \DateTime $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         if (!$canViewOthers) {
             $filter             = ['owner_id' => $this->userHelper->getUser()->getId()];

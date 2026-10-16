@@ -303,10 +303,7 @@ class Point extends FormEntity implements UuidInterface
         return $this->log;
     }
 
-    /**
-     * @param \DateTime $publishUp
-     */
-    public function setPublishUp($publishUp): static
+    public function setPublishUp(\DateTime $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -322,10 +319,7 @@ class Point extends FormEntity implements UuidInterface
         return $this->publishUp;
     }
 
-    /**
-     * @param \DateTime $publishDown
-     */
-    public function setPublishDown($publishDown): static
+    public function setPublishDown(\DateTime $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;

@@ -75,10 +75,7 @@ class DynamicContentLeadData extends CommonEntity
         return $this->dateAdded;
     }
 
-    /**
-     * @param \DateTime $dateAdded
-     */
-    public function setDateAdded($dateAdded): static
+    public function setDateAdded(\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -93,10 +90,7 @@ class DynamicContentLeadData extends CommonEntity
         return $this->dynamicContent;
     }
 
-    /**
-     * @param DynamicContent $dynamicContent
-     */
-    public function setDynamicContent($dynamicContent): static
+    public function setDynamicContent(DynamicContent $dynamicContent): static
     {
         $this->dynamicContent = $dynamicContent;
 
@@ -111,10 +105,7 @@ class DynamicContentLeadData extends CommonEntity
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function setLead($lead): static
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -129,10 +120,7 @@ class DynamicContentLeadData extends CommonEntity
         return $this->dataAdded;
     }
 
-    /**
-     * @param \DateTime $dataAdded
-     */
-    public function setDataAdded($dataAdded): static
+    public function setDataAdded(\DateTime $dataAdded): static
     {
         $this->dataAdded = $dataAdded;
 

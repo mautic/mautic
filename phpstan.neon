@@ -454,6 +454,7 @@ rules:
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
+    - Utils\PHPStan\ServiceTypeDetector
     -
         class: Utils\PHPStan\Rule\MoveObjectParamDocblockToNativeTypeRule
         tags:

@@ -61,10 +61,7 @@ class PostCount
         return $this->monitor;
     }
 
-    /**
-     * @param Monitoring $monitor
-     */
-    public function setMonitor($monitor): static
+    public function setMonitor(Monitoring $monitor): static
     {
         $this->monitor = $monitor;
 
