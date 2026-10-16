@@ -28,7 +28,8 @@ final class AvatarExtension extends AbstractExtension
     public function getImage(int $userId): string
     {
         if (null === $this->style) {
-            $definition = file_get_contents(InstalledVersions::getInstallPath('dicebear/styles').'/src/line-face.json');
+            $installPath = InstalledVersions::getInstallPath('dicebear/styles');
+            $definition  = null === $installPath ? false : file_get_contents($installPath.'/src/line-face.json');
 
             if (false === $definition) {
                 throw new \RuntimeException('Unable to load the Line Face avatar style.');
