@@ -66,7 +66,7 @@ class DownloadRepository extends CommonRepository
                   ->setParameter('search', '%'.$options['search'].'%');
         }
 
-        return $this->getTimelineResults($query, $options, 'a.title', 'd.date_download', [], ['date_download'], null, 'd.id');
+        return $this->getTimelineResults($query, $options, 'a.title', 'd.date_download', [], ['dateDownload'], null, 'd.id');
     }
 
     /**

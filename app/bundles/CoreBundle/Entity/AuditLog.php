@@ -97,7 +97,7 @@ class AuditLog
             ->nullable()
             ->build();
 
-        $builder->addDateAdded();
+        $builder->addDateAdded(false, 3);
 
         $builder->createField('ipAddress', 'string')
             ->columnName('ip_address')

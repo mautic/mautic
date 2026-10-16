@@ -8,6 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeMicrosecondType;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -102,8 +103,9 @@ class Stat
 
         $builder->addIpAddress(true);
 
-        $builder->createField('dateSent', 'datetime')
+        $builder->createField('dateSent', UTCDateTimeMicrosecondType::NAME)
             ->columnName('date_sent')
+            ->precision(3)
             ->build();
 
         $builder->createField('isFailed', 'boolean')

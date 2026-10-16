@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeMicrosecondType;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -158,8 +159,9 @@ class Stat
 
         $builder->addIpAddress(true);
 
-        $builder->createField('dateSent', 'datetime')
+        $builder->createField('dateSent', UTCDateTimeMicrosecondType::NAME)
             ->columnName('date_sent')
+            ->precision(3)
             ->build();
 
         $builder->createField('isRead', 'boolean')
@@ -174,8 +176,9 @@ class Stat
             ->columnName('viewed_in_browser')
             ->build();
 
-        $builder->createField('dateRead', 'datetime')
+        $builder->createField('dateRead', UTCDateTimeMicrosecondType::NAME)
             ->columnName('date_read')
+            ->precision(3)
             ->nullable()
             ->build();
 
@@ -208,7 +211,11 @@ class Stat
 
         $builder->addNullableField('openCount', 'integer', 'open_count');
 
-        $builder->addNullableField('lastOpened', 'datetime', 'last_opened');
+        $builder->createField('lastOpened', UTCDateTimeMicrosecondType::NAME)
+            ->columnName('last_opened')
+            ->precision(3)
+            ->nullable()
+            ->build();
 
         $builder->addNullableField('openDetails', 'array', 'open_details');
 
