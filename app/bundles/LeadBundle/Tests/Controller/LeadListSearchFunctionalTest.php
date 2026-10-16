@@ -98,15 +98,12 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
         $responseText = $crawler->text();
 
-        $queries = $this->client->getProfile()->getCollector('db')->getQueries()['default'];
-        $queryContext = sprintf("\nExecuted queries: %s", json_encode($queries, JSON_THROW_ON_ERROR));
-
         foreach ($expectedLeads as $expectedLead) {
-            $this->assertStringContainsString($expectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should be in the result.%s', $expectedLead->getEmail(), $queryContext));
+            $this->assertStringContainsString($expectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should be in the result.', $expectedLead->getEmail()));
         }
 
         foreach ($notExpectedLeads as $notExpectedLead) {
-            $this->assertStringNotContainsString($notExpectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should not be in the result.%s', $notExpectedLead->getEmail(), $queryContext));
+            $this->assertStringNotContainsString($notExpectedLead->getEmail(), $responseText, sprintf('Lead with the email "%s" should not be in the result.', $notExpectedLead->getEmail()));
         }
     }
 
