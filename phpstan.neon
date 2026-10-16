@@ -386,6 +386,7 @@ rules:
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
     - Utils\PHPStan\Rule\NoUselessReferenceParamRule
     - Utils\PHPStan\Rule\NoUselessReferenceForeachRule
+    - Utils\PHPStan\Rule\ExplicitNullableParamTypeRule
 
     - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
     - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
