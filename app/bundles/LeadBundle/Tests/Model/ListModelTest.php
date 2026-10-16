@@ -65,6 +65,8 @@ final class ListModelTest extends TestCase
         $entityManagerMock = $this->createMock(EntityManager::class);
         $entityManagerMock->method('getRepository')
             ->willReturn($this->leadListRepositoryMock);
+        $entityManagerMock->method('getReference')
+            ->willReturn(new LeadList());
         $this->contactSegmentServiceMock       = $this->createMock(ContactSegmentService::class);
         $this->segmentCountCacheHelper         = $this->createMock(SegmentCountCacheHelper::class);
 
