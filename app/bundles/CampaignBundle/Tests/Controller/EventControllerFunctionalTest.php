@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\DomCrawler\Crawler;
@@ -69,6 +70,133 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('campaignEvent', $responseData['mauticContent']);
         $this->assertSame(1, $responseData['closeModal']);
         $this->assertTrue($responseData['formSubmitted'], $response->getContent());
+    }
+
+    public function testContactTagsConditionRepopulatesSavedTagsWhenEditing(): void
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Issue 17561 campaign');
+        $this->em->persist($campaign);
+
+        $tag = new Tag('issue-17561-saved-tag');
+        $this->em->persist($tag);
+
+        $this->em->flush();
+
+        $campaignId = (string) $campaign->getId();
+        $tagId      = (string) $tag->getId();
+
+        $uri = sprintf(
+            '/s/campaigns/events/new?type=lead.tags&eventType=condition&campaignId=%s&anchor=leadsource&anchorEventType=source',
+            $campaignId
+        );
+
+        $this->client->xmlHttpRequest('GET', $uri);
+        $this->assertResponseIsSuccessful();
+
+        $responseData = json_decode(
+            (string) $this->client->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        $crawler = new Crawler(
+            $responseData['newContent'],
+            $this->client->getInternalRequest()->getUri()
+        );
+        $form = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
+
+        $form->setValues([
+            'campaignevent[name]'             => 'Contact has saved tag',
+            'campaignevent[properties][tags]' => [$tagId],
+            'campaignevent[type]'             => 'lead.tags',
+            'campaignevent[eventType]'        => 'condition',
+            'campaignevent[campaignId]'       => $campaignId,
+        ]);
+
+        $formData           = $form->getPhpValues();
+        $formData['submit'] = '1';
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(
+            $form->getMethod(),
+            $form->getUri(),
+            $formData
+        );
+        $this->assertResponseIsSuccessful();
+
+        $responseData = json_decode(
+            (string) $this->client->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        $this->assertSame(1, $responseData['success'], print_r($responseData, true));
+        $this->assertArrayHasKey('modifiedEvents', $responseData);
+
+        $modifiedEvents = $responseData['modifiedEvents'];
+        $eventId        = (string) $responseData['eventId'];
+
+        $editUri = sprintf(
+            '/s/campaigns/events/edit/%s?campaignId=%s',
+            $eventId,
+            $campaignId
+        );
+
+        $this->client->xmlHttpRequest(
+            'GET',
+            $editUri,
+            ['modifiedEvents' => json_encode($modifiedEvents, JSON_THROW_ON_ERROR)]
+        );
+        $this->assertResponseIsSuccessful();
+
+        $this->assertContactTagSelectedInEditResponse($tagId);
+    }
+
+    public function testPersistedContactTagsConditionRepopulatesSavedTagsWhenEditing(): void
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Issue 17561 persisted campaign');
+        $this->em->persist($campaign);
+
+        $tag = new Tag('issue-17561-persisted-tag');
+        $this->em->persist($tag);
+
+        $this->em->flush();
+
+        $tagId      = (string) $tag->getId();
+        $campaignId = (string) $campaign->getId();
+
+        $event = new Event();
+        $event->setName('Persisted contact has saved tag');
+        $event->setCampaign($campaign);
+        $event->setType('lead.tags');
+        $event->setEventType('condition');
+        $event->setTriggerInterval(1);
+        $event->setTriggerMode('immediate');
+        $event->setProperties(['tags' => [$tagId]]);
+
+        $this->em->persist($event);
+        $this->em->flush();
+
+        $eventId = (string) $event->getId();
+
+        $this->em->clear();
+
+        $this->client->request(
+            Request::METHOD_POST,
+            sprintf('/s/campaigns/events/edit/%s?campaignId=%s', $eventId, $campaignId),
+            [],
+            [],
+            $this->createAjaxHeaders(),
+            '{}'
+        );
+
+        $this->assertResponseIsSuccessful();
+
+        $this->assertContactTagSelectedInEditResponse($tagId);
     }
 
     /**
@@ -620,6 +748,42 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
             'date'     => (string) $triggerDate['date'],
             'timezone' => (string) $triggerDate['timezone'],
         ];
+    }
+
+    private function assertContactTagSelectedInEditResponse(string $tagId): void
+    {
+        $responseData = json_decode(
+            (string) $this->client->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+
+        $crawler = new Crawler(
+            $responseData['newContent'],
+            $this->client->getInternalRequest()->getUri()
+        );
+
+        $option = $crawler->filter(
+            sprintf(
+                'select[name="campaignevent[properties][tags][]"] option[value="%s"]',
+                $tagId
+            )
+        );
+
+        $this->assertCount(
+            1,
+            $option,
+            sprintf('Expected tag ID %s in the Contact Tags selector.', $tagId)
+        );
+
+        $this->assertNotNull(
+            $option->attr('selected'),
+            sprintf(
+                'Regression #17561: Contact Tags ID %s is not selected when editing.',
+                $tagId
+            )
+        );
     }
 
     private function createCampaign(): Campaign
