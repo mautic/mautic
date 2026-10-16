@@ -10,11 +10,12 @@ use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormRenderer;
+use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\Forms;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
-use Twig\Loader\FilesystemLoader;
 use Twig\Loader\ChainLoader;
+use Twig\Loader\FilesystemLoader;
 use Twig\TwigFilter;
 
 final class FormThemeCheckboxTest extends TestCase
@@ -29,7 +30,7 @@ final class FormThemeCheckboxTest extends TestCase
             new FilesystemLoader([$views]),
             $loader,
         ]));
-        $twig->addExtension(new TranslationExtension(null));
+        $twig->addExtension(new TranslationExtension());
         $twig->addFilter(new TwigFilter('purify', static fn (string $value): string => $value, ['is_safe' => ['html']]));
         $twig->addFilter(new TwigFilter('trans', static fn (string $value): string => $value));
         $twig->addFilter(new TwigFilter('humanize', static fn (string $value): string => ucfirst(str_replace('_', ' ', $value))));
@@ -43,7 +44,7 @@ final class FormThemeCheckboxTest extends TestCase
         $twig->addExtension(new FormExtension());
         $renderer = new FormRenderer(new TwigRendererEngine(['form_div_layout.html.twig'], $twig));
         $twig->addRuntimeLoader(new class($renderer) implements \Twig\RuntimeLoader\RuntimeLoaderInterface {
-            public function __construct(private FormRenderer $renderer)
+            public function __construct(private readonly FormRendererInterface $renderer)
             {
             }
 

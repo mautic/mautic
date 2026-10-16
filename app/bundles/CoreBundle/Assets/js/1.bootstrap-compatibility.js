@@ -805,15 +805,15 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         }
     }
 
-    var bootstrapToggleValues = ['collapse', 'dropdown', 'modal', 'popover', 'tab', 'tooltip'];
+    const bootstrapToggleValues = ['collapse', 'dropdown', 'modal', 'popover', 'tab', 'tooltip'];
 
     function mirrorBootstrapAttributes(element) {
-        var legacyToggle = element.getAttribute('data-toggle');
-        var isBootstrapToggle = bootstrapToggleValues.indexOf(legacyToggle) !== -1;
+        const legacyToggle = element.getAttribute('data-toggle');
+        const isBootstrapToggle = bootstrapToggleValues.indexOf(legacyToggle) !== -1;
 
         dataAttributes.forEach(function (name) {
             if ('toggle' === name && !isBootstrapToggle) {
-                var owned = mirroredAttributes.get(element) || {};
+                const owned = mirroredAttributes.get(element) || {};
                 if (owned['data-bs-toggle'] !== undefined && owned['data-bs-toggle'] === element.getAttribute('data-bs-toggle')) {
                     element.removeAttribute('data-bs-toggle');
                     delete owned['data-bs-toggle'];
