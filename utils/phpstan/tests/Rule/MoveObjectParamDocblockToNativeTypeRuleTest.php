@@ -33,8 +33,12 @@ final class MoveObjectParamDocblockToNativeTypeRuleTest extends RuleTestCase
     {
         $this->analyse([__DIR__.'/Fixture/ObjectParamDocblock.php'], [
             [
-                'Parameter "$item" has a method called on it and an "@param Utils\PHPStan\Tests\Rule\Fixture\SomeValueObject" docblock. Declare "Utils\PHPStan\Tests\Rule\Fixture\SomeValueObject" as a native type and drop the "@param" tag.',
+                'Parameter "$item" has an "@param Utils\PHPStan\Tests\Rule\Fixture\SomeValueObject" docblock. Declare "Utils\PHPStan\Tests\Rule\Fixture\SomeValueObject" as a native type and drop the "@param" tag.',
                 12,
+            ],
+            [
+                'Parameter "$item" has an "@param Utils\PHPStan\Tests\Rule\Fixture\SomeValueObject" docblock. Declare "Utils\PHPStan\Tests\Rule\Fixture\SomeValueObject" as a native type and drop the "@param" tag.',
+                20,
             ],
         ]);
     }
