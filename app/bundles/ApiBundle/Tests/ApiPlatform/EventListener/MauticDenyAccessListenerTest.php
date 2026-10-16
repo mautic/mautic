@@ -284,6 +284,9 @@ final class MauticDenyAccessListenerTest extends TestCase
 
     private function createFormEntityMock(): FormEntity
     {
-        return $this->createConfiguredMock(FormEntity::class, ['getCreatedBy' => 0]);
+        $formEntity = new FormEntity();
+        $formEntity->setCreatedBy(0);
+
+        return $formEntity;
     }
 }

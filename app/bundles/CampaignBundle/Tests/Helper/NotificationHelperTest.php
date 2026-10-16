@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
@@ -57,13 +58,9 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $campaign = new Campaign();
         $event->setCampaign($campaign);
 
-        $user = $this->createMock(User::class);
-        $user->method('getId')
-            ->willReturn('1');
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('getOwner')
-            ->willReturn($user);
+        $user = $this->createUser(1);
+        $lead = new Lead();
+        $lead->setOwner($user);
 
         $this->userModel->expects($this->never())
             ->method('getEntity');
@@ -93,13 +90,8 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $event->setCampaign($campaign);
         $campaign->setCreatedBy(1);
 
-        $user = $this->createMock(User::class);
-        $user->method('getId')
-            ->willReturn('1');
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('getOwner')
-            ->willReturn(null);
+        $user = $this->createUser(1);
+        $lead = new Lead();
 
         $this->userModel->expects($this->once())
             ->method('getEntity')
@@ -130,13 +122,8 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $event->setCampaign($campaign);
         $campaign->setCreatedBy(2);
 
-        $user = $this->createMock(User::class);
-        $user->method('getId')
-            ->willReturn('1');
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('getOwner')
-            ->willReturn(null);
+        $user = $this->createUser(1);
+        $lead = new Lead();
 
         $this->userModel->expects($this->once())
             ->method('getEntity')
@@ -168,10 +155,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $event->setCampaign($campaign);
         $campaign->setCreatedBy(2);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('getOwner')
-            ->willReturn(null);
+        $lead = new Lead();
 
         $this->userModel->expects($this->once())
             ->method('getEntity')
@@ -190,7 +174,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     public function testNotificationOfUnpublishToAuthor(): void
     {
         $event    = new Event();
-        $user     = $this->createMock(User::class);
+        $user     = $this->createUser(1);
         $this->prepareCommonMocks($event, $user);
 
         $this->coreParametersHelper
@@ -212,7 +196,7 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
     public function testNotificationOfUnpublishToEmailAddress(): void
     {
         $event = new Event();
-        $this->prepareCommonMocks($event, $this->createMock(User::class));
+        $this->prepareCommonMocks($event, $this->createUser(1));
 
         $emails = 'a@test.co, b@test.co';
         $this->coreParametersHelper->expects($this->exactly(2))
@@ -232,23 +216,11 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->getNotificationHelper()->notifyOfUnpublish($event);
     }
 
-    /**
-     * @param MockObject&User $user
-     */
-    private function prepareCommonMocks(Event $event, MockObject $user): void
+    private function prepareCommonMocks(Event $event, User $user): void
     {
         $campaign = new Campaign();
         $event->setCampaign($campaign);
         $campaign->setCreatedBy(2);
-
-        $lead = $this->createMock(Lead::class);
-        $lead
-            ->method('getOwner')
-            ->willReturn(null);
-
-        $user->expects($this->once())
-            ->method('getId')
-            ->willReturn(1);
 
         $this->userModel->expects($this->once())
             ->method('getEntity')
@@ -257,6 +229,14 @@ final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
         $this->translator
             ->method('trans')
             ->willReturn('test');
+    }
+
+    private function createUser(int $id): User
+    {
+        $user       = new User();
+        ReflectionHelper::setEntityId($user, $id);
+
+        return $user;
     }
 
     private function getNotificationHelper(): NotificationHelper

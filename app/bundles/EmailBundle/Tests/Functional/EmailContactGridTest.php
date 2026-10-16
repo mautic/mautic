@@ -135,10 +135,13 @@ final class EmailContactGridTest extends MauticMysqlTestCase
      *
      * @throws ORMException
      */
+    /**
+     * @return array{Email, Lead, Lead}
+     */
     private function setupData(): array
     {
         /** @var UserRepository $userRepository */
-        $userRepository = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class);
+        $userRepository = $this->getContainer()->get(UserRepository::class);
         $adminUser      = $userRepository->findOneBy(['username' => 'admin']);
 
         $segment = $this->createSegment('SegmentOne', []);

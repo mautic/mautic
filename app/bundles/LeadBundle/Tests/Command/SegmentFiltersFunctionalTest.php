@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -62,7 +63,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segmentId]);
 
         // get the lead list leads stored in db after the segment update
-        $leadListLeads = $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findBy(['list' => $segment]);
+        $leadListLeads = $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment]);
         foreach ($leadListLeads as $listLead) {
             $leadListLeadsIds[] = (int) $listLead->getLead()->getId();
         }
@@ -101,7 +102,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
         $numberOfContacts               = 8;
         $numberOfContactsWithBlankValue = 2;
         /** @var LeadRepository $contactRepo */
-        $contactRepo = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $contactRepo = $this->getContainer()->get(LeadRepository::class);
         $contacts    = [];
         $cars        = [
             'value1', 'value2', 'value3',
@@ -138,7 +139,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
     private function saveSegment(array $segmentData = []): LeadList
     {
         /** @var LeadListRepository $segmentRepo */
-        $segmentRepo = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadListRepository::class);
+        $segmentRepo = $this->getContainer()->get(LeadListRepository::class);
         $segment     = new LeadList();
 
         $filterToSave = $segmentData['filterToSave'];
@@ -205,7 +206,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            fn ($contact): bool => empty($contact->getFields()) || 'value1' !== $contact->getField(self::FIELD_NAME)['value'],
+            fn(Lead $contact): bool => empty($contact->getFields()) || 'value1' !== $contact->getField(self::FIELD_NAME)['value'],
         ];
 
         // to test multiple excluding values
@@ -214,8 +215,8 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            fn ($contact): bool => empty($contact->getFields())
-            || !in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']),
+            fn(Lead $contact): bool => empty($contact->getFields())
+                || !in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']),
         ];
 
         // to test including filter, should NOT contain blank values
@@ -225,7 +226,7 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            fn ($contact): bool => !empty($contact->getFields()) && 'value1' === $contact->getField(self::FIELD_NAME)['value'],
+            fn(Lead $contact): bool => !empty($contact->getFields()) && 'value1' === $contact->getField(self::FIELD_NAME)['value'],
         ];
 
         // to test multiple including values
@@ -234,8 +235,8 @@ final class SegmentFiltersFunctionalTest extends MauticMysqlTestCase
             // custom field
             $customField,
             $segmentData,
-            fn ($contact): bool => !empty($contact->getFields())
-            && in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']),
+            fn(Lead $contact): bool => !empty($contact->getFields())
+                && in_array($contact->getField(self::FIELD_NAME)['value'], ['value1', 'value2']),
         ];
     }
 }

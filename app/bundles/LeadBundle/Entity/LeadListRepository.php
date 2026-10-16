@@ -95,6 +95,7 @@ final class LeadListRepository extends CommonRepository
      * Get lists for a specific lead.
      *
      * @param int|Lead[] $lead Lead ID or array of Leads
+     * @return ($singleArrayHydration is true ? array<int, array<string, mixed>> : array<int, LeadList>)
      */
     public function getLeadLists($lead, bool $forList = false, bool $singleArrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false): array
     {

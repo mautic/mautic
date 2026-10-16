@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Event\CompanyEvent;
@@ -92,11 +93,9 @@ final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             $companyModel,
         );
 
-        $company            = $this->createMock(Company::class);
+        $company            = new Company();
         $company->deletedId = $companyId;
-        $company->expects($this->once())
-            ->method('getPrimaryIdentifier')
-            ->willReturn($companyName);
+        $company->setName($companyName);
 
         $event = $this->createMock(CompanyEvent::class);
         $event->expects($this->once())
@@ -142,10 +141,8 @@ final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(CompanyModel::class),
         );
 
-        $company = $this->createMock(Company::class);
-        $company->expects($this->once())
-            ->method('getId')
-            ->willReturn($companyId);
+        $company = new Company();
+        ReflectionHelper::setEntityId($company, $companyId);
 
         $event = $this->createMock(CompanyEvent::class);
         $event->expects($this->once())

@@ -9,6 +9,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Redirect;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -66,7 +67,7 @@ final class PageControllerSqlRollbackFunctionalTest extends MauticMysqlTestCase
         // Re-enable redirect following for subsequent tests.
         $this->client->followRedirects();
 
-        $hitRepository = $this->getContainer()->get(\Mautic\PageBundle\Entity\HitRepository::class);
+        $hitRepository = $this->getContainer()->get(HitRepository::class);
         /** @var Hit|null $hit */
         $hit = $hitRepository->findOneBy(['lead' => $lead]);
 

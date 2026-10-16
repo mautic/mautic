@@ -24,18 +24,14 @@ final class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $channelListHelperMock            = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
         $reportHelperMock                 = new ReportHelper($this->createStub(EventDispatcherInterface::class));
         $fieldsBuilderMock                = $this->createStub(FieldsBuilder::class);
-        $reportMock                       = $this->createMock(Report::class);
+        $reportMock                       = new Report();
+        $reportMock->setSource('badContext');
         $queryBuilder                     = $this->createMock(QueryBuilder::class);
         $reportBuilderEvent               = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'badContext', [], $reportHelperMock);
         $segmentReportSubscriber          = new SegmentReportSubscriber($fieldsBuilderMock);
         $segmentReportSubscriber->onReportBuilder($reportBuilderEvent);
 
         $this->assertSame([], $reportBuilderEvent->getTables());
-
-        $reportMock->expects($this->once())
-            ->method('getSource')
-            ->with()
-            ->willReturn('badContext');
 
         $queryBuilder->expects($this->never())
             ->method('from');
@@ -158,23 +154,9 @@ final class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $channelListHelperMock            = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
         $fieldsBuilderMock                = $this->createStub(FieldsBuilder::class);
         $segmentReportSubscriber          = new SegmentReportSubscriber($fieldsBuilderMock);
-        $reportMock                       = $this->createMock(Report::class);
+        $reportMock                       = new Report();
+        $reportMock->setSource('segment.membership');
         $queryBuilder                     = $this->createMock(QueryBuilder::class);
-
-        $reportMock->expects($this->once())
-            ->method('getSource')
-            ->with()
-            ->willReturn('segment.membership');
-
-        $reportMock->expects($this->exactly(2))
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->with()
-            ->willReturn([]);
-
-        $reportMock->expects($this->exactly(1))
-            ->method('getFilters')
-            ->with()
-            ->willReturn([]);
 
         $queryBuilder->expects($this->once())
             ->method('from')

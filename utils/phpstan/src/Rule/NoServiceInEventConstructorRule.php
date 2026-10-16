@@ -4,6 +4,14 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Helper\BundleHelper;
+use Mautic\CoreBundle\Menu\MenuHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use PhpParser\Node;
 use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\Variable;
@@ -19,7 +27,9 @@ use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * An event carries data, not services.
@@ -27,6 +37,8 @@ use Symfony\Contracts\EventDispatcher\Event;
  * This flags a service that an event only stashes to hand to its listeners through a getter - the
  * service belongs in the listener, not on the event. A service the event actually uses in its own
  * methods is left alone, as translating a label or checking a permission is the event's own work.
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoServiceInEventConstructorRuleTest
  *
  * @implements Rule<Class_>
  */
@@ -38,16 +50,16 @@ final readonly class NoServiceInEventConstructorRule implements Rule
      * @var string[]
      */
     private const array SERVICE_TYPES = [
-        \Doctrine\ORM\EntityManagerInterface::class,
-        \Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface::class,
-        \Mautic\ChannelBundle\Helper\ChannelListHelper::class,
-        \Mautic\CoreBundle\Helper\BundleHelper::class,
-        \Mautic\CoreBundle\Menu\MenuHelper::class,
-        \Mautic\CoreBundle\Security\Permissions\CorePermissions::class,
-        \Mautic\CoreBundle\Twig\Helper\AssetsHelper::class,
-        \Mautic\ReportBundle\Helper\ReportHelper::class,
-        \Symfony\Component\Security\Core\User\UserProviderInterface::class,
-        \Symfony\Contracts\Translation\TranslatorInterface::class,
+        EntityManagerInterface::class,
+        CacheProviderTagAwareInterface::class,
+        ChannelListHelper::class,
+        BundleHelper::class,
+        MenuHelper::class,
+        CorePermissions::class,
+        AssetsHelper::class,
+        ReportHelper::class,
+        UserProviderInterface::class,
+        TranslatorInterface::class,
     ];
 
     public function __construct(

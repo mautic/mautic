@@ -19,6 +19,9 @@ class CorePermissions implements ResetInterface
 
     private array $permissionObjectsByClass = [];
 
+    /**
+     * @var array<string, AbstractPermissions>
+     */
     private array $permissionObjectsByName = [];
 
     private array $grantedPermissions = [];
@@ -59,6 +62,8 @@ class CorePermissions implements ResetInterface
 
     /**
      * Retrieves all permission objects.
+     *
+     * @return array<string, AbstractPermissions>
      */
     public function getPermissionObjects(): array
     {

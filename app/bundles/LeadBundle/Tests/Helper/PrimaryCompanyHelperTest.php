@@ -43,14 +43,8 @@ final class PrimaryCompanyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testProfileFieldsReturnedWithPrimaryCompany(): void
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn(
-                [
-                    'email' => 'test@test.com',
-                ]
-            );
+        $lead = new Lead();
+        $lead->setFields(['email' => 'test@test.com']);
 
         $profileFields = $this->getPrimaryCompanyHelper()->getProfileFieldsWithPrimaryCompany($lead);
 

@@ -643,13 +643,12 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Make a basic call using cURL to get the data.
      *
      * @param string               $url
-     * @param array                $parameters
      * @param string               $method
      * @param array<string, mixed> $settings   Set $settings['return_raw'] to receive a ResponseInterface
      *
      * @return mixed|string|ResponseInterface
      */
-    public function makeRequest($url, $parameters = [], $method = 'GET', array $settings = [])
+    public function makeRequest($url, array $parameters = [], $method = 'GET', array $settings = [])
     {
         // If not authorizing the session itself, check isAuthorized which will refresh tokens if applicable
         if (empty($settings['authorize_session'])) {
@@ -867,7 +866,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return array<int, mixed>
      */
-    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType): array
+    public function prepareRequest(string $url, array $parameters, string $method, array $settings, $authType): array
     {
         $clientIdKey     = $this->getClientIdKey();
         $clientSecretKey = $this->getClientSecretKey();
@@ -2008,7 +2007,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *                                   integration is called when adding an integration to events like point triggers,
      *                                   campaigns actions, forms actions, etc
      */
-    public function appendToForm(&$builder, $data, $formArea): void
+    public function appendToForm($builder, $data, $formArea): void
     {
     }
 

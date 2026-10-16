@@ -163,7 +163,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
+     * @return iterable<Sms>
      */
     public function getEntities(array $args = []): iterable
     {
@@ -340,7 +340,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
 
             foreach ($recipientCollection as $recipient) {
                 $defaultSendResult['content'] = $recipient->getFinalMessage();
-                if (true !== $recipient->getResult()) {
+                if (!$recipient->getResult()) {
                     $defaultSendResult['sent']   = false;
                     $defaultSendResult['status'] = $recipient->getResult();
                     unset($stats[$recipient->getKey()]);
@@ -428,7 +428,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q): void
+    public function limitQueryToCreator(QueryBuilder $q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'sms_messages', 's', 's.id = t.sms_id')
             ->andWhere('s.created_by = :userId')
@@ -480,7 +480,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
         return $chart->render();
     }
 
-    public function getSmsStatus(string $idHash): ?\Mautic\SmsBundle\Entity\Stat
+    public function getSmsStatus(string $idHash): ?Stat
     {
         return $this->statRepository->getSmsStatus($idHash);
     }

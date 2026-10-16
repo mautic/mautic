@@ -48,7 +48,7 @@ final class Issue9488Test extends MauticMysqlTestCase
         parent::setUp();
 
         /** @var LeadRepository $leadRepository */
-        $leadRepository          = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $leadRepository          = $this->getContainer()->get(LeadRepository::class);
         $this->contactRepository = $leadRepository;
     }
 

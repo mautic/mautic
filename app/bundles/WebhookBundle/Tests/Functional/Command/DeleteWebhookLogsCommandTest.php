@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\DeleteWebhookLogsCommand;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Log;
+use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Model\WebhookModel;
 
@@ -89,7 +90,7 @@ final class DeleteWebhookLogsCommandTest extends MauticMysqlTestCase
      */
     private function assertLogs(Webhook $webhook, int $expectedCount, array $expectedIds): void
     {
-        $logs   = $this->getContainer()->get(\Mautic\WebhookBundle\Entity\LogRepository::class)->findBy(['webhook' => $webhook]);
+        $logs   = $this->getContainer()->get(LogRepository::class)->findBy(['webhook' => $webhook]);
         $logIds = array_map(fn (Log $log) => $log->getId(), $logs);
 
         $this->assertCount($expectedCount, $logs);

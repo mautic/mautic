@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
- * @template T of TranslationEntityInterface
+ * @template TEntity of TranslationEntityInterface
  */
 trait TranslationEntityTrait
 {
@@ -21,13 +21,13 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var Collection<int, T>
+     * @var Collection<int, TEntity>
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     private $translationChildren;
 
     /**
-     * @var T|null
+     * @var TEntity|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'download:write', 'email:read', 'email:write', 'dynamicContent:read', 'dynamicContent:write'])]
     private $translationParent;
@@ -53,28 +53,37 @@ trait TranslationEntityTrait
             ->build();
     }
 
+    /**
+     * @param TEntity $child
+     */
     public function addTranslationChild(TranslationEntityInterface $child): static
     {
         if (!$this->translationChildren->contains($child)) {
-            $this->translationChildren[] = $child;
+            $this->translationChildren->add($child);
         }
 
         return $this;
     }
 
+    /**
+     * @param TEntity $child
+     */
     public function removeTranslationChild(TranslationEntityInterface $child): void
     {
         $this->translationChildren->removeElement($child);
     }
 
     /**
-     * Get translated items.
+     * @return Collection<int, TEntity>|null
      */
     public function getTranslationChildren(): ?Collection
     {
         return $this->translationChildren;
     }
 
+    /**
+     * @param TEntity|null $parent
+     */
     public function setTranslationParent(?TranslationEntityInterface $parent = null): self
     {
         if (method_exists($this, 'isChanged')) {
@@ -86,6 +95,9 @@ trait TranslationEntityTrait
         return $this;
     }
 
+    /**
+     * @return TEntity|null
+     */
     public function getTranslationParent(): ?TranslationEntityInterface
     {
         return $this->translationParent;
@@ -150,7 +162,7 @@ trait TranslationEntityTrait
     /**
      * Get translation parent/children.
      *
-     * @return array<mixed>
+     * @return array<int, TranslationEntityInterface|array<TranslationEntityInterface>>
      */
     public function getTranslations(bool $onlyChildren = false): array
     {
@@ -177,13 +189,7 @@ trait TranslationEntityTrait
         return [$parent, $children];
     }
 
-    /**
-     * @param string                      $getter
-     * @param ?TranslationEntityInterface $variantParent
-     *
-     * @return int
-     */
-    protected function getAccumulativeTranslationCount($getter, $variantParent = null)
+    protected function getAccumulativeTranslationCount(string $getter, ?TranslationEntityInterface $variantParent = null): int
     {
         $count = 0;
 

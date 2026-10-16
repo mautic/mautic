@@ -15,15 +15,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[AllowMockObjectsWithoutExpectations]
 final class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Lead
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $contactMock5;
+    private Lead $contactMock5;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&Lead
-     */
-    private \PHPUnit\Framework\MockObject\Stub $contactMock6;
+    private Lead $contactMock6;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&LeadModel
@@ -41,8 +35,8 @@ final class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->contactMock5     = $this->createMock(Lead::class);
-        $this->contactMock6     = $this->createStub(Lead::class);
+        $this->contactMock5     = new Lead();
+        $this->contactMock6     = new Lead();
         $this->contactModelMock = $this->createMock(LeadModel::class);
         $this->doNotContactMock = $this->createMock(DoNotContact::class);
         $this->actionModel      = new ChannelActionModel(
@@ -51,7 +45,7 @@ final class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(TranslatorInterface::class)
         );
 
-        $this->contactMock5->method('getId')->willReturn(5);
+        $this->contactMock5->setId(5);
     }
 
     public function testUpdateEntityAccess(): void

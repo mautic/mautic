@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -449,7 +450,7 @@ final class HitRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getReferers(\Doctrine\DBAL\Query\QueryBuilder $query, int $limit = 10, int $offset = 0): array
+    public function getReferers(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->select('ph.referer, count(ph.referer) as sessions')
             ->groupBy('ph.referer')
@@ -466,7 +467,7 @@ final class HitRepository extends CommonRepository
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getMostVisited(\Doctrine\DBAL\Query\QueryBuilder $query, int $limit = 10, int $offset = 0, string $column = 'p.hits', string $as = ''): array
+    public function getMostVisited(QueryBuilder $query, int $limit = 10, int $offset = 0, string $column = 'p.hits', string $as = ''): array
     {
         if ($as) {
             $as = ' as "'.$as.'"';

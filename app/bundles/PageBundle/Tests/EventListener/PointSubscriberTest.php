@@ -64,9 +64,9 @@ final class PointSubscriberTest extends TestCase
     public function testPageHitTriggersPageHitWhenPageIsSet(): void
     {
         $pageHitEvent      = $this->createMock(PageHitEvent::class);
-        $page              = $this->createStub(Page::class);
-        $hit               = $this->createStub(Hit::class);
-        $lead              = $this->createStub(Lead::class);
+        $page              = new Page();
+        $hit               = new Hit();
+        $lead              = new Lead();
         $pointModel        = $this->createMock(PointModel::class);
         $pointActionHelper = $this->createStub(PointActionHelper::class);
 
@@ -82,8 +82,8 @@ final class PointSubscriberTest extends TestCase
     public function testURLHitTriggersPageHitWhenPageIsSet(): void
     {
         $pageHitEvent      = $this->createMock(PageHitEvent::class);
-        $hit               = $this->createStub(Hit::class);
-        $lead              = $this->createStub(Lead::class);
+        $hit               = new Hit();
+        $lead              = new Lead();
         $pointModel        = $this->createMock(PointModel::class);
         $pointActionHelper = $this->createStub(PointActionHelper::class);
 

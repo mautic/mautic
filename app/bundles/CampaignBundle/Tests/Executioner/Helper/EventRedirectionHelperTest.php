@@ -74,8 +74,7 @@ final class EventRedirectionHelperTest extends TestCase
         $campaign = new Campaign();
 
         $deletedEvent     = $this->createEventWithId(1);
-        $nonExistentEvent = $this->createMock(Event::class);
-        $nonExistentEvent->method('getId')->willReturn(null);
+        $nonExistentEvent = new Event();
         $deletedEvent->setRedirectEvent($nonExistentEvent);
         $deletedEvent->setCampaign($campaign);
         $deletedEvent->setDeleted(new \DateTime());
@@ -91,6 +90,7 @@ final class EventRedirectionHelperTest extends TestCase
         $events = new ArrayCollection([$deletedEvent]);
         ReflectionHelper::setValue($campaign, 'events', $events);
 
+        /** @var ArrayCollection<int, Event> $logs */
         $logs = new ArrayCollection([0 => $deletedEvent]);
 
         $logger = $this->createStub(LoggerInterface::class);

@@ -10,6 +10,7 @@ use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -183,7 +184,7 @@ final class LeadEmailReadDateSegmentFunctionalTest extends MauticMysqlTestCase
     {
         return array_map(
             static fn (ListLead $member): int => (int) $member->getLead()->getId(),
-            $this->getContainer()->get(\Mautic\LeadBundle\Entity\ListLeadRepository::class)->findBy(['list' => $segment->getId()])
+            $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment->getId()])
         );
     }
 }

@@ -83,7 +83,7 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return object[]|array<int,mixed>|iterable<object>|Paginator<object>|SimplePaginator<mixed>
+     * @return T[]|array<int,mixed>|iterable<T>|Paginator<T>|SimplePaginator<T>
      */
     public function getEntities(array $args = []): iterable
     {
@@ -99,6 +99,7 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
      * Get a specific entity.
      *
      * @param string|int|mixed[]|null $id
+     * @return T|null
      */
     public function getEntity($id = null): ?object
     {
@@ -153,6 +154,7 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
 
     /**
      * Retrieve entity based on id/alias slugs.
+     * @return T|null
      */
     public function getEntityBySlugs(string $slug): ?object
     {

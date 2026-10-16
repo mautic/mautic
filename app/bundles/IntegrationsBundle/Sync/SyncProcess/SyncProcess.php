@@ -230,6 +230,8 @@ final class SyncProcess
     }
 
     /**
+     * @param \Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO[] $objectsToSynchronize
+     *
      * @throws \Mautic\IntegrationsBundle\Exception\InvalidValueException
      */
     private function getInputOptionsForObjects(array $objectsToSynchronize): InputOptionsDAO

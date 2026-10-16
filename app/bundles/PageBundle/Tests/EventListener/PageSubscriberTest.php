@@ -52,7 +52,7 @@ final class PageSubscriberTest extends TestCase
 EOF;
         $event = new PageDisplayEvent(
             $dummyPageContent,
-            $this->createStub(Page::class)
+            new Page()
         );
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getPageSubscriber();

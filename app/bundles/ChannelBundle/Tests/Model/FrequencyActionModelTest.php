@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\Tests\Model;
 
-use Doctrine\Common\Collections\AbstractLazyCollection;
 use Mautic\ChannelBundle\Model\FrequencyActionModel;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
@@ -16,10 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 #[AllowMockObjectsWithoutExpectations]
 final class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject&Lead
-     */
-    private MockObject $contactMock5;
+    private Lead $contact;
 
     /**
      * @var MockObject&LeadModel
@@ -31,15 +27,9 @@ final class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $frequencyRepoMock;
 
-    /**
-     * @var MockObject&FrequencyRule
-     */
-    private MockObject $frequencyRuleEmailMock;
+    private FrequencyRule $frequencyRuleEmail;
 
-    /**
-     * @var MockObject&FrequencyRule
-     */
-    private MockObject $frequencyRuleSmsMock;
+    private FrequencyRule $frequencyRuleSms;
 
     private FrequencyActionModel $actionModel;
 
@@ -47,24 +37,20 @@ final class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->contactMock5           = $this->createMock(Lead::class);
-        $this->contactModelMock       = $this->createMock(LeadModel::class);
-        $this->frequencyRepoMock      = $this->createMock(FrequencyRuleRepository::class);
-        $this->frequencyRuleEmailMock = $this->createMock(FrequencyRule::class);
-        $this->frequencyRuleSmsMock   = $this->createMock(FrequencyRule::class);
-        $collectionMock               = $this->createMock(AbstractLazyCollection::class);
-        $this->actionModel            = new FrequencyActionModel(
+        $this->contact            = new Lead();
+        $this->contactModelMock   = $this->createMock(LeadModel::class);
+        $this->frequencyRepoMock  = $this->createMock(FrequencyRuleRepository::class);
+        $this->frequencyRuleEmail = new FrequencyRule();
+        $this->frequencyRuleSms   = new FrequencyRule();
+        $this->actionModel        = new FrequencyActionModel(
             $this->contactModelMock,
             $this->frequencyRepoMock
         );
 
-        $collectionMock->method('toArray')
-            ->willReturn([
-                'email' => $this->frequencyRuleEmailMock,
-                'sms'   => $this->frequencyRuleSmsMock,
-            ]);
-
-        $this->contactMock5->method('getFrequencyRules')->willReturn($collectionMock);
+        $this->contact->setFrequencyRules([
+            'email' => $this->frequencyRuleEmail,
+            'sms'   => $this->frequencyRuleSms,
+        ]);
     }
 
     public function testUpdateWhenEntityAccess(): void
@@ -74,11 +60,11 @@ final class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
         $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
-            ->willReturn([$this->contactMock5]);
+            ->willReturn([$this->contact]);
 
         $this->contactModelMock->expects($this->once())
             ->method('canEditContact')
-            ->with($this->contactMock5)
+            ->with($this->contact)
             ->willReturn(false);
 
         $this->contactModelMock->expects($this->never())
@@ -106,11 +92,11 @@ final class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
         $this->contactModelMock->expects($this->once())
             ->method('getLeadsByIds')
             ->with($contacts)
-            ->willReturn([$this->contactMock5]);
+            ->willReturn([$this->contact]);
 
         $this->contactModelMock->expects($this->once())
             ->method('canEditContact')
-            ->with($this->contactMock5)
+            ->with($this->contact)
             ->willReturn(true);
 
         $this->contactModelMock->expects($this->once())
@@ -119,89 +105,36 @@ final class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
                 'Email'        => 'email',
                 'Text Message' => 'sms',
             ]);
-
-        $this->frequencyRuleEmailMock->expects($this->once())
-            ->method('setChannel')
-            ->with('email');
-
-        $this->frequencyRuleEmailMock->expects($this->once())
-            ->method('setLead')
-            ->with($this->contactMock5);
-
-        $this->frequencyRuleEmailMock->expects($this->once())
-            ->method('setDateAdded');
-
-        $this->frequencyRuleEmailMock->expects($this->once())
-            ->method('setFrequencyNumber')
-            ->with('2');
-
-        $this->frequencyRuleEmailMock->expects($this->once())
-            ->method('setFrequencyTime')
-            ->with('WEEK');
-
-        $this->frequencyRuleEmailMock->expects($this->once())
-            ->method('setPauseFromDate')
-            ->with(new \DateTime('2018-05-13T00:00:00.000000+0000'));
-
-        $this->frequencyRuleEmailMock->expects($this->once())
-            ->method('setPauseToDate')
-            ->with(new \DateTime('2018-05-26T00:00:00.000000+0000'));
-
-        $this->frequencyRuleEmailMock->expects($this->once())
-            ->method('setPreferredChannel')
-            ->with(true);
-        $matcher = $this->exactly(2);
-
-        $this->contactMock5->expects($matcher)
-            ->method('addFrequencyRule')->willReturnCallback(function (...$parameters) use ($matcher): void {
-                if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertEquals($this->frequencyRuleEmailMock, $parameters[0]);
-                }
-                if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertEquals($this->frequencyRuleEmailMock, $parameters[0]);
-                }
-            });
         $matcher = $this->exactly(2);
 
         $this->frequencyRepoMock->expects($matcher)
             ->method('saveEntity')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame($this->frequencyRuleEmailMock, $parameters[0]);
+                    $this->assertSame($this->frequencyRuleEmail, $parameters[0]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame($this->frequencyRuleSmsMock, $parameters[0]);
+                    $this->assertSame($this->frequencyRuleSms, $parameters[0]);
                 }
             });
 
-        $this->frequencyRuleSmsMock->expects($this->once())
-            ->method('setChannel')
-            ->with('sms');
-
-        $this->frequencyRuleSmsMock->expects($this->once())
-            ->method('setLead')
-            ->with($this->contactMock5);
-
-        $this->frequencyRuleSmsMock->expects($this->once())
-            ->method('setDateAdded');
-
-        $this->frequencyRuleSmsMock->expects($this->once())
-            ->method('setFrequencyNumber')
-            ->with(null);
-
-        $this->frequencyRuleSmsMock->expects($this->once())
-            ->method('setFrequencyTime')
-            ->with(null);
-
-        $this->frequencyRuleSmsMock->expects($this->never())
-            ->method('setPauseFromDate');
-
-        $this->frequencyRuleSmsMock->expects($this->never())
-            ->method('setPauseToDate');
-
-        $this->frequencyRuleSmsMock->expects($this->once())
-            ->method('setPreferredChannel')
-            ->with(false);
-
         $this->actionModel->update($contacts, $params, 'email');
+
+        $this->assertSame('email', $this->frequencyRuleEmail->getChannel());
+        $this->assertSame($this->contact, $this->frequencyRuleEmail->getLead());
+        $this->assertInstanceOf(\DateTimeInterface::class, $this->frequencyRuleEmail->getDateAdded());
+        $this->assertSame('2', $this->frequencyRuleEmail->getFrequencyNumber());
+        $this->assertSame('WEEK', $this->frequencyRuleEmail->getFrequencyTime());
+        $this->assertEquals(new \DateTime('2018-05-13T00:00:00.000000+0000'), $this->frequencyRuleEmail->getPauseFromDate());
+        $this->assertEquals(new \DateTime('2018-05-26T00:00:00.000000+0000'), $this->frequencyRuleEmail->getPauseToDate());
+        $this->assertTrue($this->frequencyRuleEmail->getPreferredChannel());
+
+        $this->assertSame('sms', $this->frequencyRuleSms->getChannel());
+        $this->assertSame($this->contact, $this->frequencyRuleSms->getLead());
+        $this->assertInstanceOf(\DateTimeInterface::class, $this->frequencyRuleSms->getDateAdded());
+        $this->assertNull($this->frequencyRuleSms->getFrequencyNumber());
+        $this->assertNull($this->frequencyRuleSms->getFrequencyTime());
+        $this->assertNull($this->frequencyRuleSms->getPauseFromDate());
+        $this->assertNull($this->frequencyRuleSms->getPauseToDate());
+        $this->assertFalse($this->frequencyRuleSms->getPreferredChannel());
     }
 }

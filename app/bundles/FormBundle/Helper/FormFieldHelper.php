@@ -157,7 +157,7 @@ final class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Search and replace the HTML of the form field with the value.
      */
-    public function populateField($field, $value, $formName, &$formHtml): void
+    public function populateField(Field $field, $value, $formName, &$formHtml): void
     {
         $alias = $field->getAlias();
 
@@ -166,7 +166,7 @@ final class FormFieldHelper extends AbstractFormFieldHelper
         $escapedAlias      = preg_quote($alias, '/');
 
         // Adds the "readonly" attribute to a field if it is configured as read-only with auto-fill enabled and a sanitized value exists.
-        $fieldAttributeReadOnly = fn ($field, $sanitizedValue): string => ($field->isAutoFillReadOnly() && $sanitizedValue) ? ' readonly ' : '';
+        $fieldAttributeReadOnly = fn (Field $field, $sanitizedValue): string => ($field->isAutoFillReadOnly() && $sanitizedValue) ? ' readonly ' : '';
 
         switch ($field->getType()) {
             case 'text':

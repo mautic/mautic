@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -14,6 +15,8 @@ final class ImportRepository extends CommonRepository
      * Count how many imports with the status is there.
      *
      * @param int $ghostDelay when is the import ghost? In hours
+     *
+     * @return Import[]
      */
     public function getGhostImports(int $ghostDelay = 2, ?int $limit = null): array
     {
@@ -70,7 +73,7 @@ final class ImportRepository extends CommonRepository
         return $this->countImportsWithStatuses([Import::IN_PROGRESS]);
     }
 
-    public function getQueryForStatuses(array $statuses): \Doctrine\ORM\QueryBuilder
+    public function getQueryForStatuses(array $statuses): QueryBuilder
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
 

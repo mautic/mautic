@@ -202,7 +202,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityForNotFoundContactField(): void
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $formField  = new Field();
         $formField->setMappedField('contactselect');
@@ -211,9 +211,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $fields->add($formField);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -231,16 +229,14 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityForNotLinkedSelectField(): void
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $formField  = new Field();
         $formField->setProperties(['syncList' => true]);
 
         $fields->add($formField);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -255,7 +251,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityForNotSyncedSelectField(): void
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $formField  = new Field();
         $formField->setMappedField('contactselect');
@@ -264,9 +260,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $fields->add($formField);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -281,7 +275,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityForSyncedBooleanFieldFromNotLeadObject(): void
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $options    = ['no' => 'lunch?', 'yes' => 'dinner?'];
         $formField  = new Field();
@@ -295,9 +289,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $contactField->setType('boolean');
         $contactField->setProperties($options);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -312,7 +304,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityForSyncedBooleanField(): void
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $options    = ['no' => 'lunch?', 'yes' => 'dinner?'];
         $formField  = new Field();
@@ -326,9 +318,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $contactField->setType('boolean');
         $contactField->setProperties($options);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -386,7 +376,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
     #[DataProvider('fieldTypeProvider')]
     public function testSyncListField(string $type): void
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $options    = [
             ['label' => 'label1', 'value' => 'value1'],
@@ -404,9 +394,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $fields->add($formField);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -433,7 +421,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     private function standardSyncListStaticFieldTest(string $type): Field
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $formField  = new Field();
         $formField->setMappedField('contactfield');
@@ -445,9 +433,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $contactField = new LeadField();
         $contactField->setType($type);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')

@@ -2,12 +2,14 @@
 
 namespace Mautic\FormBundle\Helper;
 
+use Mautic\FormBundle\Entity\Submission;
+
 final class PointActionHelper
 {
     /**
      * @param array<string, mixed> $action
      */
-    public static function validateFormSubmit($eventDetails, array $action): bool
+    public static function validateFormSubmit(Submission $eventDetails, array $action): bool
     {
         $form         = $eventDetails->getForm();
         $formId       = $form->getId();

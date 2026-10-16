@@ -57,10 +57,7 @@ final class UserModelTest extends TestCase
      */
     private MockObject $translator;
 
-    /**
-     * @var MockObject&User
-     */
-    private MockObject $user;
+    private User $user;
 
     /**
      * @var MockObject&UserTokenServiceInterface
@@ -92,7 +89,7 @@ final class UserModelTest extends TestCase
         $this->mailHelper       = $this->createMock(MailHelper::class);
         $this->userTokenService = $this->createMock(UserTokenServiceInterface::class);
         $this->entityManager    = $this->createMock(EntityManager::class);
-        $this->user             = $this->createMock(User::class);
+        $this->user             = new User();
         $this->router           = $this->createMock(UrlGeneratorInterface::class);
         $this->translator       = $this->createMock(Translator::class);
         $this->logger           = $this->createMock(LoggerInterface::class);
@@ -125,7 +122,7 @@ final class UserModelTest extends TestCase
     {
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->createStub(UserToken::class));
+            ->willReturn(new UserToken());
 
         $this->mailHelper
             ->method('getMailer')
@@ -136,7 +133,7 @@ final class UserModelTest extends TestCase
 
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->createStub(UserToken::class));
+            ->willReturn(new UserToken());
 
         $this->router->expects($this->once())
             ->method('generate')
@@ -157,7 +154,7 @@ final class UserModelTest extends TestCase
 
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->createStub(UserToken::class));
+            ->willReturn(new UserToken());
 
         $this->entityManager->expects($this->once())
             ->method('flush')
@@ -180,18 +177,14 @@ final class UserModelTest extends TestCase
     public function testEmailUser(): void
     {
         $email   = 'a@test.com';
-        $name    = 'name';
+        $name    = 'John Doe';
         $toMail  = [$email => $name];
         $subject = 'subject';
         $content = 'content';
 
-        $this->user->expects($this->once())
-            ->method('getEmail')
-            ->willReturn($email);
-
-        $this->user->expects($this->once())
-            ->method('getName')
-            ->willReturn($name);
+        $this->user->setEmail($email);
+        $this->user->setFirstName('John');
+        $this->user->setLastName('Doe');
 
         $this->mailHelper->expects($this->once())
             ->method('getMailer')

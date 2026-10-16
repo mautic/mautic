@@ -367,7 +367,7 @@ class CommonApiController extends FetchCommonApiController
      *
      * @return mixed
      */
-    protected function prePopulateForm(&$entity, $parameters, $action = 'edit')
+    protected function prePopulateForm($entity, array $parameters, $action = 'edit')
     {
     }
 
@@ -381,7 +381,7 @@ class CommonApiController extends FetchCommonApiController
      *
      * @return mixed
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(&$entity, $form, array $parameters, $action = 'edit')
     {
     }
 
@@ -399,7 +399,7 @@ class CommonApiController extends FetchCommonApiController
      * @param mixed[][]          $errors
      * @param array<object|null> $entities
      */
-    protected function processBatchForm(Request $request, $key, $entity, $params, $method, array &$errors, array &$entities)
+    protected function processBatchForm(Request $request, $key, $entity, ?array $params, $method, array &$errors, array &$entities)
     {
         $this->inBatchMode = true;
         $formResponse      = $this->processForm($request, $entity, $params, $method);
@@ -447,7 +447,7 @@ class CommonApiController extends FetchCommonApiController
      *
      * @return mixed
      */
-    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, $entity, ?array $parameters = null, $method = 'PUT')
     {
         $categoryId = null;
 

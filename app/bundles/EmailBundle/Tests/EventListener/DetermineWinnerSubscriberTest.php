@@ -45,12 +45,15 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnDetermineOpenRateWinner(): void
     {
-        $parentMock = $this->createMock(Email::class);
-        $children   = [2 => $this->createStub(Email::class)];
-        $ids        = [1, 2];
-        $parameters = ['parent' => $parentMock, 'children' => $children];
-        $event      = new DetermineWinnerEvent($parameters);
-        $startDate  = new \DateTime();
+        $parent       = new Email();
+        $variantChild = new Email();
+        $child        = new Email();
+        $child->setId(2);
+        $children     = [2 => $child];
+        $ids          = [1, 2];
+        $parameters   = ['parent' => $parent, 'children' => $children];
+        $event        = new DetermineWinnerEvent($parameters);
+        $startDate    = new \DateTime();
 
         $openedRates = [
             1 => [
@@ -70,17 +73,10 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ['mautic.email.abtest.label.sent', [], null, null, 'sent'],
         ]);
 
-        $parentMock->expects($this->once())
-            ->method('getRelatedEntityIds')
-            ->willReturn($ids);
-
-        $parentMock
-            ->method('getId')
-            ->willReturn(1);
-
-        $parentMock->expects($this->once())
-            ->method('getVariantStartDate')
-            ->willReturn($startDate);
+        $parent->setId(1);
+        $variantChild->setId(2);
+        $parent->addVariantChild($variantChild);
+        $parent->setVariantStartDate($startDate);
 
         $this->statRepository->expects($this->once())
             ->method('getOpenedRates')
@@ -102,10 +98,13 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnDetermineOClickthroughRateWinner(): void
     {
-        $parentMock    = $this->createMock(Email::class);
-        $children      = [2 => $this->createStub(Email::class)];
+        $parent        = new Email();
+        $variantChild  = new Email();
+        $child         = new Email();
+        $child->setId(2);
+        $children      = [2 => $child];
         $ids           = [1, 2];
-        $parameters    = ['parent' => $parentMock, 'children' => $children];
+        $parameters    = ['parent' => $parent, 'children' => $children];
         $event         = new DetermineWinnerEvent($parameters);
         $startDate     = new \DateTime();
 
@@ -126,17 +125,10 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ]
         );
 
-        $parentMock->expects($this->once())
-            ->method('getRelatedEntityIds')
-            ->willReturn($ids);
-
-        $parentMock
-            ->method('getId')
-            ->willReturn(1);
-
-        $parentMock->expects($this->once())
-            ->method('getVariantStartDate')
-            ->willReturn($startDate);
+        $parent->setId(1);
+        $variantChild->setId(2);
+        $parent->addVariantChild($variantChild);
+        $parent->setVariantStartDate($startDate);
 
         $this->hitRepository->expects($this->once())
             ->method('getEmailClickthroughHitCount')

@@ -147,7 +147,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                foreach ($lists as &$list) {
+                foreach ($lists as $list) {
                     $listUrl    = $this->router->generate('mautic_segment_action', ['objectAction' => 'edit', 'objectId' => $list['id']]);
                     $contactUrl = $this->router->generate('mautic_contact_index', ['search' => 'segment:'.$list['alias']]);
                     $row        = [
@@ -303,7 +303,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $items  = [];
 
                 // Build table rows with links
-                foreach ($owners as &$owner) {
+                foreach ($owners as $owner) {
                     $ownerUrl = $this->router->generate('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $owner['owner_id']]);
                     $row      = [
                         [
@@ -356,7 +356,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $items    = [];
 
                 // Build table rows with links
-                foreach ($creators as &$creator) {
+                foreach ($creators as $creator) {
                     $creatorUrl = $this->router->generate('mautic_user_action', ['objectAction' => 'edit', 'objectId' => $creator['created_by']]);
                     $row        = [
                         [
@@ -408,7 +408,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 }
 
                 // Build table rows with links
-                foreach ($leads as &$lead) {
+                foreach ($leads as $lead) {
                     $leadUrl = isset($lead['id']) ? $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $lead['id']]) : '';
                     $type    = isset($lead['id']) ? 'link' : 'text';
                     $row     = [

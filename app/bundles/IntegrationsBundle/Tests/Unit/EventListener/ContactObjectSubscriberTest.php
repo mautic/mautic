@@ -128,12 +128,14 @@ final class ContactObjectSubscriberTest extends TestCase
 
     public function testCreateContactsWithRightObject(): void
     {
-        $event = new InternalObjectCreateEvent(new Contact(), [['somefield' => 'somevalue']]);
+        $objectChangeDAOStub = $this->createStub(ObjectChangeDAO::class);
 
-        $objectMapping = $this->createStub(ObjectMapping::class);
+        $event = new InternalObjectCreateEvent(new Contact(), [$objectChangeDAOStub]);
+
+        $objectMapping = new ObjectMapping();
         $this->contactObjectHelper->expects($this->once())
             ->method('create')
-            ->with([['somefield' => 'somevalue']])
+            ->with([$objectChangeDAOStub])
             ->willReturn([$objectMapping]);
 
         $this->subscriber->createContacts($event);
@@ -338,7 +340,7 @@ final class ContactObjectSubscriberTest extends TestCase
     {
         $event = new InternalObjectFindByIdEvent(new Contact());
         $event->setId(1);
-        $contactObj = $this->createStub(Lead::class);
+        $contactObj = new Lead();
         $this->contactObjectHelper->expects($this->once())
             ->method('findObjectById')
             ->with(1)

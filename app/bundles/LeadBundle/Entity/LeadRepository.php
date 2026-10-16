@@ -110,6 +110,8 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
      * @param string          $field
      * @param string[]|string $value
      * @param ?int            $ignoreId
+     *
+     * @return Lead[]
      */
     public function getLeadsByFieldValue($field, $value, $ignoreId = null, bool $indexByColumn = false): array
     {
@@ -217,6 +219,8 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
 
     /**
      * Get a list of lead entities.
+     *
+     * @return Lead[]
      */
     public function getLeadsByUniqueFields(iterable $uniqueFieldsWithData, int|string|null $leadId = null, ?int $limit = null): array
     {
@@ -281,8 +285,8 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->{$this->getUniqueIdentifiersWherePart()}("l.{$col} = :".$col)
-                ->setParameter($col, $val);
+            $q->{$this->getUniqueIdentifiersWherePart()}("l.{$col} = :".$col);
+            $q->setParameter($col, $val);
         }
 
         // if we have a lead ID lets use it
@@ -450,7 +454,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         $contacts = $this->getEntitiesWithCustomFields(
             'lead',
             $args,
-            function ($r): void {
+            function (Lead $r): void {
                 if ($this->triggerModel instanceof TriggerModel) {
                     $r->setColor($this->triggerModel->getColorForLeadPoints($r->getPoints()));
                 }

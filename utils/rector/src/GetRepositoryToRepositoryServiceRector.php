@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Utils\Rector;
 
+use Doctrine\ORM\EntityManagerInterface;
 use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
@@ -30,6 +31,8 @@ use Rector\NodeManipulator\ClassDependencyManipulator;
 use Rector\PhpParser\AstResolver;
 use Rector\PostRector\ValueObject\PropertyMetadata;
 use Rector\Rector\AbstractRector;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Replaces $em->getRepository(SomeEntity::class) with the concrete repository service.
@@ -57,9 +60,9 @@ final class GetRepositoryToRepositoryServiceRector extends AbstractRector
     /**
      * Any class extending this is treated as a test and gets the container lookup.
      */
-    private const string KERNEL_TEST_CASE = \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase::class;
+    private const string KERNEL_TEST_CASE = KernelTestCase::class;
 
-    private const string ENTITY_MANAGER = \Doctrine\ORM\EntityManagerInterface::class;
+    private const string ENTITY_MANAGER = EntityManagerInterface::class;
 
     public function __construct(
         private readonly AstResolver $astResolver,
@@ -347,7 +350,7 @@ final class GetRepositoryToRepositoryServiceRector extends AbstractRector
 
         // Symfony calls every #[Required] method on service instantiation.
         $classMethod->attrGroups = [
-            new AttributeGroup([new Attribute(new FullyQualified(\Symfony\Contracts\Service\Attribute\Required::class))]),
+            new AttributeGroup([new Attribute(new FullyQualified(Required::class))]),
         ];
 
         return $classMethod;

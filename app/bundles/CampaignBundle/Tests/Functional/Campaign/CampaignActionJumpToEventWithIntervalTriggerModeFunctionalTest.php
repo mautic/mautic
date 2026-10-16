@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
@@ -110,7 +111,7 @@ final class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest exten
         );
 
         // Search the logs
-        $leadEventLogRepo = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class);
+        $leadEventLogRepo = $this->getContainer()->get(LeadEventLogRepository::class);
         $adjustEventLog   = $leadEventLogRepo->findOneBy(['event' => $adjustPointEvent->getId()]);
 
         $assertEventLog($adjustEventLog);

@@ -102,7 +102,7 @@ final class TrackableModel extends AbstractCommonModel
     /**
      * Return a channel Trackable entity by URL.
      */
-    public function getTrackableByUrl($url, $channel, $channelId): ?\Mautic\PageBundle\Entity\Trackable
+    public function getTrackableByUrl($url, $channel, $channelId): ?Trackable
     {
         if (empty($url)) {
             return null;

@@ -24,6 +24,7 @@ use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -321,6 +322,7 @@ final class ImportController extends AbstractStandardFormController
                             unlink($fullPath);
                         }
 
+                        /** @var UploadedFile|null $fileData */
                         $fileData = $form['file']->getData();
                         if (!empty($fileData)) {
                             $errorMessage    = null;

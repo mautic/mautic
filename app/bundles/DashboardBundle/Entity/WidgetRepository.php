@@ -16,15 +16,13 @@ final class WidgetRepository extends CommonRepository
      */
     public function updateOrdering(array $ordering, $userId): void
     {
-        $widgets = $this->getEntities(
-            [
-                'filter' => [
-                    'createdBy' => $userId,
-                ],
-            ]
-        );
+        $widgets = $this->getEntities([
+            'filter' => [
+                'createdBy' => $userId,
+            ],
+        ]);
 
-        foreach ($widgets as &$widget) {
+        foreach ($widgets as $widget) {
             if (isset($ordering[$widget->getId()])) {
                 $widget->setOrdering((int) $ordering[$widget->getId()]);
             }

@@ -6,6 +6,7 @@
 
 ## Removed code
 
+- The ClearbitBundle was removed as the service was sunset.
 - Constant `ON_AFTER_EVENTS_DELETE` removed from `Mautic\CampaignBundle\CampaignEvents`. The after-events-delete event is now dispatched by its own event class `Mautic\CampaignBundle\Event\AfterEventsDeleteEvent`, dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `AfterEventsDeleteEvent::class` instead of the constant. The pre-existing `Mautic\CampaignBundle\Event\DeleteEvent` (dispatched when event logs are deleted) is unchanged.
 - Constants `EMAIL_PARSE` and `EMAIL_PRE_FETCH` removed from `Mautic\EmailBundle\EmailEvents`. These two events used to share one `Mautic\EmailBundle\Event\ParseEmailEvent` object dispatched under both names; the pre-fetch phase (setting search criteria) is now a dedicated `Mautic\EmailBundle\Event\PreFetchEmailEvent` and the parse phase keeps `ParseEmailEvent` (messages only). Both are dispatched by the event object alone (Symfony 4.3+), so their names are the event classes. The criteria methods (`setCriteriaRequest`, `getCriteriaRequests`, `getMarkAsSeenInstructions`) moved from `ParseEmailEvent` to `PreFetchEmailEvent`. Subscribe to the event class instead of the constant.
 
@@ -148,6 +149,7 @@
 - Deprecated Mautic v1 theme fallback removed from `Mautic\PageBundle\Controller\PublicController::indexAction()`. Public pages are now rendered solely from `Page::getCustomHtml()`; the legacy path that rendered `Page::getContent()` through a `@themes/<template>/html/page.html.twig` theme template (used when `customHtml` was empty) is gone. The unused `ThemeHelper` argument was dropped from `indexAction()`.
 - Deprecated method `Mautic\LeadBundle\Model\LeadModel::isContactable()` removed. Use `Mautic\LeadBundle\Model\DoNotContact::isContactable()` instead.
 - Builder helper `Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder::addContact()` removed. Map the `contact` association with Doctrine attributes instead: `#[ORM\ManyToOne(targetEntity: Lead::class)]` plus `#[ORM\JoinColumn(name: 'contact_id', nullable: false, onDelete: 'CASCADE')]`.
+- Deprecated constant `MauticPlugin\MauticFocusBundle\FocusEvents::TOKEN_REPLACEMENT` (`mautic.focus_token_replacement`) removed. The focus token replacement is now dispatched as `MauticPlugin\MauticFocusBundle\Event\FocusTokenReplacementEvent` (extends `Mautic\CoreBundle\Event\AbstractTokenReplacementEvent`). Subscribe to the event class instead of the constant, e.g. `FocusTokenReplacementEvent::class => 'onTokenReplacement'`.
 - Deprecated class `Mautic\CoreBundle\Controller\FormController` removed (deprecated since 2.3). It was a thin layer over `AbstractStandardFormController` that added the `setStandardParameters()` glue and default getters. Controllers that used no standard-form machinery now extend `Mautic\CoreBundle\Controller\AbstractFormController`; controllers using the standard CRUD/lock helpers now extend `Mautic\CoreBundle\Controller\AbstractStandardFormController` directly and declare their own `getModelName()` and related getters (previously supplied via `setStandardParameters()`). The generic `mautic_core_form_action` route (entity unlock) is now hosted by the new concrete `Mautic\CoreBundle\Controller\LockController`. Any custom controller extending `FormController` must switch to one of these two parents.
 - Removed `Mautic\EmailBundle\EmailEvents` constants for events that now dispatch by class name (Symfony 4.3+): dispatch the event object alone and key any subscriber or listener on the event class instead of the string constant. The removed constants and their event class (all in `Mautic\EmailBundle\Event` unless noted):
 
@@ -405,6 +407,9 @@
     - `CATEGORY_PRE_SAVE`, `CATEGORY_POST_SAVE`, `CATEGORY_PRE_DELETE` and `CATEGORY_POST_DELETE` - unused duplicates of the `Mautic\CategoryBundle\CategoryEvents` constants (same string values); key on `CategoryEvents` instead.
 - Constant `PLUGIN_ON_INTEGRATION_REQUEST` removed from `Mautic\PluginBundle\PluginEvents`; it was unused, with no dispatcher or listener.
 - Constants `ADD_DONOT_CONTACT` and `REMOVE_DONOT_CONTACT` removed from `Mautic\LeadBundle\Event\DoNotContactAddEvent` and `DoNotContactRemoveEvent`; they were unused, with no dispatcher or listener.
+- Class `Mautic\PluginBundle\Integration\AbstractSsoFormIntegration` removed. Extend `Mautic\PluginBundle\Integration\AbstractSsoServiceIntegration` instead and reproduce the two overrides the removed class provided, otherwise form authentication breaks: `getSupportedFeatures()` must return `['sso_form']` (so `SsoAuthenticator::authenticate()` still selects the integration), and `getFormSettings()` must return `['requires_callback' => false, 'requires_authorization' => false]`.
+- Trait `Mautic\CoreBundle\Tests\Twig\TwigIntegrationTestTrait` removed; it was never used.
+- Trait `Mautic\IntegrationsBundle\Integration\DefaultConfigFormTrait` removed; each method only returned `null`. Implement `getConfigFormName()` and `getConfigFormContentTemplate()` directly on your integration (return `null` to keep the default).
 - Method `Mautic\CampaignBundle\Entity\CampaignRepository::getCampaignLeads()` removed as dead code. Nothing in Mautic calls it, and its `$limit` parameter was typed `bool`, so any truthy limit (such as `50`) became `setMaxResults(1)`, while `false` or `0` returned every row. `CampaignModel::getCampaignLeads()` is unrelated and unchanged.
 
 ## Changed code
@@ -957,7 +962,15 @@
 - `Mautic\LeadBundle\Field\SchemaDefinition::getSchemaDefinition()` now returns an explicit `length` for a unique identifier field, where it previously left the length to DBAL. DBAL 4 refuses a VARCHAR without one. The value is the 255 DBAL 3 applied implicitly, so the column is unchanged.
 - `Mautic\CoreBundle\Model\FormModel::cleanAlias()` and `Mautic\FormBundle\Entity\SubmissionRepository` check a generated alias against `Mautic\CoreBundle\Doctrine\ReservedWords` instead of the platform's keyword list, which DBAL 4 deprecated with no replacement. The list is the union of the newest MySQL and MariaDB reserved words, so a handful of aliases that were left alone before are now prefixed.
 - `Mautic\CoreBundle\Entity\CommonRepository` and `Mautic\CoreBundle\Event\CommonEvent` are now `abstract`. They were only ever used as base classes; if you instantiate either directly, create your own subclass instead.
+- `Mautic\CoreBundle\Entity\CommonEntity` and `MauticPlugin\MauticFullContactBundle\Services\FullContact_Base` are now `abstract`. They were only ever used as base classes; if you instantiate either directly, create your own subclass instead.
 - All class and interface constants now declare a native type (PHP 8.3 typed class constants), e.g. `public const string NAME = ...`. If a plugin class overrides one of them, add a compatible type to the overriding constant, otherwise PHP fails with "Type of X::NAME must be compatible with Y::NAME". `AbstractMauticMigration::TABLE_NAME` is `?string`, so migrations declare `protected const string TABLE_NAME`.
+- Base entity properties now declare native types. A plugin entity that redeclares either property without a compatible type causes a PHP fatal error. Add the matching type to the overriding property:
+
+    | Class | Property | Type |
+    | --- | --- | --- |
+    | `CoreBundle\Entity\CommonEntity` | `$changes` | `array` |
+    | `CoreBundle\Entity\FormEntity` | `$new` | `bool` |
+
 - `Mautic\DashboardBundle\Entity\Widget::getParams()` and `::getTemplateData()` now declare a native `array` return type instead of a `@return array` docblock. If a plugin class extends `Widget` and overrides either method, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::getParams() must be compatible with Widget::getParams(): array".
 - Methods in Core and shared base classes, interfaces and traits that documented `@return array` now declare a native return type. If a plugin class implements one of these interfaces or overrides one of these methods, add a compatible return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with Y::method(): array". The return type is `array` unless noted:
 
@@ -1074,6 +1087,24 @@
     | `StageBundle\Entity\Stage` | `setCategory()` | `?Category` |
 
     `ContactIdentificationEvent::getIdentifier()` now returns `?string` and `ListPreProcessListEvent::getResult()` returns `?bool`.
+
+- Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
+
+    | Class | Method | New parameter types |
+    | --- | --- | --- |
+    | `PluginBundle\Integration\AbstractIntegration` | `makeRequest()` (`$parameters`) | `array` |
+    | `PluginBundle\Integration\AbstractIntegration` | `prepareRequest()` (`$parameters`) | `array` |
+    | `ApiBundle\Controller\CommonApiController` | `prePopulateForm()` (`$parameters`) | `array` |
+    | `ApiBundle\Controller\CommonApiController` | `preSaveEntity()` (`$parameters`) | `array` |
+    | `ApiBundle\Controller\CommonApiController` | `processForm()` (`$parameters`) | `?array` |
+    | `ApiBundle\Controller\CommonApiController` | `processBatchForm()` (`$params`) | `?array` |
+    | `ApiBundle\Controller\FetchCommonApiController` | `getBatchEntities()` (`$parameters`) | `array` |
+    | `CoreBundle\Entity\CommonRepository` | `parseSearchFilters()` (`&$parameters`) | `array` |
+    | `PluginBundle\Helper\oAuthHelper` | `getAuthorizationHeader()` (`$parameters`) | `array` |
+    | `FormBundle\Entity\Field` | `setCustomParameters()` (`$customParameters`) | `array` |
+    | `LeadBundle\Segment\Query\QueryBuilder` | `setParametersPairs()` (`$parameters`, `$filterParameters`) | `array\|string`, `array\|string\|bool\|null` |
+    | `LeadBundle\Controller\FrequencyRuleTrait` | `getFrequencyRuleForm()` (`&$viewParameters`) | `array` |
+    | `LeadBundle\Controller\Api\CustomFieldsApiControllerTrait` | `setCustomFieldValues()` (`$parameters`) | `array` |
 
 - Methods in `Mautic\PluginBundle\Integration\AbstractIntegration`, `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration` and `MauticPlugin\MauticSocialBundle\Integration\SocialIntegration` that documented `@return array` now declare a native `array` return type. Most third-party integrations extend one of these classes, so if yours overrides one of the methods below, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with AbstractIntegration::method(): array":
 

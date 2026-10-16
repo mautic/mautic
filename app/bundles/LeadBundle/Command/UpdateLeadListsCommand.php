@@ -135,7 +135,6 @@ final class UpdateLeadListsCommand extends ModeratedCommand
             $rebuiltLists = [];
             $leadLists    = $this->listModel->getEntities($filter);
 
-            /** @var LeadList $leadList */
             foreach ($leadLists as $leadList) {
                 $listId = $leadList->getId();
 

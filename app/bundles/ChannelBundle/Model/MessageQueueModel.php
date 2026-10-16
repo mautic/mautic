@@ -138,6 +138,7 @@ final class MessageQueueModel extends FormModel
 
         $scheduledDate = new \DateTime()->add($scheduledInterval);
 
+        /** @var Lead|array<string, mixed> $lead */
         foreach ($leads as $lead) {
             $leadId = (is_array($lead)) ? $lead['id'] : $lead->getId();
             if ($this->messageQueueRepository->findMessage($channel, $channelId, $leadId) instanceof \Mautic\ChannelBundle\Entity\MessageQueue) {
@@ -272,6 +273,9 @@ final class MessageQueueModel extends FormModel
         return $counter;
     }
 
+    /**
+     * @param MessageQueue|mixed $message
+     */
     public function reschedule($message, \DateInterval $rescheduleInterval, $leadId = null, $channel = null, $channelId = null, bool $persist = false): void
     {
         if (!$message instanceof MessageQueue && $leadId && $channel && $channelId) {

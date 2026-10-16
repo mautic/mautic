@@ -6,6 +6,8 @@ namespace Mautic\FormBundle\Tests\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,7 +22,7 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         $this->submitFormWithCompanies($formId, $formAlias, 'test@acquia.cz', 'Luk', 'Doe', 'Acquia', 'Keplerova');
 
         // Check the address.
-        $companyRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class);
+        $companyRepository = $this->getContainer()->get(CompanyRepository::class);
         $companiesOriginal = $companyRepository->findBy(['address1' => 'Keplerova']);
         $this->assertCount(1, $companiesOriginal);
 
@@ -41,7 +43,7 @@ final class SubmissionModelFunctionalTest extends MauticMysqlTestCase
         $this->submitFormWithoutCompanies($formId, $formAlias, 'test@acquia.cz', 'Luk', 'Doe Smith');
 
         // Check the contact.
-        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $contactRepository = $this->getContainer()->get(LeadRepository::class);
         $contactsOriginal  = $contactRepository->findBy(['lastname' => 'Doe Smith']);
         $this->assertCount(1, $contactsOriginal);
 

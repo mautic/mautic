@@ -7,9 +7,11 @@ namespace Mautic\LeadBundle\Tests\Functional\EventListener;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
@@ -36,7 +38,7 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
         $companyModel = self::getContainer()->get(CompanyModel::class);
         $companyModel->saveEntity($company);
 
-        $auditLogRepository = $this->getContainer()->get(\Mautic\CoreBundle\Entity\AuditLogRepository::class);
+        $auditLogRepository = $this->getContainer()->get(AuditLogRepository::class);
         $auditLogs          = $auditLogRepository->findOneBy(['bundle' => 'lead', 'object' => 'company', 'action' => 'create', 'objectId' => $company->getId()]);
         $this->assertInstanceOf(AuditLog::class, $auditLogs);
         $auditLogDetail = $auditLogs->getDetails();
@@ -60,7 +62,7 @@ final class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
         $companyModel->addLeadToCompany($company, $lead);
         $leadModel->saveEntity($lead);
 
-        $leadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $leadRepository = $this->getContainer()->get(LeadRepository::class);
         $lead           = $leadRepository->findOneBy(['firstname' => 'Test name']);
         $this->assertInstanceOf(Lead::class, $lead);
         $this->assertSame('Test Delete Company', $lead->getCompany());

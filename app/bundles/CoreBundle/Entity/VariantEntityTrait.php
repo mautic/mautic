@@ -9,18 +9,18 @@ use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
- * @template T of VariantEntityInterface
+ * @template TEntity of VariantEntityInterface
  */
 trait VariantEntityTrait
 {
     /**
-     * @var mixed
+     * @var Collection<int, TEntity>
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantChildren;
 
     /**
-     * @var T|null
+     * @var TEntity|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantParent;
@@ -41,11 +41,8 @@ trait VariantEntityTrait
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_AB_WEIGHT, 'enableAbTest' => false];
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $variantStartDate;
+    private ?\DateTime $variantStartDate = null;
 
     protected static function addVariantMetadata(ClassMetadataBuilder $builder, string $entityClass): void
     {
@@ -97,6 +94,9 @@ trait VariantEntityTrait
         return $this->variantChildren;
     }
 
+    /**
+     * @param TEntity|null $parent
+     */
     public function setVariantParent(?VariantEntityInterface $parent = null): static
     {
         if (method_exists($this, 'isChanged')) {
@@ -108,6 +108,9 @@ trait VariantEntityTrait
         return $this;
     }
 
+    /**
+     * @return TEntity|null
+     */
     public function getVariantParent(): ?VariantEntityInterface
     {
         return $this->variantParent;
@@ -146,12 +149,12 @@ trait VariantEntityTrait
         return $this->variantSettings ?? [];
     }
 
-    public function getVariantStartDate(): mixed
+    public function getVariantStartDate(): ?\DateTime
     {
         return $this->variantStartDate;
     }
 
-    public function setVariantStartDate(mixed $variantStartDate): static
+    public function setVariantStartDate(?\DateTime $variantStartDate): static
     {
         if (method_exists($this, 'isChanged')) {
             $this->isChanged('variantStartDate', $variantStartDate);
@@ -198,9 +201,8 @@ trait VariantEntityTrait
 
     /**
      * Get the variant parent/children.
-     **.
      *
-     * @return array<mixed>
+     * @return array{0: TEntity, 1: array<TEntity>}
      */
     public function getVariants(): array
     {
@@ -219,15 +221,16 @@ trait VariantEntityTrait
 
     /**
      * Get an array of all IDs for parent/child variants and associated translations if applicable.
-     *
      * @return array<int,int|string>
      */
     public function getRelatedEntityIds(bool $publishedOnly = false): array
     {
+        /** @var TEntity&FormEntity $parent */
+        /** @var array<TEntity&FormEntity> $children */
         [$parent, $children] = $this->getVariants();
 
         // If parent is not published and only published has been requested, no need to proceed
-        if ($parent && $publishedOnly && !$parent->isPublished()) {
+        if ($publishedOnly && !$parent->isPublished()) {
             return [];
         }
 
@@ -360,7 +363,7 @@ trait VariantEntityTrait
         }
 
         /** @var TranslationEntityInterface $parentTranslation */
-        /** @var ArrayCollection $childrenTranslations */
+        /** @var iterable<TranslationEntityInterface> $childrenTranslations */
         [$parentTranslation, $childrenTranslations] = $entity->getTranslations();
         if ($entity->getId() && $parentTranslation != $entity) {
             if (!$publishedOnly || $parentTranslation->isPublished()) {

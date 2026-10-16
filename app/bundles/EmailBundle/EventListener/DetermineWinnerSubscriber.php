@@ -34,6 +34,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
     {
         $parameters = $event->getParameters();
         $parent     = $parameters['parent'];
+        /** @var array<int, Email> $children */
         $children   = $parameters['children'];
 
         /** @var Email $parent */
@@ -124,6 +125,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
     {
         $parameters = $event->getParameters();
         $parent     = $parameters['parent'];
+        /** @var array<int, Email> $children */
         $children   = $parameters['children'];
 
         /** @var Email $parent */

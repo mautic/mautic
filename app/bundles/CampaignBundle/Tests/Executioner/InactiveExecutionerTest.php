@@ -17,6 +17,7 @@ use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -61,10 +62,7 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testNoContactsFoundResultsInNothingExecuted(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->expects($this->once())
-            ->method('getEventsByType')
-            ->willReturn(new ArrayCollection());
+        $campaign = new Campaign();
 
         $this->inactiveContactFinder->expects($this->never())
             ->method('getContactCount');
@@ -78,10 +76,11 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testNoEventsFoundResultsInNothingExecuted(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->expects($this->once())
-            ->method('getEventsByType')
-            ->willReturn(new ArrayCollection([new Event()]));
+        $decision = new Event();
+        $decision->setEventType(Event::TYPE_DECISION);
+        ReflectionHelper::setEntityId($decision, 1);
+        $campaign = new Campaign();
+        $campaign->addEvent(0, $decision);
 
         $this->inactiveContactFinder->expects($this->once())
             ->method('getContactCount')
@@ -97,13 +96,11 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
     public function testNextBatchOfContactsAreExecuted(): void
     {
         $decision = new Event();
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->expects($this->once())
-            ->method('getEventsByType')
-            ->willReturn(new ArrayCollection([$decision]));
-        $campaign
-            ->method('getId')
-            ->willReturn(1);
+        $decision->setEventType(Event::TYPE_DECISION);
+        ReflectionHelper::setEntityId($decision, 1);
+        $campaign = new Campaign();
+        $campaign->addEvent(0, $decision);
+        ReflectionHelper::setEntityId($campaign, 1);
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
@@ -133,10 +130,8 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testValidationExecutesNothingIfCampaignUnpublished(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(false);
+        $campaign = new Campaign();
+        $campaign->setIsPublished(false);
 
         $event = new Event();
         $event->setCampaign($campaign);
@@ -158,13 +153,9 @@ final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testValidationEvaluatesFoundEvents(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(true);
-        $campaign
-            ->method('getId')
-            ->willReturn(1);
+        $campaign = new Campaign();
+        $campaign->setIsPublished(true);
+        ReflectionHelper::setEntityId($campaign, 1);
 
         $decision = new Event();
         $decision->setCampaign($campaign);

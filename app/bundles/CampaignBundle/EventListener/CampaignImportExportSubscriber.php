@@ -409,7 +409,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      * @param array<string, mixed> $data
      * @param array<int, int>      $campaignIdMap
      */
-    private function persistUpdatedCanvasSettings(array &$data, array $campaignIdMap): void
+    private function persistUpdatedCanvasSettings(array $data, array $campaignIdMap): void
     {
         foreach ($data[Campaign::ENTITY_NAME] as $campaignData) {
             $campaign = $this->campaignRepository->find($campaignIdMap[$campaignData['id']] ?? null);

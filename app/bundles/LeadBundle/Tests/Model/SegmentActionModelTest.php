@@ -11,15 +11,9 @@ use PHPUnit\Framework\Exception;
 
 final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&Lead
-     */
-    private \PHPUnit\Framework\MockObject\Stub $contactMock5;
+    private Lead $contactMock5;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\Stub&Lead
-     */
-    private \PHPUnit\Framework\MockObject\Stub $contactMock6;
+    private Lead $contactMock6;
 
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject&LeadModel
@@ -30,8 +24,8 @@ final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->contactMock5        = $this->createStub(Lead::class);
-        $this->contactMock6        = $this->createStub(Lead::class);
+        $this->contactMock5        = new Lead();
+        $this->contactMock6        = new Lead();
         $this->contactModelMock    = $this->createMock(LeadModel::class);
         $this->actionModel         = new SegmentActionModel($this->contactModelMock);
     }

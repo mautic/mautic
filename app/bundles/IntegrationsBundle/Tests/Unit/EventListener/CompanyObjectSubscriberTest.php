@@ -128,12 +128,14 @@ final class CompanyObjectSubscriberTest extends TestCase
 
     public function testCreateCompaniesWithRightObject(): void
     {
-        $event = new InternalObjectCreateEvent(new Company(), [['somefield' => 'somevalue']]);
+        $objectChangeDAOStub = $this->createStub(ObjectChangeDAO::class);
 
-        $objectMapping = $this->createStub(ObjectMapping::class);
+        $event = new InternalObjectCreateEvent(new Company(), [$objectChangeDAOStub]);
+
+        $objectMapping = new ObjectMapping();
         $this->companyObjectHelper->expects($this->once())
             ->method('create')
-            ->with([['somefield' => 'somevalue']])
+            ->with([$objectChangeDAOStub])
             ->willReturn([$objectMapping]);
 
         $this->subscriber->createCompanies($event);
@@ -335,7 +337,7 @@ final class CompanyObjectSubscriberTest extends TestCase
     {
         $event = new InternalObjectFindByIdEvent(new Company());
         $event->setId(1);
-        $companyObj = $this->createStub(CompanyEntity::class);
+        $companyObj = new CompanyEntity();
         $this->companyObjectHelper->expects($this->once())
             ->method('findObjectById')
             ->with(1)

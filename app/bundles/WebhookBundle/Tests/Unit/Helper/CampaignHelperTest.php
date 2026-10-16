@@ -18,10 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject&Lead
-     */
-    private MockObject $contact;
+    private Lead $contact;
 
     /**
      * @var MockObject&Client
@@ -34,7 +31,7 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->contact           = $this->createMock(Lead::class);
+        $this->contact           = new Lead();
         $this->client            = $this->createMock(Client::class);
         $ipCollection            = new ArrayCollection();
         $companyRepository       = $this->getMockBuilder(CompanyRepository::class)
@@ -49,13 +46,10 @@ final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
         $ipCollection->add(new IpAddress()->setIpAddress('127.0.0.1'));
         $ipCollection->add(new IpAddress()->setIpAddress('127.0.0.2'));
 
-        $this->contact->expects($this->once())
-            ->method('getProfileFields')
-            ->willReturn(['email' => 'john@doe.email', 'company' => 'Mautic']);
+        $this->contact->setFields(['email' => 'john@doe.email', 'company' => 'Mautic']);
 
-        $this->contact->expects($this->once())
-            ->method('getIpAddresses')
-            ->willReturn($ipCollection);
+        $ipAddressesProperty = new \ReflectionProperty($this->contact, 'ipAddresses');
+        $ipAddressesProperty->setValue($this->contact, $ipCollection);
     }
 
     public function testFireWebhookWithGet(): void

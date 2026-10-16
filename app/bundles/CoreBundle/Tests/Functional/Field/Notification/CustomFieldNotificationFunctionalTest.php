@@ -34,7 +34,7 @@ final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
     {
         $this->notifier->customFieldCannotBeUpdated($this->leadField, -1);
         /** @var NotificationRepository $notificationRepo */
-        $notificationRepo   = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class);
+        $notificationRepo   = $this->getContainer()->get(NotificationRepository::class);
         $notifications      = $notificationRepo->getEntities([]);
 
         $this->assertEquals(0, $notifications->count());
@@ -45,7 +45,7 @@ final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
         $this->notifier->customFieldCannotBeUpdated($this->leadField, 1);
 
         /** @var NotificationRepository $notificationRepo */
-        $notificationRepo   = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class);
+        $notificationRepo   = $this->getContainer()->get(NotificationRepository::class);
         $notifications      = $notificationRepo->getNotifications(1);
         $this->assertCount(1, $notifications);
 

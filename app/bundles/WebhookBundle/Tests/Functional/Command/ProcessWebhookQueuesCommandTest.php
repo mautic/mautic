@@ -9,8 +9,10 @@ use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand;
 use Mautic\WebhookBundle\Entity\Event;
+use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueue;
+use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -57,10 +59,10 @@ final class ProcessWebhookQueuesCommandTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Webhook Processing Complete', $output->getDisplay());
 
         // There will be 2 batches of webhook events sent. We've set we want to send 3 events per batch.
-        $this->assertCount(2, $this->getContainer()->get(\Mautic\WebhookBundle\Entity\LogRepository::class)->findBy(['webhook' => $webhook]));
+        $this->assertCount(2, $this->getContainer()->get(LogRepository::class)->findBy(['webhook' => $webhook]));
 
         // And 4 out of 10 queue records will be left alone as they did not fit the ID range.
-        $this->assertCount(4, $this->getContainer()->get(\Mautic\WebhookBundle\Entity\WebhookQueueRepository::class)->findBy(['webhook' => $webhook]));
+        $this->assertCount(4, $this->getContainer()->get(WebhookQueueRepository::class)->findBy(['webhook' => $webhook]));
     }
 
     public function testCommandWhenNoWebhooksFound(): void

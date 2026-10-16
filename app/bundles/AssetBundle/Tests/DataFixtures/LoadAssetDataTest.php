@@ -6,6 +6,7 @@ namespace Mautic\AssetBundle\Tests\DataFixtures;
 
 use Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 final class LoadAssetDataTest extends MauticMysqlTestCase
@@ -13,7 +14,7 @@ final class LoadAssetDataTest extends MauticMysqlTestCase
     public function testLoadFixtures(): void
     {
         $this->loadFixtures([LoadAssetData::class]);
-        $asset = $this->getContainer()->get(\Mautic\AssetBundle\Entity\AssetRepository::class)->findOneBy(
+        $asset = $this->getContainer()->get(AssetRepository::class)->findOneBy(
             ['title' => '@TOCHANGE: Asset1 Title'],
             ['id' => 'DESC']
         );

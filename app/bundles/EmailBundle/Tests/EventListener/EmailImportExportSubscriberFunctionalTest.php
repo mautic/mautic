@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class EmailImportExportSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -196,7 +197,7 @@ final class EmailImportExportSubscriberFunctionalTest extends MauticMysqlTestCas
 
         $this->em->clear();
 
-        $imported = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class)->findOneBy(['uuid' => $exported['uuid']]);
+        $imported = $this->getContainer()->get(EmailRepository::class)->findOneBy(['uuid' => $exported['uuid']]);
         $this->assertInstanceOf(Email::class, $imported);
 
         $this->assertSame($email->getCustomHtml(), $imported->getCustomHtml());

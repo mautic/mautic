@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
 use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -92,11 +93,8 @@ final class InactiveHelperTest extends TestCase
             ->method('getNonActionPathTaken')
             ->willReturnOnConsecutiveCalls(1, 0, 1);
 
-        /** @var Campaign&MockObject $campaign */
-        $campaign = $this->createMock(Campaign::class);
-        $campaign
-            ->method('getId')
-            ->willReturn(2);
+        $campaign   = new Campaign();
+        ReflectionHelper::setEntityId($campaign, 2);
 
         /** @var Event&MockObject $parentEvent */
         $parentEvent = $this->createMock(Event::class);

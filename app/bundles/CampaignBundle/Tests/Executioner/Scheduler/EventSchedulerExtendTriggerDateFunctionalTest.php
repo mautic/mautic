@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
@@ -95,7 +96,7 @@ final class EventSchedulerExtendTriggerDateFunctionalTest extends MauticMysqlTes
         $this->assertStringNotContainsString('Exception', $output, 'Command should execute without errors');
 
         // Verify the event was processed
-        $updatedLog = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->find($logId);
+        $updatedLog = $this->getContainer()->get(LeadEventLogRepository::class)->find($logId);
 
         $this->assertInstanceOf(LeadEventLog::class, $updatedLog, 'Event log should exist');
         $this->assertInstanceOf(\DateTimeInterface::class, $updatedLog->getTriggerDate(), 'Trigger date should be set');
@@ -156,7 +157,7 @@ final class EventSchedulerExtendTriggerDateFunctionalTest extends MauticMysqlTes
         $this->assertStringNotContainsString('Exception', $output, 'Command should execute without errors');
 
         // The event should be rescheduled to approximately 7 days from now (10 day interval - 3 days elapsed)
-        $updatedLog = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->find($logId);
+        $updatedLog = $this->getContainer()->get(LeadEventLogRepository::class)->find($logId);
 
         $this->assertInstanceOf(LeadEventLog::class, $updatedLog, 'Event log should exist');
         $this->assertInstanceOf(\DateTimeInterface::class, $updatedLog->getTriggerDate(), 'Trigger date should be set');

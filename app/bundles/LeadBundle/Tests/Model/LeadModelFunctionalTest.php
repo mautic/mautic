@@ -117,7 +117,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         $leadModel->addToCompany($contact, $company2);
 
         /** @var CompanyLeadRepository $companyLeadRepo */
-        $companyLeadRepo  = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyLeadRepository::class);
+        $companyLeadRepo  = $this->getContainer()->get(CompanyLeadRepository::class);
 
         return $companyLeadRepo->getCompaniesByLeadId($contact->getId());
     }

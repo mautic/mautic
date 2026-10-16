@@ -306,7 +306,7 @@ class LeadModel extends FormModel
         return $this->dispatchLeadEvent($action, $entity, $isNew, true);
     }
 
-    protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, ?Event $event = null): ?Event
+    protected function dispatchBatchEvent(string $action, array $entitiesBatchParams, ?Event $event = null): ?Event
     {
         if (count($entitiesBatchParams) < 1) {
             throw new MethodNotAllowedHttpException(['Lead'], 'For the batch operation the array must be used');
@@ -831,6 +831,7 @@ class LeadModel extends FormModel
 
     /**
      * Get a list of segments this lead belongs to.
+     * @return ($arrayHydration is true ? array<int, array<string, mixed>> : array<int, LeadList>)
      */
     public function getLists(Lead $lead, bool $forLists = false, bool $arrayHydration = false, bool $isPublic = false, bool $isPreferenceCenter = false): array
     {

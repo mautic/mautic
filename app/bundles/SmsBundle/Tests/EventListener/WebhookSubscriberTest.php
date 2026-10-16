@@ -51,7 +51,7 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnSend(): void
     {
         $event   = $this->createMock(SmsSendEvent::class);
-        $contact = $this->createStub(Lead::class);
+        $contact = new Lead();
 
         $event->expects($this->once())
             ->method('getSmsId')

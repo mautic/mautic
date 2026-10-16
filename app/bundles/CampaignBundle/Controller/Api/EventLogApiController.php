@@ -217,6 +217,8 @@ final class EventLogApiController extends FetchCommonApiController
 
         $errors= [];
 
+        /** @var array<int, Event> $events */
+        /** @var array<Event> $events */
         $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->eventModel, false);
         $contacts = $this->getBatchEntities($parameters, $errors, false, 'contactId', $this->leadModel, false);
 
@@ -231,6 +233,7 @@ final class EventLogApiController extends FetchCommonApiController
                 continue;
             }
 
+            /** @var Event $event */
             $event = $events[$params['eventId']];
 
             // Ensure contact exists and user has access

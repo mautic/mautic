@@ -15,6 +15,7 @@ use Mautic\DashboardBundle\Form\Type\UploadType;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -455,6 +456,7 @@ final class DashboardController extends AbstractFormController
         if ($request->isMethod(Request::METHOD_POST)) {
             if (!$this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
+                    /** @var UploadedFile|null $fileData */
                     $fileData = $form['file']->getData();
                     if (!empty($fileData)) {
                         $extension = pathinfo($fileData->getClientOriginalName(), PATHINFO_EXTENSION);

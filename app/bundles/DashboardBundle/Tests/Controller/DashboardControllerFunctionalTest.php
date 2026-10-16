@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -22,7 +23,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testWidgetWithReport(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy([]);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy([]);
 
         $report = new Report();
         $report->setName('Lead and points');
@@ -68,7 +69,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testWidgetWithBestHours(): void
     {
-        $user    = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy([]);
+        $user    = $this->getContainer()->get(UserRepository::class)->findOneBy([]);
         $segment = $this->createSegment('A', 'a');
         $widget  = new Widget();
         $widget->setName('Best email read hours');
@@ -105,7 +106,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testWidgetWithSegmentBuildTime(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy([]);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy([]);
         $this->assertInstanceOf(User::class, $user);
         $this->createSegment('A', 'a', 3, $user);
         $this->createSegment('B', 'b', 60, $user);
@@ -150,7 +151,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testAuditLogWidgetWithDeletedContact(): void
     {
-        $user   = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user   = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $widget = new Widget();
         $widget->setName('Recent activity');
         $widget->setType('recent.activity');
@@ -208,7 +209,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testUpcomingEmailsWidget(): void
     {
-        $user = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
 
         $widget = new Widget();
         $widget->setName('Upcoming Emails');

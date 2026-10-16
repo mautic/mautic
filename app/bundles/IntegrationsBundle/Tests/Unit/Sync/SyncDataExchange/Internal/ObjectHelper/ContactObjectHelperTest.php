@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
@@ -89,9 +90,7 @@ final class ContactObjectHelperTest extends TestCase
                 $this->assertManipulator($lead, 'create');
 
                 // Set contact ID
-                $reflection = new \ReflectionClass($lead);
-                $property   = $reflection->getProperty('id');
-                $property->setValue($lead, $idMap[$lead->getEmail()]);
+                ReflectionHelper::setEntityId($lead, $idMap[$lead->getEmail()]);
             });
 
         $this->repository
@@ -139,9 +138,7 @@ final class ContactObjectHelperTest extends TestCase
                 $this->assertManipulator($lead, 'create');
 
                 // Set contact ID
-                $reflection = new \ReflectionClass($lead);
-                $property   = $reflection->getProperty('id');
-                $property->setValue($lead, $idMap[$lead->getEmail() ?? '']);
+                ReflectionHelper::setEntityId($lead, $idMap[$lead->getEmail() ?? '']);
             });
 
         $this->repository
@@ -257,9 +254,8 @@ final class ContactObjectHelperTest extends TestCase
             1 => $objectChangeDAO,
         ];
 
-        $contact1 = $this->createMock(Lead::class);
-        $contact1->expects($this->exactly(3))->method('getId')
-            ->willReturn(1);
+        $contact1 = new Lead();
+        $contact1->setId(1);
 
         $this->model->expects($this->once())
             ->method('getEntities')
@@ -280,9 +276,8 @@ final class ContactObjectHelperTest extends TestCase
             1 => $objectChangeDAO,
         ];
 
-        $contact1 = $this->createMock(Lead::class);
-        $contact1->expects($this->exactly(3))->method('getId')
-            ->willReturn(1);
+        $contact1 = new Lead();
+        $contact1->setId(1);
 
         $this->model->expects($this->once())
             ->method('getEntities')
@@ -303,9 +298,8 @@ final class ContactObjectHelperTest extends TestCase
             1 => $objectChangeDAO,
         ];
 
-        $contact1 = $this->createMock(Lead::class);
-        $contact1->expects($this->exactly(3))->method('getId')
-            ->willReturn(1);
+        $contact1 = new Lead();
+        $contact1->setId(1);
 
         $this->model->expects($this->once())
             ->method('getEntities')

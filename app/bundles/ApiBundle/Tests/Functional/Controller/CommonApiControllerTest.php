@@ -8,7 +8,9 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Security\UserTokenSetter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -135,7 +137,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
     private function lockEntityAsAdmin(object $entity): void
     {
-        $adminUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->find(1);
+        $adminUser = $this->getContainer()->get(UserRepository::class)->find(1);
         $entity->setCheckedOut(new \DateTime())
             ->setCheckedOutBy($adminUser);
 
@@ -144,7 +146,7 @@ final class CommonApiControllerTest extends MauticMysqlTestCase
 
     private function createAndAuthenticateApiUser(string $username, string $email): void
     {
-        $role = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class)->find(1);
+        $role = $this->getContainer()->get(RoleRepository::class)->find(1);
         $this->assertInstanceOf(Role::class, $role);
 
         $user = new User()

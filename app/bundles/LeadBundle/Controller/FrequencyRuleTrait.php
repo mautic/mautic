@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
@@ -16,14 +17,14 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 trait FrequencyRuleTrait
 {
-    protected $leadLists;
+    /**
+     * @var array<LeadList>
+     */
+    protected array $leadLists = [];
 
     protected $dncChannels;
 
-    /**
-     * @var bool
-     */
-    protected $isPublicView = false;
+    protected bool $isPublicView = false;
 
     private \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel;
 
@@ -47,11 +48,9 @@ trait FrequencyRuleTrait
     }
 
     /**
-     * @param array $viewParameters
-     *
      * @return true|FormInterface
      */
-    protected function getFrequencyRuleForm(Lead $lead, &$viewParameters = [], &$data = null, bool $isPublic = false, $action = null, bool $isPreferenceCenter = false)
+    protected function getFrequencyRuleForm(Lead $lead, array &$viewParameters = [], &$data = null, bool $isPublic = false, $action = null, bool $isPreferenceCenter = false)
     {
 
         $leadChannels = $this->frequencyRuleLeadModel->getContactChannels($lead);
@@ -143,6 +142,7 @@ trait FrequencyRuleTrait
 
         $this->leadLists    = $this->frequencyRuleLeadModel->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
+
         foreach ($this->leadLists as $leadList) {
             $data['lead_lists'][] = $leadList->getId();
         }

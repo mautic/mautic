@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Functional\Sync\Notification;
 
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\IntegrationsBundle\Sync\Notification\BulkNotification;
 
@@ -21,7 +22,7 @@ final class BulkNotificationTest extends MauticMysqlTestCase
 
     public function testNotifications(): void
     {
-        $notificationRepository = $this->getContainer()->get(\Mautic\CoreBundle\Entity\NotificationRepository::class);
+        $notificationRepository = $this->getContainer()->get(NotificationRepository::class);
 
         $this->bulkNotification->addNotification('dup1', 'message 1', 'Integration name', 'Lead', 'lead', 0, 'link 1');
         $this->bulkNotification->addNotification('dup2', 'message 2', 'Integration name', 'Lead', 'lead', 0, 'link 2');

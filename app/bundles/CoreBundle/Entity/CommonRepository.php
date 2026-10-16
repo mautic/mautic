@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Proxy\DefaultProxyClassNameResolver;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr\Andx;
+use Doctrine\ORM\Query\Expr\Composite;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -138,7 +139,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      * @throws \Doctrine\ORM\Mapping\MappingException
      * @throws \Exception
      */
-    public function createFromArray($className, array &$data): object
+    public function createFromArray(string $className, array &$data): object
     {
         $entity        = new $className();
         $meta          = $this->getEntityManager()->getClassMetadata($className);
@@ -340,7 +341,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      *
      * @param array<string,mixed> $args
      *
-     * @return object[]|array<int,mixed>|iterable<object>|Paginator<object>|SimplePaginator<mixed>
+     * @return iterable<T>|Paginator<T>|SimplePaginator<T>
      */
     public function getEntities(array $args = []): iterable
     {
@@ -1602,7 +1603,7 @@ abstract class CommonRepository extends ServiceEntityRepository
     /**
      * @param array $clauses [['expr' => 'expression', 'col' => 'DB column', 'val' => 'value to search for']]
      */
-    protected function buildWhereClauseFromArray(QueryBuilder|DbalQueryBuilder $query, array $clauses, $expr = null)
+    protected function buildWhereClauseFromArray(QueryBuilder|DbalQueryBuilder $query, array $clauses, ?Composite $expr = null)
     {
         $parts = $this->buildWhereClausePartsFromArray($query, $clauses);
 
@@ -1745,7 +1746,7 @@ abstract class CommonRepository extends ServiceEntityRepository
         return [];
     }
 
-    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder &$queryBuilder, \stdClass $filter): Query\Expr\Func|string|false
+    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder $queryBuilder, \stdClass $filter): Query\Expr\Func|string|false
     {
         if ($ids = array_map(intval(...), explode(',', $filter->string))) {
             $parameterName = $this->generateRandomParameterName();
@@ -1795,7 +1796,7 @@ abstract class CommonRepository extends ServiceEntityRepository
     /**
      * @param array<int, mixed>   $expressions
      */
-    protected function parseSearchFilters(\stdClass|array $parseFilters, QueryBuilder|DbalQueryBuilder $qb, array &$expressions, &$parameters)
+    protected function parseSearchFilters(\stdClass|array $parseFilters, QueryBuilder|DbalQueryBuilder $qb, array &$expressions, array &$parameters)
     {
         foreach ($parseFilters as $f) {
             [$expr, $params] = $this->getSearchFilterExpression($qb, $f);

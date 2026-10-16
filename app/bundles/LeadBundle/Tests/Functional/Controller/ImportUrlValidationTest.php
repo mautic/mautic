@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\UserBundle\Security\UserTokenSetter;
@@ -51,7 +52,7 @@ final class ImportUrlValidationTest extends MauticMysqlTestCase
 
         $this->assertStringContainsString('4 lines were processed, 2 items created, 0 items updated, 2 items ignored', $display);
 
-        $leadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $leadRepository = $this->getContainer()->get(LeadRepository::class);
 
         $this->assertInstanceOf(Lead::class, $leadRepository->findOneBy(['email' => 'ok1@a.com']));
         $this->assertInstanceOf(Lead::class, $leadRepository->findOneBy(['email' => 'ok2@a.com']));

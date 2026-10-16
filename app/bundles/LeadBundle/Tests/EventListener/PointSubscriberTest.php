@@ -43,10 +43,7 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $triggerExecutedEvent;
 
-    /**
-     * @var MockObject&TriggerEventEntity
-     */
-    private MockObject $triggerEventEntity;
+    private TriggerEventEntity $triggerEventEntity;
 
     protected function setUp(): void
     {
@@ -55,7 +52,7 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->subscriber           = new PointSubscriber($this->leadModel, $this->stageModel, $this->translator, $this->createStub(LoggerInterface::class));
         $this->triggerExecutedEvent = $this->createMock(TriggerExecutedEvent::class);
-        $this->triggerEventEntity   = $this->createMock(TriggerEventEntity::class);
+        $this->triggerEventEntity   = new TriggerEventEntity();
 
         $this->triggerExecutedEvent
             ->method('getTriggerEvent')
@@ -174,12 +171,10 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testThatTheLeadIsAddedToTheSegmentOnTriggerOnLeadSegmentsChangeEvent(): void
     {
-        $this->triggerEventEntity
-            ->method('getProperties')
-            ->willReturn([
-                'addToLists'      => 1,
-                'removeFromLists' => null,
-            ]);
+        $this->triggerEventEntity->setProperties([
+            'addToLists'      => 1,
+            'removeFromLists' => null,
+        ]);
 
         $this->leadModel->expects($this->once())->method('addToLists');
         $this->subscriber->onLeadSegmentsChange($this->triggerExecutedEvent);
@@ -187,12 +182,10 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testThatTheLeadIsRemovedFromTheSegmentOnTriggerOnLeadSegmentsChangeEvent(): void
     {
-        $this->triggerEventEntity
-            ->method('getProperties')
-            ->willReturn([
-                'removeFromLists' => 1,
-                'addToLists'      => null,
-            ]);
+        $this->triggerEventEntity->setProperties([
+            'removeFromLists' => 1,
+            'addToLists'      => null,
+        ]);
 
         $this->leadModel->expects($this->once())->method('removeFromLists');
         $this->subscriber->onLeadSegmentsChange($this->triggerExecutedEvent);

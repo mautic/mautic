@@ -8,7 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 abstract class CommonEvent extends Event
 {
     /**
-     * @var object
+     * @var object|null
      */
     protected $entity;
 

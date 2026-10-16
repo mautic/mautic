@@ -8,6 +8,7 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\LeadBundle\Tests\Functional\ApiPlatform\OwnershipScopedApiAuthorizationTestBase;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -58,7 +59,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $this->em->clear();
 
         // Authenticate as restricted user
-        $restrictedUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'restricted.user']);
+        $restrictedUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'restricted.user']);
         $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
@@ -131,7 +132,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $this->em->clear();
 
         // Authenticate as restricted user
-        $restrictedUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'restricted.collection.user']);
+        $restrictedUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'restricted.collection.user']);
         $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
@@ -209,7 +210,7 @@ final class DownloadOwnershipApiV2AuthorizationRegressionTest extends OwnershipS
         $this->em->clear();
 
         // Authenticate as restricted user
-        $restrictedUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'restricted.pagination.user']);
+        $restrictedUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'restricted.pagination.user']);
         $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());

@@ -34,8 +34,8 @@ final class BuildJsSubscriberTest extends TestCase
 
     public function testTrackingBuildContainsGuardedOneSignalContribution(): void
     {
-        $settings = $this->createStub(Integration::class);
-        $settings->method('getIsPublished')->willReturn(true);
+        $settings = new Integration();
+        $settings->setIsPublished(true);
         $integration = $this->createStub(AbstractIntegration::class);
         $integration->method('getIntegrationSettings')->willReturn($settings);
 

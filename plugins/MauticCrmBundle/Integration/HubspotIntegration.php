@@ -258,7 +258,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
      * @param mixed[]              $data
      * @param string               $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea): void
+    public function appendToForm($builder, $data, $formArea): void
     {
         if ('keys' === $formArea) {
             $builder->add(

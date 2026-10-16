@@ -24,6 +24,7 @@ use Psr\Log\LogLevel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -129,6 +130,7 @@ final class ImportController extends AbstractFormController
             $form->addError(new FormError($this->translator->trans('mautic.campaign.import.incorrectfile', [], 'validators')));
         } else {
             // Retrieve uploaded file
+            /** @var UploadedFile|null $fileData */
             $fileData = $request->files->get('campaign_import')['campaignFile'] ?? null;
 
             if (!$fileData) {

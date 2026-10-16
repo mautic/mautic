@@ -21,13 +21,13 @@ final class DeleteCompanyLeadsFunctionalTest extends MauticMysqlTestCase
     public function testDeleteCompanies(): void
     {
         /** @var CompanyLeadRepository $companyLeadRepository */
-        $companyLeadRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyLeadRepository::class);
+        $companyLeadRepository = $this->getContainer()->get(CompanyLeadRepository::class);
 
         /** @var CompanyRepository $companyRepository */
-        $companyRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\CompanyRepository::class);
+        $companyRepository = $this->getContainer()->get(CompanyRepository::class);
 
         /** @var LeadRepository $contactRepository */
-        $contactRepository = $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class);
+        $contactRepository = $this->getContainer()->get(LeadRepository::class);
 
         $contact1 = $this->createContact();
         $contact2 = $this->createContact();

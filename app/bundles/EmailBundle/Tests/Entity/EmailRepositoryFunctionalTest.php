@@ -24,7 +24,7 @@ final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         /** @var EmailRepository $repository */
-        $repository = $this->getContainer()->get(\Mautic\EmailBundle\Entity\EmailRepository::class);
+        $repository = $this->getContainer()->get(EmailRepository::class);
 
         $this->emailRepository = $repository;
     }

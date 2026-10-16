@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Mautic\ChannelBundle\Tests\PreferenceBuilder;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\ChannelBundle\PreferenceBuilder\ChannelPreferences;
 use Mautic\ChannelBundle\PreferenceBuilder\PreferenceBuilder;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -19,50 +21,43 @@ final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 {
     public function testChannelsArePrioritized(): void
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('getChannelRules')
-            ->willReturn(
-                [
-                    'sms' => [
-                        'dnc' => DoNotContact::IS_CONTACTABLE,
-                    ],
-                    'email' => [
-                        'dnc' => DoNotContact::IS_CONTACTABLE,
-                    ],
-                ]
-            );
+        $lead = new Lead();
+        $lead->setChannelRules(
+            [
+                'sms' => [
+                    'dnc' => DoNotContact::IS_CONTACTABLE,
+                ],
+                'email' => [
+                    'dnc' => DoNotContact::IS_CONTACTABLE,
+                ],
+            ]
+        );
 
-        $log = $this->createMock(LeadEventLog::class);
-        $log->method('getLead')
-            ->willReturn($lead);
-        $log->method('getId')
-            ->willReturn(1);
+        $log = new LeadEventLog();
+        $log->setLead($lead);
+        ReflectionHelper::setEntityId($log, 1);
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->expects($this->once())
-            ->method('getChannelRules')
-            ->willReturn(
-                [
-                    'email' => [
-                        'dnc' => DoNotContact::IS_CONTACTABLE,
-                    ],
-                    'sms' => [
-                        'dnc' => DoNotContact::UNSUBSCRIBED,
-                    ],
-                ]
-            );
+        $lead2 = new Lead();
+        $lead2->setChannelRules(
+            [
+                'email' => [
+                    'dnc' => DoNotContact::IS_CONTACTABLE,
+                ],
+                'sms' => [
+                    'dnc' => DoNotContact::UNSUBSCRIBED,
+                ],
+            ]
+        );
 
-        $log2 = $this->createMock(LeadEventLog::class);
-        $log2->method('getLead')
-            ->willReturn($lead2);
-        $log2->method('getId')
-            ->willReturn(2);
+        $log2 = new LeadEventLog();
+        $log2->setLead($lead2);
+        ReflectionHelper::setEntityId($log2, 2);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$log, $log2]);
 
         $event = new Event();
+        $event->setCampaign(new Campaign());
 
         $builder = new PreferenceBuilder($logs, $event, ['email' => [], 'sms' => [], 'push' => []], new NullLogger());
 
@@ -105,30 +100,27 @@ final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
 
     public function testLogIsRemovedFromAllChannels(): void
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('getChannelRules')
-            ->willReturn(
-                [
-                    'sms' => [
-                        'dnc' => DoNotContact::IS_CONTACTABLE,
-                    ],
-                    'email' => [
-                        'dnc' => DoNotContact::IS_CONTACTABLE,
-                    ],
-                ]
-            );
+        $lead = new Lead();
+        $lead->setChannelRules(
+            [
+                'sms' => [
+                    'dnc' => DoNotContact::IS_CONTACTABLE,
+                ],
+                'email' => [
+                    'dnc' => DoNotContact::IS_CONTACTABLE,
+                ],
+            ]
+        );
 
-        $log = $this->createMock(LeadEventLog::class);
-        $log->method('getLead')
-            ->willReturn($lead);
-        $log->method('getId')
-            ->willReturn(1);
+        $log = new LeadEventLog();
+        $log->setLead($lead);
+        ReflectionHelper::setEntityId($log, 1);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$log]);
 
         $event   = new Event();
+        $event->setCampaign(new Campaign());
         $builder = new PreferenceBuilder($logs, $event, ['email' => [], 'sms' => [], 'push' => []], new NullLogger());
 
         $preferences = $builder->getChannelPreferences();

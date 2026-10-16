@@ -34,6 +34,7 @@ final class SearchSubscriberTest extends TestCase
     {
         $contactRepository = $this->createMock(LeadRepository::class);
         $emailRepository   = $this->createStub(EmailRepository::class);
+
         $connection        = $this->getMockedConnection();
         $leadModel         = $this->createStub(LeadModel::class);
         $companyModel      = $this->createStub(CompanyModel::class);

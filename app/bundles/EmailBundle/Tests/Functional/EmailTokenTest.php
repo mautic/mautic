@@ -95,7 +95,7 @@ final class EmailTokenTest extends MauticMysqlTestCase
         );
 
         /** @var StatRepository $emailStatRepository */
-        $emailStatRepository = $this->getContainer()->get(\Mautic\EmailBundle\Entity\StatRepository::class);
+        $emailStatRepository = $this->getContainer()->get(StatRepository::class);
 
         /** @var Stat|null $emailStat */
         $emailStat = $emailStatRepository->findOneBy(

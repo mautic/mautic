@@ -393,7 +393,7 @@ trait CustomFieldRepositoryTrait
     protected function prepareDbalFieldsForSave(array &$fields): void
     {
         // Ensure booleans are integers
-        foreach ($fields as $field => &$value) {
+        foreach ($fields as $field => $value) {
             if (is_bool($value)) {
                 $fields[$field] = (int) $value;
             }

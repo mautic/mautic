@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -156,9 +157,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
     public function testTrackDownload(): void
     {
         $asset = new Asset();
-        $reflection = new \ReflectionClass($asset);
-        $idProperty = $reflection->getProperty('id');
-        $idProperty->setValue($asset, 1);
+        ReflectionHelper::setEntityId($asset, 1);
 
         $lead  = new Lead();
 
@@ -190,8 +189,8 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $trackedDevice = $this->createMock(LeadDevice::class);
-        $trackedDevice->method('getTrackingId')->willReturn('test-tracking-id');
+        $trackedDevice = new LeadDevice();
+        $trackedDevice->setTrackingId('test-tracking-id');
         $this->deviceTrackingService->expects($this->once())
             ->method('getTrackedDevice')
             ->willReturn($trackedDevice);

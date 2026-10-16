@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Field;
@@ -14,6 +15,7 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Tests\FormTestHelperTrait;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
@@ -177,7 +179,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class);
+        $submissionRepository = $this->getContainer()->get(SubmissionRepository::class);
 
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $formId]);
@@ -193,7 +195,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertSame('Australia', $contact->getCountry());
         $this->assertSame('Victoria', $contact->getState());
@@ -274,7 +276,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         // Ensure the submission was created properly.
-        $submissions = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class)->findAll();
+        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findAll();
         $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
@@ -285,7 +287,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertNull($contact->getCountry());
         $this->assertNull($contact->getState());
@@ -365,7 +367,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         // Ensure the submission was created properly.
-        $submissions = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class)->findAll();
+        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findAll();
 
         // It should not create a submission now as the required field is now visible and empty.
         $this->assertCount(0, $submissions);
@@ -490,7 +492,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->client->submit($form);
 
-        $campaignLeads = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class)->findBy(['campaign' => $campaign->getId()]);
+        $campaignLeads = $this->getContainer()->get(LeadRepository::class)->findBy(['campaign' => $campaign->getId()]);
         $this->assertCount(1, $campaignLeads);
     }
 
@@ -545,7 +547,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         // Ensure the submission was created properly.
-        $submissions = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class)->findAll();
+        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findAll();
 
         $this->assertCount(1, $submissions);
 
@@ -585,7 +587,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $role->setRawPermissions(['form:forms' => ['viewown']]);
 
         /** @var RoleRepository $roleRepository */
-        $roleRepository = $this->getContainer()->get(\Mautic\UserBundle\Entity\RoleRepository::class);
+        $roleRepository = $this->getContainer()->get(RoleRepository::class);
         $roleRepository->saveEntity($role);
 
         $user = new User();
@@ -600,7 +602,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $user->setPassword($hasher->hash($this->getUserPlainPassword()));
 
         /** @var UserRepository $userRepo */
-        $userRepo = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class);
+        $userRepo = $this->getContainer()->get(UserRepository::class);
         $userRepo->saveEntities([$user]);
 
         return $user;
@@ -653,7 +655,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($htmlForm);
 
         // Ensure the submission was created properly.
-        $submissions = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class)->findAll();
+        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findAll();
         $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
@@ -665,7 +667,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertSame('Acquia', $contact->getCompany());
         $this->assertSame($company->getId(), $contact->getCompanyChangeLog()->get(0)->getCompany());
@@ -719,7 +721,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         // Ensure the submission was created properly.
-        $submissions = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class)->findAll();
+        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findAll();
         $this->assertCount(1, $submissions);
 
         /** @var Submission $submission */
@@ -730,7 +732,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         // A contact should be created by the submission.
         $contact = $submission->getLead();
-        $this->assertInstanceOf(\Mautic\LeadBundle\Entity\Lead::class, $contact);
+        $this->assertInstanceOf(Lead::class, $contact);
 
         $this->assertSame('test', $contact->getFirstname());
 
@@ -1453,7 +1455,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class);
+        $submissionRepository = $this->getContainer()->get(SubmissionRepository::class);
 
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $formId]);
@@ -1486,7 +1488,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->submitForm($form);
 
         /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class);
+        $submissionRepository = $this->getContainer()->get(SubmissionRepository::class);
 
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $form['id']]);
@@ -1521,7 +1523,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class);
+        $submissionRepository = $this->getContainer()->get(SubmissionRepository::class);
 
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $form['id']]);

@@ -98,11 +98,8 @@ final class FileHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPathToCompressedCsvFileForReport(): void
     {
-        $report = $this->createMock(Report::class);
-
-        $report->expects($this->once())
-            ->method('getId')
-            ->willReturn(33);
+        $report = new Report();
+        $report->setId(33);
 
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
@@ -116,12 +113,9 @@ final class FileHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testMoveZipToPermanentLocation(): void
     {
-        $report   = $this->createMock(Report::class);
+        $report   = new Report();
+        $report->setId(33);
         $filePath = 'file/path.csv';
-
-        $report->expects($this->once())
-            ->method('getId')
-            ->willReturn(33);
 
         $this->coreParametersHelper->expects($this->once())
             ->method('get')

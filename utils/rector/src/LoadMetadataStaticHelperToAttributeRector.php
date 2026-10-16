@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Utils\Rector;
 
+use Mautic\ProjectBundle\Entity\Project;
 use PhpParser\Modifiers;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
@@ -258,7 +259,7 @@ final class LoadMetadataStaticHelperToAttributeRector extends AbstractRector
             return null;
         }
 
-        $target = new ClassConstFetch(new FullyQualified(\Mautic\ProjectBundle\Entity\Project::class), new Identifier('class'));
+        $target = new ClassConstFetch(new FullyQualified(Project::class), new Identifier('class'));
 
         $attributeGroups = $this->manyToManyAttributes(
             $target,

@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -79,26 +80,12 @@ final class PointModelTest extends TestCase
         $pointName       = 'Point name';
         $pointProperties = ['property' => 'value'];
         $pointDelta      = 7;
-        $pointGroup      = null;
-        $ip              = $this->createStub(IpAddress::class);
+        $ip              = new IpAddress();
         $this->security->expects($this->once())->method('isAnonymous')->willReturn(true);
         $this->ipLookupHelper->expects($this->once())->method('getIpAddress')->willReturn($ip);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('adjustPoints')
-            ->with($pointDelta);
-        $lead->expects($this->once())
-            ->method('addPointsChangeLogEntry')
-            ->with(
-                'url',
-                $pointId.': '.$pointName,
-                'hit',
-                $pointDelta,
-                $ip,
-                $pointGroup
-            );
-        $eventDetails = $this->createStub(Hit::class);
+        $lead         = new Lead();
+        $eventDetails = new Hit();
 
         $pointActionHelper = $this->createMock(PointActionHelper::class);
         $pointActionHelper->expects($this->once())
@@ -115,14 +102,13 @@ final class PointModelTest extends TestCase
             )
             ->willReturn(true);
 
-        $point = $this->createMock(Point::class);
-        $point->expects($this->exactly(2))->method('getRepeatable')->willReturn(true);
-        $point->expects($this->exactly(4))->method('getType')->willReturn($type);
-        $point->method('getId')->willReturn($pointId);
-        $point->method('getName')->willReturn($pointName);
-        $point->expects($this->once())->method('getProperties')->willReturn($pointProperties);
-        $point->method('getDelta')->willReturn($pointDelta);
-        $point->expects($this->once())->method('getGroup')->willReturn($pointGroup);
+        $point = new Point();
+        $point->setRepeatable(true);
+        $point->setType($type);
+        ReflectionHelper::setEntityId($point, $pointId);
+        $point->setName($pointName);
+        $point->setProperties($pointProperties);
+        $point->setDelta($pointDelta);
 
         $this->pointRepositoryMock->expects($this->once())
             ->method('getPublishedByType')
@@ -171,5 +157,14 @@ final class PointModelTest extends TestCase
             ->with($lead);
 
         $this->pointModel->triggerAction($type, $eventDetails, null, $lead);
+
+        $this->assertSame($pointDelta, $lead->getPoints());
+        $this->assertCount(1, $lead->getPointsChangeLog());
+
+        $pointsChangeLog = $lead->getPointsChangeLog()->first();
+        $this->assertSame('url', $pointsChangeLog->getType());
+        $this->assertSame($pointId.': '.$pointName, $pointsChangeLog->getEventName());
+        $this->assertSame('hit', $pointsChangeLog->getActionName());
+        $this->assertSame($pointDelta, $pointsChangeLog->getDelta());
     }
 }

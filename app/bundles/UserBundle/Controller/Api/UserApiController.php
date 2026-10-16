@@ -154,7 +154,7 @@ final class UserApiController extends CommonApiController
      * @param array<mixed>         $parameters
      * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
+    protected function preSaveEntity(&$entity, $form, array $parameters, $action = 'edit'): void
     {
         if ('new' === $action) {
             $submittedPassword = null;

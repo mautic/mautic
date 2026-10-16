@@ -593,7 +593,7 @@ final class MailHelper
      * @param array $search
      * @param array $replace
      */
-    public static function searchReplaceTokens($search, $replace, MauticMessage &$message): void
+    public static function searchReplaceTokens($search, $replace, MauticMessage $message): void
     {
         // Body
         $body         = $message->getHtmlBody();
@@ -1139,7 +1139,7 @@ final class MailHelper
         $this->source = $source;
     }
 
-    public function getEmail(): ?\Mautic\EmailBundle\Entity\Email
+    public function getEmail(): ?Email
     {
         return $this->email;
     }

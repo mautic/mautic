@@ -565,7 +565,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         return true;
     }
 
-    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType): array
+    public function prepareRequest(string $url, array $parameters, string $method, array $settings, $authType): array
     {
         if ('oauth2' == $authType && empty($settings['authorize_session']) && isset($this->keys['access_token'])) {
             // Append the access token as the oauth-token header
@@ -856,7 +856,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
      * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea): void
+    public function appendToForm($builder, $data, $formArea): void
     {
         if ('keys' == $formArea) {
             $builder->add('version', ButtonGroupType::class, [
@@ -1399,6 +1399,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         return [$checkEmailsInSugar, $deletedSugarLeads];
     }
 
+    /**
+     * @param Lead $lead
+     */
     public function getSugarLeadId($lead): array
     {
         // try searching for lead as this has been changed before in updated done to the plugin

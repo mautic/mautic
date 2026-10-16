@@ -9,6 +9,7 @@ use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * A controller method with the #[Required] attribute must be named "autowire" + the short name of the class it lives in.
@@ -29,7 +30,7 @@ use PHPStan\Rules\RuleErrorBuilder;
  */
 final class AutowireMethodNameMustMatchClassRule implements Rule
 {
-    private const string REQUIRED_ATTRIBUTE = \Symfony\Contracts\Service\Attribute\Required::class;
+    private const string REQUIRED_ATTRIBUTE = Required::class;
 
     private const string AUTOWIRE_PREFIX = 'autowire';
 

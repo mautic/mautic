@@ -138,7 +138,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return array<mixed>
      */
-    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType): array
+    public function prepareRequest(string $url, array $parameters, string $method, array $settings, $authType): array
     {
         [$parameters,$headers] = parent::prepareRequest($url, $parameters, $method, $settings, $authType);
 
@@ -224,7 +224,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
      * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea): void
+    public function appendToForm($builder, $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -522,6 +522,9 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
         return $fieldsValues;
     }
 
+    /**
+     * @param Lead|\Mautic\LeadBundle\Entity\Company $entity
+     */
     public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
     {
         $integrationEntities = $this->integrationEntityRepository->getIntegrationEntities(

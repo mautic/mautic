@@ -6,6 +6,7 @@ namespace Mautic\DynamicContentBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -83,7 +84,7 @@ final class DynamicContentFilterChoicesTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, $form->getUri(), $values);
         self::assertResponseIsSuccessful();
 
-        $entity = $this->getContainer()->get(\Mautic\DynamicContentBundle\Entity\DynamicContentRepository::class)->findOneBy(['name' => $name]);
+        $entity = $this->getContainer()->get(DynamicContentRepository::class)->findOneBy(['name' => $name]);
         $this->assertNotInstanceOf(DynamicContent::class, $entity, 'A DWC with an invalid locale filter value must not be saved.');
     }
 
@@ -111,7 +112,7 @@ final class DynamicContentFilterChoicesTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $entity = $this->getContainer()->get(\Mautic\DynamicContentBundle\Entity\DynamicContentRepository::class)->findOneBy(['name' => $name]);
+        $entity = $this->getContainer()->get(DynamicContentRepository::class)->findOneBy(['name' => $name]);
         $this->assertInstanceOf(DynamicContent::class, $entity, 'The DWC should have been saved.');
 
         return $entity;

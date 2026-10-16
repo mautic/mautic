@@ -49,7 +49,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
         return [
             DynamicContentEvents::POST_SAVE         => ['onPostSave', 0],
             DynamicContentEvents::POST_DELETE       => ['onDelete', 0],
-            DynamicContentEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
+            MauticEvents\TokenReplacementEvent::class => ['onTokenReplacement', 0],
             PageDisplayEvent::class             => ['decodeTokens', 254],
         ];
     }

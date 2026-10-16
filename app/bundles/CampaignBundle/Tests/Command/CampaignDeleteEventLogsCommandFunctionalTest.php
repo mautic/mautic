@@ -6,8 +6,10 @@ namespace Mautic\CampaignBundle\Tests\Command;
 
 use Mautic\CampaignBundle\Command\CampaignDeleteEventLogsCommand;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -20,10 +22,10 @@ final class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTest
         $exitCode = $this->createDataAndRunCommand(false);
         $this->assertSame(0, $exitCode);
 
-        $campaign = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\CampaignRepository::class)->findAll();
+        $campaign = $this->getContainer()->get(CampaignRepository::class)->findAll();
         $this->assertCount(1, $campaign);
 
-        $eventLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findAll();
+        $eventLogs = $this->getContainer()->get(LeadEventLogRepository::class)->findAll();
         $this->assertCount(2, $eventLogs); // Logs are preserved when events are deleted
     }
 
@@ -33,10 +35,10 @@ final class CampaignDeleteEventLogsCommandFunctionalTest extends MauticMysqlTest
 
         $this->assertSame(0, $exitCode);
 
-        $campaign = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\CampaignRepository::class)->findAll();
+        $campaign = $this->getContainer()->get(CampaignRepository::class)->findAll();
         $this->assertCount(0, $campaign);
 
-        $eventLogs = $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadEventLogRepository::class)->findAll();
+        $eventLogs = $this->getContainer()->get(LeadEventLogRepository::class)->findAll();
         $this->assertCount(0, $eventLogs);
     }
 

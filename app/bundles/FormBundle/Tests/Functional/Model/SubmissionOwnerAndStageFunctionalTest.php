@@ -9,9 +9,12 @@ use Doctrine\ORM\Exception\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -41,8 +44,8 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
         ?string $expectedOwnerUsername = null,
         ?string $expectedStageName = null,
     ): void {
-        $salesUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'sales']);
-        $adminUser = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => 'admin']);
+        $salesUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'sales']);
+        $adminUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
 
         $stage = new Stage();
         $stage->setName(self::STAGE_NAME);
@@ -59,13 +62,13 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
 
         $expectedOwnerId = null;
         if ($expectedOwnerUsername) {
-            $expectedOwner   = $this->getContainer()->get(\Mautic\UserBundle\Entity\UserRepository::class)->findOneBy(['username' => $expectedOwnerUsername]);
+            $expectedOwner   = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => $expectedOwnerUsername]);
             $expectedOwnerId = $expectedOwner->getId();
         }
 
         $expectedStageId = null;
         if ($expectedStageName) {
-            $expectedStage   = $this->getContainer()->get(\Mautic\StageBundle\Entity\StageRepository::class)->findOneBy(['name' => $expectedStageName]);
+            $expectedStage   = $this->getContainer()->get(StageRepository::class)->findOneBy(['name' => $expectedStageName]);
             $expectedStageId = $expectedStage->getId();
         }
 
@@ -94,7 +97,7 @@ final class SubmissionOwnerAndStageFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form, $formValues);
 
-        $submissions = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class)->findBy(['form' => $formId]);
+        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findBy(['form' => $formId]);
         $this->assertCount(1, $submissions, "Submission was not created for test: {$testName}");
 
         /** @var Submission $submission */

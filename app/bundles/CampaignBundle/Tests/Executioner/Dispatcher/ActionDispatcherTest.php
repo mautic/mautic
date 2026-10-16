@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
@@ -39,33 +40,21 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
     public function testActionBatchEventIsDispatchedWithSuccessAndFailedLogs(): void
     {
         $event = new Event();
-        $lead1 = $this->createMock(Lead::class);
-        $lead1->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(1);
+        $event->setCampaign(new Campaign());
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->expects($this->exactly(2))
-            ->method('getId')
-            ->willReturn(2);
+        $lead1 = new Lead();
+        $lead1->setId(1);
 
-        $log1 = $this->createMock(LeadEventLog::class);
-        $log1->expects($this->exactly(2))
-            ->method('getLead')
-            ->willReturn($lead1);
-        $log1->method('setIsScheduled')
-            ->willReturn($log1);
-        $log1->method('getEvent')
-            ->willReturn($event);
+        $lead2 = new Lead();
+        $lead2->setId(2);
 
-        $log2 = $this->createMock(LeadEventLog::class);
-        $log2->expects($this->exactly(2))
-            ->method('getLead')
-            ->willReturn($lead2);
-        $log2->method('getMetadata')
-            ->willReturn([]);
-        $log2->method('getEvent')
-            ->willReturn($event);
+        $log1 = new LeadEventLog();
+        $log1->setLead($lead1);
+        $log1->setEvent($event);
+
+        $log2 = new LeadEventLog();
+        $log2->setLead($lead2);
+        $log2->setEvent($event);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(
@@ -136,33 +125,21 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->expectException(LogNotProcessedException::class);
 
         $event = new Event();
-        $lead1 = $this->createMock(Lead::class);
-        $lead1->expects($this->once())
-            ->method('getId')
-            ->willReturn(1);
+        $event->setCampaign(new Campaign());
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->expects($this->once())
-            ->method('getId')
-            ->willReturn(2);
+        $lead1 = new Lead();
+        $lead1->setId(1);
 
-        $log1 = $this->createMock(LeadEventLog::class);
-        $log1->expects($this->once())
-            ->method('getLead')
-            ->willReturn($lead1);
-        $log1->method('setIsScheduled')
-            ->willReturn($log1);
-        $log1->method('getEvent')
-            ->willReturn($event);
+        $lead2 = new Lead();
+        $lead2->setId(2);
 
-        $log2 = $this->createMock(LeadEventLog::class);
-        $log2->expects($this->once())
-            ->method('getLead')
-            ->willReturn($lead2);
-        $log2->method('getMetadata')
-            ->willReturn([]);
-        $log2->method('getEvent')
-            ->willReturn($event);
+        $log1 = new LeadEventLog();
+        $log1->setLead($lead1);
+        $log1->setEvent($event);
+
+        $log2 = new LeadEventLog();
+        $log2->setLead($lead2);
+        $log2->setEvent($event);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(
@@ -197,34 +174,21 @@ final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->expectException(LogNotProcessedException::class);
 
         $event = new Event();
+        $event->setCampaign(new Campaign());
 
-        $lead1 = $this->createMock(Lead::class);
-        $lead1->expects($this->once())
-            ->method('getId')
-            ->willReturn(1);
+        $lead1 = new Lead();
+        $lead1->setId(1);
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->expects($this->once())
-            ->method('getId')
-            ->willReturn(2);
+        $lead2 = new Lead();
+        $lead2->setId(2);
 
-        $log1 = $this->createMock(LeadEventLog::class);
-        $log1->expects($this->once())
-            ->method('getLead')
-            ->willReturn($lead1);
-        $log1->method('setIsScheduled')
-            ->willReturn($log1);
-        $log1->method('getEvent')
-            ->willReturn($event);
+        $log1 = new LeadEventLog();
+        $log1->setLead($lead1);
+        $log1->setEvent($event);
 
-        $log2 = $this->createMock(LeadEventLog::class);
-        $log2->expects($this->once())
-            ->method('getLead')
-            ->willReturn($lead2);
-        $log2->method('getMetadata')
-            ->willReturn([]);
-        $log2->method('getEvent')
-            ->willReturn($event);
+        $log2 = new LeadEventLog();
+        $log2->setLead($lead2);
+        $log2->setEvent($event);
 
         /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(

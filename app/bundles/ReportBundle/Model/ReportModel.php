@@ -488,7 +488,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
             $dataAggregatorColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']] = $aggregatorColumn['column'];
         }
         // Build a reference for column to data column (without table prefix)
-        foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
+        foreach ($tableDetails['columns'] as $dbColumn => $columnData) {
             $dataColumns[$columnData['alias']] = $dbColumn;
         }
 
@@ -794,6 +794,14 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         }
 
         return (int) $countQb->executeQuery()->fetchOne();
+    }
+
+    /**
+     * @return iterable<Report>
+     */
+    public function getEntities(array $args = []): iterable
+    {
+        return parent::getEntities($args);
     }
 
     public function getReportsIdsWithDependenciesOnSegment(int $segmentId): array

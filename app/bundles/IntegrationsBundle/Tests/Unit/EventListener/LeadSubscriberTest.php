@@ -97,12 +97,7 @@ final class LeadSubscriberTest extends TestCase
 
     public function testOnLeadPostSaveAnonymousLead(): void
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('isAnonymous')
-            ->willReturn(true);
-        $lead->expects($this->never())
-            ->method('getChanges');
+        $lead = new Lead();
 
         $this->syncIntegrationsHelper->expects($this->never())
             ->method('hasObjectSyncEnabled');
@@ -112,12 +107,8 @@ final class LeadSubscriberTest extends TestCase
 
     public function testOnLeadPostSaveLeadObjectSyncNotEnabled(): void
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('isAnonymous')
-            ->willReturn(false);
-        $lead->expects($this->never())
-            ->method('getChanges');
+        $lead = new Lead();
+        $lead->setEmail('john@example.com');
 
         $this->syncIntegrationsHelper->expects($this->once())
             ->method('hasObjectSyncEnabled')
@@ -129,15 +120,9 @@ final class LeadSubscriberTest extends TestCase
 
     public function testOnLeadPostSaveNoAction(): void
     {
-        $fieldChanges = [];
-
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())
-            ->method('isAnonymous')
-            ->willReturn(false);
-        $lead->expects($this->once())
-            ->method('getChanges')
-            ->willReturn($fieldChanges);
+        $lead = new Lead();
+        $lead->setEmail('john@example.com');
+        $lead->resetChanges();
 
         $this->syncIntegrationsHelper->expects($this->once())
             ->method('hasObjectSyncEnabled')

@@ -30,7 +30,7 @@ final class DeleteOrphanSubmissionRecordsFromResultsTableCommandTest extends Mau
         }
 
         /** @var SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->getContainer()->get(\Mautic\FormBundle\Entity\SubmissionRepository::class);
+        $submissionRepository = $this->getContainer()->get(SubmissionRepository::class);
 
         // Ensure the submission was created properly.
         $submissions = $submissionRepository->findBy(['form' => $form['id']]);

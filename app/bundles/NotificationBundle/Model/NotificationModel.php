@@ -192,7 +192,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q): void
+    public function limitQueryToCreator(QueryBuilder $q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'push_notifications', 'p', 'p.id = t.notification_id')
             ->andWhere('p.created_by = :userId')
@@ -232,7 +232,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         return $chart->render();
     }
 
-    public function getNotificationStatus(string $idHash): ?\Mautic\NotificationBundle\Entity\Stat
+    public function getNotificationStatus(string $idHash): ?Stat
     {
         return $this->statRepository->getNotificationStatus($idHash);
     }

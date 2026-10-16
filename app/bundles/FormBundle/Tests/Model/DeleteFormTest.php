@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Form;
@@ -48,7 +49,8 @@ final class DeleteFormTest extends \PHPUnit\Framework\TestCase
         $entityManager         = $this->createStub(EntityManagerInterface::class);
         $dispatcher            = $this->createMock(EventDispatcher::class);
         $formRepository        = $this->createMock(FormRepository::class);
-        $form                  = $this->createMock(Form::class);
+        $form                  = new Form();
+        ReflectionHelper::setEntityId($form, 1);
         $mappedObjectCollector = $this->createStub(MappedObjectCollectorInterface::class);
         $formModel             = new FormModel(
             $requestStack,
@@ -87,11 +89,6 @@ final class DeleteFormTest extends \PHPUnit\Framework\TestCase
 
                 return false;
             });
-
-        $form->expects($this->exactly(2))
-            ->method('getId')
-            ->with()
-            ->willReturn(1);
 
         $formUploaderMock->expects($this->once())
             ->method('deleteFilesOfForm')

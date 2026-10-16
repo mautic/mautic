@@ -127,6 +127,7 @@ final class ClientType extends AbstractType
             FormEvents::POST_SUBMIT,
             function (FormEvent $event): void {
                 $form = $event->getForm();
+                /** @var Client $data */
                 $data = $event->getData();
 
                 if ($form->has('redirectUris')) {

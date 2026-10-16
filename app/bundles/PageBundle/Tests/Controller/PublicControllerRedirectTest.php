@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -125,7 +126,7 @@ final class PublicControllerRedirectTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $this->assertSame($url, $response->getTargetUrl(), 'The dots in the query part must be preserved.');
 
-        $hit = $this->getContainer()->get(\Mautic\PageBundle\Entity\HitRepository::class)->findOneBy(['url' => $url]);
+        $hit = $this->getContainer()->get(HitRepository::class)->findOneBy(['url' => $url]);
         $this->assertInstanceOf(Hit::class, $hit);
     }
 

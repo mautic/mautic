@@ -39,7 +39,6 @@ jobs:
             matrix:
                 config:
                     - core-lib
-                    - plugin-clearbit
                     - plugin-cloudstorage
                     - plugin-crm
                     - plugin-emailmarketing

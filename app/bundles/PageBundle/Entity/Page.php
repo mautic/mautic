@@ -56,17 +56,19 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-/**
- * @use TranslationEntityTrait<Page>
- * @use VariantEntityTrait<Page>
- */
 #[EntityEvent]
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface, OptimisticLockInterface
 {
+    /** @use TranslationEntityTrait<Page> */
     use TranslationEntityTrait;
+
+    /** @use VariantEntityTrait<Page> */
     use VariantEntityTrait;
+
     use UuidTrait;
+
     use ProjectTrait;
+
     use OptimisticLockTrait;
 
     public const string ENTITY_NAME = 'page';
@@ -685,6 +687,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $current = $this->{$getter}();
 
         if ('translationParent' == $prop || 'variantParent' == $prop || 'category' == $prop) {
+            /** @var self|Category|null $current */
+            /** @var self|Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

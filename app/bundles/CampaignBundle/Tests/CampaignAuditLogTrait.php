@@ -7,8 +7,11 @@ namespace Mautic\CampaignBundle\Tests;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
-use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 
+/**
+ * @method \Symfony\Component\DependencyInjection\ContainerInterface getContainer()
+ */
 trait CampaignAuditLogTrait
 {
     /**
@@ -18,7 +21,9 @@ trait CampaignAuditLogTrait
      */
     private function saveAuditLogs(EntityManagerInterface $em, array $auditLogs, Campaign $campaign): void
     {
-        $user = $em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $userRepository = $this->getContainer()->get(UserRepository::class);
+
+        $user = $userRepository->findOneBy(['username' => 'admin']);
         foreach ($auditLogs as $auditLog) {
             $log = new AuditLog();
             $log->setDateAdded(new \DateTime($auditLog['dateAdded']));

@@ -62,6 +62,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DNC;
@@ -176,7 +177,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $clonedEmails[] = $clonedParent;
 
         foreach ($email->getTranslationChildren() as $translation) {
-            \assert($translation instanceof Email);
+            if (!$translation instanceof Email) {
+                continue;
+            }
 
             $clonedTranslation = $this->cloneEmailForRelatedClone($translation);
             $clonedTranslation->setTranslationParent($clonedParent);
@@ -185,16 +188,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         foreach ($email->getVariantChildren() as $variant) {
-            \assert($variant instanceof Email);
-
             $clonedVariant = $this->cloneEmailForRelatedClone($variant);
             $clonedVariant->setVariantParent($clonedParent);
             $this->saveEntity($clonedVariant);
             $clonedEmails[] = $clonedVariant;
 
             foreach ($variant->getTranslationChildren() as $variantTranslation) {
-                \assert($variantTranslation instanceof Email);
-
                 $clonedVariantTranslation = $this->cloneEmailForRelatedClone($variantTranslation);
                 $clonedVariantTranslation->setTranslationParent($clonedVariant);
                 $this->saveEntity($clonedVariantTranslation);
@@ -219,8 +218,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         // Ensure that list emails are published
         if ('list' == $entity->getEmailType()) {
             // Ensure that this email has the same lists assigned as the translated parent if applicable
-            if ($translationParent = $entity->getTranslationParent()) {
-                \assert($translationParent instanceof Email);
+            $translationParent = $entity->getTranslationParent();
+            if ($translationParent instanceof Email) {
                 $parentLists = $translationParent->getLists()->toArray();
                 $entity->setLists($parentLists);
             }
@@ -254,9 +253,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
             // Force translations for this entity to use the same segments
             if ('list' == $entity->getEmailType() && $entity->hasTranslations()) {
+                /** @var Email[] $translations */
                 $translations                      = $entity->getTranslationChildren()->toArray();
                 $this->updatingTranslationChildren = true;
                 foreach ($translations as $translation) {
+                    if (!$translation instanceof Email) {
+                        continue;
+                    }
+
                     $this->saveEntity($translation);
                 }
                 $this->updatingTranslationChildren = false;
@@ -351,7 +355,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return Paginator|array<string, int|object>
+     * @return Paginator<Email>|array<string, int|Email>
      */
     public function getEntities(array $args = []): iterable
     {
@@ -635,13 +639,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         return $data;
     }
 
-    public function getEmailStatus(string $idHash): ?\Mautic\EmailBundle\Entity\Stat
+    public function getEmailStatus(string $idHash): ?Stat
     {
         return $this->statRepository->getEmailStatus($idHash);
     }
 
     /**
      * Search for an email stat by email and lead IDs.
+     *
+     * @return array<int, \Mautic\EmailBundle\Entity\Stat>
      */
     public function getEmailStati($emailId, $leadId): array
     {
@@ -1032,7 +1038,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead lists.
      *
-     * @param array    $lists
+     * @param LeadList[]|null $lists
      * @param int|null $limit
      * @param int|null $batch        True to process and batch all pending leads
      * @param int      $minContactId
@@ -1042,7 +1048,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     public function sendEmailToLists(
         Email $email,
-        $lists = null,
+        ?array $lists = null,
         $limit = null,
         $batch = null,
         ?OutputInterface $output = null,
@@ -1784,7 +1790,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Joins the email table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q): void
+    public function limitQueryToCreator(QueryBuilder $q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.id = t.email_id')
             ->andWhere('e.created_by = :userId')
@@ -2144,7 +2150,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function sendSampleEmailToUser(
-        $email,
+        Email $email,
         $users,
         $leadFields = null,
         array $tokens = [],
@@ -2255,6 +2261,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         );
 
         $ids = [];
+
         foreach ($entities as $entity) {
             $ids[] = $entity->getId();
         }

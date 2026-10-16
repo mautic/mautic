@@ -747,11 +747,10 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * Return array of options update select response.
      *
      * @param string $updateSelect HTML id of the select
-     * @param object $entity
      * @param string $nameMethod   name of the entity method holding the name
      * @param string $groupMethod  name of the entity method holding the select group
      */
-    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = 'getLanguage'): array
+    protected function getUpdateSelectParams(string $updateSelect, object $entity, string $nameMethod = 'getName', string $groupMethod = 'getLanguage'): array
     {
         $options = [
             'updateSelect' => $updateSelect,
@@ -767,11 +766,11 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param string $timezone
+     * @param-out FormInterface $dateRangeForm
      *
-     * @return \DateTime[]
+     * @return array{0: \DateTime, 1: \DateTime}
      */
-    protected function getViewDateRange(Request $request, $objectId, $returnUrl, $timezone = 'local', &$dateRangeForm = null): array
+    protected function getViewDateRange(Request $request, $objectId, $returnUrl, string $timezone = 'local', ?FormInterface &$dateRangeForm = null): array
     {
         $name            = $this->getSessionBase($objectId).'.view.daterange';
         $method          = ('POST' === $request->getMethod()) ? 'request' : 'query';
@@ -794,10 +793,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         return [$dateFrom, $dateTo];
     }
 
-    /**
-     * @param int $page
-     */
-    protected function indexStandard(Request $request, $page = null): Response
+    protected function indexStandard(Request $request, ?int $page = null): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(

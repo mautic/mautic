@@ -48,8 +48,8 @@ final class CampaignConditionSubscriberTest extends TestCase
             ->willThrowException(new UnexpectedValueException(null, 'string'));
 
         // Prepare the ConditionEvent with the lead
-        $log = $this->createStub(LeadEventLog::class);
-        $log->method('getLead')->willReturn($lead);
+        $log = new LeadEventLog();
+        $log->setLead($lead);
 
         $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
@@ -73,8 +73,8 @@ final class CampaignConditionSubscriberTest extends TestCase
             ->willThrowException(new InvalidEmailException($lead->getEmail(), 'Invalid email format'));
 
         // Prepare the ConditionEvent with the lead
-        $log = $this->createStub(LeadEventLog::class);
-        $log->method('getLead')->willReturn($lead);
+        $log = new LeadEventLog();
+        $log->setLead($lead);
 
         $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
@@ -100,8 +100,8 @@ final class CampaignConditionSubscriberTest extends TestCase
             });
 
         // Prepare the ConditionEvent with the lead
-        $log = $this->createStub(LeadEventLog::class);
-        $log->method('getLead')->willReturn($lead);
+        $log = new LeadEventLog();
+        $log->setLead($lead);
 
         $event = new ConditionEvent($this->createStub(AbstractEventAccessor::class), $log);
 
