@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Twig\Sandbox;
 
 use Twig\Sandbox\SecurityError;
-use Twig\Sandbox\SecurityNotAllowedFilterError;
 use Twig\Sandbox\SecurityNotAllowedFunctionError;
 use Twig\Sandbox\SecurityPolicyInterface;
 
@@ -39,18 +38,6 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
     ];
 
     /**
-     * Twig filters that must never execute in theme templates.
-     * map/reduce/filter accept PHP callable strings, enabling RCE.
-     *
-     * @var string[]
-     */
-    private const DENIED_FILTERS = [
-        'map',    // {{ ['id']|map('system')|join }} → RCE
-        'reduce', // {{ ['id']|reduce('system') }} → RCE
-        'filter', // {{ ['id']|filter('system') }} → RCE
-    ];
-
-    /**
      * @param string[] $tags
      * @param string[] $filters
      * @param string[] $functions
@@ -59,12 +46,6 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
      */
     public function checkSecurity($tags, $filters, $functions): void
     {
-        foreach ($filters as $filter) {
-            if (in_array($filter, self::DENIED_FILTERS, true)) {
-                throw new SecurityNotAllowedFilterError(sprintf('Filter "%s" is not allowed in theme templates.', $filter), $filter);
-            }
-        }
-
         foreach ($functions as $function) {
             if (in_array($function, self::DENIED_FUNCTIONS, true)) {
                 throw new SecurityNotAllowedFunctionError(sprintf('Function "%s" is not allowed in theme templates.', $function), $function);
