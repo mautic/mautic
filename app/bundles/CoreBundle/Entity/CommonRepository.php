@@ -1582,19 +1582,23 @@ class CommonRepository extends ServiceEntityRepository
             }
 
             if ([] !== $advancedFilterStrings) {
+                $parsedFilters = [];
                 foreach ($advancedFilterStrings as $parseString) {
                     $parsed = $filterHelper->parseString($parseString);
+                    $parsedFilters[] = $parsed;
 
                     $advancedFilters->root = array_merge($advancedFilters->root, $parsed->root);
                     $filterHelper->mergeCommands($advancedFilters, $parsed->commands);
                 }
                 $this->advancedFilterCommands = $advancedFilters->commands;
 
-                [$expr, $parameters] = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
-                $this->appendExpression($queryExpression, $expr);
+                foreach ($parsedFilters as $parsed) {
+                    [$expr, $parameters] = $this->addAdvancedSearchWhereClause($q, $parsed);
+                    $this->appendExpression($queryExpression, $expr);
 
-                if (is_array($parameters)) {
-                    $queryParameters = array_merge($queryParameters, $parameters);
+                    if (is_array($parameters)) {
+                        $queryParameters = array_merge($queryParameters, $parameters);
+                    }
                 }
             }
         }
