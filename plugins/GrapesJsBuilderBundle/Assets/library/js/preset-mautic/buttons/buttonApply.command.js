@@ -24,7 +24,7 @@ export default class ButtonApplyCommand {
       const mjmlCode = MjmlService.getEditorMjmlContent(editor);
 
       if (!htmlCode || !mjmlCode) {
-        throw new Error('Could not generate html from MJML');
+        return false;
       }
 
       ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode);
@@ -37,6 +37,8 @@ export default class ButtonApplyCommand {
     editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
 
     ButtonApplyCommand.postForm(editor, sender);
+
+    return true;
   }
 
   /**
