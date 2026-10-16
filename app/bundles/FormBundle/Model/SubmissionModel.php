@@ -135,8 +135,11 @@ final class SubmissionModel extends CommonFormModel
             }
         }
 
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
-        $submission->setIpAddress($ipAddress);
+        // Kiosk mode does not track the submitter, so their IP address is not stored either
+        $trackSubmitter = !$form->isInKioskMode();
+        if ($trackSubmitter) {
+            $submission->setIpAddress($this->ipLookupHelper->getIpAddress());
+        }
 
         if (!empty($post['return'])) {
             $referer = $post['return'];
@@ -330,7 +333,7 @@ final class SubmissionModel extends CommonFormModel
 
         $lead = $this->getManagedLeadForSubmission($lead);
 
-        $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
+        $trackedDevice = $trackSubmitter ? $this->deviceTrackingService->getTrackedDevice() : null;
         $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
         // set tracking ID for stats purposes to determine unique hits
