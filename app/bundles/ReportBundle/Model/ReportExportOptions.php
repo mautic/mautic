@@ -44,10 +44,7 @@ final class ReportExportOptions
         return $this->page * $this->batchSize;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateFrom()
+    public function getDateFrom(): ?\DateTime
     {
         return $this->dateFrom;
     }
@@ -57,10 +54,7 @@ final class ReportExportOptions
         $this->dateFrom = $dateFrom;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateTo()
+    public function getDateTo(): ?\DateTime
     {
         return $this->dateTo;
     }
