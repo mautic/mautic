@@ -4,6 +4,7 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -72,6 +73,52 @@ class TriggerEventRepository extends CommonRepository
         $q->where($expr);
         $q->andWhere($groupsExpr);
         $q->andWhere('r.group IS NOT NULL');
+
+        return $q->getQuery()->getArrayResult();
+    }
+
+    /**
+     * Get published point and group-score triggers for one contact in one query.
+     *
+     * @return mixed[]
+     */
+    public function getPublishedByPointTotalAndGroupScore(int $points, int $leadId): array
+    {
+        $expr = $this->getEntityManager()->createQueryBuilder()->expr();
+        $joinCondition = $expr->andX(
+            $expr->eq('gcs.group', 'pl.id'),
+            $expr->eq('gcs.contact', ':leadId')
+        );
+
+        $q = $this->createQueryBuilder('a')
+            ->select('partial a.{id, type, name, properties}, partial r.{id, name, points, color}, partial pl.{id, name}')
+            ->leftJoin('a.trigger', 'r')
+            ->leftJoin('r.group', 'pl')
+            ->leftJoin(
+                GroupContactScore::class,
+                'gcs',
+                Expr\Join::WITH,
+                $joinCondition
+            )
+            ->orderBy('IDENTITY(r.group)')
+            ->addOrderBy('a.order')
+            ->addOrderBy('r.points')
+            ->setParameter('points', $points)
+            ->setParameter('leadId', $leadId);
+
+        $q->where($this->getPublishedByDateOrmExpression($q, 'r'))
+            ->andWhere(
+                $q->expr()->orX(
+                    $q->expr()->andX(
+                        $q->expr()->isNull('r.group'),
+                        $q->expr()->lte('r.points', ':points')
+                    ),
+                    $q->expr()->andX(
+                        $q->expr()->isNotNull('r.group'),
+                        $q->expr()->lte('r.points', 'gcs.score')
+                    )
+                )
+            );
 
         return $q->getQuery()->getArrayResult();
     }

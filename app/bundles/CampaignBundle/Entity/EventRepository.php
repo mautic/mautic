@@ -211,6 +211,25 @@ class EventRepository extends CommonRepository
     }
 
     /**
+     * Load campaign events together with the relations used by the builder.
+     *
+     * @return Event[]
+     */
+    public function getCampaignEventsWithBuilderRelations(int $campaignId): array
+    {
+        return $this->createQueryBuilder('e')
+            ->select('DISTINCT e, ec, ep, er')
+            ->leftJoin('e.children', 'ec')
+            ->leftJoin('e.parent', 'ep')
+            ->leftJoin('e.redirectingEvents', 'er')
+            ->where('IDENTITY(e.campaign) = :campaignId')
+            ->setParameter('campaignId', $campaignId)
+            ->orderBy('e.order', Order::Ascending->value)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @return string[]
      */
     public function getCampaignEventIds(int $campaignId): array
