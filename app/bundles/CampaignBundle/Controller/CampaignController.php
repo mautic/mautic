@@ -106,6 +106,8 @@ class CampaignController extends AbstractStandardFormController
      */
     private ?array $indexSearchScopes = null;
 
+    private readonly EventRepository $eventRepository;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -127,9 +129,14 @@ class CampaignController extends AbstractStandardFormController
         private readonly CampaignRepository $campaignRepository,
         private readonly SummaryRepository $summaryRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
-        private readonly ?EventRepository $eventRepository = null,
+        /** @phpstan-ignore-next-line Keep the optional parameter for positional constructor compatibility. */
+        ?EventRepository $eventRepository = null,
     ) {
         parent::__construct($formFactory, $fieldHelper, $managerRegistry, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+
+        /** @var EventRepository $legacyEventRepository */
+        $legacyEventRepository = call_user_func([$eventModel, 'getRepository']);
+        $this->eventRepository = $eventRepository ?? $legacyEventRepository;
     }
 
     protected function getPermissions(): array
@@ -1254,7 +1261,7 @@ class CampaignController extends AbstractStandardFormController
 
         $existingEvents = $entity->getEvents()->toArray();
         if (!$isClone && null !== $entity->getId()) {
-            $existingEvents = ($this->eventRepository ?? $this->eventModel->getRepository())->getCampaignEventsWithBuilderRelations($entity->getId());
+            $existingEvents = $this->eventRepository->getCampaignEventsWithBuilderRelations($entity->getId());
         }
         foreach ($existingEvents as $e) {
             // remove deleted events from existing events
