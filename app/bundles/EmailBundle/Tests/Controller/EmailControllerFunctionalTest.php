@@ -841,6 +841,37 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(1, $settings['enableAbTest']);
     }
 
+    public function testWinnerActionRedirectsToEmailView(): void
+    {
+        $segment = $this->createSegment('Manual winner', 'manual-winner');
+        $parent  = $this->createEmail('Leading email', 'Leading email', 'list', 'blank', 'Parent', $segment);
+        $variant = $this->createEmail('Other email', 'Other email', 'list', 'blank', 'Variant', $segment);
+
+        $parent->setIsPublished(true);
+        $parent->setVariantSettings(['enableAbTest' => true, 'weight' => 50, 'totalWeight' => 100, 'winnerCriteria' => 'email.openrate']);
+        $parent->setVariantStartDate(new \DateTime('2020-01-01', new \DateTimeZone('UTC')));
+        $variant->setIsPublished(true);
+        $variant->setVariantParent($parent);
+        $variant->setVariantSettings(['weight' => 50, 'winnerCriteria' => 'email.openrate']);
+        $parent->addVariantChild($variant);
+
+        foreach ([$parent, $variant] as $item) {
+            $stat = new Stat();
+            $stat->setEmail($item);
+            $stat->setEmailAddress('abtest@example.com');
+            $stat->setDateSent(new \DateTime('2020-01-02 12:00:00', new \DateTimeZone('UTC')));
+            $stat->setIsRead($item === $parent);
+            $this->em->persist($stat);
+        }
+
+        $this->em->flush();
+        $this->setCsrfHeader();
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_POST, '/s/emails/winner/'.$variant->getId());
+
+        $this->assertResponseRedirects('/s/emails/view/'.$variant->getId());
+    }
+
     #[DataProvider('dwcTokenTypeDataProvider')]
     public function testSaveEmailWithHtmlTypeDWC(string $type): void
     {
