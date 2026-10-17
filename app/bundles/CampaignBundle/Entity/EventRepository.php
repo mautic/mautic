@@ -75,7 +75,20 @@ class EventRepository extends CommonRepository
                 $parentQb->expr()->eq('parent_log_event.event', 'e.parent'),
                 $parentQb->expr()->eq('parent_log_event.lead', 'l.lead'),
                 $parentQb->expr()->eq('parent_log_event.rotation', 'l.rotation'),
-                $parentQb->expr()->eq('parent_log_event.isScheduled', 0)
+                $parentQb->expr()->eq('parent_log_event.isScheduled', 0),
+                $parentQb->expr()->orX(
+                    $parentQb->expr()->andX(
+                        $parentQb->expr()->orX(
+                            $parentQb->expr()->isNull('e.decisionPath'),
+                            $parentQb->expr()->eq('e.decisionPath', ':positivePath')
+                        ),
+                        $parentQb->expr()->eq('parent_log_event.nonActionPathTaken', 0)
+                    ),
+                    $parentQb->expr()->andX(
+                        $parentQb->expr()->eq('e.decisionPath', ':negativePath'),
+                        $parentQb->expr()->eq('parent_log_event.nonActionPathTaken', 1)
+                    )
+                )
             );
 
         $q = $this->createQueryBuilder('e', 'e.id');
@@ -105,7 +118,9 @@ class EventRepository extends CommonRepository
                 )
             )
             ->setParameter('type', $type)
-            ->setParameter('contactId', (int) $contactId);
+            ->setParameter('contactId', (int) $contactId)
+            ->setParameter('positivePath', Event::PATH_ACTION)
+            ->setParameter('negativePath', Event::PATH_INACTION);
 
         return $q->getQuery()->getResult();
     }

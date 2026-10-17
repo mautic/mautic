@@ -64,7 +64,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     private $systemTriggered = false;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private $metadata = [];
 
@@ -390,18 +390,12 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getNonActionPathTaken()
+    public function getNonActionPathTaken(): ?bool
     {
         return $this->nonActionPathTaken;
     }
 
-    /**
-     * @param bool $nonActionPathTaken
-     */
-    public function setNonActionPathTaken($nonActionPathTaken): static
+    public function setNonActionPathTaken(?bool $nonActionPathTaken): static
     {
         $this->nonActionPathTaken = $nonActionPathTaken;
 
