@@ -575,20 +575,29 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             }
         } elseif ('utmtags' == $prop) {
             if ($val instanceof UtmTag) {
-                if ($val->getUtmContent()) {
-                    $this->changes['utmtags'] = ['utm_content', $val->getUtmContent()];
+                $fields = [
+                    'utm_content'  => 'getUtmContent',
+                    'utm_medium'   => 'getUtmMedium',
+                    'utm_campaign' => 'getUtmCampaign',
+                    'utm_term'     => 'getUtmTerm',
+                    'utm_source'   => 'getUtmSource',
+                ];
+                // Always fetch previous UtmTag if not provided
+                $previous = null;
+                $utmtagsCollection = $this->getUtmTags();
+                if ($utmtagsCollection instanceof \Doctrine\Common\Collections\Collection && !$utmtagsCollection->isEmpty()) {
+                    $previous = $utmtagsCollection->last();
                 }
-                if ($val->getUtmMedium()) {
-                    $this->changes['utmtags'] = ['utm_medium', $val->getUtmMedium()];
-                }
-                if ($val->getUtmCampaign()) {
-                    $this->changes['utmtags'] = ['utm_campaign', $val->getUtmCampaign()];
-                }
-                if ($val->getUtmTerm()) {
-                    $this->changes['utmtags'] = ['utm_term', $val->getUtmTerm()];
-                }
-                if ($val->getUtmSource()) {
-                    $this->changes['utmtags'] = ['utm_source', $val->getUtmSource()];
+                foreach ($fields as $field => $getterMethod) {
+                    $newValue = $val->$getterMethod();
+                    $oldVal = null;
+                    if ($previous instanceof UtmTag) {
+                        $oldVal = $previous->$getterMethod();
+                    }
+                    // Only log if at least one value is not empty and they differ
+                    if ((($oldVal !== null && $oldVal !== '') || ($newValue !== null && $newValue !== '')) && $newValue !== $oldVal) {
+                        $this->changes['utmtags'][$field] = [$oldVal, $newValue];
+                    }
                 }
             }
         } elseif ('frequencyRules' == $prop) {
