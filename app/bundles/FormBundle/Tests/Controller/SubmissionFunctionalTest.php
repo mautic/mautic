@@ -103,6 +103,52 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('bar', $queryParams['foo']);
     }
 
+    public function testMessagePostActionRendersSubmissionMessageWithoutStatusIcon(): void
+    {
+        $message = 'Submission message marker';
+        $payload = [
+            'name'               => 'Message post action test form',
+            'description'        => 'Form created via submission test',
+            'formType'           => 'standalone',
+            'isPublished'        => true,
+            'postAction'         => 'message',
+            'postActionProperty' => $message,
+            'fields'             => [
+                [
+                    'label'     => 'Email',
+                    'type'      => 'email',
+                    'alias'     => 'email',
+                    'leadField' => 'email',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $formId = json_decode($clientResponse->getContent(), true)['form']['id'];
+
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_POST, "/form/submit?formId={$formId}", [
+            'mauticform' => [
+                'email'    => 'generic-message@example.test',
+                'formId'   => $formId,
+                'formName' => 'Message post action test form',
+            ],
+        ]);
+        $this->assertSame(Response::HTTP_FOUND, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
+
+        $crawler = $this->client->followRedirect();
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString($message, strip_tags((string) $this->client->getResponse()->getContent()));
+        $this->assertCount(0, $crawler->filter('svg'));
+    }
+
     public function testRequiredConditionalFieldIfNotEmpty(): void
     {
         // Create the test form via API.
