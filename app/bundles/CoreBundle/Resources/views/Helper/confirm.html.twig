@@ -70,7 +70,7 @@
 {%- set precheck = precheck|default('') %}
 {{- wrapOpeningTag }}
 <{{ tag }}{{ buttonType }}
-    id="delete"
+    id="{{ id|default('delete') }}"
     class="{{ btnClass }}"
     href="{{ confirmAction }}"
     data-toggle="confirmation"
