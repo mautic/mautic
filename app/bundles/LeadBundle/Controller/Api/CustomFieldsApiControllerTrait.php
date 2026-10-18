@@ -174,6 +174,9 @@ trait CustomFieldsApiControllerTrait
      */
     protected function setCustomFieldValues($entity, $form, $parameters, $isPostOrPatch = false)
     {
+        // The form loop below adds every field, so record which keys the client sent.
+        $parameterKeysBeforeForm = array_keys($parameters);
+
         // set the custom field values
         // pull the data from the form in order to apply the form's formatting
         foreach ($form as $f) {
@@ -186,17 +189,22 @@ trait CustomFieldsApiControllerTrait
                 unset($parameters['points']);
             }
 
-            // When merging a contact because of a unique identifier match in POST /api/contacts//new or PATCH /api/contacts//edit all 0 values must be unset because
-            // we have to assume 0 was not meant to overwrite an existing value. Other empty values will be caught by LeadModel::setFieldValues
+            // A 0 the form filled in for an unsent field must not overwrite a stored value.
+            // A 0 the client sent is kept. Other empty values are handled by LeadModel::setFieldValues.
             $parameters = array_filter(
                 $parameters,
-                function ($value): bool {
+                function ($value, $key) use ($parameterKeysBeforeForm): bool {
+                    if (in_array($key, $parameterKeysBeforeForm, true)) {
+                        return true;
+                    }
+
                     if (is_numeric($value)) {
                         return 0.0 !== (float) $value;
                     }
 
                     return true;
-                }
+                },
+                ARRAY_FILTER_USE_BOTH
             );
         }
 
