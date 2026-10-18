@@ -314,7 +314,7 @@ class TrackableModel extends AbstractCommonModel
                 $search  = str_replace('&amp;', '&', $search);
                 $search  = str_replace('&', '(?:&|&amp;)', $search);
                 $content = preg_replace(
-                    '/<(.*?) href=(["\'])(?:\R|)(?:\s*)'.$search.'(.*?)(?:\s*)(?:\R|)\\2(.*?)>/i',
+                    '/<(.*?)\s+href\s*=\s*(["\'])(?:\R|)(?:\s*)'.$search.'(.*?)(?:\s*)(?:\R|)\\2(.*?)>/is',
                     '<$1 href=$2'.$replace.'$3$2$4>',
                     $content
                 );
@@ -681,7 +681,7 @@ class TrackableModel extends AbstractCommonModel
         ];
 
         $trackableUrls = $this->extractTrackablesFromContent($content);
-        $contentType   = (preg_match('/<(.*?) href/i', $content)) ? 'html' : 'text';
+        $contentType   = (preg_match('/<(.*?)\s+href\s*=/is', $content)) ? 'html' : 'text';
         if (count($trackableUrls)) {
             // Create Trackable/Redirect entities for the URLs
             $entities = $this->getEntitiesFromUrls($trackableUrls, $channel, $channelId);
