@@ -69,8 +69,14 @@ final readonly class SendSmsSubscriber implements EventSubscriberInterface
 
     public function genericFilter(FilterEvent $event): void
     {
-        $contactsWithoutNumbers = array_filter($event->getContacts(), fn (Lead $contact): bool => empty($contact->getLeadPhoneNumber()));
+        $contactsWithoutNumbers = array_filter(
+            $event->getContacts(),
+            fn (Lead $contact): bool => '' === trim((string) $contact->getLeadPhoneNumber()),
+        );
 
-        $event->removeContacts(array_map(fn (Lead $contact): int => $contact->getId(), $contactsWithoutNumbers));
+        $event->removeContacts(
+            array_map(fn (Lead $contact): int => $contact->getId(), $contactsWithoutNumbers),
+            FilterEvent::REMOVAL_REASON_MISSING_NUMBER,
+        );
     }
 }
