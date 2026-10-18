@@ -270,6 +270,20 @@ final class SubmissionModel extends CommonFormModel
             if (!empty($mappedField) && in_array($f->getMappedObject(), ['company', 'contact'])) {
                 $leadValue = $value;
 
+                if ('boolean' === $f->getType() && !empty($f->getProperties())) {
+                    $properties   = $f->getProperties();
+                    $onlyYesLabel = !empty($properties['yes']) && empty($properties['no']);
+                    $onlyNoLabel  = !empty($properties['no']) && empty($properties['yes']);
+
+                    if ($onlyYesLabel || $onlyNoLabel) {
+                        $hasSubmittedValue = is_array($value)
+                            ? [] !== $value
+                            : null !== $value && '' !== $value;
+
+                        $leadValue = (int) ($onlyNoLabel ? !$hasSubmittedValue : $hasSubmittedValue);
+                    }
+                }
+
                 $leadFieldMatches[$mappedField] = $leadValue;
             }
 
@@ -1230,9 +1244,16 @@ final class SubmissionModel extends CommonFormModel
         return true;
     }
 
-    private function normalizeValue(mixed $value, Field $f): string
+    private function normalizeValue(mixed $value, Field $f): string|bool
     {
         $value = !is_array($value) ? [$value] : $value;
+
+        // boolean field normalization
+        if ('boolean' === $f->getType()) {
+            $submitted = 1 === count($value) ? $value[0] : null;
+
+            return 1 === $submitted || '1' === $submitted || true === $submitted;
+        }
 
         // select and multiselect normalization
         if ($properties = $f->getProperties()['list'] ?? null) {
