@@ -74,4 +74,29 @@ final class DynamicContentApiControllerFunctionalTest extends MauticMysqlTestCas
         $this->client->request(Request::METHOD_POST, '/api/dynamiccontents/new', $payload);
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED, $this->client->getResponse()->getContent());
     }
+
+    public function testListCanFilterByLanguage(): void
+    {
+        $germanDwc = new DynamicContent();
+        $germanDwc->setName('German content');
+        $germanDwc->setLanguage('de_DE');
+
+        $englishDwc = new DynamicContent();
+        $englishDwc->setName('English content');
+        $englishDwc->setLanguage('en_US');
+
+        $this->em->persist($germanDwc);
+        $this->em->persist($englishDwc);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/api/dynamiccontents?search=lang%3Ade');
+
+        self::assertResponseIsSuccessful($this->client->getResponse()->getContent());
+
+        $responseArray = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $names         = array_column($responseArray['dynamicContents'], 'name');
+
+        self::assertContains('German content', $names);
+        self::assertNotContains('English content', $names);
+    }
 }
