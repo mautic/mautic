@@ -66,10 +66,6 @@ return [
                     'url' => '.*/$',
                 ],
             ],
-            'mautic_core_elfinder' => [
-                'path'       => '/elfinder',
-                'controller' => 'Mautic\CoreBundle\Controller\ElFinderController::showAction',
-            ],
         ],
         'api' => [
             'mautic_core_api_file_list' => [
