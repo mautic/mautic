@@ -13,6 +13,7 @@ use Mautic\CoreBundle\EventListener\AssetsSubscriber;
 use Mautic\CoreBundle\EventListener\ConfigPrivacySubscriber;
 use Mautic\CoreBundle\EventListener\ConfigThemeSubscriber;
 use Mautic\CoreBundle\EventListener\CoreSubscriber;
+use Mautic\CoreBundle\EventListener\ElFinderSubscriber;
 use Mautic\CoreBundle\EventListener\EnvironmentSubscriber;
 use Mautic\CoreBundle\EventListener\ErrorHandlingListener;
 use Mautic\CoreBundle\EventListener\ExceptionListener;
@@ -89,6 +90,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             ExceptionListener::class,
         ],
         'kernel.controller' => [
+            ElFinderSubscriber::class,
             ControllerSubscriber::class,
         ],
         OAuthEvent::PRE_AUTHORIZATION_PROCESS => [
