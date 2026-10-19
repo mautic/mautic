@@ -98,6 +98,75 @@ final class TrackableModelTest extends TestCase
         yield 'multiline comment text' => ["<!-- Example:\nhref=\"https://example.org/button\" -->"];
         yield 'link inside comment' => ["<!-- <a\nhref=\"https://example.org/button\">Commented out</a> -->"];
         yield 'body text after nested tag' => ["<p><span>Example:</span>\nhref=\"https://example.org/button\"</p>"];
+        yield 'link markup inside quoted attribute' => ['<div title=\'<a href="https://example.org/button">\'>Example</div>'];
+    }
+
+    #[DataProvider('quotedLinkAttributesProvider')]
+    public function testLinkTrackingPreservesQuotedAttributes(string $attributes, string $title): void
+    {
+        $url   = 'https://example.org/button';
+        $model = $this->getModel();
+        $html  = '<a'."\n".$attributes.'>Button</a>';
+
+        [$content, $trackables] = $model->parseContentForTrackables($html, [], 'email', 1);
+
+        $this->assertCount(1, $trackables);
+        $document = new \DOMDocument();
+        $document->loadHTML($content);
+        $link = $document->getElementsByTagName('a')->item(0);
+        $this->assertSame($title, $link->getAttribute('title'));
+        $this->assertArrayHasKey($link->getAttribute('href'), $trackables);
+        $this->assertSame($url, $trackables[$link->getAttribute('href')]->getRedirect()->getUrl());
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function quotedLinkAttributesProvider(): iterable
+    {
+        yield 'href-like text in single-quoted title' => [
+            'title=\'Use href="https://example.org/button"\''."\n".'href="https://example.org/button"',
+            'Use href="https://example.org/button"',
+        ];
+        yield 'href-like text in double-quoted title' => [
+            'title="Use href=\'https://example.org/button\'"'."\n".'href=\'https://example.org/button\'',
+            'Use href=\'https://example.org/button\'',
+        ];
+        yield 'tag boundaries in title before href' => [
+            'title="1 < 2 > 0"'."\n".'href="https://example.org/button"',
+            '1 < 2 > 0',
+        ];
+        yield 'href-like text in title after href' => [
+            'href="https://example.org/button"'."\n".'title=\'Use href="https://example.org/button"\'',
+            'Use href="https://example.org/button"',
+        ];
+    }
+
+    #[DataProvider('disabledUrlWithSharedPrefixProvider')]
+    public function testLinkTrackingPreservesDisabledUrlsWithSharedPrefix(string $suffix, bool $disabledFirst): void
+    {
+        $url      = 'https://example.org/button';
+        $model    = $this->getModel();
+        $tracked  = '<a href="'.$url.'">Tracked</a>';
+        $disabled = '<a'."\n".'href="'.$url.$suffix.'" data-mautic-disable-tracking="true">Private</a>';
+        $html     = $disabledFirst ? $disabled.$tracked : $tracked.$disabled;
+
+        [$content, $trackables] = $model->parseContentForTrackables($html, [], 'email', 1);
+
+        $this->assertCount(1, $trackables);
+        $this->assertStringContainsString($disabled, $content);
+        $this->assertStringContainsString('<a href="'.array_key_first($trackables).'">Tracked</a>', $content);
+    }
+
+    /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function disabledUrlWithSharedPrefixProvider(): iterable
+    {
+        foreach (['#private', '?private=1', '/private'] as $suffix) {
+            yield $suffix.' disabled first' => [$suffix, true];
+            yield $suffix.' disabled last' => [$suffix, false];
+        }
     }
 
     public function testMultilineLinkTrackingPreservesDisabledLinksAndAnchors(): void

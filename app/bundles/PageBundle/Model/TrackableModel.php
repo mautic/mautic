@@ -308,15 +308,16 @@ class TrackableModel extends AbstractCommonModel
         if ('html' === $type) {
             // Hours spent trying to handle through \DomDocument: 9h. The issue is that tokens "{token}" is replaced
             // by the \DomDocument::save will encode those on all doc, but here we need to replace only `href`.
+            $tagContent = '(?:[^<>"\']|"[^"]*"|\'[^\']*\')*?';
             foreach ($this->contentReplacements['second_pass'] as $search => $replace) {
                 // Make the search regular expression match both "&" and "&amp;".
                 $search  = preg_quote($search, '/');
                 $search  = str_replace('&amp;', '&', $search);
                 $search  = str_replace('&', '(?:&|&amp;)', $search);
-                // Skip comments and keep multiline matches within a single opening tag.
+                // Skip comments and unmatched tags, including quoted values; match the complete href.
                 $content = preg_replace(
-                    '/<!--[\s\S]*?-->(*SKIP)(*F)|<([^<>]*?)\s+href\s*=\s*(["\'])(?:\R|)(?:\s*)'.$search.'([^<>]*?)(?:\s*)(?:\R|)\\2([^<>]*?)>/i',
-                    '<$1 href=$2'.$replace.'$3$2$4>',
+                    '/<!--[\s\S]*?-->(*SKIP)(*F)|<('.$tagContent.')\s+href\s*=\s*(["\'])\s*'.$search.'\s*\\2('.$tagContent.')>|<'.$tagContent.'>(*SKIP)(*F)/i',
+                    '<$1 href=$2'.$replace.'$2$3>',
                     $content
                 );
             }
