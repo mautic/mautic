@@ -38,6 +38,59 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Test Html', (string) $response->getContent());
     }
 
+    public function testManualWinnerActionIsAvailableForPublishedStartedVariant(): void
+    {
+        [$parent, $variant] = $this->createManualWinnerPagePair(true, true);
+        $winnerUrl          = self::getContainer()->get('router')->generate('mautic_page_action', [
+            'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+
+        $this->client->request(Request::METHOD_GET, "/s/pages/view/{$parent->getId()}");
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
+
+        $this->client->request(Request::METHOD_POST, $winnerUrl);
+        $this->assertSame($winnerUrl, $this->client->getResponse()->getTargetUrl());
+
+        $this->em->clear();
+        $winner = $this->em->find(Page::class, $variant->getId());
+        $oldParent = $this->em->find(Page::class, $parent->getId());
+
+        $this->assertInstanceOf(Page::class, $winner);
+        $this->assertInstanceOf(Page::class, $oldParent);
+        $this->assertNull($winner->getVariantParent());
+        $this->assertTrue($winner->isPublished(false));
+        $this->assertFalse($oldParent->isPublished(false));
+        $this->assertSame(100, $winner->getVariantSettings()['totalWeight']);
+    }
+
+    public function testManualWinnerActionIsUnavailableForUnpublishedVariant(): void
+    {
+        [$parent, $variant] = $this->createManualWinnerPagePair(false, true);
+        $winnerUrl          = self::getContainer()->get('router')->generate('mautic_page_action', [
+            'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+
+        $this->client->request(Request::METHOD_GET, "/s/pages/view/{$parent->getId()}");
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testManualWinnerActionIsUnavailableBeforeAbTestStarts(): void
+    {
+        [$parent, $variant] = $this->createManualWinnerPagePair(true, false);
+        $winnerUrl          = self::getContainer()->get('router')->generate('mautic_page_action', [
+            'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+
+        $this->client->request(Request::METHOD_GET, "/s/pages/view/{$parent->getId()}");
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
+    }
+
     private function createSegment(): LeadList
     {
         $segment = new LeadList();
@@ -48,6 +101,39 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $segment;
+    }
+
+    /**
+     * @return array{0: Page, 1: Page}
+     */
+    private function createManualWinnerPagePair(bool $variantPublished, bool $testStarted): array
+    {
+        $suffix = bin2hex(random_bytes(4));
+        $parent = new Page();
+        $parent->setTitle('Manual winner parent')
+            ->setAlias('manual-winner-parent-'.$suffix)
+            ->setTemplate('blank')
+            ->setCustomHtml('Manual winner parent html')
+            ->setIsPublished(true)
+            ->setVariantStartDate($testStarted ? new \DateTime('-1 hour') : null);
+        $this->em->persist($parent);
+
+        $variant = new Page();
+        $variant->setTitle('Manual winner variant')
+            ->setAlias('manual-winner-variant-'.$suffix)
+            ->setTemplate('blank')
+            ->setCustomHtml('Manual winner variant html')
+            ->setIsPublished($variantPublished)
+            ->setVariantParent($parent)
+            ->setVariantSettings([
+                'weight'         => 50,
+                'winnerCriteria' => 'page.bouncerate',
+            ]);
+        $parent->addVariantChild($variant);
+        $this->em->persist($variant);
+        $this->em->flush();
+
+        return [$parent, $variant];
     }
 
     /**

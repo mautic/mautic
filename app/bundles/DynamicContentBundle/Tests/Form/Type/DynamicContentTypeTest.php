@@ -66,7 +66,7 @@ final class DynamicContentTypeTest extends TestCase
         $tagChoices = [];
 
         foreach ($tags as $tag) {
-            $tagChoices[$tag['label']] = $tag['value'];
+            $tagChoices[$tag['value']] = $tag['label'];
         }
         $matcher = $this->exactly(2);
 

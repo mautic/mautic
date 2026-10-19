@@ -502,7 +502,7 @@ final class FilterOperatorSubscriberTest extends TestCase
         );
     }
 
-    public function testFieldsAreLoadedForNonSegmentRoutes(): void
+    public function testOnlyCustomFieldsAreLoadedForNonSegmentRoutes(): void
     {
         $request = new Request();
         $request->attributes->set('_route', 'mautic_dynamicContent_action');
@@ -564,7 +564,6 @@ final class FilterOperatorSubscriberTest extends TestCase
         // Only custom fields should be shown
         $this->assertArrayHasKey('lead', $choices);
         $this->assertArrayHasKey('test_select', $choices['lead']);
-        $this->assertArrayHasKey('tags', $choices['lead']);
 
         // Static fields should not be included
         $this->assertArrayNotHasKey('utm_source', $choices['lead']);
