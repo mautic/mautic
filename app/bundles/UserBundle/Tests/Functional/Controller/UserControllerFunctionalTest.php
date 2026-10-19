@@ -78,7 +78,10 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         foreach ($images as $image) {
             $this->assertInstanceOf(\DOMElement::class, $image);
-            $this->assertStringStartsWith('data:image/svg+xml;', $image->getAttribute('src'));
+            $this->assertMatchesRegularExpression(
+                '#^(data:image/svg\+xml;|.*images/avatar\.png)#',
+                $image->getAttribute('src')
+            );
             $this->assertSame('', $image->getAttribute('alt'));
         }
     }
@@ -90,7 +93,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $image = $crawler->filter('img.media-object');
         $this->assertGreaterThan(0, $image->count());
-        $this->assertStringStartsWith('data:image/svg+xml;', $image->attr('src'));
+        $this->assertMatchesRegularExpression('#^(data:image/svg\+xml;|.*images/avatar\.png)#', (string) $image->attr('src'));
         $this->assertStringNotContainsString('gravatar', (string) $image->attr('src'));
     }
 

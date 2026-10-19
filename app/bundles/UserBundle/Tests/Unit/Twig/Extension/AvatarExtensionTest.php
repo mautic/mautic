@@ -8,6 +8,8 @@ use Composer\InstalledVersions;
 use DiceBear\Avatar;
 use DiceBear\Style;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
 use Mautic\UserBundle\Twig\Extension\AvatarExtension;
 use PHPUnit\Framework\TestCase;
 
@@ -75,6 +77,8 @@ final class AvatarExtensionTest extends TestCase
         $parameters = $this->createMock(CoreParametersHelper::class);
         $parameters->method('get')->with('site_url')->willReturn($siteUrl);
 
-        return new AvatarExtension($parameters);
+        $assets = (new \ReflectionClass(AssetsHelper::class))->newInstanceWithoutConstructor();
+
+        return new AvatarExtension($parameters, new DefaultAvatarHelper($assets));
     }
 }

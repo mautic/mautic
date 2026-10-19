@@ -8,18 +8,18 @@ use Composer\InstalledVersions;
 use DiceBear\Avatar;
 use DiceBear\Style;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
 use Psr\Log\LoggerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 final class AvatarExtension extends AbstractExtension
 {
-    private const FALLBACK_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiNlMGUwZTAiLz48L3N2Zz4=';
-
     private ?Style $style = null;
 
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly DefaultAvatarHelper $defaultAvatarHelper,
         private readonly ?LoggerInterface $logger = null,
     ) {
     }
@@ -34,7 +34,7 @@ final class AvatarExtension extends AbstractExtension
         $style = $this->loadStyle();
 
         if (null === $style) {
-            return self::FALLBACK_IMAGE;
+            return $this->defaultAvatarHelper->getDefaultAvatar(true);
         }
 
         $siteUrl = rtrim((string) $this->coreParametersHelper->get('site_url'), '/');
