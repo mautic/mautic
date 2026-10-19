@@ -60,46 +60,27 @@
                     <div class="col-sm-12" style="font-weight: 600;">{{ 'mautic.campaign.form.type.interval_trigger_restricted_dow'|trans }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3">
-                        {% do form['triggerRestrictedDaysOfWeek'][0].setRendered() %}
-                        {% include '@MauticCore/Components/checkbox.html.twig' with {
-    items: [{ id: form['triggerRestrictedDaysOfWeek'][0].vars.id, name: form['triggerRestrictedDaysOfWeek'][0].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][0].vars.value, checked: form['triggerRestrictedDaysOfWeek'][0].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][0].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][0].vars.label, attributes: form['triggerRestrictedDaysOfWeek'][0].vars.attr }]
-} %}
-                        {% do form['triggerRestrictedDaysOfWeek'][1].setRendered() %}
-                        {% include '@MauticCore/Components/checkbox.html.twig' with {
-    items: [{ id: form['triggerRestrictedDaysOfWeek'][1].vars.id, name: form['triggerRestrictedDaysOfWeek'][1].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][1].vars.value, checked: form['triggerRestrictedDaysOfWeek'][1].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][1].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][1].vars.label, attributes: form['triggerRestrictedDaysOfWeek'][1].vars.attr }]
-} %}
-                    </div>
-                    <div class="col-sm-3">
-                        {% do form['triggerRestrictedDaysOfWeek'][2].setRendered() %}
-                        {% include '@MauticCore/Components/checkbox.html.twig' with {
-    items: [{ id: form['triggerRestrictedDaysOfWeek'][2].vars.id, name: form['triggerRestrictedDaysOfWeek'][2].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][2].vars.value, checked: form['triggerRestrictedDaysOfWeek'][2].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][2].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][2].vars.label, attributes: form['triggerRestrictedDaysOfWeek'][2].vars.attr }]
-} %}
-                        {% do form['triggerRestrictedDaysOfWeek'][3].setRendered() %}
-                        {% include '@MauticCore/Components/checkbox.html.twig' with {
-    items: [{ id: form['triggerRestrictedDaysOfWeek'][3].vars.id, name: form['triggerRestrictedDaysOfWeek'][3].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][3].vars.value, checked: form['triggerRestrictedDaysOfWeek'][3].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][3].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][3].vars.label, attributes: form['triggerRestrictedDaysOfWeek'][3].vars.attr }]
-} %}
-                    </div>
-                    <div class="col-sm-3">
-                        {% do form['triggerRestrictedDaysOfWeek'][4].setRendered() %}
-                        {% include '@MauticCore/Components/checkbox.html.twig' with {
-    items: [{ id: form['triggerRestrictedDaysOfWeek'][4].vars.id, name: form['triggerRestrictedDaysOfWeek'][4].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][4].vars.value, checked: form['triggerRestrictedDaysOfWeek'][4].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][4].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][4].vars.label, attributes: form['triggerRestrictedDaysOfWeek'][4].vars.attr }]
-} %}
-                        {% do form['triggerRestrictedDaysOfWeek'][5].setRendered() %}
-                        {% include '@MauticCore/Components/checkbox.html.twig' with {
-    items: [{ id: form['triggerRestrictedDaysOfWeek'][5].vars.id, name: form['triggerRestrictedDaysOfWeek'][5].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][5].vars.value, checked: form['triggerRestrictedDaysOfWeek'][5].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][5].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][5].vars.label, attributes: form['triggerRestrictedDaysOfWeek'][5].vars.attr }]
-} %}
-                    </div>
-                    <div class="col-sm-3">
-                        {% do form['triggerRestrictedDaysOfWeek'][6].setRendered() %}
-                        {% include '@MauticCore/Components/checkbox.html.twig' with {
-    items: [{ id: form['triggerRestrictedDaysOfWeek'][6].vars.id, name: form['triggerRestrictedDaysOfWeek'][6].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][6].vars.value, checked: form['triggerRestrictedDaysOfWeek'][6].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][6].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][6].vars.label, attributes: form['triggerRestrictedDaysOfWeek'][6].vars.attr }]
-} %}
-                        {% do form['triggerRestrictedDaysOfWeek'][7].setRendered() %}
-                        {% include '@MauticCore/Components/checkbox.html.twig' with {
-    items: [{ id: form['triggerRestrictedDaysOfWeek'][7].vars.id, name: form['triggerRestrictedDaysOfWeek'][7].vars.full_name, value: form['triggerRestrictedDaysOfWeek'][7].vars.value, checked: form['triggerRestrictedDaysOfWeek'][7].vars.checked, disabled: form['triggerRestrictedDaysOfWeek'][7].vars.disabled, label: form['triggerRestrictedDaysOfWeek'][7].vars.label, attributes: form['triggerRestrictedDaysOfWeek'][7].vars.attr }]
-} %}
-                    </div>
+                    {% for start in [0, 2, 4, 6] %}
+                        <div class="col-sm-3">
+                            {% for day in form['triggerRestrictedDaysOfWeek']|slice(start, 2) %}
+                                {% do day.setRendered() %}
+                                {% include '@MauticCore/Components/checkbox.html.twig' with {
+                                    items: [{
+                                        id: day.vars.id,
+                                        name: day.vars.full_name,
+                                        value: day.vars.value,
+                                        checked: day.vars.checked,
+                                        disabled: day.vars.disabled,
+                                        label: day.vars.label,
+                                        label_html: day.vars.label_html,
+                                        translation_domain: day.vars.translation_domain,
+                                        label_translation_parameters: day.vars.label_translation_parameters,
+                                        attributes: day.vars.attr
+                                    }]
+                                } %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>

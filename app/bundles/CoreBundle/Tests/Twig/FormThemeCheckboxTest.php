@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormRendererInterface;
@@ -20,13 +21,13 @@ use Twig\TwigFilter;
 
 final class FormThemeCheckboxTest extends TestCase
 {
-    public function testRequiredChoiceGroupDoesNotMarkEachCheckboxRequired(): void
+    public function testRequiredChoiceGroupAndCheckboxRequiredStateAreRenderedCorrectly(): void
     {
         $views  = dirname(__DIR__, 2).'/Resources/views';
         $loader = new FilesystemLoader([dirname(__DIR__, 5).'/vendor/symfony/twig-bridge/Resources/views/Form']);
         $loader->addPath($views, 'MauticCore');
         $twig = new Environment(new ChainLoader([
-            new ArrayLoader(['page.html.twig' => '{% form_theme form "FormTheme/mautic_form_layout.html.twig" %}{{ form_row(form.choices) }}']),
+            new ArrayLoader(['page.html.twig' => '{% form_theme form "FormTheme/mautic_form_layout.html.twig" %}{{ form_row(form.choices) }}{{ form_row(form.enabled) }}']),
             new FilesystemLoader([$views]),
             $loader,
         ]));
@@ -61,12 +62,28 @@ final class FormThemeCheckboxTest extends TestCase
                 'multiple' => true,
                 'required' => true,
             ])
+            ->add('enabled', CheckboxType::class, ['required' => true])
             ->getForm()
             ->createView();
 
         $output = $twig->render('page.html.twig', ['form' => $form]);
 
-        $this->assertSame(2, substr_count($output, 'type="checkbox"'));
-        $this->assertSame(0, preg_match_all('/<input[^>]*\brequired\b/', $output));
+        $this->assertSame(3, substr_count($output, 'type="checkbox"'));
+
+        $inputFragments = array_slice(explode('<input', $output), 1);
+        $inputs         = array_filter(array_map(
+            static fn (string $fragment): string => substr($fragment, 0, strpos($fragment, '>') ?: strlen($fragment)),
+            $inputFragments
+        ));
+        $choiceInputs = array_filter($inputs, static fn (string $input): bool => str_contains($input, 'id="f_choices_'));
+        $requiredChoiceInputs = array_filter($choiceInputs, static fn (string $input): bool => str_contains($input, ' required'));
+        $requiredCheckboxes = array_filter(
+            $inputs,
+            static fn (string $input): bool => str_contains($input, 'id="f_enabled"') && str_contains($input, ' required')
+        );
+
+        $this->assertCount(2, $choiceInputs);
+        $this->assertCount(0, $requiredChoiceInputs);
+        $this->assertCount(1, $requiredCheckboxes);
     }
 }

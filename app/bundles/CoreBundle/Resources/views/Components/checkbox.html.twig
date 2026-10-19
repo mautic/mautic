@@ -9,7 +9,7 @@
 {% set base_id = (name ?: 'checkbox')|replace({'[': '-', ']': '', ' ': '-', '.': '-'}) %}
 {% set help_id = helpText ? base_id ~ '-help' : null %}
 
-<fieldset class="{{ [wrapperClass, 'border-0', 'p-0', 'm-0']|filter(value => value is not empty)|join(' ') }}" style="min-width: 0; border: 0; padding: 0; margin: 0;">
+<fieldset class="{{ [wrapperClass, 'border-0', 'p-0', 'm-0']|filter(value => value is not empty)|join(' ')|escape('html_attr') }}" style="min-width: 0; border: 0; padding: 0; margin: 0;">
     {% if legend %}
         <legend class="form-label mb-2">{{ legend|trans }}</legend>
     {% endif %}
@@ -30,7 +30,7 @@
             {% set classes = classes|merge(['form-check-reverse']) %}
         {% endif %}
 
-        <div class="{{ classes|join(' ') }}">
+        <div class="{{ classes|join(' ')|escape('html_attr') }}">
             {% set input_classes = ['form-check-input'] %}
             {% if item.className|default('') %}
                 {% set input_classes = input_classes|merge([item.className]) %}
@@ -39,31 +39,31 @@
                 {% set input_classes = input_classes|merge([item_attributes.class]) %}
             {% endif %}
             <input
-                class="{{ input_classes|join(' ')|escape }}"
+                class="{{ input_classes|join(' ')|escape('html_attr') }}"
                 type="checkbox"
-                {% if item_name %}name="{{ item_name|escape }}"{% endif %}
-                id="{{ item_id|escape }}"
-                value="{{ item_value|escape }}"
-                {% if help_id %}aria-describedby="{{ help_id|escape }}"{% endif %}
+                {% if item_name %}name="{{ item_name|escape('html_attr') }}"{% endif %}
+                id="{{ item_id|escape('html_attr') }}"
+                value="{{ item_value|escape('html_attr') }}"
+                {% if help_id %}aria-describedby="{{ help_id|escape('html_attr') }}"{% endif %}
                 {% if item.checked|default(false) %}checked{% endif %}
                 {% if item.disabled|default(false) %}disabled{% endif %}
                 {% if required %}required{% endif %}
                 {% for attr_key, attr_value in item_attributes %}
                     {% if attr_key != 'class' and attr_value is not same as(false) and attr_value is not null %}
-                    {{ attr_key|escape }}="{{ attr_value|escape }}"
+                        {{ attr_key|escape('html_attr') }}{% if attr_value is not same as(true) %}="{{ attr_value|escape('html_attr') }}"{% endif %}
                     {% endif %}
                 {% endfor %}
             >
             {% if item_label is not same as('') %}
-            <label class="form-check-label" for="{{ item_id|escape }}"{% for label_key, label_value in item.labelAttributes|default({}) %} {{ label_key|escape }}="{{ label_value|escape }}"{% endfor %}>
+            <label class="form-check-label" for="{{ item_id|escape('html_attr') }}"{% for label_key, label_value in item.labelAttributes|default({}) %} {{ label_key|escape('html_attr') }}="{{ label_value|escape('html_attr') }}"{% endfor %}>
                 {% set item_text = item_label|trans(item.label_translation_parameters|default({}), item.translation_domain is defined ? item.translation_domain : null) %}
-                {% if item.label_html|default(false) %}{{ item_text|purify }}{% else %}{{ item_text }}{% endif %}
+                {% if item.label_html|default(false) %}{{ item_text|purify }}{% else %}{{ item_text|escape('html') }}{% endif %}
             </label>
             {% endif %}
         </div>
     {% endfor %}
 
     {% if helpText %}
-        <div id="{{ help_id }}" class="form-text">{{ helpText|trans }}</div>
+        <div id="{{ help_id|escape('html_attr') }}" class="form-text">{{ helpText|trans }}</div>
     {% endif %}
 </fieldset>

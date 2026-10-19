@@ -46,7 +46,7 @@ final class CheckboxComponentTest extends TestCase
         ]);
 
         $this->assertSame(0, substr_count($output, ' required'));
-        $this->assertSame(2, substr_count($output, 'name="events[]"'));
+        $this->assertSame(2, substr_count($output, 'name="events'));
     }
 
     public function testRequiredGroupMarksEveryInput(): void
@@ -60,7 +60,7 @@ final class CheckboxComponentTest extends TestCase
             ],
         ]);
 
-        $this->assertSame(2, substr_count($output, 'required'));
+        $this->assertSame(2, substr_count($output, ' required'));
     }
 
     public function testLabelZeroIsRendered(): void
@@ -97,7 +97,7 @@ final class CheckboxComponentTest extends TestCase
         $this->assertStringContainsString('&quot;&gt;&lt;script&gt;', $output);
     }
 
-    public function testItemAttributesArePassedAndClassIsMerged(): void
+    public function testItemAttributesAreEscapedAndClassIsMerged(): void
     {
         $output = $this->render([
             'items' => [[
@@ -105,12 +105,22 @@ final class CheckboxComponentTest extends TestCase
                 'value'      => '1',
                 'label'      => 'Attr',
                 'className'  => 'list-checkbox',
-                'attributes' => ['class' => 'extra-class', 'data-toggle' => 'selectrow', 'onclick' => false, 'data-x' => null],
+                'attributes' => [
+                    'class'       => 'extra-class',
+                    'data-toggle' => 'selectrow',
+                    'data-note'   => '"><script>alert(1)</script>',
+                    'required'    => true,
+                    'onclick'     => false,
+                    'data-x'     => null,
+                ],
             ]],
         ]);
 
-        $this->assertStringContainsString('class="form-check-input list-checkbox extra-class"', $output);
+        $this->assertStringContainsString('class="form-check-input&#x20;list-checkbox&#x20;extra-class"', $output);
         $this->assertStringContainsString('data-toggle="selectrow"', $output);
+        $this->assertStringContainsString('data-note="&quot;&gt;&lt;script&gt;', $output);
+        $this->assertStringContainsString(' required', $output);
+        $this->assertStringNotContainsString('required="1"', $output);
         $this->assertStringNotContainsString('onclick', $output);
         $this->assertStringNotContainsString('data-x', $output);
     }
