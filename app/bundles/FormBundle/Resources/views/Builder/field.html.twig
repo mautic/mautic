@@ -21,7 +21,7 @@
 {% set validation = form.validation is defined ? form.validation : null %}
 
 {% set showAttributes = (form.labelAttributes is defined or form.inputAttributes is defined or form.containerAttributes is defined or properties.labelAttributes is defined or form.alias is defined) %}
-{% set showBehavior = (form.showWhenValueExists is defined or properties.showWhenValueExists is defined) %}
+{% set showBehavior = (form.showWhenValueExists is defined or form.isAutoFill is defined or form.isReadOnly is defined or properties.showWhenValueExists is defined) %}
 {% set showConditions = form.parent is defined ? form.parent.vars.value : null %}
 
 {% set placeholder = '' %}

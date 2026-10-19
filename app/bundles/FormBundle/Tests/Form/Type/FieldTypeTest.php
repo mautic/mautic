@@ -13,7 +13,10 @@ use Mautic\FormBundle\Collector\ObjectCollectorInterface;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
 use Mautic\FormBundle\Form\Type\FieldType;
+use Mautic\FormBundle\Form\Type\FormFieldConditionType;
 use Mautic\FormBundle\Form\Type\FormFieldRatingType;
+use Mautic\FormBundle\Helper\PropertiesAccessor;
+use Mautic\FormBundle\Model\FieldModel;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;
@@ -57,6 +60,11 @@ final class FieldTypeTest extends TypeTestCase
      */
     protected function getExtensions(): array
     {
+        $coreParametersHelper = $this->createStub(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')->willReturnCallback(
+            static fn (string $key, mixed $default): mixed => 'form_field_autofill' === $key ? true : $default
+        );
+
         return [
             new ValidatorExtension(Validation::createValidator()),
             new PreloadedExtension([
@@ -65,7 +73,11 @@ final class FieldTypeTest extends TypeTestCase
                     $this->objectCollector,
                     $this->fieldCollector,
                     $this->createStub(AlreadyMappedFieldCollectorInterface::class),
-                    $this->createStub(CoreParametersHelper::class)
+                    $coreParametersHelper
+                ),
+                FormFieldConditionType::class => new FormFieldConditionType(
+                    $this->createStub(FieldModel::class),
+                    $this->createStub(PropertiesAccessor::class),
                 ),
                 FormFieldRatingType::class => new FormFieldRatingType($this->createStub(TranslatorInterface::class)),
             ], []),
@@ -155,5 +167,42 @@ final class FieldTypeTest extends TypeTestCase
         $this->assertSame('◆', $form->get('properties')->get('symbol')->getData());
         $this->assertSame('#112233', $form->get('properties')->get('star_color')->getData());
         $this->assertSame('#ddeeff', $form->get('properties')->get('base_color')->getData());
+    }
+
+    public function testConditionalFieldHasAutoFillBehaviorWithoutProgressiveProfiling(): void
+    {
+        $formData = [
+            'type'       => 'text',
+            'formId'     => 1,
+            'parent'     => '10',
+            'conditions' => [],
+            'isAutoFill' => true,
+            'isReadOnly' => true,
+        ];
+
+        $form = $this->factory->create(FieldType::class, $formData);
+
+        $this->assertTrue($form->has('conditions'));
+        $this->assertTrue($form->has('isAutoFill'));
+        $this->assertTrue($form->has('isReadOnly'));
+        $this->assertTrue($form->get('isAutoFill')->getData());
+        $this->assertTrue($form->get('isReadOnly')->getData());
+        $this->assertFalse($form->has('alwaysDisplay'));
+        $this->assertFalse($form->has('showWhenValueExists'));
+        $this->assertFalse($form->has('showAfterXSubmissions'));
+    }
+
+    public function testTopLevelFieldKeepsAllBehaviorFields(): void
+    {
+        $form = $this->factory->create(FieldType::class, [
+            'type'   => 'text',
+            'formId' => 1,
+        ]);
+
+        $this->assertTrue($form->has('alwaysDisplay'));
+        $this->assertTrue($form->has('showWhenValueExists'));
+        $this->assertTrue($form->has('showAfterXSubmissions'));
+        $this->assertTrue($form->has('isAutoFill'));
+        $this->assertTrue($form->has('isReadOnly'));
     }
 }
