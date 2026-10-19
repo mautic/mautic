@@ -141,7 +141,7 @@ class FormModel extends AbstractCommonModel
      *
      * @param iterable<TEntity> $entities
      */
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize             = 20;
@@ -384,6 +384,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Dispatches events for child classes.
      *
+     * @param TEntity $entity
      * @param string $action
      */
     protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event

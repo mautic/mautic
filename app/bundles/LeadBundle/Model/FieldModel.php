@@ -653,15 +653,13 @@ class FieldModel extends FormModel
     /**
      * Build schema for each entity.
      *
-     * @param array $entities
-     *
      * @throws AbortColumnCreateException
      * @throws Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         foreach ($entities as $entity) {
             $this->saveEntity($entity, $unlock);

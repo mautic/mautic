@@ -72,13 +72,8 @@ parameters:
                 - phpunit.noMockObjectAndRealObjectProperty
                 - method.notFound
                 - symplify.forbiddenFuncCall
-#                - symplify.forbiddenArrayMethodCall
                 - symplify.forbiddenStaticClassConstFetch
-#                - symplify.newOverSetters
-#                - symplify.noArrayMapWithArrayCallable
-#                - symfony.noListenerWithoutContract
                 - symfony.noFindTaggedServiceIdsCall
-<<<<<<< HEAD
 
         # registered manually
         -
@@ -95,8 +90,6 @@ parameters:
             paths:
                 - app/bundles/EmailBundle/EventListener/PointSubscriber.php
                 - app/bundles/PageBundle/EventListener/PointSubscriber.php
-=======
->>>>>>> d9e47b50b5 (Add PHPStan rule requiring $entity param to have a type)
 
         # type-perfect no_mixed_caller: rule enabled, violations typed incrementally; ignored wholesale for now
         -

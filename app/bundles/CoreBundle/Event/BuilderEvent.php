@@ -6,6 +6,9 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @template TEntity of object
+ */
 class BuilderEvent extends Event
 {
     protected $tokens               = [];
@@ -20,6 +23,7 @@ class BuilderEvent extends Event
     protected string $tokenFilterTarget;
 
     /**
+     * @param TEntity|null $entity
      * @param string|string[] $requested
      */
     public function __construct(

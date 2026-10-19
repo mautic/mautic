@@ -101,10 +101,8 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
 
     /**
      * Save an array of entities.
-     *
-     * @param iterable<Sms> $entities
      */
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;

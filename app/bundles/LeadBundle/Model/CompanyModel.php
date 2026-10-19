@@ -101,10 +101,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
     /**
      * Save an array of entities.
-     *
-     * @param array $entities
      */
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         // Update leads primary company name
         foreach ($entities as $entity) {

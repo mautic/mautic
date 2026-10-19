@@ -65,7 +65,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
         return 'notification:notifications';
     }
 
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
