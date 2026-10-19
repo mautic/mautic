@@ -87,8 +87,8 @@ final class FormActionFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // email send to contact
-        /** @var EmailModel $emailModel */
-        $emailModel = self::getContainer()->get('mautic.email.model.email');
+        $emailModel = self::getContainer()->get(EmailModel::class);
+        \assert($emailModel instanceof EmailModel);
         $emailModel->sendEmail($emailToSendForm, [[
             'id'           => $lead->getId(),
             'email'        => $lead->getEmail(),
@@ -108,6 +108,7 @@ final class FormActionFunctionalTest extends MauticMysqlTestCase
                 'lead'  => $lead->getId(),
             ]
         );
+        $this->assertInstanceOf(Stat::class, $emailStat);
 
         // fetch email body
         $crawler = $this->client->request(Request::METHOD_GET, "/email/view/{$emailStat->getTrackingHash()}");
@@ -135,7 +136,7 @@ final class FormActionFunctionalTest extends MauticMysqlTestCase
         );
 
         // as contact is unsubscribed so no email after form submit
-        $this->assertEmpty($emailStat);
+        $this->assertNotInstanceOf(Stat::class, $emailStat);
     }
 
     private function createLandingPage(string $title, string $alias, string $html): Page
