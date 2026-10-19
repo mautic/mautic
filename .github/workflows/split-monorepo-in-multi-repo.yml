@@ -92,6 +92,9 @@ jobs:
                     - theme-mono
                     - theme-capture
                     - theme-multi-step
+                # GrapesJS tags are published by publish-grapesjs-package.yml. Tag deletions still sync here.
+                exclude:
+                    - config: ${{ github.event_name == 'create' && github.ref_type == 'tag' && 'plugin-grapesjs' || '' }}
 
         name: Sync commits into mautic/${{ matrix.config }}
         steps:
