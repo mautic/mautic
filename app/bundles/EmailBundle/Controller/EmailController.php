@@ -1394,7 +1394,7 @@ final class EmailController extends FormController
                 'objectAction' => 'view',
                 'objectId'     => $objectId,
             ];
-            $postActionVars['returnUrl']       = $this->generateUrl('mautic_page_action', $postActionVars['viewParameters']);
+            $postActionVars['returnUrl']       = $this->generateUrl('mautic_email_action', $postActionVars['viewParameters']);
             $postActionVars['contentTemplate'] = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
         } // else don't do anything
 
