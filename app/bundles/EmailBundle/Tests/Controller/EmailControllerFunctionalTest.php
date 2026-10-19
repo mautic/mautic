@@ -32,6 +32,7 @@ use function Symfony\Component\Clock\now;
 
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterInterface;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -844,8 +845,13 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testManualWinnerActionIsAvailableForPublishedStartedVariant(): void
     {
         [$parent, $variant] = $this->createManualWinnerEmailPair(true, true);
-        $winnerUrl          = self::getContainer()->get('router')->generate('mautic_email_action', [
+        $router             = self::getContainer()->get(RouterInterface::class);
+        $winnerUrl          = $router->generate('mautic_email_action', [
             'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+        $viewUrl            = $router->generate('mautic_email_action', [
+            'objectAction' => 'view',
             'objectId'     => $variant->getId(),
         ]);
 
@@ -854,7 +860,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
 
         $this->client->request(Request::METHOD_POST, $winnerUrl);
-        $this->assertSame($winnerUrl, $this->client->getResponse()->getTargetUrl());
+        $this->assertResponseRedirects($viewUrl);
 
         $this->em->clear();
         $winner = $this->em->find(Email::class, $variant->getId());
@@ -871,7 +877,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testManualWinnerActionIsUnavailableForUnpublishedVariant(): void
     {
         [$parent, $variant] = $this->createManualWinnerEmailPair(false, true);
-        $winnerUrl          = self::getContainer()->get('router')->generate('mautic_email_action', [
+        $winnerUrl          = self::getContainer()->get(RouterInterface::class)->generate('mautic_email_action', [
             'objectAction' => 'winner',
             'objectId'     => $variant->getId(),
         ]);
@@ -884,7 +890,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testManualWinnerActionIsUnavailableBeforeAbTestStarts(): void
     {
         [$parent, $variant] = $this->createManualWinnerEmailPair(true, false);
-        $winnerUrl          = self::getContainer()->get('router')->generate('mautic_email_action', [
+        $winnerUrl          = self::getContainer()->get(RouterInterface::class)->generate('mautic_email_action', [
             'objectAction' => 'winner',
             'objectId'     => $variant->getId(),
         ]);
