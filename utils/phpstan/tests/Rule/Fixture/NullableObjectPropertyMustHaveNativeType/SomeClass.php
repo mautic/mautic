@@ -47,6 +47,26 @@ final class SomeClass
      * @var ?IpAddress
      */
     private $prefixNullable;
+
+    /**
+     * @var class-string|null
+     */
+    private $skipClassStringPseudoType;
+
+    /**
+     * @var positive-int|null
+     */
+    private $skipPositiveIntPseudoType;
+
+    /**
+     * @var non-empty-string|null
+     */
+    private $skipNonEmptyStringPseudoType;
+
+    /**
+     * @var $this|null
+     */
+    private $skipThisPseudoType;
 }
 
 final class IpAddress

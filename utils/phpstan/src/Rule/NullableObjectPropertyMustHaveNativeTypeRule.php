@@ -145,6 +145,11 @@ final class NullableObjectPropertyMustHaveNativeTypeRule implements Rule
             return null;
         }
 
+        // PHPStan pseudo-types ("class-string", "positive-int", "$this", ...) are not native class names
+        if (!preg_match('/^\\\\?[A-Za-z_]\w*(\\\\[A-Za-z_]\w*)*$/', $core)) {
+            return null;
+        }
+
         if (in_array($bare, $templateNames, true)) {
             return null;
         }
