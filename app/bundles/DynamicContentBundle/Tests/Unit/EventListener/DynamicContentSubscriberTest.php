@@ -156,23 +156,20 @@ HTML;
             ->method('getContact')
             ->willReturn($contact);
 
+        // No {dwc=...} tokens in this content, so findDwcTokens returns empty
+        $this->dynamicContentHelper->expects($this->once())
+            ->method('findDwcTokens')
+            ->with($content, $contact, $event)
+            ->willReturn([]);
+
         $this->dynamicContentHelper->expects($this->once())
             ->method('getDynamicContentForLead')
             ->willReturn($dwcContent);
 
-        $this->dynamicContentHelper->expects($this->once())
-            ->method('replaceDWCTokenToHtmlTag')
-            ->willReturn($content);
-        $matcher = $this->exactly(2);
-        $event->expects($matcher)
-            ->method('setContent')->willReturnCallback(function (...$parameters) use ($matcher, $content, $expected): void {
-                if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertSame($content, $parameters[0]);
-                }
-                if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame($expected, $parameters[0]);
-                }
-            });
+        $event->expects($this->once())
+            ->method('setContent')
+            ->with($expected);
+
         $this->subscriber->decodeTokens($event);
     }
 

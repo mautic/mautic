@@ -13,7 +13,6 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -26,16 +25,19 @@ class DynamicContentHelper
 
     public const DYNAMIC_WEB_CONTENT_REGEX = '/{dwc=(.*?)}/';
 
-    public const DWC_WITH_OPTIONAL_DEFAULT_CONTENT = '/\{dwc=([^\{\}=]+)\}(.*?)\{\/dwc\}/s';
+    /**
+     * Matches {dwc=slotname}default content{/dwc} pattern.
+     * The default content cannot contain another {dwc= token to avoid greedy matching across the page.
+     */
+    public const DWC_WITH_OPTIONAL_DEFAULT_CONTENT = '/\{dwc=([^\{\}=]+)\}((?:(?!\{dwc=).)*?)\{\/dwc\}/s';
 
     public function __construct(
         protected DynamicContentModel $dynamicContentModel,
         protected RealTimeExecutioner $realTimeExecutioner,
         protected EventDispatcherInterface $dispatcher,
         protected LeadModel $leadModel,
-        private LeadListRepository $segmentRepository,
-        private CompanyLeadRepository $companyLeadRepository,
-        private TagRepository $tagRepository,
+        private readonly CompanyLeadRepository $companyLeadRepository,
+        private readonly TagRepository $tagRepository,
     ) {
     }
 
@@ -116,6 +118,108 @@ class DynamicContentHelper
         }
 
         return $dwcListBySlotName;
+    }
+
+    /**
+     * Find all {dwc=...} tokens in content and return their content for the given lead.
+     *
+     * @param Lead|array<mixed>|null $lead
+     *
+     * @return array<string, array{content: string, filters: array<mixed>}>
+     */
+    public function findDwcTokens(string $content, Lead|array|null $lead, ?PageDisplayEvent $event = null): array
+    {
+        $tokens = [];
+
+        // First, match tokens with closing tag and default content: {dwc=slotname}default{/dwc}
+        preg_match_all(self::DWC_WITH_OPTIONAL_DEFAULT_CONTENT, $content, $matchesWithDefault, PREG_SET_ORDER);
+        foreach ($matchesWithDefault as $match) {
+            $fullToken      = $match[0];
+            $slotName       = $match[1];
+            $defaultContent = $match[2];
+
+            if (isset($tokens[$fullToken])) {
+                continue;
+            }
+
+            $tokens[$fullToken] = $this->getDwcContentForToken($slotName, $lead, $event, $defaultContent);
+        }
+
+        // Then, match simple tokens without closing tag: {dwc=slotname}
+        // But exclude those already matched (part of {dwc=...}{/dwc} pattern)
+        preg_match_all(self::DYNAMIC_WEB_CONTENT_REGEX, $content, $matchesSimple, PREG_SET_ORDER);
+        foreach ($matchesSimple as $match) {
+            $fullToken = $match[0];
+            $slotName  = $match[1];
+
+            // Skip if this token is part of a {dwc=...}{/dwc} pattern (already processed)
+            if (isset($tokens[$fullToken]) || $this->isPartOfClosingTagPattern($content, $fullToken)) {
+                continue;
+            }
+
+            $tokens[$fullToken] = $this->getDwcContentForToken($slotName, $lead, $event, '');
+        }
+
+        return $tokens;
+    }
+
+    /**
+     * Check if a simple {dwc=...} token is part of a {dwc=...}{/dwc} pattern.
+     */
+    private function isPartOfClosingTagPattern(string $content, string $token): bool
+    {
+        // Find position of the token
+        $pos = strpos($content, $token);
+        if (false === $pos) {
+            return false;
+        }
+
+        // Check if there's a closing {/dwc} after this token
+        $afterToken = substr($content, $pos + strlen($token));
+
+        return (bool) preg_match('/^[^{]*\{\/dwc\}/', $afterToken);
+    }
+
+    /**
+     * Get DWC content for a specific token/slot.
+     *
+     * @param Lead|array<mixed>|null $lead
+     *
+     * @return array{content: string, filters: array<mixed>}
+     */
+    private function getDwcContentForToken(string $slotName, Lead|array|null $lead, ?PageDisplayEvent $event, string $defaultContent): array
+    {
+        $dwcs = $this->getDwcsBySlotName($slotName, true);
+
+        $leadArray = [];
+        if ($lead instanceof Lead) {
+            $leadArray = $this->convertLeadToArray($lead);
+        } elseif (is_array($lead)) {
+            $leadArray = $lead;
+        }
+
+        /** @var DynamicContent $dwc */
+        foreach ($dwcs as $dwc) {
+            if ($dwc->getIsCampaignBased()) {
+                continue;
+            }
+
+            // Enrich lead array with company data if this DWC has company filters
+            $leadWithCompanies = $this->loadLeadPrimaryCompanyIfNeeded($leadArray, [$dwc->getSlotName() ?? '' => [$dwc]]);
+
+            if ($lead && $this->filtersMatchContact($dwc->getFilters(), $leadWithCompanies)) {
+                return [
+                    'content' => $this->getRealDynamicContent($lead, $dwc, $event),
+                    'filters' => $dwc->getFilters(),
+                ];
+            }
+        }
+
+        // No matching DWC found, return default content
+        return [
+            'content' => $defaultContent,
+            'filters' => [],
+        ];
     }
 
     /**
@@ -352,33 +456,6 @@ class DynamicContentHelper
                 }
             }
         }
-    }
-
-    public function replaceDWCTokenToHtmlTag(string $content): string
-    {
-        // First, replace tokens with default content and closing tag: {dwc=slotname}default{/dwc}
-        // Preserve default content inside the div for fallback
-        $content = preg_replace_callback(
-            self::DWC_WITH_OPTIONAL_DEFAULT_CONTENT,
-            function (array $matches): string {
-                $slotName       = htmlspecialchars($matches[1], ENT_QUOTES);
-                $defaultContent = $matches[2];
-
-                return '<div data-slot="dwc" data-param-slot-name="'.$slotName.'">'.$defaultContent.'</div>';
-            },
-            $content
-        );
-
-        // Then, replace simple tokens without closing tag: {dwc=slotname}
-        return preg_replace_callback(
-            self::DYNAMIC_WEB_CONTENT_REGEX,
-            function (array $matches): string {
-                $slotName = htmlspecialchars($matches[1], ENT_QUOTES);
-
-                return '<div data-slot="dwc" data-param-slot-name="'.$slotName.'"></div>';
-            },
-            $content
-        );
     }
 
     /**

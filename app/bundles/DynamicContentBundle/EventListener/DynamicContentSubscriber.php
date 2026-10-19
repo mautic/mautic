@@ -213,14 +213,27 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
             return;
         }
 
-        $content = $this->dynamicContentHelper->replaceDWCTokenToHtmlTag($content);
-        $event->setContent($content);
-
         if (!$lead = $event->getLead()) {
             $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
         }
 
+        // Step 1: Replace {dwc=...} tokens directly with their content
+        $dwcTokens = $this->dynamicContentHelper->findDwcTokens($content, $lead, $event);
+        if (!empty($dwcTokens)) {
+            $content = $this->replaceDwcTokensInContent($content, $dwcTokens);
+        }
+
         if (!$lead) {
+            $event->setContent($content);
+
+            return;
+        }
+
+        // Step 2: Process HTML data-slot="dwc" elements (for builder-inserted slots)
+        // Only use DOM processing if there are data-slot="dwc" elements
+        if (!str_contains($content, 'data-slot="dwc"')) {
+            $event->setContent($content);
+
             return;
         }
 
@@ -255,6 +268,36 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
         $event->setContent($content);
     }
 
+    /**
+     * Replace {dwc=...} tokens in content, handling href/src attributes specially.
+     *
+     * @param array<string, array{content: string, filters: array<mixed>}> $dwcTokens
+     */
+    private function replaceDwcTokensInContent(string $content, array $dwcTokens): string
+    {
+        foreach ($dwcTokens as $token => $data) {
+            $dwcContent = $data['content'];
+
+            // For href/src: strip HTML tags and decode entities, then escape for attribute context
+            $plainContent = strip_tags($dwcContent);
+            $plainContent = html_entity_decode($plainContent, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $escapedContent = htmlspecialchars($plainContent, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+            // Replace tokens ANYWHERE inside href/src attribute values with escaped plain text
+            // Pattern matches href="...{token}..." or src='...{token}...'
+            $content = preg_replace_callback(
+                '/((?:href|src)\s*=\s*)(["\'])([^"\']*'.preg_quote($token, '/').'[^"\']*)\2/i',
+                fn (array $matches): string => $matches[1].$matches[2].str_replace($token, $escapedContent, $matches[3]).$matches[2],
+                $content
+            );
+
+            // Replace remaining occurrences with full HTML content
+            $content = str_replace($token, $dwcContent, $content);
+        }
+
+        return $content;
+    }
+
     public function onEmailDisplay(EmailSendEvent $event): void
     {
         $event->setIsPreview(true);
@@ -282,15 +325,22 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
             $this->dynamicContentHelper->replaceTokensWithPlainText($event->getSubject(), $lead, $event)
         );
 
-        $content               = $this->dynamicContentHelper->replaceDWCTokenToHtmlTag($content);
-        $slotNames             = $this->dynamicContentHelper->findDwcSlotNameFromContent($content);
+        // Collect all slot names from both {dwc=...} tokens and HTML data-slot elements
+        $slotNamesFromTokens = $this->extractSlotNamesFromDwcTokens($content);
+        $slotNamesFromHtml   = $this->dynamicContentHelper->findDwcSlotNameFromContent($content);
+        $allSlotNames        = array_unique(array_merge($slotNamesFromTokens, $slotNamesFromHtml));
+
         $dwcSlotContentForLead = $this->dynamicContentHelper->getDwcTokensWithContent(
-            $slotNames,
+            $allSlotNames,
             $lead,
             $event
         );
 
+        // Step 1: Replace {dwc=...} tokens directly
         $index   = 1;
+        $content = $this->replaceEmailDwcTokens($content, $dwcSlotContentForLead, $event, $lead, $index);
+
+        // Step 2: Replace HTML data-slot="dwc" elements
         $content = preg_replace_callback(
             '/<([a-z0-9]+)[^>]*data-slot="dwc"[^>]*data-param-slot-name="([^"]+)"[^>]*>.*?<\/\1>/is',
             function (array $matches) use ($dwcSlotContentForLead, &$index, $event, $lead): string {
@@ -314,5 +364,83 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
         );
 
         $event->setContent($content);
+    }
+
+    /**
+     * Extract slot names from {dwc=...} tokens in content.
+     *
+     * @return array<string>
+     */
+    private function extractSlotNamesFromDwcTokens(string $content): array
+    {
+        $slotNames = [];
+
+        // Match {dwc=slotname}...{/dwc} pattern
+        preg_match_all(DynamicContentHelper::DWC_WITH_OPTIONAL_DEFAULT_CONTENT, $content, $matches);
+        if (!empty($matches[1])) {
+            $slotNames = array_merge($slotNames, $matches[1]);
+        }
+
+        // Match simple {dwc=slotname} pattern
+        preg_match_all(DynamicContentHelper::DYNAMIC_WEB_CONTENT_REGEX, $content, $matches);
+        if (!empty($matches[1])) {
+            $slotNames = array_merge($slotNames, $matches[1]);
+        }
+
+        return array_unique($slotNames);
+    }
+
+    /**
+     * Replace {dwc=...} tokens in email content.
+     *
+     * @param array<string, string> $dwcSlotContentForLead
+     * @param Lead|array<mixed>     $lead
+     */
+    private function replaceEmailDwcTokens(string $content, array $dwcSlotContentForLead, EmailSendEvent $event, Lead|array $lead, int &$index): string
+    {
+        // First, replace tokens with closing tag: {dwc=slotname}default{/dwc}
+        $content = preg_replace_callback(
+            DynamicContentHelper::DWC_WITH_OPTIONAL_DEFAULT_CONTENT,
+            function (array $matches) use ($dwcSlotContentForLead, &$index, $event, $lead): string {
+                $slotName       = $matches[1];
+                $defaultContent = $matches[2];
+                $token          = '{dwc_'.$slotName.'_'.$index.'}';
+                $slotContent    = $dwcSlotContentForLead[$slotName] ?? $defaultContent;
+
+                if (!empty($slotContent)) {
+                    $slotContent = $this->dynamicContentHelper->replaceTokenInsideDWCContent(
+                        $slotContent, $event, $lead
+                    );
+                }
+
+                $event->addToken($token, $slotContent);
+                ++$index;
+
+                return $token;
+            },
+            $content
+        );
+
+        // Then, replace simple tokens: {dwc=slotname}
+        return preg_replace_callback(
+            DynamicContentHelper::DYNAMIC_WEB_CONTENT_REGEX,
+            function (array $matches) use ($dwcSlotContentForLead, &$index, $event, $lead): string {
+                $slotName    = $matches[1];
+                $token       = '{dwc_'.$slotName.'_'.$index.'}';
+                $slotContent = $dwcSlotContentForLead[$slotName] ?? '';
+
+                if (!empty($slotContent)) {
+                    $slotContent = $this->dynamicContentHelper->replaceTokenInsideDWCContent(
+                        $slotContent, $event, $lead
+                    );
+                }
+
+                $event->addToken($token, $slotContent);
+                ++$index;
+
+                return $token;
+            },
+            $content
+        );
     }
 }
