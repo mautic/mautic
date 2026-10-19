@@ -45,8 +45,12 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
             'mappedField'  => 'email',
         ]);
 
+        // The visitor is sent back to the referer after submitting, so it points at the form page itself
+        $page    = "http://localhost/form/{$formId}";
+        $referer = $page.'?email=visitor%40example.com&utm_source=newsletter#form';
+
         $this->logoutUser();
-        $this->submitForm($formId, ['mauticform[email]' => 'visitor@example.com'], $server + ['REMOTE_ADDR' => '203.0.113.9']);
+        $this->submitForm($formId, ['mauticform[email]' => 'visitor@example.com'], $server + ['REMOTE_ADDR' => '203.0.113.9', 'HTTP_REFERER' => $referer]);
 
         $cookieJar = $this->client->getCookieJar();
         $this->assertSame($expectTracking, $cookieJar->get('mautic_device_id') instanceof Cookie);
@@ -59,6 +63,9 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame($expectTracking, null !== $submission->getIpAddress());
         $this->assertSame($expectTracking, null !== $submission->getTrackingId());
+
+        // The query string of the page can carry identifiers, so only the page address is kept for an untracked visitor
+        $this->assertSame($expectTracking ? $referer : $page, $submission->getReferer());
 
         // The submitted data is still saved to the contact
         $contact = $submission->getLead();

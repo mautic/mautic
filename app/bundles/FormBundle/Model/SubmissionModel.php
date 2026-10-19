@@ -151,6 +151,13 @@ final class SubmissionModel extends CommonFormModel
 
         // clean the referer by removing mauticError and mauticMessage
         $referer = InputHelper::url($referer, null, null, null, ['mauticError', 'mauticMessage']);
+
+        // An untracked submitter's referer keeps only the page address, because its query string can carry identifiers
+        if (!$trackSubmitter) {
+            [$referer] = explode('?', $referer, 2);
+            [$referer] = explode('#', $referer, 2);
+        }
+
         $submission->setReferer($referer);
 
         // Create an event to be dispatched through the processes
