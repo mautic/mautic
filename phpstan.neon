@@ -424,6 +424,7 @@ rules:
     - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
     - Utils\PHPStan\Rule\SingleArgumentDispatchRule
     - Utils\PHPStan\Rule\NativeUnionParamMustHaveUnionDocblockRule
+    - Utils\PHPStan\Rule\NoDuplicateParamDocblockRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver

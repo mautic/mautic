@@ -290,7 +290,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
 
             $this->emailRepository->saveEntity($entity, false);
 
-            $this->dispatchEvent('post_save', $entity, $isNew, $event);
+            if ($dispatchEvent) {
+                $this->dispatchEvent('post_save', $entity, $isNew, $event);
+            }
 
             if (0 === ++$i % $batchSize) {
                 $this->em->flush();

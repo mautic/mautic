@@ -51,10 +51,9 @@ final class FieldModel extends CommonFormModel
     }
 
     /**
-     * @param object|array<mixed> $entity
-     * @param string|null         $action
-     * @param array               $options
      * @param Field|array<string, mixed> $entity
+     * @param string|null                $action
+     * @param array                      $options
      *
      * @return FormInterface<mixed>
      */
