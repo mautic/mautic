@@ -119,7 +119,7 @@
 
 {% block content %}
 <div class="col-md-9">
-    <div class="marketplace-header {{ packageDetail.packageBase.type|default('')|purify }} bg-picture col-xs-12 jc-center pt-lg pb-lg">
+    <div class="marketplace-header {{ packageDetail.packageBase.type|default('')|purify }} bg-picture col-xs-12 justify-content-center pt-lg pb-lg">
 
         <h1 class="fw-b fs-46">{{ packageDetail.packageBase.getHumanPackageName()|escape }}</h1>
         {% if packageDetail.packageBase.description %}
@@ -272,7 +272,7 @@
         </div>
         {% for maintainer in packageDetail.maintainers %}
         <div class="box-layout">
-            <div class="col-xs-3 va-m">
+            <div class="col-xs-3 align-middle">
                 <div class="panel-body">
                     <span class="img-wrapper img-rounded">
                         <img class="img" src="{{ maintainer.avatar|escape }}">

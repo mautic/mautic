@@ -8,7 +8,7 @@ Variables
 - action
 #}
 
-<div class="mauticform-row pa-0 panel {% block panel_classes %}{% endblock %}" id="mauticform_action_{{ id }}">
+<div class="mauticform-row p-0 panel {% block panel_classes %}{% endblock %}" id="mauticform_action_{{ id }}">
     <div class="panel-body">
         {% block content %}
             {% if inForm is defined %}
@@ -31,7 +31,7 @@ Variables
     </div>
 
     {% if block('action_label')|trim is not empty %}
-        <div class="d-flex panel-footer as-stretch gap-3 ai-center">
+        <div class="d-flex panel-footer align-self-stretch gap-3 align-items-center">
             {% block action_label %}{% endblock %}
         </div>
     {% endif %}

@@ -16,7 +16,7 @@
             {{ 'mautic.asset.no_audio_support'|trans }}
         </audio>
     {% else %}
-        <div class="d-flex jc-center ai-center text-helper">
+        <div class="d-flex justify-content-center align-items-center text-helper">
             <i class="{{ activeAsset.getIconClass() }} ri-lg mr-xs"></i>
             <span>{{ 'mautic.asset.no_preview'|trans }}</span>
         </div>
@@ -78,7 +78,7 @@
         {% endif %}
     </div>
     {% else %}
-    <div class="d-flex jc-center ai-center text-helper">
+    <div class="d-flex justify-content-center align-items-center text-helper">
         <i class="{{ activeAsset.getIconClass() }} ri-lg mr-xs"></i>
         <span>{{ 'mautic.asset.no_preview'|trans }}</span>
     </div>

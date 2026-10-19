@@ -56,7 +56,7 @@
 
 {% set common_pictogram_content %}
     {% if type == 'pictogram' and pictogram is defined %}
-        <div class="card__pictogram-wrapper mt-a">
+        <div class="card__pictogram-wrapper mt-auto">
             {% include '@MauticCore/Components/pictogram.html.twig' with {'pictogram': pictogram, 'size': 48} %}
         </div>
     {% endif %}
@@ -83,7 +83,7 @@
         {% include '@MauticCore/Components/tile.html.twig' with {
             type: 'base',
             content: cardContent,
-            className: 'card pa-0' ~ (disabled is defined ? ' tile--disabled' : ''),
+            className: 'card p-0' ~ (disabled is defined ? ' tile--disabled' : ''),
         } %}
 
     {# === LOGO TYPE === #}
@@ -102,7 +102,7 @@
         {% include '@MauticCore/Components/tile.html.twig' with {
             type: 'clickable',
             content: cardContent,
-            className: 'card pa-0 card--link' ~ (disabled is defined ? ' tile--disabled' : ''),
+            className: 'card p-0 card--link' ~ (disabled is defined ? ' tile--disabled' : ''),
             icon: ctaIcons[ctaType],
             href: href,
         } %}
@@ -121,7 +121,7 @@
         {% include '@MauticCore/Components/tile.html.twig' with {
             type: 'clickable',
             content: cardContent,
-            className: 'card pa-0 card--link' ~ (disabled is defined ? ' tile--disabled' : ''),
+            className: 'card p-0 card--link' ~ (disabled is defined ? ' tile--disabled' : ''),
             icon: ctaIcons[ctaType],
             href: href,
         } %}
@@ -129,8 +129,8 @@
     {# === PICTOGRAM TYPE === #}
     {% elseif type == 'pictogram' %}
         {% set cardContent %}
-            <div class="card__wrapper d-flex fd-column">
-                <div class="card__content d-flex fd-column fg-1 pb-64">
+            <div class="card__wrapper d-flex flex-column">
+                <div class="card__content d-flex flex-column flex-grow-1 pb-64">
                     {{ common_heading_content }}
                     {{ common_copy_content }}
                     {{ common_pictogram_content }}
@@ -140,7 +140,7 @@
         {% include '@MauticCore/Components/tile.html.twig' with {
             type: 'clickable',
             content: cardContent,
-            className: 'card pa-0 card--link' ~ (disabled is defined ? ' tile--disabled' : ''),
+            className: 'card p-0 card--link' ~ (disabled is defined ? ' tile--disabled' : ''),
             icon: ctaIcons[ctaType],
             href: href,
         } %}
@@ -161,18 +161,18 @@
         {% include '@MauticCore/Components/tile.html.twig' with {
             type: 'clickable',
             content: cardContent,
-            className: 'card pa-0 card--link' ~ (disabled is defined ? ' tile--disabled' : ''),
+            className: 'card p-0 card--link' ~ (disabled is defined ? ' tile--disabled' : ''),
             href: href,
         } %}
 
     {# === FEATURE TYPE === #}
     {% elseif type == 'feature' %}
         {% set cardContent %}
-        <div class="d-flex fd-column fd-row-md">
-            <div class="d-flex fg-1 flex-shrink-1 fb-0 as-1-1">
+        <div class="d-flex flex-column flex-lg-row">
+            <div class="d-flex flex-grow-1 flex-shrink-1 fb-0 as-1-1">
                 {{ common_image_content }}
             </div>
-            <div class="fg-1 flex-shrink-1 fb-0">
+            <div class="flex-grow-1 flex-shrink-1 fb-0">
             <div class="card__wrapper as-1-1">
                 <div class="card__content">
                     {{ common_heading_content }}
@@ -184,18 +184,18 @@
         {% include '@MauticCore/Components/tile.html.twig' with {
             type: 'clickable',
             content: cardContent,
-            className: 'card pa-0 card--link',
+            className: 'card p-0 card--link',
             href: href,
         } %}
 
         {# === FEATURE TYPE === #}
     {% elseif type == 'feature--large' %}
         {% set cardContent %}
-        <div class="d-flex fd-column fd-row-lg">
-            <div class="d-flex fg-1 flex-shrink-1 fb-0 as-1-1">
+        <div class="d-flex flex-column flex-xl-row">
+            <div class="d-flex flex-grow-1 flex-shrink-1 fb-0 as-1-1">
                 {{ common_image_content }}
             </div>
-            <div class="fg-1 flex-shrink-1 fb-0">
+            <div class="flex-grow-1 flex-shrink-1 fb-0">
             <div class="card__wrapper as-1-1">
                 <div class="card__content pa-32">
                     {{ common_eyebrow_content }}
@@ -209,7 +209,7 @@
         {% include '@MauticCore/Components/tile.html.twig' with {
             type: 'clickable',
             content: cardContent,
-            className: 'card pa-0 card--link',
+            className: 'card p-0 card--link',
             href: href,
             icon: ctaIcons[ctaType],
         } %}

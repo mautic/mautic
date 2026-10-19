@@ -115,17 +115,17 @@
                         {% endif %}
                           <div class="panel">
                               <div class="panel-body box-layout">
-                                  <div class="col-md-3 va-m">
+                                  <div class="col-md-3 align-middle">
                                       <h5 class="text-white dark-md fw-sb mb-xs">
                                           <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.core.stats'|trans }}
                                       </h5>
                                   </div>
-                                  <div class="col-md-9 va-m">
+                                  <div class="col-md-9 align-middle">
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
-                              <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                              <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>

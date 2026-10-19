@@ -192,17 +192,17 @@
                         ]}) }}
                           <div class="panel">
                               <div class="panel-body box-layout">
-                                  <div class="col-xs-4 va-m">
+                                  <div class="col-xs-4 align-middle">
                                       <h5 class="text-white dark-md fw-sb mb-xs">
                                           <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.focus.graph.stats'|trans }}
                                       </h5>
                                   </div>
-                                  <div class="col-xs-8 va-m">
+                                  <div class="col-xs-8 align-middle">
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
-                              <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                              <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
@@ -273,7 +273,7 @@
           <hr class="hr-w-2" style="width:50%">
 
           {# we can leverage data from audit_log table and build activity feed from it #}
-          <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
+          <div class="panel shd-none rounded-0 bdr-w-0 mb-0">
               <!-- recent activity -->
               {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
           </div>

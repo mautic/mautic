@@ -13,15 +13,15 @@ Variables:
 {% set icon = 'ri-video-chat-line' %}
 {% endif %}
 <li class="note-single mb-lg" id="LeadNote{{ note.id }}">
-    <div class="note-body d-flex np mb-md">
+    <div class="note-body d-flex p-0 mb-md">
         <div class="height-auto icon text-right">
-            <div class="icon-wrapper d-flex ai-center jc-center"><i class="ri-lg fs-22 {{ icon }}"></i></div>
+            <div class="icon-wrapper d-flex align-items-center justify-content-center"><i class="ri-lg fs-22 {{ icon }}"></i></div>
         </div>
         <div class="tile media-body pa-lg">
 
-            <div class="d-flex jc-space-between ai-center mb-md fw-wrap fw-nowrap-lg">
+            <div class="d-flex justify-content-between align-items-center mb-md flex-wrap flex-xl-nowrap">
                 <span class="fw-b ellipsis"><i class="ri-user-6-line mr-xs"></i>{{ note.createdByUser }}</span>
-                <div class="d-flex fg-1 ai-center jc-space-between jc-end-lg gap-sm">
+                <div class="d-flex flex-grow-1 align-items-center justify-content-between justify-content-xl-end gap-sm">
                     <span class="small text-secondary">{{ dateToFullConcat(note.dateTime) }}</span>
                     <div class="pull-right btn-group">
                         {% if permissions['edit'] %}

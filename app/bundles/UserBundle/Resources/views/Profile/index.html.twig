@@ -57,7 +57,7 @@
         <!-- container -->
         <div class="col-md-9 height-auto">
             <div class="tab-content">
-                <div class="tab-pane fade in active bdr-rds-0 bdr-w-0" id="profile">
+                <div class="tab-pane fade in active rounded-0 bdr-w-0" id="profile">
                     {{ form_start(userForm) }}
                     <div class="row pa-md bdr-b">
                         <h4 class="fw-sb">{{ 'mautic.user.account.header.details'|trans }}</h4>
@@ -106,7 +106,7 @@
                 </div>
 
                 {% if permissions.apiAccess is defined and permissions.apiAccess %}
-                <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="clients">
+                <div class="tab-pane fade rounded-0 bdr-w-0" id="clients">
                     <div class="row pa-md bdr-b">
                         <h4 class="fw-sb">{{ 'mautic.user.account.header.authorizedclients'|trans }}</h4>
                     </div>
@@ -116,7 +116,7 @@
                 </div>
                 {% endif %}
 
-                <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="appearance">
+                <div class="tab-pane fade rounded-0 bdr-w-0" id="appearance">
                     <div class="row pa-md bdr-b">
                         <h4 class="fw-sb">{{ 'mautic.user.account.appearance'|trans }}</h4>
                     </div>
@@ -172,7 +172,7 @@
                     </div>
                 </div>
 
-                <div class="tab-pane fade bdr-rds-0 bdr-w-0" id="accessibility">
+                <div class="tab-pane fade rounded-0 bdr-w-0" id="accessibility">
                     <div class="row pa-md bdr-b">
                         <h4 class="fw-sb">{{ 'mautic.user.account.accessibility'|trans }}</h4>
                     </div>
