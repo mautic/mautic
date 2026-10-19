@@ -43,6 +43,7 @@ use Mautic\StageBundle\Entity\StageRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -233,8 +234,24 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->submissionModelReflection = new \ReflectionClass($this->submissionModel);
     }
 
-    public function testSaveSubmission(): void
+    /**
+     * @return iterable<string, array{bool}>
+     */
+    public static function trackableRequestProvider(): iterable
     {
+        yield 'trackable request' => [true];
+        yield 'request with a privacy signal' => [false];
+    }
+
+    #[DataProvider('trackableRequestProvider')]
+    public function testSaveSubmission(bool $isRequestTrackable): void
+    {
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn($isRequestTrackable);
+
+        // Only a trackable submitter becomes the tracked contact, which writes the tracking cookies
+        $this->contactTracker->expects($isRequestTrackable ? $this->once() : $this->never())->method('setTrackedContact');
+        $this->contactTracker->expects($isRequestTrackable ? $this->never() : $this->once())->method('setSystemContact');
+
         $this->contactTracker
             ->method('getContact')
             ->willReturn(new Lead());
@@ -315,6 +332,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($formData['email'], $tokens['{formfield=email}']);
         $this->assertEquals($formData['file'], $tokens['{formfield=file}']);
         $this->assertSame(['email' => 'test@email.com'], $submissionEvent->getContactFieldMatches());
+        $this->assertSame($isRequestTrackable, null !== $submissionEvent->getSubmission()->getIpAddress());
     }
 
     public function testNormalizeValues(): void
