@@ -17,6 +17,8 @@ final class AvatarExtension extends AbstractExtension
 {
     private ?Style $style = null;
 
+    private bool $styleUnavailable = false;
+
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly DefaultAvatarHelper $defaultAvatarHelper,
@@ -48,6 +50,10 @@ final class AvatarExtension extends AbstractExtension
             return $this->style;
         }
 
+        if ($this->styleUnavailable) {
+            return null;
+        }
+
         try {
             $installPath = InstalledVersions::getInstallPath('dicebear/styles');
             $file        = null === $installPath ? null : $installPath.'/src/line-face.json';
@@ -55,6 +61,7 @@ final class AvatarExtension extends AbstractExtension
 
             if (false === $definition) {
                 $this->logger?->error('Line Face avatar style file not found.', ['path' => $file]);
+                $this->styleUnavailable = true;
 
                 return null;
             }
@@ -62,6 +69,7 @@ final class AvatarExtension extends AbstractExtension
             return $this->style = Style::fromJson($definition);
         } catch (\Throwable $exception) {
             $this->logger?->error('Unable to load the Line Face avatar style.', ['exception' => $exception]);
+            $this->styleUnavailable = true;
 
             return null;
         }
