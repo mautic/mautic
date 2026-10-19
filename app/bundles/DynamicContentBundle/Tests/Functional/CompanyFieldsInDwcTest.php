@@ -21,7 +21,11 @@ final class CompanyFieldsInDwcTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         $options = $crawler->filter('#available_filters')->html();
-        $this->assertStringContainsString('<optgroup label="Primary company">', $options, 'The company group should be present.');
+        $this->assertStringContainsString(
+            '<optgroup label="Contact\'s primary company">',
+            $options,
+            'The company group should be present.'
+        );
     }
 
     /**

@@ -219,7 +219,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
 
         // Step 1: Replace {dwc=...} tokens directly with their content
         $dwcTokens = $this->dynamicContentHelper->findDwcTokens($content, $lead, $event);
-        if (!empty($dwcTokens)) {
+        if ($dwcTokens !== []) {
             $content = $this->replaceDwcTokensInContent($content, $dwcTokens);
         }
 
