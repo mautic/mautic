@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -56,6 +57,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertStringContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
 
+        $this->client->followRedirects(false);
         $this->client->request(Request::METHOD_POST, $winnerUrl);
         $this->assertResponseRedirects($viewUrl);
 
@@ -65,7 +67,7 @@ final class PageControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertInstanceOf(Page::class, $winner);
         $this->assertInstanceOf(Page::class, $oldParent);
-        $this->assertNull($winner->getVariantParent());
+        $this->assertNotInstanceOf(VariantEntityInterface::class, $winner->getVariantParent());
         $this->assertTrue($winner->isPublished(false));
         $this->assertFalse($oldParent->isPublished(false));
         $this->assertSame(100, $winner->getVariantSettings()['totalWeight']);
