@@ -23,11 +23,9 @@ final class OpenIDConnectBridge extends OpenIDConnectClient implements ClientBri
     }
 
     /**
-     * @param string $key
-     *
      * @return mixed
      */
-    protected function getSessionKey($key)
+    protected function getSessionKey(string $key)
     {
         $this->requireSession();
 
@@ -37,7 +35,7 @@ final class OpenIDConnectBridge extends OpenIDConnectClient implements ClientBri
     /**
      * instead of redirecting like the client store the url to prevent the request from exiting immediately.
      */
-    public function redirect($url): void
+    public function redirect(string $url): void
     {
         $this->authRedirectURL = $url;
     }
@@ -64,7 +62,7 @@ final class OpenIDConnectBridge extends OpenIDConnectClient implements ClientBri
      *
      * @throws OidcAuthorizationException
      */
-    public function requestUserInfo($claim = null)
+    public function requestUserInfo(?string $claim = null)
     {
         try {
             return parent::requestUserInfo($claim);
@@ -74,19 +72,15 @@ final class OpenIDConnectBridge extends OpenIDConnectClient implements ClientBri
     }
 
     /**
-     * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      */
-    protected function setSessionKey($key, $value): void
+    protected function setSessionKey(string $key, $value): void
     {
         $this->requireSession();
         $this->session->set($key, $value);
     }
 
-    /**
-     * @param string $key
-     */
-    protected function unsetSessionKey($key): void
+    protected function unsetSessionKey(string $key): void
     {
         $this->requireSession();
         $this->session->remove($key);

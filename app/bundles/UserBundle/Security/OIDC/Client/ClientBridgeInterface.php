@@ -24,13 +24,11 @@ interface ClientBridgeInterface
     public function getVerifiedClaims(?string $claim = null);
 
     /**
-     * @param string|null $claim
-     *
      * @return mixed
      *
      * @throws OidcAuthorizationException
      */
-    public function requestUserInfo($claim = null);
+    public function requestUserInfo(?string $claim = null);
 
     /**
      * Test the connection to the OIDC provider by checking the discovery endpoint.
