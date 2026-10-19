@@ -470,7 +470,7 @@ class DynamicContentHelper
     {
         $dwcSlotNames = [];
         $dom          = new \DOMDocument('1.0', 'utf-8');
-        $dom->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), LIBXML_NOERROR);
+        $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
         $xpath        = new \DOMXPath($dom);
         $contentSlots = $xpath->query('//*[@data-slot="dwc" and not(ancestor::title)]');
         for ($i = 0; $i < $contentSlots->length; ++$i) {
