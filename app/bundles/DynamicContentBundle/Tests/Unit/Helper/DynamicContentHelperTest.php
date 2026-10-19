@@ -13,6 +13,7 @@ use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -47,6 +48,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
             $this->createStub(RealTimeExecutioner::class),
             $this->mockDispatcher,
             $this->leadModel,
+            $this->createStub(LeadListRepository::class),
             $this->createStub(CompanyLeadRepository::class),
             $this->createStub(TagRepository::class),
         );

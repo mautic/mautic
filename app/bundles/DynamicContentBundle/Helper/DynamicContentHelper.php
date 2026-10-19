@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -36,6 +37,10 @@ class DynamicContentHelper
         protected RealTimeExecutioner $realTimeExecutioner,
         protected EventDispatcherInterface $dispatcher,
         protected LeadModel $leadModel,
+        /**
+         * @phpstan-ignore property.onlyWritten (Used by MatchFilterForLeadTrait via property_exists check)
+         */
+        private readonly LeadListRepository $segmentRepository,
         private readonly CompanyLeadRepository $companyLeadRepository,
         private readonly TagRepository $tagRepository,
     ) {
