@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Form\Validator\Constraints;
 
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -17,6 +18,7 @@ final class InfiniteLoopValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint, InfiniteLoop::class);
         }
 
+        /** @var FormInterface $root */
         $root = $this->context->getRoot();
         $data = $root->getData();
 

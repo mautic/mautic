@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -486,6 +487,12 @@ final class CampaignApiController extends CommonApiController
             }
 
             $uploadedFile = array_values($files)[0];
+
+            if (!$uploadedFile instanceof UploadedFile) {
+                return $this->handleView(
+                    $this->view(['error' => $this->translator->trans('mautic.campaign.api.import.incorrect_zip_file', [], 'messages')], Response::HTTP_BAD_REQUEST)
+                );
+            }
 
             if (!$uploadedFile->isValid()) {
                 return $this->handleView(
