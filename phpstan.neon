@@ -87,6 +87,14 @@ parameters:
                 - app/bundles/CoreBundle/EventListener/ConsoleErrorListener.php
                 - app/bundles/CoreBundle/EventListener/ConsoleTerminateListener.php
 
+        # point action/trigger callbacks must stay array callables: PointModel/TriggerModel run str_contains($callback, '::') on them,
+        # which throws a TypeError on a first-class callable Closure, see https://github.com/mautic/mautic/pull/17852#issuecomment-6269806298
+        -
+            identifier: symplify.forbiddenArrayMethodCall
+            paths:
+                - app/bundles/EmailBundle/EventListener/PointSubscriber.php
+                - app/bundles/PageBundle/EventListener/PointSubscriber.php
+
         # type-perfect no_mixed_caller: rule enabled, violations typed incrementally; ignored wholesale for now
         -
             identifier: typePerfect.noMixedMethodCaller

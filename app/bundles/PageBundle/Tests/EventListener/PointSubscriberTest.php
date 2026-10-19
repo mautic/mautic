@@ -36,40 +36,24 @@ final class PointSubscriberTest extends TestCase
         $pointBuilderEvent->expects($matcher)->method('addAction')->willReturnCallback(function (...$parameters) use ($matcher, $pointActionHelper): void {
             if (1 === $matcher->numberOfInvocations()) {
                 $this->assertSame('page.hit', $parameters[0]);
-
-                $callback = $parameters[1]['callback'];
-                unset($parameters[1]['callback']);
-
                 $this->assertSame([
                     'group'       => 'mautic.page.point.action',
                     'label'       => 'mautic.page.point.action.pagehit',
                     'description' => 'mautic.page.point.action.pagehit_descr',
+                    'callback'    => [PointActionHelper::class, 'validatePageHit'],
                     'formType'    => PointActionPageHitType::class,
                 ], $parameters[1]);
-
-                $this->assertInstanceOf(\Closure::class, $callback);
-                $reflection = new \ReflectionFunction($callback);
-                $this->assertSame('validatePageHit', $reflection->getName());
-                $this->assertSame(PointActionHelper::class, $reflection->getClosureScopeClass()?->getName());
             }
             if (2 === $matcher->numberOfInvocations()) {
                 $this->assertSame('url.hit', $parameters[0]);
-
-                $callback = $parameters[1]['callback'];
-                unset($parameters[1]['callback']);
-
                 $this->assertSame([
                     'group'       => 'mautic.page.point.action',
                     'label'       => 'mautic.page.point.action.urlhit',
                     'description' => 'mautic.page.point.action.urlhit_descr',
+                    'callback'    => [$pointActionHelper, 'validateUrlHit'],
                     'formType'    => PointActionUrlHitType::class,
                     'formTheme'   => '@MauticPage/FormTheme/Point/pointaction_urlhit_widget.html.twig',
                 ], $parameters[1]);
-
-                $this->assertInstanceOf(\Closure::class, $callback);
-                $reflection = new \ReflectionFunction($callback);
-                $this->assertSame('validateUrlHit', $reflection->getName());
-                $this->assertSame($pointActionHelper, $reflection->getClosureThis());
             }
         });
 
