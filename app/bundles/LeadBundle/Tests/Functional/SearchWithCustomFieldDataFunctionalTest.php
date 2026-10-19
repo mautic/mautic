@@ -88,7 +88,7 @@ final class SearchWithCustomFieldDataFunctionalTest extends AbstractSearchTestCa
         $crawler  = new Crawler($content['newContent'], $this->client->getInternalRequest()->getUri());
         $this->assertSame('Contacts 2', $crawler->filterXPath('//div[@id="globalSearchPanel"]//div[contains(@class, "text-secondary")]')->text());
 
-        $results = $crawler->filterXPath('//ul[contains(@class, "p-0")]');
+        $results = $crawler->filterXPath('//ul[contains(concat(" ", normalize-space(@class), " "), " p-0 ")]');
         $this->assertCount(2, $results->filter('li'));
 
         foreach ($results->filter('li')->each(fn ($li) => $li->filter('a')->eq(0)->html()) as $i => $result) {
