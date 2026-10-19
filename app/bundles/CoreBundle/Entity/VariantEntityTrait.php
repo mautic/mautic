@@ -308,7 +308,6 @@ trait VariantEntityTrait
 
     public function getVariantEndDate(): ?\DateTime
     {
-        /** @var \DateTime $startDate */
         $startDate  = $this->getVariantStartDate();
         $delayHours = $this->getSendWinnerDelay();
 
@@ -316,7 +315,8 @@ trait VariantEntityTrait
             return null;
         }
 
-        $endDate = clone $startDate;
+        // copy to a mutable DateTime, so modify() works even for an immutable start date
+        $endDate = \DateTime::createFromInterface($startDate);
         $endDate->modify("+{$delayHours} hours");
 
         return $endDate;
