@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -41,6 +42,19 @@ final class KioskModeSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('kiosk@example.com', $submission->getLead()?->getEmail());
     }
 
+    #[DataProvider('kioskModeProvider')]
+    public function testIpAddressIsSavedOnlyOutsideKioskMode(bool $inKioskMode, bool $expectTracking): void
+    {
+        $formId = $this->createForm($inKioskMode);
+
+        $this->logoutUser();
+        $this->submitForm($formId, 'kiosk@example.com', '203.0.113.7');
+
+        $this->em->clear();
+        $ipAddress = $this->em->getRepository(IpAddress::class)->findOneBy(['ipAddress' => '203.0.113.7']);
+        $this->assertSame($expectTracking, null !== $ipAddress);
+    }
+
     private function createForm(bool $inKioskMode): int
     {
         $this->client->request(Request::METHOD_POST, '/api/forms/new', [
@@ -66,14 +80,14 @@ final class KioskModeSubmissionFunctionalTest extends MauticMysqlTestCase
         return (int) $response['form']['id'];
     }
 
-    private function submitForm(int $formId, string $email): void
+    private function submitForm(int $formId, string $email, string $remoteAddress = '127.0.0.1'): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->filter('form[id=mauticform_kioskform]')->form();
         $form->setValues(['mauticform[email]' => $email]);
-        $this->client->submit($form);
+        $this->client->submit($form, [], ['REMOTE_ADDR' => $remoteAddress]);
         $this->assertResponseIsSuccessful();
     }
 }

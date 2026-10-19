@@ -1091,18 +1091,15 @@ final class SubmissionModel extends CommonFormModel
             }
         }
 
-        // check for existing IP address
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
+        // Kiosk mode skips the IP lookup entirely, because the lookup itself saves new IP addresses
+        if (!$inKioskMode) {
+            $ipAddress = $this->ipLookupHelper->getIpAddress();
 
-        // no lead was found by a mapped email field so create a new one
-        if ($lead->isNewlyCreated()) {
-            if (!$inKioskMode) {
+            // no lead was found by a mapped email field so create a new one
+            if ($lead->isNewlyCreated()) {
                 $lead->addIpAddress($ipAddress);
                 $this->logger->debug('FORM: Associating '.$ipAddress->getIpAddress().' to contact');
-            }
-        } elseif (!$inKioskMode) {
-            $leadIpAddresses = $lead->getIpAddresses();
-            if (!$leadIpAddresses->contains($ipAddress)) {
+            } elseif (!$lead->getIpAddresses()->contains($ipAddress)) {
                 $lead->addIpAddress($ipAddress);
 
                 $this->logger->debug('FORM: Associating '.$ipAddress->getIpAddress().' to contact');
