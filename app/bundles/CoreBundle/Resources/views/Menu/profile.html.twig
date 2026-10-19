@@ -6,7 +6,7 @@
     <ul class="dropdown-menu dropdown-menu-right">
         <li>
             <div class="dropdown-menu-user row-no-gutters fw-nowrap ma-md">
-                <span class="img-wrapper"><img onerror="this.classList.add('hide')" src="{{ gravatarGetImage(app.getUser().getEmail()) }}"></span>
+                <span class="img-wrapper"><img onerror="this.classList.add('hide')" src="{{ userAvatar(app.getUser().getId()) }}"></span>
                 <span class="d-flex fd-column jc-center ml-sm info">
                     <span class="text text-nowrap fw-sb">{{ app.getUser().getName() }}</span>
                     {% if app.getUser().getPosition() %}

@@ -83,6 +83,17 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    public function testAccountPageUsesLocalAvatar(): void
+    {
+        $crawler = $this->client->request('GET', '/s/account');
+
+        $this->assertResponseIsSuccessful();
+        $image = $crawler->filter('img.media-object');
+        $this->assertGreaterThan(0, $image->count());
+        $this->assertStringStartsWith('data:image/svg+xml;', $image->attr('src'));
+        $this->assertStringNotContainsString('gravatar', (string) $image->attr('src'));
+    }
+
     public function testIndexIncludesInviteForm(): void
     {
         $crawler = $this->client->request('GET', '/s/users');
