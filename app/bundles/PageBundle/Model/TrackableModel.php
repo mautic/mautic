@@ -313,8 +313,9 @@ class TrackableModel extends AbstractCommonModel
                 $search  = preg_quote($search, '/');
                 $search  = str_replace('&amp;', '&', $search);
                 $search  = str_replace('&', '(?:&|&amp;)', $search);
+                // Skip comments and keep multiline matches within a single opening tag.
                 $content = preg_replace(
-                    '/<(.*?)\s+href\s*=\s*(["\'])(?:\R|)(?:\s*)'.$search.'(.*?)(?:\s*)(?:\R|)\\2(.*?)>/is',
+                    '/<!--[\s\S]*?-->(*SKIP)(*F)|<([^<>]*?)\s+href\s*=\s*(["\'])(?:\R|)(?:\s*)'.$search.'([^<>]*?)(?:\s*)(?:\R|)\\2([^<>]*?)>/i',
                     '<$1 href=$2'.$replace.'$3$2$4>',
                     $content
                 );

@@ -74,6 +74,32 @@ final class TrackableModelTest extends TestCase
         $this->assertArrayHasKey($document->getElementsByTagName('a')->item(0)->getAttribute('href'), $trackables);
     }
 
+    #[DataProvider('nonAttributeHrefProvider')]
+    public function testLinkTrackingPreservesHrefOutsideOpeningTags(string $fragment): void
+    {
+        $url   = 'https://example.org/button';
+        $model = $this->getModel();
+        $html  = $fragment.'<a'."\n".'href="'.$url.'">Button</a>';
+
+        [$content, $trackables] = $model->parseContentForTrackables($html, [], 'email', 1);
+
+        $this->assertCount(1, $trackables);
+        $token = array_key_first($trackables);
+        $this->assertSame($url, $trackables[$token]->getRedirect()->getUrl());
+        $this->assertSame($fragment.'<a href="'.$token.'">Button</a>', $content);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function nonAttributeHrefProvider(): iterable
+    {
+        yield 'multiline body text' => ["<p>Example:\nhref=\"https://example.org/button\"</p>"];
+        yield 'multiline comment text' => ["<!-- Example:\nhref=\"https://example.org/button\" -->"];
+        yield 'link inside comment' => ["<!-- <a\nhref=\"https://example.org/button\">Commented out</a> -->"];
+        yield 'body text after nested tag' => ["<p><span>Example:</span>\nhref=\"https://example.org/button\"</p>"];
+    }
+
     public function testMultilineLinkTrackingPreservesDisabledLinksAndAnchors(): void
     {
         $model = $this->getModel(['^#']);
