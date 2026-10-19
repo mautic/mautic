@@ -305,7 +305,9 @@ final class SubmissionModel extends CommonFormModel
             ->setResults($results)
             ->setContactFieldMatches($leadFieldMatches);
 
-        $lead = $this->contactTracker->getContact();
+        $lead = $form->isInKioskMode()
+            ? null
+            : $this->contactTracker->getContact();
 
         // Remove validation errors if the field is not visible
         if ($lead && $form->usesProgressiveProfiling()) {
@@ -386,7 +388,7 @@ final class SubmissionModel extends CommonFormModel
         $campaigns = $this->campaignModel->getCampaignsByForm($form);
         /** @var Campaign $campaign */
         foreach ($campaigns ?? [] as $campaign) {
-            if ($campaign->isPublished()) {
+            if ($lead instanceof Lead && $campaign->isPublished()) {
                 $this->membershipManager->addContact($lead, $campaign);
             }
         }
@@ -1089,10 +1091,8 @@ final class SubmissionModel extends CommonFormModel
                     .' between current tracked contact and submitted data so assuming a new contact'
                 );
             }
-        }
 
-        // Kiosk mode skips the IP lookup entirely, because the lookup itself saves new IP addresses
-        if (!$inKioskMode) {
+            // The lookup itself saves new IP addresses, so kiosk mode never reaches it
             $ipAddress = $this->ipLookupHelper->getIpAddress();
 
             // no lead was found by a mapped email field so create a new one
