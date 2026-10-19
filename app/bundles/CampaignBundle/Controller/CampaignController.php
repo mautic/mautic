@@ -1259,9 +1259,10 @@ class CampaignController extends AbstractStandardFormController
         // load existing events into session
         $campaignEvents = [];
 
-        $existingEvents = $entity->getEvents()->toArray();
         if (!$isClone && null !== $entity->getId()) {
             $existingEvents = $this->eventRepository->getCampaignEventsWithBuilderRelations($entity->getId());
+        } else {
+            $existingEvents = $entity->getEvents()->toArray();
         }
         foreach ($existingEvents as $e) {
             // remove deleted events from existing events
