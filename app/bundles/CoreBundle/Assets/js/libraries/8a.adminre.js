@@ -272,7 +272,7 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     }
                 });
                 
-                $(document).on('mouseenter', '[data-bs-toggle="popover"][data-trigger="hover"]', function() {
+                $(document).on('mouseenter', '[data-bs-toggle="popover"][data-bs-trigger="hover"]', function() {
                     hideAllPopovers();
                 });
             },
