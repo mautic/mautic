@@ -38,10 +38,13 @@ final readonly class BuildJsSubscriber implements EventSubscriberInterface
 
         $js = <<<JS
         
-           // call variable if doesnt exist
-            if (typeof MauticDomain == 'undefined') {
-                var MauticDomain = '{$this->requestStack->getCurrentRequest()->getSchemeAndHttpHost()}';
-            }            
+           // register the current instance origin for form message allowlisting
+            if (!Array.isArray(window.MauticDomains)) {
+                window.MauticDomains = [];
+            }
+            if (window.MauticDomains.indexOf('{$this->requestStack->getCurrentRequest()->getSchemeAndHttpHost()}') === -1) {
+                window.MauticDomains.push('{$this->requestStack->getCurrentRequest()->getSchemeAndHttpHost()}');
+            }
             if (typeof MauticLang == 'undefined') {
                 var MauticLang = {
                      'submittingMessage': "{$this->translator->trans('mautic.form.submission.pleasewait')}"
