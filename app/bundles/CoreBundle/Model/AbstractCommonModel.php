@@ -83,7 +83,7 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return T[]|array<int,mixed>|iterable<T>|Paginator<T>|SimplePaginator<T>
+     * @return iterable<T>|Paginator<T>|SimplePaginator<T>
      */
     public function getEntities(array $args = []): iterable
     {
