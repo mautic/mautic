@@ -82,7 +82,7 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
      *
      * @param array $rawPermissions (i.e. from request)
      */
-    public function setRolePermissions(Role $entity, $rawPermissions): void
+    public function setRolePermissions(Role $entity, array $rawPermissions): void
     {
         if (!is_array($rawPermissions)) {
             return;
