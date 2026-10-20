@@ -6,14 +6,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
+final class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
     public const PRIORITY = 10;
 
     /**
      * @var HttpKernelInterface
      */
-    protected $app;
+    private $app;
 
     /**
      * @var string

@@ -8,12 +8,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 
-class PluginBadge implements BadgeInterface
+final readonly class PluginBadge implements BadgeInterface
 {
     public function __construct(
-        private readonly ?TokenInterface $preAuthenticatedToken,
-        private readonly ?Response $pluginResponse,
-        private readonly ?string $authenticatingService,
+        private ?TokenInterface $preAuthenticatedToken,
+        private ?Response $pluginResponse,
+        private ?string $authenticatingService,
     ) {
     }
 

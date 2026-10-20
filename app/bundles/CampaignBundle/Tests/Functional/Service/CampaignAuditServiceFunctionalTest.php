@@ -32,7 +32,7 @@ final class CampaignAuditServiceFunctionalTest extends MauticMysqlTestCase
         $this->campaignAuditService = new CampaignAuditService(
             $this->flashBagMock,
             $this->urlGeneratorMock,
-            static::getContainer()->get(EventRepository::class)
+            self::getContainer()->get(EventRepository::class)
         );
     }
 

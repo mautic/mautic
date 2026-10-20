@@ -25,16 +25,14 @@ final class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
     public function testGetTokens(): void
     {
         $coreParametersHelper = new class($this->createStub(ContainerInterface::class)) extends CoreParametersHelper {
-            public function get($name, $default = null)
+            public function get($name, $default = null): ?string
             {
-                switch ($name) {
-                    case 'default_timezone':
-                        return DateTokenHelperTest::TIMEZONE;
-                    case 'date_format_dateonly':
-                        return DateTokenHelperTest::DATE_FORMAT;
-                    case 'date_format_timeonly':
-                        return DateTokenHelperTest::TIME_FORMAT;
-                }
+                return match ($name) {
+                    'default_timezone' => DateTokenHelperTest::TIMEZONE,
+                    'date_format_dateonly' => DateTokenHelperTest::DATE_FORMAT,
+                    'date_format_timeonly' => DateTokenHelperTest::TIME_FORMAT,
+                    default => null,
+                };
             }
         };
 

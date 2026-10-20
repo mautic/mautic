@@ -56,11 +56,11 @@ final class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        protected LeadModel $leadModel,
-        protected ListModel $leadListModel,
-        protected RouterInterface $router,
-        protected TranslatorInterface $translator,
-        protected DateHelper $dateHelper,
+        private readonly LeadModel $leadModel,
+        private readonly ListModel $leadListModel,
+        private readonly RouterInterface $router,
+        private readonly TranslatorInterface $translator,
+        private readonly DateHelper $dateHelper,
     ) {
     }
 
@@ -401,7 +401,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $leads = $this->leadModel->getLeadList($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers, []);
                 $items = [];
 
-                if (empty($leads)) {
+                if ([] === $leads) {
                     $leads[] = [
                         'name' => $this->translator->trans('mautic.report.report.noresults'),
                     ];

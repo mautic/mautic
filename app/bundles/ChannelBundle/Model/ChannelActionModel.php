@@ -8,12 +8,12 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ChannelActionModel
+final readonly class ChannelActionModel
 {
     public function __construct(
-        private readonly LeadModel $contactModel,
-        private readonly DoNotContact $doNotContact,
-        private readonly TranslatorInterface $translator,
+        private LeadModel $contactModel,
+        private DoNotContact $doNotContact,
+        private TranslatorInterface $translator,
     ) {
     }
 

@@ -111,7 +111,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12">
-                    {{ form_row(form.facebook_pixel_id) }}
+                    {{ formRowIfExists(form, 'facebook_pixel_id') }}
                 </div>
                 <hr>
                 {% for name, f in form.children %}
@@ -133,7 +133,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-xs-12">
-                    {{ form_row(form.google_analytics_id) }}
+                    {{ formRowIfExists(form, 'google_analytics_id') }}
                 </div>
                 <hr>
                 {% for name, f in form.children %}

@@ -31,13 +31,13 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     public function testSavingPrimaryCompanyAfterPointsAreSetByListenerAreNotResetToDefaultOf0BecauseOfPointsFieldDefaultIs0(): void
     {
         /** @var EventDispatcher $eventDispatcher */
-        $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
         $eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, $this->addPointsListener(...));
 
         /** @var LeadModel $model */
-        $model = static::getContainer()->get(LeadModel::class);
+        $model = self::getContainer()->get(LeadModel::class);
         /** @var EntityManager $em */
-        $em   = static::getContainer()->get(EntityManagerInterface::class);
+        $em   = self::getContainer()->get(EntityManagerInterface::class);
 
         // Set company to trigger setPrimaryCompany()
         $lead = new Lead();
@@ -71,7 +71,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         $lead->adjustPoints(10);
 
         /** @var LeadModel $model */
-        $model = static::getContainer()->get(LeadModel::class);
+        $model = self::getContainer()->get(LeadModel::class);
         $model->saveEntity($lead);
     }
 

@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: self::COMMAND_NAME,
     description: 'Remove contact export cache files from `contacts_export` directory if file is older than the week/7 days'
 )]
-class CleanupExportedFilesCommand extends Command
+final class CleanupExportedFilesCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:contacts:cleanup_exported_files';
 

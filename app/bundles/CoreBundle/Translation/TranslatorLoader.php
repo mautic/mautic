@@ -9,7 +9,7 @@ namespace Mautic\CoreBundle\Translation;
  *
  * @phpstan-ignore-next-line class.extendsFinalByPhpDoc
  */
-class TranslatorLoader extends \Symfony\Bundle\FrameworkBundle\Translation\Translator
+final class TranslatorLoader extends \Symfony\Bundle\FrameworkBundle\Translation\Translator
 {
     protected function loadCatalogue(string $locale): void
     {

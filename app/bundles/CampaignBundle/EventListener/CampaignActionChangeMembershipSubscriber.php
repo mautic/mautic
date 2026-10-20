@@ -122,7 +122,7 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
         }
 
         $campaignEntities = [];
-        if (!empty($campaigns)) {
+        if ([] !== $campaigns) {
             $campaignEntities = $this->campaignModel->getEntities(['ids' => $campaigns, 'ignore_paginator' => true]);
         }
 

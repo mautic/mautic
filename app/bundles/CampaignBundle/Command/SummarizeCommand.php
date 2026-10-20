@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: SummarizeCommand::NAME,
     description: 'Builds historical campaign summary statistics if they do not already exist.'
 )]
-class SummarizeCommand extends ModeratedCommand
+final class SummarizeCommand extends ModeratedCommand
 {
     use WriteCountTrait;
 

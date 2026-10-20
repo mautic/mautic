@@ -4,7 +4,7 @@ namespace Mautic\CampaignBundle\EventCollector\Builder;
 
 use Mautic\CampaignBundle\Entity\Event;
 
-class ConnectionBuilder
+final class ConnectionBuilder
 {
     private static array $eventTypes = [];
 

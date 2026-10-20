@@ -6,6 +6,7 @@ use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
@@ -67,7 +68,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $event->addDecision('page.devicehit', $deviceHitTrigger);
 
         $trackingServices = $this->trackingHelper->getEnabledServices();
-        if (!empty($trackingServices)) {
+        if ([] !== $trackingServices) {
             $action = [
                 'label'                  => 'mautic.page.tracking.pixel.event.send',
                 'description'            => 'mautic.page.tracking.pixel.event.send_desc',
@@ -180,32 +181,24 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             $pageHitId = 0;
         }
 
-        $limitToPages = $config['pages'] ?? [];
-
-        $urlMatches = [];
+        $limitToPages    = $config['pages'] ?? [];
+        $pageUrl         = null;
+        $limitToUrls     = [];
+        $refererUrl      = null;
+        $limitToReferers = [];
 
         // Check Landing Pages URL or Tracing Pixel URL
         if (isset($config['url']) && $config['url']) {
             $pageUrl     = html_entity_decode($eventDetails->getUrl());
             $limitToUrls = explode(',', $config['url']);
-
-            foreach ($limitToUrls as $url) {
-                $url              = html_entity_decode(trim($url));
-                $urlMatches[$url] = fnmatch($url, $pageUrl);
-            }
+            $limitToUrls = \array_map(static fn (string $url): string => \html_entity_decode(\trim($url)), $limitToUrls);
         }
-
-        $refererMatches = [];
 
         // Check Landing Pages URL or Tracing Pixel URL
         if (isset($config['referer']) && $config['referer']) {
             $refererUrl      = html_entity_decode($eventDetails->getReferer());
             $limitToReferers = explode(',', $config['referer']);
-
-            foreach ($limitToReferers as $referer) {
-                $referer                  = html_entity_decode(trim($referer));
-                $refererMatches[$referer] = fnmatch($referer, $refererUrl);
-            }
+            $limitToReferers = \array_map(static fn (string $referer): string => \html_entity_decode(\trim($referer)), $limitToReferers);
         }
 
         // **Page hit is true if:**
@@ -216,10 +209,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $langingPageIsHit = (!empty($limitToPages) && in_array($pageHitId, $limitToPages));
 
         // 3. URL rule is set and match with URL hit
-        $urlIsHit = (!empty($config['url']) && in_array(true, $urlMatches));
+        $urlIsHit = (!empty($config['url']) && UrlMatcher::hasMatch($limitToUrls, $pageUrl));
 
         // 3. URL rule is set and match with URL hit
-        $refererIsHit = (!empty($config['referer']) && in_array(true, $refererMatches));
+        $refererIsHit = (!empty($config['referer']) && UrlMatcher::hasMatch($limitToReferers, $refererUrl));
 
         if ($applyToAny || $langingPageIsHit || $urlIsHit || $refererIsHit) {
             return $event->setResult(true);

@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -68,6 +69,7 @@ final class CampaignModelTransactionalTest extends TestCase
                 $this->createStub(LeadRepository::class),
                 $this->createStub(LeadEventLogRepository::class),
                 $this->createStub(StatRepository::class),
+                $this->createStub(FormRepository::class),
             ])
             ->onlyMethods(['saveEntity'])
             ->getMock();

@@ -47,7 +47,7 @@ final class SendWinnerService
             $emails = [$emailEntity];
         }
 
-        if (empty($emails)) {
+        if ([] === $emails) {
             $this->addOutputMessage('No emails to send');
 
             return;

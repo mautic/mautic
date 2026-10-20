@@ -535,7 +535,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         }
 
         $eventDependencies = $this->getSubDependencies($dependencies, Event::ENTITY_NAME);
-        if (empty($eventDependencies)) {
+        if ([] === $eventDependencies) {
             return;
         }
 
@@ -561,7 +561,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         }
 
         $emailDependencies = $this->getSubDependencies($dependencies, Email::ENTITY_NAME);
-        if (empty($emailDependencies)) {
+        if ([] === $emailDependencies) {
             return;
         }
 
@@ -591,7 +591,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         }
 
         $formDependencies = $this->getSubDependencies($dependencies, Form::ENTITY_NAME);
-        if (empty($formDependencies)) {
+        if ([] === $formDependencies) {
             return;
         }
 

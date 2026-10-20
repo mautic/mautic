@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\AuthenticationInterface;
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-class AuthIntegrationsHelper
+final class AuthIntegrationsHelper
 {
     /**
      * @var AuthenticationInterface[]

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Event;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -7,18 +9,15 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class AuthenticationContentEvent extends Event
 {
-    /**
-     * @var array
-     */
-    protected $content = [];
+    private array $content = [];
 
     /**
      * @var bool
      */
-    protected $postLogout = false;
+    private $postLogout = false;
 
     public function __construct(
-        protected Request $request,
+        private readonly Request $request,
     ) {
         $this->postLogout = $request->getSession()->get('post_logout', false);
     }

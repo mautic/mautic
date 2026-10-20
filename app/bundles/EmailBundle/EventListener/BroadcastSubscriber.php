@@ -7,6 +7,7 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -17,7 +18,7 @@ final readonly class BroadcastSubscriber implements EventSubscriberInterface
         private EmailModel $model,
         private EntityManagerInterface $em,
         private TranslatorInterface $translator,
-        private readonly \Mautic\EmailBundle\Entity\EmailRepository $emailRepository,
+        private EmailRepository $emailRepository,
     ) {
     }
 

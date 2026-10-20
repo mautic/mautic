@@ -299,7 +299,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
             }
         }
 
-        if (!empty($persist)) {
+        if ([] !== $persist) {
             $this->pointRepository->saveEntities($persist);
             $this->pointRepository->detachEntities($persist);
         }

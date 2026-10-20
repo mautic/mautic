@@ -48,7 +48,7 @@ final class MonitoringV2ApiTest extends MauticMysqlTestCase
             [],
             [],
             $headers,
-            !empty($data) ? json_encode($data) : null
+            [] !== $data ? json_encode($data) : null
         );
 
         return [

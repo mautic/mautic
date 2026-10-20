@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -70,18 +72,6 @@ return [
                     'report:reports:viewother',
                 ],
                 'priority' => 20,
-            ],
-        ],
-    ],
-
-    'services' => [
-        'helpers' => [
-            'mautic.report.helper.report' => [
-                'class'     => Mautic\ReportBundle\Helper\ReportHelper::class,
-                'alias'     => 'report',
-                'arguments' => [
-                    'event_dispatcher',
-                ],
             ],
         ],
     ],

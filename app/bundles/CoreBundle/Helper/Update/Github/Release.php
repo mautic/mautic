@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper\Update\Github;
 use Mautic\CoreBundle\Helper\Update\Exception\UpdatePackageNotFoundException;
 use Mautic\CoreBundle\Release\Metadata;
 
-class Release
+final class Release
 {
     /**
      * @var string

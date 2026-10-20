@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: CampaignDeleteEventLogsCommand::COMMAND_NAME,
     description: 'Delete campaign event logs'
 )]
-class CampaignDeleteEventLogsCommand extends Command
+final class CampaignDeleteEventLogsCommand extends Command
 {
     public const COMMAND_NAME = 'mautic:campaign:delete-event-logs';
 

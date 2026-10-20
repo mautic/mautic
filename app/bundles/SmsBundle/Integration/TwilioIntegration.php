@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 
-class TwilioIntegration extends AbstractIntegration
+final class TwilioIntegration extends AbstractIntegration
 {
     protected bool $coreIntegration = true;
 

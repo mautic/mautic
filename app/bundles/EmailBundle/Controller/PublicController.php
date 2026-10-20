@@ -21,6 +21,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -38,27 +39,30 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
-    private \Mautic\LeadBundle\Entity\LeadRepository $leadRepository;
+    private LeadRepository $leadRepository;
 
     private EmailModel $emailModel;
 
     private LeadModel $leadModel;
 
+    private LoggerInterface $mauticLogger;
+
     #[Required]
     public function autowirePublicController(
         LeadModel $leadModel,
         EmailModel $emailModel,
-        \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
+        LeadRepository $leadRepository,
+        LoggerInterface $mauticLogger,
     ): void {
         $this->leadModel = $leadModel;
         $this->emailModel = $emailModel;
         $this->leadRepository = $leadRepository;
+        $this->mauticLogger = $mauticLogger;
     }
 
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, $idHash): Response
@@ -201,9 +205,9 @@ final class PublicController extends CommonFormController
 
             if (!$isHeadRequest && (!$showContactPreferences || $isUnsubscribeAll)) {
                 if (!empty($stat)) {
-                    $message = $this->getUnsubscribeMessage($idHash, $model, $stat, $this->translator);
+                    $message = $this->getUnsubscribeMessage($idHash, $model, $stat);
                 } elseif ($lead && $lead instanceof Lead) {
-                    $message = $this->getUnsubscribeMessageLead($idHash, $model, $lead, $this->translator, $urlEmail);
+                    $message = $this->getUnsubscribeMessageLead($idHash, $model, $lead, $urlEmail);
                 }
             } elseif ($lead) {
                 $params = ['idHash' => $idHash, 'urlEmail' => $urlEmail];
@@ -555,14 +559,12 @@ final class PublicController extends CommonFormController
     /**
      * @throws \Exception
      */
-    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration): void
+    private function doTracking(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, $integration): void
     {
-        $logger = $mauticLogger;
-
         // if additional data were sent with the tracking pixel
         $query_string = $request->server->get('QUERY_STRING');
         if (!$query_string) {
-            $logger->log('error', $integration.': query string is not available');
+            $this->mauticLogger->log('error', $integration.': query string is not available');
 
             return;
         }
@@ -575,7 +577,7 @@ final class PublicController extends CommonFormController
 
         // URL attr 'd' is encoded so let's decode it first.
         if (!isset($query['d'], $query['sig'])) {
-            $logger->log('error', $integration.': query variables are not found');
+            $this->mauticLogger->log('error', $integration.': query variables are not found');
 
             return;
         }
@@ -584,7 +586,7 @@ final class PublicController extends CommonFormController
         $myIntegration = $integrationHelper->getIntegrationObject($integration);
 
         if (!$myIntegration) {
-            $logger->log('error', $integration.': integration not found');
+            $this->mauticLogger->log('error', $integration.': integration not found');
 
             return;
         }
@@ -606,19 +608,19 @@ final class PublicController extends CommonFormController
             parse_str($gz, $query);
         } else {
             // signatures don't match: stop
-            $logger->log('error', $integration.': signatures don\'t match');
+            $this->mauticLogger->log('error', $integration.': signatures don\'t match');
 
             unset($query);
         }
 
         if (empty($query) || !isset($query['email'], $query['subject'], $query['body'])) {
-            $logger->log('error', $integration.': query variables are empty');
+            $this->mauticLogger->log('error', $integration.': query variables are empty');
 
             return;
         }
 
         if (MAUTIC_ENV === 'dev') {
-            $logger->log('error', $integration.': '.json_encode($query, JSON_PRETTY_PRINT));
+            $this->mauticLogger->log('error', $integration.': '.json_encode($query, JSON_PRETTY_PRINT));
         }
 
         // email is a semicolon delimited list of emails
@@ -652,9 +654,9 @@ final class PublicController extends CommonFormController
         }
     }
 
-    public function pluginTrackingGifAction(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, LoggerInterface $mauticLogger, $integration): Response
+    public function pluginTrackingGifAction(Request $request, IntegrationHelper $integrationHelper, MailHelper $mailer, $integration): Response
     {
-        $this->doTracking($request, $integrationHelper, $mailer, $mauticLogger, $integration);
+        $this->doTracking($request, $integrationHelper, $mailer, $integration);
 
         return TrackingPixelHelper::getResponse($request); // send gif
     }
@@ -703,25 +705,25 @@ final class PublicController extends CommonFormController
         return $this->leadRepository->getLeadByEmail($email);
     }
 
-    public function getUnsubscribeMessage(string $idHash, $model, $stat, TranslatorInterface $translator): string
+    public function getUnsubscribeMessage(string $idHash, $model, $stat): string
     {
-        $model->setDoNotContact($stat, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
+        $model->setDoNotContact($stat, $this->translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
-        return $this->getUnsubscribeText($translator, $stat->getEmailAddress(), $idHash);
+        return $this->getUnsubscribeText($stat->getEmailAddress(), $idHash);
     }
 
-    public function getUnsubscribeMessageLead(string $idHash, EmailModel $model, Lead $lead, TranslatorInterface $translator, string $urlEmail): string
+    public function getUnsubscribeMessageLead(string $idHash, EmailModel $model, Lead $lead, string $urlEmail): string
     {
-        $model->setDoNotContactLead($lead, $translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
+        $model->setDoNotContactLead($lead, $this->translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
-        return $this->getUnsubscribeText($translator, $urlEmail, $idHash);
+        return $this->getUnsubscribeText($urlEmail, $idHash);
     }
 
-    private function getUnsubscribeText(TranslatorInterface $translator, string $email, string $idHash): string
+    private function getUnsubscribeText(string $email, string $idHash): string
     {
         $message = $this->coreParametersHelper->get('unsubscribe_message');
         if (!$message) {
-            $message = $translator->trans(
+            $message = $this->translator->trans(
                 'mautic.email.unsubscribed.success',
                 [
                     '%resubscribeUrl%' => '|URL|',

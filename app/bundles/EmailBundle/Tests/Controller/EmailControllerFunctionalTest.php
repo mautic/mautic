@@ -8,6 +8,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
@@ -32,6 +33,7 @@ use function Symfony\Component\Clock\now;
 
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterInterface;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -208,7 +210,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var DoctrineDataCollector $dbCollector */
         $dbCollector = $profile->getCollector('db');
         $queries     = $dbCollector->getQueries();
-        $prefix      = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix      = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $dncQueries = array_filter(
             $queries['default'],
@@ -294,6 +296,19 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $html    = $crawler->filterXPath('//*[@id="toolbar"]')->html();
         $this->assertStringNotContainsString('disabled', $html, $html);
+    }
+
+    public function testEmailListOffersSendExampleWithoutOpeningTheDetail(): void
+    {
+        $email = $this->createEmail('Automation test email', self::SUBJECT_A, 'template', 'blank', 'test html');
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $button  = $crawler->filter("#row_email_{$email->getId()} a[href=\"/s/emails/sendExample/{$email->getId()}\"]");
+
+        $this->assertCount(1, $button);
+        $this->assertSame('ajaxmodal', $button->attr('data-toggle'));
+        $this->assertSame('Send example', trim($button->text()));
     }
 
     public function testEmailDetailPageForListEmailShowsScheduleButton(): void
@@ -826,6 +841,65 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(24, $settings['sendWinnerDelay']);
         $this->assertEquals(10, $settings['totalWeight']);
         $this->assertEquals(1, $settings['enableAbTest']);
+    }
+
+    public function testManualWinnerActionIsAvailableForPublishedStartedVariant(): void
+    {
+        [$parent, $variant] = $this->createManualWinnerEmailPair(true, true);
+        $router             = self::getContainer()->get(RouterInterface::class);
+        $winnerUrl          = $router->generate('mautic_email_action', [
+            'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+        $viewUrl            = $router->generate('mautic_email_action', [
+            'objectAction' => 'view',
+            'objectId'     => $variant->getId(),
+        ]);
+
+        $this->client->request(Request::METHOD_GET, "/s/emails/view/{$parent->getId()}");
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
+
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_POST, $winnerUrl);
+        $this->assertResponseRedirects($viewUrl);
+
+        $this->em->clear();
+        $winner = $this->em->find(Email::class, $variant->getId());
+        $oldParent = $this->em->find(Email::class, $parent->getId());
+
+        $this->assertInstanceOf(Email::class, $winner);
+        $this->assertInstanceOf(Email::class, $oldParent);
+        $this->assertNotInstanceOf(VariantEntityInterface::class, $winner->getVariantParent());
+        $this->assertTrue($winner->isPublished(false));
+        $this->assertFalse($oldParent->isPublished(false));
+        $this->assertSame(100, $winner->getVariantSettings()['totalWeight']);
+    }
+
+    public function testManualWinnerActionIsUnavailableForUnpublishedVariant(): void
+    {
+        [$parent, $variant] = $this->createManualWinnerEmailPair(false, true);
+        $winnerUrl          = self::getContainer()->get(RouterInterface::class)->generate('mautic_email_action', [
+            'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+
+        $this->client->request(Request::METHOD_GET, "/s/emails/view/{$parent->getId()}");
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testManualWinnerActionIsUnavailableBeforeAbTestStarts(): void
+    {
+        [$parent, $variant] = $this->createManualWinnerEmailPair(true, false);
+        $winnerUrl          = self::getContainer()->get(RouterInterface::class)->generate('mautic_email_action', [
+            'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+
+        $this->client->request(Request::METHOD_GET, "/s/emails/view/{$parent->getId()}");
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
     }
 
     #[DataProvider('dwcTokenTypeDataProvider')]
@@ -1603,6 +1677,49 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($segment);
 
         return $segment;
+    }
+
+    /**
+     * @return array{0: Email, 1: Email}
+     */
+    private function createManualWinnerEmailPair(bool $variantPublished, bool $testStarted): array
+    {
+        $parent = $this->createEmail(
+            'Manual winner parent',
+            'Manual winner parent subject',
+            'list',
+            'blank',
+            'Manual winner parent html',
+            null,
+            [
+                'enableAbTest'    => true,
+                'totalWeight'     => 100,
+                'winnerCriteria'  => 'email.openrate',
+                'sendWinnerDelay' => 24,
+            ]
+        );
+        $parent->setIsPublished(true);
+        $parent->setVariantStartDate($testStarted ? new \DateTime('-1 hour') : null);
+
+        $variant = $this->createEmail(
+            'Manual winner variant',
+            'Manual winner variant subject',
+            'list',
+            'blank',
+            'Manual winner variant html',
+            null,
+            [
+                'weight'         => 50,
+                'winnerCriteria' => 'email.openrate',
+            ]
+        );
+        $variant->setIsPublished($variantPublished);
+        $variant->setVariantParent($parent);
+        $parent->addVariantChild($variant);
+
+        $this->em->flush();
+
+        return [$parent, $variant];
     }
 
     private function createCategory(string $title, string $alias, string $bundle): Category

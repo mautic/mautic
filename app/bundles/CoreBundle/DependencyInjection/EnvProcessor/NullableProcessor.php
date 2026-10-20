@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\DependencyInjection\EnvProcessor;
 
 use Symfony\Component\DependencyInjection\EnvVarProcessorInterface;
 
-class NullableProcessor implements EnvVarProcessorInterface
+final class NullableProcessor implements EnvVarProcessorInterface
 {
     public function getEnv(string $prefix, string $name, \Closure $getEnv): ?string
     {

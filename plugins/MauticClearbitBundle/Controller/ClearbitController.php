@@ -33,8 +33,6 @@ final class ClearbitController extends FormController
     /**
      * @param string $objectId
      *
-     * @return JsonResponse
-     *
      * @throws \InvalidArgumentException
      */
     public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
@@ -125,8 +123,6 @@ final class ClearbitController extends FormController
     }
 
     /**
-     * @return JsonResponse
-     *
      * @throws \InvalidArgumentException
      */
     public function batchLookupPersonAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response
@@ -281,8 +277,6 @@ final class ClearbitController extends FormController
     /**
      * @param string $objectId
      *
-     * @return JsonResponse
-     *
      * @throws \InvalidArgumentException
      */
     public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = ''): JsonResponse|Response
@@ -372,8 +366,6 @@ final class ClearbitController extends FormController
     }
 
     /**
-     * @return JsonResponse
-     *
      * @throws \InvalidArgumentException
      */
     public function batchLookupCompanyAction(Request $request, LookupHelper $lookupHelper): JsonResponse|Response

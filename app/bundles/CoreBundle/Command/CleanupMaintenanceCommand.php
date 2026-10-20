@@ -53,7 +53,7 @@ Shows you how many records of anonymous contacts <info>%command.name%</info> wil
 The <info>%command.name%</info> command dispatches the <info>CoreEvents::MAINTENANCE_CLEANUP_DATA</info> event in order to purge old data (data must be supported by event listeners, as not all data is applicable to be purged).
 TXT
 )]
-class CleanupMaintenanceCommand extends ModeratedCommand
+final class CleanupMaintenanceCommand extends ModeratedCommand
 {
     public const NAME = 'mautic:maintenance:cleanup';
 
@@ -157,7 +157,7 @@ class CleanupMaintenanceCommand extends ModeratedCommand
      * @param array<int|string>                                   $stats
      * @param array<string|bool|int|float|array<int|string>|null> $options
      */
-    protected function storeToAuditLog(array $stats, bool $dryRun, array $options): void
+    private function storeToAuditLog(array $stats, bool $dryRun, array $options): void
     {
         $notEmptyStats = array_filter($stats);
         if (!$dryRun && count($notEmptyStats)) {

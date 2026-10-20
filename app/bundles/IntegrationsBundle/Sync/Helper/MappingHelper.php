@@ -64,14 +64,13 @@ class MappingHelper
         foreach ($uniqueIdentifierFields as $field => $fieldLabel) {
             try {
                 $integrationField = $mappingManualDAO->getIntegrationMappedField($integrationObjectDAO->getObject(), $internalObjectName, $field);
-                if ($integrationValue = $integrationObjectDAO->getField($integrationField)) {
-                    $identifiers[$field] = $integrationValue->getValue()->getNormalizedValue();
-                }
+                $integrationValue = $integrationObjectDAO->getField($integrationField);
+                $identifiers[$field] = $integrationValue->getValue()->getNormalizedValue();
             } catch (FieldNotFoundException) {
             }
         }
 
-        if (empty($identifiers)) {
+        if ([] === $identifiers) {
             // No fields found to search for contact so return null
             return new ObjectDAO($internalObjectName, null);
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Helper;
 
 use Mautic\ReportBundle\Event\ColumnCollectEvent;

@@ -7,10 +7,10 @@ use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -117,16 +117,15 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
                     'log' => $log,
                 ];
 
-                if (!empty($log['parent_id'])) {
-                    $parentEvent = $this->getParentEvent($log['parent_id']);
-                    if ($parentEvent) {
-                        $extra['parentDetails'] = $this->getParentDetails($parentEvent, $log);
+                // check if the event is a condition or decision event
+                $eventEntity = $this->getConditionOrDecisionEvent($log['event_id']);
+                if ($eventEntity) {
+                    $extra['eventDetails'] = $this->getCampaignEventDetails($log);
 
-                        $toolTipClass = 'yes' === $log['decision_path'] ? 'text-success' : 'text-danger';
-                        $toolTip      = $this->translator->trans('mautic.campaign.event.path.tooltip', ['%path%' => ucfirst($log['decision_path'])]);
+                    $toolTipClass = 'yes' === $extra['eventDetails']['path'] ? 'text-success' : 'text-danger';
+                    $toolTip      = $this->translator->trans('mautic.campaign.event.path.tooltip', ['%path%' => ucfirst($extra['eventDetails']['path'])]);
 
-                        $label .= sprintf(' <i class="ri-node-tree %s" data-toggle="tooltip" title="%s"></i>', $toolTipClass, $toolTip);
-                    }
+                    $label .= sprintf(' <i class="ri-node-tree %s" data-toggle="tooltip" title="%s"></i>', $toolTipClass, $toolTip);
                 }
 
                 if ($event->isForTimeline()) {
@@ -157,12 +156,12 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Fetch the parent event if exists.
+     * Check if the given campaign event is a condition or decision event.
      */
-    private function getParentEvent(int $parentId): ?Event
+    private function getConditionOrDecisionEvent(int $id): ?Event
     {
         $entities = $this->eventRepository->findBy([
-            'id'        => $parentId,
+            'id'        => $id,
             'eventType' => [Event::TYPE_CONDITION, Event::TYPE_DECISION],
         ]);
 
@@ -170,27 +169,25 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Get details for the parent event.
+     * Get details for the campaign event.
      *
      * @param array<string, mixed> $log
      *
      * @return array<string, mixed>
      */
-    private function getParentDetails(Event $parentEvent, array $log): array
+    private function getCampaignEventDetails(array $log): array
     {
-        $properties = ArrayHelper::removeEmptyValues($parentEvent->getProperties());
-
-        // Remove unnecessary properties
-        $keysToRemove = ['canvasSettings', 'anchor', 'type', 'eventType', 'campaignId', '_token', 'buttons', 'anchorEventType', 'tempId', 'id', 'order', 'contactLog', 'changes', 'failedCount', 'properties'];
-        foreach ($keysToRemove as $key) {
-            unset($properties[$key]);
+        $metadata = $log['metadata'] ?? [];
+        if (isset($metadata['operator'])) {
+            $operators            = OperatorOptions::getFilterExpressionFunctions();
+            $label                = $operators[$metadata['operator']]['label'] ?? $metadata['operator'];
+            $metadata['operator'] = $this->translator->trans($label);
         }
 
+        // write the actual value to the properties that was used to compare the field value with.
         return [
-            'name'       => $parentEvent->getName(),
-            'type'       => $parentEvent->getEventType(),
-            'path'       => $log['decision_path'],
-            'properties' => $properties,
+            'path'       => '1' === $log['nonActionPathTaken'] ? 'no' : 'yes',
+            'properties' => $metadata,
         ];
     }
 }

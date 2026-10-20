@@ -20,7 +20,7 @@ final class PropertyToPropertyAssignService
 
     public function increase(): void
     {
-        $this->count = $this->count + 1;
+        ++$this->count;
     }
 
     public function rememberPreviousCount(): void

@@ -7,16 +7,18 @@ namespace MauticPlugin\MauticFocusBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
 
 final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testGenerateFocusItemScript(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get(FocusModel::class);
+        $focusModel = self::getContainer()->get(FocusModel::class);
         $focus      = $this->createFocus('popup');
         $focus->setStyle('bar');
         $focusModel->saveEntity($focus);
@@ -39,12 +41,12 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('/mautic-tracking.js', $content);
     }
 
-    #[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-    #[\PHPUnit\Framework\Attributes\RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testInactiveFocusItemScript(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get(FocusModel::class);
+        $focusModel = self::getContainer()->get(FocusModel::class);
         $focus      = $this->createFocus('popup');
         $focus->setIsPublished(false);
         $focusModel->saveEntity($focus);

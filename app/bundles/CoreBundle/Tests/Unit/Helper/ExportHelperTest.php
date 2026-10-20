@@ -15,7 +15,6 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -90,7 +89,6 @@ final class ExportHelperTest extends TestCase
 
         $response = $this->exportHelper->downloadAsZip($zipFilePath, 'exported.zip');
 
-        $this->assertInstanceOf(BinaryFileResponse::class, $response);
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('application/zip', $response->headers->get('Content-Type'));
         $this->assertSame('attachment; filename="exported.zip"', $response->headers->get('Content-Disposition'));

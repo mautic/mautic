@@ -46,11 +46,6 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
     protected $useCleanupRollback = false;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
     #[DataProvider('dataForGlobalSearch')]
     public function testGlobalSearch(string $searchString, mixed $entity, string $expectedLink): void
     {

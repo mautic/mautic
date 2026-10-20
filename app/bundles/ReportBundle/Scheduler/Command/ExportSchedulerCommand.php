@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Scheduler\Command;
 
 use Mautic\ReportBundle\Exception\FileIOException;
@@ -17,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: 'mautic:reports:scheduler',
     description: "Processes scheduler for report's export"
 )]
-class ExportSchedulerCommand extends Command
+final class ExportSchedulerCommand extends Command
 {
     public function __construct(
         private readonly ReportExporter $reportExporter,

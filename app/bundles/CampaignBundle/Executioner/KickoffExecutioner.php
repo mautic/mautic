@@ -23,7 +23,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class KickoffExecutioner implements ExecutionerInterface
+final class KickoffExecutioner implements ExecutionerInterface
 {
     private ?ContactLimiter $limiter = null;
 

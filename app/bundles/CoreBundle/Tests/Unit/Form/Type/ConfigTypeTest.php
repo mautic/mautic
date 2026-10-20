@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PageListType;
-use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
@@ -145,11 +144,7 @@ final class ConfigTypeTest extends TypeTestCase
                  ->method('getPageList')
                  ->willReturn([]);
 
-        $pageModelMock = $this->createMock(PageModel::class);
-        $pageModelMock
-                      ->method('getRepository')
-                      ->willReturn($repoMock);
-        $pageListType = new PageListType($pageModelMock, $this->createStub(CorePermissions::class));
+        $pageListType = new PageListType($this->createStub(CorePermissions::class), $repoMock);
 
         return [
             // register the type instances with the PreloadedExtension

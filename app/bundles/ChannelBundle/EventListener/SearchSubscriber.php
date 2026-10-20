@@ -34,7 +34,7 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             '@MauticChannel/SubscribedEvents/Search/global.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.messages.header', $results);
         }
     }

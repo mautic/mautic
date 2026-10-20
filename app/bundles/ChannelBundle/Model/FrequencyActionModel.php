@@ -7,11 +7,11 @@ use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 
-class FrequencyActionModel
+final readonly class FrequencyActionModel
 {
     public function __construct(
-        private readonly LeadModel $contactModel,
-        private readonly FrequencyRuleRepository $frequencyRuleRepository,
+        private LeadModel $contactModel,
+        private FrequencyRuleRepository $frequencyRuleRepository,
     ) {
     }
 

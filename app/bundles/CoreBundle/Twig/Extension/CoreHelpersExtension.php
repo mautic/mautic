@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Twig\Extension;
 
+use Mautic\CoreBundle\Helper\SearchScopeHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -13,7 +14,7 @@ use Twig\TwigFunction;
  * The main goal of this extension is to move a lot of PHP logic that was previously
  * present in PHP templates into an extension, which can then be parsed by Twig.
  */
-class CoreHelpersExtension extends AbstractExtension
+final class CoreHelpersExtension extends AbstractExtension
 {
     public function __construct(
         private readonly TranslatorInterface $translate,
@@ -27,6 +28,7 @@ class CoreHelpersExtension extends AbstractExtension
             new TwigFunction('getFilterAttributes', $this->getFilterAttributes(...), ['is_safe' => 'all']),
             // Used by CoreBundle:Helper:pagination.html.twig
             new TwigFunction('getPaginationAction', $this->getPaginationAction(...), ['is_safe' => 'all']),
+            new TwigFunction('search_scope_parse', $this->parseSearchScope(...)),
             new TwigFunction('md5', fn (string $string): string => md5($string), ['is_safe' => 'all']),
         ];
     }
@@ -39,6 +41,7 @@ class CoreHelpersExtension extends AbstractExtension
         return [
             new TwigFilter('json_decode', fn (string $json): mixed => json_decode($json, true)),
             new TwigFilter('parse_str', $this->parseString(...)),
+            new TwigFilter('search_scope_label', static fn (string $label, bool $indent = false): string => SearchScopeHelper::formatLabel($label, $indent)),
         ];
     }
 
@@ -121,5 +124,15 @@ class CoreHelpersExtension extends AbstractExtension
         }
 
         return "href=\"{$baseUrl}/{$page}{$queryString}\"";
+    }
+
+    /**
+     * @param list<string> $scopeCommands
+     *
+     * @return array{command: string, value: string}
+     */
+    public function parseSearchScope(string $search, array $scopeCommands): array
+    {
+        return SearchScopeHelper::parse($search, $scopeCommands);
     }
 }

@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -88,9 +89,10 @@ final class DynamicContentType extends AbstractType
         private readonly EntityManagerInterface $em,
         ListModel $listModel,
         private readonly TranslatorInterface $translator,
-        private readonly LeadModel $leadModel,
+        LeadModel $leadModel,
         private TypeList $typeList,
         private readonly RelativeDate $relativeDate,
+        private readonly LeadRepository $leadRepository,
     ) {
         $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
@@ -343,7 +345,7 @@ final class DynamicContentType extends AbstractType
     {
         unset($this->fieldChoices['company']);
 
-        $customFields = $this->leadModel->getRepository()->getCustomFieldList('lead');
+        $customFields = $this->leadRepository->getCustomFieldList('lead');
 
         $this->fieldChoices['lead'] = array_filter(
             $this->fieldChoices['lead'],

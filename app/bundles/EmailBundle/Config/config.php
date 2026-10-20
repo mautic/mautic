@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -117,15 +119,6 @@ return [
     'categories' => [
         'email' => [
             'class' => Mautic\EmailBundle\Entity\Email::class,
-        ],
-    ],
-    'services' => [
-        'fixtures' => [
-            'mautic.email.fixture.email' => [
-                'class'     => Mautic\EmailBundle\DataFixtures\ORM\LoadEmailData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.email.model.email'],
-            ],
         ],
     ],
     'parameters' => [

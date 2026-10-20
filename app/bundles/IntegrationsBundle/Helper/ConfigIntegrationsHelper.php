@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-class ConfigIntegrationsHelper
+final class ConfigIntegrationsHelper
 {
     /**
      * @var ConfigFormInterface[]

@@ -21,15 +21,27 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Focus>
  */
-class FocusApiController extends CommonApiController
+final class FocusApiController extends CommonApiController
 {
     /**
      * @var FocusModel|null
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, FocusModel $focusModel)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        FocusModel $focusModel,
+    ) {
         $this->model           = $focusModel;
         $this->entityClass     = Focus::class;
         $this->entityNameOne   = 'focus';

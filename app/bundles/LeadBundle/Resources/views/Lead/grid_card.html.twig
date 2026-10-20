@@ -23,11 +23,11 @@
                     {% endif %}
                     <h4 class="fw-sb mb-xs ellipsis">
                         <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">
-                            <span>{{ contact.primaryIdentifier | trans }}</span>
+                            <span>{% if contact.isAnonymous %}{{ contact.primaryIdentifier|trans }}{% else %}{{ htmlEntityDecode(contact.primaryIdentifier)|purify }}{% endif %}</span>
                         </a>
                     </h4>
                     <div class="text-secondary mb-1 ellipsis">
-                        <i class="ri-fw ri-building-2-line mr-xs"></i>{{ fields.core.company.value|default('') }}
+                        <i class="ri-fw ri-building-2-line mr-xs"></i>{{ htmlEntityDecode(fields.core.company.value|default(''))|purify }}
                     </div>
                     <div class="text-secondary mb-1 ellipsis">
                         <i class="ri-fw ri-map-pin-2-line mr-xs"></i>

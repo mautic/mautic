@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class AssetPermissions extends AbstractPermissions
+final class AssetPermissions extends AbstractPermissions
 {
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {

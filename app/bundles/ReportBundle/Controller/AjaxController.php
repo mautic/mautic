@@ -13,8 +13,9 @@ final class AjaxController extends CommonAjaxController
     private ReportModel $reportModel;
 
     #[Required]
-    public function autowireReportAjaxController(ReportModel $reportModel): void
-    {
+    public function autowireReportAjaxController(
+        ReportModel $reportModel,
+    ): void {
         $this->reportModel = $reportModel;
     }
 

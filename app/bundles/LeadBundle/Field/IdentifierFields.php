@@ -8,11 +8,11 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\IdentifierFieldEntityInterface;
 use Mautic\LeadBundle\Entity\Lead;
 
-class IdentifierFields
+final readonly class IdentifierFields
 {
     public function __construct(
-        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
-        private readonly FieldList $fieldList,
+        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private FieldList $fieldList,
     ) {
     }
 

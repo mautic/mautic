@@ -17,11 +17,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class MobileNotificationSendTypeTest extends TypeTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setup();
-    }
-
     /**
      * @return array<mixed>
      */

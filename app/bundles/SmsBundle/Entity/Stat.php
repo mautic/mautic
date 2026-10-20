@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;

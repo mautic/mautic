@@ -109,7 +109,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
         $this->assertInstanceOf(AuditLog::class, $sendEmailAuditLog);
 
         /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = static::getContainer()->get(CoreParametersHelper::class);
+        $coreParametersHelper = self::getContainer()->get(CoreParametersHelper::class);
         $zipFileName          = 'contacts_export_'.$contactExportScheduler->getScheduledDateTime()->format('Y_m_d_H_i_s').'.zip';
         $this->filePaths[]    = $filePath = $coreParametersHelper->get('contact_export_dir').'/'.$zipFileName;
         $downloadLink         = $this->router->generate(
@@ -144,7 +144,7 @@ final class ContactExportAdminNotificationsDisabledTest extends MauticMysqlTestC
             $contacts[] = $contact;
         }
 
-        $leadModel = static::getContainer()->get(LeadModel::class);
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $leadModel->saveEntities($contacts);
     }
 

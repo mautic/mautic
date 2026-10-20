@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
-class Version20220429091934 extends PreUpAssertionMigration
+final class Version20220429091934 extends PreUpAssertionMigration
 {
     private const SIGNED   = 'SIGNED';
 

@@ -119,9 +119,7 @@ final class UserStepType extends AbstractType
                         message: 'mautic.core.value.required'
                     ),
                     new Assert\Length(min: 6, minMessage: 'mautic.install.password.minlength'),
-                    new NotWeak([
-                        'message' => 'mautic.user.user.password.weak',
-                    ]),
+                    new NotWeak(message: 'mautic.user.user.password.weak'),
                 ],
             ]
         );

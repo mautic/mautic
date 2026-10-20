@@ -8,20 +8,23 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class PublicController extends AbstractFormController
 {
-    private \Mautic\AssetBundle\Entity\AssetRepository $assetRepository;
+    private AssetRepository $assetRepository;
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function autowirePublicController(\Mautic\AssetBundle\Entity\AssetRepository $assetRepository): void
-    {
+    #[Required]
+    public function autowirePublicController(
+        AssetRepository $assetRepository,
+    ): void {
         $this->assetRepository = $assetRepository;
     }
 

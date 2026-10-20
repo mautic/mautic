@@ -31,7 +31,8 @@ final class CampaignRepositoryTest extends TestCase
             'mautic.campaign.campaign.searchcommand.ispending' => 'is:pending',
             default                                            => $id,
         });
-        $this->repository->setTranslator($translator);
+
+        $this->repository->autowireCommonRepository($translator);
     }
 
     public function testAddSearchCommandWhereClauseHandlesExpirationFilters(): void

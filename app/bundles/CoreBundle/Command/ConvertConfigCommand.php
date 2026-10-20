@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -29,7 +31,7 @@ You may opt to save the PHP config file by using the --save-php-config option.
 <info>php %command.full_name% --save-php-config</info>
 TXT
 )]
-class ConvertConfigCommand extends Command
+final class ConvertConfigCommand extends Command
 {
     public function __construct(
         private readonly PathsHelper $pathsHelper,

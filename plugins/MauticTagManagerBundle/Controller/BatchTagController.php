@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticTagManagerBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
 use MauticPlugin\MauticTagManagerBundle\Form\Type\BatchTagType;
 use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,11 +13,12 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class BatchTagController extends AbstractFormController
 {
-    private \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository;
+    private TagRepository $tagRepository;
 
     #[Required]
     public function autowireBatchTagController(
-        TagModel $tagModel, \MauticPlugin\MauticTagManagerBundle\Entity\TagRepository $tagRepository,
+        TagModel $tagModel,
+        TagRepository $tagRepository,
     ): void {
         $this->tagRepository = $tagRepository;
     }

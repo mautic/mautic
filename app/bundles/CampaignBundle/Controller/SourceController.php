@@ -16,8 +16,9 @@ class SourceController extends CommonFormController
     private CampaignModel $campaignModel;
 
     #[Required]
-    public function autowireSourceController(CampaignModel $campaignModel): void
-    {
+    public function autowireSourceController(
+        CampaignModel $campaignModel,
+    ): void {
         $this->campaignModel = $campaignModel;
     }
 

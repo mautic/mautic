@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
+use Mautic\LeadBundle\Entity\ContactExportSchedulerRepository;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -31,7 +32,7 @@ class ContactScheduledExportCommand extends Command
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly FormatterHelper $formatterHelper,
         private readonly ProcessSignalService $processSignalService,
-        private readonly \Mautic\LeadBundle\Entity\ContactExportSchedulerRepository $contactExportSchedulerRepository,
+        private readonly ContactExportSchedulerRepository $contactExportSchedulerRepository,
     ) {
         parent::__construct();
     }

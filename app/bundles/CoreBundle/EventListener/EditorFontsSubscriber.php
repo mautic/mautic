@@ -32,7 +32,7 @@ final readonly class EditorFontsSubscriber implements EventSubscriberInterface
 
     private function addEditorFonts(CustomAssetsEvent $customAssetsEvent): void
     {
-        $fonts = (array) $this->coreParametersHelper->get(static::PARAMETER_EDITOR_FONTS, []);
+        $fonts = (array) $this->coreParametersHelper->get(self::PARAMETER_EDITOR_FONTS, []);
         foreach ($fonts as $font) {
             if (empty($font['url'])) {
                 continue;

@@ -15,7 +15,7 @@ use Doctrine\ORM\Tools\Pagination\CountWalker;
  *
  * @implements \IteratorAggregate<mixed>
  */
-class SimplePaginator implements \IteratorAggregate, \Countable
+final class SimplePaginator implements \IteratorAggregate, \Countable
 {
     private ?int $count = null;
 

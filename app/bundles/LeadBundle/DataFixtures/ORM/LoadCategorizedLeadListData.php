@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 
-class LoadCategorizedLeadListData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadCategorizedLeadListData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
         private readonly LeadListRepository $leadListRepository,

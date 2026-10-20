@@ -10,7 +10,7 @@ final class CategoryTypesEvent extends CommonEvent
     /**
      * @var array
      */
-    protected $types = [];
+    private $types = [];
 
     /**
      * Returns the array of Category Types.

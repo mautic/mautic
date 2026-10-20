@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Webhook>
  */
-class WebhookApiController extends CommonApiController
+final class WebhookApiController extends CommonApiController
 {
     /**
      * @var WebhookModel|null

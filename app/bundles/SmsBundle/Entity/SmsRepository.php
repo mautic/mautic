@@ -46,7 +46,7 @@ class SmsRepository extends CommonRepository
     private function getPublishedBroadcastsQuery(?int $id = null): Query
     {
         $qb   = $this->createQueryBuilder($this->getTableAlias());
-        $expr = $this->getPublishedByDateExpression($qb, null, true, true, false);
+        $expr = $this->getPublishedByDateOrmExpression($qb, null, true, true, false);
 
         $expr->add(
             $qb->expr()->eq($this->getTableAlias().'.smsType', $qb->expr()->literal('list'))
@@ -255,7 +255,7 @@ class SmsRepository extends CommonRepository
             $q->andWhere($q->expr()->isNull('e.translationParent'));
         }
 
-        if (!empty($ignoreIds)) {
+        if ([] !== $ignoreIds) {
             $q->andWhere($q->expr()->notIn('e.id', ':smsIds'))
                 ->setParameter('smsIds', $ignoreIds);
         }

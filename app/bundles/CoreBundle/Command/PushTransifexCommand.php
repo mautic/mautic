@@ -36,7 +36,7 @@ You can optionally choose to update resources for one bundle only with the --bun
 <info>php %command.full_name% --bundle AssetBundle</info>
 TXT
 )]
-class PushTransifexCommand extends Command
+final class PushTransifexCommand extends Command
 {
     public const NAME = 'mautic:transifex:push';
 
@@ -70,7 +70,6 @@ class PushTransifexCommand extends Command
         }
 
         $resources = $transifex->getConnector(Resources::class);
-        \assert($resources instanceof Resources);
 
         $existingResources = json_decode((string) $resources->getAll()->getBody(), true);
         $promises          = new \SplQueue();

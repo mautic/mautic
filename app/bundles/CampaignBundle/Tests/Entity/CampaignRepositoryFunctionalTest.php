@@ -83,6 +83,25 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(new CountResult(1, $leadThree->getId(), $leadThree->getId()), $result, 'Only lead three should match as it is the only one who does not have any event log.');
     }
 
+    public function testGetCountsForPendingContactsIgnoresLogsForNonPendingEvents(): void
+    {
+        $campaign     = $this->createCampaign();
+        $eventLog     = $this->createEventLog($campaign);
+        $lead         = $eventLog->getLead();
+        $pendingEvent = $this->createEvent($campaign);
+        $this->em->flush();
+
+        $this->assertInstanceOf(Lead::class, $lead);
+
+        $result = $this->repository->getCountsForPendingContacts(
+            $campaign->getId(),
+            [$pendingEvent->getId()],
+            new ContactLimiter(100, null, null, null, [$lead->getId()])
+        );
+
+        $this->assertEquals(new CountResult(1, $lead->getId(), $lead->getId()), $result);
+    }
+
     public function testGetCountsForPendingContactsWithEventLogsWithNonMatchingRotations(): void
     {
         $campaign   = $this->createCampaign();
@@ -109,7 +128,6 @@ final class CampaignRepositoryFunctionalTest extends MauticMysqlTestCase
             [$eventOne->getId(), $eventTwo->getId(), $eventThree->getId()],
             new ContactLimiter(100, null, null, null, [$leadOne->getId(), $leadTwo->getId(), $leadThree->getId()])
         );
-        $this->assertInstanceOf(Lead::class, $leadTwo);
 
         $this->assertEquals(new CountResult(1, $leadTwo->getId(), $leadTwo->getId()), $result, 'Only lead two should match as it is the only one who has a non-matching rotation.');
     }

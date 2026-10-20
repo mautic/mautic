@@ -515,11 +515,10 @@ final class ContactManagementCest
         // Click the upload button
         $I->click(ContactPage::$uploadButton);
 
-        // Wait for the new form to open
-        $I->waitForElement(ContactPage::$importForm, AcceptanceTester::TIMEOUT);
+        // Wait for the mapping form to open and field widgets to initialize
+        $I->waitForElementVisible(ContactPage::$firstName, AcceptanceTester::TIMEOUT);
 
         // Fill in the form
-        $I->seeElement(ContactPage::$importFormFields);
         $contact->fillImportFormFields();
 
         // Click 'import in browser'

@@ -6,9 +6,12 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
+use Mautic\LeadBundle\Segment\Decorator\ParseDateFilterValueTrait;
 
-class DateDefault implements FilterDecoratorInterface
+final class DateDefault implements FilterDecoratorInterface
 {
+    use ParseDateFilterValueTrait;
+
     /**
      * @param string $originalValue
      */
@@ -52,14 +55,14 @@ class DateDefault implements FilterDecoratorInterface
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): mixed
     {
-        $filter = $this->originalValue;
+        $filter = $this->parseDateFilterValue($this->originalValue, $contactSegmentFilterCrate->getOperator());
 
         return match ($contactSegmentFilterCrate->getOperator()) {
             'like', '!like' => !str_contains($filter, '%') ? '%'.$filter.'%' : $filter,
             'contains'   => '%'.$filter.'%',
             'startsWith' => $filter.'%',
             'endsWith'   => '%'.$filter,
-            default      => $this->originalValue,
+            default      => $filter,
         };
     }
 

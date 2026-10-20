@@ -9,7 +9,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class NamedAutowireController
 {
     #[Required]
-    public function autowireNamedAutowireController(SomeModel $someModel): void
-    {
+    public function autowireNamedAutowireController(
+        SomeModel $someModel,
+    ): void {
     }
 }

@@ -3,13 +3,17 @@
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Mautic\PointBundle\Helper\PointGroupSearchScopeProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class GroupController extends AbstractStandardFormController
 {
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
+
     protected function getTemplateBase(): string
     {
         return '@MauticPoint/Group';
@@ -23,17 +27,33 @@ final class GroupController extends AbstractStandardFormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, PointGroupSearchScopeProvider $pointGroupSearchScopeProvider, $page = 1): Response
     {
+        $this->indexSearchScopes = $pointGroupSearchScopeProvider->getScopes();
+
         return parent::indexStandard($request, $page);
     }
 
     /**
-     * Generates new form and processes post data.
+     * @param array<string, mixed> $args
+     * @param string               $action
      *
-     * @return JsonResponse|Response
+     * @return array<string, mixed>
      */
-    public function newAction(Request $request)
+    protected function getViewArguments(array $args, $action): array
+    {
+        if ('index' === $action && null !== $this->indexSearchScopes) {
+            $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+            $this->indexSearchScopes                = null;
+        }
+
+        return parent::getViewArguments($args, $action);
+    }
+
+    /**
+     * Generates new form and processes post data.
+     */
+    public function newAction(Request $request): Response
     {
         return parent::newStandard($request);
     }
@@ -53,20 +73,16 @@ final class GroupController extends AbstractStandardFormController
      * Deletes the entity.
      *
      * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function deleteAction(Request $request, $objectId)
+    public function deleteAction(Request $request, $objectId): Response
     {
         return parent::deleteStandard($request, $objectId);
     }
 
     /**
      * Deletes a group of entities.
-     *
-     * @return JsonResponse|RedirectResponse
      */
-    public function batchDeleteAction(Request $request)
+    public function batchDeleteAction(Request $request): Response
     {
         return parent::batchDeleteStandard($request);
     }

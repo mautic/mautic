@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -10,10 +12,10 @@ final class IconEvent extends Event
     /**
      * @var array
      */
-    protected $icons = [];
+    private $icons = [];
 
     public function __construct(
-        protected CorePermissions $security,
+        private readonly CorePermissions $security,
     ) {
     }
 

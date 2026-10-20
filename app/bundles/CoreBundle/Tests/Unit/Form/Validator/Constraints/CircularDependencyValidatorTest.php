@@ -52,7 +52,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
         $this->mockListModel->expects($this->never())
             ->method('getEntity');
 
-        $this->validator->validate([], new CircularDependency([]));
+        $this->validator->validate([], new CircularDependency());
     }
 
     /**
@@ -155,7 +155,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidateOnInvalid(?string $message, int $currentSegmentId, array $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)
-            ->validate($filters, new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']));
+            ->validate($filters, new CircularDependency(message: 'mautic.core.segment.circular_dependency_exists'));
     }
 
     /**
@@ -163,7 +163,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
      */
     public static function validateDataProvider(): \Iterator
     {
-        $constraint = new CircularDependency(['message' => 'mautic.core.segment.circular_dependency_exists']);
+        $constraint = new CircularDependency(message: 'mautic.core.segment.circular_dependency_exists');
         // Segment 1 is dependent on Segment 2 which is dependent on segment 1 - circular
         yield [
             $constraint->message,

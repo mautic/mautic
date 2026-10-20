@@ -41,6 +41,7 @@ final class ContactStep extends \AcceptanceTester
     {
         $I           = $this;
         $xpath       = "//*[@id='leadTable']/tbody/tr[{$place}]/td[2]/a/div[1]";
+        $I->waitForElementVisible($xpath, self::TIMEOUT);
         $contactName = $I->grabTextFrom($xpath);
         $I->see($contactName, $xpath);
 

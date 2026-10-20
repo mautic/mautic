@@ -16,6 +16,9 @@
 <div id="page-list-wrapper" class="panel panel-default">
   {% include "@MauticCore/Helper/list_toolbar.html.twig" with {
     action: currentRoute,
+    searchValue: searchValue|default(''),
+    searchScopes: searchScopes|default([]),
+    searchScopeHint: searchScopeHint|default(null),
     'bulk_actions': {
       'langVar' : 'core.theme',
       'routeBase': 'themes',

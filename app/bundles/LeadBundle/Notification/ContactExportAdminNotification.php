@@ -86,7 +86,6 @@ class ContactExportAdminNotification
         );
 
         $primaryAdmin = array_shift($adminUsers);
-        \assert($primaryAdmin instanceof User);
 
         $mailer = $this->mailHelper->getMailer(true);
         $mailer->setTo([$primaryAdmin->getEmail() => $primaryAdmin->getName()]);

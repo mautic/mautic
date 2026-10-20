@@ -21,15 +21,27 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Role>
  */
-class RoleApiController extends CommonApiController
+final class RoleApiController extends CommonApiController
 {
     /**
      * @var RoleModel|null
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, RoleModel $roleModel)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        RoleModel $roleModel,
+    ) {
         $this->model            = $roleModel;
         $this->entityClass      = Role::class;
         $this->entityNameOne    = 'role';

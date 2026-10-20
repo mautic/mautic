@@ -30,7 +30,7 @@ final readonly class FormFieldSubscriber implements EventSubscriberInterface
     {
         $field = $event->getField();
 
-        if (isset($field->deletedId)) {
+        if (null !== $field->deletedId) {
             $this->fieldModel->removeFieldColumn($field);
         }
     }

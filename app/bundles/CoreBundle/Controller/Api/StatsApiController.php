@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * @extends CommonApiController<object>
  */
-class StatsApiController extends CommonApiController
+final class StatsApiController extends CommonApiController
 {
     /**
      * Lists stats for a database table.

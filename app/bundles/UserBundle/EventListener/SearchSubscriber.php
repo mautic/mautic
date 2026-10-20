@@ -41,7 +41,7 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             '@MauticUser/SubscribedEvents/Search/global_user.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.user.users', $results);
         }
     }
@@ -55,7 +55,7 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             '@MauticUser/SubscribedEvents/Search/global_role.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.user.roles', $results);
         }
     }

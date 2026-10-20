@@ -28,13 +28,28 @@ final class TestKernel extends \AppTestKernel
 
     public function boot(): void
     {
+        $exceptionHandlerBeforeBoot = $this->currentExceptionHandler();
+
         parent::boot();
+
+        // the Symfony ErrorHandler registers itself on boot and never restores the previous handler, what PHPUnit reports as a risky test
+        if ($this->currentExceptionHandler() !== $exceptionHandlerBeforeBoot) {
+            restore_exception_handler();
+        }
 
         // HTMLPurifier warns about its missing cache directory, that is only created by a cache warmer on container compilation
         $htmlPurifierCacheDir = $this->getCacheDir().'/htmlpurifier';
         if (!is_dir($htmlPurifierCacheDir)) {
             mkdir($htmlPurifierCacheDir, 0777, true);
         }
+    }
+
+    private function currentExceptionHandler(): ?callable
+    {
+        $exceptionHandler = set_exception_handler(null);
+        restore_exception_handler();
+
+        return $exceptionHandler;
     }
 
     /**

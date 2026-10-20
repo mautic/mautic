@@ -6,7 +6,7 @@ namespace Mautic\ProjectBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-class ProjectRepository extends CommonRepository
+final class ProjectRepository extends CommonRepository
 {
     /**
      * @return array<string[]>

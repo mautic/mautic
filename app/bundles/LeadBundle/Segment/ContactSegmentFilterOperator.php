@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment;
 
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;

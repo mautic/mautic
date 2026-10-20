@@ -115,7 +115,7 @@ class Stat
     /**
      * @var array<string,mixed[]>
      */
-    private $changes = [];
+    private array $changes = [];
 
     public function __construct()
     {

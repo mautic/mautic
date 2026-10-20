@@ -23,12 +23,24 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Event>
  */
-class EventApiController extends CommonApiController
+final class EventApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper, EventModel $campaignEventModel)
-    {
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        EventModel $campaignEventModel,
+    ) {
         $this->model                    = $campaignEventModel;
         $this->entityClass              = Event::class;
         $this->entityNameOne            = 'event';

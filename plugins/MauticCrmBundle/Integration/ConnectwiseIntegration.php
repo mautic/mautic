@@ -172,11 +172,11 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $settings
+     * @param array<string, mixed> $settings
      *
      * @return array|mixed
      */
-    public function getFormLeadFields($settings = [])
+    public function getFormLeadFields(array $settings = [])
     {
         return $this->getFormFieldsByObject('Contact', $settings);
     }
@@ -184,7 +184,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         $cwFields = [];
         if (isset($settings['feature_settings']['objects'])) {
@@ -588,7 +588,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 foreach ($cwContactExists as $cwContact) { // go through array of contacts found since Connectwise lets you duplicate records with same email address
                     $mappedData = $this->getMappedFields($object, $lead, $personFound, $config, $cwContact);
 
-                    if (!empty($mappedData)) {
+                    if ([] !== $mappedData) {
                         $personData = $this->getApiHelper()->updateContact($mappedData, $cwContact['id']);
                     } else {
                         $personData['id'] = $cwContact['id'];
@@ -603,7 +603,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 $id                    = $personData['id'];
                 $integrationEntities[] = $this->saveSyncedData($lead, $object, 'lead', $id);
 
-                if (isset($config['push_activities']) and true == $config['push_activities']) {
+                if (isset($config['push_activities']) && true == $config['push_activities']) {
                     $savedEntity = $this->createActivity($config['campaign_task'], $id, $lead->getId());
                     if ($savedEntity instanceof IntegrationEntity) {
                         $integrationEntities[] = $savedEntity;
@@ -712,7 +712,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 if ($config['update']) {
                     $communicationItems = array_merge($config['communicationItems'], $communicationItems);
                 }
-                if (!empty($communicationItems)) {
+                if ([] !== $communicationItems) {
                     $matched[$integrationKey] = $communicationItems;
                 }
             }
@@ -845,7 +845,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             while ($campaignsMembersResults = $this->getApiHelper()->getCampaignMembers($campaignId, $page)) {
                 $campaignMemberObject = new IntegrationObject('CampaignMember', 'lead');
                 $recordList           = $this->getRecordList($campaignsMembersResults, 'id');
-                $contacts             = (array) $this->integrationEntityModel->getSyncedRecords(new IntegrationObject('Contact', 'lead'), $this->getName(), $recordList);
+                $contacts             = $this->integrationEntityModel->getSyncedRecords(new IntegrationObject('Contact', 'lead'), $this->getName(), $recordList);
 
                 $existingContactsIds = array_column(array_filter(
                     $contacts,
@@ -854,7 +854,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $contactsToFetch = array_diff_key($recordList, array_flip($existingContactsIds));
 
-                if (!empty($contactsToFetch)) {
+                if ([] !== $contactsToFetch) {
                     $listOfContactsToFetch = implode(',', array_keys($contactsToFetch));
                     $params['Ids']         = $listOfContactsToFetch;
 
@@ -896,7 +896,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         // first find existing campaign members.
         foreach ($contacts as $contact) {
             $existingCampaignMember = $this->integrationEntityModel->getSyncedRecords($campaignMemberObject, $this->getName(), $campaignId, $contact['internal_entity_id']);
-            if (empty($existingCampaignMember)) {
+            if ([] === $existingCampaignMember) {
                 $persistEntities[] = $this->createIntegrationEntity(
                     $campaignMemberObject->getType(),
                     $campaignId,
@@ -970,7 +970,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      */
     public function createActivity(array $config, $cwContactId, $leadId): ?IntegrationEntity
     {
-        if ($cwContactId and !empty($config['activity_name'])) {
+        if ($cwContactId && !empty($config['activity_name'])) {
             $activity = [
                 'name'     => $config['activity_name'],
                 'type'     => ['id' => $config['campaign_activity_type']],

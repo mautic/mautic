@@ -29,6 +29,29 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
+    private const DYNAMIC_CONTENT = [
+        [
+            'tokenName' => 'Greeting',
+            'content'   => 'Hello <strong>there</strong>',
+            'filters'   => [
+                [
+                    'content' => 'Hello Prague',
+                    'filters' => [
+                        [
+                            'glue'     => 'and',
+                            'field'    => 'city',
+                            'object'   => 'lead',
+                            'type'     => 'text',
+                            'operator' => '=',
+                            'display'  => null,
+                            'filter'   => 'Prague',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+    ];
+
     private SmtpTransport $transport;
 
     protected function setUp(): void
@@ -45,7 +68,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     private function setUpMailer(): void
     {
         /** @var MailHelper $mailHelper */
-        $mailHelper = static::getContainer()->get(MailHelper::class);
+        $mailHelper = self::getContainer()->get(MailHelper::class);
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
         ReflectionHelper::setValue($mailHelper, 'mailer', $mailer);
@@ -58,7 +81,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         // Clear owners cache (to leave a clean environment for future tests):
         /** @var MailHelper $mailHelper */
-        $mailHelper = static::getContainer()->get(MailHelper::class);
+        $mailHelper = self::getContainer()->get(MailHelper::class);
         ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
     }
 
@@ -159,6 +182,73 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($payload['lists'][0], $response['lists'][0]['id']);
         $this->assertSame('API segment', $response['lists'][0]['name']);
         $this->assertSame($payload['dynamicContent'], $response['dynamicContent']);
+    }
+
+    public function testPatchWithoutDynamicContentKeepsIt(): void
+    {
+        $emailId = $this->createEmailWithDynamicContentViaApi();
+
+        $this->client->request(Request::METHOD_PATCH, "/api/emails/{$emailId}/edit", ['subject' => 'Patched subject']);
+        $this->assertResponseIsSuccessful();
+        $response = json_decode($this->client->getResponse()->getContent(), true)['email'];
+
+        $this->assertSame('Patched subject', $response['subject']);
+        $this->assertSame(self::DYNAMIC_CONTENT, $response['dynamicContent']);
+
+        $this->em->clear();
+        $this->assertSame(self::DYNAMIC_CONTENT, $this->em->find(Email::class, $emailId)->getDynamicContent());
+    }
+
+    public function testPutWithoutDynamicContentResetsItToTheDefault(): void
+    {
+        $emailId = $this->createEmailWithDynamicContentViaApi();
+
+        $this->client->request(Request::METHOD_PUT, "/api/emails/{$emailId}/edit", [
+            'name'          => 'Email with dynamic content',
+            'subject'       => 'Replaced subject',
+            'emailType'     => 'template',
+            'customHtml'    => '<p>{dynamiccontent="Greeting"}</p>',
+            'language'      => 'en',
+            'publicPreview' => false,
+        ]);
+        $this->assertResponseIsSuccessful();
+        $response = json_decode($this->client->getResponse()->getContent(), true)['email'];
+
+        $this->assertSame('Replaced subject', $response['subject']);
+        $this->assertSame('Dynamic Content 1', $response['dynamicContent'][0]['tokenName']);
+        $this->assertSame('Default Dynamic Content', $response['dynamicContent'][0]['content']);
+    }
+
+    public function testCreateWithoutDynamicContentGetsTheDefault(): void
+    {
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', [
+            'name'       => 'Email without dynamic content',
+            'subject'    => 'No dynamic content',
+            'emailType'  => 'template',
+            'customHtml' => '<p>Hello</p>',
+        ]);
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $response = json_decode($this->client->getResponse()->getContent(), true)['email'];
+
+        $this->assertCount(1, $response['dynamicContent']);
+        $this->assertSame('Dynamic Content 1', $response['dynamicContent'][0]['tokenName']);
+        $this->assertSame('Default Dynamic Content', $response['dynamicContent'][0]['content']);
+    }
+
+    private function createEmailWithDynamicContentViaApi(): int
+    {
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', [
+            'name'           => 'Email with dynamic content',
+            'subject'        => 'Original subject',
+            'emailType'      => 'template',
+            'customHtml'     => '<p>{dynamiccontent="Greeting"}</p>',
+            'dynamicContent' => self::DYNAMIC_CONTENT,
+        ]);
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $response = json_decode($this->client->getResponse()->getContent(), true)['email'];
+        $this->assertSame(self::DYNAMIC_CONTENT, $response['dynamicContent']);
+
+        return $response['id'];
     }
 
     public function testSingleEmailWorkflow(): void
@@ -485,7 +575,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $trackingHash = 'tracking_hash_123';
 
         /** @var StatRepository $statRepository */
-        $statRepository = static::getContainer()->get(StatRepository::class);
+        $statRepository = self::getContainer()->get(StatRepository::class);
 
         // Create a test email stat.
         $stat = new Stat();
@@ -540,7 +630,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $user->setSignature('Best regards, |FROM_NAME|');
         $user->setRole($role);
 
-        $hasher = static::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
 
         $user->setPassword($hasher->hash('password'));
@@ -827,12 +917,8 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     private function getUser(string $userName): ?User
     {
         $repository = $this->em->getRepository(User::class);
-        $user       = $repository->findOneBy(['username' => $userName]);
-        if (!$user instanceof User) {
-            return null;
-        }
 
-        return $user;
+        return $repository->findOneBy(['username' => $userName]);
     }
 
     /**

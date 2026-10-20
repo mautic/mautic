@@ -6,14 +6,14 @@ use Doctrine\Common\Collections\Collection;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\WebhookBundle\Event\WebhookRequestEvent;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CampaignHelper
+final class CampaignHelper
 {
     /**
      * Cached contact values in format [contact_id => [key1 => val1, key2 => val1]].
@@ -21,9 +21,9 @@ class CampaignHelper
     private array $contactsValues = [];
 
     public function __construct(
-        protected Client $client,
-        protected CompanyModel $companyModel,
+        private readonly Client $client,
         private readonly EventDispatcherInterface $dispatcher,
+        private readonly CompanyRepository $companyRepository,
     ) {
     }
 
@@ -141,7 +141,7 @@ class CampaignHelper
         if (empty($this->contactsValues[$contact->getId()])) {
             $this->contactsValues[$contact->getId()]              = $contact->getProfileFields();
             $this->contactsValues[$contact->getId()]['ipAddress'] = $this->ipAddressesToCsv($contact->getIpAddresses());
-            $this->contactsValues[$contact->getId()]['companies'] = $this->companyModel->getRepository()->getCompaniesByLeadId($contact->getId());
+            $this->contactsValues[$contact->getId()]['companies'] = $this->companyRepository->getCompaniesByLeadId($contact->getId());
         }
 
         return $this->contactsValues[$contact->getId()];

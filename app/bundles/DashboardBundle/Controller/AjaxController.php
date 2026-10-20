@@ -4,6 +4,7 @@ namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Entity\WidgetRepository;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Mautic\PageBundle\Entity\HitRepository;
@@ -13,7 +14,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class AjaxController extends CommonAjaxController
 {
-    private \Mautic\DashboardBundle\Entity\WidgetRepository $widgetRepository;
+    private WidgetRepository $widgetRepository;
 
     private DashboardModel $dashboardModel;
 
@@ -21,7 +22,7 @@ final class AjaxController extends CommonAjaxController
 
     #[Required]
     public function autowireDashboardAjaxController(
-        \Mautic\DashboardBundle\Entity\WidgetRepository $widgetRepository,
+        WidgetRepository $widgetRepository,
         DashboardModel $dashboardModel,
         HitRepository $hitRepository,
     ): void {

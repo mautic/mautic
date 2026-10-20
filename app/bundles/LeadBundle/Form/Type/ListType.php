@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\RelativeDate;
 use Mautic\LeadBundle\Validator\Constraints\SegmentDate;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
@@ -33,7 +34,9 @@ final class ListType extends AbstractType
         private readonly TranslatorInterface $translator,
         private readonly ListModel $listModel,
         private readonly RelativeDate $relativeDate,
+        TypeOperatorProviderInterface $typeOperatorProvider,
     ) {
+        $typeOperatorProvider->setContext('segment');
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -140,12 +143,8 @@ final class ListType extends AbstractType
                     'allow_delete'   => true,
                     'label'          => false,
                     'constraints'    => [
-                        new CircularDependency([
-                            'message' => 'mautic.core.segment.circular_dependency_exists',
-                        ]),
-                        new SegmentDate([
-                            'message' => 'mautic.lead.segment.date_invalid',
-                        ]),
+                        new CircularDependency(message: 'mautic.core.segment.circular_dependency_exists'),
+                        new SegmentDate(message: 'mautic.lead.segment.date_invalid'),
                     ],
                 ]
             )->addModelTransformer($filterModalTransformer)

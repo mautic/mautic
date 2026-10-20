@@ -109,7 +109,7 @@ class LeadRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
 
-        if (!empty($campaigns)) {
+        if ([] !== $campaigns) {
             $q->andWhere(
                 $q->expr()->notIn('campaign_id', ':ids')
             )
@@ -534,7 +534,7 @@ class LeadRepository extends CommonRepository
     {
         $membershipConditions = $qb->expr()->and(
             $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
-            $qb->expr()->eq('cl.campaign_id', (int) $campaignId)
+            $qb->expr()->eq('cl.campaign_id', $campaignId)
         );
 
         if ($campaignCanBeRestarted) {

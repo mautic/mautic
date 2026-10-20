@@ -37,7 +37,7 @@ The command can optionally only pull files for a specific language with the --la
 <info>php %command.full_name% --language=<language_code></info>
 TXT
 )]
-class PullTransifexCommand extends Command
+final class PullTransifexCommand extends Command
 {
     public const NAME = 'mautic:transifex:pull';
 
@@ -75,10 +75,8 @@ class PullTransifexCommand extends Command
         }
 
         $statistics = $transifex->getConnector(Statistics::class);
-        \assert($statistics instanceof Statistics);
 
         $translations = $transifex->getConnector(Translations::class);
-        \assert($translations instanceof Translations);
 
         /** @var \SplQueue<Promise> $queue */
         $queue = new \SplQueue();

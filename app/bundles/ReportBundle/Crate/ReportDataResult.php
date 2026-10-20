@@ -4,7 +4,7 @@ namespace Mautic\ReportBundle\Crate;
 
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 
-class ReportDataResult
+final class ReportDataResult
 {
     private readonly int $totalResults;
 
@@ -20,12 +20,12 @@ class ReportDataResult
     /**
      * @var array<string>
      */
-    private array $columnKeys = [];
+    private readonly array $columnKeys;
 
     /**
      * @var array<mixed>
      */
-    private array $graphs = [];
+    private readonly array $graphs;
 
     private readonly ?\DateTime $dateFrom;
 
@@ -131,7 +131,7 @@ class ReportDataResult
      */
     public function getTotalsToExport(FormatterHelper $formatterHelper): array
     {
-        if (empty($this->totals)) {
+        if ([] === $this->totals) {
             return [];
         }
 

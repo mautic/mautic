@@ -10,7 +10,7 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
-class TranslationLoader extends ArrayLoader implements LoaderInterface
+final class TranslationLoader extends ArrayLoader implements LoaderInterface
 {
     public function __construct(
         private readonly BundleHelper $bundleHelper,

@@ -60,7 +60,7 @@ final class Dsn implements \Stringable
         $host     = urldecode($parsedDsn['host']);
         $user     = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
         $password = '' !== ($parsedDsn['pass'] ?? '') ? urldecode($parsedDsn['pass']) : null;
-        $port     = isset($parsedDsn['port']) ? (int) $parsedDsn['port'] : null;
+        $port     = $parsedDsn['port'] ?? null;
         $path     = isset($parsedDsn['path']) ? ltrim(urldecode($parsedDsn['path']), '/') : null;
         parse_str($parsedDsn['query'] ?? '', $query);
 

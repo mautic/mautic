@@ -5,6 +5,9 @@ declare(strict_types=1);
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
+use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()
         ->defaults()
@@ -19,6 +22,19 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\SmsBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+
+    $services->set('mautic.sms.twilio.transport', Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class)
+        ->arg('$logger', service('monolog.logger.mautic'))
+        ->tag('mautic.sms_transport', ['integrationAlias' => 'Twilio']);
+
+    $services->alias(Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class, 'mautic.sms.twilio.transport');
+    $services->alias('sms_api', 'mautic.sms.twilio.transport');
+    $services->alias('mautic.sms.api', 'mautic.sms.twilio.transport');
+    $services->set('mautic.helper.sms', Mautic\SmsBundle\Helper\SmsHelper::class)->tag('twig.helper', ['alias' => 'sms_helper']);
+    $services->alias(Mautic\SmsBundle\Helper\SmsHelper::class, 'mautic.helper.sms');
+    $services->set('mautic.sms.transport_chain', Mautic\SmsBundle\Sms\TransportChain::class)
+        ->arg('$primaryTransport', param('mautic.sms_transport'));
+    $services->alias(Mautic\SmsBundle\Sms\TransportChain::class, 'mautic.sms.transport_chain');
     $services->set('mautic.sms.helper.contact', Mautic\SmsBundle\Helper\ContactHelper::class);
     $services->set('mautic.sms.helper.reply', Mautic\SmsBundle\Helper\ReplyHelper::class);
     $services->set('mautic.sms.twilio.configuration', Mautic\SmsBundle\Integration\Twilio\Configuration::class);

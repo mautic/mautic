@@ -125,7 +125,7 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $data    = $crawler->filterXPath('//div[@id="social"]//td');
         $this->assertCount(1, $data);
 
-        $translator = static::getContainer()->get(TranslatorInterface::class);
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $this->assertStringContainsString($translator->trans('mautic.lead.field.group.no_data'), $data->text());
     }
 

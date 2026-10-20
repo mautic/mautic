@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Portions modified from https://code.google.com/p/simple-php-oauth/.
  */
-class oAuthHelper
+final class oAuthHelper
 {
     private $clientId;
 

@@ -42,7 +42,7 @@ final class UnsubscribedHelperTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->unsubscribedHelper = static::getContainer()->get(UnsubscribedHelper::class);
+        $this->unsubscribedHelper = self::getContainer()->get(UnsubscribedHelper::class);
 
         $this->createUsers();
         $this->createEmailAndCampaign();
@@ -288,7 +288,6 @@ final class UnsubscribedHelperTest extends MauticMysqlTestCase
         $stat1->setEmailAddress($this->lead1->getEmail());
         $stat1->setDateSent(new \DateTime());
         $stat1->setSource('campaign.event');
-        $this->assertInstanceOf(Event::class, $event);
         $stat1->setSourceId($event->getId());
         $this->em->persist($stat1);
 

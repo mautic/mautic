@@ -558,10 +558,27 @@ Mautic.toggleMailerIsOwnerWarningMessage = function(radioSelector) {
     }
 }
 
+Mautic.destroyCkEditorsInContainer = function (container) {
+    if (typeof ckEditors === 'undefined' || ckEditors.size === 0) {
+        return;
+    }
+
+    container.find('textarea.editor').each(function () {
+        var editor = ckEditors.get(this);
+
+        if (editor && typeof editor.destroy === 'function') {
+            editor.destroy();
+            ckEditors.delete(this);
+        }
+    });
+};
+
 Mautic.initRemoveEvents = function (elements, jQueryVariant) {
     var mQuery = (typeof jQueryVariant != 'undefined') ? jQueryVariant : window.mQuery;
     if (elements.hasClass('remove-selected')) {
-        elements.on('click', function() {
+        elements.off('click').on('click', function() {
+            Mautic.destroyCkEditorsInContainer(mQuery(this).closest('.panel'));
+
             mQuery(this).closest('.panel').animate(
                 {'opacity': 0},
                 'fast',
@@ -571,7 +588,7 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             );
         });
     } else {
-        elements.on('click', function (e) {
+        elements.off('click').on('click', function (e) {
             e.preventDefault();
             var $this         = mQuery(this);
             var parentElement = $this.parents('.tab-pane.dynamic-content');
@@ -579,6 +596,8 @@ Mautic.initRemoveEvents = function (elements, jQueryVariant) {
             if ($this.hasClass('remove-filter')) {
                 parentElement = $this.parents('.tab-pane.dynamic-content-filter');
             }
+
+            Mautic.destroyCkEditorsInContainer(parentElement);
 
             var tabLink      = mQuery('a[href="#' + parentElement.attr('id') + '"]').parent();
             var tabContainer = tabLink.parent();

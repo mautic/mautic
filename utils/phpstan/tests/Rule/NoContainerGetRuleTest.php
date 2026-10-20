@@ -23,19 +23,19 @@ final class NoContainerGetRuleTest extends RuleTestCase
         $this->analyse([__DIR__.'/Fixture/ContainerGetService.php'], [
             [
                 'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.',
-                19,
+                20,
             ],
             [
                 'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.',
-                24,
+                25,
             ],
             [
                 'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.',
-                29,
+                30,
             ],
             [
                 'Do not fetch a service from the container via ->get(...). Inject the service as a typed constructor property instead.',
-                34,
+                35,
             ],
         ]);
 
@@ -49,7 +49,7 @@ final class NoContainerGetRuleTest extends RuleTestCase
         $this->analyse([__DIR__.'/Fixture/ContainerGetInTestCase.php'], [
             [
                 'Do not fetch a service from the container by a string name. Use a class constant, e.g. ->get(SomeService::class), to get a typed service.',
-                19,
+                20,
             ],
         ]);
     }

@@ -5,10 +5,10 @@ namespace Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\EmailBundle\MonitoredEmail\Exception\ReplyNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 
-class Parser
+final readonly class Parser
 {
     public function __construct(
-        private readonly Message $message,
+        private Message $message,
     ) {
     }
 

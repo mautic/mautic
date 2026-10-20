@@ -43,21 +43,23 @@ class NotificationHelper
         return $this->doNotContact->addDncForContact((int) $lead['id'], 'notification', DoNotContact::UNSUBSCRIBED);
     }
 
-    public function getHeaderScript()
+    public function getHeaderScript(): ?string
     {
         if ($this->hasScript()) {
             return 'MauticJS.insertScript(\'https://cdn.onesignal.com/sdks/OneSignalSDK.js\');
                     var OneSignal = OneSignal || [];';
         }
+
+        return null;
     }
 
-    public function getScript()
+    public function getScript(): ?string
     {
         if ($this->hasScript()) {
             $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
 
             if (!$integration || false === $integration->getIntegrationSettings()->getIsPublished()) {
-                return;
+                return null;
             }
 
             $settings        = $integration->getIntegrationSettings();
@@ -158,6 +160,8 @@ JS;
 
             return $oneSignalInit;
         }
+
+        return null;
     }
 
     private function hasScript(): bool

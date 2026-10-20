@@ -253,7 +253,7 @@ final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         // Add events to campaign
         $campaign->addEvent(0, $event);
 
-        if (!empty($leadsPayload)) {
+        if ([] !== $leadsPayload) {
             $this->emulateEmailCampaignStat($event, $email, $leadsPayload);
         }
 

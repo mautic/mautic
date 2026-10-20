@@ -294,6 +294,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(TrackableRepository::class), // $trackableRepository
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->companyRepository, // $companyRepository
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepository);
@@ -587,8 +588,8 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn([1 => 'someone@domain.com']);
 
         // If it makes it to the point of calling getContactCompanies then DNC failed
-        $this->companyModel->expects($this->exactly(0))
-            ->method('getRepository');
+        $this->companyRepository->expects($this->exactly(0))
+            ->method('getCompaniesForContacts');
 
         $this->emailEntity->method('getId')
             ->willReturn(1);
@@ -638,6 +639,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(TrackableRepository::class), // $trackableRepository
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->companyRepository, // $companyRepository
         );
 
         $contacts = [
@@ -727,9 +729,6 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper = $this->createStub(CoreParametersHelper::class);
 
         $messageModel = new MessageQueueModel(
-            $this->leadModel,
-            $this->companyModel,
-            $coreParametersHelper,
             $this->entityManager,
             $this->createStub(CorePermissions::class),
             $this->eventDispatcher,
@@ -737,8 +736,14 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->userHelper,
             $this->createStub(LoggerInterface::class),
-            $this->createStub(MessageQueueRepository::class), // $messageQueueRepository
-            $this->frequencyRepository // $frequencyRuleRepository
+            $coreParametersHelper,
+        );
+        $messageModel->autowireMessageQueueModel(
+            $this->leadModel,
+            $this->companyModel,
+            $this->createStub(MessageQueueRepository::class),
+            $this->frequencyRepository,
+            $this->createStub(LeadRepository::class)
         );
 
         $emailModel = new EmailModel(
@@ -779,6 +784,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(TrackableRepository::class), // $trackableRepository
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
+            $this->companyRepository, // $companyRepository
         );
 
         $this->emailEntity->method('getId')

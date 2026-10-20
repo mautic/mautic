@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -7,9 +9,9 @@ use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 final class SocialMonitorEvent extends CommonEvent
 {
-    protected int $newLeadCount;
+    private readonly int $newLeadCount;
 
-    protected int $updatedLeadCount;
+    private readonly int $updatedLeadCount;
 
     /**
      * @param string $integrationName
@@ -17,9 +19,9 @@ final class SocialMonitorEvent extends CommonEvent
      * @param int    $updatedLeadCount
      */
     public function __construct(
-        protected $integrationName,
+        private $integrationName,
         Monitoring $monitoring,
-        protected array $leadIds,
+        private readonly array $leadIds,
         $newLeadCount,
         $updatedLeadCount,
     ) {

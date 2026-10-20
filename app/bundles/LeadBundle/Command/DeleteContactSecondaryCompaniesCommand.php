@@ -23,7 +23,7 @@ The <info>%command.name%</info> command deletes non-primary companies of every c
 <info>php %command.full_name%</info>
 TXT
 )]
-class DeleteContactSecondaryCompaniesCommand extends Command
+final class DeleteContactSecondaryCompaniesCommand extends Command
 {
     public const NAME                    = 'mautic:contact:delete:secondary-companies';
 

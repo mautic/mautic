@@ -22,7 +22,7 @@ final class SearchCommandList implements SearchCommandListInterface
 
     public function getList(): array
     {
-        if (!empty($this->searchCommands)) {
+        if ([] !== $this->searchCommands) {
             return $this->searchCommands;
         }
 

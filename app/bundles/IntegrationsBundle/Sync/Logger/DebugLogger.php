@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Sync\Logger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
-class DebugLogger
+final class DebugLogger
 {
     private static ?LoggerInterface $logger = null;
 

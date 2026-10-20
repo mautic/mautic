@@ -64,7 +64,7 @@ final class FilterOperatorSubscriberTest extends TestCase
 
     public function testOnListOperatorsGenerate(): void
     {
-        $event = new LeadListFiltersOperatorsEvent([], $this->translator);
+        $event = new LeadListFiltersOperatorsEvent([]);
 
         $this->subscriber->onListOperatorsGenerate($event);
 
@@ -491,11 +491,11 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'properties' => [
                     'type' => 'number',
                 ],
+                'object'    => 'lead',
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object'    => 'lead',
                 'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']
@@ -795,11 +795,11 @@ final class FilterOperatorSubscriberTest extends TestCase
                 'properties' => [
                     'type' => 'number',
                 ],
+                'object'    => 'lead',
                 'operators' => [
                     'equals'    => '=',
                     'not equal' => '!=',
                 ],
-                'object'    => 'lead',
                 'iconClass' => 'ri-external-link-line',
             ],
             $choices['behaviors']['hit_url_count']

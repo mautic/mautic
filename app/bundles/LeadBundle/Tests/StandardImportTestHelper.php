@@ -102,7 +102,7 @@ abstract class StandardImportTestHelper extends CommonMocks
 
     public function setUp(): void
     {
-        defined('MAUTIC_ENV') or define('MAUTIC_ENV', 'test');
+        defined('MAUTIC_ENV') || define('MAUTIC_ENV', 'test');
 
         $this->eventEntities = [];
     }

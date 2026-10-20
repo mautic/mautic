@@ -9,7 +9,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 final class SomeAutowireService
 {
     #[Required]
-    public function setSomeModel(SomeModel $someModel): void
-    {
+    public function setSomeModel(
+        SomeModel $someModel,
+    ): void {
     }
 }

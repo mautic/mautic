@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -101,7 +103,7 @@ final class FocusPropertiesType extends AbstractType
                 break;
         }
 
-        if (!empty($choices)) {
+        if ([] !== $choices) {
             $builder->add(
                 'placement',
                 ChoiceType::class,

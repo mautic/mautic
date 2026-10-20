@@ -16,8 +16,9 @@ final class AjaxController extends CommonAjaxController
     private MessageQueueModel $messageQueueModel;
 
     #[Required]
-    public function autowireChannelAjaxController(MessageQueueModel $messageQueueModel): void
-    {
+    public function autowireChannelAjaxController(
+        MessageQueueModel $messageQueueModel,
+    ): void {
         $this->messageQueueModel = $messageQueueModel;
     }
 

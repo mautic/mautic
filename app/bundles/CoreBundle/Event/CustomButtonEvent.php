@@ -7,16 +7,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class CustomButtonEvent extends AbstractCustomRequestEvent
 {
-    /**
-     * @var array
-     */
-    protected $buttons = [];
+    private array $buttons = [];
 
     public function __construct(
-        protected $location,
+        private $location,
         Request $request,
         array $buttons = [],
-        protected $item = null,
+        private $item = null,
     ) {
         parent::__construct($request);
 
@@ -33,10 +30,7 @@ final class CustomButtonEvent extends AbstractCustomRequestEvent
         return $this->location;
     }
 
-    /**
-     * @return array
-     */
-    public function getButtons()
+    public function getButtons(): array
     {
         return $this->buttons;
     }
@@ -115,7 +109,7 @@ final class CustomButtonEvent extends AbstractCustomRequestEvent
     /**
      * Generate a button ID that can be overridden by other plugins.
      */
-    protected function generateButtonKey(array $button): string
+    private function generateButtonKey(array $button): string
     {
         $buttonKey = '';
         if (!empty($button['btnText'])) {

@@ -2,7 +2,7 @@
 
 namespace Mautic\PluginBundle\Helper;
 
-class Cleaner
+final class Cleaner
 {
     public const FIELD_TYPE_STRING   = 'string';
 

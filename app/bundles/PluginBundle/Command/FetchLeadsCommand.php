@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
         'mautic:integration:synccontacts',
     ]
 )]
-class FetchLeadsCommand extends Command
+final class FetchLeadsCommand extends Command
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -115,7 +115,7 @@ class FetchLeadsCommand extends Command
         $config            = $integrationObject->mergeConfigToFeatureSettings();
         $supportedFeatures = $integrationObject->getIntegrationSettings()->getSupportedFeatures();
 
-        defined('MAUTIC_CONSOLE_VERBOSITY') or define('MAUTIC_CONSOLE_VERBOSITY', $output->getVerbosity());
+        defined('MAUTIC_CONSOLE_VERBOSITY') || define('MAUTIC_CONSOLE_VERBOSITY', $output->getVerbosity());
 
         if (!isset($config['objects'])) {
             $config['objects'] = [];

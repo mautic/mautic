@@ -18,8 +18,9 @@ class ActionModel extends CommonFormModel
     private ActionRepository $actionRepository;
 
     #[Required]
-    public function autowireActionModel(ActionRepository $actionRepository): void
-    {
+    public function autowireActionModel(
+        ActionRepository $actionRepository,
+    ): void {
         $this->actionRepository = $actionRepository;
     }
 

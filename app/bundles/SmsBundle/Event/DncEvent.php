@@ -40,7 +40,7 @@ final class DncEvent extends Event
 
     public function removeContact(int $id): void
     {
-        array_push($this->removed, $id);
+        $this->removed[] = $id;
         unset($this->contacts[$id]);
     }
 

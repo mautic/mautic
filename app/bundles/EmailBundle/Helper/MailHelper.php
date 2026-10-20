@@ -323,11 +323,13 @@ class MailHelper
         if (empty($this->message->getReplyTo()) && !empty($this->getReplyTo())) {
             $this->setMessageReplyTo($this->getReplyTo());
         }
-        // Set system return path if applicable
+        // Sender wins over Return-Path in Symfony's envelope resolution, so drop it whenever a Return-Path is set.
         if (!$isQueueFlush && ($bounceEmail = $this->generateBounceEmail())) {
             $this->message->returnPath($bounceEmail);
+            $this->message->getHeaders()->remove('Sender');
         } elseif (!empty($this->returnPath)) {
             $this->message->returnPath($this->returnPath);
+            $this->message->getHeaders()->remove('Sender');
         }
 
         $this->dispatchPreSendEvent();
@@ -734,10 +736,8 @@ class MailHelper
      *
      * @param string $template
      * @param bool   $returnContent
-     *
-     * @return void|string
      */
-    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null)
+    public function setTemplate($template, array $vars = [], $returnContent = false, $charset = null): ?string
     {
         $content = $this->twig->render($template, $vars);
 
@@ -749,6 +749,8 @@ class MailHelper
 
         $this->setBody($content, 'text/html', $charset);
         unset($content);
+
+        return null;
     }
 
     public function setSubject($subject): void
@@ -1579,7 +1581,7 @@ class MailHelper
     protected function createAssetDownloadEntries(): void
     {
         // Nothing was sent out so bail
-        if ($this->fatal || empty($this->assetStats)) {
+        if ($this->fatal || [] === $this->assetStats) {
             return;
         }
 
@@ -1591,7 +1593,7 @@ class MailHelper
         }
 
         // Create a download entry if there is an Asset attachment
-        if (!empty($this->assetStats)) {
+        if ([] !== $this->assetStats) {
             foreach ($this->assets as $asset) {
                 foreach ($this->assetStats as $stat) {
                     $this->assetModel->trackDownload(
@@ -1615,7 +1617,7 @@ class MailHelper
      */
     protected function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null): void
     {
-        if ($this->internalSend || empty($this->assets)) {
+        if ($this->internalSend || [] === $this->assets) {
             return;
         }
 
@@ -1870,7 +1872,7 @@ class MailHelper
         $headers = $this->getCustomHeaders();
 
         // Set custom headers
-        if (!empty($headers)) {
+        if ([] !== $headers) {
             $tokens = $this->getTokens();
             // Replace tokens
             $messageHeaders = $this->message->getHeaders();
@@ -2094,7 +2096,7 @@ class MailHelper
         $this->skip               = $event->isSkip();
         $this->fatal              = $event->isFatal();
         $errors                   = $event->getErrors();
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $currentErrors = [];
             if (isset($this->errors['failures']) && is_array($this->errors['failures'])) {
                 $currentErrors = $this->errors['failures'];

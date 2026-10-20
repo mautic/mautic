@@ -172,7 +172,7 @@ final class PublicController extends FormController
                 $this->leadModel->setFieldValues($lead, $data);
                 $this->leadModel->saveEntity($lead);
 
-                if ($notify && (!isset($lead->imported) || !$lead->imported)) {
+                if ($notify && (!$lead->imported)) {
                     if ($user = $this->userModel->getEntity($notify)) {
                         $this->addNewNotification(
                             sprintf($this->translator->trans('mautic.plugin.clearbit.contact_retrieved'), $lead->getEmail()),

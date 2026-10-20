@@ -23,7 +23,7 @@ trait LoginUserWithSamlTrait
         $session->save();
 
         $sessionFactory = $this->createMock(SessionFactory::class);
-        $sessionFactory->expects($this->any())
+        $sessionFactory
             ->method('createSession')
             ->willReturn($session);
 
