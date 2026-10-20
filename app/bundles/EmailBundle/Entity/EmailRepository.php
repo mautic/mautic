@@ -36,8 +36,10 @@ class EmailRepository extends CommonRepository
 
     /**
      * Get an array of do not email.
+     *
+     * @param array $leadIds
      */
-    public function getDoNotEmailList(array $leadIds = []): array
+    public function getDoNotEmailList($leadIds = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id, l.email')
@@ -46,7 +48,7 @@ class EmailRepository extends CommonRepository
             ->where($q->expr()->eq('dnc.channel', $q->expr()->literal('email')))
             ->andWhere($q->expr()->neq('l.email', $q->expr()->literal('')));
 
-        if ($leadIds !== []) {
+        if ($leadIds) {
             $q->andWhere(
                 $q->expr()->in('l.id', ':leadIds')
             )

@@ -571,6 +571,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
      * @param array<string, mixed> $args             same as getEntity/getEntities
      * @param string               $joinTable
      * @param int                  $entityId
+     * @param array                $filters
      * @param string               $entityColumnName
      * @param array|null           $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      */
@@ -578,7 +579,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         array $args,
         $joinTable,
         $entityId,
-        array $filters = [],
+        $filters = [],
         $entityColumnName = 'id',
         ?array $additionalJoins = null,
         $contactColumnName = 'lead_id',
@@ -621,7 +622,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
             }
         }
 
-        if ($filters !== []) {
+        if ($filters) {
             $expr = null;
             foreach ($filters as $column => $value) {
                 if (is_array($value)) {
@@ -1116,9 +1117,12 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         return (bool) $q->executeQuery()->fetchOne();
     }
 
-    public function checkLeadOwner(Lead $lead, array $ownerIds = []): bool
+    /**
+     * @param array $ownerIds
+     */
+    public function checkLeadOwner(Lead $lead, $ownerIds = []): bool
     {
-        if ($ownerIds === []) {
+        if (empty($ownerIds)) {
             return false;
         }
 

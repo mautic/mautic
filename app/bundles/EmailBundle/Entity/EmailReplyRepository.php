@@ -16,7 +16,7 @@ final class EmailReplyRepository extends CommonRepository implements EmailReplyR
     /**
      * @param int|Lead|null $leadId
      */
-    public function getByLeadIdForTimeline($leadId, array $options): array
+    public function getByLeadIdForTimeline($leadId, $options): array
     {
         if ($leadId instanceof Lead) {
             $leadId = $leadId->getId();

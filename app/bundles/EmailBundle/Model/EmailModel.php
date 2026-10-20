@@ -2141,11 +2141,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead(s).
      *
-     * @param array                   $assetAttachments
      * @param array<string>|Lead|null $leadFields
      *
      * @return false|mixed[]
-     *
      * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function sendSampleEmailToUser(
@@ -2153,7 +2151,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $users,
         $leadFields = null,
         array $tokens = [],
-        $assetAttachments = [],
+        array $assetAttachments = [],
         bool $saveStat = true,
     ): false|array {
         if (!$emailId = $email->getId()) {
@@ -2300,7 +2298,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return string
      */
-    public function buildUrl(string $route, array $routeParams = [], bool $absolute = true, $clickthrough = [])
+    public function buildUrl(string $route, array $routeParams = [], bool $absolute = true, array $clickthrough = [])
     {
         $parts = parse_url($this->coreParametersHelper->get('site_url') ?: '');
 

@@ -959,10 +959,8 @@ class FieldModel extends FormModel
 
     /**
      * Get the fields for a specific group.
-     *
-     * @param array $filters
      */
-    public function getGroupFields($group, $filters = ['isPublished' => true]): array
+    public function getGroupFields($group, array $filters = ['isPublished' => true]): array
     {
         $forceFilters = [
             [

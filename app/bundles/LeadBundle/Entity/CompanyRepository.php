@@ -472,7 +472,7 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
      *
      * @return array<array{id: string}>
      */
-    public function getCompanyIdsByUniqueFields(iterable $uniqueFieldsWithData, ?int $companyId = null, ?int $limit = null): array
+    public function getCompanyIdsByUniqueFields($uniqueFieldsWithData, ?int $companyId = null, ?int $limit = null): array
     {
         return $this->getCompanyFieldsByUniqueFields($uniqueFieldsWithData, 'c.id', $companyId, $limit);
     }
@@ -486,7 +486,7 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
      *
      * @return array<array{id: string}>
      */
-    public function getCompanyFieldsByUniqueFields(iterable $uniqueFieldsWithData, string $select, ?int $companyId = null, ?int $limit = null): array
+    public function getCompanyFieldsByUniqueFields($uniqueFieldsWithData, string $select, ?int $companyId = null, ?int $limit = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select($select)
