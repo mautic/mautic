@@ -609,13 +609,9 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         synchronizeDropdownState(jQuery, '_completeHide', 'hidden.bs.dropdown', false);
         var tabChildren = window.bootstrap.Tab.prototype._getChildren;
         window.bootstrap.Tab.prototype._getChildren = function () {
-            var children = tabChildren.call(this);
-            if (this._element.hasAttribute('data-toggle')) {
-                return children.filter(function (child) {
-                    return !child.matches('li') || !child.querySelector('[data-toggle="tab"], [data-toggle="pill"]');
-                });
-            }
-            return children;
+            return tabChildren.call(this).filter(function (child) {
+                return !child.matches('li') || !child.querySelector('[data-toggle="tab"], [data-toggle="pill"], [data-bs-toggle="tab"], [data-bs-toggle="pill"]');
+            });
         };
         jQuery(document).on('shown.bs.collapse hidden.bs.collapse shown.bs.modal hidden.bs.modal', function (event) {
             jQuery(event.target).toggleClass('in', 'shown' === event.type);
