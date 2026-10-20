@@ -18,7 +18,7 @@ Colors are grouped by the role each variable has in the theme. Each value is wri
 ```yaml
 colors:
   brand:
-    primary: "var(--primary-60, #4E5D9D)"
+    primary: "var(--primary-60, #4e5d9d)"
   text:
     primary: "var(--text-primary, #161616)"
     secondary: "var(--text-secondary, #525252)"
@@ -40,11 +40,11 @@ colors:
   border:
     subtle-01: "var(--border-subtle-01, #e0e0e0)"
     strong-01: "var(--border-strong-01, #8d8d8d)"
-    interactive: "var(--border-interactive, #4E5D9D)"
+    interactive: "var(--border-interactive, #4e5d9d)"
   interactive:
-    interactive: "var(--interactive, #4E5D9D)"
-    focus: "var(--focus, #4E5D9D)"
-    button-primary: "var(--button-primary, #4E5D9D)"
+    interactive: "var(--interactive, #4e5d9d)"
+    focus: "var(--focus, #4e5d9d)"
+    button-primary: "var(--button-primary, #4e5d9d)"
 ```
 
 ## Typography
@@ -102,7 +102,7 @@ typography:
 
 Layout follows the official Bootstrap documentation: https://getbootstrap.com/docs/5.3/layout/overview/
 
-The layout uses the Bootstrap grid. Page layout (rows, columns, and similar) can use plain HTML and hardcoded classes without permission, as stated in the Components rules.
+The layout uses the Bootstrap grid. Page layout (rows, columns, and similar) can use plain HTML and hardcoded classes without permission, as stated in Do's and Don'ts.
 
 ### Design Tokens
 
@@ -133,8 +133,6 @@ rounded:
 ```
 
 ## Components
-
-Every page must be built using components.
 
 #### card
 
@@ -285,13 +283,12 @@ uishell: "Use for the global app header with skip link, menu toggle, brand and a
 
 ## Do's and Don'ts
 
+- Do build every page using components.
 - Do reuse an existing component. Ask permission before creating a new one when none fits the flow.
 - Do import and configure components only through their public API (content, state, callbacks, config).
 - Don't copy a component to change it, and don't create wrappers, aliases, or redesigns of existing ones.
 - Do ask permission before any custom styling or visual or structural change to a shared component. Make the change in the imported component so it applies to all instances.
 - Don't write custom visual CSS without permission. Plain HTML and hardcoded classes are allowed without permission only for page layout (rows, columns, and similar). Otherwise, plain HTML is limited to semantic structure and text, with no component behavior.
 - Do use `var(--name)` tokens for every value. Don't write a hex, rgb, or pixel value directly.
-- Do assign any colors to tokens from the theme variables.
 - Do use the primary color for one main action per view (to confirm).
 - Do keep WCAG AA contrast for text: 4.5:1 for normal text.
-- Don't create a new component when an existing one fits the flow.
