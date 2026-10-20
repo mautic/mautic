@@ -14,7 +14,7 @@ final class RoleData extends AbstractFixture implements OrderedFixtureInterface,
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
-        private RoleRepository $roleRepository,
+        private readonly RoleRepository $roleRepository,
     ) {
     }
 
@@ -32,7 +32,7 @@ final class RoleData extends AbstractFixture implements OrderedFixtureInterface,
         $roleName = $this->translator->trans('mautic.user.role.admin.name', [], 'fixtures');
 
         // Prevent unique constraint violation when the role already exists in the database
-        $role = $manager->roleRepository->findOneBy(['name' => $roleName]);
+        $role = $this->roleRepository->findOneBy(['name' => $roleName]);
 
         if (!$role) {
             $role = new Role();
