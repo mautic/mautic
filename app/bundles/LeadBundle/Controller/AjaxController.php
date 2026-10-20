@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -72,14 +73,16 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($results);
     }
 
-    public function getLeadIdsByFieldValueAction(Request $request, LeadModel $leadModel): JsonResponse
+    public function getLeadIdsByFieldValueAction(Request $request, LeadModel $leadModel, FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier): JsonResponse
     {
         $field     = InputHelper::clean($request->query->get('field'));
         $value     = InputHelper::clean($request->query->get('value'));
         $ignore    = (int) $request->query->get('ignore');
         $dataArray = ['items' => []];
 
-        if ($field && $value) {
+        $allowedFields = array_keys($fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['object' => 'lead']));
+
+        if ($field && $value && in_array($field, $allowedFields, true)) {
             $repo                       = $leadModel->getRepository();
             $leads                      = $repo->getLeadsByFieldValue($field, $value, $ignore);
             $dataArray['existsMessage'] = $this->translator->trans('mautic.lead.exists.by.field').': ';
