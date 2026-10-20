@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-{{ size|default('md') }}">
         <div class="modal-content">
             <div class="modal-header {% if type is defined and type == 'expressive' %}pr-32 pl-32 pt-32 pb-0{% endif %}">
-                <button type="button" aria-label="{{ closeButtonLabel|default('mautic.core.btn-close'|trans) }}" class="modal-close-button close" data-bs-dismiss="modal" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ closeButtonLabel|default('mautic.core.btn-close'|trans) }}"></button>
+                <button type="button" aria-label="{{ closeButtonLabel|default('mautic.core.close'|trans) }}" class="modal-close-button btn-close" data-bs-dismiss="modal" data-bs-toggle="tooltip" data-bs-placement="left" title="{{ closeButtonLabel|default('mautic.core.close'|trans) }}"></button>
 
                 {% if modalLabel is defined %}
                     <div class="modal-header__label type-label-01">{{ modalLabel|trans }}</div>

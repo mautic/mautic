@@ -28,7 +28,7 @@
             <div class="col-xs-12">
                 <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active">
-                        <a href="#details" role="tab" data-bs-toggle="tab" class="nav-link {% if hasMainErrors %}text-danger{% endif %}">
+                        <a href="#details" role="tab" data-bs-toggle="tab" class="nav-link active {% if hasMainErrors %}text-danger{% endif %}" aria-selected="true">
                             {{ 'mautic.core.details'|trans }}
                             {% if hasMainErrors %}
                                 <i class="ri-alert-line"></i>

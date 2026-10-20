@@ -6,7 +6,7 @@
 <ul class="nav nav-tabs nav-tabs-contained">
     <!-- Enabled\Auth -->
     <li class="{% if 'details-container' == activeTab %} active{% endif %}" id="details-tab">
-        <a href="#details-container" role="tab" data-bs-toggle="tab" class="nav-link">
+        <a href="#details-container" role="tab" data-bs-toggle="tab" class="nav-link{% if 'details-container' == activeTab %} active{% endif %}" aria-selected="{{ 'details-container' == activeTab ? 'true' : 'false' }}">
             {{ 'mautic.plugin.integration.tab.details'|trans }}
             {% if (hasAuthErrors) %}
                 <i class="ri-fw ri-alert-fill text-danger"></i>
@@ -33,7 +33,7 @@
     {% set objects = integrationObject.getSyncConfigObjects() %}
     {% for object, objectFieldMapping in form.featureSettings.sync.fieldMappings %}
         <li class="{% if activeTab == 'field-mapping-' ~ object %} active{% endif %}" id="fields-{{ object }}-tab">
-            <a href="#field-mappings-{{ object }}-container" role="tab" data-bs-toggle="tab" class="nav-link">
+            <a href="#field-mappings-{{ object }}-container" role="tab" data-bs-toggle="tab" class="nav-link{% if activeTab == 'field-mapping-' ~ object %} active{% endif %}" aria-selected="{{ activeTab == 'field-mapping-' ~ object ? 'true' : 'false' }}">
                 {{ 'mautic.integration.sync_field_mapping'|trans({'%object%' : objects[object]|trans }) }}
                 {% if formContainsErrors(objectFieldMapping) %}
                     <i class="ri-fw ri-alert-fill text-danger"></i>

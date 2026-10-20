@@ -524,7 +524,7 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
 Mautic.updateDynamicContentDropdown = function () {
     var options = [];
 
-    mQuery('#dynamicContentTabs').find('a[data-toggle="tab"]').each(function () {
+    mQuery('#dynamicContentTabs').find('a[data-toggle="tab"], a[data-bs-toggle="tab"]').each(function () {
         var prototype       = '<li><a class="fr-command" data-cmd="dynamicContent" data-param1="__tokenName__">__tokenName__</a></li>';
         var newOption       = prototype.replace(/__tokenName__/g, mQuery(this).text());
 

@@ -69,15 +69,16 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
     Mautic.attachDismissHandlers();
 
     // Initialize popovers with custom configuration
-    mQuery('[data-toggle="popover"]').popover({
+    mQuery('[data-toggle="popover"]:not([data-quick-filter])').popover({
         sanitize: false,
         content: function() {
             return mQuery(this).data('content');
         }
     });
+    mQuery('[data-quick-filter]').popover(Mautic.getQuickFilterPopoverOptions());
 
     // Handle popover shown event
-    mQuery('[data-toggle="popover"]').on('shown.bs.popover', function () {
+    mQuery('[data-toggle="popover"], [data-bs-toggle="popover"]').on('shown.bs.popover', function () {
         mQuery('.popover-content select').chosen({
             allow_single_deselect: true,
             disable_search_threshold: 10
