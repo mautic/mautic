@@ -31,11 +31,15 @@ jobs:
           - php-versions: '8.5'
             db-types: 'mariadb:11.4'
           - php-versions: '8.6'
-            db-types: 'mysql:26.7' # 'mysql:9.7'
-            experimental: false
+            db-types: 'mysql:9.7'
           - php-versions: '8.6'
-            db-types: 'mariadb:13.1-rc' # 'mariadb:13.0'
-            experimental: false
+            db-types: 'mariadb:13.0'
+          - php-versions: '8.7'
+            db-types: 'mysql:26.7' 
+            experimental: true
+          - php-versions: '8.7'
+            db-types: 'mariadb:13.1-rc' 
+            experimental: true
 
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
@@ -117,8 +121,8 @@ jobs:
     - name: Install dependencies
       uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
       with:
-        # Conditionally appends ignore platform rules ONLY for PHP 8.6 dev runs
-        composer-options: ${{ matrix.php-versions == '8.6' && '--ignore-platform-reqs' || '' }}
+        # Conditionally appends ignore platform rules ONLY for PHP 8.6/8.7 dev runs
+        composer-options: ${{ (matrix.php-versions == '8.6' || matrix.php-versions == '8.7') && '--ignore-platform-reqs' || '' }}
 
     - name: Run tests - database = ${{ matrix.db-types }}
       continue-on-error: ${{ matrix.experimental == true }}
@@ -178,10 +182,12 @@ jobs:
           - php-versions: '8.2'
             postgres-versions: '16'
           - php-versions: '8.5'
-            postgres-versions: '18'
+            postgres-versions: '17'
           - php-versions: '8.6'
+            postgres-versions: '18'
+          - php-versions: '8.7'
             postgres-versions: '19beta4-alpine'
-            experimental: false
+            experimental: true            
 
     name: PHPUnit ${{ matrix.php-versions }} postgres:${{ matrix.postgres-versions }}
 
@@ -289,8 +295,8 @@ jobs:
         # composer install cache - https://github.com/ramsey/composer-install
         uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
         with:
-          # Conditionally appends ignore platform rules ONLY for PHP 8.6 dev runs
-          composer-options: ${{ matrix.php-versions == '8.6' && '--ignore-platform-reqs' || '' }}
+          # Conditionally appends ignore platform rules ONLY for PHP 8.6/8.7 dev runs
+          composer-options: ${{ (matrix.php-versions == '8.6' || matrix.php-versions == '8.7') || '' }}
 
       - name: Configure env for postgress
         run: |
