@@ -94,7 +94,7 @@ MauticExampleBundle/
 
 ## Design System
 
-Before building or changing any UI, read `DESIGN.md` in the repository root. Use its components, tokens and do's and don'ts, and ask permission before creating a new component or changing a shared one.
+Before building or changing any UI, read `DESIGN.md` in the repository root.
 
 ## Coding Standards
 
