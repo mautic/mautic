@@ -121,6 +121,9 @@ final class DynamicContentType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('dynamicContent.dynamicContent', $options));
 
+        /** @var DynamicContent $dynamicContent */
+        $dynamicContent = $options['data'];
+
         $builder->add(
             'name',
             TextType::class,
@@ -173,7 +176,7 @@ final class DynamicContentType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.dwc.form.is_campaign_based',
-                'data'  => (bool) $options['data']->isCampaignBased(),
+                'data'  => (bool) $dynamicContent->isCampaignBased(),
                 'attr'  => [
                     'tooltip'  => 'mautic.dwc.form.is_campaign_based.tooltip',
                     'onchange' => 'Mautic.toggleDwcFilters()',
@@ -227,7 +230,7 @@ final class DynamicContentType extends AbstractType
                     'multiple'    => false,
                     'placeholder' => 'mautic.core.form.translation_parent.empty',
                     'top_level'   => 'translation',
-                    'ignore_ids'  => [(int) $options['data']->getId()],
+                    'ignore_ids'  => [(int) $dynamicContent->getId()],
                 ]
             )->addModelTransformer($transformer)
         );

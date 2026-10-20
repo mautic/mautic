@@ -32,6 +32,9 @@ final class MonitoringType extends AbstractType
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
 
+        /** @var Monitoring $monitoring */
+        $monitoring = $options['data'];
+
         $builder->add('title', TextType::class, [
             'label'      => 'mautic.core.name',
             'label_attr' => ['class' => 'control-label'],
@@ -62,7 +65,7 @@ final class MonitoringType extends AbstractType
         // if we have a network type value add in the form
         if (!empty($options['networkType']) && array_key_exists($options['networkType'], $options['networkTypes'])) {
             // get the values from the entity function
-            $properties = $options['data']->getProperties();
+            $properties = $monitoring->getProperties();
 
             $formType = $this->monitoringModel->getFormByType($options['networkType']);
 
