@@ -573,7 +573,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
             });
 
         //initialize tooltips
-        mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
+        mQuery(eventId + " *[data-toggle='tooltip'], " + eventId + " *[data-bs-toggle='tooltip']").tooltip({html: true});
 
         // Connect into last anchor clicked
         Mautic.campaignBuilderInstance.connect({
@@ -763,7 +763,7 @@ Mautic.campaignSourceOnLoad = function (container, response) {
             });
 
         //initialize tooltipslist-campaign-event
-        mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
+        mQuery(eventId + " *[data-toggle='tooltip'], " + eventId + " *[data-bs-toggle='tooltip']").tooltip({html: true});
         if (autoConnect) {
             // Connect into last anchor clicked
             if (Mautic.campaignBuilderAnchorClicked.search('left') !== -1) {

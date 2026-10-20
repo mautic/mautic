@@ -22,7 +22,7 @@ final class ClearbitKeysType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.integration.clearbit.apikey',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
