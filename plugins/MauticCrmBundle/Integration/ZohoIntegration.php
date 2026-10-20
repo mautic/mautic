@@ -474,10 +474,9 @@ final class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array                $result
      * @param array<string, mixed> $params
      */
-    public function getCompanies(array $params = [], $query = null, &$executed = null, &$result = []): int
+    public function getCompanies(array $params = [], $query = null, &$executed = null, array &$result = []): int
     {
         $executed = 0;
         $object   = 'company';
@@ -546,9 +545,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $data
-     * @param array $config
      */
-    public function populateMauticLeadData($data, $config = [], $object = 'Leads'): array
+    public function populateMauticLeadData($data, array $config = [], $object = 'Leads'): array
     {
         // Match that data with mapped lead fields
         $aFields       = $this->getAvailableLeadFields($config);
@@ -607,12 +605,11 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * @param Form|FormBuilder $builder
-     * @param array            $data
      * @param string           $formArea
      *
      * @throws \InvalidArgumentException
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -1002,9 +999,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * @param Lead|array $lead
-     * @param array      $config
      */
-    public function pushLead($lead, $config = []): array|bool
+    public function pushLead($lead, array $config = []): array|bool
     {
         $config  = $this->mergeConfigToFeatureSettings($config);
         $zObject = 'Leads';
@@ -1092,11 +1088,9 @@ final class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $response
-     *
      * @throws \MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
      */
-    private function consumeResponse($response, string $zObject, bool $createIntegrationEntity = false, ?Mapper $mapper = null): int
+    private function consumeResponse(array $response, string $zObject, bool $createIntegrationEntity = false, ?Mapper $mapper = null): int
     {
         $rows = $response;
         if (isset($rows['data'][0])) {

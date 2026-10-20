@@ -8311,12 +8311,6 @@ parameters:
 			path: plugins/MauticSocialBundle/Exception/ExitMonitorException.php
 
 		-
-			message: '#^Parameter \#2 \$withFeatures of method Mautic\\PluginBundle\\Helper\\IntegrationHelper\:\:getIntegrationObjects\(\) expects array\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: plugins/MauticSocialBundle/Form/Type/SocialLoginType.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\FacebookIntegration\:\:getApiUrl\(\) has parameter \$endpoint with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1

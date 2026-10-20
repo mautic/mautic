@@ -18,12 +18,10 @@ final class FullContact_Batch extends FullContact_Base
     protected $_resourceUri = '/batch.json';
 
     /**
-     * @param array $requests
-     *
      * @throws NoCreditException
      * @throws NotImplementedException
      */
-    public function sendRequests($requests): ?\stdClass
+    public function sendRequests(array $requests): ?\stdClass
     {
         $this->_execute([], ['requests' => $requests]);
 

@@ -259,10 +259,7 @@ class ObjectMapping
         return $this->internalStorage;
     }
 
-    /**
-     * @param array $internalStorage
-     */
-    public function setInternalStorage($internalStorage): static
+    public function setInternalStorage(array $internalStorage): static
     {
         $this->internalStorage = $internalStorage;
 
