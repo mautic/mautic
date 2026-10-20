@@ -128,12 +128,6 @@ final class ThemeSandboxPolicyTest extends TestCase
         $this->policy->checkPropertyAllowed(new Page(), 'title');
     }
 
-    public function testDangerousFiltersAreBlocked(): void
-    {
-        $this->expectException(SecurityNotAllowedFilterError::class);
-        $this->policy->checkSecurity([], ['map'], []);
-    }
-
     /**
      * The less_compile filter allows Less's @import (inline) directive to read
      * arbitrary files accessible to the PHP process (GHSA-275m-hc5j-qqrg).

@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Twig\Sandbox;
 
 use Twig\Markup;
 use Twig\Sandbox\SecurityError;
+use Twig\Sandbox\SecurityNotAllowedFilterError;
 use Twig\Sandbox\SecurityNotAllowedFunctionError;
 use Twig\Sandbox\SecurityNotAllowedMethodError;
 use Twig\Sandbox\SecurityNotAllowedPropertyError;
@@ -99,6 +100,17 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
     ];
 
     /**
+     * Twig filters that must never execute in theme templates.
+     * Collection filters (map/filter/reduce/sort/find) are protected by Twig's
+     * sandbox, which only accepts closures as callbacks.
+     *
+     * @var string[]
+     */
+    private const DENIED_FILTERS = [
+        'less_compile', // {{ '@import (inline) "/etc/passwd";'|less_compile }} → arbitrary file read via Less @import
+    ];
+
+    /**
      * @param string[] $tags
      * @param string[] $filters
      * @param string[] $functions
@@ -107,6 +119,12 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
      */
     public function checkSecurity($tags, $filters, $functions): void
     {
+        foreach ($filters as $filter) {
+            if (in_array($filter, self::DENIED_FILTERS, true)) {
+                throw new SecurityNotAllowedFilterError(sprintf('Filter "%s" is not allowed in theme templates.', $filter), $filter);
+            }
+        }
+
         foreach ($functions as $function) {
             if (in_array($function, self::DENIED_FUNCTIONS, true)) {
                 throw new SecurityNotAllowedFunctionError(sprintf('Function "%s" is not allowed in theme templates.', $function), $function);
