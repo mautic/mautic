@@ -51,8 +51,20 @@
     min-height: 1000px;
   }
 
-  .panel-title a {
+  .panel-title a,
+  .panel-title > button {
     display: block;
+  }
+
+  .panel-title > button {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
   }
 
   .nav > li > a {
