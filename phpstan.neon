@@ -6,7 +6,7 @@ parameters:
     tmpDir: ./var/phpstan-cache
     level: 6
 
-    reportUnmatchedIgnoredErrors: false
+    # reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
 
     # see https://github.com/tomasVotruba/type-coverage
@@ -98,10 +98,6 @@ parameters:
                 - app/config
                 - app/bundles
                 - plugins
-
-        -
-            path: utils/phpstan/src/Rule/EntityParamMustHaveTypeRule.php
-            identifier: phpstanApi.method
 
         -
             path: utils/phpstan/src/Rule/EntityParamConcreteTypeRule.php
