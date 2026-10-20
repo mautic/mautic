@@ -11,6 +11,7 @@ use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportSubscriber implements EventSubscriberInterface
 {
@@ -219,6 +220,8 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
+            /** @var TranslatorInterface $translator */
+            $translator = $options['translator'];
             $queryBuilder = clone $qb;
             $chartQuery   = clone $options['chartQuery'];
             $chartQuery->applyDateFilters($queryBuilder, 'date_download', 'ad');
@@ -228,7 +231,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_download', 'ad');
                     $downloads = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans($g), $downloads);
+                    $chart->setDataset($translator->trans($g), $downloads);
                     $data         = $chart->render();
                     $data['name'] = $g;
 

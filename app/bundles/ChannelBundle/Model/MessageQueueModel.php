@@ -287,6 +287,7 @@ final class MessageQueueModel extends FormModel
             return;
         }
 
+        /** @var MessageQueue $message */
         $message->setAttempts($message->getAttempts() + 1);
         $message->setLastAttempt(new \DateTime());
         $rescheduleTo = clone $message->getScheduledDate();
