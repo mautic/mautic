@@ -9,6 +9,9 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\PointsChangeLog;
+use Mautic\PointBundle\Entity\LeadPointLog;
+use Mautic\PointBundle\Entity\Point;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,6 +47,7 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
             'mappedObject' => 'contact',
             'mappedField'  => 'email',
         ]);
+        $this->createFormSubmitPointAction($formId);
 
         // The visitor is sent back to the referer after submitting, so it points at the form page itself
         $page    = "http://localhost/form/{$formId}";
@@ -75,6 +79,15 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
 
         // The visitor's IP address is not saved anywhere, not even on its own
         $this->assertSame($expectTracking, $this->em->getRepository(IpAddress::class)->findOneBy(['ipAddress' => '203.0.113.9']) instanceof IpAddress);
+
+        // The visitor still gets the points, the points log just has no IP
+        $this->assertSame(5, $contact->getPoints());
+        $pointsChangeLog = $this->em->getRepository(PointsChangeLog::class)->findOneBy(['lead' => $contact]);
+        $this->assertInstanceOf(PointsChangeLog::class, $pointsChangeLog);
+        $this->assertSame($expectTracking, null !== $pointsChangeLog->getIpAddress());
+        $pointLog = $this->em->getRepository(LeadPointLog::class)->findOneBy(['lead' => $contact]);
+        $this->assertInstanceOf(LeadPointLog::class, $pointLog);
+        $this->assertSame($expectTracking, null !== $pointLog->getIpAddress());
     }
 
     public function testAnonymousSubmissionWithPrivacySignalCreatesNoContact(): void
@@ -133,6 +146,19 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $trackingCookies = array_values(array_intersect(['mautic_device_id', 'mtc_id', 'mautic_referer_id'], $cookieNames));
 
         $this->assertSame($trackingPermitted ? ['mautic_device_id', 'mtc_id'] : [], $trackingCookies);
+    }
+
+    private function createFormSubmitPointAction(int $formId): void
+    {
+        $point = new Point();
+        $point->setName('Submits the form');
+        $point->setType('form.submit');
+        $point->setDelta(5);
+        $point->setRepeatable(false);
+        $point->setIsPublished(true);
+        $point->setProperties(['forms' => [$formId]]);
+        $this->em->persist($point);
+        $this->em->flush();
     }
 
     /**
