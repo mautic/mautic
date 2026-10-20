@@ -4,11 +4,11 @@
 <ul id="tokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
     <!-- Contact fields tokens -->
     <li class="panel">
-        <a role="button" id="headingContactFields" class="accordion-heading collapsed" data-bs-toggle="collapse" href="#collapseContactFields" aria-expanded="false"
+        <button type="button" id="headingContactFields" class="accordion-heading collapsed" data-bs-toggle="collapse" data-bs-target="#collapseContactFields" aria-expanded="false"
             aria-controls="collapseContactFields">
             <i class="ri-arrow-down-s-line accordion-arrow"></i>
             <span class="accordion-title">{{ 'mautic.placeholder_tokens.contact_fields'|trans }}</span>
-        </a>
+        </button>
         <div id="collapseContactFields" data-bs-parent="#tokensAccordion" class="collapse accordion-wrapper" role="tabpanel"
             aria-labelledby="headingContactFields">
 
@@ -135,10 +135,10 @@
 
     <!-- Contact Owner fields tokens -->
     <li class="panel">
-        <a role="button" id="headingOwnerFields" class="accordion-heading collapsed" data-bs-toggle="collapse" href="#collapseOwnerFields" aria-expanded="false" aria-controls="collapseOwnerFields">
+        <button type="button" id="headingOwnerFields" class="accordion-heading collapsed" data-bs-toggle="collapse" data-bs-target="#collapseOwnerFields" aria-expanded="false" aria-controls="collapseOwnerFields">
             <i class="ri-arrow-down-s-line accordion-arrow"></i>
             <span class="accordion-title">{{ 'mautic.placeholder_tokens.contact_owner_fields'|trans }}</span>
-        </a>
+        </button>
         <div id="collapseOwnerFields" data-bs-parent="#tokensAccordion" class="collapse accordion-wrapper" role="tabpanel"
             aria-labelledby="headingOwnerFields">
 
@@ -177,11 +177,11 @@
 
     <!-- Company Contact fields tokens -->
     <li class="panel">
-        <a role="button" id="headingCompanyFields" class="accordion-heading collapsed" data-bs-toggle="collapse" href="#collapseCompanyFields" aria-expanded="false"
+        <button type="button" id="headingCompanyFields" class="accordion-heading collapsed" data-bs-toggle="collapse" data-bs-target="#collapseCompanyFields" aria-expanded="false"
             aria-controls="collapseCompanyFields">
             <i class="ri-arrow-down-s-line accordion-arrow"></i>
             <span class="accordion-title">{{ 'mautic.placeholder_tokens.company_contact_fields'|trans }}</span>
-        </a>
+        </button>
         <div id="collapseCompanyFields" data-bs-parent="#tokensAccordion" class="collapse accordion-wrapper" role="tabpanel"
             aria-labelledby="headingCompanyFields">
 
@@ -259,11 +259,11 @@
 
 <!-- Custom fields tokens -->
 <li class="panel">
-    <a role="button" id="headingCustomFields" class="accordion-heading collapsed" data-bs-toggle="collapse" href="#collapseCustomFields" aria-expanded="false"
+    <button type="button" id="headingCustomFields" class="accordion-heading collapsed" data-bs-toggle="collapse" data-bs-target="#collapseCustomFields" aria-expanded="false"
       aria-controls="collapseCustomFields">
       <i class="ri-arrow-down-s-line accordion-arrow"></i>
       <span class="accordion-title">{{ 'mautic.placeholder_tokens.custom_fields'|trans }}</span>
-    </a>
+    </button>
 
     <div id="collapseCustomFields" data-bs-parent="#tokensAccordion" class="collapse accordion-wrapper" role="tabpanel"
       aria-labelledby="headingCustomFields">

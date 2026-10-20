@@ -1,10 +1,10 @@
 {% for section, shortcut_list in shortcuts %}
     <li class="panel">
-    <a role="button" id="heading{{section}}" class="accordion-heading collapsed" data-bs-toggle="collapse" href="#collapse{{section}}" aria-expanded="false"
+    <button type="button" id="heading{{section}}" class="accordion-heading collapsed" data-bs-toggle="collapse" data-bs-target="#collapse{{section}}" aria-expanded="false"
         aria-controls="collapse{{section}}">
         <i class="ri-arrow-down-s-line accordion-arrow"></i>
         <span class="accordion-title">{{ ('mautic.keyboard.section.' ~ section)|trans }}</span>
-    </a>
+    </button>
     <div id="collapse{{section}}" data-bs-parent="#accordion" class="collapse accordion-wrapper" role="tabpanel"
         aria-labelledby="heading{{section}}">
         <div class="accordion-content col-xs-12">

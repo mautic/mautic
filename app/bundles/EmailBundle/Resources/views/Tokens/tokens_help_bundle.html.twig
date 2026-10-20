@@ -3,11 +3,11 @@
 <ul id="emailTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
   <!-- Email specific tokens -->
   <li class="panel">
-    <a role="button" id="headingEmailTokens" class="accordion-heading collapsed" data-bs-toggle="collapse" href="#collapseEmailTokens" aria-expanded="false"
+    <button type="button" id="headingEmailTokens" class="accordion-heading collapsed" data-bs-toggle="collapse" data-bs-target="#collapseEmailTokens" aria-expanded="false"
       aria-controls="collapseEmailTokens">
       <i class="ri-arrow-down-s-line accordion-arrow"></i>
       <span class="accordion-title">{{ 'mautic.placeholder_tokens.email_tokens'|trans }}</span>
-    </a>
+    </button>
     <div id="collapseEmailTokens" data-bs-parent="#tokensAccordion" class="collapse accordion-wrapper" role="tabpanel"
       aria-labelledby="headingEmailTokens">
 

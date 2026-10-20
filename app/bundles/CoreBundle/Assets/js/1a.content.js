@@ -2532,19 +2532,20 @@ Mautic.initFilterCommands = function () {
  * @returns {Object}
  */
 Mautic.getQuickFilterPopoverOptions = function () {
-    const defaultAllowList = window.bootstrap && window.bootstrap.Popover ? window.bootstrap.Popover.Default.allowList : {'*': ['class', 'dir', 'id', 'lang', 'role']};
+    const defaultAllowList = window.bootstrap?.Popover ? window.bootstrap.Popover.Default.allowList : {'*': ['class', 'dir', 'id', 'lang', 'role']};
 
     return {
         html: true,
         container: 'body',
         sanitize: true,
-        allowList: Object.assign({}, defaultAllowList, {
+        allowList: {
+            ...defaultAllowList,
             '*': defaultAllowList['*'].concat([/^data-[\w-]+$/]),
             button: ['type', 'name', 'value'],
             optgroup: ['label'],
             option: ['value', 'selected'],
             select: ['name', 'multiple']
-        }),
+        },
         content: function () {
             return mQuery(this).data('content');
         }
