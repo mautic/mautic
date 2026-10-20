@@ -69,6 +69,10 @@
                             {% if isSamlUser is empty %}
 							    {{ form_widget(form.plainPassword, {'attr' : {'placeholder' : form.plainPassword.vars.label }}) }}
                             {% endif %}
+
+							{% if form.subjectID is defined %}
+							    {{ form_widget(form.subjectID, {'attr' : {'placeholder' : form.subjectID.vars.label }}) }}
+                            {% endif %}
 						</div>
 					</div>
 				</div>
