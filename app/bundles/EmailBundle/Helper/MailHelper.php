@@ -498,15 +498,18 @@ final class MailHelper
 
                 $email = $this->email;
 
+                /** @var AddressDTO $from */
+                $from = $metadatum['from'];
+
                 if (!empty($metadatum['from'])) {
-                    $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
-                    $this->setMessageFrom(new AddressDTO($metadatum['from']->getEmail(), $metadatum['from']->getName()));
+                    $this->setFrom($from->getEmail(), $from->getName());
+                    $this->setMessageFrom(new AddressDTO($from->getEmail(), $from->getName()));
                 } else {
                     $this->setMessageFrom($this->fromEmailHelper->getFrom($email));
                 }
                 $this->setReplyToForQueueMessage(
                     $email,
-                    ($email && $email->getUseOwnerAsMailer()) ? $metadatum['from']->getEmail() : null
+                    ($email && $email->getUseOwnerAsMailer()) ? $from->getEmail() : null
                 );
 
                 foreach ($metadatum['contacts'] as $email => $contact) {

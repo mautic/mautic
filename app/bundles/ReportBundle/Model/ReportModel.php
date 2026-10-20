@@ -460,16 +460,23 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
 
             $options['dateTo'] ??= $now;
 
+            /** @var \DateTime $dateFrom */
+            $dateFrom = $options['dateFrom'];
+            /** @var \DateTime $dateTo */
+            $dateTo = $options['dateTo'];
+
             // Set time to the last second of the "to date" date
-            if ($now->format('Y-m-d') === $options['dateTo']->format('Y-m-d')) {
-                $options['dateTo'] = $now->setTime(23, 59, 59);
+            if ($now->format('Y-m-d') === $dateTo->format('Y-m-d')) {
+                $dateTo = $now->setTime(23, 59, 59);
             } else {
-                $options['dateTo']->setTime(23, 59, 59);
+                $dateTo->setTime(23, 59, 59);
             }
 
             // Convert date ranges to UTC for fetching tabular data
-            $options['dateFrom']->setTimeZone(new \DateTimeZone('UTC'));
-            $options['dateTo']->setTimeZone(new \DateTimeZone('UTC'));
+            $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
+            $dateTo->setTimeZone(new \DateTimeZone('UTC'));
+
+            $options['dateTo'] = $dateTo;
         }
 
         $paginate        = !empty($options['paginate']);

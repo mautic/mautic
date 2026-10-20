@@ -347,6 +347,7 @@ abstract class CommonRepository extends ServiceEntityRepository
         $alias = $this->getTableAlias();
 
         if (isset($args['qb'])) {
+            /** @var QueryBuilder $q */
             $q = $args['qb'];
         } else {
             $q = $this->getEntityManager()
