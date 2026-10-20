@@ -342,7 +342,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
     });
 
     //initialize tooltips
-    var pageTooltips = mQuery(container + " *[data-toggle='tooltip']");
+    var pageTooltips = mQuery(container + " *[data-toggle='tooltip'], " + container + " *[data-bs-toggle='tooltip']");
     pageTooltips.tooltip({html: true, container: 'body'});
 
     // Enable tooltips on checkbox & radio input's to
@@ -813,7 +813,7 @@ Mautic.makeLinksAlive = function(jQueryObject) {
 Mautic.onPageUnload = function (container, response) {
     //unload tooltips so they don't double show
     if (typeof container != 'undefined') {
-        mQuery(container + " *[data-toggle='tooltip']").tooltip('destroy');
+        mQuery(container + " *[data-toggle='tooltip'], " + container + " *[data-bs-toggle='tooltip']").tooltip('destroy');
 
         //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
         if (typeof MauticVars.modalsReset == 'undefined') {

@@ -47,7 +47,7 @@ final class FormFieldFileType extends AbstractType
                 TextareaType::class,
                 [
                     'label'      => 'mautic.form.field.file.allowed_extensions',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'required'   => false,
                     'attr'       => [
                         'class'   => 'form-control',
@@ -65,7 +65,7 @@ final class FormFieldFileType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.file.allowed_size',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class'   => 'form-control',
