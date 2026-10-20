@@ -9,6 +9,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadField;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -70,7 +71,7 @@ final class ImportEntityDenormalizerTest extends TestCase
         yield 'custom field group' => ['field_group', 'group'];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('aliasProvider')]
+    #[DataProvider('aliasProvider')]
     public function testExplicitAliases(string $exported, string $property): void
     {
         $mapped = $this->denormalizer->mapKeys([$exported => 'value']);
@@ -118,7 +119,7 @@ final class ImportEntityDenormalizerTest extends TestCase
      *
      * @param class-string $entityClass
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('aliasTargetProvider')]
+    #[DataProvider('aliasTargetProvider')]
     public function testEveryAliasPointsAtAnExistingSetter(string $exported, string $entityClass): void
     {
         $mapped = array_keys($this->denormalizer->mapKeys([$exported => 'value']));
