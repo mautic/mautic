@@ -53,6 +53,10 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
             $permissions  = $this->permissions[$table] ?? [];
             $allowedJoins = [];
 
+            if ([] === $permissions && !$this->security->isAdmin()) {
+                throw new AccessDeniedException(sprintf('You do not have permission to load data from the %s table', $table));
+            }
+
             foreach ($permissions as $tableAlias => $permBase) {
                 // It's an admin, don't check any further
                 if ('admin' === $permBase && $this->security->isAdmin()) {

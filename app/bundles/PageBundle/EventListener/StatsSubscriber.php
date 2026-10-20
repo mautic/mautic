@@ -22,7 +22,12 @@ class StatsSubscriber extends CommonStatsSubscriber
             ]
         );
 
-        $this->repositories[] = $entityManager->getRepository(Redirect::class);
-        $this->repositories[] = $entityManager->getRepository(Trackable::class);
+        $this->addRestrictedRepostories(
+            [
+                Redirect::class,
+                Trackable::class,
+            ],
+            ['admin']
+        );
     }
 }
