@@ -211,12 +211,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Entity/Event.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\Event\:\:getContactLog\(\) should return \(Doctrine\\Common\\Collections\\Collection&iterable\<Mautic\\CampaignBundle\\Entity\\LeadEventLog\>\)\|static\(Mautic\\CampaignBundle\\Entity\\Event\) but returns array\.$#'
-			identifier: return.type
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/Event.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\Event\:\:getLogByContactAndRotation\(\) has parameter \$rotation with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -674,12 +668,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageQueueModel\:\:reschedule\(\) has parameter \$leadId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageQueueModel.php
-
-		-
-			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageQueueModel\:\:reschedule\(\) has parameter \$message with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/ChannelBundle/Model/MessageQueueModel.php
