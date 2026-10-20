@@ -578,7 +578,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         array $args,
         $joinTable,
         $entityId,
-        $filters = [],
+        ?array $filters = [],
         $entityColumnName = 'id',
         ?array $additionalJoins = null,
         $contactColumnName = 'lead_id',
