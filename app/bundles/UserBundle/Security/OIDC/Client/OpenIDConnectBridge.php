@@ -91,7 +91,11 @@ final class OpenIDConnectBridge extends OpenIDConnectClient implements ClientBri
         try {
             // Test the connection by fetching the OIDC discovery document
             // This is the proper way to test OIDC connectivity without user interaction
-            $this->getProviderConfigValue('issuer');
+            // We fetch authorization_endpoint instead of issuer because the constructor
+            // pre-sets issuer to the provider URL, so checking it won't actually
+            // contact the provider. Authorization endpoint is not pre-set and will
+            // trigger a real fetch of .well-known/openid-configuration
+            $this->getProviderConfigValue('authorization_endpoint');
 
             return null;
         } catch (OpenIDConnectClientException $e) {

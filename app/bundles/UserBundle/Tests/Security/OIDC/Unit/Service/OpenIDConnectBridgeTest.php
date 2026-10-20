@@ -100,6 +100,34 @@ final class OpenIDConnectBridgeTest extends TestCase
         $this->assertNull($bridge->testConnection());
     }
 
+    public function testConnectionReturnsErrorWhenProviderConfigNotAvailable(): void
+    {
+        // Create a bridge WITHOUT pre-setting the authorization_endpoint
+        // This simulates a real scenario where the provider config must be fetched
+        $bridge = new OpenIDConnectBridge('https://invalid-provider.example.com', 'client_id', 'client_secret');
+
+        $result = $bridge->testConnection();
+
+        // Should return an error message because the provider is unreachable
+        $this->assertNotNull($result);
+        $this->assertIsString($result);
+    }
+
+    public function testConnectionFetchesActualProviderConfig(): void
+    {
+        // This test verifies that testConnection() actually tries to fetch provider config
+        // and doesn't just return the issuer that was set in the constructor
+        $bridge = new OpenIDConnectBridge('https://non-existent-oidc-provider-'.uniqid().'.example.com', 'client_id', 'client_secret');
+
+        $result = $bridge->testConnection();
+
+        // If testConnection() only checked the cached issuer from constructor,
+        // this would return null (success). But it should fail because we need
+        // to fetch actual config like authorization_endpoint.
+        $this->assertNotNull($result, 'testConnection() should fail for unreachable provider, not return null from cached issuer');
+        $this->assertIsString($result);
+    }
+
     private function createBridge(): OpenIDConnectBridge
     {
         $bridge = new OpenIDConnectBridge(self::PROVIDER_URL, 'client_id', 'client_secret');
