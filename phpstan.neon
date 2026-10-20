@@ -425,15 +425,16 @@ services:
             variableNameToType:
                 parameters: array
     -
-<<<<<<< HEAD
         class: Utils\PHPStan\Rule\EntityParamMustHaveTypeRule
         tags:
             - phpstan.rules.rule
     -
         class: Utils\PHPStan\Rule\EntityParamConcreteTypeRule
-=======
+        tags:
+            - phpstan.rules.rule
+
+    -
         class: Utils\PHPStan\Rule\NullableObjectPropertyMustHaveNativeTypeRule
->>>>>>> 550f8c4bc0 (Add NullableObjectPropertyMustHaveNativeTypeRule)
         tags:
             - phpstan.rules.rule
     -
