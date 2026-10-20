@@ -72,7 +72,7 @@ final class FieldType extends AbstractType
             ]
         );
 
-        $disabled = (!empty($options['data'])) ? $leadField->isFixed() : false;
+        $disabled = !empty($options['data']) && $leadField->isFixed();
 
         $builder->add(
             'group',
