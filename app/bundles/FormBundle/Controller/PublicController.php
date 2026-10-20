@@ -31,20 +31,24 @@ class PublicController extends CommonFormController
         }
         $isAjax        = $request->query->get('ajax', false);
         $form          = null;
-        $post          = $request->request->get('mauticform');
-        $messengerMode = (!empty($post['messenger']));
+        $post          = $request->request->all()['mauticform'] ?? [];
+        $post          = is_array($post) ? $post : [];
+        $messengerMode = in_array($post['messenger'] ?? null, [1, '1', true, 'true'], true);
         $server        = $request->server->all();
-        $return        = $post['return'] ?? false;
+        $return        = $this->getTrustedReturnUrl($request);
 
-        if (empty($return)) {
-            // try to get it from the HTTP_REFERER
-            $return = $server['HTTP_REFERER'] ?? false;
+        // Only forward a trusted return URL to submission metadata and repost actions.
+        if (null !== $return) {
+            $post['return'] = $return;
+        } else {
+            unset($post['return']);
         }
 
+        // The submission model falls back to HTTP_REFERER when return is absent.
+        $server['HTTP_REFERER'] = $return ?? '';
+
         if (!empty($return)) {
-            // remove mauticError and mauticMessage from the referer so it doesn't get sent back
-            $return = InputHelper::url($return, null, null, null, ['mauticError', 'mauticMessage'], true);
-            $query  = (!str_contains($return, '?')) ? '?' : '&';
+            $query = (!str_contains($return, '?')) ? '?' : '&';
         }
 
         $translator = $this->translator;
@@ -444,5 +448,83 @@ class PublicController extends CommonFormController
         }
 
         return new JsonResponse($companyModel->getRepository()->getCompanyLookupData($search));
+    }
+
+    /**
+     * Returns a sanitized return URL only if it is relative, same-origin as site_url,
+     * or matches a domain listed in the CORS valid_domains configuration.
+     * External/untrusted URLs are rejected and null is returned.
+     */
+    private function getTrustedReturnUrl(Request $request): ?string
+    {
+        $post   = $request->request->all()['mauticform'] ?? [];
+        $post   = is_array($post) ? $post : [];
+        $return = $post['return'] ?? '';
+
+        if ('' === $return) {
+            $return = $request->server->get('HTTP_REFERER', '');
+        }
+
+        if ('' === $return) {
+            return null;
+        }
+
+        if (!is_string($return)) {
+            return null;
+        }
+
+        $return = InputHelper::url($return, false, null, null, ['mauticError', 'mauticMessage'], true);
+
+        // Reject URLs containing backslashes or @ signs that could be misinterpreted
+        // by browsers differently than PHP's parse_url.
+        if (str_contains($return, '\\') || (str_contains($return, '@') && !str_starts_with($return, '/'))) {
+            return null;
+        }
+
+        // Allow relative URLs (starting with / but not //)
+        if (str_starts_with($return, '/') && !str_starts_with($return, '//')) {
+            return $return;
+        }
+
+        $returnHost = parse_url($return, PHP_URL_HOST);
+        if (!$returnHost) {
+            return null;
+        }
+
+        // Allow same-origin URLs (comparing scheme, host, and port)
+        $siteUrl = (string) $this->coreParametersHelper->get('site_url');
+        if ('' !== $siteUrl) {
+            $siteScheme = parse_url($siteUrl, PHP_URL_SCHEME);
+            $siteHost   = parse_url($siteUrl, PHP_URL_HOST);
+            $sitePort   = parse_url($siteUrl, PHP_URL_PORT);
+
+            $returnScheme = parse_url($return, PHP_URL_SCHEME);
+            $returnPort   = parse_url($return, PHP_URL_PORT);
+
+            // Only proceed with same-origin check if both URLs have schemes
+            if ($siteScheme && $returnScheme) {
+                // Normalize ports: null means default port for the scheme
+                $sitePort ??= 'https' === $siteScheme ? 443 : 80;
+                $returnPort ??= 'https' === $returnScheme ? 443 : 80;
+
+                if ($siteHost && strtolower($siteScheme) === strtolower($returnScheme)
+                    && strtolower($siteHost) === strtolower($returnHost)
+                    && $sitePort === $returnPort) {
+                    return $return;
+                }
+            }
+        }
+
+        // Allow URLs matching CORS valid domains configuration
+        $validDomains = (array) $this->coreParametersHelper->get('cors_valid_domains');
+        $returnOrigin = parse_url($return, PHP_URL_SCHEME).'://'.$returnHost;
+
+        foreach ($validDomains as $validDomain) {
+            if (fnmatch($validDomain, $returnOrigin, FNM_CASEFOLD)) {
+                return $return;
+            }
+        }
+
+        return null;
     }
 }
