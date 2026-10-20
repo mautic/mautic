@@ -8,7 +8,7 @@ final class Reference
 {
     private readonly ?int $emailId;
 
-    private int $leadId = 0;
+    private int|string $leadId = 0;
 
     private readonly ?string $statId;
 
