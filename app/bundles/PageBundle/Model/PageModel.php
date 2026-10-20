@@ -394,7 +394,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
      * @return bool If hit is tracked or not
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, array $query = [], ?\DateTime $dateTime = null): bool
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, array|string|null $query = [], ?\DateTime $dateTime = null): bool
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous() || $request->cookies->get('Blocked-Tracking')) {
