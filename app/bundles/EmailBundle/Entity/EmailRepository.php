@@ -722,7 +722,6 @@ class EmailRepository extends CommonRepository
         } else {
             $variantsToUpdateFromParent = $entity->getVariantChildren()->toArray();
             foreach ($variantsToUpdateFromParent as $variant) {
-                \assert($variant instanceof Email);
                 $variant->setPublishUp($parent->getPublishUp());
                 $variant->setPublishDown($parent->getPublishDown());
                 $variant->setIsPublished($parent->getIsPublished());

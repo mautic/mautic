@@ -188,7 +188,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         foreach ($email->getVariantChildren() as $variant) {
-            /** @var Email $variant */
             $clonedVariant = $this->cloneEmailForRelatedClone($variant);
             $clonedVariant->setVariantParent($clonedParent);
             $this->saveEntity($clonedVariant);
