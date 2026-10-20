@@ -15,12 +15,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\InteractiveAuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class OidcAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface
+final class OidcAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface, InteractiveAuthenticatorInterface
 {
     public function __construct(
         private readonly Settings $parameters,
@@ -91,5 +92,14 @@ final class OidcAuthenticator extends AbstractAuthenticator implements Authentic
         return new RedirectResponse(
             $this->urlGenerator->generate('mautic_oidc_login', [], UrlGeneratorInterface::ABSOLUTE_URL)
         );
+    }
+
+    /**
+     * Marks this authenticator as interactive, ensuring the security.interactive_login event is dispatched.
+     * This event triggers Mautic's login side effects: audit log, last_login update, and session setup.
+     */
+    public function isInteractive(): bool
+    {
+        return true;
     }
 }
