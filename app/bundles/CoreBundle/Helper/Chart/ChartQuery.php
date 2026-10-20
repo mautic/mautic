@@ -411,7 +411,7 @@ class ChartQuery extends AbstractChart
      * @param mixed[] $filters      will be added to where claues
      * @param mixed[] $options      for special behavior
      */
-    public function getCountQuery(string $table, string $uniqueColumn, ?string $dateColumn = null, $filters = [], $options = [], string $tablePrefix = 't'): TrackingQueryBuilder
+    public function getCountQuery(string $table, string $uniqueColumn, ?string $dateColumn = null, $filters = [], array $options = [], string $tablePrefix = 't'): TrackingQueryBuilder
     {
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), $tablePrefix);
