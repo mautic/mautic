@@ -43,6 +43,8 @@ class EmailRepository extends CommonRepository
 
     public const DNC_PREFIX           = 'dnc';
 
+    public const DNC_COUNT_PREFIX     = 'dnc_count';
+
     public const TRACKABLE_PREFIX     = 'tr';
 
     public const REDIRECT_PREFIX      = 'pr';
@@ -535,7 +537,7 @@ class EmailRepository extends CommonRepository
     public function getSentReadNotReadCount(QueryBuilder $queryBuilder): array
     {
         $queryBuilder->resetQueryPart('groupBy');
-        $queryBuilder->resetQueryParts(['join']);
+        $this->resetJoinsExceptDncCount($queryBuilder);
 
         $queryBuilder->select('SUM(e.sent_count) as sent_count, SUM(e.read_count) as read_count');
         $results = $queryBuilder->executeQuery()->fetchAssociative();
@@ -554,7 +556,7 @@ class EmailRepository extends CommonRepository
 
     public function getUnsubscribedCount(QueryBuilder $queryBuilder): int
     {
-        $queryBuilder->resetQueryParts(['join']);
+        $this->resetJoinsExceptDncCount($queryBuilder);
         $this->addDNCTableForEmails($queryBuilder);
         $queryBuilder->select('e.id as email_id, dnc.lead_id');
         $queryBuilder->andWhere('dnc.reason='.DoNotContact::UNSUBSCRIBED);
@@ -614,6 +616,23 @@ class EmailRepository extends CommonRepository
         }
     }
 
+    /**
+     * Remove the report joins, but keep the per-email DNC counts. Report filters on DNC columns reference them.
+     */
+    private function resetJoinsExceptDncCount(QueryBuilder $qb): void
+    {
+        $dncCountJoins = array_filter(
+            $qb->getQueryParts()['join'][self::EMAILS_PREFIX] ?? [],
+            fn (array $join): bool => self::DNC_COUNT_PREFIX === $join['joinAlias']
+        );
+
+        $qb->resetQueryParts(['join']);
+
+        foreach ($dncCountJoins as $join) {
+            $qb->leftJoin(self::EMAILS_PREFIX, $join['joinTable'], $join['joinAlias'], $join['joinCondition']);
+        }
+    }
+
     private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
         $joins = $query->getQueryParts()['join'][$fromAlias] ?? null;
@@ -622,7 +641,7 @@ class EmailRepository extends CommonRepository
             return false;
         }
 
-        foreach ($joins[$fromAlias] as $join) {
+        foreach ($joins as $join) {
             if ($join['joinTable'] == $table && $join['joinAlias'] == $alias) {
                 return true;
             }
