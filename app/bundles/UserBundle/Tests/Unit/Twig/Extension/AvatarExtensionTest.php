@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
 use Mautic\UserBundle\Twig\Extension\AvatarExtension;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 final class AvatarExtensionTest extends TestCase
 {
@@ -79,6 +80,6 @@ final class AvatarExtensionTest extends TestCase
 
         $assets = (new \ReflectionClass(AssetsHelper::class))->newInstanceWithoutConstructor();
 
-        return new AvatarExtension($parameters, new DefaultAvatarHelper($assets));
+        return new AvatarExtension($parameters, new DefaultAvatarHelper($assets), $this->createStub(LoggerInterface::class));
     }
 }

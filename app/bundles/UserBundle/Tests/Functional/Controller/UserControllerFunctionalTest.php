@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -78,10 +79,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         foreach ($images as $image) {
             $this->assertInstanceOf(\DOMElement::class, $image);
-            $this->assertMatchesRegularExpression(
-                '#^(data:image/svg\+xml;|.*images/avatar\.png)#',
-                $image->getAttribute('src')
-            );
+            $this->assertLocalAvatarUrl($image->getAttribute('src'));
             $this->assertSame('', $image->getAttribute('alt'));
         }
     }
@@ -93,8 +91,17 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $image = $crawler->filter('img.media-object');
         $this->assertGreaterThan(0, $image->count());
-        $this->assertMatchesRegularExpression('#^(data:image/svg\+xml;|.*images/avatar\.png)#', (string) $image->attr('src'));
-        $this->assertStringNotContainsString('gravatar', (string) $image->attr('src'));
+        $this->assertLocalAvatarUrl((string) $image->attr('src'));
+    }
+
+    private function assertLocalAvatarUrl(string $avatarUrl): void
+    {
+        if (str_starts_with($avatarUrl, 'data:image/svg+xml;')) {
+            return;
+        }
+
+        $siteUrl = rtrim((string) self::getContainer()->get(CoreParametersHelper::class)->get('site_url'), '/');
+        $this->assertSame($siteUrl.'/images/avatar.png', $avatarUrl);
     }
 
     public function testIndexIncludesInviteForm(): void
