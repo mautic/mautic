@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Entity\AuditLog;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -96,12 +95,7 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
 
     private function assertLocalAvatarUrl(string $avatarUrl): void
     {
-        if (str_starts_with($avatarUrl, 'data:image/svg+xml;')) {
-            return;
-        }
-
-        $siteUrl = rtrim((string) self::getContainer()->get(CoreParametersHelper::class)->get('site_url'), '/');
-        $this->assertSame($siteUrl.'/images/avatar.png', $avatarUrl);
+        $this->assertStringStartsWith('data:image/svg+xml;', $avatarUrl);
     }
 
     public function testIndexIncludesInviteForm(): void
