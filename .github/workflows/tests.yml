@@ -105,6 +105,25 @@ jobs:
         echo "SYMFONY_ENV=test" >> $GITHUB_ENV
         echo "MAUTIC_ENV=test" >> $GITHUB_ENV
 
+    # Composer post-install runs `npm ci` and the asset build. Cache npm's download
+    # cache (~/.npm, outside var/cache which the test step wipes) so npm ci installs
+    # offline, and cache the dart-sass binary so sass-bundle does not re-download it.
+    - name: NPM download cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: ${{ runner.os }}-npm-
+
+    - name: Dart Sass binary cache
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: |
+          ./var/sass
+          ./var/dart-sass
+        key: ${{ runner.os }}-sass-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-sass-
+
     - name: Install dependencies
       uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
 
