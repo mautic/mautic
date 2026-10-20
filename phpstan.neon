@@ -6,7 +6,7 @@ parameters:
     tmpDir: ./var/phpstan-cache
     level: 6
 
-    # reportUnmatchedIgnoredErrors: false
+    reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
 
     # see https://github.com/tomasVotruba/type-coverage
