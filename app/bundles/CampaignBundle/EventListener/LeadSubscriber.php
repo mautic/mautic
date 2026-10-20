@@ -104,12 +104,12 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
 
                 if (empty($log['isScheduled']) && empty($log['dateTriggered'])) {
                     // Note as cancelled
-                    $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.cancelled')
+                    $label .= ' <i data-bs-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.cancelled')
                         .'" class="ri-calendar-close-fill text-warning timeline-campaign-event-cancelled-'.$log['event_id'].'"></i>';
                 }
 
                 if ((!empty($log['metadata']['errors']) && empty($log['dateTriggered'])) || !empty($log['metadata']['failed']) || !empty($log['fail_reason'])) {
-                    $label .= ' <i data-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.has_last_attempt_error')
+                    $label .= ' <i data-bs-toggle="tooltip" title="'.$this->translator->trans('mautic.campaign.event.has_last_attempt_error')
                         .'" class="ri-alert-line text-danger"></i>';
                 }
 
@@ -125,7 +125,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
                     $toolTipClass = 'yes' === $extra['eventDetails']['path'] ? 'text-success' : 'text-danger';
                     $toolTip      = $this->translator->trans('mautic.campaign.event.path.tooltip', ['%path%' => ucfirst($extra['eventDetails']['path'])]);
 
-                    $label .= sprintf(' <i class="ri-node-tree %s" data-toggle="tooltip" title="%s"></i>', $toolTipClass, $toolTip);
+                    $label .= sprintf(' <i class="ri-node-tree %s" data-bs-toggle="tooltip" title="%s"></i>', $toolTipClass, $toolTip);
                 }
 
                 if ($event->isForTimeline()) {
