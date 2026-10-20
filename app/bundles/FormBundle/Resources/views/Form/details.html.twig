@@ -202,11 +202,11 @@
             <ul class="nav nav-tabs nav-tabs-contained">
                 {% if showActions %}
                     <li class="active">
-                        <a href="#actions-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.form.tab.actions'|trans }}</a>
+                        <a href="#actions-container" role="tab" data-bs-toggle="tab" class="active nav-link">{{ 'mautic.form.tab.actions'|trans }}</a>
                     </li>
                 {% endif %}
                 <li class="{% if not showActions %}active{% endif %}">
-                    <a href="#fields-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.form.tab.fields'|trans }}</a>
+                    <a href="#fields-container" role="tab" data-bs-toggle="tab" class="{% if not showActions %}active {% endif %}nav-link">{{ 'mautic.form.tab.fields'|trans }}</a>
                 </li>
             </ul>
             <!--/ tabs controls -->

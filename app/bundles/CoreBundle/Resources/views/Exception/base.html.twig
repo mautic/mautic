@@ -89,12 +89,12 @@
                         <div class="panel panel-default">
                             <div class="panel-heading" role="tab" id="previous_heading_{{ key }}">
                                 <h4 class="panel-title pa-sm">
-                                    <a data-bs-toggle="collapse" data-bs-parent="#previous" href="#previous_body_{{ key }}" aria-expanded="true" aria-controls="collapseOne">
+                                    <a data-bs-toggle="collapse" href="#previous_body_{{ key }}" aria-expanded="true" aria-controls="collapseOne">
                                         {{ e.message }}
                                     </a>
                                 </h4>
                             </div>
-                            <div id="previous_body_{{ key }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                            <div id="previous_body_{{ key }}" data-bs-parent="#previous" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                                 <div class="panel-body">
                                     <div class="pa-sm">
                                         {{ include ('@MauticCore/Exception/traces.html.twig', {
