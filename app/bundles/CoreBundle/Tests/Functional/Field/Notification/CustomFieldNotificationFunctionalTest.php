@@ -38,7 +38,7 @@ final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
         /** @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\CoreBundle\Entity\Notification> $notifications */
         $notifications      = $notificationRepo->getEntities([]);
 
-        $this->assertEquals(0, $notifications->count());
+        $this->assertCount(0, $notifications);
     }
 
     public function testNotificationForLeadFieldCanNotUpdate(): void
