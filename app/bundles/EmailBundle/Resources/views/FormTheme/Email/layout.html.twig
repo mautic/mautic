@@ -165,7 +165,7 @@
                 <a role="tab" class="addNewDynamicContentFilter" data-index="{{ form.vars.name }}"><i class="ri-add-line text-success"></i>{{ 'mautic.core.form.new'|trans }}</a>
               </li>
               <li class="active">
-                <a data-bs-toggle="tab" href="#emailform_dynamicContent_{{ form.vars.name }}_default" role="tab" class="nav-link">Default</a>
+                <a data-bs-toggle="tab" href="#emailform_dynamicContent_{{ form.vars.name }}_default" role="tab" class="nav-link active" aria-selected="true">Default</a>
               </li>
               {% for i, filter in form['filters'] %}
                 <li><a role="tab" data-bs-toggle="tab" href="#{{ filter.vars.id }}" class="nav-link">{{ 'mautic.core.dynamicContent.tab'|trans }} {{ loop.index }}</a></li>

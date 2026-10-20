@@ -100,7 +100,7 @@
                     {% set active = 'active' %}
                     {% for channel, contacts in messagedLeads %}
                     <li class="{{ active }}">
-                        <a href="#contacts-{{ channel }}" role="tab" data-bs-toggle="tab" class="nav-link">
+                        <a href="#contacts-{{ channel }}" role="tab" data-bs-toggle="tab" class="nav-link{{ active is not empty ? ' active' : '' }}" aria-selected="{{ active is not empty ? 'true' : 'false' }}">
                             {{ ('all' is not same as(channel)) ? channels[channel]['label'] : 'mautic.lead.leads'|trans() }}
                         </a>
                     </li>

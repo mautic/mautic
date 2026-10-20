@@ -64,7 +64,7 @@
     <div role="tabpanel">
         <ul class="nav nav-tabs nav-tabs-contained" role="tablist">
             <li role="presentation" class="active">
-                <a class="nav-link {% if generalTabError %}text-danger{% endif %}" href="#general" aria-controls="general" role="tab" data-bs-toggle="tab">
+                <a class="nav-link active {% if generalTabError %}text-danger{% endif %}" href="#general" aria-controls="general" role="tab" data-bs-toggle="tab" aria-selected="true">
                     {{ 'mautic.form.field.section.general'|trans }}
                     {% if generalTabError %}
                         <i class="ri-alert-line"></i>
