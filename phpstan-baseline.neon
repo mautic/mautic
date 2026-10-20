@@ -2053,12 +2053,6 @@ parameters:
 			path: app/bundles/EmailBundle/Entity/CopyRepository.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setCategory\(\) has parameter \$category with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setContent\(\) has parameter \$content with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2078,18 +2072,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setPlainText\(\) has parameter \$plainText with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setPublishDown\(\) has parameter \$publishDown with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setPublishUp\(\) has parameter \$publishUp with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Entity/Email.php
@@ -2861,6 +2843,12 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/EmailBundle/Security/Permissions/EmailPermissions.php
+
+		-
+			message: '#^Property Mautic\\EmailBundle\\Stat\\Reference\:\:\$leadId \(int\|string\) is never assigned string so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: app/bundles/EmailBundle/Stat/Reference.php
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Stat\\StatHelper\:\:getStat\(\) has parameter \$emailAddress with no type specified\.$#'
@@ -4777,12 +4765,6 @@ parameters:
 			path: app/bundles/NotificationBundle/Api/AbstractNotificationApi.php
 
 		-
-			message: '#^Method Mautic\\NotificationBundle\\Entity\\Notification\:\:setCategory\(\) has parameter \$category with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/NotificationBundle/Entity/Notification.php
-
-		-
 			message: '#^Method Mautic\\NotificationBundle\\Entity\\Notification\:\:setPublishDown\(\) has parameter \$publishDown with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -6323,12 +6305,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/SmsBundle/Callback/HandlerContainer.php
-
-		-
-			message: '#^Method Mautic\\SmsBundle\\Entity\\Sms\:\:setCategory\(\) has parameter \$category with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/SmsBundle/Entity/Sms.php
 
 		-
 			message: '#^Method Mautic\\SmsBundle\\Entity\\Sms\:\:setPublishDown\(\) has parameter \$publishDown with no type specified\.$#'
@@ -8615,12 +8591,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticSocialBundle/Integration/TwitterIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Model\\PostCountModel\:\:updatePostCount\(\) has parameter \$monitor with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticSocialBundle/Model/PostCountModel.php
 
 		-
 			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
