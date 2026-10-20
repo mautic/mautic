@@ -10,10 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class EmailSendEvent extends CommonEvent
 {
-    /**
-     * @var Email|null
-     */
-    private $email;
+    private readonly ?Email $email;
 
     private string $content;
 
@@ -106,10 +103,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Returns the Email entity.
-     *
-     * @return ?Email
      */
-    public function getEmail()
+    public function getEmail(): ?\Mautic\EmailBundle\Entity\Email
     {
         return (null !== $this->helper) ? $this->helper->getEmail() : $this->email;
     }

@@ -91,11 +91,8 @@ class Form extends FormEntity implements UuidInterface
     #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $alias;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['form:read', 'form:write', 'campaign:read', 'email:read'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var string|null
@@ -672,18 +669,12 @@ class Form extends FormEntity implements UuidInterface
         return $this->actions;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
     {
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category): void
+    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category): void
     {
         $this->category = $category;
     }

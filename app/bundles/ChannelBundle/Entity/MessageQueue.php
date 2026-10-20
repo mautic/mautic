@@ -45,12 +45,9 @@ class MessageQueue
 
     private $channelId;
 
-    /**
-     * @var Event|null
-     */
     #[ORM\ManyToOne(targetEntity: Event::class)]
     #[ORM\JoinColumn(name: 'event_id', onDelete: 'CASCADE')]
-    private $event;
+    private ?Event $event = null;
 
     /**
      * @var Lead
@@ -89,20 +86,11 @@ class MessageQueue
      */
     private $datePublished;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $scheduledDate;
+    private ?\DateTimeInterface $scheduledDate = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $lastAttempt;
+    private ?\DateTimeInterface $lastAttempt = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $dateSent;
+    private ?\DateTimeInterface $dateSent = null;
 
     /**
      * @var mixed[][]
@@ -250,10 +238,7 @@ class MessageQueue
         return $this;
     }
 
-    /**
-     * @return Event|null
-     */
-    public function getEvent()
+    public function getEvent(): ?\Mautic\CampaignBundle\Entity\Event
     {
         return $this->event;
     }
@@ -281,10 +266,7 @@ class MessageQueue
         $this->datePublished = $datePublished;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateSent()
+    public function getDateSent(): ?\DateTimeInterface
     {
         return $this->dateSent;
     }
@@ -292,15 +274,12 @@ class MessageQueue
     /**
      * @param \DateTime $dateSent
      */
-    public function setDateSent($dateSent): void
+    public function setDateSent(?\DateTimeInterface $dateSent): void
     {
         $this->dateSent = $dateSent;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getLastAttempt()
+    public function getLastAttempt(): ?\DateTimeInterface
     {
         return $this->lastAttempt;
     }
@@ -308,7 +287,7 @@ class MessageQueue
     /**
      * @param \DateTime $lastAttempt
      */
-    public function setLastAttempt($lastAttempt): void
+    public function setLastAttempt(?\DateTimeInterface $lastAttempt): void
     {
         $this->lastAttempt = $lastAttempt;
     }
@@ -358,18 +337,12 @@ class MessageQueue
         $this->priority = $priority;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getScheduledDate()
+    public function getScheduledDate(): ?\DateTimeInterface
     {
         return $this->scheduledDate;
     }
 
-    /**
-     * @param mixed $scheduledDate
-     */
-    public function setScheduledDate($scheduledDate): void
+    public function setScheduledDate(?\DateTimeInterface $scheduledDate): void
     {
         $this->scheduledDate = $scheduledDate;
     }

@@ -127,11 +127,8 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     #[Groups(['notification:read'])]
     private $sentCount = 0;
 
-    /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
-     */
     #[Groups(['notification:read', 'notification:write'])]
-    private $category;
+    private ?\Mautic\CategoryBundle\Entity\Category $category = null;
 
     /**
      * @var ArrayCollection<int, LeadList>
@@ -377,15 +374,12 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->id;
     }
 
-    /**
-     * @return \Mautic\CategoryBundle\Entity\Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
     {
         return $this->category;
     }
 
-    public function setCategory($category): static
+    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;

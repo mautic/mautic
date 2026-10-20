@@ -46,12 +46,9 @@ class Summary
      */
     private $failedCount = 0;
 
-    /**
-     * @var Event|null
-     */
     #[ORM\ManyToOne(targetEntity: Event::class, fetch: 'EXTRA_LAZY')]
     #[ORM\JoinColumn(name: 'event_id', nullable: false, onDelete: 'CASCADE')]
-    private $event;
+    private ?Event $event = null;
 
     #[ORM\ManyToOne(targetEntity: Campaign::class, fetch: 'EXTRA_LAZY')]
     #[ORM\JoinColumn(name: 'campaign_id')]

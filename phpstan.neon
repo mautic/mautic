@@ -432,6 +432,11 @@ services:
         class: Utils\PHPStan\Rule\EntityParamConcreteTypeRule
         tags:
             - phpstan.rules.rule
+
+    -
+        class: Utils\PHPStan\Rule\NullableObjectPropertyMustHaveNativeTypeRule
+        tags:
+            - phpstan.rules.rule
     -
         class: Utils\PHPStan\Type\ConnectionQueryBuilderReturnTypeExtension
         tags:
