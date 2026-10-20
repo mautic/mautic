@@ -77,7 +77,7 @@ final readonly class FieldsBuilder
 
         $ownerPrefix           = $prefix.'owner_id';
         $ownersList            = [];
-        $owners                = $this->userModel->getUserList('', 0);
+        $owners                = $this->userModel->getUserList('', null);
         foreach ($owners as $owner) {
             $ownersList[$owner['id']] = sprintf('%s %s', $owner['firstName'], $owner['lastName']);
         }

@@ -82,8 +82,11 @@ final class UserRepository extends CommonRepository
      *
      * The users API hands over the raw query parameters, so both arrive as string|null,
      * and a null limit means "no limit".
+     *
+     * @param positive-int|null $limit
+     * @param non-negative-int $start
      */
-    public function getUserList(?string $search = '', int|string|null $limit = 10, int $start = 0, array $permissionLimiter = []): array
+    public function getUserList(?string $search = '', ?int $limit = 10, int $start = 0, array $permissionLimiter = []): array
     {
         $q = $this->createQueryBuilder('u');
 
@@ -132,7 +135,7 @@ final class UserRepository extends CommonRepository
             ->setParameter('true', true, 'boolean')
             ->orderBy('u.firstName, u.lastName');
 
-        if (!empty($limit)) {
+        if (null !== $limit && $limit > 0) {
             $q->setFirstResult($start)
                 ->setMaxResults($limit);
         }
@@ -165,8 +168,11 @@ final class UserRepository extends CommonRepository
 
     /**
      * $search arrives as null from UserModel::getLookupResults().
+     *
+     * @param positive-int|null $limit
+     * @param non-negative-int $start
      */
-    public function getPositionList(?string $search = '', int $limit = 10, int $start = 0): array
+    public function getPositionList(?string $search = '', ?int $limit = 10, int $start = 0): array
     {
         $q = $this->createQueryBuilder('u')
             ->select('u.position')
@@ -180,7 +186,7 @@ final class UserRepository extends CommonRepository
 
         $q->orderBy('u.position');
 
-        if (!empty($limit)) {
+        if (null !== $limit && $limit > 0) {
             $q->setFirstResult($start)
                 ->setMaxResults($limit);
         }
