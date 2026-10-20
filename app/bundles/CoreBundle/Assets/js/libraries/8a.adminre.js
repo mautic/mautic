@@ -248,9 +248,13 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
             // Per call
             // ================================
             BsPopover: function () {
-                $("[data-toggle~=popover]").popover({
+                $("[data-toggle~=popover]:not([data-quick-filter])").popover({
                     sanitize: false
                 });
+                var quickFilterOptions = window.Mautic && Mautic.getQuickFilterPopoverOptions
+                    ? Mautic.getQuickFilterPopoverOptions()
+                    : { sanitize: false };
+                $("[data-quick-filter]").popover(quickFilterOptions);
                 
                 var hideAllPopovers = function() {
                     $("[data-toggle~=popover]").each(function() {

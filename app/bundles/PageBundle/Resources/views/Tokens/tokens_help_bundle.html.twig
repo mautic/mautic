@@ -3,13 +3,12 @@
 <ul id="pageTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
   <!-- Landing Page tokens -->
   <li class="panel">
-    <a role="button" id="headingLandingPageTokens" class="accordion-heading collapsed" data-bs-toggle="collapse"
-      data-bs-parent="#pageTokensAccordion" href="#collapseLandingPageTokens" aria-expanded="false"
+    <a role="button" id="headingLandingPageTokens" class="accordion-heading collapsed" data-bs-toggle="collapse" href="#collapseLandingPageTokens" aria-expanded="false"
       aria-controls="collapseLandingPageTokens">
       <i class="ri-arrow-down-s-line accordion-arrow"></i>
       <span class="accordion-title">{{ 'mautic.placeholder_tokens.landing_page_tokens'|trans }}</span>
     </a>
-    <div id="collapseLandingPageTokens" class="collapse accordion-wrapper" role="tabpanel"
+    <div id="collapseLandingPageTokens" data-bs-parent="#pageTokensAccordion" class="collapse accordion-wrapper" role="tabpanel"
       aria-labelledby="headingLandingPageTokens">
 
       <table class="table table-hover">
@@ -43,13 +42,12 @@
 
   <!-- Preference Center Landing Page tokens -->
   <li class="panel">
-    <a role="button" id="headingPreferenceCenterTokens" class="accordion-heading collapsed" data-bs-toggle="collapse"
-      data-bs-parent="#pageTokensAccordion" href="#collapsePreferenceCenterTokens" aria-expanded="false"
+    <a role="button" id="headingPreferenceCenterTokens" class="accordion-heading collapsed" data-bs-toggle="collapse" href="#collapsePreferenceCenterTokens" aria-expanded="false"
       aria-controls="collapsePreferenceCenterTokens">
       <i class="ri-arrow-down-s-line accordion-arrow"></i>
       <span class="accordion-title">{{ 'mautic.placeholder_tokens.preference_center_tokens'|trans }}</span>
     </a>
-    <div id="collapsePreferenceCenterTokens" class="collapse accordion-wrapper" role="tabpanel"
+    <div id="collapsePreferenceCenterTokens" data-bs-parent="#pageTokensAccordion" class="collapse accordion-wrapper" role="tabpanel"
       aria-labelledby="headingPreferenceCenterTokens">
 
       <table class="table table-hover">
@@ -95,13 +93,12 @@
 
   <!-- Mautic component tokens -->
   <li class="panel">
-    <a role="button" id="headingComponentTokens" class="accordion-heading collapsed" data-bs-toggle="collapse"
-      data-bs-parent="#pageTokensAccordion" href="#collapseComponentTokens" aria-expanded="false"
+    <a role="button" id="headingComponentTokens" class="accordion-heading collapsed" data-bs-toggle="collapse" href="#collapseComponentTokens" aria-expanded="false"
       aria-controls="collapseComponentTokens">
       <i class="ri-arrow-down-s-line accordion-arrow"></i>
       <span class="accordion-title">{{ 'mautic.placeholder_tokens.component_tokens'|trans }}</span>
     </a>
-    <div id="collapseComponentTokens" class="collapse accordion-wrapper" role="tabpanel"
+    <div id="collapseComponentTokens" data-bs-parent="#pageTokensAccordion" class="collapse accordion-wrapper" role="tabpanel"
       aria-labelledby="headingComponentTokens">
 
       <table class="table table-hover">

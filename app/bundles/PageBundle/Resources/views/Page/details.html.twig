@@ -200,14 +200,14 @@
               <ul class="nav nav-tabs nav-tabs-contained">
                   {% if showVariants %}
                       <li class="active">
-                          <a href="#variants-container" role="tab" data-bs-toggle="tab" class="nav-link">
+                          <a href="#variants-container" role="tab" data-bs-toggle="tab" class="active nav-link">
                               {{- 'mautic.core.variants'|trans -}}
                           </a>
                       </li>
                   {% endif %}
                   {% if showTranslations %}
                       <li class="{% if not showVariants %}active{% endif %}">
-                          <a href="#translation-container" role="tab" data-bs-toggle="tab" class="nav-link">
+                          <a href="#translation-container" role="tab" data-bs-toggle="tab" class="{% if not showVariants %}active {% endif %}nav-link">
                               {{- 'mautic.core.translations'|trans -}}
                           </a>
                       </li>
