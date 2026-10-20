@@ -34,7 +34,7 @@ final class FormSubmitActionUserEmailType extends AbstractType
             UserListType::class,
             [
                 'label'      => 'mautic.email.form.users',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.help.autocomplete',
