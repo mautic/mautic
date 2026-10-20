@@ -51,13 +51,13 @@ final class FieldModel extends CommonFormModel
     }
 
     /**
-     * @param object|array<mixed> $entity
-     * @param string|null         $action
-     * @param array               $options
+     * @param Field|array<string, mixed> $entity
+     * @param string|null                $action
+     * @param array                      $options
      *
      * @return FormInterface<mixed>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if ($action) {
             $options['action'] = $action;
@@ -127,9 +127,11 @@ final class FieldModel extends CommonFormModel
     }
 
     /**
+     * @param Field $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Field) {
             throw new MethodNotAllowedHttpException(['Form']);

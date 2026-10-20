@@ -1704,7 +1704,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         array &$mauticData,
         array $objectFields,
         $object,
-        array &$entity,
+        object|array &$entity,
         $objectId = null,
         $sfRecord = null,
     ): array {

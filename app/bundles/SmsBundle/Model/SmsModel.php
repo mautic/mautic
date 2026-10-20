@@ -89,6 +89,9 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
         return 'sms:smses';
     }
 
+    /**
+     * @param Sms $entity
+     */
     public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
@@ -98,10 +101,8 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
 
     /**
      * Save an array of entities.
-     *
-     * @param iterable<Sms> $entities
      */
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -112,15 +113,11 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
             // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
 
-            if ($dispatchEvent = $entity instanceof Sms) {
-                $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-            }
+            $event = $this->dispatchEvent('pre_save', $entity, $isNew);
 
             $this->smsRepository->saveEntity($entity, false);
 
-            if ($dispatchEvent) {
-                $this->dispatchEvent('post_save', $entity, $isNew, $event);
-            }
+            $this->dispatchEvent('post_save', $entity, $isNew, $event);
 
             if (0 === ++$i % $batchSize) {
                 $this->em->flush();
@@ -130,11 +127,12 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
     }
 
     /**
+     * @param Sms|array<string, mixed>     $entity
      * @param mixed[] $options
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Sms) {
             throw new MethodNotAllowedHttpException(['Sms']);
@@ -400,9 +398,11 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
     }
 
     /**
+     * @param Sms $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Sms) {
             throw new MethodNotAllowedHttpException(['Sms']);

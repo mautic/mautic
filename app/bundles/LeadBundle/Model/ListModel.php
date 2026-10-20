@@ -216,12 +216,13 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param LeadList|array<string, mixed>    $entity
      * @param string|null $action
      * @param array       $options
      *
      * @return FormInterface<LeadList>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
@@ -252,9 +253,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param LeadList $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');

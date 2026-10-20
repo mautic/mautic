@@ -272,7 +272,7 @@ final class MobileNotificationController extends AbstractFormController
      *
      * @param Notification $entity
      */
-    public function newAction(Request $request, IntegrationHelper $integrationHelper, $entity = null): Response
+    public function newAction(Request $request, IntegrationHelper $integrationHelper, ?object $entity = null): Response
     {
         if (!$entity instanceof Notification) {
             /** @var Notification $entity */

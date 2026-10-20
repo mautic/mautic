@@ -56,6 +56,10 @@ return RectorConfig::configure()
         Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
         Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
 
+        \Rector\TypeDeclaration\Rector\ClassMethod\AddParamStringTypeFromSprintfUseRector::class => [
+            __DIR__ . '/app/bundles/DashboardBundle/Controller/DashboardController.php',
+        ],
+
         // Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',

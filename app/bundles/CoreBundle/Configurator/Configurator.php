@@ -214,7 +214,6 @@ final class Configurator
 
     /**
      * @param array<mixed> $array
-     * @param int          $level
      */
     private function renderArray(array $array, int|float $level = 1): string
     {

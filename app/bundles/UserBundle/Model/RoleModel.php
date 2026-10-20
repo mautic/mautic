@@ -57,6 +57,8 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Role $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     public function saveEntity(object $entity, bool $unlock = true): void
@@ -99,6 +101,8 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Role $entity
+     *
      * @throws PreconditionRequiredHttpException
      */
     public function deleteEntity(object $entity): void
@@ -115,7 +119,10 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    /**
+     * @param Role|array<string, mixed> $entity
+     */
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role']);
@@ -151,9 +158,11 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Role $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');

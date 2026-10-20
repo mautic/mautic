@@ -309,11 +309,11 @@ final class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param ?object $entity
+     * @param MessageQueue|null $entity
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, ?object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         switch ($action) {
             case 'process_message_queue':

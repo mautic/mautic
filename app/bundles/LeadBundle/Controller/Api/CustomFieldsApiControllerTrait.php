@@ -175,7 +175,7 @@ trait CustomFieldsApiControllerTrait
      *
      * @return bool|void
      */
-    protected function setCustomFieldValues($entity, $form, array $parameters, bool $isPostOrPatch = false)
+    protected function setCustomFieldValues(object $entity, $form, array $parameters, bool $isPostOrPatch = false)
     {
         // set the custom field values
         // pull the data from the form in order to apply the form's formatting
