@@ -40,7 +40,7 @@ final class CategoryType extends AbstractType
                     CategoryBundlesType::class,
                     [
                         'label'      => 'mautic.core.type',
-                        'label_attr' => ['class' => 'control-label'],
+                        'label_attr' => ['class' => 'form-label'],
                         'attr'       => ['class' => 'form-control'],
                         'required'   => true,
                         'data'       => $selected,
@@ -63,7 +63,7 @@ final class CategoryType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.title',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -73,7 +73,7 @@ final class CategoryType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.description',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
@@ -84,7 +84,7 @@ final class CategoryType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.alias',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.category.form.alias.help',
@@ -98,7 +98,7 @@ final class CategoryType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.color',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'       => 'form-control',
                     'data-toggle' => 'color',

@@ -40,7 +40,7 @@ final class YesNoButtonGroupType extends AbstractType
                 },
                 'expanded'          => true,
                 'multiple'          => false,
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'label'             => 'mautic.core.form.active',
                 'placeholder'       => false,
                 'required'          => false,
