@@ -113,9 +113,7 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
             // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
 
-            if ($dispatchEvent = $entity instanceof Sms) {
-                $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-            }
+            $event = $this->dispatchEvent('pre_save', $entity, $isNew);
 
             $this->smsRepository->saveEntity($entity, false);
 

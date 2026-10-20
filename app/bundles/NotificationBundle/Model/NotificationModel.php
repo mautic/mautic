@@ -76,9 +76,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
             // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
 
-            if ($dispatchEvent = $entity instanceof Notification) {
-                $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-            }
+            $event = $this->dispatchEvent('pre_save', $entity, $isNew);
 
             $this->notificationRepository->saveEntity($entity, false);
 
