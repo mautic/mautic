@@ -1609,7 +1609,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param string|null $object
      */
-    public function populateMauticLeadData($data, array $config = [], $object = null): array
+    public function populateMauticLeadData($data, ?array $config = [], $object = null): array
     {
         // Glean supported fields from what was returned by the integration
         $gleanedData = $data;
