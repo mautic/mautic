@@ -81,7 +81,7 @@ final class OidcAuthenticatorInteractiveLoginTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $user);
 
         // Verify last_login is null initially
-        $this->assertNull($user->getLastLogin(), 'Expected last_login to be null initially');
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $user->getLastLogin(), 'Expected last_login to be null initially');
 
         // Perform OIDC login through the real authenticator
         $this->performOidcLogin();
@@ -90,8 +90,7 @@ final class OidcAuthenticatorInteractiveLoginTest extends MauticMysqlTestCase
         $this->em->clear();
         $user = $userRepo->findOneBy(['username' => 'oidc_user']);
         $this->assertInstanceOf(User::class, $user);
-        $this->assertNotNull($user->getLastLogin(), 'Expected last_login to be set after OIDC login');
-        $this->assertInstanceOf(\DateTimeInterface::class, $user->getLastLogin());
+        $this->assertInstanceOf(\DateTimeInterface::class, $user->getLastLogin(), 'Expected last_login to be set after OIDC login');
     }
 
     public function testOidcLoginStoresUserInSession(): void
@@ -138,7 +137,7 @@ final class OidcAuthenticatorInteractiveLoginTest extends MauticMysqlTestCase
         $this->assertInstanceOf(User::class, $user);
 
         // Verify last_login is null initially
-        $this->assertNull($user->getLastLogin(), 'Expected last_login to be null initially');
+        $this->assertNotInstanceOf(\DateTimeInterface::class, $user->getLastLogin(), 'Expected last_login to be null initially');
 
         // Perform OIDC login through the real authenticator
         $this->performOidcLogin();
@@ -147,7 +146,7 @@ final class OidcAuthenticatorInteractiveLoginTest extends MauticMysqlTestCase
         $this->em->clear();
         $user = $userRepo->findOneBy(['username' => 'oidc_user']);
         $this->assertInstanceOf(User::class, $user);
-        $this->assertNotNull($user->getLastLogin(), 'Expected last_login to be set after OIDC login');
+        $this->assertInstanceOf(\DateTimeInterface::class, $user->getLastLogin(), 'Expected last_login to be set after OIDC login');
 
         // Verify session has all expected values
         $session = $this->client->getRequest()->getSession();
