@@ -160,8 +160,11 @@ final class DashboardModel extends FormModel
 
     /**
      * Fill widgets with their content.
+     *
+     * @param array $widgets
+     * @param array $filter
      */
-    public function populateWidgetsContent(array &$widgets, array $filter = []): void
+    public function populateWidgetsContent(&$widgets, $filter = []): void
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
