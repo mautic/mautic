@@ -578,7 +578,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         array $args,
         $joinTable,
         $entityId,
-        array $filters = [],
+        $filters = [],
         $entityColumnName = 'id',
         ?array $additionalJoins = null,
         $contactColumnName = 'lead_id',
@@ -621,7 +621,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
             }
         }
 
-        if ($filters !== []) {
+        if ($filters) {
             $expr = null;
             foreach ($filters as $column => $value) {
                 if (is_array($value)) {
