@@ -313,18 +313,14 @@ final class CampaignApiController extends CommonApiController
 
     /**
      * Change the array structure.
-     *
-     * @param array $events
      */
-    private function modifyCampaignEventArray($events): array
+    private function modifyCampaignEventArray(array $events): array
     {
         $updatedEvents = [];
 
-        if ($events && is_array($events)) {
-            foreach ($events as $event) {
-                if (!empty($event['id'])) {
-                    $updatedEvents[$event['id']] = 'ignore';
-                }
+        foreach ($events as $event) {
+            if (!empty($event['id'])) {
+                $updatedEvents[$event['id']] = 'ignore';
             }
         }
 

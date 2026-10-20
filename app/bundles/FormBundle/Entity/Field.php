@@ -470,10 +470,7 @@ class Field implements UuidInterface
         return $this->order;
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
@@ -486,10 +483,7 @@ class Field implements UuidInterface
         return $this->properties;
     }
 
-    /**
-     * @param array $validation
-     */
-    public function setValidation($validation): static
+    public function setValidation(array $validation): static
     {
         $this->isChanged('validation', $validation);
         $this->validation = $validation;
@@ -911,7 +905,7 @@ class Field implements UuidInterface
     /**
      * @param array<string, mixed> $conditions
      */
-    public function setConditions($conditions): static
+    public function setConditions(array $conditions): static
     {
         $this->isChanged('conditions', $conditions);
         $this->conditions = $conditions;

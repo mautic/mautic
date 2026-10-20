@@ -316,11 +316,10 @@ final class PageModel extends FormModel implements GlobalSearchInterface
      * Generate URL for a page.
      *
      * @param Page  $entity
-     * @param array $clickthrough
      *
      * @return string
      */
-    public function generateUrl(object $entity, bool $absolute = true, $clickthrough = [])
+    public function generateUrl(object $entity, bool $absolute = true, array $clickthrough = [])
     {
         // If this is a variant, then get the parent's URL
         $parent = $entity->getVariantParent();
@@ -391,13 +390,11 @@ final class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * @param string|int $code
-     * @param array      $query
      *
      * @return bool If hit is tracked or not
-     *
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, $query = [], ?\DateTime $dateTime = null): bool
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, array $query = [], ?\DateTime $dateTime = null): bool
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous() || $request->cookies->get('Blocked-Tracking')) {
@@ -411,7 +408,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
         $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Process the query
-        if (empty($query) || !is_array($query)) {
+        if ($query === [] || !is_array($query)) {
             $query = $this->getHitQuery($request, $page);
         }
 

@@ -201,10 +201,7 @@ class Point extends FormEntity implements UuidInterface
         return $this->id;
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
 
