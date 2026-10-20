@@ -4213,18 +4213,6 @@ parameters:
 			path: app/bundles/LeadBundle/Event/PointsChangeEvent.php
 
 		-
-			message: '#^Parameter \#3 \$filters of method Mautic\\LeadBundle\\Model\\LeadModel\:\:getAnonymousVsIdentifiedPieChartData\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Parameter \#4 \$filters of method Mautic\\LeadBundle\\Model\\LeadModel\:\:getLeadList\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/DashboardSubscriber.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\EventListener\\LeadSubscriber\:\:getChannelEntity\(\) has parameter \$channelId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
