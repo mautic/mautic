@@ -5,7 +5,7 @@ name: Mautic
 
 ## Overview
 
-Mautic is an open source marketing automation product. The UI looks serious: it is built on Bootstrap and uses a restrained palette and layout. The copy is playful: text can be more relaxed while the interface stays formal. The target audience is not defined yet (to confirm).
+Mautic is an open source marketing automation product. The UI looks serious: it is built on Bootstrap and uses a restrained palette and layout. The copy is playful: text can be more relaxed while the interface stays formal.
 
 ## Colors
 
@@ -104,13 +104,6 @@ Layout follows the official Bootstrap documentation: https://getbootstrap.com/do
 
 The layout uses the Bootstrap grid. Page layout (rows, columns, and similar) can use plain HTML and hardcoded classes without permission, as stated in Do's and Don'ts.
 
-### Design Tokens
-
-```yaml
-spacing:
-  gutter: 30px
-```
-
 ## Elevation & Depth
 
 Depth is shown with layered background colors, not shadows. Each layer sits on the layer below it and uses its own color. Carbon works the same way with its layer sets.
@@ -119,7 +112,7 @@ Two classes apply the layer automatically: `.layer-one` (the default) and `.laye
 
 ## Shapes
 
-The shape language is defined by square corners. The theme base radius is `0px`, which the small, medium and large radius variables derive from. Interactive elements, containers and inputs use these variables, so they stay square until the base radius changes (to confirm the exact intent).
+The shape language is defined by square corners. The theme base radius is `0px`, which the small, medium and large radius variables derive from. Interactive elements, containers and inputs use these variables, so they stay square until the base radius changes.
 
 Carbon also keeps corners at 0 by default for components.
 
@@ -290,5 +283,5 @@ uishell: "Use for the global app header with skip link, menu toggle, brand and a
 - Do ask permission before any custom styling or visual or structural change to a shared component. Make the change in the imported component so it applies to all instances.
 - Don't write custom visual CSS without permission. Plain HTML and hardcoded classes are allowed without permission only for page layout (rows, columns, and similar). Otherwise, plain HTML is limited to semantic structure and text, with no component behavior.
 - Do use `var(--name)` tokens for every value. Don't write a hex, rgb, or pixel value directly.
-- Do use the primary color for one main action per view (to confirm).
+- Do use the primary color for one main action per view.
 - Do keep WCAG AA contrast for text: 4.5:1 for normal text.
