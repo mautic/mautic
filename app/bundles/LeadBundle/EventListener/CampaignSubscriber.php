@@ -504,6 +504,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
                 if (!empty($company)) {
                     // Save after the lead in for new leads created
+                    /** @var Company $companyEntity */
                     $this->companyModel->addLeadToCompany($companyEntity, $lead);
                     $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
                 }
@@ -522,6 +523,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
+        /** @var Lead $lead */
         $lead   = $event->getLead();
         $result = false;
 
@@ -676,8 +678,12 @@ final class CampaignSubscriber implements EventSubscriberInterface
                         $pageUrl = html_entity_decode($pageHitUrl);
                         if (UrlMatcher::hasMatch([$url], $pageUrl)) {
                             if ($hit['dateLeft'] && $totalSpentTime) {
-                                $realTotalSpentTime = new \DateTime($hit['dateLeft']->format('Y-m-d H:i'))->getTimestamp() -
-                                    new \DateTime($hit['dateHit']->format('Y-m-d H:i'))->getTimestamp();
+                                /** @var \DateTimeInterface $dateLeft */
+                                $dateLeft = $hit['dateLeft'];
+                                /** @var \DateTimeInterface $dateHit */
+                                $dateHit            = $hit['dateHit'];
+                                $realTotalSpentTime = new \DateTime($dateLeft->format('Y-m-d H:i'))->getTimestamp() -
+                                    new \DateTime($dateHit->format('Y-m-d H:i'))->getTimestamp();
                                 if ($realTotalSpentTime >= $totalSpentTime) {
                                     $event->pass();
 
@@ -693,8 +699,12 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
                     if (!empty($page) && (int) $page === (int) $pageId) {
                         if ($hit['dateLeft'] && $totalSpentTime) {
-                            $realTotalSpentTime = new \DateTime($hit['dateLeft']->format('Y-m-d H:i'))->getTimestamp() -
-                                new \DateTime($hit['dateHit']->format('Y-m-d H:i'))->getTimestamp();
+                            /** @var \DateTimeInterface $dateLeft */
+                            $dateLeft = $hit['dateLeft'];
+                            /** @var \DateTimeInterface $dateHit */
+                            $dateHit            = $hit['dateHit'];
+                            $realTotalSpentTime = new \DateTime($dateLeft->format('Y-m-d H:i'))->getTimestamp() -
+                                new \DateTime($dateHit->format('Y-m-d H:i'))->getTimestamp();
                             if ($realTotalSpentTime >= $totalSpentTime) {
                                 $event->pass();
 

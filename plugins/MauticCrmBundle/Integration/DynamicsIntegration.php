@@ -386,8 +386,10 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     $executed += array_key_exists('value', $data) ? count($data['value']) : count($result);
 
                     if (isset($params['output'])) {
-                        if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                            $params['output']->writeln($result);
+                        /** @var OutputInterface $output */
+                        $output = $params['output'];
+                        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                            $output->writeln($result);
                         } else {
                             $progress->advance(count($result));
                         }
@@ -455,8 +457,10 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     $executed += count($result);
 
                     if (isset($params['output'])) {
-                        if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                            $params['output']->writeln($result);
+                        /** @var OutputInterface $output */
+                        $output = $params['output'];
+                        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                            $output->writeln($result);
                         } else {
                             $progress->advance(count($result));
                         }
