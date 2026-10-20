@@ -241,7 +241,7 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
             // Per call
             // ================================
             BsTooltip: function () {
-                $("[data-toggle~=tooltip]").tooltip();
+                $("[data-toggle~=tooltip], [data-bs-toggle~=tooltip]").tooltip();
             },
 
             // @MISC: BsPopover - Bootstrap popover
