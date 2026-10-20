@@ -170,10 +170,8 @@ abstract class CommonRepository extends ServiceEntityRepository
 
     /**
      * Delete an array of entities.
-     *
-     * @param array $entities
      */
-    public function deleteEntities($entities): void
+    public function deleteEntities(array $entities): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -811,7 +809,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      *
      * @param TObject[]|ArrayCollection<int, TObject> $entities
      */
-    public function saveEntities($entities): void
+    public function saveEntities(iterable $entities): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
