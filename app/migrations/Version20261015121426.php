@@ -10,11 +10,16 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Model\RoleModel;
+use Symfony\Component\Console\Input\ArgvInput;
 
 final class Version20261015121426 extends AbstractMauticMigration
 {
     public function postUp(Schema $schema): void
     {
+        if ((new ArgvInput())->hasParameterOption('--dry-run')) {
+            return;
+        }
+
         $model = $this->container->get(RoleModel::class);
 
         // Get all non admin roles.
