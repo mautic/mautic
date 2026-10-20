@@ -114,6 +114,7 @@ final class TrackableModelTest extends TestCase
         $document = new \DOMDocument();
         $document->loadHTML($content);
         $link = $document->getElementsByTagName('a')->item(0);
+        $this->assertInstanceOf(\DOMElement::class, $link);
         $this->assertSame($title, $link->getAttribute('title'));
         $this->assertArrayHasKey($link->getAttribute('href'), $trackables);
         $this->assertSame($url, $trackables[$link->getAttribute('href')]->getRedirect()->getUrl());
@@ -154,8 +155,8 @@ final class TrackableModelTest extends TestCase
         [$content, $trackables] = $model->parseContentForTrackables($html, [], 'email', 1);
 
         $this->assertCount(1, $trackables);
-        $this->assertStringContainsString($disabled, $content);
-        $this->assertStringContainsString('<a href="'.array_key_first($trackables).'">Tracked</a>', $content);
+        $this->assertStringContainsString($disabled, (string) $content);
+        $this->assertStringContainsString('<a href="'.array_key_first($trackables).'">Tracked</a>', (string) $content);
     }
 
     /**
