@@ -1116,7 +1116,9 @@ $utilities: map-merge($utilities, (
 @mixin form-control-validation($text-color: #555, $border-color: #ccc, $background-color: #f5f5f5) {
 
   .help-block,
+  .form-text,
   .control-label,
+  .form-label,
   .radio,
   .checkbox,
   .radio-inline,

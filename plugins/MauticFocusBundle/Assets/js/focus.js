@@ -236,7 +236,7 @@ Mautic.launchFocusBuilder = function (forceFetch) {
         mQuery('.preview-body').html('');
 
         // Clear any previous error state
-        mQuery('.website-placeholder').removeClass('has-error').find('.help-block').html('');
+        mQuery('.website-placeholder').removeClass('has-error').find('.form-text').html('');
 
         // Disable droppers
         mQuery('.btn-dropper').addClass('disabled');
