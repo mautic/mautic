@@ -251,7 +251,7 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                 $("[data-toggle~=popover]:not([data-quick-filter])").popover({
                     sanitize: false
                 });
-                var quickFilterOptions = window.Mautic && Mautic.getQuickFilterPopoverOptions
+                const quickFilterOptions = window.Mautic && Mautic.getQuickFilterPopoverOptions
                     ? Mautic.getQuickFilterPopoverOptions()
                     : { sanitize: false };
                 $("[data-quick-filter]").popover(quickFilterOptions);
