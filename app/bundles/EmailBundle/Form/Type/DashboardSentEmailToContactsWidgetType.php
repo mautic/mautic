@@ -22,7 +22,7 @@ final class DashboardSentEmailToContactsWidgetType extends AbstractType
             CompanyListType::class,
             [
                 'label'       => 'mautic.email.companyId.filter',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'empty_data'  => '',
                 'required'    => false,
@@ -36,7 +36,7 @@ final class DashboardSentEmailToContactsWidgetType extends AbstractType
             CampaignListType::class,
             [
                 'label'       => 'mautic.email.campaignId.filter',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'empty_data'  => '',
                 'placeholder' => '',
@@ -50,7 +50,7 @@ final class DashboardSentEmailToContactsWidgetType extends AbstractType
             LeadListType::class,
             [
                 'label'      => 'mautic.email.segmentId.filter',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'empty_data' => '',
                 'required'   => false,

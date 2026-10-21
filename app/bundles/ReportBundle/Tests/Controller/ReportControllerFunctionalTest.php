@@ -550,7 +550,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(SchedulerRepository::class, $schedulerRepository);
         $scheduler = $schedulerRepository->getSchedulerByReport($report);
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/messengerconfig');
         self::assertResponseIsSuccessful();
 
         // Find save & close button

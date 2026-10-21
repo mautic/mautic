@@ -1052,6 +1052,8 @@ final class EmailController extends FormController
                             $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
                             $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                         } else {
+                            $entity->setIsClone(false);
+
                             return $this->forward(self::class.'::editAction', [
                                 'objectId'   => $entity->getId(),
                                 'ignorePost' => true,
