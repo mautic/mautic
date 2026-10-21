@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Security\OIDC\Functional\Entity;
 
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Entity\Role;
@@ -13,12 +12,15 @@ use Mautic\UserBundle\Entity\User;
 
 final class SubjectIdTest extends MauticMysqlTestCase
 {
+    private string $prefix;
     private User $linkedUser;
     private User $unlinkedUser;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $role = new Role();
         $role->setName('Admin');
@@ -101,29 +103,27 @@ final class SubjectIdTest extends MauticMysqlTestCase
 
     public function testSubjectUserIsUnique(): void
     {
-        if (DatabasePlatform::isPostgreSQL($this->em->getConnection()->getDatabasePlatform())) {
-            $this->useCleanupRollback = false;   // We do not rely on transaction rollback
-        }
-
-        $subjectId = new OidcSubjectId($this->linkedUser, 'test2');
-
         $this->expectException(UniqueConstraintViolationException::class);
 
-        $this->em->persist($subjectId);
-        $this->em->flush();
+        $this->connection->insert(
+            $this->prefix.OidcSubjectId::TABLE_NAME,
+            [
+                'user_id'    => $this->linkedUser->getId(),
+                'subject_id' => 'test2',
+            ]
+        );
     }
 
     public function testSubjectIdIsUnique(): void
     {
-        if (DatabasePlatform::isPostgreSQL($this->em->getConnection()->getDatabasePlatform())) {
-            $this->useCleanupRollback = false;   // We do not rely on transaction rollback
-        }
-
-        $subjectId = new OidcSubjectId($this->unlinkedUser, 'linked_admin');
-
         $this->expectException(UniqueConstraintViolationException::class);
 
-        $this->em->persist($subjectId);
-        $this->em->flush();
+        $this->connection->insert(
+            $this->prefix.OidcSubjectId::TABLE_NAME,
+            [
+                'user_id'    => $this->unlinkedUser->getId(),
+                'subject_id' => 'linked_admin',
+            ]
+        );
     }
 }
