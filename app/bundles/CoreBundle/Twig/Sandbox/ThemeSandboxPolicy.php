@@ -101,14 +101,12 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
 
     /**
      * Twig filters that must never execute in theme templates.
-     * map/reduce/filter accept PHP callable strings, enabling RCE.
+     * Collection filters (map/filter/reduce/sort/find) are protected by Twig's
+     * sandbox, which only accepts closures as callbacks.
      *
      * @var string[]
      */
     private const DENIED_FILTERS = [
-        'map',          // {{ ['id']|map('system')|join }} → RCE
-        'reduce',       // {{ ['id']|reduce('system') }} → RCE
-        'filter',       // {{ ['id']|filter('system') }} → RCE
         'less_compile', // {{ '@import (inline) "/etc/passwd";'|less_compile }} → arbitrary file read via Less @import
     ];
 
