@@ -4393,21 +4393,9 @@ parameters:
 			path: app/bundles/LeadBundle/Model/LeadModel.php
 
 		-
-			message: '#^Parameter \#2 \$dateFrom of class Mautic\\CoreBundle\\Helper\\Chart\\ChartQuery constructor expects DateTime, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/Model/LeadModel.php
-
-		-
 			message: '#^Parameter \#2 \$dateFrom of class Mautic\\CoreBundle\\Helper\\Chart\\ChartQuery constructor expects DateTime, string\|null given\.$#'
 			identifier: argument.type
 			count: 2
-			path: app/bundles/LeadBundle/Model/LeadModel.php
-
-		-
-			message: '#^Parameter \#3 \$dateTo of class Mautic\\CoreBundle\\Helper\\Chart\\ChartQuery constructor expects DateTime, string given\.$#'
-			identifier: argument.type
-			count: 1
 			path: app/bundles/LeadBundle/Model/LeadModel.php
 
 		-
