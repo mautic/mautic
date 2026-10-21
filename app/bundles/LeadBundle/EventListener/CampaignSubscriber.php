@@ -523,7 +523,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
-        /** @var Lead $lead */
+        /** @var Lead|null $lead */
         $lead   = $event->getLead();
         $result = false;
 
