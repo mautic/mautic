@@ -206,6 +206,12 @@ final class CampaignApiController extends CommonApiController
             }
         }
 
+        foreach (['lists', 'forms'] as $source) {
+            if (isset($parameters[$source]) && !is_array($parameters[$source])) {
+                return $this->returnError('$campaign['.$source.'] must be an array', Response::HTTP_BAD_REQUEST);
+            }
+        }
+
         $deletedSources = ['lists' => [], 'forms' => []];
         $deletedEvents  = [];
         $currentSources = [
