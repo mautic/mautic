@@ -79,7 +79,7 @@
                                       </h5>
                                   </div>
                                   <div class="col-md-9 va-m">
-                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
+                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'float-end'}) }}
                                   </div>
                               </div>
                               <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
@@ -96,7 +96,7 @@
               <!-- tabs controls -->
               <ul class="nav nav-tabs nav-tabs-contained">
                   <li class="active">
-                      <a href="#leads-container" role="tab" data-toggle="tab">
+                      <a href="#leads-container" role="tab" data-bs-toggle="tab" class="active nav-link">
                           {{ 'mautic.lead.leads'|trans }}
                       </a>
                   </li>

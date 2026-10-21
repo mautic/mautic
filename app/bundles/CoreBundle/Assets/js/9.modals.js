@@ -2,6 +2,38 @@ Mautic.modalContentXhr = {};
 Mautic.activeModal = '';
 Mautic.backgroundedModal = '';
 
+const showingModals = new WeakSet();
+mQuery(document).on('show.bs.modal.mauticLifecycle', event => {
+    showingModals.add(event.target);
+    queueMicrotask(() => {
+        if (event.isDefaultPrevented()) {
+            showingModals.delete(event.target);
+            mQuery(event.target).off('shown.bs.modal.mauticHide');
+        }
+    });
+}).on('shown.bs.modal.mauticLifecycle hidden.bs.modal.mauticLifecycle', event => {
+    showingModals.delete(event.target);
+});
+
+Mautic.hideModal = function (element) {
+    const modal = bootstrap.Modal.getInstance(element);
+    if (!modal) {
+        return;
+    }
+    if (showingModals.has(element)) {
+        mQuery(element).off('shown.bs.modal.mauticHide').one('shown.bs.modal.mauticHide', () => modal.hide());
+        return;
+    }
+    modal.hide();
+};
+
+Mautic.configureModal = function (element, options) {
+    const modal = bootstrap.Modal.getOrCreateInstance(element, options);
+    modal._config.keyboard = options.keyboard;
+    modal._config.backdrop = options.backdrop;
+    return modal;
+};
+
 /**
  * Load a modal with ajax content
  *
@@ -130,28 +162,10 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
         Mautic.resetModal(target);
     });
 
-    // Check if dismissal is allowed
-    if (typeof element.data('bs.modal') !== 'undefined' && typeof element.data('bs.modal').options !== 'undefined') {
-        if (preventDismissal) {
-            element.data('bs.modal').options.keyboard = false;
-            element.data('bs.modal').options.backdrop = 'static';
-        } else {
-            element.data('bs.modal').options.keyboard = true;
-            element.data('bs.modal').options.backdrop = true;
-        }
-    } else {
-        if (preventDismissal) {
-            element.modal({
-                backdrop: 'static',
-                keyboard: false
-            });
-        } else {
-            element.modal({
-                backdrop: true,
-                keyboard: true
-            });
-        }
-    }
+    Mautic.configureModal(element[0], {
+        keyboard: !preventDismissal,
+        backdrop: preventDismissal ? 'static' : true
+    });
 
     Mautic.showModal(target);
 
@@ -188,7 +202,7 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
  * @param target
  */
 Mautic.resetModal = function (target) {
-    if (mQuery(target).hasClass('in')) {
+    if (mQuery(target).hasClass('show')) {
         return;
     }
 
@@ -230,7 +244,7 @@ Mautic.processModalContent = function (response, target) {
     }
 
     if (response.sessionExpired || (response.closeModal && response.newContent && !response.updateModalContent)) {
-        mQuery(target).modal('hide');
+        mQuery(target).each((index, element) => Mautic.hideModal(element));
         mQuery('body').removeClass('modal-open');
         mQuery('.modal-backdrop').remove();
         //assume the content is to refresh main app
@@ -267,7 +281,7 @@ Mautic.processModalContent = function (response, target) {
         Mautic.modalMauticContent = false;
         if (response.closeModal) {
             mQuery('body').removeClass('noscroll');
-            mQuery(target).modal('hide');
+            mQuery(target).each((index, element) => Mautic.hideModal(element));
 
             if (!response.updateModalContent) {
                 Mautic.onPageUnload(target, response);
@@ -354,7 +368,7 @@ Mautic.showConfirmation = function (el, customMessage) {
         mQuery(this).remove();
     });
 
-    mQuery('.confirmation-modal').modal('show');
+    mQuery('.confirmation-modal').each((index, element) => bootstrap.Modal.getOrCreateInstance(element).show());
 };
 
 /**
@@ -362,7 +376,7 @@ Mautic.showConfirmation = function (el, customMessage) {
  */
 Mautic.dismissConfirmation = function () {
     if (mQuery('.confirmation-modal').length) {
-        mQuery('.confirmation-modal').modal('hide');
+        mQuery('.confirmation-modal').each((index, element) => Mautic.hideModal(element));
     }
 };
 
@@ -408,7 +422,7 @@ Mautic.loadAjaxModalBySelectValue = function (el, value, route, header) {
  * @param target
  */
 Mautic.showModal = function(target) {
-    if (mQuery('.modal.in').length) {
+    if (mQuery('.modal.show').length) {
         // another modal is activated so let's stack
 
         // is this modal within another modal?
@@ -422,13 +436,13 @@ Mautic.showModal = function(target) {
             mQuery(target).appendTo('body');
         }
 
-        var activeModal = mQuery('.modal.in .modal-dialog:not(:has(.aside))').parents('.modal').last(),
+        var activeModal = mQuery('.modal.show .modal-dialog:not(:has(.aside))').parents('.modal').last(),
             targetModal  = mQuery(target);
 
         if (activeModal.length && activeModal.attr('id') !== targetModal.attr('id')) {
             targetModal.attr('data-previous-modal', '#'+activeModal.attr('id'));
             activeModal.find('.modal-dialog').addClass('aside');
-            var stackedDialogCount = mQuery('.modal.in .modal-dialog.aside').length;
+            var stackedDialogCount = mQuery('.modal.show .modal-dialog.aside').length;
             if (stackedDialogCount <= 5) {
                 activeModal.find('.modal-dialog').addClass('aside-' + stackedDialogCount);
             }
@@ -450,6 +464,6 @@ Mautic.showModal = function(target) {
         }
     }
 
-    mQuery(target).modal('show');
+    mQuery(target).each((index, element) => bootstrap.Modal.getOrCreateInstance(element).show());
 };
 

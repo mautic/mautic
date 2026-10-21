@@ -54,16 +54,16 @@
                   <!-- tabs controls -->
                   <ul class="nav nav-tabs nav-tabs-contained">
                       <li class="active">
-                          <a href="#theme-container" role="tab" data-toggle="tab">{{ 'mautic.core.form.theme'|trans }}</a>
+                          <a href="#theme-container" role="tab" data-bs-toggle="tab" class="active nav-link">{{ 'mautic.core.form.theme'|trans }}</a>
                       </li>
                       <li id="advanced-tab" class="hidden">
-                          <a href="#advanced-container" role="tab" data-toggle="tab">{{ 'mautic.core.advanced'|trans }}</a>
+                          <a href="#advanced-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.core.advanced'|trans }}</a>
                       </li>
                   </ul>
                   <!--/ tabs controls -->
 
                   <div class="tab-content pa-md">
-                      <div class="tab-pane fade in active bdr-w-0" id="theme-container">
+                      <div class="tab-pane fade show active bdr-w-0" id="theme-container">
                           <div class="row">
                               <div class="col-md-12">
                                   {{ form_row(form.template) }}

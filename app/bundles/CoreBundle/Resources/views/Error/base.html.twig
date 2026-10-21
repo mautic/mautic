@@ -36,16 +36,16 @@
             {% else %}
 
             <div class="mautibot-image col-xs-4 col-md-3">
-                <img class="img-responsive" src="{{src}}" />
+                <img class="img-fluid" src="{{src}}" />
             </div>
             <div class="mautibot-content col-xs-8 col-md-9">
                 <blockquote class="np break-word">
                     <h1><i class="ri-double-quotes-l"></i> {{ message|trans({'%code%': status_code}) }} <i class="ri-double-quotes-r"></i></h1>
                     <h4 class="mt-5"><strong>{{ status_code }}</strong> {{ status_text }}</h4>
 
-                    <footer class="text-right">Mautibot</footer>
+                    <footer class="text-end">Mautibot</footer>
                 </blockquote>
-                <div class="pull-right">
+                <div class="float-end">
                     <a class="text-secondary" href="http://mau.tc/report-issue" target="_new">{{ 'mautic.core.report_issue' | trans }}</a>
                 </div>
             </div>

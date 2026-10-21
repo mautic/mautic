@@ -29,7 +29,7 @@
                              style="width: {{ percent }}%; height: 50px;"
                              data-batchlimit="{{ batchlimit }}"
                              data-email="{{ email.id }}">
-                            <span class="sr-only">{{ percent }}%</span>
+                            <span class="visually-hidden">{{ percent }}%</span>
                         </div>
                     </div>
                 </div>
@@ -74,11 +74,11 @@
                     variant: 'link',
                     icon: 'ri-information-line',
                     attributes: {
-                        'data-toggle': 'popover',
-                        'data-content': 'mautic.email.send.help_subheading_leaving'|trans,
-                        'data-placement': 'bottom',
-                        'data-container': 'body',
-                        'data-title': 'mautic.email.send.help_heading_leaving'|trans,
+                        'data-bs-toggle': 'popover',
+                        'data-bs-content': 'mautic.email.send.help_subheading_leaving'|trans,
+                        'data-bs-placement': 'bottom',
+                        'data-bs-container': 'body',
+                        'data-bs-title': 'mautic.email.send.help_heading_leaving'|trans,
                     }
                 }
             ]

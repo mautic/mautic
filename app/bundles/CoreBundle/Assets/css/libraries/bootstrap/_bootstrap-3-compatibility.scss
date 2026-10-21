@@ -1116,7 +1116,9 @@ $utilities: map-merge($utilities, (
 @mixin form-control-validation($text-color: #555, $border-color: #ccc, $background-color: #f5f5f5) {
 
   .help-block,
+  .form-text,
   .control-label,
+  .form-label,
   .radio,
   .checkbox,
   .radio-inline,
@@ -4779,7 +4781,8 @@ a.thumbnail.active {
 .alert-dismissible {
   padding-right: ($alert-padding + 20);
 
-  .close {
+  .close,
+  .btn-close {
     position: relative;
     top: -2px;
     right: -21px;
@@ -4895,7 +4898,8 @@ a.thumbnail.active {
 }
 
 .media-left,
-.media > .pull-left {
+.media > .pull-left,
+.media > .float-start {
   padding-right: 10px;
 }
 
@@ -4947,6 +4951,7 @@ a.thumbnail.active {
     @include border-bottom-radius($list-group-border-radius);
   }
 
+  .btn-check:disabled + &,
   &.disabled,
   &.disabled:hover,
   &.disabled:focus {
@@ -4962,6 +4967,7 @@ a.thumbnail.active {
     }
   }
 
+  .btn-check:checked + &,
   &.active,
   &.active:hover,
   &.active:focus {
@@ -5309,7 +5315,8 @@ button.list-group-item {
   border-radius: $border-radius-small;
 }
 
-.close {
+.close,
+.btn-close {
   float: right;
   font-size: ($font-size-base * 1.5);
   font-weight: $close-font-weight;
@@ -5328,7 +5335,8 @@ button.list-group-item {
 
 }
 
-button.close {
+button.close,
+button.btn-close {
   padding: 0;
   cursor: pointer;
   background: transparent;
@@ -5402,8 +5410,13 @@ button.close {
   @include clearfix;
 }
 
-.modal-header .close {
+.modal-header .close,
+.modal-header .btn-close {
   margin-top: -2px;
+}
+
+.btn-close::before {
+  content: "\00d7";
 }
 
 .modal-title {

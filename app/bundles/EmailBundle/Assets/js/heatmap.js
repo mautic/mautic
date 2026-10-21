@@ -32,7 +32,7 @@
         render() {
             this.renderModal();
             this.bindEvents();
-            this.$modal.modal('show');
+            this.$modal.each((index, element) => bootstrap.Modal.getOrCreateInstance(element).show());
         }
 
         fetchHeatmap(callback) {
@@ -144,7 +144,7 @@
             this.$iframeBody = $('body', this.iframeDocument);
             this.$iframeBody.addClass('heatmap-iframe-body');
             $modalContentDiv.append(this.legendTemplate);
-            $modalContentDiv.append('<button type="button" class="modal-heatmap-close close" data-dismiss="modal"><span aria-hidden="true">×</span></button>');
+            $modalContentDiv.append('<button type="button" class="modal-heatmap-close close" data-bs-dismiss="modal"><span aria-hidden="true">×</span></button>');
             this.iframeDocument.close();
         }
 

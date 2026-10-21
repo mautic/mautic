@@ -24,7 +24,7 @@
             </h4>
         </div>
         <!-- button -->
-        <div class="col-xs-2 va-m text-right">
+        <div class="col-xs-2 va-m text-end">
             {% include '@MauticCore/Helper/button.html.twig' with {
                 buttons: [
                     {
@@ -32,7 +32,7 @@
                         variant: 'primary',
                         href: '#',
                         attributes: {
-                            'data-toggle': 'modal',
+                            'data-bs-toggle': 'modal',
                             'data-target': '#abStatsModal'
                         }
                     }
