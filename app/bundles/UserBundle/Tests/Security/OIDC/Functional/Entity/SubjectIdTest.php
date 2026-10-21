@@ -101,41 +101,29 @@ final class SubjectIdTest extends MauticMysqlTestCase
 
     public function testSubjectUserIsUnique(): void
     {
-        //if(DatabasePlatform::isPostgreSQL($this->em->getConnection()->getDatabasePlatform())){
-        //    $this->useCleanupRollback = false;   // We do not rely on transaction rollback
-        //}
+        if (DatabasePlatform::isPostgreSQL($this->em->getConnection()->getDatabasePlatform())) {
+            $this->useCleanupRollback = false;   // We do not rely on transaction rollback
+        }
 
         $subjectId = new OidcSubjectId($this->linkedUser, 'test2');
 
         $this->expectException(UniqueConstraintViolationException::class);
 
-        try {
-            $this->em->persist($subjectId);
-            $this->em->flush();
-            self::fail('no exception');
-        } catch (\Throwable $e) {
-            dump(get_class($e), $e->getMessage(), $e->getPrevious() ? get_class($e->getPrevious()) : null);
-            throw $e;
-        }
+        $this->em->persist($subjectId);
+        $this->em->flush();
     }
 
     public function testSubjectIdIsUnique(): void
     {
-        //if(DatabasePlatform::isPostgreSQL($this->em->getConnection()->getDatabasePlatform())){
-        //    $this->useCleanupRollback = false;   // We do not rely on transaction rollback
-        //}
+        if (DatabasePlatform::isPostgreSQL($this->em->getConnection()->getDatabasePlatform())) {
+            $this->useCleanupRollback = false;   // We do not rely on transaction rollback
+        }
 
         $subjectId = new OidcSubjectId($this->unlinkedUser, 'linked_admin');
 
         $this->expectException(UniqueConstraintViolationException::class);
 
-        try {
-            $this->em->persist($subjectId);
-            $this->em->flush();
-            self::fail('no exception');
-        } catch (\Throwable $e) {
-            dump(get_class($e), $e->getMessage(), $e->getPrevious() ? get_class($e->getPrevious()) : null);
-            throw $e;
-        }
+        $this->em->persist($subjectId);
+        $this->em->flush();
     }
 }
