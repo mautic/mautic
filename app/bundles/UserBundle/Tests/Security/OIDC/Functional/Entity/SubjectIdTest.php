@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Security\OIDC\Functional\Entity;
 
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\OidcSubjectId;
 use Mautic\UserBundle\Entity\Role;
@@ -100,23 +101,41 @@ final class SubjectIdTest extends MauticMysqlTestCase
 
     public function testSubjectUserIsUnique(): void
     {
-        $this->useCleanupRollback = false;   // We do not rely on transaction rollback
+        //if(DatabasePlatform::isPostgreSQL($this->em->getConnection()->getDatabasePlatform())){
+        //    $this->useCleanupRollback = false;   // We do not rely on transaction rollback
+        //}
 
         $subjectId = new OidcSubjectId($this->linkedUser, 'test2');
 
         $this->expectException(UniqueConstraintViolationException::class);
-        $this->em->persist($subjectId);
-        $this->em->flush();
+
+        try {
+            $this->em->persist($subjectId);
+            $this->em->flush();
+            self::fail('no exception');
+        } catch (\Throwable $e) {
+            dump(get_class($e), $e->getMessage(), $e->getPrevious() ? get_class($e->getPrevious()) : null);
+            throw $e;
+        }
     }
 
     public function testSubjectIdIsUnique(): void
     {
-        $this->useCleanupRollback = false;   // We do not rely on transaction rollback
+        //if(DatabasePlatform::isPostgreSQL($this->em->getConnection()->getDatabasePlatform())){
+        //    $this->useCleanupRollback = false;   // We do not rely on transaction rollback
+        //}
 
         $subjectId = new OidcSubjectId($this->unlinkedUser, 'linked_admin');
 
         $this->expectException(UniqueConstraintViolationException::class);
-        $this->em->persist($subjectId);
-        $this->em->flush();
+
+        try {
+            $this->em->persist($subjectId);
+            $this->em->flush();
+            self::fail('no exception');
+        } catch (\Throwable $e) {
+            dump(get_class($e), $e->getMessage(), $e->getPrevious() ? get_class($e->getPrevious()) : null);
+            throw $e;
+        }
     }
 }
