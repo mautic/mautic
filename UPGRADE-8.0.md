@@ -415,6 +415,7 @@
 
     | Removed class | Bootstrap class |
     |---|---|
+    | `.bdr-a` | `.border` |
     | `.bdr-w-0` | `.border-0` |
     | `.bdr-l` | `.border-start` |
     | `.bdr-r` | `.border-end` |
@@ -424,13 +425,16 @@
     | `.bdr-r-wdh-0` | `.border-end-0` |
     | `.bdr-t-wdh-0` | `.border-top-0` |
     | `.bdr-b-wdh-0` | `.border-bottom-0` |
-    | `.bdr-rds-0`, `.bdr-rds-sm`, `.bdr-rds-lg`, `.bdr-rds` | `.rounded-0` |
+    | `.bdr-rds-0` | `.rounded-0` |
+    | `.bdr-rds`, `.bdr-rds-sm`, `.bdr-rds-lg` | No direct equivalent. The radius comes from Mautic's theme. No callers in the repository. |
     | `.bdr-rds-circle` | `.rounded-circle` |
     | `.ovf-h` | `.overflow-hidden` |
     | `.va-t` | `.align-top` |
     | `.va-m` | `.align-middle` |
     | `.va-b` | `.align-bottom` |
     | `.fs-1` | `.flex-shrink-1` |
+
+    `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
 
 ## Changed code
 
