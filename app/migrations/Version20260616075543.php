@@ -19,9 +19,12 @@ final class Version20260616075543 extends PreUpAssertionMigration
 
     public function up(Schema $schema): void
     {
+        $categoryIdDataType = $this->getColumnTypeSignedOrUnsigned($schema, 'categories', 'id');
+        $categoryIdType     = self::COLUMN_TYPE_UNSIGNED === $categoryIdDataType ? 'INT UNSIGNED' : 'INT';
+
         $this->addSql("CREATE TABLE `{$this->prefix}point_insights` (
             `id`                  INT UNSIGNED AUTO_INCREMENT NOT NULL,
-            `category_id`         INT UNSIGNED DEFAULT NULL,
+            `category_id`         {$categoryIdType} DEFAULT NULL,
             `is_published`        TINYINT(1) NOT NULL,
             `date_added`          DATETIME DEFAULT NULL,
             `created_by`          INT DEFAULT NULL,
