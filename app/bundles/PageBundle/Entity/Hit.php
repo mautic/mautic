@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
-use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Validator\PageHit;
 
 #[ORM\Entity(repositoryClass: HitRepository::class)]

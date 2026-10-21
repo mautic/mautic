@@ -2,10 +2,10 @@
 
 namespace MauticPlugin\MauticSocialBundle\Model;
 
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Entity\PostCount;
 use MauticPlugin\MauticSocialBundle\Entity\PostCountRepository;
-use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**

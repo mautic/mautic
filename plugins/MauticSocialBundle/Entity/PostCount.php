@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: PostCountRepository::class)]
