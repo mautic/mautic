@@ -120,7 +120,7 @@ Mautic.insertEmailBuilderToken = function(editorId, token) {
 Mautic.getEmailAbTestWinnerForm = function(abKey) {
     if (abKey && mQuery(abKey).val() && mQuery(abKey).closest('.form-group').hasClass('has-error')) {
         mQuery(abKey).closest('.form-group').removeClass('has-error');
-        if (mQuery(abKey).next().hasClass('help-block')) {
+        if (mQuery(abKey).next().hasClass('form-text')) {
             mQuery(abKey).next().remove();
         }
     }
