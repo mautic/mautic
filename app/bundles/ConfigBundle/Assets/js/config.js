@@ -61,7 +61,7 @@ Mautic.configDsnTestExecute = function(element, action, key) {
         const theClass = (response.success) ? 'has-success' : 'has-error',
             theMessage = response.message;
         $container.find('.config-dsn-test-container').removeClass('has-success has-error').addClass(theClass);
-        $container.find('.help-block .status-msg').html(theMessage);
+        $container.find('.form-text .status-msg').html(theMessage);
         $container.find('.ri-loader-3-line').addClass('hide');
     });
 };
@@ -69,8 +69,8 @@ Mautic.configDsnTestExecute = function(element, action, key) {
 Mautic.configDsnTestDisable = function(element) {
     const $container = mQuery(element).closest('.config-dsn-container');
 
-    $container.find('.help-block .status-msg').html('');
-    $container.find('.help-block .save-config-msg').removeClass('hide');
+    $container.find('.form-text .status-msg').html('');
+    $container.find('.form-text .save-config-msg').removeClass('hide');
     $container.find('.config-dsn-test-button').prop('disabled', true).addClass('disabled');
 };
 
