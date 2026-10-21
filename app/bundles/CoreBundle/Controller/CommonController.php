@@ -151,6 +151,7 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Determines if ajax content should be returned or direct content (page refresh).
+     * @param array<string, mixed> $args
      */
     protected function delegateView(array $args): Response
     {
@@ -160,15 +161,6 @@ class CommonController extends AbstractController implements MauticController
 
         // Used for error handling
         defined('MAUTIC_DELEGATE_VIEW') || define('MAUTIC_DELEGATE_VIEW', 1);
-
-        if (!is_array($args)) {
-            $args = [
-                'contentTemplate' => $args,
-                'passthroughVars' => [
-                    'mauticContent' => $bundle,
-                ],
-            ];
-        }
 
         if (!isset($args['viewParameters']['currentRoute']) && isset($args['passthroughVars']['route'])) {
             $args['viewParameters']['currentRoute'] = $args['passthroughVars']['route'];
