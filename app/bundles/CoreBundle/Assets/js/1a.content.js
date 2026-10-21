@@ -2771,6 +2771,18 @@ Mautic.handlePopoverInsertion = function () {
     });
 };
 
+document.addEventListener('click', (event) => {
+    const toggle = event.target.closest('.form-field-toggle');
+    if (!toggle) return;
+
+    const field = toggle.parentElement.querySelector('input');
+    const shown = field.type === 'text';
+    field.type = shown ? 'password' : 'text';
+    toggle.setAttribute('aria-pressed', String(!shown));
+    toggle.setAttribute('aria-label', shown ? toggle.dataset.labelShow : toggle.dataset.labelHide);
+    toggle.querySelector('i').className = shown ? 'ri-eye-line' : 'ri-eye-off-line';
+});
+
 // Initialize filter commands on page load
 document.addEventListener('DOMContentLoaded', function () {
     Mautic.initFilterCommands();
