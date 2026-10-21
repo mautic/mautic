@@ -1,0 +1,44 @@
+<div class="text-center mt-md">
+    <a href="{{ url('mautic_oidc_login') }}" class="btn btn-lg btn-primary mb-lg">
+        {{ 'mautic.open_id.login.button'|trans({'%provider%': 'OpenID Connect'})|raw }}
+    </a>
+</div>
+
+{% if parameters.isUserRegistrationAllowed %}
+    <div>
+        <a href="#" data-toggle="modal" data-target="#noAccountModal">
+            {{ 'mautic.open_id.login.register.question'|trans|raw }}
+        </a>
+    </div>
+    <div class="modal fade" id="noAccountModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    {{ 'mautic.open_id.login.register.answer'|trans({'%provider%': 'OpenID Connect'})|raw }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ 'mautic.open_id.modal.close'|trans }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<div>
+    <a href="#" data-toggle="modal" data-target="#linkAccountModal">
+        {{ 'mautic.open_id.login.link.question'|trans|raw }}
+    </a>
+</div>
+<div class="modal fade" id="linkAccountModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p>{{ 'mautic.open_id.login.link.answer'|trans({'%provider%': 'OpenID Connect'})|raw }}</p>
+                <p>{{ 'mautic.open_id.login.linked.answer'|trans({'%provider%': 'OpenID Connect'})|raw }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ 'mautic.open_id.modal.close'|trans }}</button>
+            </div>
+        </div>
+    </div>
+</div>

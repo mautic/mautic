@@ -128,7 +128,7 @@ final class DynamicContentType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.dynamicContent.form.internal.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -138,7 +138,7 @@ final class DynamicContentType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.dynamicContent.send.slot_name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'                  => 'form-control',
                     'tooltip'                => 'mautic.dynamicContent.send.slot_name.tooltip',
@@ -192,7 +192,7 @@ final class DynamicContentType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.dynamicContent.description',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
@@ -229,7 +229,7 @@ final class DynamicContentType extends AbstractType
             LocaleType::class,
             [
                 'label'      => 'mautic.core.language',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -245,7 +245,7 @@ final class DynamicContentType extends AbstractType
             EmailUtmTagsType::class,
             [
                 'label'      => 'mautic.email.utm_tags',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.utm_tags.tooltip',
@@ -261,7 +261,7 @@ final class DynamicContentType extends AbstractType
                 DynamicContentListType::class,
                 [
                     'label'      => 'mautic.core.form.translation_parent',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.core.form.translation_parent.help',
@@ -413,7 +413,7 @@ final class DynamicContentType extends AbstractType
 
         $form->add('content', $typeClass, [
             'label'      => 'mautic.dynamicContent.form.content',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'tooltip'              => 'mautic.dynamicContent.form.content.help',
                 'class'                => 'form-control'.($enableEditor ? ' '.$editorClass : ''),
