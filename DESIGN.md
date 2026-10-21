@@ -5,7 +5,7 @@ name: Mautic
 
 ## Overview
 
-Mautic is an open source marketing automation product. The UI looks serious: it is built on Bootstrap and uses a restrained palette and layout. The copy is playful: text can be more relaxed while the interface stays formal.
+Mautic is an open-source marketing automation product. The UI looks serious: it is built on Bootstrap and uses a restrained palette and layout. The copy is playful: text can be more relaxed while the interface stays formal.
 
 ## Colors
 
@@ -51,11 +51,7 @@ colors:
 
 Type classes are defined in `app/bundles/CoreBundle/Assets/css/app/scss/components/_type.scss`. Use them instead of writing the styles again.
 
-The UI uses **Source Sans 3**, with Helvetica Neue, Helvetica, Arial and sans-serif as fallbacks. The base size is 14px. Headings use weight 400 and line height 1.2. Monospace text uses Menlo, Monaco, Consolas, Courier New and monospace.
-
-- **Headings:** h1 36px, h2 30px, h3 20px.
-- **Body:** 14px with line height 1.3856.
-- **Small labels:** 12px.
+The UI uses **Source Sans 3**, with Helvetica Neue, Helvetica, Arial and sans-serif as fallbacks. Monospace text uses Menlo, Monaco, Consolas, Courier New and monospace. Sizes, line heights, weights and letter spacing come from the tokens below.
 
 ### Design Tokens
 
@@ -100,7 +96,7 @@ typography:
 
 ## Layout
 
-Layout follows the official Bootstrap documentation: https://getbootstrap.com/docs/5.3/layout/overview/
+Layout follows the official Bootstrap documentation: https://getbootstrap.com/docs/5.3/layout/grid/
 
 The layout uses the Bootstrap grid. Page layout (rows, columns, and similar) can use plain HTML and hardcoded classes without permission, as stated in Do's and Don'ts.
 
@@ -127,7 +123,7 @@ rounded:
 
 ## Components
 
-#### card
+### card
 
 Use for a single item with image, title and call to action.
 
@@ -142,31 +138,25 @@ card:
   static: "Use to show information only, with no action."
 ```
 
-#### card-group
+### card-group
 
 ```yaml
 card-group: "Use to lay out several cards in a responsive grid, optionally with a featured card-in-card first."
 ```
 
-#### card-in-card
+### card-in-card
 
 ```yaml
 card-in-card: "Use to highlight one main item at the top of a card group."
 ```
 
-#### checkbox
-
-```yaml
-checkbox: "Use when the user picks one or more options from a list inside a form."
-```
-
-#### code-snippet
+### code-snippet
 
 ```yaml
 code-snippet: "Use to show code, commands or config, inline or as a single or multi-block copyable snippet."
 ```
 
-#### contained-list
+### contained-list
 
 Use for a list of rows that need actions or selection.
 
@@ -178,7 +168,7 @@ contained-list:
   interactive-actions: "Use for a list of selectable rows where each row also has actions."
 ```
 
-#### content-block
+### content-block
 
 Container. Holds a heading, subheading, copy, optional CTA, and nested content through the child container.
 
@@ -186,7 +176,7 @@ Container. Holds a heading, subheading, copy, optional CTA, and nested content t
 content-block: "Use to start a titled section of a page. Nest content-group or content-item inside it through the child container."
 ```
 
-#### content-group
+### content-group
 
 Container. Holds a smaller heading, copy, optional CTA, and nested content through the child container. It has no subheading.
 
@@ -194,7 +184,7 @@ Container. Holds a smaller heading, copy, optional CTA, and nested content throu
 content-group: "Use to group a smaller heading with its copy and nested content inside a content block."
 ```
 
-#### content-item
+### content-item
 
 Leaf. Holds a heading, copy and optional CTA. It has no child container, so it cannot contain other components.
 
@@ -207,7 +197,7 @@ content-item:
   text: "Use to show a heading and copy with no media."
 ```
 
-#### content-item-row
+### content-item-row
 
 Use to place several content items side by side.
 
@@ -218,19 +208,19 @@ content-item-row:
   default: "Use to place content items side by side in a standard row."
 ```
 
-#### content-section
+### content-section
 
 ```yaml
 content-section: "Use on settings-style pages where a heading sits on the left and its content on the right."
 ```
 
-#### list-unordered
+### list-unordered
 
 ```yaml
 list-unordered: "Use for bulleted lists, including nested ones."
 ```
 
-#### modal
+### modal
 
 Use to confirm an action or show focused content without leaving the page.
 
@@ -240,13 +230,13 @@ modal:
   expressive: "Use for content: text, media and reading."
 ```
 
-#### pictogram
+### pictogram
 
 ```yaml
 pictogram: "Use for decorative illustrations, such as empty states, by name and size."
 ```
 
-#### tile
+### tile
 
 Use for a compact block of content with an optional button or click target. Tile is the main component to create a layer: place content inside a tile to add a new layer on top of the background.
 
@@ -259,7 +249,7 @@ tile:
   mini: "Use for a small clickable block with an icon."
 ```
 
-#### toggletip
+### toggletip
 
 Use to reveal a short explanation from an icon or label next to a control. Toggletip requires user interaction to open: it is triggered by a click, not by hover like a tooltip.
 
@@ -267,7 +257,7 @@ Use to reveal a short explanation from an icon or label next to a control. Toggl
 toggletip: "Use to reveal a short explanation that the user opens by clicking the trigger."
 ```
 
-#### uishell
+### uishell
 
 ```yaml
 uishell: "Use for the global app header with skip link, menu toggle, brand and actions."
