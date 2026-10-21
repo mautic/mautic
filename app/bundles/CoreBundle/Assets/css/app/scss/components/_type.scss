@@ -388,7 +388,8 @@ blockquote {
   border-width: 0px;
 }
 
-.help-block {
+.help-block,
+.form-text {
   font-size: 12px;
   color: var(--text-helper);
 }
