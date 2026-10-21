@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Event;
 
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\LeadBundle\Entity\Lead;
 
-final class ConditionEvent extends CampaignExecutionEvent
+final class ConditionEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     use ContextTrait;
 
@@ -17,18 +19,6 @@ final class ConditionEvent extends CampaignExecutionEvent
         private readonly AbstractEventAccessor $eventConfig,
         private readonly LeadEventLog $eventLog,
     ) {
-        // @deprecated support for pre 2.13.0; to be removed in 3.0
-        parent::__construct(
-            [
-                'eventSettings'   => $eventConfig->getConfig(),
-                'eventDetails'    => null,
-                'event'           => $eventLog->getEvent(),
-                'lead'            => $eventLog->getLead(),
-                'systemTriggered' => $eventLog->getSystemTriggered(),
-            ],
-            null,
-            $eventLog
-        );
     }
 
     public function getEventConfig(): AbstractEventAccessor
@@ -39,6 +29,19 @@ final class ConditionEvent extends CampaignExecutionEvent
     public function getLog(): LeadEventLog
     {
         return $this->eventLog;
+    }
+
+    public function getEvent(): Event
+    {
+        $event = $this->eventLog->getEvent();
+        \assert($event instanceof Event);
+
+        return $event;
+    }
+
+    public function getLead(): ?Lead
+    {
+        return $this->eventLog->getLead();
     }
 
     /**

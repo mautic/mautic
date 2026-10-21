@@ -84,8 +84,8 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
      */
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
-        $eventConfig  = $event->getConfig();
-        $eventDetails = $event->getEventDetails();
+        $eventConfig  = $event->getEvent()->getProperties();
+        $eventDetails = $event->getPassthrough();
         $lead         = $event->getLead();
 
         // stop

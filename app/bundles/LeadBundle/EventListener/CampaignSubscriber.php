@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -536,43 +535,43 @@ final class CampaignSubscriber implements EventSubscriberInterface
         if ($event->checkContext('lead.device')) {
             $result = $this->validateContactDevice($event, $lead);
         } elseif ($event->checkContext('lead.tags')) {
-            $result = $this->tagRepository->checkLeadByTags($lead, $event->getConfig()['tags']);
+            $result = $this->tagRepository->checkLeadByTags($lead, $event->getEvent()->getProperties()['tags']);
         } elseif ($event->checkContext('lead.segments')) {
-            $result = $this->leadListRepository->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
+            $result = $this->leadListRepository->checkLeadSegmentsByIds($lead, $event->getEvent()->getProperties()['segments']);
         } elseif ($event->checkContext('lead.stages')) {
-            $result   = $this->leadRepository->isContactInOneOfStages($lead, $event->getConfig()['stages']);
+            $result   = $this->leadRepository->isContactInOneOfStages($lead, $event->getEvent()->getProperties()['stages']);
         } elseif ($event->checkContext('lead.owner')) {
-            $result = $this->leadRepository->checkLeadOwner($lead, $event->getConfig()['owner']);
+            $result = $this->leadRepository->checkLeadOwner($lead, $event->getEvent()->getProperties()['owner']);
         } elseif ($event->checkContext('lead.attached')) {
             $result = $this->onCampaignTriggerConditionContactAdded($event);
         } elseif ($event->checkContext('lead.campaigns')) {
-            $result = $this->campaignLeadRepository->checkLeadInCampaigns($lead, $event->getConfig());
+            $result = $this->campaignLeadRepository->checkLeadInCampaigns($lead, $event->getEvent()->getProperties());
         } elseif ($event->checkContext('lead.field_value')) {
-            if ('date' === $event->getConfig()['operator']) {
+            if ('date' === $event->getEvent()->getProperties()['operator']) {
                 // Set the date in system timezone since this is triggered by cron
                 $triggerDate = new \DateTime('now',
                     new \DateTimeZone($this->coreParametersHelper->getDefaultTimezone()));
-                $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
+                $interval    = substr($event->getEvent()->getProperties()['value'], 1); // remove 1st character + or -
 
-                if (str_contains($event->getConfig()['value'], '+P')) { // add date
+                if (str_contains($event->getEvent()->getProperties()['value'], '+P')) { // add date
                     $triggerDate->add(new \DateInterval($interval)); // add the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
-                } elseif (str_contains($event->getConfig()['value'], '-P')) { // subtract date
+                } elseif (str_contains($event->getEvent()->getProperties()['value'], '-P')) { // subtract date
                     $triggerDate->sub(new \DateInterval($interval)); // subtract the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
-                } elseif ('anniversary' === $event->getConfig()['value']) {
+                } elseif ('anniversary' === $event->getEvent()->getProperties()['value']) {
                     /**
                      * note: currently mautic campaign only one time execution
                      * ( to integrate with: recursive campaign (future)).
                      */
                     $result = $this->leadFieldRepository->compareDateMonthValue(
-                        $lead->getId(), $event->getConfig()['field'], $triggerDate);
+                        $lead->getId(), $event->getEvent()->getProperties()['field'], $triggerDate);
                 }
             } else {
                 $operators = OperatorOptions::getFilterExpressionFunctions();
-                $field     = $event->getConfig()['field'];
-                $value     = $event->getConfig()['value'] ?? '';
-                $operator  = $event->getConfig()['operator'];
+                $field     = $event->getEvent()->getProperties()['field'];
+                $value     = $event->getEvent()->getProperties()['value'] ?? '';
+                $operator  = $event->getEvent()->getProperties()['operator'];
                 $fields    = $this->getFields($lead);
 
                 $fieldType  = '';
@@ -602,20 +601,17 @@ final class CampaignSubscriber implements EventSubscriberInterface
                         $operators[$operator]['expr']
                     );
 
-                    $log = $event->getLogEntry();
-                    if (null !== $log) {
-                        $log->setMetadata([
-                            'comparisonValue' => $fieldValue,
-                            'operator'        => $operators[$event->getConfig()['operator']]['expr'],
-                            'value'           => $value,
-                            'field'           => $field,
-                        ]);
-                    }
+                    $event->getLog()->setMetadata([
+                        'comparisonValue' => $fieldValue,
+                        'operator'        => $operators[$event->getEvent()->getProperties()['operator']]['expr'],
+                        'value'           => $value,
+                        'field'           => $field,
+                    ]);
                 }
             }
         } elseif ($event->checkContext('lead.dnc')) {
-            $channels  = $event->getConfig()['channels'];
-            $reason    = $event->getConfig()['reason'] ?? null;
+            $channels  = $event->getEvent()->getProperties()['channels'];
+            $reason    = $event->getEvent()->getProperties()['reason'] ?? null;
             foreach ($channels as $channel) {
                 $isLeadDNC = $this->doNotContact->isContactable($lead, $channel);
                 if (!empty($reason)) {
@@ -633,10 +629,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
                 }
             }
         } elseif ($event->checkContext('lead.pageHit')) {
-            $startDate = $event->getConfig()['startDate'] ?? null;
-            $endDate   = $event->getConfig()['endDate'] ?? null;
-            $page      = $event->getConfig()['page'] ?? null;
-            $url       = $event->getConfig()['page_url'] ?? null;
+            $startDate = $event->getEvent()->getProperties()['startDate'] ?? null;
+            $endDate   = $event->getEvent()->getProperties()['endDate'] ?? null;
+            $page      = $event->getEvent()->getProperties()['page'] ?? null;
+            $url       = $event->getEvent()->getProperties()['page_url'] ?? null;
 
             $filter = [
                 'search'        => '',
@@ -666,7 +662,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             ];
 
             $leadTimeline       = $this->leadModel->getEngagements($lead, $filter, $orderby, 1, 255, false);
-            $totalSpentTime     = $event->getConfig()['accumulative_time'] ?? null;
+            $totalSpentTime     = $event->getEvent()->getProperties()['accumulative_time'] ?? null;
             $eventsLeadTimeline = $leadTimeline[0]['events'] ?? null;
             if (!empty($eventsLeadTimeline)) {
                 foreach ($eventsLeadTimeline as $eventLeadTimeline) {
@@ -720,9 +716,9 @@ final class CampaignSubscriber implements EventSubscriberInterface
             }
         } elseif ($event->checkContext('lead.points')) {
             $operators    = $this->filterOperatorProvider->getAllOperators();
-            $group        = $event->getConfig()['group'] ?? null;
-            $score        = $event->getConfig()['score'];
-            $operatorExpr = $operators[$event->getConfig()['operator']]['expr'];
+            $group        = $event->getEvent()->getProperties()['group'] ?? null;
+            $score        = $event->getEvent()->getProperties()['score'];
+            $operatorExpr = $operators[$event->getEvent()->getProperties()['operator']]['expr'];
 
             if ($group) {
                 $result = $this->groupContactScoreRepository->compareScore(
@@ -745,14 +741,11 @@ final class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @throws \Exception
      */
-    /**
-     * @phpstan-ignore-next-line
-     */
-    public function onCampaignTriggerConditionContactAdded(CampaignExecutionEvent $event): bool
+    public function onCampaignTriggerConditionContactAdded(ConditionEvent $event): bool
     {
-        $campaign = $this->campaignModel->getEntity($event->getEvent()['campaign']['id']);
+        $campaign = $this->campaignModel->getEntity($event->getEvent()->getCampaign()->getId());
 
-        $campaignExecutionEventConfig = $event->getConfig();
+        $campaignExecutionEventConfig = $event->getEvent()->getProperties();
 
         $timestamp              = $campaignExecutionEventConfig['timestamp'] ?? null;
         $operator               = $campaignExecutionEventConfig['operator'] ?? null;
@@ -823,11 +816,11 @@ final class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Function to compare date value.
      */
-    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate): bool
+    private function compareDateValue(Lead $lead, ConditionEvent $event, \DateTime $triggerDate): bool
     {
         return $this->leadFieldRepository->compareDateValue(
             $lead->getId(),
-            $event->getConfig()['field'],
+            $event->getEvent()->getProperties()['field'],
             $triggerDate->format('Y-m-d')
         );
     }
@@ -846,11 +839,11 @@ final class CampaignSubscriber implements EventSubscriberInterface
     /**
      * It returns true if contact device matches
      * device specified in the
-     * CampaignExecutionEvent's settings.
+     * ConditionEvent's settings.
      */
     private function validateContactDevice(ConditionEvent $campaignExecutionEvent, Lead $contact): bool
     {
-        $campaignExecutionEventConfig = $campaignExecutionEvent->getConfig();
+        $campaignExecutionEventConfig = $campaignExecutionEvent->getEvent()->getProperties();
         $deviceType                   = empty($campaignExecutionEventConfig['device_type']) ? null : $campaignExecutionEventConfig['device_type'];
         $deviceBrands                 = empty($campaignExecutionEventConfig['device_brand']) ? null : $campaignExecutionEventConfig['device_brand'];
         $deviceOs                     = empty($campaignExecutionEventConfig['device_os']) ? null : $campaignExecutionEventConfig['device_os'];

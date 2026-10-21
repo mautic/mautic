@@ -8,17 +8,13 @@ use Mautic\CampaignBundle\Entity\Event;
 
 trait ContextTrait
 {
+    abstract public function getEvent(): Event;
+
     /**
      * Check if an event is applicable.
      */
     public function checkContext($eventType): bool
     {
-        if (!$this->event) {
-            return false;
-        }
-
-        $type = ($this->event instanceof Event) ? $this->event->getType() : $this->event['type'];
-
-        return strtolower((string) $eventType) === strtolower((string) $type);
+        return strtolower((string) $eventType) === strtolower((string) $this->getEvent()->getType());
     }
 }
