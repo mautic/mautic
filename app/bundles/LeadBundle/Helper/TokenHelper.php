@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
 final class TokenHelper
@@ -21,7 +22,7 @@ final class TokenHelper
      *
      * @return array|string
      */
-    public static function findLeadTokens($content, array|null $lead, bool $replace = false)
+    public static function findLeadTokens($content, array|Lead|null $lead, bool $replace = false)
     {
         if (!$lead) {
             return $replace ? $content : [];
