@@ -13,9 +13,44 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\Stage;
 
 final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 {
+    public function testMergedContactInheritsLoserStage(): void
+    {
+        $model  = self::getContainer()->get(LeadModel::class);
+        $merger = self::getContainer()->get(ContactMerger::class);
+
+        $stage = new Stage();
+        $stage->setName('Merged contact stage');
+        $this->em->persist($stage);
+        $this->em->flush();
+        $stageId = $stage->getId();
+
+        $winner = new Lead();
+        $winner->setEmail('winner.stage@test.com');
+        $model->saveEntity($winner);
+        $winnerId = $winner->getId();
+
+        $loser = new Lead();
+        $loser->setEmail('loser.stage@test.com');
+        $loser->setStage($stage);
+        $model->saveEntity($loser);
+        $loserId = $loser->getId();
+
+        $merger->merge($winner, $loser);
+        $this->em->clear();
+
+        $repository = $this->em->getRepository(Lead::class);
+        $winner     = $repository->find($winnerId);
+        $this->assertInstanceOf(Lead::class, $winner);
+        $this->assertInstanceOf(Stage::class, $winner->getStage());
+        $this->assertSame($stageId, $winner->getStage()->getId());
+        // Query the repository directly: LeadModel redirects merged IDs to the winner.
+        $this->assertNotInstanceOf(Lead::class, $repository->find($loserId));
+    }
+
     public function testMergedContactFound(): void
     {
         /** @var LeadModel $model */

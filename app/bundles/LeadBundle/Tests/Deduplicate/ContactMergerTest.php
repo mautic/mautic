@@ -17,8 +17,10 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 final class ContactMergerTest extends \PHPUnit\Framework\TestCase
@@ -605,6 +607,37 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(SameContactException::class);
 
         $this->getMerger()->merge($winner, $loser);
+    }
+
+    #[DataProvider('stageMergeProvider')]
+    public function testFullMergePreservesStage(bool $winnerHasStage, bool $loserHasStage): void
+    {
+        $winnerStage = $winnerHasStage ? new Stage() : null;
+        $loserStage  = $loserHasStage ? new Stage() : null;
+
+        $winner = new Lead();
+        $winner->setId(1);
+        $winner->setStage($winnerStage);
+
+        $loser = new Lead();
+        $loser->setId(2);
+        $loser->setStage($loserStage);
+
+        $merged = $this->getMerger()->merge($winner, $loser);
+
+        $this->assertSame($winner, $merged);
+        $this->assertSame($winnerStage ?? $loserStage, $merged->getStage());
+    }
+
+    /**
+     * @return iterable<string, array{bool, bool}>
+     */
+    public static function stageMergeProvider(): iterable
+    {
+        yield 'inherit loser stage when winner has none' => [false, true];
+        yield 'retain winner stage when both have stages' => [true, true];
+        yield 'retain winner stage when loser has none' => [true, false];
+        yield 'remain without stage when neither has one' => [false, false];
     }
 
     public function testFullMerge(): void
