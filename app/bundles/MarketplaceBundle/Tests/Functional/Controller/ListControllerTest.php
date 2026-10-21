@@ -81,7 +81,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertPackageRows($crawler, ['Newsletter '.$label.' One'], [$label]);
         $this->assertStringContainsString('2 items, 2 pages in total', $crawler->text(null, true));
-        $popover = new Crawler($crawler->filter('button[data-toggle="popover"]')->attr('data-content'));
+        $popover = new Crawler($crawler->filter('button[data-bs-toggle="popover"]')->attr('data-bs-content'));
         $this->assertSame('type:'.$type, $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
         $this->assertCount(1, $popover->filter('[data-filter-action="apply"]'));
         $this->assertCount(1, $popover->filter('[data-filter-action="reset"]'));
@@ -101,7 +101,7 @@ final class ListControllerTest extends MauticMysqlTestCase
             'Newsletter Campaign One', 'Newsletter Campaign Two',
         ], ['Plugin', 'Plugin', 'Theme', 'Theme', 'Campaign', 'Campaign']);
         $this->assertStringContainsString('6 items, 1 page in total', $crawler->text(null, true));
-        $popover = new Crawler($crawler->filter('button[data-toggle="popover"]')->attr('data-content'));
+        $popover = new Crawler($crawler->filter('button[data-bs-toggle="popover"]')->attr('data-bs-content'));
         $this->assertSame('', $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
         $this->assertCount(0, $this->getClientMockHandler());
     }
@@ -118,7 +118,7 @@ final class ListControllerTest extends MauticMysqlTestCase
             $response = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
             $crawler  = new Crawler($response['newContent']);
             $this->assertPackageRows($crawler, ['Newsletter '.$label.' One', 'Newsletter '.$label.' Two'], [$label, $label]);
-            $popover = new Crawler($crawler->filter('button[data-toggle="popover"]')->attr('data-content'));
+            $popover = new Crawler($crawler->filter('button[data-bs-toggle="popover"]')->attr('data-bs-content'));
             $this->assertSame('type:mautic-'.$type, $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
         }
         $this->assertCount(0, $this->getClientMockHandler());
@@ -193,7 +193,7 @@ final class ListControllerTest extends MauticMysqlTestCase
         $crawler = $this->client->request('GET', $backLink);
         self::assertResponseIsSuccessful();
         $this->assertSame($search, $crawler->filter('#list-search')->attr('value'));
-        $popover = new Crawler($crawler->filter('button[data-toggle="popover"]')->attr('data-content'));
+        $popover = new Crawler($crawler->filter('button[data-bs-toggle="popover"]')->attr('data-bs-content'));
         $this->assertSame('type:mautic-resource', $popover->filter('#marketplace-package-type option[selected]')->attr('value'));
         parse_str($handler->getLastRequest()->getUri()->getQuery(), $query);
         $this->assertSame('mautic-resource', $query['type']);
