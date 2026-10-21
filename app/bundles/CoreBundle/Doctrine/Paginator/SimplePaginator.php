@@ -13,7 +13,7 @@ use Doctrine\ORM\Tools\Pagination\CountWalker;
  *
  * @template T
  *
- * @implements \IteratorAggregate<int, T>
+ * @implements \IteratorAggregate<array-key, T>
  */
 final class SimplePaginator implements \IteratorAggregate, \Countable
 {
@@ -28,7 +28,7 @@ final class SimplePaginator implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @return \ArrayIterator<int, T>
+     * @return \ArrayIterator<array-key, T>
      */
     public function getIterator(): \ArrayIterator
     {
