@@ -30,7 +30,10 @@ final class CategoryType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber([]));
         $builder->addEventSubscriber(new FormExitSubscriber('category.category', $options));
 
-        if (!$options['data']->getId()) {
+        /** @var Category $category */
+        $category = $options['data'];
+
+        if (!$category->getId()) {
             // Do not allow custom bundle
             if (true == $options['show_bundle_select']) {
                 // Create new category from category bundle - let user select the bundle
@@ -136,7 +139,9 @@ final class CategoryType extends AbstractType
                 'data_class'         => Category::class,
                 'show_bundle_select' => false,
                 'bundle'             => function (Options $options) {
-                    if (!$bundle = $options['data']->getBundle()) {
+                    /** @var Category $category */
+                    $category = $options['data'];
+                    if (!$bundle = $category->getBundle()) {
                         return 'category';
                     }
 

@@ -42,6 +42,9 @@ final class UserType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['signature' => 'html', 'email' => 'email']));
         $builder->addEventSubscriber(new FormExitSubscriber('user.user', $options));
 
+        /** @var User $user */
+        $user = $options['data'];
+
         $builder->add(
             'username',
             TextType::class,
@@ -104,7 +107,7 @@ final class UserType extends AbstractType
             ]
         );
 
-        $existing    = (!empty($options['data']) && $options['data']->getId());
+        $existing    = (!empty($options['data']) && $user->getId());
         $placeholder = ($existing) ?
             $this->translator->trans('mautic.user.user.form.passwordplaceholder') : '';
         $required = !$existing;
@@ -185,10 +188,10 @@ final class UserType extends AbstractType
         );
 
         $defaultSignature = '';
-        if (isset($options['data']) && null === $options['data']->getSignature()) {
+        if (isset($options['data']) && null === $user->getSignature()) {
             $defaultSignature = $this->translator->trans('mautic.email.default.signature', ['%from_name%' => '|FROM_NAME|']);
         } elseif (isset($options['data'])) {
-            $defaultSignature = $options['data']->getSignature();
+            $defaultSignature = $user->getSignature();
         }
 
         $builder->add(

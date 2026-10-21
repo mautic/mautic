@@ -41,13 +41,16 @@ final class LeadType extends AbstractType
     {
         $builder->addEventSubscriber(new FormExitSubscriber('lead.lead', $options));
 
+        /** @var Lead $lead */
+        $lead = $options['data'];
+
         if (!$options['isShortForm']) {
             $imageChoices = [
                 'Gravatar'                             => 'gravatar',
                 'mautic.lead.lead.field.custom_avatar' => 'custom',
             ];
 
-            $cache = $options['data']->getSocialCache() ?? [];
+            $cache = $lead->getSocialCache() ?? [];
             if (count($cache)) {
                 foreach ($cache as $key => $data) {
                     $imageChoices[$key] = $key;
@@ -115,7 +118,7 @@ final class LeadType extends AbstractType
         );
 
         $allowMultipleCompanies = $this->coreParametersHelper->get('contact_allow_multiple_companies');
-        $companyIds             = $this->companyLeadRepository->getCompanyIdsByLeadId((string) $options['data']->getId());
+        $companyIds             = $this->companyLeadRepository->getCompanyIdsByLeadId((string) $lead->getId());
 
         $builder->add(
             'companies',

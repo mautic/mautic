@@ -38,6 +38,9 @@ final class FocusType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['website' => 'url', 'html' => 'html', 'editor' => 'html', 'description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('focus', $options));
 
+        /** @var Focus $focus */
+        $focus = $options['data'];
+
         $builder->add(
             'name',
             TextType::class,
@@ -79,7 +82,7 @@ final class FocusType extends AbstractType
             [
                 'label'      => 'mautic.focus.form.html_mode',
                 'label_attr' => ['class' => 'control-label'],
-                'data'       => !empty($options['data']->getHtmlMode()) ? $options['data']->getHtmlMode() : 'basic',
+                'data'       => !empty($focus->getHtmlMode()) ? $focus->getHtmlMode() : 'basic',
                 'attr'       => [
                     'class'    => 'form-control',
                     'onchange' => 'Mautic.focusUpdatePreview()',
@@ -149,9 +152,9 @@ final class FocusType extends AbstractType
 
         $builder->add('projects', ProjectType::class);
 
-        if (!empty($options['data']) && $options['data']->getId()) {
+        if (!empty($options['data']) && $focus->getId()) {
             $readonly = !$this->security->isGranted('focus:items:publish');
-            $data     = $options['data']->isPublished(false);
+            $data     = $focus->isPublished(false);
         } elseif (!$this->security->isGranted('focus:items:publish')) {
             $readonly = true;
             $data     = false;
@@ -173,7 +176,7 @@ final class FocusType extends AbstractType
 
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
-        $builder->add('properties', PropertiesType::class, ['data' => $options['data']->getProperties()]);
+        $builder->add('properties', PropertiesType::class, ['data' => $focus->getProperties()]);
 
         // Will be managed by JS
         $builder->add('type', HiddenType::class);

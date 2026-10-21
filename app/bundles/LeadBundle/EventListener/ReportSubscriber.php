@@ -21,6 +21,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ReportSubscriber implements EventSubscriberInterface
 {
@@ -395,6 +396,8 @@ final class ReportSubscriber implements EventSubscriberInterface
         foreach ($graphs as $g) {
             $queryBuilder = clone $qb;
             $options      = $event->getOptions($g);
+            /** @var TranslatorInterface $translator */
+            $translator = $options['translator'];
             /** @var ChartQuery $chartQuery */
             $chartQuery    = clone $options['chartQuery'];
             $attributionQb = clone $queryBuilder;
@@ -483,10 +486,10 @@ final class ReportSubscriber implements EventSubscriberInterface
                     $tablePrefix    = $leadListFilter ? 's' : 'l';
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', $tablePrefix);
                     $leads = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans('mautic.lead.all.leads'), $leads);
+                    $chart->setDataset($translator->trans('mautic.lead.all.leads'), $leads);
                     $queryBuilder->andwhere($qb->expr()->isNotNull('l.date_identified'));
                     $identified = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans('mautic.lead.identified'), $identified);
+                    $chart->setDataset($translator->trans('mautic.lead.identified'), $identified);
                     $data         = $chart->render();
                     $data['name'] = $g;
                     $event->setGraph($g, $data);
@@ -496,7 +499,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 'lp');
                     $leads = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans('mautic.lead.graph.line.points'), $leads);
+                    $chart->setDataset($translator->trans('mautic.lead.graph.line.points'), $leads);
                     $data         = $chart->render();
                     $data['name'] = $g;
                     $event->setGraph($g, $data);
@@ -585,7 +588,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                         }
                         $companyCount += $count['companies'];
                     }
-                    $chart->setDataset($options['translator']->trans('mautic.lead.all.companies'), $companyCount);
+                    $chart->setDataset($translator->trans('mautic.lead.all.companies'), $companyCount);
                     $event->setGraph(
                         $g,
                         [
@@ -599,7 +602,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 'comp');
                     $companies = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans('mautic.lead.all.companies'), $companies);
+                    $chart->setDataset($translator->trans('mautic.lead.all.companies'), $companies);
                     $data         = $chart->render();
                     $data['name'] = $g;
                     $event->setGraph($g, $data);
@@ -614,7 +617,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                         }
                         $companyCount += $count['companies'];
                     }
-                    $chart->setDataset($options['translator']->trans('mautic.lead.all.companies'), $companyCount);
+                    $chart->setDataset($translator->trans('mautic.lead.all.companies'), $companyCount);
                     $event->setGraph(
                         $g,
                         [

@@ -23,6 +23,7 @@ use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportSubscriber implements EventSubscriberInterface
 {
@@ -502,6 +503,8 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
+            /** @var TranslatorInterface $translator */
+            $translator = $options['translator'];
             $queryBuilder = clone $qb;
             /** @var ChartQuery $chartQuery */
             $chartQuery   = clone $options['chartQuery'];
@@ -528,9 +531,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $sends  = $chartQuery->loadAndBuildTimeData($sendQuery);
                     $reads  = $chartQuery->loadAndBuildTimeData($readQuery);
                     $failes = $chartQuery->loadAndBuildTimeData($failedQuery);
-                    $chart->setDataset($options['translator']->trans('mautic.email.sent.emails'), $sends);
-                    $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $reads);
-                    $chart->setDataset($options['translator']->trans('mautic.email.failed.emails'), $failes);
+                    $chart->setDataset($translator->trans('mautic.email.sent.emails'), $sends);
+                    $chart->setDataset($translator->trans('mautic.email.read.emails'), $reads);
+                    $chart->setDataset($translator->trans('mautic.email.failed.emails'), $failes);
                     $data         = $chart->render();
                     $data['name'] = $g;
 
@@ -541,10 +544,10 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->resetGroupBy();
                     $counts = $this->statRepository->getIgnoredReadFailed($queryBuilder);
                     $chart  = new PieChart();
-                    $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $counts['read']);
-                    $chart->setDataset($options['translator']->trans('mautic.email.failed.emails'), $counts['failed']);
+                    $chart->setDataset($translator->trans('mautic.email.read.emails'), $counts['read']);
+                    $chart->setDataset($translator->trans('mautic.email.failed.emails'), $counts['failed']);
                     $chart->setDataset(
-                        $options['translator']->trans('mautic.email.ignored.emails'),
+                        $translator->trans('mautic.email.ignored.emails'),
                         $counts['ignored']
                     );
                     $event->setGraph(
@@ -567,11 +570,11 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $chart  = new SeriesPieChart();
                     $chart->setTotalCount($counts['sent_count']);
                     $chart->setLabels([
-                        $chart->buildFullLabel($options['translator']->trans('mautic.email.report.unsubscribed'), $unsubCount['unsubscribed']),
-                        $chart->buildFullLabel($options['translator']->trans('mautic.email.clicked'), $clicked),
-                        $chart->buildFullLabel($options['translator']->trans('mautic.email.stat.read'), $counts['read_count']),
-                        $chart->buildFullLabel($options['translator']->trans('mautic.email.stat.notread'), $counts['not_read']),
-                        $chart->buildFullLabel($options['translator']->trans('mautic.email.stat.sent'), $counts['sent_count']),
+                        $chart->buildFullLabel($translator->trans('mautic.email.report.unsubscribed'), $unsubCount['unsubscribed']),
+                        $chart->buildFullLabel($translator->trans('mautic.email.clicked'), $clicked),
+                        $chart->buildFullLabel($translator->trans('mautic.email.stat.read'), $counts['read_count']),
+                        $chart->buildFullLabel($translator->trans('mautic.email.stat.notread'), $counts['not_read']),
+                        $chart->buildFullLabel($translator->trans('mautic.email.stat.sent'), $counts['sent_count']),
                     ]);
 
                     $chart->setDataset([$unsubCount['unsubscribed'], 0, $unsubCount['vsRead'], $unsubCount['vsNotRead'], 0]);
@@ -639,19 +642,19 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $counts = $queryBuilder->executeQuery()->fetchAssociative();
                     $chart  = new PieChart();
                     $chart->setDataset(
-                        $options['translator']->trans('mautic.email.stat.read'),
+                        $translator->trans('mautic.email.stat.read'),
                         $counts['read_count'] ?? 0
                     );
                     $chart->setDataset(
-                        $options['translator']->trans('mautic.email.graph.pie.ignored.read.failed.ignored'),
+                        $translator->trans('mautic.email.graph.pie.ignored.read.failed.ignored'),
                         ($counts['sent_count'] ?? 0) - ($counts['read_count'] ?? 0)
                     );
                     $chart->setDataset(
-                        $options['translator']->trans('mautic.email.unsubscribed'),
+                        $translator->trans('mautic.email.unsubscribed'),
                         $counts['unsubscribed'] ?? 0
                     );
                     $chart->setDataset(
-                        $options['translator']->trans('mautic.email.bounced'),
+                        $translator->trans('mautic.email.bounced'),
                         $counts['bounced'] ?? 0
                     );
 

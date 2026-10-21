@@ -58,6 +58,9 @@ final class PageType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html', 'redirectUrl' => 'url', 'headScript' => 'html', 'footerScript' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('page.page', $options));
 
+        /** @var Page $dataEntity */
+        $dataEntity = $options['data'];
+
         $builder->add(
             'title',
             TextType::class,
@@ -68,9 +71,9 @@ final class PageType extends AbstractType
             ]
         );
 
-        $html = $options['data']->getCustomHtml();
-        if ($this->pageConfig->isDraftEnabled() && !empty($options['data']->getId()) && $options['data']->hasDraft() && !empty($options['data']->getDraft()->getHtml())) {
-            $html = $options['data']->getDraft()->getHtml();
+        $html = $dataEntity->getCustomHtml();
+        if ($this->pageConfig->isDraftEnabled() && !empty($dataEntity->getId()) && $dataEntity->hasDraft() && !empty($dataEntity->getDraft()->getHtml())) {
+            $html = $dataEntity->getDraft()->getHtml();
         }
         $builder->add(
             'customHtml',
@@ -89,11 +92,11 @@ final class PageType extends AbstractType
             ]
         );
 
-        $template = $options['data']->getTemplate() ?? 'blank';
+        $template = $dataEntity->getTemplate() ?? 'blank';
         // If theme does not exist, set empty
         $template = $this->themeHelper->getCurrentTheme($template, 'page');
-        if ($this->pageConfig->isDraftEnabled() && !empty($options['data']->getId()) && $options['data']->hasDraft() && !empty($options['data']->getDraft()->getTemplate())) {
-            $template = $options['data']->getDraft()->getTemplate();
+        if ($this->pageConfig->isDraftEnabled() && !empty($dataEntity->getId()) && $dataEntity->hasDraft() && !empty($dataEntity->getDraft()->getTemplate())) {
+            $template = $dataEntity->getDraft()->getTemplate();
         }
         $builder->add(
             'template',
@@ -118,7 +121,7 @@ final class PageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.form.preference_center',
-                'data'  => $options['data']->isPreferenceCenter() ?: false,
+                'data'  => $dataEntity->isPreferenceCenter() ?: false,
                 'attr'  => [
                     'tooltip' => 'mautic.page.form.preference_center.tooltip',
                 ],
@@ -130,7 +133,7 @@ final class PageType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.no_index',
-                'data'  => $options['data']->getNoIndex() ?: false,
+                'data'  => $dataEntity->getNoIndex() ?: false,
             ]
         );
 
@@ -142,7 +145,7 @@ final class PageType extends AbstractType
         $this->pageRepository->setCurrentUser($this->user);
 
         $redirectUrlDataOptions = '';
-        $pages                  = $this->pageRepository->getPageList('', 0, 0, $this->canViewOther, 'variant', [$options['data']->getId()]);
+        $pages                  = $this->pageRepository->getPageList('', 0, 0, $this->canViewOther, 'variant', [$dataEntity->getId()]);
         foreach ($pages as $page) {
             $redirectUrlDataOptions .= "|{$page['alias']}";
         }
@@ -170,7 +173,7 @@ final class PageType extends AbstractType
                     'multiple'    => false,
                     'placeholder' => 'mautic.core.form.translation_parent.empty',
                     'top_level'   => 'translation',
-                    'ignore_ids'  => [(int) $options['data']->getId()],
+                    'ignore_ids'  => [(int) $dataEntity->getId()],
                 ]
             )->addModelTransformer($transformer)
         );
