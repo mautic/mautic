@@ -160,7 +160,7 @@
 
           <!-- start: tab-content -->
           <div class="tab-content pa-md">
-              <div class="tab-pane active bdr-w-0" id="clicks-container">
+              <div class="tab-pane active border-0" id="clicks-container">
                   {{ include('@MauticPage/Trackable/click_counts.html.twig', {
                       'trackables': trackables,
                       'entity': notification,
@@ -168,12 +168,12 @@
                   }) }}
               </div>
 
-              <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">
+              <div class="tab-pane fade in border-0 page-list" id="contacts-container">
                   {{ contacts|raw }}
               </div>
 
               {% if showTranslations %}
-                  <div class="tab-pane bdr-w-0" id="translation-container">
+                  <div class="tab-pane border-0" id="translation-container">
                       {{ translationContent|raw }}
                   </div>
               {% endif %}

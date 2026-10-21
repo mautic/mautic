@@ -216,7 +216,7 @@
         <div class="tab-content pa-md">
             {% if showActions %}
                 <!-- #actions-container -->
-                <div class="tab-pane active fade in bdr-w-0" id="actions-container">
+                <div class="tab-pane active fade in border-0" id="actions-container">
                     {% for group, groupActions in activeFormActions %}
                         <h5 class="fw-sb mb-xs">{{ group|title }}</h5>
                         <ul class="list-group">
@@ -252,7 +252,7 @@
             {% endif %}
 
             <!-- #fields-container -->
-            <div class="tab-pane fade {% if not showActions %}active in{% endif %} bdr-w-0" id="fields-container">
+            <div class="tab-pane fade {% if not showActions %}active in{% endif %} border-0" id="fields-container">
                 <h5 class="fw-sb mb-xs">{{ 'mautic.form.field'|trans }}</h5>
                 <ul class="list-group mb-xs">
                     {# @var \Mautic\FormBundle\Entity\Field $field #}
@@ -280,7 +280,7 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bdr-l height-auto">
+    <div class="col-md-3 border-start height-auto">
         <!-- form HTML -->
         <div class="pa-md">
             {% set aboveFoldContent %}
@@ -332,7 +332,7 @@
         <!--/ form HTML -->
 
         <!-- preview URL -->
-        <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel shd-none rounded-0 border-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title">{{ 'mautic.form.form.preview'|trans }}</div>
             </div>
@@ -372,7 +372,7 @@
         <hr class="hr-w-2" style="width:50%">
 
         {# we can leverage data from audit_log table and build activity feed from it #}
-        <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
+        <div class="panel shd-none rounded-0 border-0 mb-0">
             <!-- recent activity -->
             {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
         </div>

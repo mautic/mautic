@@ -114,7 +114,7 @@
             <div class="tab-content pa-md">
             {% set active = ' active in' %}
                 {% for channel, contacts in messagedLeads %}
-                <div class="tab-pane bdr-w-0 page-list{{ active }}" id="contacts-{{ channel }}">
+                <div class="tab-pane border-0 page-list{{ active }}" id="contacts-{{ channel }}">
                     {% set message = ('all' is same as(channel)) ? 'mautic.channel.message.all_contacts' : 'mautic.channel.message.channel_contacts' %}
                     <div class="alert alert-info"><strong>{{ message|trans }}</strong></div>
                     <div class="message-{{ channel }}">
@@ -126,7 +126,7 @@
             </div>
         </div>
         <!-- right section -->
-        <div class="col-md-3 bdr-l height-auto">
+        <div class="col-md-3 border-start height-auto">
             <!-- recent activity -->
             {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
             {% block rightFormContent %}

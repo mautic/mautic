@@ -87,7 +87,7 @@
 
 {{- form_start(form) -}}
 <div class="tab-content pa-md">
-    <div class="tab-pane fade {% if 'details-container' == activeTab %}in active{% endif %} bdr-w-0" id="details-container">
+    <div class="tab-pane fade {% if 'details-container' == activeTab %}in active{% endif %} border-0" id="details-container">
         {{- form_row(form.isPublished) -}}
         {%- if form.virtual is defined %}{{ form_row(form.virtual) }}{% endif %}
         {%- if form.apiKeys is defined -%}
@@ -132,7 +132,7 @@
     </div>
 
     {%- if hasSupportedFeatures or hasFeatureSettings -%}
-        <div class="tab-pane fade bdr-w-0" id="features-container">
+        <div class="tab-pane fade border-0" id="features-container">
             {%- if hasSupportedFeatures -%}
                 {{- form_row(form.supportedFeatures, {
                       'formSettings': formSettings,
@@ -150,14 +150,14 @@
     {%- endif -%}
 
     {%- if hasFields -%}
-        <div class="tab-pane fade {% if 'leadFieldsContainer' == activeTab %}in active{% endif %}  bdr-w-0" id="fields-container">
+        <div class="tab-pane fade {% if 'leadFieldsContainer' == activeTab %}in active{% endif %}  border-0" id="fields-container">
             <h4 class="mb-sm">{{ fieldLabel|trans }}</h4>
             {{- fieldHtml|raw -}}
         </div>
     {%- endif -%}
 
     {%- if hasCompanyFields -%}
-        <div class="tab-pane fade {% if 'companyFieldsContainer' == activeTab %}in active{% endif %} bdr-w-0" id="company-fields-container">
+        <div class="tab-pane fade {% if 'companyFieldsContainer' == activeTab %}in active{% endif %} border-0" id="company-fields-container">
             <h4 class="mb-sm">{{ 'mautic.integration.companyfield_matches'|trans }}</h4>
             {{- companyFieldHtml|raw -}}
         </div>

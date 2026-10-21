@@ -11,9 +11,9 @@
     {% if fields[group] is defined %}
         {% set groupFields = fields[group] %}
         {% if groupFields is not empty %}
-            <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-rds-0 bdr-w-0" id="company-{{ group }}">
+            <div class="tab-pane fade {% if loop.first %}in active{% endif %} rounded-0 border-0" id="company-{{ group }}">
                 {% if embedded is not defined %}
-                    <div class="pa-md bdr-b">
+                    <div class="pa-md border-bottom">
                         <h4 class="fw-sb">{{ ('mautic.lead.field.group.'~group)|trans }}</h4>
                     </div>
                 {% endif %}
