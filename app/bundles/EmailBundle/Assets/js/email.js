@@ -196,7 +196,7 @@ Mautic.sendEmailBatch = function () {
             if (response.progress[0] > 0) {
                 mQuery('.imported-count').html(response.progress[0]);
                 mQuery('.progress-bar-send').attr('aria-valuenow', response.progress[0]).css('width', response.percent + '%');
-                mQuery('.progress-bar-send span.sr-only').html(response.percent + '%');
+                mQuery('.progress-bar-send span.visually-hidden').html(response.percent + '%');
             }
 
             if (response.progress[0] >= response.progress[1]) {
