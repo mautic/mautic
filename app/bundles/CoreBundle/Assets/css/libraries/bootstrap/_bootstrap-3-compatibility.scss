@@ -4960,6 +4960,7 @@ a.thumbnail.active {
     @include border-bottom-radius($list-group-border-radius);
   }
 
+  .btn-check:disabled + &,
   &.disabled,
   &.disabled:hover,
   &.disabled:focus {
@@ -4975,6 +4976,7 @@ a.thumbnail.active {
     }
   }
 
+  .btn-check:checked + &,
   &.active,
   &.active:hover,
   &.active:focus {
