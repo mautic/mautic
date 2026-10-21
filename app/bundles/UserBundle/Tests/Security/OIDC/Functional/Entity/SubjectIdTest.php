@@ -97,9 +97,11 @@ final class SubjectIdTest extends MauticMysqlTestCase
         $subjectIdFromDatabase = $subjectIdRepo->findOneBy(['subjectID' => 'test']);
         $this->assertNotInstanceOf(OidcSubjectId::class, $subjectIdFromDatabase);
     }
-/*
+
     public function testSubjectUserIsUnique(): void
     {
+        $this->useCleanupRollback = false;   // We do not rely on transaction rollback
+
         $subjectId = new OidcSubjectId($this->linkedUser, 'test2');
 
         $this->expectException(UniqueConstraintViolationException::class);
@@ -109,11 +111,12 @@ final class SubjectIdTest extends MauticMysqlTestCase
 
     public function testSubjectIdIsUnique(): void
     {
+        $this->useCleanupRollback = false;   // We do not rely on transaction rollback
+
         $subjectId = new OidcSubjectId($this->unlinkedUser, 'linked_admin');
 
         $this->expectException(UniqueConstraintViolationException::class);
         $this->em->persist($subjectId);
         $this->em->flush();
     }
-*/
 }
