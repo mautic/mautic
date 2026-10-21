@@ -2547,7 +2547,7 @@ Mautic.getQuickFilterPopoverOptions = function () {
             select: ['name', 'multiple']
         },
         content: function () {
-            return mQuery(this).data('content');
+            return mQuery(this).attr('data-bs-content');
         }
     };
 };
