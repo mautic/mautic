@@ -426,7 +426,7 @@
     | `.bdr-t-wdh-0` | `.border-top-0` |
     | `.bdr-b-wdh-0` | `.border-bottom-0` |
     | `.bdr-rds-0` | `.rounded-0` |
-    | `.bdr-rds`, `.bdr-rds-sm`, `.bdr-rds-lg` | No direct equivalent. The radius comes from Mautic's theme, and `.rounded-1` or `.rounded-3` would give a different radius. No callers in the repository. |
+    | `.bdr-rds`, `.bdr-rds-sm`, `.bdr-rds-lg` | No direct equivalent. The radius comes from Mautic's theme, and in the default brand `.rounded-1` or `.rounded-3` would give a different radius. No callers in the repository. |
     | `.bdr-rds-circle` | `.rounded-circle` |
     | `.ovf-h` | `.overflow-hidden` |
     | `.va-t` | `.align-top` |
@@ -434,7 +434,7 @@
     | `.va-b` | `.align-bottom` |
     | `.fs-1` | `.flex-shrink-1` |
 
-    Mautic's border colour comes from `--border-subtle`. To keep it on the Bootstrap border classes, set `--bs-border-color: var(--border-subtle)` in your theme.
+    Mautic sets the Bootstrap border colour to `--border-subtle`, so the Bootstrap border classes keep Mautic's colour. A theme that replaces that colour must set `--bs-border-color` itself.
 
     `.fs-1` also sets a large font size in Bootstrap 5. Templates that still use it for flex-shrink must switch to `.flex-shrink-1`.
 
