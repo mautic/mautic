@@ -65,8 +65,8 @@
             <div>
                 <!-- form detail collapseable toggler -->
                 <div class="hr-expand nm">
-                        <span data-toggle="tooltip" title="{% trans %}mautic.core.details{% endtrans %}">
-                            <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#focus-details"><span class="caret"></span> {% trans %}mautic.core.details{% endtrans %}</a>
+                        <span data-bs-toggle="tooltip" title="{% trans %}mautic.core.details{% endtrans %}">
+                            <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#focus-details"><span class="caret"></span> {% trans %}mautic.core.details{% endtrans %}</a>
                         </span>
                 </div>
                 <!-- stats -->
@@ -77,12 +77,12 @@
                                 <div class="panel-body box-layout">
                                     <div class="col-md-6 va-m">
                                         <h5 class="text-white dark-md fw-sb mb-xs">
-                                            <div><i class="ri-line-chart-fill pull-left"></i>
-                                                <span class="pull-left"> {% trans %}mautic.messages.processed.messages{% endtrans %}</span></div>
+                                            <div><i class="ri-line-chart-fill float-start"></i>
+                                                <span class="float-start"> {% trans %}mautic.messages.processed.messages{% endtrans %}</span></div>
                                         </h5>
                                     </div>
                                     <div class="col-md-9 va-m">
-                                        {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
+                                        {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'float-end'}) -}}
                                     </div>
                                 </div>
                                 <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
@@ -100,7 +100,7 @@
                     {% set active = 'active' %}
                     {% for channel, contacts in messagedLeads %}
                     <li class="{{ active }}">
-                        <a href="#contacts-{{ channel }}" role="tab" data-toggle="tab">
+                        <a href="#contacts-{{ channel }}" role="tab" data-bs-toggle="tab" class="nav-link{{ active is not empty ? ' active' : '' }}" aria-selected="{{ active is not empty ? 'true' : 'false' }}">
                             {{ ('all' is not same as(channel)) ? channels[channel]['label'] : 'mautic.lead.leads'|trans() }}
                         </a>
                     </li>

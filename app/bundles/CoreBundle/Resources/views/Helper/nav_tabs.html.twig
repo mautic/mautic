@@ -10,11 +10,13 @@
     <ul class="nav nav-tabs {% if style|default('line') == 'line' %}nav-tabs-line{% else %}nav-tabs-contained{% endif %}" role="tablist">
         {% for tab in tabs %}
             {%- set tabId = tab.id|default(_self.generateTabId(tab.title)) -%}
-            <li role="presentation"{% if loop.first %} class="active"{% endif %}>
+            <li class="nav-item{% if loop.first %} active{% endif %}" role="presentation">
                 <a href="#{{ tabId }}"
+                   class="nav-link{% if loop.first %} active{% endif %}"
+                   aria-selected="{{ loop.first ? 'true' : 'false' }}"
                    aria-controls="{{ tabId }}"
                    role="tab"
-                   data-toggle="tab">{{ tab.title|trans }}</a>
+                   data-bs-toggle="tab">{{ tab.title|trans }}</a>
             </li>
         {% endfor %}
     </ul>
@@ -24,7 +26,7 @@
         {% for tab in tabs %}
             {%- set tabId = tab.id|default(_self.generateTabId(tab.title)) -%}
             <div role="tabpanel"
-                 class="tab-pane fade{% if loop.first %} in active{% endif %}{% if style|default('line') == 'contained' %} layer-{{ layer|default('two') }}{% endif %}"
+                 class="tab-pane fade{% if loop.first %} show active{% endif %}{% if style|default('line') == 'contained' %} layer-{{ layer|default('two') }}{% endif %}"
                  id="{{ tabId }}">
                 {{ tab.content|raw }}
             </div>

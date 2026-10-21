@@ -2527,6 +2527,44 @@ Mautic.initFilterCommands = function () {
 };
 
 /**
+ * Options for the quick filters popover. The sanitizer stays enabled and only allows the controls the filters need.
+ *
+ * @returns {Object}
+ */
+Mautic.getQuickFilterPopoverOptions = function () {
+    const defaultAllowList = window.bootstrap?.Popover ? window.bootstrap.Popover.Default.allowList : {'*': ['class', 'dir', 'id', 'lang', 'role']};
+
+    return {
+        html: true,
+        container: 'body',
+        sanitize: true,
+        allowList: {
+            ...defaultAllowList,
+            '*': defaultAllowList['*'].concat([/^data-[\w-]+$/]),
+            button: ['type', 'name', 'value'],
+            optgroup: ['label'],
+            option: ['value', 'selected'],
+            select: ['name', 'multiple']
+        },
+        content: function () {
+            return mQuery(this).data('content');
+        }
+    };
+};
+
+mQuery(document).on('click', '[data-filter-action]', function () {
+    const action = this.dataset.filterAction;
+
+    if ('toggle' === action) {
+        Mautic.toggleFilter(this);
+    } else if ('apply' === action) {
+        Mautic.applyFilters();
+    } else if ('reset' === action) {
+        Mautic.resetFilters();
+    }
+});
+
+/**
  * Toggles the active state of a filter label and manages conflicting filters.
  *
  * @param {HTMLElement} element
@@ -2577,12 +2615,9 @@ Mautic.applyFilters = function () {
     searchInput.value = newSearchValue;
 
     // Properly destroy and reinitialize popover
-    const popoverTrigger = mQuery('[data-toggle="popover"]');
+    const popoverTrigger = mQuery('[data-quick-filter]');
     popoverTrigger.popover('destroy');
-    popoverTrigger.popover({
-        html: true,
-        container: 'body'
-    });
+    popoverTrigger.popover(Mautic.getQuickFilterPopoverOptions());
 
     const enterKeyEvent = new KeyboardEvent('keyup', {
         key: 'Enter',
@@ -2633,7 +2668,7 @@ Mautic.resetFilters = function () {
     });
 
     // Properly destroy the popover instead of hiding it
-    const popoverTrigger = mQuery('[data-toggle="popover"]');
+    const popoverTrigger = mQuery('[data-quick-filter]');
     popoverTrigger.popover('destroy');
 
     const enterKeyEvent = new KeyboardEvent('keyup', {
@@ -2753,7 +2788,7 @@ Mautic.initializePopoverFilters = function (popoverElement) {
  * Handles the insertion of the popover and initializes active filter labels.
  */
 Mautic.handlePopoverInsertion = function () {
-    mQuery(document).on('inserted.bs.popover', '[data-toggle="popover"]', function () {
+    mQuery(document).on('inserted.bs.popover', '[data-toggle="popover"], [data-bs-toggle="popover"]', function () {
         const popoverId = mQuery(this).attr('aria-describedby');
         if (!popoverId) return;
 

@@ -3,7 +3,7 @@
 {% set htmlcode %}
 <pre class="dwc--generator-content-code d-flex fd-column fg-1 gap-md pa-0 fs-16 text-helper">{{ '<div
     data-slot="dwc"
-    data-param-slot-name="' ~ entity.slotName ~ '">'|raw }}<div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 ai-center ml-lg text-primary"><i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{{ '</div>'|escape }}</pre>
+    data-param-slot-name="' ~ entity.slotName ~ '">'|raw }}<div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 ai-center ml-lg text-primary"><i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-bs-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{{ '</div>'|escape }}</pre>
 {% endset %}
 
 <div class="row mt-lg">
@@ -14,7 +14,7 @@
     <div class="col-xs-12 col-md-4">
         <ul class="list-group" role="tablist">
             <li role="presentation" class="list-group-item active">
-                <a href="#dwc--generator-html" aria-controls="dwc--generator-html" role="tab" data-toggle="tab">
+                <a href="#dwc--generator-html" aria-controls="dwc--generator-html" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
                     <div class="d-flex jc-space-between mb-sm">
                         <h4 class="list-group-item-heading fw-sb">{{ 'mautic.dynamiccontent.generator.html'|trans }}</h4>
                         <i class="ri-html5-fill ri-lg"></i>
@@ -23,7 +23,7 @@
                 </a>
             </li>
             <li role="presentation" class="list-group-item">
-                <a href="#dwc--generator-plugins" aria-controls="dwc--generator-plugins" role="tab" data-toggle="tab">
+                <a href="#dwc--generator-plugins" aria-controls="dwc--generator-plugins" role="tab" data-bs-toggle="tab" class="nav-link" aria-selected="false">
                     <div class="d-flex jc-space-between mb-sm">
                         <h4 class="list-group-item-heading fw-sb">{{ 'mautic.dynamiccontent.generator.plugins'|trans }}</h4>
                         <i class="ri-apps-2-add-fill ri-lg"></i>
@@ -36,7 +36,7 @@
     </div>
     <div class="col-xs-12 col-md-8 tab-content">
 
-        <div role="tabpanel" class="tab-pane fade in active" id="dwc--generator-html">
+        <div role="tabpanel" class="tab-pane fade show active" id="dwc--generator-html">
             <div class="tile dwc--generator-wrapper">
                 <div class="d-flex fg-1">
                     <div class="dwc--generator-toolbar pa-xs layer-two d-flex fd-column jc-space-between ai-start mr-md">
@@ -120,7 +120,7 @@
 
                     </div>
                     <div class="dwc--generator-content mt-md mb-sm d-flex fd-column fg-1">
-                        <pre class="dwc--generator-content-code d-flex fd-column fg-1 gap-md pa-0 fs-16 text-helper">{mautic type="content" slot="{{ entity.slotName }}"} <div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 ai-center ml-lg text-primary"> <i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{/mautic}
+                        <pre class="dwc--generator-content-code d-flex fd-column fg-1 gap-md pa-0 fs-16 text-helper">{mautic type="content" slot="{{ entity.slotName }}"} <div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 ai-center ml-lg text-primary"> <i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-bs-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{/mautic}
                         </pre>
                         <div class="dwc--generator-content-help text-helper small">
                             <i class="ri-information-2-line"></i>

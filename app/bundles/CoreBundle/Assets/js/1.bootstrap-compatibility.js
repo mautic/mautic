@@ -581,7 +581,7 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         var prototype = window.bootstrap.Dropdown.prototype;
         var nativeMethod = prototype[method];
         prototype[method] = function () {
-            if (!this._element.hasAttribute('data-toggle')) {
+            if (!this._element.hasAttribute('data-toggle') && !this._element.hasAttribute('data-bs-toggle')) {
                 return nativeMethod.apply(this, arguments);
             }
             var trigger = jQuery(this._element);
@@ -609,13 +609,9 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         synchronizeDropdownState(jQuery, '_completeHide', 'hidden.bs.dropdown', false);
         var tabChildren = window.bootstrap.Tab.prototype._getChildren;
         window.bootstrap.Tab.prototype._getChildren = function () {
-            var children = tabChildren.call(this);
-            if (this._element.hasAttribute('data-toggle')) {
-                return children.filter(function (child) {
-                    return !child.matches('li') || !child.querySelector('[data-toggle="tab"], [data-toggle="pill"]');
-                });
-            }
-            return children;
+            return tabChildren.call(this).filter(function (child) {
+                return !child.matches('li') || !child.querySelector('[data-toggle="tab"], [data-toggle="pill"], [data-bs-toggle="tab"], [data-bs-toggle="pill"]');
+            });
         };
         jQuery(document).on('shown.bs.collapse hidden.bs.collapse shown.bs.modal hidden.bs.modal', function (event) {
             jQuery(event.target).toggleClass('in', 'shown' === event.type);
@@ -1184,6 +1180,7 @@ window.MauticInstallLegacyAffix = function (jQuery) {
                 mutation.addedNodes.forEach(function (node) {
                     if (Node.ELEMENT_NODE === node.nodeType) {
                         mirrorLegacyMarkup(node);
+                        initBootstrapPopovers(node);
                         window.MauticBootstrapLegacyExceptions.prepareMarkup(node);
                         prepareLegacyTabs(node);
                     }
@@ -1208,8 +1205,18 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         version: '5.3.8-router'
     });
 
+    function initBootstrapPopovers(container) {
+        if (!container || !container.querySelectorAll || !window.bootstrap || !window.bootstrap.Popover) {
+            return;
+        }
+        container.querySelectorAll('[data-bs-toggle="popover"]:not([data-toggle="popover"])').forEach(function (element) {
+            window.bootstrap.Popover.getOrCreateInstance(element);
+        });
+    }
+
     mirrorLegacyMarkup(document);
     bridgeJQueryPlugins();
+    initBootstrapPopovers(document);
     window.MauticBootstrapLegacyExceptions.prepareMarkup(document);
     prepareLegacyTabs(document);
     window.addEventListener('click', function (event) {
@@ -1223,6 +1230,7 @@ window.MauticInstallLegacyAffix = function (jQuery) {
     document.addEventListener('DOMContentLoaded', function () {
         mirrorLegacyMarkup(document);
         bridgeJQueryPlugins();
+        initBootstrapPopovers(document);
         window.MauticBootstrapLegacyExceptions.prepareMarkup(document);
         prepareLegacyTabs(document);
     });
