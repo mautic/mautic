@@ -391,6 +391,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/DeepanshuPal"><img src="https://avatars.githubusercontent.com/u/40927968?v=4?s=100" width="100px;" alt="Deepanshu Pal"/><br /><sub><b>Deepanshu Pal</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=DeepanshuPal" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://giadaware.vercel.app"><img src="https://avatars.githubusercontent.com/u/126195429?v=4?s=100" width="100px;" alt="Giancarlo Cicellyn Comneno"/><br /><sub><b>Giancarlo Cicellyn Comneno</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=gcomneno" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://techsurrection.com"><img src="https://avatars.githubusercontent.com/u/24973245?v=4?s=100" width="100px;" alt="TechSurrection"/><br /><sub><b>TechSurrection</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=techsurrusr" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://tendence.ru/zlobin"><img src="https://avatars.githubusercontent.com/u/186687229?v=4?s=100" width="100px;" alt="Alexander Zlobin"/><br /><sub><b>Alexander Zlobin</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=AlexanderZlobinM1" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
