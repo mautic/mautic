@@ -2589,16 +2589,6 @@ input[type="checkbox"] {
   }
 }
 
-input[type="checkbox"] {
-  line-height: normal;
-
-  &[disabled],
-  &.disabled,
-  fieldset[disabled] & {
-    cursor: $cursor-disabled;
-  }
-}
-
 input[type="file"] {
   display: block;
 }
