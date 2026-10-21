@@ -43,3 +43,10 @@ Replace the custom utility classes listed below with their Bootstrap 5 equivalen
 - `as-end` → `align-self-end`
 - `jc-end-lg` → `justify-content-xl-end`
 - `fs-1` → `flex-shrink-1`
+- `control-label` → `form-label`
+- `data-dismiss` → `data-bs-dismiss`
+- `data-toggle` → `data-bs-toggle`
+- `sr-only` → `visually-hidden`
+- `pull-right` → `float-end`
+- `help-block` → `form-text`
+- `data-placement` → `data-bs-placement`
