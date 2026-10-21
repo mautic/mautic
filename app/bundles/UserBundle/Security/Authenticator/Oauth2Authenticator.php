@@ -14,11 +14,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
-final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\Oauth2Authenticator
+class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenticator\Oauth2Authenticator
 {
-    public function supports(Request $request): bool
+    public function supports(Request $request): ?bool
     {
         // needed until the oAuth2 library will not be updated to 4.0.5
         return null !== $this->serverService->getBearerToken($request);
@@ -29,7 +30,7 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
      * token user's identifier when one is available instead of always using the
      * OAuth client identifier.
      */
-    public function authenticate(Request $request): SelfValidatingPassport
+    public function authenticate(Request $request): Passport
     {
         try {
             $tokenString = $this->serverService->getBearerToken($request);
@@ -51,7 +52,10 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
                 }
             }
 
-            $roles = (null !== $user) ? $user->getRoles() : [];
+            // For user-bound tokens, use the user's roles.
+            // For client-only tokens (client_credentials), use a placeholder role to mark the badge
+            // as resolved. The actual roles will be set by ApiUserSubscriber from the client's Role.
+            $roles = (null !== $user) ? $user->getRoles() : ['ROLE_API'];
             $scope = $accessToken->getScope();
 
             if (!empty($scope)) {
@@ -67,6 +71,8 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
             // Parent uses $client->getUserIdentifier() here, which breaks
             // user-bound bearer tokens on /api/v2 because the client identifier
             // is not a Mautic username.
+            // Note: No userLoader is provided here - ApiUserSubscriber will set one
+            // for client-only tokens to create a pseudo-user with proper permissions.
             return new SelfValidatingPassport(
                 new UserBadge($user?->getUserIdentifier() ?? $client->getUserIdentifier()),
                 [$accessTokenBadge]

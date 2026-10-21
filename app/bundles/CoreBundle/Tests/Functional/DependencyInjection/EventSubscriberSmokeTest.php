@@ -39,6 +39,7 @@ use Mautic\SmsBundle\EventListener\CampaignSendSubscriber;
 use Mautic\UserBundle\Controller\SecurityController;
 use Mautic\UserBundle\EventListener\ApiUserSubscriber;
 use Mautic\UserBundle\EventListener\LogoutListener;
+use Mautic\UserBundle\EventListener\OidcRequestSubscriber;
 use Mautic\UserBundle\EventListener\PasswordStrengthSubscriber;
 use Mautic\UserBundle\EventListener\PasswordSubscriber;
 use MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber;
@@ -80,6 +81,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             RequestSubscriber::class,
             RouterSubscriber::class,
             SecurityController::class,
+            OidcRequestSubscriber::class,
         ],
         'kernel.response' => [
             ApiSubscriber::class,
