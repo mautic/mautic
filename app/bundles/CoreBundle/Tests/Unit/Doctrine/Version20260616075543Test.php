@@ -32,8 +32,8 @@ final class Version20260616075543Test extends TestCase
         $migration->up($schema);
 
         $sql = $plannedSql->getValue($migration);
-        self::assertCount(2, $sql);
-        self::assertStringContainsString("`category_id`         {$expectedType} DEFAULT NULL", (string) $sql[0]);
+        $this->assertCount(2, $sql);
+        $this->assertStringContainsString("`category_id`         {$expectedType} DEFAULT NULL", (string) $sql[0]);
     }
 
     /**
