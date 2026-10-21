@@ -4908,7 +4908,8 @@ a.thumbnail.active {
 }
 
 .media-left,
-.media > .pull-left {
+.media > .pull-left,
+.media > .float-start {
   padding-right: 10px;
 }
 
