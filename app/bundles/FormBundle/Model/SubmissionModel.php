@@ -139,6 +139,9 @@ final class SubmissionModel extends CommonFormModel
         $trackSubmitter = $this->shouldTrackSubmitter($form);
         if ($trackSubmitter) {
             $submission->setIpAddress($this->ipLookupHelper->getIpAddress());
+        } else {
+            // Keeps the IP out of the contact, company, point trigger and campaign logs this submission writes
+            $this->ipLookupHelper->markVisitorAsUntracked();
         }
 
         if (!empty($post['return'])) {
