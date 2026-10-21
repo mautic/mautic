@@ -140,7 +140,7 @@ class StagesChangeLog
         return $this;
     }
 
-    public function getStage(): ?\Mautic\StageBundle\Entity\Stage
+    public function getStage(): ?Stage
     {
         return $this->stage;
     }

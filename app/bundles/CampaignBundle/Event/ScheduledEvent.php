@@ -21,11 +21,11 @@ final class ScheduledEvent extends Event
 
     private readonly ?Lead $lead;
 
-    private ?CampaignEvent $event;
+    private readonly ?CampaignEvent $event;
 
     private bool $systemTriggered = true;
 
-    private ?\DateTimeInterface $dateScheduled;
+    private readonly ?\DateTimeInterface $dateScheduled;
 
     /**
      * @var array

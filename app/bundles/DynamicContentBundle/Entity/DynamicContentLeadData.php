@@ -82,12 +82,12 @@ class DynamicContentLeadData extends CommonEntity
         return $this;
     }
 
-    public function getDynamicContent(): ?\Mautic\DynamicContentBundle\Entity\DynamicContent
+    public function getDynamicContent(): ?DynamicContent
     {
         return $this->dynamicContent;
     }
 
-    public function setDynamicContent(?\Mautic\DynamicContentBundle\Entity\DynamicContent $dynamicContent): static
+    public function setDynamicContent(?DynamicContent $dynamicContent): static
     {
         $this->dynamicContent = $dynamicContent;
 

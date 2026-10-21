@@ -50,12 +50,12 @@ class PostCount
         return $this->id;
     }
 
-    public function getMonitor(): ?\MauticPlugin\MauticSocialBundle\Entity\Monitoring
+    public function getMonitor(): ?Monitoring
     {
         return $this->monitor;
     }
 
-    public function setMonitor(?\MauticPlugin\MauticSocialBundle\Entity\Monitoring $monitor): static
+    public function setMonitor(?Monitoring $monitor): static
     {
         $this->monitor = $monitor;
 

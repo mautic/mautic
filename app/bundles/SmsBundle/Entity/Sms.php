@@ -321,12 +321,12 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this->id;
     }
 
-    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;

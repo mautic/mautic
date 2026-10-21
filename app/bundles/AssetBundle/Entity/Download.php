@@ -233,7 +233,7 @@ class Download
         return $this;
     }
 
-    public function getAsset(): ?\Mautic\AssetBundle\Entity\Asset
+    public function getAsset(): ?Asset
     {
         return $this->asset;
     }
@@ -245,7 +245,7 @@ class Download
         return $this;
     }
 
-    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }

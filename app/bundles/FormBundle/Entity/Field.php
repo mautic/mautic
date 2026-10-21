@@ -528,7 +528,7 @@ class Field implements UuidInterface
         return $this;
     }
 
-    public function getForm(): ?\Mautic\FormBundle\Entity\Form
+    public function getForm(): ?Form
     {
         return $this->form;
     }

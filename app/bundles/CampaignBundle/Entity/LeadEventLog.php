@@ -420,7 +420,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this;
     }
 
-    public function getFailedLog(): ?\Mautic\CampaignBundle\Entity\FailedLeadEventLog
+    public function getFailedLog(): ?FailedLeadEventLog
     {
         return $this->failedLog;
     }

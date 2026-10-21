@@ -246,7 +246,7 @@ class Stat
         $this->dateSent = $dateSent;
     }
 
-    public function getEmail(): ?\Mautic\EmailBundle\Entity\Email
+    public function getEmail(): ?Email
     {
         return $this->email;
     }
@@ -301,7 +301,7 @@ class Stat
         $this->isRead = $isRead;
     }
 
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
@@ -327,12 +327,12 @@ class Stat
         $this->trackingHash = $trackingHash;
     }
 
-    public function getList(): ?\Mautic\LeadBundle\Entity\LeadList
+    public function getList(): ?LeadList
     {
         return $this->list;
     }
 
-    public function setList(?\Mautic\LeadBundle\Entity\LeadList $list): void
+    public function setList(?LeadList $list): void
     {
         $this->list = $list;
     }
@@ -535,7 +535,7 @@ class Stat
         return $this;
     }
 
-    public function getStoredCopy(): ?\Mautic\EmailBundle\Entity\Copy
+    public function getStoredCopy(): ?Copy
     {
         return $this->storedCopy;
     }

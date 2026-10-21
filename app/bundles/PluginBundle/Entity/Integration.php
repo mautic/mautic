@@ -86,12 +86,12 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->id;
     }
 
-    public function getPlugin(): ?\Mautic\PluginBundle\Entity\Plugin
+    public function getPlugin(): ?Plugin
     {
         return $this->plugin;
     }
 
-    public function setPlugin(?\Mautic\PluginBundle\Entity\Plugin $plugin): static
+    public function setPlugin(?Plugin $plugin): static
     {
         $this->plugin = $plugin;
 

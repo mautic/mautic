@@ -525,7 +525,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    public function getOwner(): ?\Mautic\UserBundle\Entity\User
+    public function getOwner(): ?User
     {
         return $this->owner;
     }
@@ -1213,7 +1213,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         return $this;
     }
 
-    public function getStage(): ?\Mautic\StageBundle\Entity\Stage
+    public function getStage(): ?Stage
     {
         return $this->stage;
     }
