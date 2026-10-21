@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
@@ -790,6 +791,89 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($winnerReloaded->getContinueSending());
     }
 
+    public function testContactWhenSendToDncIsNo(): void
+    {
+        $contact = $this->createContact();
+        $email   = $this->createTransactionalEmail();
+        $this->em->flush();
+
+        $this->sendEmail($email, $contact);
+        $this->assertEmailIsSend($email, $contact);
+    }
+
+    public function testContactWhenSendToDncIsYes(): void
+    {
+        $contact = $this->createContact();
+        $email   = $this->createTransactionalEmail();
+        $email->setSendToDnc(true);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $this->sendEmail($email, $contact);
+        $this->assertEmailIsSend($email, $contact);
+    }
+
+    #[DataProvider('dataDNCContactWhenSendToDncIsNo')]
+    public function testDNCContactWhenSendToDncIsNo(int $reason): void
+    {
+        $contact = $this->createContact();
+        $email   = $this->createTransactionalEmail();
+        $this->addDNC($contact, $reason);
+        $this->em->flush();
+
+        $this->sendEmail($email, $contact);
+        $this->assertEmailIsNotSend();
+    }
+
+    /**
+     * @return iterable<mixed[]>
+     */
+    public static function dataDNCContactWhenSendToDncIsNo(): iterable
+    {
+        yield [DoNotContact::UNSUBSCRIBED];
+        yield [DoNotContact::BOUNCED];
+        yield [DoNotContact::MANUAL];
+    }
+
+    #[DataProvider('dataDNCContactWhenSendToDncIsYes')]
+    public function testDNCContactWhenSendToDncIsYes(int $reason, bool $send): void
+    {
+        $contact = $this->createContact();
+        $email   = $this->createTransactionalEmail();
+        $email->setSendToDnc(true);
+        $this->em->persist($email);
+        $this->addDNC($contact, $reason);
+        $this->em->flush();
+
+        $this->sendEmail($email, $contact);
+        if ($send) {
+            $this->assertEmailIsSend($email, $contact);
+        } else {
+            $this->assertEmailIsNotSend();
+        }
+    }
+
+    /**
+     * @return iterable<mixed[]>
+     */
+    public static function dataDNCContactWhenSendToDncIsYes(): iterable
+    {
+        yield [DoNotContact::UNSUBSCRIBED, true];
+        yield [DoNotContact::BOUNCED, false];
+        yield [DoNotContact::MANUAL, true];
+    }
+
+    private function createTransactionalEmail(): Email
+    {
+        $email = new Email();
+        $email->setName('Transactional Email');
+        $email->setSubject('Transactional Email Subject');
+        $email->setCustomHtml('Email content');
+        $this->em->persist($email);
+
+        return $email;
+    }
+
     private function createContact(): Lead
     {
         $contact = new Lead();
@@ -920,5 +1004,40 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($email->getId(), $queuedMessage->getChannelId());
         $this->assertSame($contact, $queuedMessage->getLead());
         $this->assertSame($queuedMessage::STATUS_PENDING, $queuedMessage->getStatus());
+    }
+
+    private function addDNC(Lead $contact, int $reason): DoNotContact
+    {
+        $doNotContact = new DoNotContact();
+        $doNotContact->setLead($contact);
+        $doNotContact->setDateAdded(new \DateTime());
+        $doNotContact->setChannel('email');
+        $doNotContact->setReason($reason);
+        $this->em->persist($doNotContact);
+
+        return $doNotContact;
+    }
+
+    private function assertEmailIsNotSend(): void
+    {
+        $statRepository = $this->em->getRepository(Stat::class);
+        $this->assertInstanceOf(StatRepository::class, $statRepository);
+        $stat = $statRepository->findBy([]);
+        $this->assertCount(0, $stat);
+    }
+
+    private function assertEmailIsSend(Email $email, Lead $contact): void
+    {
+        $statRepository = $this->em->getRepository(Stat::class);
+        $this->assertInstanceOf(StatRepository::class, $statRepository);
+
+        $stat = $statRepository->findBy([]);
+        $this->assertCount(1, $stat);
+
+        $stat = reset($stat);
+        $this->assertInstanceOf(Stat::class, $stat);
+
+        $this->assertSame($stat->getEmail()->getId(), $email->getId());
+        $this->assertSame($stat->getLead()->getId(), $contact->getId());
     }
 }

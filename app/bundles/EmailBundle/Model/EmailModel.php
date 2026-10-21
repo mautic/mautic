@@ -1020,6 +1020,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             $maxThreads,
             $threadId,
             $email->isSegmentEmail() && !$email->getContinueSending() ? $email->getPublishUp() : null,
+            $email->getSendToDnc(),
         );
 
         if ($storeToCache) {
@@ -1358,7 +1359,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     public function sendEmail(Email $email, array $leads, array $options = [])
     {
         $listId              = ArrayHelper::getValue('listId', $options);
-        $ignoreDNC           = ArrayHelper::getValue('ignoreDNC', $options, false);
+        $ignoreDNC           = ArrayHelper::getValue('ignoreDNC', $options, $email->getSendToDnc());
         $tokens              = ArrayHelper::getValue('tokens', $options, []);
         $assetAttachments    = ArrayHelper::getValue('assetAttachments', $options, []);
         $customHeaders       = ArrayHelper::getValue('customHeaders', $options, []);
@@ -1396,16 +1397,14 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         // get email settings such as templates, weights, etc
         $emailSettings = &$this->getEmailSettings($email);
 
-        if (!$ignoreDNC) {
-            $dnc = $this->emailRepository->getDoNotEmailList($leadIds);
+        $dnc = $this->emailRepository->getDoNotEmailList($leadIds, $ignoreDNC ? [DoNotContact::BOUNCED] : null);
 
-            foreach ($dnc as $removeMeId => $removeMeEmail) {
-                if ($dncAsError) {
-                    $errors[$removeMeId] = $this->translator->trans('mautic.email.dnc');
-                }
-                unset($sendTo[$removeMeId]);
-                unset($leadIds[$removeMeId]);
+        foreach ($dnc as $removeMeId => $removeMeEmail) {
+            if ($dncAsError) {
+                $errors[$removeMeId] = $this->translator->trans('mautic.email.dnc');
             }
+            unset($sendTo[$removeMeId]);
+            unset($leadIds[$removeMeId]);
         }
 
         // Process frequency rules for email
