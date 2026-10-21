@@ -588,12 +588,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->id;
     }
 
-    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -1017,7 +1017,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    public function getUnsubscribeForm(): ?\Mautic\FormBundle\Entity\Form
+    public function getUnsubscribeForm(): ?Form
     {
         return $this->unsubscribeForm;
     }
@@ -1029,7 +1029,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    public function getPreferenceCenter(): ?\Mautic\PageBundle\Entity\Page
+    public function getPreferenceCenter(): ?Page
     {
         return $this->preferenceCenter;
     }

@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -200,7 +201,7 @@ class Action implements UuidInterface
         return $this;
     }
 
-    public function getForm(): ?\Mautic\FormBundle\Entity\Form
+    public function getForm(): ?Form
     {
         return $this->form;
     }

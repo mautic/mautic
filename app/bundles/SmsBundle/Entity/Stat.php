@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\SmsBundle\Entity\Sms;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
@@ -143,7 +144,7 @@ class Stat
         return (int) $this->id;
     }
 
-    public function getSms(): ?\Mautic\SmsBundle\Entity\Sms
+    public function getSms(): ?Sms
     {
         return $this->sms;
     }
@@ -155,7 +156,7 @@ class Stat
         return $this;
     }
 
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
@@ -167,7 +168,7 @@ class Stat
         return $this;
     }
 
-    public function getList(): ?\Mautic\LeadBundle\Entity\LeadList
+    public function getList(): ?LeadList
     {
         return $this->list;
     }
@@ -179,7 +180,7 @@ class Stat
         return $this;
     }
 
-    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }

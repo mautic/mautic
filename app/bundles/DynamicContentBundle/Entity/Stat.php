@@ -7,6 +7,7 @@ namespace Mautic\DynamicContentBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
@@ -144,7 +145,7 @@ class Stat
         $this->id = (string) $id;
     }
 
-    public function getDynamicContent(): ?\Mautic\DynamicContentBundle\Entity\DynamicContent
+    public function getDynamicContent(): ?DynamicContent
     {
         return $this->dynamicContent;
     }
@@ -154,12 +155,12 @@ class Stat
         $this->dynamicContent = $dynamicContent;
     }
 
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
 
-    public function setLead(?\Mautic\LeadBundle\Entity\Lead $lead): void
+    public function setLead(?Lead $lead): void
     {
         $this->lead = $lead;
     }

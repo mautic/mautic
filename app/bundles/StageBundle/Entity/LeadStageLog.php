@@ -60,7 +60,7 @@ class LeadStageLog
         $this->dateFired = $dateFired;
     }
 
-    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }

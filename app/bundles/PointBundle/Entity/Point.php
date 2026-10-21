@@ -338,12 +338,12 @@ class Point extends FormEntity implements UuidInterface
         return $this->publishDown;
     }
 
-    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    public function setCategory(?\Mautic\CategoryBundle\Entity\Category $category): void
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
     }

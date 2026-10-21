@@ -104,7 +104,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Returns the Email entity.
      */
-    public function getEmail(): ?\Mautic\EmailBundle\Entity\Email
+    public function getEmail(): ?Email
     {
         return (null !== $this->helper) ? $this->helper->getEmail() : $this->email;
     }

@@ -271,7 +271,7 @@ class Stage extends FormEntity implements UuidInterface
         return $this->publishDown;
     }
 
-    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
+    public function getCategory(): ?Category
     {
         return $this->category;
     }

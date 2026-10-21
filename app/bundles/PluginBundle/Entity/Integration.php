@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
+use Mautic\PluginBundle\Entity\Plugin;
 
 #[ORM\Entity(repositoryClass: IntegrationRepository::class)]
 #[ORM\Table(name: 'plugin_integration_settings')]
@@ -86,12 +87,12 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->id;
     }
 
-    public function getPlugin(): ?\Mautic\PluginBundle\Entity\Plugin
+    public function getPlugin(): ?Plugin
     {
         return $this->plugin;
     }
 
-    public function setPlugin(?\Mautic\PluginBundle\Entity\Plugin $plugin): static
+    public function setPlugin(?Plugin $plugin): static
     {
         $this->plugin = $plugin;
 

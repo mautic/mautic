@@ -185,7 +185,7 @@ class Submission
         return $this;
     }
 
-    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
@@ -209,12 +209,12 @@ class Submission
         return $this;
     }
 
-    public function getPage(): ?\Mautic\PageBundle\Entity\Page
+    public function getPage(): ?Page
     {
         return $this->page;
     }
 
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }

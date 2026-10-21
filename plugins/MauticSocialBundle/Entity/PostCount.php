@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: PostCountRepository::class)]
@@ -50,12 +51,12 @@ class PostCount
         return $this->id;
     }
 
-    public function getMonitor(): ?\MauticPlugin\MauticSocialBundle\Entity\Monitoring
+    public function getMonitor(): ?Monitoring
     {
         return $this->monitor;
     }
 
-    public function setMonitor(?\MauticPlugin\MauticSocialBundle\Entity\Monitoring $monitor): static
+    public function setMonitor(?Monitoring $monitor): static
     {
         $this->monitor = $monitor;
 

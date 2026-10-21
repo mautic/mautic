@@ -5,6 +5,7 @@ namespace Mautic\DynamicContentBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: DynamicContentLeadDataRepository::class)]
@@ -82,12 +83,12 @@ class DynamicContentLeadData extends CommonEntity
         return $this;
     }
 
-    public function getDynamicContent(): ?\Mautic\DynamicContentBundle\Entity\DynamicContent
+    public function getDynamicContent(): ?DynamicContent
     {
         return $this->dynamicContent;
     }
 
-    public function setDynamicContent(?\Mautic\DynamicContentBundle\Entity\DynamicContent $dynamicContent): static
+    public function setDynamicContent(?DynamicContent $dynamicContent): static
     {
         $this->dynamicContent = $dynamicContent;
 

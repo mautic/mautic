@@ -238,7 +238,7 @@ class MessageQueue
         return $this;
     }
 
-    public function getEvent(): ?\Mautic\CampaignBundle\Entity\Event
+    public function getEvent(): ?Event
     {
         return $this->event;
     }

@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\NotificationBundle\Entity\Notification;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
@@ -212,7 +213,7 @@ class Stat
         $this->dateSent = $dateSent;
     }
 
-    public function getNotification(): ?\Mautic\NotificationBundle\Entity\Notification
+    public function getNotification(): ?Notification
     {
         return $this->notification;
     }
@@ -253,7 +254,7 @@ class Stat
         $this->isClicked = $isClicked;
     }
 
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
@@ -279,12 +280,12 @@ class Stat
         $this->trackingHash = $trackingHash;
     }
 
-    public function getList(): ?\Mautic\LeadBundle\Entity\LeadList
+    public function getList(): ?LeadList
     {
         return $this->list;
     }
 
-    public function setList(?\Mautic\LeadBundle\Entity\LeadList $list): void
+    public function setList(?LeadList $list): void
     {
         $this->list = $list;
     }

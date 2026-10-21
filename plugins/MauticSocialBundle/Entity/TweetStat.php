@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead as TheLead;
+use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: TweetStatRepository::class)]
 #[ORM\Table(name: 'tweet_stats')]
@@ -188,7 +189,7 @@ class TweetStat
         $this->tweet = $tweet;
     }
 
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }

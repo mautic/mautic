@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Validator\PageHit;
 
 #[ORM\Entity(repositoryClass: HitRepository::class)]
@@ -468,7 +469,7 @@ class Hit
         return $this;
     }
 
-    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
@@ -527,7 +528,7 @@ class Hit
         return $this->browserLanguages;
     }
 
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
@@ -575,7 +576,7 @@ class Hit
         return $this;
     }
 
-    public function getRedirect(): ?\Mautic\PageBundle\Entity\Redirect
+    public function getRedirect(): ?Redirect
     {
         return $this->redirect;
     }
@@ -612,7 +613,7 @@ class Hit
         return $this;
     }
 
-    public function getDeviceStat(): ?\Mautic\LeadBundle\Entity\LeadDevice
+    public function getDeviceStat(): ?LeadDevice
     {
         return $this->device;
     }

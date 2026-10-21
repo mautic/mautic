@@ -362,7 +362,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    public function getAsset(): ?\Mautic\AssetBundle\Entity\Asset
+    public function getAsset(): ?Asset
     {
         return $this->asset;
     }
@@ -374,7 +374,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    public function getPage(): ?\Mautic\PageBundle\Entity\Page
+    public function getPage(): ?Page
     {
         return $this->page;
     }
@@ -386,7 +386,7 @@ class Tweet extends FormEntity
         return $this;
     }
 
-    public function getCategory(): ?\Mautic\CategoryBundle\Entity\Category
+    public function getCategory(): ?Category
     {
         return $this->category;
     }

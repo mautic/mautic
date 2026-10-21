@@ -66,12 +66,12 @@ class LeadTriggerLog
         $this->dateFired = $dateFired;
     }
 
-    public function getIpAddress(): ?\Mautic\CoreBundle\Entity\IpAddress
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
 
-    public function setIpAddress(?\Mautic\CoreBundle\Entity\IpAddress $ipAddress): void
+    public function setIpAddress(?IpAddress $ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }

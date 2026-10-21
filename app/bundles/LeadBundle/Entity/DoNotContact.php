@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: DoNotContactRepository::class)]
 #[ORM\Table(name: 'lead_donotcontact')]
@@ -114,7 +115,7 @@ class DoNotContact
         return $this->id;
     }
 
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
