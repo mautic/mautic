@@ -14,7 +14,7 @@
         <th>
             {% include '@MauticCore/Components/checkbox.html.twig' with {
                 items: [{ id: 'contact_channels_subscribed_channels_0', name: 'check_all', value: 'all', attributes: { onclick: "Mautic.togglePreferredChannel('all');" } }]
-            } %}
+            } only %}
         </th>
         <th>{{ 'mautic.lead.contact.channels'|trans }}</th>
         <th>{{ 'mautic.lead.preferred.frequency'|trans }}</th>
@@ -33,7 +33,7 @@
             <th style="vertical-align: top" class="col-md-1">
                 {% include '@MauticCore/Components/checkbox.html.twig' with {
                     items: [{ id: channel.value, name: 'contact_channels[subscribed_channels][]', value: channel.value, checked: contactMe, attributes: { onclick: 'Mautic.togglePreferredChannel(this.value);' } }]
-                } %}
+                } only %}
             </th>
             <td class="col-md-1" style="vertical-align: top">
                 <div id="is-contactable-{{ channel.value }}" class="{{ isContactable }} fw-sb">

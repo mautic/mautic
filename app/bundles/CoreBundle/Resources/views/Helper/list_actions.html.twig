@@ -19,7 +19,7 @@
         {% include '@MauticCore/Components/checkbox.html.twig' with {
             name: 'cb' ~ id,
             items: [{ value: id, className: 'list-checkbox', attributes: { 'data-target': 'tbody', 'data-toggle': 'selectrow' } }]
-        } %}
+        } only %}
     </span>
 
     <div class="ml-xs">

@@ -25,7 +25,7 @@
         <div id="category-1" class="text-left">
             {% include '@MauticCore/Components/checkbox.html.twig' with {
                 items: [{ id: 'lead_contact_frequency_rules_global_categories_1', name: 'lead_contact_frequency_rules[global_categories][]', value: '1', checked: true, label: 'mautic.core.category' }]
-            } %}
+            } only %}
         </div>
     </div>
 {% endif %}
