@@ -319,7 +319,8 @@ ul.tag-cloud li {
     background-color: var(--layer);
 }
 
-.filter--panel .help-block {
+.filter--panel .help-block,
+.filter--panel .form-text {
     position: absolute;
     bottom: -10px;
     right: 18px;
