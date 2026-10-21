@@ -16,25 +16,23 @@
 </head>
 <body>
 <section id="main" role="main">
-    <div class="container ml-a mr-a" style="margin-top:100px;">
-        <div class="row">
-            <div class="col-lg-4 col-lg-offset-4">
-                <div class="panel" name="form-login">
-                    <div class="panel-body">
-                        <div class="mautic-logo img-circle mb-md text-center">
-                            {{ source('@MauticCore/Assets/images/logo--minimized.svg') }}
-                        </div>
+    <div class="container ml-a mr-a" style="min-height:100vh;justify-content:center;">
+        <div class="d-flex jc-center">
+            <div class="layer-two">
+                <div name="form-login">
+                    <div class="tile p-0" style="width:450px;max-width:100%;">
+
                         <div id="main-panel-flash-msgs">
                             {{- include('@MauticCore/Notification/flashes.html.twig') -}}
                         </div>
                         {% block content %}{% endblock %}
                     </div>
-                </div>
+                    <div class="row">
+            <div class="pt-8 ps-5 pe-5 type-helper-text-01 fs-10 text-secondary">
+                {{ 'mautic.core.copyright'|trans({'%date%' : date('Y').format('Y') }) }}
             </div>
         </div>
-         <div class="row">
-            <div class="col-lg-4 col-lg-offset-4 text-center text-secondary">
-                {{ 'mautic.core.copyright'|trans({'%date%' : date('Y').format('Y') }) }}
+                </div>
             </div>
         </div>
     </div>

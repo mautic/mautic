@@ -15,10 +15,16 @@
 {% endblock %}
 
 {% block mainContent %}
-	{% if oidcSettings is defined and oidcSettings.isEnabled and oidcSettings.isRequired %}
-		{% include '@MauticUser/Security/oidc_login_top.html.twig' with {parameters: oidcSettings} %}
-	{% endif %}
-	<form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="{{ path('mautic_user_logincheck') }}" method="post">
+		{% if not app.request.xmlHttpRequest %}
+		<div class="mb-32 ps-16 pe-16 pt-16">
+			<h1 class="type-fluid-paragraph-01">{% trans %}mautic.user.auth.header{% endtrans %}</h1>
+			<span class="text-secondary type-helper-text-01">Need help? Contact your administrator.</span>
+		</div>
+		{% endif %}
+		{% if oidcSettings is defined and oidcSettings.isEnabled and oidcSettings.isRequired %}
+			{% include '@MauticUser/Security/oidc_login_top.html.twig' with {parameters: oidcSettings} %}
+		{% endif %}
+		<form class="login-form bdr-t" name="login" data-toggle="ajax" role="form" action="{{ path('mautic_user_logincheck') }}" method="post">
 		{% include '@MauticCore/Components/text-input.html.twig' with {
 			variant: 'fluid',
 			id: 'username',
@@ -45,16 +51,20 @@
 		</div>
 
 		<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate')|escape }}"/>
-		{% include '@MauticCore/Helper/button.html.twig' with {
-			buttons: [
-				{
-					label: 'mautic.user.auth.form.loginbtn',
-					variant: 'primary',
-					size: 'lg',
-					wide: true
-				}
-			]
-		} %}
+		<div class="mt-24 row-no-gutters justify-content-end">
+			<div class="col-xs-6">
+				{% include '@MauticCore/Helper/button.html.twig' with {
+					buttons: [{
+						label: 'mautic.user.auth.form.loginbtn',
+						variant: 'primary',
+						size: 'xl',
+						wide: true,
+						icon: 'ri-arrow-right-line',
+						attributes: {type: 'submit', id: 'form-loginbtn'}
+					}]
+				} only %}
+			</div>
+		</div>
 	</form>
 	{% if integrations is not empty %}
 		<ul class="list-group">
