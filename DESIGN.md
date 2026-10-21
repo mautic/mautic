@@ -51,43 +51,43 @@ colors:
 
 Type classes are defined in `app/bundles/CoreBundle/Assets/css/app/scss/components/_type.scss`. Use them instead of writing the styles again.
 
-The UI uses **Source Sans 3**, with Helvetica Neue, Helvetica, Arial and sans-serif as fallbacks. Monospace text uses Menlo, Monaco, Consolas, Courier New and monospace. Sizes, line heights, weights and letter spacing come from the tokens below.
+The UI uses **Source Sans 3**, with Helvetica Neue, Helvetica, Arial and sans-serif as fallbacks. Monospace text uses Menlo, Monaco, Consolas, Courier New and monospace. Apply the tokens below through the matching `.type-*` classes (for example `.type-heading-06`); plain `h1`–`h6` tags do not use them by default.
 
 ### Design Tokens
 
 ```yaml
 typography:
-  h1:
+  heading-06:
     fontSize: "var(--heading-06-font-size, 42px)"
     lineHeight: "var(--heading-06-line-height, 50px)"
     fontWeight: "var(--heading-06-font-weight, 300)"
     letterSpacing: "var(--heading-06-letter-spacing, 0px)"
-  h2:
+  heading-05:
     fontSize: "var(--heading-05-font-size, 32px)"
     lineHeight: "var(--heading-05-line-height, 40px)"
     fontWeight: "var(--heading-05-font-weight, 400)"
     letterSpacing: "var(--heading-05-letter-spacing, 0px)"
-  h3:
+  heading-04:
     fontSize: "var(--heading-04-font-size, 28px)"
     lineHeight: "var(--heading-04-line-height, 36px)"
     fontWeight: "var(--heading-04-font-weight, 400)"
     letterSpacing: "var(--heading-04-letter-spacing, 0px)"
-  h4:
+  heading-03:
     fontSize: "var(--heading-03-font-size, 20px)"
     lineHeight: "var(--heading-03-line-height, 28px)"
     fontWeight: "var(--heading-03-font-weight, 400)"
     letterSpacing: "var(--heading-03-letter-spacing, 0px)"
-  h5:
+  heading-02:
     fontSize: "var(--heading-02-font-size, 16px)"
     lineHeight: "var(--heading-02-line-height, 24px)"
     fontWeight: "var(--heading-02-font-weight, 600)"
     letterSpacing: "var(--heading-02-letter-spacing, 0px)"
-  body:
+  body-01:
     fontSize: "var(--body-01-font-size, 14px)"
     lineHeight: "var(--body-01-line-height, 20px)"
     fontWeight: "var(--body-01-font-weight, 400)"
     letterSpacing: "var(--body-01-letter-spacing, 0.16px)"
-  helper:
+  helper-text-01:
     fontSize: "var(--helper-text-01-font-size, 12px)"
     lineHeight: "var(--helper-text-01-line-height, 16px)"
     fontWeight: "var(--helper-text-01-font-weight, 400)"
@@ -262,7 +262,6 @@ toggletip: "Use to reveal a short explanation that the user opens by clicking th
 ```yaml
 uishell: "Use for the global app header with skip link, menu toggle, brand and actions."
 ```
-
 
 ## Do's and Don'ts
 
