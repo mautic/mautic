@@ -1905,7 +1905,7 @@ class LeadModel extends FormModel
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$canViewOthers) {
-            $filter             = ['owner_id' => $this->userHelper->getUser()->getId()];
+            $filters             = ['owner_id' => $this->userHelper->getUser()->getId()];
         }
 
         $identified = $query->count('leads', 'date_identified', 'date_added', $filters);
