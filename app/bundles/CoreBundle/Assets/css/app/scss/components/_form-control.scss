@@ -1,0 +1,147 @@
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px var(--field) inset, inset 0 -1px 0 var(--border-strong);
+    -webkit-text-fill-color: var(--text-primary);
+    transition: background-color 5000s ease-in-out 0s, box-shadow var(--duration-productive) var(--easing-standard-productive);
+}
+
+input:-webkit-autofill:hover {
+    -webkit-box-shadow: 0 0 0 1000px var(--field-hover) inset, inset 0 -1px 0 var(--border-strong);
+    -webkit-text-fill-color: var(--text-primary);
+    transition: background-color 5000s ease-in-out 0s, box-shadow var(--duration-productive) var(--easing-standard-productive);
+}
+
+.form-control,
+.form-select {
+    &:hover,
+    &:focus {
+        background-color: var(--field-hover);
+    }
+}
+
+.form-control,
+.input-group-text,
+.form-select {
+    border-bottom: 1px solid var(--border-strong);
+}
+
+.input-group-text {
+    &.prepend::after,
+    &.append::before {
+        content: '';
+        display: block;
+        width: 1px;
+        height: 1rem;
+        background-color: var(--border-subtle);
+        position: absolute;
+    }
+    &.prepend::after {
+        right: 0;
+    }
+    &.append::before {
+        left: 0;
+    }
+}
+
+// When the field in an input group is disabled, blend the addon into the same
+// disabled look and drop the separator so the whole control reads as inactive.
+.input-group:has(.form-control:disabled) .input-group-text {
+    background-color: var(--bs-secondary-bg);
+    color: var(--text-disabled);
+
+    > i {
+        color: var(--text-disabled);
+    }
+
+    &.prepend::after,
+    &.append::before {
+        display: none;
+    }
+}
+
+.form-field-with-action,
+.form-field-with-number {
+    position: relative;
+}
+
+.form-field-with-action > .form-control {
+    padding-right: 40px;
+}
+
+.form-field-with-number > .form-control {
+    padding-right: 96px;
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+.form-field-with-number > .form-control::-webkit-outer-spin-button,
+.form-field-with-number > .form-control::-webkit-inner-spin-button {
+    margin: 0;
+    -webkit-appearance: none;
+}
+
+.form-field-icon {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    color: var(--text-helper);
+    pointer-events: none;
+}
+
+.form-field-clear,
+.form-field-toggle,
+.form-field-step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.form-field-clear,
+.form-field-toggle {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+}
+
+.form-field-clear {
+    right: 36px;
+}
+
+.form-field-clear[hidden] {
+    display: none;
+}
+
+.form-field-stepper {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: stretch;
+    height: 40px;
+}
+
+.form-field-step {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+    line-height: 16px;
+}
+
+.form-field-step:disabled {
+    color: var(--bs-gray-500);
+    cursor: not-allowed;
+}
+
+.form-field-step:not(:disabled):hover {
+    background-color: var(--field-hover);
+}
