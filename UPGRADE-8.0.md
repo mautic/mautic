@@ -1,6 +1,8 @@
-# Bootstrap 5 utility class renames
+# Upgrade notes
 
-Replace the custom utility classes listed below with their Bootstrap 5 equivalents in your templates, styles and scripts.
+## Notes
+
+Replace the classes and attributes listed below with their Bootstrap 5 equivalents in your templates, styles and scripts.
 
 - `va-m` → `align-middle`
 - `ai-center` → `align-items-center`
