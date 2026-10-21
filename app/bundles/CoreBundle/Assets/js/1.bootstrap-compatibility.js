@@ -1209,7 +1209,7 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         if (!container || !container.querySelectorAll || !window.bootstrap || !window.bootstrap.Popover) {
             return;
         }
-        container.querySelectorAll('[data-bs-toggle="popover"]:not([data-toggle="popover"])').forEach(function (element) {
+        container.querySelectorAll('[data-bs-toggle="popover"]:not([data-toggle="popover"]):not([data-quick-filter])').forEach(function (element) {
             window.bootstrap.Popover.getOrCreateInstance(element);
         });
     }
