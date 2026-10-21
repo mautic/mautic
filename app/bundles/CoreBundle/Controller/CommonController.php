@@ -613,10 +613,7 @@ class CommonController extends AbstractController implements MauticController
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }
 
-    /**
-     * @param array|\Iterator $toExport
-     */
-    protected function exportResultsAs(iterable $toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
+    protected function exportResultsAs(array|\Iterator $toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
     {
         if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
