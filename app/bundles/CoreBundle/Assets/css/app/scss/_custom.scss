@@ -11,7 +11,8 @@
 }
 
 // Fit the right menu to the screen no matter the viewport size
-.dropdown-menu-right {
+.dropdown-menu-right,
+.dropdown-menu-end {
   max-height: 85vh;
   overflow-y: auto;
 }
@@ -203,7 +204,8 @@ body.noscroll {
 }
 
 #app-content.content-only {
-  .toolbar-form-buttons.pull-right {
+  .toolbar-form-buttons.pull-right,
+  .toolbar-form-buttons.float-end {
     padding-right:20px;
   }
 }

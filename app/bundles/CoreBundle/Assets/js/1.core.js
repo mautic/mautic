@@ -49,11 +49,11 @@ mQuery.ajaxSetup({
 mQuery(document).on('click', function (e) {
     var target = mQuery(e.target);
     // Check if the click is outside the popover and its trigger
-    if (!target.closest('.popover').length && !target.closest('[data-toggle="popover"]').length) {
-        mQuery('[data-toggle="popover"]').each(function () {
+    if (!target.closest('.popover').length && !target.closest('[data-bs-toggle="popover"]').length) {
+        mQuery('[data-bs-toggle="popover"]').each(function () {
             var $this = mQuery(this);
             var popover = $this.data('bs.popover');
-            if (popover && popover.tip().hasClass('in')) {
+            if (popover && popover.tip().hasClass('show')) {
                 $this.popover('hide');
                 popover.inState.click = false; // Reset the internal click state
             }
@@ -69,21 +69,22 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
     Mautic.attachDismissHandlers();
 
     // Initialize popovers with custom configuration
-    mQuery('[data-toggle="popover"]').popover({
+    mQuery('[data-bs-toggle="popover"]:not([data-quick-filter])').popover({
         sanitize: false,
         content: function() {
             return mQuery(this).data('content');
         }
     });
+    mQuery('[data-quick-filter]').popover(Mautic.getQuickFilterPopoverOptions());
 
     // Handle popover shown event
-    mQuery('[data-toggle="popover"]').on('shown.bs.popover', function () {
-        mQuery('.popover-content select').chosen({
+    mQuery('[data-bs-toggle="popover"]').on('shown.bs.popover', function () {
+        mQuery('.popover-body select').chosen({
             allow_single_deselect: true,
             disable_search_threshold: 10
         });
 
-        mQuery('.popover-content [data-toggle="tooltip"], .popover-content [data-bs-toggle="tooltip"]').tooltip();
+        mQuery('.popover-body [data-bs-toggle="tooltip"]').tooltip();
     });
 });
 
@@ -362,7 +363,7 @@ var Mautic = {
      * Initializes list group toggle functionality.
      */
     initListGroupToggle: function(container) {
-        mQuery(container).on('click', '.list-group[data-toggle="list-group"] .list-group-item', function(e) {
+        mQuery(container).on('click', '.list-group[data-bs-toggle="list-group"] .list-group-item', function(e) {
             e.preventDefault(); // Prevent default action if necessary
 
             var $item = mQuery(this);
@@ -817,12 +818,12 @@ var Mautic = {
                     //update URL in address bar
                     history.pushState(null, "Mautic", response.route);
                 }
-            } else if (response.newContent && mQuery('.modal.in').length) {
+            } else if (response.newContent && mQuery('.modal.show').length) {
                 //assume a modal was the recipient of the information
-                mQuery('.modal.in .modal-body-content').html(response.newContent);
-                mQuery('.modal.in .modal-body-content').removeClass('hide');
-                if (mQuery('.modal.in  .loading-placeholder').length) {
-                    mQuery('.modal.in  .loading-placeholder').addClass('hide');
+                mQuery('.modal.show .modal-body-content').html(response.newContent);
+                mQuery('.modal.show .modal-body-content').removeClass('hide');
+                if (mQuery('.modal.show  .loading-placeholder').length) {
+                    mQuery('.modal.show  .loading-placeholder').addClass('hide');
                 }
             } else if (response.closeModal) {
                 if (typeof target !== "undefined") {
@@ -1001,7 +1002,7 @@ var Mautic = {
     clearNotification: function (id) {
         if (id) {
             mQuery("#notification" + id).fadeTo("fast", 0.01).slideUp("fast", function () {
-                mQuery(this).find("*[data-toggle='tooltip'], *[data-bs-toggle='tooltip']").tooltip('destroy');
+                mQuery(this).find("*[data-bs-toggle='tooltip']").tooltip('destroy');
                 mQuery(this).remove();
 
                 if (!mQuery('#notifications .notification').length) {

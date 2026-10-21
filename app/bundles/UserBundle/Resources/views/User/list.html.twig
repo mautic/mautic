@@ -17,7 +17,7 @@
 				'attr': {
 					'class': 'btn btn-ghost btn--icon-only btn-nospin',
 					'href': '#InviteUserModal',
-					'data-toggle': 'modal',
+					'data-bs-toggle': 'modal',
 				},
 				'iconClass': 'ri-team-line',
 				'tooltip': 'mautic.user.profile.invite',
@@ -96,7 +96,7 @@
 					'label': 'mautic.core.form.cancel'|trans,
 					'variant': 'secondary',
 					'attributes': {
-						'data-dismiss': 'modal'
+						'data-bs-dismiss': 'modal'
 					}
 				},
 				{
@@ -179,7 +179,7 @@
                    }) -}}
 						</td>
 						<td class="visible-md visible-lg">
-							<img class="img img-responsive img-thumbnail w-44" src="{{ gravatarGetImage(item.getEmail(), '50') }}"/>
+							<img class="img img-fluid img-thumbnail w-44" src="{{ gravatarGetImage(item.getEmail(), '50') }}"/>
 						</td>
 						<td>
 							<div>

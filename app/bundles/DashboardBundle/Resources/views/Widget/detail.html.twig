@@ -3,10 +3,10 @@
         <h4 class="fw-sb">{{ widget.name|purify }}</h4>
         {% if widget.id %}
             <div class="dropdown">
-                <a class="btn btn-ghost btn--icon-only btn-xs dropdown-toggle" data-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
+                <a class="btn btn-ghost btn--icon-only btn-xs dropdown-toggle" data-bs-toggle="dropdown" href="#" aria-haspopup="true" aria-expanded="false">
                     <i class="ri-more-2-fill"></i>
                 </a>
-                <ul class="dropdown-menu dropdown-menu-right">
+                <ul class="dropdown-menu dropdown-menu-end">
                     <li class="small fw-sb text-secondary ma-md ellipsis">
                         {% if widget.isCached %}
                             <i class="ri-history-line mr-xs"></i>

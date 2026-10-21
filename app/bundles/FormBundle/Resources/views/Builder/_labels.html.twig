@@ -35,8 +35,8 @@
                     icon: typeIcons[field.type] ?? 'ri-input-field',
                     color: isConditional ? 'warm-gray' : 'high-contrast',
                     attributes: {
-                        'data-toggle': 'tooltip',
-                        'data-original-title': 'mautic.form.field.type'|trans
+                        'data-bs-toggle': 'tooltip',
+                        'data-bs-title': 'mautic.form.field.type'|trans
                     }
                 }
             ]
@@ -56,7 +56,7 @@
                     (field.mappedObject == 'contact' ? ('mautic.lead.field.' ~ field.mappedField) :
                     (field.mappedObject == 'company' ? ('mautic.lead.field.' ~ field.mappedField) : field.mappedField)),
             'attributes': {
-                'data-toggle': 'tooltip',
+                'data-bs-toggle': 'tooltip',
                 'title': 'mautic.core.field.mapped.to'|trans({'%object%': objectLabel})
             }
         }]
@@ -115,7 +115,7 @@
                     icon: 'ri-forward-end-mini-fill',
                     color: 'blue',
                     'attributes': {
-                        'data-toggle': 'tooltip',
+                        'data-bs-toggle': 'tooltip',
                         'title': 'mautic.form.field.hide.if.submission.count'|trans({'%count%': field.showAfterXSubmissions})
                     }
                 }
