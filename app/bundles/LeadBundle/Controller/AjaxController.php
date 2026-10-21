@@ -29,6 +29,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Services\ContactColumnsDictionary;
@@ -806,8 +807,13 @@ final class AjaxController extends CommonAjaxController
     /**
      * @throws \Exception
      */
-    public function getLeadCountAction(Request $request, ListModel $model): JsonResponse
+    public function getLeadCountAction(Request $request, ListModel $model, CorePermissions $corePermissions): JsonResponse
     {
+        if (!$corePermissions->isGranted(LeadPermissions::LISTS_VIEW_OWN)
+            && !$corePermissions->isGranted(LeadPermissions::LISTS_VIEW_OTHER)) {
+            $this->throwAccessDenied();
+        }
+
         $id = (int) InputHelper::clean($request->get('id'));
 
         $leadList = $model->getEntity($id);

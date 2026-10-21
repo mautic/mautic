@@ -980,6 +980,19 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('data-model="category.category"', (string) $response['viewParameters']['form']);
     }
 
+    public function testGetLeadCountActionAuthorisationForInadequatePermissions(): void
+    {
+        $userRepository = $this->em->getRepository(User::class);
+        $this->assertInstanceOf(UserRepository::class, $userRepository);
+
+        $user = $userRepository->findOneBy(['username' => 'sales']);
+        $this->assertInstanceOf(User::class, $user);
+
+        $this->loginUser($user);
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLeadCount&id=1');
+        $this->assertResponseStatusCodeSame(403, 'The user without view own/others permission should not be able to access the getLeadCount action.');
+    }
+
     /**
      * @return array<int, array<string, mixed>>
      */
