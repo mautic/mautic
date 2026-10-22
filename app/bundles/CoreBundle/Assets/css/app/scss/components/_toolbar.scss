@@ -3,20 +3,16 @@
 }
 
     .toolbar--toolbar-content {
-    .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
     .form-control.search,
     .search-scope-select,
-    .input-group .input-group-btn button,
     .btn,
     div {
       height: 48px;
       border-radius: unset;
       margin: 0;
     }
-    .input-group .twitter-typeahead:last-child .tt-input, .input-group .twitter-typeahead:last-child .tt-hint,
     .form-control.search,
     .search-scope-select,
-    .input-group .input-group-btn button,
     .btn-ghost {
         border: var(--border-no-width);
         &:hover { background-color: var(--field-hover); }

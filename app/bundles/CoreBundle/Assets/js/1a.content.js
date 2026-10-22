@@ -1337,6 +1337,7 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
     const setSearchInputValue = function (value) {
         Mautic.suppressLiveSearch = true;
         searchInput.val(value);
+        searchInput[0].dispatchEvent(new Event('input', { bubbles: true }));
         // Only sync typeahead when it is already initialized (bundle OnLoad runs later).
         if (searchInput.parent('.twitter-typeahead').length) {
             searchInput.typeahead('val', value);
@@ -1346,7 +1347,6 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
 
     if (!scopeSelect.length) {
         setSearchInputValue(initialSearch);
-        Mautic.updateLiveSearchButton(searchId, initialSearch);
 
         return;
     }
@@ -1377,7 +1377,6 @@ Mautic.applySearchScopeState = function (searchEl, searchString) {
     const visibleValue = parsed.command ? parsed.value : initialSearch;
     setSearchInputValue(visibleValue);
     Mautic.refreshSearchScopeChosen(scopeSelect);
-    Mautic.updateLiveSearchButton(searchId, initialSearch);
 };
 
 /**
@@ -1706,27 +1705,6 @@ Mautic.getLiveSearchFilterValue = function (elId) {
 };
 
 /**
- * Toggle the livesearch button between search and clear (eraser) icons.
- */
-Mautic.updateLiveSearchButton = function (elId, filterValue) {
-    const btn = mQuery("button[data-livesearch-parent='" + elId + "']");
-    if (!btn.length) {
-        return;
-    }
-
-    filterValue = (filterValue || '').trim();
-    const icon = btn.children('i').first();
-
-    if (filterValue) {
-        btn.attr('data-livesearch-action', 'clear');
-        icon.removeClass('ri-search-line').addClass('ri-eraser-line');
-    } else {
-        btn.attr('data-livesearch-action', 'search');
-        icon.removeClass('ri-eraser-line').addClass('ri-search-line');
-    }
-};
-
-/**
  * Apply the selected search scope immediately (used by the scope dropdown).
  */
 Mautic.submitSearchScopeChange = function (scopeSelect, searchInput, searchId) {
@@ -1749,7 +1727,6 @@ Mautic.submitSearchScopeChange = function (scopeSelect, searchInput, searchId) {
                 searchInput.attr('data-target'),
                 'liveCache'
             );
-            Mautic.updateLiveSearchButton(searchId, scopedValue);
         }
 
         searchInput.trigger('focus');
@@ -1772,7 +1749,6 @@ Mautic.submitSearchScopeChange = function (scopeSelect, searchInput, searchId) {
         searchInput.attr('data-target'),
         'liveCache'
     );
-    Mautic.updateLiveSearchButton(searchId, scopedValue);
 };
 
 /**
@@ -1913,9 +1889,6 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
 
     let activeIndex = -1;
 
-    //find associated button
-    var btn = "button[data-livesearch-parent='" + mQuery(el).attr('id') + "']";
-
     mQuery(el).on('focus', function () {
         Mautic.currentSearchString = mQuery(this).val().trim();
     });
@@ -2007,26 +1980,6 @@ Mautic.activateLiveSearch = function (el, searchStrVar, liveCacheVar) {
             }
         }
     });
-
-    if (mQuery(btn).length) {
-        mQuery(btn).on('click', {'parent': mQuery(el).attr('id')}, function (event) {
-            var searchStr = mQuery(el).val().trim();
-            MauticVars[searchStrVar] = searchStr;
-
-            Mautic.filterButtonClicked = true;
-
-            Mautic.filterList(
-                event,
-                event.data.parent,
-                mQuery('#' + event.data.parent).attr('data-action'),
-                mQuery('#' + event.data.parent).attr('data-target'),
-                'liveCache',
-                mQuery(this).attr('data-livesearch-action')
-            );
-        });
-
-        Mautic.updateLiveSearchButton(mQuery(el).attr('id'), Mautic.getLiveSearchFilterValue(mQuery(el).attr('id')));
-    }
 
     if (Mautic.isGlobalSearchInput(el)) {
         mQuery(el).off('keydown.globalSearchNav');
@@ -2575,6 +2528,7 @@ Mautic.applyFilters = function () {
 
     const newSearchValue = (currentSearchValue + ' ' + searchCommands.concat(selectedFilterValues).join(' ')).trim();
     searchInput.value = newSearchValue;
+    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
 
     // Properly destroy and reinitialize popover
     const popoverTrigger = mQuery('[data-toggle="popover"]');
@@ -2616,7 +2570,6 @@ Mautic.resetFilters = function () {
     }
 
     if (typeof mQuery !== 'undefined') {
-        Mautic.updateLiveSearchButton('list-search', '');
     }
 
     const activeFilters = document.querySelectorAll('.label.active');
@@ -2799,6 +2752,26 @@ document.addEventListener('click', (event) => {
     wrapper.querySelector('.search-expandable__field input').focus();
 });
 
+const clearSearchField = (clear, field) => {
+    const isLiveSearch = field.dataset.toggle === 'livesearch';
+    if (isLiveSearch) {
+        MauticVars.lastSearchStr = field.value.trim();
+    }
+
+    field.value = '';
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+
+    if (isLiveSearch) {
+        const event = mQuery.Event('click', { target: clear });
+        event.data = {};
+        Mautic.filterList(event, field.id, field.dataset.action, field.dataset.target, 'liveCache', 'clear');
+    } else {
+        field.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    field.focus();
+};
+
 const collapseSearchExpandable = (wrapper) => {
     wrapper.classList.remove('is-open');
     wrapper.querySelector('.search-expandable__field').hidden = true;
@@ -2813,7 +2786,8 @@ document.addEventListener('keydown', (event) => {
     const input = event.target.closest('.search-expandable__field input');
     if (!input) return;
 
-    input.value = '';
+    const clear = input.closest('.form-field-with-action').querySelector('.form-field-clear');
+    if (input.value !== '') clearSearchField(clear, input);
     collapseSearchExpandable(input.closest('[data-search-expandable]')).focus();
 });
 
@@ -2828,11 +2802,7 @@ document.addEventListener('click', (event) => {
     const clear = event.target.closest('.form-field-clear');
     if (!clear) return;
 
-    const field = clear.parentElement.querySelector('input:not(.tt-hint)');
-    field.value = '';
-    field.dispatchEvent(new Event('input', { bubbles: true }));
-    field.dispatchEvent(new Event('change', { bubbles: true }));
-    field.focus();
+    clearSearchField(clear, clear.parentElement.querySelector('input:not(.tt-hint)'));
 });
 
 // Initialize filter commands on page load

@@ -58,10 +58,10 @@ input:-webkit-autofill:hover {
     padding-right: 40px;
 }
 
-[data-size='xs'] { --search-height: var(--spacing-06); }
-[data-size='sm'] { --search-height: var(--spacing-07); }
-[data-size='md'] { --search-height: var(--spacing-08); }
-[data-size='lg'] { --search-height: var(--spacing-09); }
+.form-field-with-action[data-size='xs'], .search-expandable[data-size='xs'] { --search-height: var(--spacing-06); }
+.form-field-with-action[data-size='sm'], .search-expandable[data-size='sm'] { --search-height: var(--spacing-07); }
+.form-field-with-action[data-size='md'], .search-expandable[data-size='md'] { --search-height: var(--spacing-08); }
+.form-field-with-action[data-size='lg'], .search-expandable[data-size='lg'] { --search-height: var(--spacing-09); }
 
 .form-field-with-action[data-size] .form-control,
 .search-expandable[data-size] .form-control {
@@ -166,7 +166,7 @@ input:-webkit-autofill:hover {
     }
 
     &:focus-visible {
-        outline: 2px solid var(--focus);
+        outline: 2px var(--outline-style) var(--focus);
         outline-offset: -2px;
     }
 }
