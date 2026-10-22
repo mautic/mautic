@@ -330,20 +330,20 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('0', $this->getConfigPageForm('leadconfig')['config[leadconfig][contact_export_notify_admins]']->getValue());
     }
 
-    public function testFormSubmitWithoutTrackingConfigDefaultsToDisabledAndCanBeEnabled(): void
+    public function testFormTrackSubmittersConfigDefaultsToEnabledAndCanBeDisabled(): void
     {
-        $this->assertSame('0', $this->getConfigPageForm('formconfig')['config[formconfig][form_submit_without_tracking]']->getValue());
-        $this->assertStringContainsString('Submit forms without tracking the submitter (no cookies, device or IP address)', (string) $this->client->getResponse()->getContent());
+        $this->assertSame('1', $this->getConfigPageForm('formconfig')['config[formconfig][form_track_submitters]']->getValue());
+        $this->assertStringContainsString('Track submitters on form submission', (string) $this->client->getResponse()->getContent());
 
         $this->submitConfigPage('formconfig', [
-            'config[formconfig][form_submit_without_tracking]' => '1',
+            'config[formconfig][form_track_submitters]' => '0',
         ]);
 
         $configParameters = $this->getConfigParameters();
-        $this->assertArrayHasKey('form_submit_without_tracking', $configParameters);
-        $this->assertTrue((bool) $configParameters['form_submit_without_tracking']);
+        $this->assertArrayHasKey('form_track_submitters', $configParameters);
+        $this->assertFalse((bool) $configParameters['form_track_submitters']);
 
-        $this->assertSame('1', $this->getConfigPageForm('formconfig')['config[formconfig][form_submit_without_tracking]']->getValue());
+        $this->assertSame('0', $this->getConfigPageForm('formconfig')['config[formconfig][form_track_submitters]']->getValue());
     }
 
     public function testRestrictedAssetFieldIsNotRenderedInConfigForm(): void

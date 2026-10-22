@@ -405,11 +405,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
-     * Looking up the visitor while rendering a form would track them, so it is skipped when forms are set to submit without tracking.
+     * Looking up the visitor while rendering a form would track them, so it is skipped when form submitters are not tracked.
      */
     private function tracksVisitors(): bool
     {
-        return !$this->coreParametersHelper->get('form_submit_without_tracking');
+        return (bool) $this->coreParametersHelper->get('form_track_submitters');
     }
 
     /**

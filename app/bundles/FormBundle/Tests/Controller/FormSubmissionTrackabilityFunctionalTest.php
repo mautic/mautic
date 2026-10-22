@@ -30,7 +30,7 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        $this->configParams['form_submit_without_tracking'] = str_contains((string) $this->dataName(), 'forms submitted without tracking');
+        $this->configParams['form_track_submitters'] = !str_contains((string) $this->dataName(), 'submitters not tracked');
 
         parent::setUp();
     }
@@ -42,7 +42,7 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
     {
         yield 'Do Not Track' => [['HTTP_DNT' => '1'], false];
         yield 'Global Privacy Control' => [['HTTP_SEC_GPC' => '1'], false];
-        yield 'trackable visitor, forms submitted without tracking' => [[], false];
+        yield 'trackable visitor, submitters not tracked' => [[], false];
         yield 'trackable visitor' => [[], true];
     }
 
@@ -201,9 +201,9 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         yield 'standard form, Global Privacy Control' => [false, ['HTTP_SEC_GPC' => '1'], false];
         yield 'kiosk form, trackable visitor' => [true, [], false];
         yield 'kiosk form, Do Not Track' => [true, ['HTTP_DNT' => '1'], false];
-        yield 'standard form, trackable visitor, forms submitted without tracking' => [false, [], false];
-        yield 'kiosk form, trackable visitor, forms submitted without tracking' => [true, [], false];
-        yield 'standard form, Do Not Track, forms submitted without tracking' => [false, ['HTTP_DNT' => '1'], false];
+        yield 'standard form, trackable visitor, submitters not tracked' => [false, [], false];
+        yield 'kiosk form, trackable visitor, submitters not tracked' => [true, [], false];
+        yield 'standard form, Do Not Track, submitters not tracked' => [false, ['HTTP_DNT' => '1'], false];
         yield 'standard form, trackable visitor' => [false, [], true];
     }
 

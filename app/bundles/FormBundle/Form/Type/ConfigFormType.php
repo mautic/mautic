@@ -30,12 +30,12 @@ final class ConfigFormType extends AbstractType
         );
 
         $builder->add(
-            'form_submit_without_tracking',
+            'form_track_submitters',
             YesNoButtonGroupType::class,
             [
-                'label' => 'mautic.form.config.form.form_submit_without_tracking',
+                'label' => 'mautic.form.config.form.form_track_submitters',
                 'attr'  => [
-                    'tooltip' => 'mautic.form.config.form.form_submit_without_tracking.tooltip',
+                    'tooltip' => 'mautic.form.config.form.form_track_submitters.tooltip',
                 ],
             ]
         );

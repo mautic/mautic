@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * With forms set to submit without tracking, no form tracks the submitter, the same as kiosk mode and DNT/GPC.
+ * With tracking submitters turned off, no form tracks the submitter, the same as kiosk mode and DNT/GPC.
  */
 final class FormSubmitWithoutTrackingFunctionalTest extends MauticMysqlTestCase
 {
@@ -29,8 +29,8 @@ final class FormSubmitWithoutTrackingFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        $this->configParams['form_submit_without_tracking'] = 'testTrackedVisitorIsStillTrackedWhileTheOptionIsOff' !== $this->name();
-        $this->configParams['form_field_autofill']          = true;
+        $this->configParams['form_track_submitters'] = 'testTrackedVisitorIsStillTrackedWhileTheOptionIsOn' === $this->name();
+        $this->configParams['form_field_autofill']   = true;
 
         parent::setUp();
     }
@@ -40,7 +40,7 @@ final class FormSubmitWithoutTrackingFunctionalTest extends MauticMysqlTestCase
      */
     #[PreserveGlobalState(false)]
     #[RunInSeparateProcess]
-    public function testExistingTrackingCookiesAreIgnoredWhileTheOptionIsOn(): void
+    public function testExistingTrackingCookiesAreIgnoredWhileTheOptionIsOff(): void
     {
         $formId         = $this->createForm();
         $trackedContact = $this->createTrackedVisitor();
@@ -66,7 +66,7 @@ final class FormSubmitWithoutTrackingFunctionalTest extends MauticMysqlTestCase
         $this->assertNull($this->em->find(Lead::class, $trackedContact->getId())?->getEmail());
     }
 
-    public function testAjaxSubmissionIsNotLinkedToTheTrackedContactWhileTheOptionIsOn(): void
+    public function testAjaxSubmissionIsNotLinkedToTheTrackedContactWhileTheOptionIsOff(): void
     {
         $formId         = $this->createForm();
         $trackedContact = $this->createTrackedVisitor();
@@ -87,7 +87,7 @@ final class FormSubmitWithoutTrackingFunctionalTest extends MauticMysqlTestCase
         $this->assertNotSame($trackedContact->getId(), $submission->getLead()->getId());
     }
 
-    public function testFormWithoutContactFieldsCreatesNoContactWhileTheOptionIsOn(): void
+    public function testFormWithoutContactFieldsCreatesNoContactWhileTheOptionIsOff(): void
     {
         $formId = $this->createForm([['label' => 'Comment', 'type' => 'text', 'alias' => 'comment']]);
 
@@ -111,7 +111,7 @@ final class FormSubmitWithoutTrackingFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $this->em->getRepository(Lead::class)->findAll());
     }
 
-    public function testTrackedVisitorIsStillTrackedWhileTheOptionIsOff(): void
+    public function testTrackedVisitorIsStillTrackedWhileTheOptionIsOn(): void
     {
         $formId         = $this->createForm();
         $trackedContact = $this->createTrackedVisitor();
@@ -134,7 +134,7 @@ final class FormSubmitWithoutTrackingFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * A visitor tracked before forms were set to submit without tracking still sends the tracking cookies.
+     * A visitor tracked before tracking submitters was turned off still sends the tracking cookies.
      */
     private function createTrackedVisitor(): Lead
     {
