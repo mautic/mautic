@@ -24,7 +24,7 @@ final class BatchType extends AbstractType
                 'multiple'          => true,
                 'choices'           => $options['items'],
                 'required'          => false,
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => ['class' => 'form-control'],
             ]
         );
@@ -37,7 +37,7 @@ final class BatchType extends AbstractType
                 'multiple'          => true,
                 'choices'           => $options['items'],
                 'required'          => false,
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => ['class' => 'form-control'],
             ]
         );
@@ -52,7 +52,7 @@ final class BatchType extends AbstractType
                 'save_text'      => 'mautic.core.form.save',
                 'cancel_onclick' => 'javascript:void(0);',
                 'cancel_attr'    => [
-                    'data-dismiss' => 'modal',
+                    'data-bs-dismiss' => 'modal',
                 ],
             ]
         );

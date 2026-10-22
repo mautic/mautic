@@ -17,7 +17,31 @@ parameters:
 		property: 71.6
 		# wait for PHP 8.3 before changing
 		constant: 3
-		declare: 73
+
+	# rules merged from rector/type-perfect, opt-in since type-coverage 2.3
+	type_perfect:
+		no_param_type_removal: true
+		no_isset_on_object: true
+		no_empty_on_object: true
+
+	# phpstan-rules 14.19 enables most of these sets by default; keep them off on 7.x,
+	# the rules this branch relies on are registered explicitly under "rules"
+	symplify:
+		naming: false
+		complexity: false
+		configurable: false
+		static: false
+		modern: false
+		symfony: false
+		symfonyConfig: false
+		doctrine: false
+		collections: false
+		phpunit: false
+		mocks: false
+		ctor: false
+		symfonyReturnType: false
+		laravelReturnType: false
+		pathStrings: false
 	paths:
 		- app/bundles
 		- app/migrations
@@ -222,8 +246,6 @@ parameters:
 		-
 			identifier: symplify.noJustPropertyAssign
 			path: app/bundles/ApiBundle/Serializer/Driver/ApiMetadataDriver.php
-		-
-			identifier: typePerfect.noArrayAccessOnObject
 		# @todo the form factory has to move into FormModel::createForm() first, which every model shares
 		-
 			identifier: mautic.noServiceJuggling
