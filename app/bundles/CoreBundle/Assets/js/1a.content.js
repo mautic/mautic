@@ -2772,12 +2772,11 @@ Mautic.handlePopoverInsertion = function () {
 };
 
 mQuery(document).off('click.passwordVisibility', '.form-field-toggle').on('click.passwordVisibility', '.form-field-toggle', function () {
-    const toggle = this;
-    const field = toggle.parentElement.querySelector('input');
+    const field = this.parentElement.querySelector('input');
     const shown = field.type === 'text';
     field.type = shown ? 'password' : 'text';
-    toggle.setAttribute('aria-label', shown ? toggle.dataset.labelShow : toggle.dataset.labelHide);
-    toggle.querySelector('i').className = shown ? 'ri-eye-line' : 'ri-eye-off-line';
+    this.setAttribute('aria-label', shown ? this.dataset.labelShow : this.dataset.labelHide);
+    this.querySelector('i').className = shown ? 'ri-eye-line' : 'ri-eye-off-line';
 });
 
 // Initialize filter commands on page load
