@@ -37,7 +37,7 @@
 </div>
 {% elseif variant == 'expandable' %}
 <div class="search-expandable{{ wrapperClass ? ' ' ~ wrapperClass : '' }}" data-search-expandable>
-    <button type="button" class="btn btn-transparent search-expandable__toggle" aria-expanded="false" aria-controls="{{ id }}" aria-label="{{ labelText|trans }}">
+    <button type="button" class="btn btn-transparent btn-nospin search-expandable__toggle" aria-expanded="false" aria-controls="{{ id }}" aria-label="{{ labelText|trans }}">
         <i class="ri-search-line" aria-hidden="true"></i>
     </button>
     <div class="search-expandable__field form-field-with-action" hidden>
