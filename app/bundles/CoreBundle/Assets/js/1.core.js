@@ -60,7 +60,7 @@ mQuery(document).on('click', function (e) {
             var popover = $this.data('bs.popover');
             if (popover && popover.tip().hasClass('in')) {
                 $this.popover('hide');
-                popover.inState.click = false;
+                popover.inState.click = false; // Reset the internal click state
             }
         });
     }
@@ -1129,6 +1129,5 @@ Mautic.initHelpTooltips = function () {
         this.addEventListener('hidden.bs.popover', () => this.setAttribute('aria-expanded', 'false'));
     });
 };
-
 
 Mautic.initDismiss();
