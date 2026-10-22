@@ -146,20 +146,20 @@
         box-shadow: 0 0 0 1000px var(--field-hover) inset, inset 0 -1px 0 var(--border-strong);
     }
 
-    &:has(> .form-control:disabled, > .form-select:disabled) > .form-fluid__label > label {
+    &:has(.form-control:disabled, .form-select:disabled) > .form-fluid__label > label {
         color: var(--bs-gray-600);
     }
 
-    &:has(> .form-control:focus, > .form-select:focus) {
+    &:has(.form-control:focus, .form-select:focus) {
         outline: 2px solid var(--border-interactive);
         outline-offset: -2px;
     }
 
-    &:has(> .form-control.is-invalid, > .form-select.is-invalid) {
+    &:has(.form-control.is-invalid, .form-select.is-invalid) {
         box-shadow: inset 0 -1px 0 var(--bs-danger);
     }
 
-    &:has(> .form-control.is-invalid:focus, > .form-select.is-invalid:focus) {
+    &:has(.form-control.is-invalid:focus, .form-select.is-invalid:focus) {
         outline-color: var(--bs-danger);
     }
 
