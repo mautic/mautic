@@ -52,11 +52,6 @@ mQuery(document).on('click', function (e) {
     if (!target.closest('.popover').length && !target.closest('[data-toggle="popover"]').length) {
         mQuery('[data-toggle="popover"]').each(function () {
             var $this = mQuery(this);
-            var bsPopover = bootstrap.Popover.getInstance(this);
-            if (bsPopover) {
-                bsPopover.hide();
-                return;
-            }
             var popover = $this.data('bs.popover');
             if (popover && popover.tip().hasClass('in')) {
                 $this.popover('hide');
@@ -81,7 +76,6 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
         }
     });
     mQuery('[data-quick-filter]').popover(Mautic.getQuickFilterPopoverOptions());
-
 
     // Handle popover shown event
     mQuery('[data-toggle="popover"], [data-bs-toggle="popover"]').on('shown.bs.popover', function () {
