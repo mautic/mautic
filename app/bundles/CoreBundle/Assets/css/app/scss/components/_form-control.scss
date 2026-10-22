@@ -54,8 +54,13 @@ input:-webkit-autofill:hover {
     position: relative;
 }
 
-.form-field-with-action > .form-control {
+.form-field-with-action .form-control {
     padding-right: 40px;
+}
+
+.form-field-with-action > .twitter-typeahead {
+    width: 100%;
+    vertical-align: top;
 }
 
 [data-size='xs'] { --search-height: var(--spacing-06); }
@@ -63,14 +68,14 @@ input:-webkit-autofill:hover {
 [data-size='md'] { --search-height: var(--spacing-08); }
 [data-size='lg'] { --search-height: var(--spacing-09); }
 
-.form-field-with-action[data-size] > .form-control,
+.form-field-with-action[data-size] .form-control,
 .search-expandable[data-size] .form-control {
     height: var(--search-height);
     padding-top: 0;
     padding-bottom: 0;
 }
 
-.form-field-with-action > .form-control:has(~ .form-field-clear) {
+.form-field-with-action:has(> .form-field-clear) .form-control {
     padding-right: var(--search-height, #{$input-height-base});
 }
 
@@ -91,6 +96,7 @@ input:-webkit-autofill:hover {
     top: 50%;
     right: 12px;
     transform: translateY(-50%);
+    z-index: 4;
     width: 16px;
     font-size: 16px;
     line-height: 16px;
@@ -103,7 +109,8 @@ input:-webkit-autofill:hover {
     left: calc((var(--search-height, #{$input-height-base}) - 16px) / 2);
 }
 
-.form-field-icon--start ~ .form-control {
+.form-field-icon--start ~ .form-control,
+.form-field-icon--start ~ .twitter-typeahead .form-control {
     padding-left: var(--search-height, #{$input-height-base});
 }
 
@@ -149,6 +156,7 @@ input:-webkit-autofill:hover {
     right: 0;
     width: var(--search-height, #{$input-height-base});
     height: var(--search-height, #{$input-height-base});
+    z-index: 4;
     font-size: 16px;
     line-height: 16px;
     isolation: isolate;

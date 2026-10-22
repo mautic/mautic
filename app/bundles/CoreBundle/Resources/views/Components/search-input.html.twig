@@ -23,7 +23,7 @@
     } only %}
 {% endset %}
 {% set clear %}
-    <button type="button" class="form-field-clear" aria-label="{{ clear_label }}" title="{{ clear_label }}" hidden>
+    <button type="button" class="form-field-clear" aria-label="{{ clear_label }}" title="{{ clear_label }}"{{ value|default('') is same as('') ? ' hidden' : '' }}>
         <i class="ri-close-line" aria-hidden="true"></i>
     </button>
 {% endset %}

@@ -2781,9 +2781,9 @@ mQuery(document).off('click.passwordVisibility', '.form-field-toggle').on('click
 
 document.addEventListener('input', (event) => {
     const field = event.target;
-    if (!field.matches || !field.matches('.form-field-with-action > input')) return;
+    if (!field.matches || !field.matches('.form-field-with-action input')) return;
 
-    const clear = field.parentElement.querySelector('.form-field-clear');
+    const clear = field.closest('.form-field-with-action').querySelector('.form-field-clear');
     if (clear) clear.hidden = field.value === '';
 });
 
@@ -2828,9 +2828,10 @@ document.addEventListener('click', (event) => {
     const clear = event.target.closest('.form-field-clear');
     if (!clear) return;
 
-    const field = clear.parentElement.querySelector('input');
+    const field = clear.parentElement.querySelector('input:not(.tt-hint)');
     field.value = '';
     field.dispatchEvent(new Event('input', { bubbles: true }));
+    field.dispatchEvent(new Event('change', { bubbles: true }));
     field.focus();
 });
 
