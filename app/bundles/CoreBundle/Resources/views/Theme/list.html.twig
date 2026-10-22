@@ -16,6 +16,7 @@
     {% include "@MauticCore/Helper/list_toolbar.html.twig" with {
         action: currentRoute,
         searchValue: searchValue|default(''),
+        searchPlaceholder: 'mautic.theme.search.placeholder',
         searchScopes: searchScopes|default([]),
         searchScopeHint: searchScopeHint|default(null),
         'bulk_actions': {
