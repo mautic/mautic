@@ -1,5 +1,6 @@
 {% set classes = ['btn', 'btn-nospin', 'btn-ghost'] %}
 {% set is_icon_only = not (label is defined and label) %}
+{% set toggletip_id = content is defined and content ? 'toggletip-' ~ content|u.replaceMatches('/[^a-zA-Z0-9]+/', '-')|u.lower()|u.slice(0, 60) : null %}
 {% set size_class = is_icon_only and not (size is defined and size) ? 'btn-toggletip' : (size is defined and size ? 'btn-' ~ size : 'btn-xs') %}
 {% set classes = classes|merge([size_class]) %}
 
@@ -11,16 +12,16 @@
 
 <span data-toggle="tooltip" title="{{ tooltip|default('mautic.core.toggletip')|trans }}" data-placement="left">
     <button type="button"
-        {% if content is defined and content %}id="toggletip-{{ content|u.replaceMatches('/[^a-zA-Z0-9]+/', '-')|u.lower()|u.slice(0, 60) }}"{% endif %}
+        {% if toggletip_id %}id="{{ toggletip_id }}-trigger" aria-controls="{{ toggletip_id }}" aria-expanded="false"{% endif %}
         class="{{ classes|join(' ') }}"
         data-toggle="popover"
         data-container="body"
         data-placement="{{ placement|default('right') }}"
         data-html="{{ html is defined and html ? 'true' : 'false' }}"
+        {% if toggletip_id %} data-content-source="{{ toggletip_id }}" {% endif %}
         data-trigger="{{ trigger|default('focus') }}"
         {% if selector is defined and selector %} data-selector="{{ selector }}" {% endif %}
         {% if title is defined and title %} title="{{ title|trans }}" {% endif %}
-        {% if content is defined and content %} data-content="{{ content|trans }}" {% endif %}
         aria-haspopup="true"
         aria-label="{% if not is_icon_only and label is defined and label %}{{ label|trans }}{% elseif is_icon_only %}{{ 'mautic.core.toggletip'|trans }}{% endif %}"
     >
@@ -30,3 +31,6 @@
         {% if label is defined and label %} {{ label|trans }} {% endif %}
     </button>
 </span>
+{% if toggletip_id %}
+<span id="{{ toggletip_id }}" hidden>{% if html is defined and html %}{{ content|trans|raw }}{% else %}{{ content|trans }}{% endif %}</span>
+{% endif %}
