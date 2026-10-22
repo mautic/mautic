@@ -40,7 +40,7 @@
     <button type="button" class="btn btn-ghost btn--icon-only btn-nospin search-expandable__toggle" aria-expanded="false" aria-controls="{{ id }}" aria-label="{{ labelText|trans }}">
         <i class="ri-search-line" aria-hidden="true"></i>
     </button>
-    <div class="search-expandable__field form-field-with-action" hidden>
+    <div class="search-expandable__field form-field-with-action flex-grow-1" hidden>
         <i class="ri-search-line form-field-icon form-field-icon--start" aria-hidden="true"></i>
         {{ control|raw }}
         <button type="button" class="form-field-clear" aria-label="{{ closeButtonLabelText|default('mautic.core.forms.field.clear_search')|trans }}" hidden>
