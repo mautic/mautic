@@ -1117,16 +1117,15 @@ Mautic.initHelpTooltips = function () {
     mQuery('[data-toggle="popover"][data-content-source]').each(function () {
         const source = document.getElementById(this.getAttribute('data-content-source'));
         if (!source) return;
-        const trigger = this;
-        const existing = bootstrap.Popover.getInstance(trigger);
+        const existing = bootstrap.Popover.getInstance(this);
         if (existing) existing.dispose();
-        new bootstrap.Popover(trigger, {
+        new bootstrap.Popover(this, {
             sanitize: false,
             content: () => source.innerHTML,
-            html: trigger.getAttribute('data-html') === 'true'
+            html: this.getAttribute('data-html') === 'true'
         });
-        trigger.addEventListener('shown.bs.popover', () => trigger.setAttribute('aria-expanded', 'true'));
-        trigger.addEventListener('hidden.bs.popover', () => trigger.setAttribute('aria-expanded', 'false'));
+        this.addEventListener('shown.bs.popover', () => this.setAttribute('aria-expanded', 'true'));
+        this.addEventListener('hidden.bs.popover', () => this.setAttribute('aria-expanded', 'false'));
     });
 };
 
