@@ -3,7 +3,7 @@
 {% set id = id|default(name|replace({'[': '-', ']': '', ' ': '-', '.': '-'})) %}
 {% set label = label|default(null) %}
 {% set labelPosition = labelPosition|default('top') %}
-{% set value = value|default(null) %}
+{% set value = value is defined ? value : null %}
 {% set placeholder = placeholder|default(null) %}
 {% set helpText = helpText|default(null) %}
 {% set help_id = help_id|default(helpText ? id ~ '-help' : null) %}
@@ -74,7 +74,7 @@
             class="{{ input_class|trim }}"
             id="{{ id }}"
             name="{{ name }}"
-            {% if value is not same as(null) %}value="{{ value }}"{% endif %}
+            {% if value is not same as(null) %}value="{{ value|e('html_attr') }}"{% endif %}
             {% if placeholder is defined and placeholder is not empty %}placeholder="{{ placeholder|trans }}"{% endif %}
             {% if describedby is not empty %}aria-describedby="{{ describedby|join(' ') }}"{% endif %}
             {% if disabled %}disabled{% endif %}
