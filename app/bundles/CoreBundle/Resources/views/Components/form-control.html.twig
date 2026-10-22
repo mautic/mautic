@@ -8,7 +8,7 @@
 {% set helpText = helpText|default(null) %}
 {% set help_id = help_id|default(helpText ? id ~ '-help' : null) %}
 {% set feedback_id = feedback_id|default(id ~ '-feedback') %}
-{% set render_feedback = render_feedback|default(true) %}
+{% set render_feedback = render_feedback is defined ? render_feedback : true %}
 {% set rows = rows|default(3) %}
 {% set size = size|default(null) %}
 {% set plaintext = plaintext|default(false) %}
@@ -24,7 +24,7 @@
         {% if icon is defined and icon is not empty %}
         <i class="{{ icon }} me-4" aria-hidden="true"></i>
         {% endif %}
-        {{ required ? 'mautic.marketplace.forms.field.required'|trans({'%fieldLabel%': label|trans}) : label|trans }}
+        {{ required ? 'mautic.core.forms.field.required'|trans({'%fieldLabel%': label|trans}) : label|trans }}
     </label>
     {% endif %}
 {% endset %}

@@ -11,17 +11,17 @@ input:-webkit-autofill:hover {
     transition: background-color 5000s ease-in-out 0s, box-shadow var(--duration-productive) var(--easing-standard-productive);
 }
 
-.form-control,
-.form-select {
+.form-fluid .form-control,
+.form-fluid .form-select {
     &:hover,
     &:focus {
         background-color: var(--field-hover);
     }
 }
 
-.form-control,
-.input-group-text,
-.form-select {
+.form-fluid .form-control,
+.form-fluid .input-group-text,
+.form-fluid .form-select {
     border-bottom: 1px solid var(--border-strong);
 }
 
@@ -43,8 +43,6 @@ input:-webkit-autofill:hover {
     }
 }
 
-// When the field in an input group is disabled, blend the addon into the same
-// disabled look and drop the separator so the whole control reads as inactive.
 .input-group:has(.form-control:disabled) .input-group-text {
     background-color: var(--bs-secondary-bg);
     color: var(--text-disabled);
