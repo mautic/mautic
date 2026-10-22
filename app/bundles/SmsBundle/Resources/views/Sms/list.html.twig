@@ -8,6 +8,7 @@
     <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
+            'searchPlaceholder': 'mautic.sms.search.placeholder',
             'searchId': 'sms-search',
             'action': currentRoute,
             'page_actions': {
