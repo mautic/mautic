@@ -35,15 +35,25 @@
         {{ extra|raw }}
     </div>
 </div>
-{% else %}
-<div class="{{ wrapperClass ?: '' }}">
-    <label for="{{ id }}" class="form-label type-label-01">{{ labelText|trans }}</label>
-    <div class="form-field-with-action">
+{% elseif variant == 'expandable' %}
+<div class="search-expandable{{ wrapperClass ? ' ' ~ wrapperClass : '' }}" data-search-expandable>
+    <button type="button" class="btn btn-transparent search-expandable__toggle" aria-expanded="false" aria-controls="{{ id }}" aria-label="{{ labelText|trans }}">
+        <i class="ri-search-line" aria-hidden="true"></i>
+    </button>
+    <div class="search-expandable__field form-field-with-action" hidden>
+        <i class="ri-search-line form-field-icon form-field-icon--start" aria-hidden="true"></i>
         {{ control|raw }}
-        <i class="ri-search-line form-field-icon" aria-hidden="true"></i>
         <button type="button" class="form-field-clear" aria-label="{{ closeButtonLabelText|default('mautic.core.forms.field.clear_search')|trans }}" hidden>
             <i class="ri-close-line" aria-hidden="true"></i>
         </button>
     </div>
+</div>
+{% else %}
+<div class="form-field-with-action{{ wrapperClass ? ' ' ~ wrapperClass : '' }}">
+    <i class="ri-search-line form-field-icon form-field-icon--start" aria-hidden="true"></i>
+    {{ control|raw }}
+    <button type="button" class="form-field-clear" aria-label="{{ closeButtonLabelText|default('mautic.core.forms.field.clear_search')|trans }}" hidden>
+        <i class="ri-close-line" aria-hidden="true"></i>
+    </button>
 </div>
 {% endif %}
