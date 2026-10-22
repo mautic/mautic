@@ -5,6 +5,9 @@
     margin-bottom: 0;
     background-color: var(--field);
     box-shadow: inset 0 -1px 0 var(--border-strong);
+    outline: 2px var(--outline-style) transparent;
+    outline-offset: -2px;
+    transition: var(--transition-all-productive);
 
     > .form-fluid__label {
         position: absolute;
