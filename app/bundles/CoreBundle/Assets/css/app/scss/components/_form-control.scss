@@ -58,8 +58,20 @@ input:-webkit-autofill:hover {
     padding-right: 40px;
 }
 
+[data-size='xs'] { --search-height: var(--spacing-06); }
+[data-size='sm'] { --search-height: var(--spacing-07); }
+[data-size='md'] { --search-height: var(--spacing-08); }
+[data-size='lg'] { --search-height: var(--spacing-09); }
+
+.form-field-with-action[data-size] > .form-control,
+.search-expandable[data-size] .form-control {
+    height: var(--search-height);
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
 .form-field-with-action > .form-control:has(~ .form-field-clear) {
-    padding-right: $input-height-base;
+    padding-right: var(--search-height, #{$input-height-base});
 }
 
 .form-field-with-number > .form-control {
@@ -79,6 +91,7 @@ input:-webkit-autofill:hover {
     top: 50%;
     right: 12px;
     transform: translateY(-50%);
+    width: 16px;
     font-size: 16px;
     line-height: 16px;
     color: var(--text-helper);
@@ -87,11 +100,11 @@ input:-webkit-autofill:hover {
 
 .form-field-icon--start {
     right: auto;
-    left: 12px;
+    left: calc((var(--search-height, #{$input-height-base}) - 16px) / 2);
 }
 
 .form-field-icon--start ~ .form-control {
-    padding-left: $input-height-base;
+    padding-left: var(--search-height, #{$input-height-base});
 }
 
 .search-expandable {
@@ -134,8 +147,8 @@ input:-webkit-autofill:hover {
 
 .form-field-clear {
     right: 0;
-    width: $input-height-base;
-    height: $input-height-base;
+    width: var(--search-height, #{$input-height-base});
+    height: var(--search-height, #{$input-height-base});
     font-size: 16px;
     line-height: 16px;
 

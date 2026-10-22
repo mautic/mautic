@@ -1,6 +1,7 @@
 {% set id = id|default(name|default('input')|replace({'[': '-', ']': '', ' ': '-', '.': '-'})) %}
 {% set variant = variant|default('default') %}
 {% set labelText = labelText|default('') %}
+{% set size = size is defined and size in ['xs', 'sm', 'md', 'lg'] ? size : 'md' %}
 {% set wrapperClass = wrapperClass|default(null) %}
 {% set attributes = attributes|default({}) %}
 {% set control %}
@@ -36,8 +37,8 @@
     </div>
 </div>
 {% elseif variant == 'expandable' %}
-<div class="search-expandable{{ wrapperClass ? ' ' ~ wrapperClass : '' }}" data-search-expandable>
-    <button type="button" class="btn btn-ghost btn--icon-only btn-nospin search-expandable__toggle" aria-expanded="false" aria-controls="{{ id }}" aria-label="{{ labelText|trans }}">
+<div class="search-expandable{{ wrapperClass ? ' ' ~ wrapperClass : '' }}" data-search-expandable data-size="{{ size }}">
+    <button type="button" class="btn btn-ghost btn--icon-only btn-nospin search-expandable__toggle" size="{{ size }}" aria-expanded="false" aria-controls="{{ id }}" aria-label="{{ labelText|trans }}">
         <i class="ri-search-line" aria-hidden="true"></i>
     </button>
     <div class="search-expandable__field form-field-with-action flex-grow-1" hidden>
@@ -49,7 +50,7 @@
     </div>
 </div>
 {% else %}
-<div class="form-field-with-action{{ wrapperClass ? ' ' ~ wrapperClass : '' }}">
+<div class="form-field-with-action{{ wrapperClass ? ' ' ~ wrapperClass : '' }}" data-size="{{ size }}">
     <i class="ri-search-line form-field-icon form-field-icon--start" aria-hidden="true"></i>
     {{ control|raw }}
     <button type="button" class="form-field-clear" aria-label="{{ closeButtonLabelText|default('mautic.core.forms.field.clear_search')|trans }}" hidden>
