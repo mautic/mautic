@@ -315,9 +315,9 @@ final class SubmissionModel extends CommonFormModel
         // Looking up the tracked contact would identify an untracked submitter, so it is skipped for them
         $lead = $trackSubmitter ? $this->contactTracker->getContact() : null;
 
-        // Remove validation errors if the field is not visible
-        if ($lead && $form->usesProgressiveProfiling()) {
-            $leadSubmissions = $this->formModel->getLeadSubmissions($form, $lead->getId());
+        // Remove validation errors if the field is not visible, the same way the form was rendered, also for an untracked submitter
+        if ($form->usesProgressiveProfiling()) {
+            $leadSubmissions = $lead ? $this->formModel->getLeadSubmissions($form, $lead->getId()) : null;
 
             $displayManager = new DisplayManager($form, $this->formModel->getCustomComponents()['viewOnlyFields']);
             foreach ($fields as $field) {

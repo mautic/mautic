@@ -108,6 +108,53 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $this->em->getRepository(Lead::class)->findAll());
     }
 
+    public function testUntrackedVisitorCanSubmitFormWithFieldsHiddenByProgressiveProfiling(): void
+    {
+        // Only the first field is shown, so the second required field can't block the submission
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', [
+            'name'                      => 'Trackability form',
+            'formType'                  => 'standalone',
+            'isPublished'               => true,
+            'inKioskMode'               => 0,
+            'progressiveProfilingLimit' => 1,
+            'fields'                    => [
+                [
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
+                    'isRequired'   => true,
+                ],
+                [
+                    'label'        => 'First name',
+                    'type'         => 'text',
+                    'alias'        => 'firstname',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'firstname',
+                    'isRequired'   => true,
+                ],
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
+        $formId = (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+
+        $this->logoutUser();
+        $crawler = $this->client->request(Request::METHOD_GET, "/form/{$formId}", [], [], ['HTTP_DNT' => '1']);
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(0, $crawler->filter('[name="mauticform[firstname]"]'));
+
+        $form = $crawler->filter('form[id=mauticform_trackabilityform]')->form();
+        $form->setValues(['mauticform[email]' => 'visitor@example.com']);
+        $this->client->submit($form, [], ['HTTP_DNT' => '1']);
+        $this->assertResponseIsSuccessful();
+
+        $this->em->clear();
+        $submission = $this->em->getRepository(Submission::class)->findOneBy(['form' => $formId]);
+        $this->assertInstanceOf(Submission::class, $submission);
+        $this->assertSame('visitor@example.com', $submission->getLead()?->getEmail());
+    }
+
     /**
      * @return iterable<string, array{bool, array<string, string>, bool}>
      */
