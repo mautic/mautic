@@ -248,7 +248,7 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
             // Per call
             // ================================
             BsPopover: function () {
-                $("[data-toggle~=popover]:not([data-content-source])").popover({
+                $("[data-toggle~=popover]").popover({
                     sanitize: false
                 });
                 

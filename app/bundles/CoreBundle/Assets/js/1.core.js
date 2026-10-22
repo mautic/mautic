@@ -60,7 +60,7 @@ mQuery(document).on('click', function (e) {
             var popover = $this.data('bs.popover');
             if (popover && popover.tip().hasClass('in')) {
                 $this.popover('hide');
-                popover.inState.click = false;
+                popover.inState.click = false; // Reset the internal click state
             }
         });
     }
@@ -74,7 +74,7 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
     Mautic.attachDismissHandlers();
 
     // Initialize popovers with custom configuration
-    mQuery('[data-toggle="popover"]:not([data-content-source])').popover({
+    mQuery('[data-toggle="popover"]').popover({
         sanitize: false,
         content: function() {
             return mQuery(this).data('content');
@@ -1128,6 +1128,5 @@ Mautic.initHelpTooltips = function () {
         this.addEventListener('hidden.bs.popover', () => this.setAttribute('aria-expanded', 'false'));
     });
 };
-
 
 Mautic.initDismiss();
