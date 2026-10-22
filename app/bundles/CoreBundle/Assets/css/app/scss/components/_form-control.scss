@@ -105,6 +105,21 @@ input:-webkit-autofill:hover {
     align-items: center;
 }
 
+.search-expandable__toggle {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-strong);
+    color: var(--text-helper);
+}
+
+.search-expandable__toggle > i {
+    font-size: 16px;
+    line-height: 1;
+}
+
 .search-expandable__field[hidden] {
     display: none;
 }
