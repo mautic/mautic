@@ -183,8 +183,6 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
             }
         }
 
-        $content = $dom->saveHTML();
-
         // These tokens need to be replaced after the content, because otherwise the replaced tokens will have encoded
         // HTML entities, which do not conform the tests.
         $result = [];
@@ -193,8 +191,7 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
         }
 
         // Depending on the libxml version, DOMDocument may URL-encode { -> %7B and } -> %7D inside href, src and action values.
-        // Replace tokens (encoded or plain) inside those attributes with HTML-stripped, attribute-escaped content
-        // to avoid injecting HTML markup into attribute values, then replace the remaining tokens normally.
+        // Replace tokens (encoded or plain) inside those attributes with HTML-stripped, attribute-escaped content.
         $content = preg_replace_callback(
             '/(\b(?:href|src|action)\s*=\s*")([^"]*)(")/i',
             static function (array $matches) use ($result): string {
@@ -209,7 +206,29 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
             },
             $content
         ) ?? $content;
-        $content = str_replace(array_keys($result), array_values($result), $content);
+
+        // Replace remaining tokens in text nodes only. A global replacement would also process tokens
+        // introduced by an attribute replacement and could turn inert token text into markup in an attribute.
+        foreach ($result as $token => $replacement) {
+            $textDom = new \DOMDocument('1.0', 'utf-8');
+            $textDom->loadHTML($content, LIBXML_NOERROR);
+            $textXpath = new \DOMXPath($textDom);
+            $placeholder = '__MAUTIC_DWC_TEXT_'.md5($token).'__';
+            $textNodes = $textXpath->query('//text()');
+            if (false === $textNodes) {
+                continue;
+            }
+
+            foreach ($textNodes as $textNode) {
+                if (!$textNode instanceof \DOMText || !str_contains($textNode->nodeValue, $token)) {
+                    continue;
+                }
+
+                $textNode->nodeValue = str_replace($token, $placeholder, $textNode->nodeValue);
+            }
+
+            $content = str_replace($placeholder, $replacement, $textDom->saveHTML());
+        }
 
         $event->setContent($content);
     }
