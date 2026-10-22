@@ -31,6 +31,7 @@
         {% if searchValue is defined %}
             {{- include('@MauticCore/Helper/search.html.twig', {
                 searchId: searchId|default(null),
+                searchPlaceholder: searchPlaceholder|default(null),
                 searchValue: searchValue,
                 filtersLabel: filtersLabel|default('mautic.core.quick_filters.more'),
                 action: action|default(''),

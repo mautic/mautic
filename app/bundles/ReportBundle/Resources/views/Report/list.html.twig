@@ -11,6 +11,7 @@
   <div id="page-list-wrapper" class="panel panel-default">
     {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
       'searchValue': searchValue,
+      'searchPlaceholder': 'mautic.report.search.placeholder',
       'searchScopes': searchScopes|default([]),
       'searchScopeHint': searchScopeHint|default(null),
       'action': currentRoute,
