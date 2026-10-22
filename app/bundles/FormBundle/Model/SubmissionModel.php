@@ -421,11 +421,14 @@ final class SubmissionModel extends CommonFormModel
     }
 
     /**
-     * Kiosk mode never tracks the submitter. Other forms track only trackable requests (no DNT/GPC, bot or prefetch).
+     * Kiosk mode and forms set to submit without tracking never track the submitter.
+     * Other forms track only trackable requests (no DNT/GPC, bot or prefetch).
      */
     private function shouldTrackSubmitter(Form $form): bool
     {
-        return !$form->isInKioskMode() && $this->ipLookupHelper->isRequestTrackable();
+        return !$form->isInKioskMode()
+            && !$this->coreParametersHelper->get('form_submit_without_tracking')
+            && $this->ipLookupHelper->isRequestTrackable();
     }
 
     /**

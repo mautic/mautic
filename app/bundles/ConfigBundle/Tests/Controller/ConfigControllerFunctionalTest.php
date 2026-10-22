@@ -330,6 +330,22 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('0', $this->getConfigPageForm('leadconfig')['config[leadconfig][contact_export_notify_admins]']->getValue());
     }
 
+    public function testFormSubmitWithoutTrackingConfigDefaultsToDisabledAndCanBeEnabled(): void
+    {
+        $this->assertSame('0', $this->getConfigPageForm('formconfig')['config[formconfig][form_submit_without_tracking]']->getValue());
+        $this->assertStringContainsString('Submit forms without tracking the submitter (no cookies, device or IP address)', (string) $this->client->getResponse()->getContent());
+
+        $this->submitConfigPage('formconfig', [
+            'config[formconfig][form_submit_without_tracking]' => '1',
+        ]);
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('form_submit_without_tracking', $configParameters);
+        $this->assertTrue((bool) $configParameters['form_submit_without_tracking']);
+
+        $this->assertSame('1', $this->getConfigPageForm('formconfig')['config[formconfig][form_submit_without_tracking]']->getValue());
+    }
+
     public function testRestrictedAssetFieldIsNotRenderedInConfigForm(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/assetconfig');

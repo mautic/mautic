@@ -30,6 +30,17 @@ final class ConfigFormType extends AbstractType
         );
 
         $builder->add(
+            'form_submit_without_tracking',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.form.config.form.form_submit_without_tracking',
+                'attr'  => [
+                    'tooltip' => 'mautic.form.config.form.form_submit_without_tracking.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
             $builder->create(
                 'do_not_submit_emails',
                 TextareaType::class,

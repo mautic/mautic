@@ -405,6 +405,14 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
+     * Looking up the visitor while rendering a form would track them, so it is skipped when forms are set to submit without tracking.
+     */
+    private function tracksVisitors(): bool
+    {
+        return !$this->coreParametersHelper->get('form_submit_without_tracking');
+    }
+
+    /**
      * Generate the form's html.
      *
      * @param bool $persist
@@ -414,7 +422,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         // Use specific template or system-wide default theme
         $theme         = $entity->getTemplate() ?? $this->coreParametersHelper->get('theme');
         $submissions   = null;
-        $lead          = ($this->requestStack->getCurrentRequest()) ? $this->contactTracker->getContact() : null;
+        $lead          = ($this->requestStack->getCurrentRequest() && $this->tracksVisitors()) ? $this->contactTracker->getContact() : null;
         $style         = '';
         $styleToRender = '@MauticForm/Builder/_style.html.twig';
         $formToRender  = '@MauticForm/Builder/form.html.twig';
@@ -779,7 +787,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             return;
         }
 
-        $lead = $this->contactTracker->getContact();
+        $lead = $this->tracksVisitors() ? $this->contactTracker->getContact() : null;
         if (!$lead instanceof Lead) {
             return;
         }
