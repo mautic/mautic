@@ -18,7 +18,7 @@ Colors are grouped by the role each variable has in the theme. Each value is wri
 ```yaml
 colors:
   brand:
-    primary: "var(--primary-60, #4e5d9d)"
+    primary: "var(--primary-60, #4e5e9e)"
   text:
     primary: "var(--text-primary, #161616)"
     secondary: "var(--text-secondary, #525252)"
@@ -40,11 +40,11 @@ colors:
   border:
     subtle-01: "var(--border-subtle-01, #e0e0e0)"
     strong-01: "var(--border-strong-01, #8d8d8d)"
-    interactive: "var(--border-interactive, #4e5d9d)"
+    interactive: "var(--border-interactive, #4e5e9e)"
   interactive:
-    interactive: "var(--interactive, #4e5d9d)"
-    focus: "var(--focus, #4e5d9d)"
-    button-primary: "var(--button-primary, #4e5d9d)"
+    interactive: "var(--interactive, #4e5e9e)"
+    focus: "var(--focus, #4e5e9e)"
+    button-primary: "var(--button-primary, #4e5e9e)"
 ```
 
 ## Typography
