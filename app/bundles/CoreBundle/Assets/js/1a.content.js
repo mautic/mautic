@@ -2771,10 +2771,8 @@ Mautic.handlePopoverInsertion = function () {
     });
 };
 
-document.addEventListener('click', (event) => {
-    const toggle = event.target.closest('.form-field-toggle');
-    if (!toggle) return;
-
+mQuery(document).off('click.passwordVisibility', '.form-field-toggle').on('click.passwordVisibility', '.form-field-toggle', function () {
+    const toggle = this;
     const field = toggle.parentElement.querySelector('input');
     const shown = field.type === 'text';
     field.type = shown ? 'password' : 'text';

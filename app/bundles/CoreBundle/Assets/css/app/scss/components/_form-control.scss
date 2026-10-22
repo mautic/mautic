@@ -66,6 +66,10 @@ input:-webkit-autofill:hover {
     padding-right: 40px;
 }
 
+.form-field-with-action > .form-control:has(~ .form-field-clear) {
+    padding-right: 68px;
+}
+
 .form-field-with-number > .form-control {
     padding-right: 96px;
     appearance: textfield;

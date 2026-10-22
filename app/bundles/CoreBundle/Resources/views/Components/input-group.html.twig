@@ -37,7 +37,7 @@
         {% endfor %}
     >
         {% for addon in addons_prepend %}
-            <span class="input-group-text position-relative prepend">{{ addon|raw }}</span>
+            <span class="input-group-text position-relative prepend">{{ addon|purify }}</span>
         {% endfor %}
 
         {% set control_type = control.component|default('form-control') %}
