@@ -18,7 +18,7 @@
     {% set displaySearchValue = searchValue %}
 {% endif %}
 
-<div class="input-group d-flex fg-1">
+<div class="d-flex fg-1">
     {% if searchScopes is defined and searchScopes is not empty %}
         {{ include('@MauticCore/Helper/search_scope.html.twig', {
             id: id,
