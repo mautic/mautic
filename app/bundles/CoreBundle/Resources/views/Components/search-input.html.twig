@@ -40,7 +40,7 @@
 </div>
 {% elseif variant == 'expandable' %}
 <div class="search-expandable{{ wrapperClass ? ' ' ~ wrapperClass : '' }}" role="search" aria-label="{{ labelText|trans }}" data-search-expandable data-size="{{ size }}">
-    <button type="button" class="btn btn-ghost btn--icon-only btn-nospin search-expandable__toggle" size="{{ size }}" aria-expanded="false" aria-controls="{{ id }}" aria-label="{{ labelText|trans }}" title="{{ labelText|trans }}">
+    <button type="button" class="btn btn-ghost btn--icon-only btn-nospin search-expandable__toggle" aria-expanded="false" aria-controls="{{ id }}" aria-label="{{ labelText|trans }}" title="{{ labelText|trans }}">
         <i class="ri-search-line" aria-hidden="true"></i>
     </button>
     <div class="search-expandable__field form-field-with-action flex-grow-1" hidden>
