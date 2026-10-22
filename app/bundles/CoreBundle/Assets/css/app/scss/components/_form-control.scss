@@ -151,8 +151,17 @@ input:-webkit-autofill:hover {
     height: var(--search-height, #{$input-height-base});
     font-size: 16px;
     line-height: 16px;
+    isolation: isolate;
 
-    &:hover {
+    &::before {
+        content: '';
+        position: absolute;
+        inset: 2px;
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    &:hover::before {
         background-color: var(--field-hover);
     }
 
