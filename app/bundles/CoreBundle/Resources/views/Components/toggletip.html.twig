@@ -13,14 +13,14 @@
     <button type="button"
         {% if content is defined and content %}id="toggletip-{{ content|u.replaceMatches('/[^a-zA-Z0-9]+/', '-')|u.lower()|u.slice(0, 60) }}"{% endif %}
         class="{{ classes|join(' ') }}"
-        data-bs-toggle="popover"
-        data-bs-container="body"
-        data-bs-placement="{{ placement|default('right') }}"
-        data-bs-html="{{ html is defined and html ? 'true' : 'false' }}"
-        data-bs-trigger="{{ trigger|default('focus') }}"
-        {% if selector is defined and selector %} data-bs-selector="{{ selector }}" {% endif %}
+        data-toggle="popover"
+        data-container="body"
+        data-placement="{{ placement|default('right') }}"
+        data-html="{{ html is defined and html ? 'true' : 'false' }}"
+        data-trigger="{{ trigger|default('focus') }}"
+        {% if selector is defined and selector %} data-selector="{{ selector }}" {% endif %}
         {% if title is defined and title %} title="{{ title|trans }}" {% endif %}
-        {% if content is defined and content %} data-bs-content="{{ content|trans }}" {% endif %}
+        {% if content is defined and content %} data-content="{{ content|trans }}" {% endif %}
         aria-haspopup="true"
         aria-label="{% if not is_icon_only and label is defined and label %}{{ label|trans }}{% elseif is_icon_only %}{{ 'mautic.core.toggletip'|trans }}{% endif %}"
     >
