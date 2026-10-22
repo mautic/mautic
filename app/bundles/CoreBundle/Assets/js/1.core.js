@@ -52,10 +52,15 @@ mQuery(document).on('click', function (e) {
     if (!target.closest('.popover').length && !target.closest('[data-toggle="popover"]').length) {
         mQuery('[data-toggle="popover"]').each(function () {
             var $this = mQuery(this);
+            var bsPopover = bootstrap.Popover.getInstance(this);
+            if (bsPopover) {
+                bsPopover.hide();
+                return;
+            }
             var popover = $this.data('bs.popover');
             if (popover && popover.tip().hasClass('in')) {
                 $this.popover('hide');
-                popover.inState.click = false; // Reset the internal click state
+                popover.inState.click = false;
             }
         });
     }
@@ -69,12 +74,14 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
     Mautic.attachDismissHandlers();
 
     // Initialize popovers with custom configuration
-    mQuery('[data-toggle="popover"]').popover({
+    mQuery('[data-toggle="popover"]:not([data-content-source])').popover({
         sanitize: false,
         content: function() {
             return mQuery(this).data('content');
         }
     });
+
+    Mautic.initHelpTooltips();
 
     // Handle popover shown event
     mQuery('[data-toggle="popover"]').on('shown.bs.popover', function () {
@@ -95,6 +102,7 @@ mQuery( document ).ajaxStop(function(event) {
 });
 
 mQuery( document ).ready(function() {
+    Mautic.initHelpTooltips();
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
@@ -1104,5 +1112,23 @@ var Mautic = {
         }
     }
 };
+
+Mautic.initHelpTooltips = function () {
+    mQuery('[data-toggle="popover"][data-content-source]').each(function () {
+        const source = document.getElementById(this.getAttribute('data-content-source'));
+        if (!source) return;
+        const trigger = this;
+        const existing = bootstrap.Popover.getInstance(trigger);
+        if (existing) existing.dispose();
+        new bootstrap.Popover(trigger, {
+            sanitize: false,
+            content: () => source.innerHTML,
+            html: trigger.getAttribute('data-html') === 'true'
+        });
+        trigger.addEventListener('shown.bs.popover', () => trigger.setAttribute('aria-expanded', 'true'));
+        trigger.addEventListener('hidden.bs.popover', () => trigger.setAttribute('aria-expanded', 'false'));
+    });
+};
+
 
 Mautic.initDismiss();

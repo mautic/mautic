@@ -2577,7 +2577,7 @@ Mautic.applyFilters = function () {
     searchInput.value = newSearchValue;
 
     // Properly destroy and reinitialize popover
-    const popoverTrigger = mQuery('[data-toggle="popover"]');
+    const popoverTrigger = mQuery('[data-toggle="popover"]:not([data-content-source])');
     popoverTrigger.popover('destroy');
     popoverTrigger.popover({
         html: true,
@@ -2633,7 +2633,7 @@ Mautic.resetFilters = function () {
     });
 
     // Properly destroy the popover instead of hiding it
-    const popoverTrigger = mQuery('[data-toggle="popover"]');
+    const popoverTrigger = mQuery('[data-toggle="popover"]:not([data-content-source])');
     popoverTrigger.popover('destroy');
 
     const enterKeyEvent = new KeyboardEvent('keyup', {
