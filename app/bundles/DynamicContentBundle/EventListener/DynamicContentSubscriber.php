@@ -183,8 +183,6 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
             }
         }
 
-        $content = $dom->saveHTML();
-
         // These tokens need to be replaced after the content, because otherwise the replaced tokens will have encoded
         // HTML entities, which do not conform the tests.
         $result = [];
@@ -192,14 +190,49 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
             $result[$token] = $dwc['content'];
         }
 
-        // DOMDocument URL-encodes { -> %7B and } -> %7D inside HTML attribute values (e.g. href).
-        // Replace those URL-encoded tokens first with HTML-stripped, attribute-escaped content to avoid injecting HTML markup
-        // into attribute values, then replace the plain tokens in the rest of the content normally.
+        // Protect tokens found in attributes before serializing the DOM. Depending on the libxml version,
+        // DOMDocument may preserve the token as-is or URL-encode its braces. Replacing the plain token in
+        // the serialized HTML would otherwise inject the replacement HTML into the attribute value.
+        $attributeReplacements = [];
+        $attributeIndex = 0;
         foreach ($result as $token => $replacement) {
+            $placeholder = '__MAUTIC_DWC_ATTRIBUTE_'.$attributeIndex++.'__';
             $encodedToken = str_replace(['{', '}'], ['%7B', '%7D'], $token);
-            $content      = str_replace($encodedToken, htmlspecialchars(strip_tags($replacement), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false), $content);
+
+            foreach ($dom->getElementsByTagName('*') as $element) {
+                if (!$element instanceof \DOMElement || !$element->hasAttributes()) {
+                    continue;
+                }
+
+                foreach ($element->attributes as $attribute) {
+                    $value = $attribute->value;
+                    $value = str_replace($encodedToken, $placeholder, $value);
+                    $value = str_replace($token, $placeholder, $value);
+
+                    if ($value === $attribute->value) {
+                        continue;
+                    }
+
+                    $attribute->value = $value;
+                    $attributeReplacements[$placeholder] = htmlspecialchars(
+                        strip_tags($replacement),
+                        ENT_QUOTES | ENT_SUBSTITUTE,
+                        'UTF-8',
+                        false
+                    );
+                }
+            }
         }
-        $content = str_replace(array_keys($result), array_values($result), $content);
+
+        $content = $dom->saveHTML();
+        foreach ($attributeReplacements as $placeholder => $replacement) {
+            $content = str_replace($placeholder, $replacement, $content);
+        }
+
+        // Replace the plain tokens in the rest of the content normally, preserving HTML in text nodes.
+        foreach ($result as $token => $replacement) {
+            $content = str_replace($token, $replacement, $content);
+        }
 
         $event->setContent($content);
     }
