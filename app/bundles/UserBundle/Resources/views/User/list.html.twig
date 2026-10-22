@@ -26,6 +26,7 @@
 		{% endif %}
 		{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
 			'searchValue': searchValue,
+			'searchPlaceholder': 'mautic.user.search.placeholder',
 			'searchScopes': searchScopes|default([]),
 			'searchScopeHint': searchScopeHint|default(null),
 			'action': currentRoute,
