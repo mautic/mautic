@@ -140,6 +140,15 @@
         }
     }
 
+    .form-field-with-action > .form-control:focus {
+        outline: 2px solid var(--border-interactive);
+        outline-offset: -2px;
+    }
+
+    .form-field-with-action > .form-control.is-invalid:focus {
+        outline-color: var(--bs-danger);
+    }
+
     > .form-control:hover:not(.is-invalid),
     .form-field-with-action > .form-control:hover:not(.is-invalid),
     .form-field-with-number > .form-control:hover:not(.is-invalid) {
