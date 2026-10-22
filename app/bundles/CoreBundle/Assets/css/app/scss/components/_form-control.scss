@@ -91,6 +91,28 @@ input:-webkit-autofill:hover {
     pointer-events: none;
 }
 
+.form-field-icon--start {
+    right: auto;
+    left: 12px;
+}
+
+.form-field-icon--start ~ .form-control {
+    padding-left: 40px;
+}
+
+.search-expandable {
+    display: inline-flex;
+    align-items: center;
+}
+
+.search-expandable__field[hidden] {
+    display: none;
+}
+
+.search-expandable__field {
+    width: 240px;
+}
+
 .form-field-clear,
 .form-field-toggle,
 .form-field-step {

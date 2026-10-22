@@ -2788,6 +2788,30 @@ document.addEventListener('input', (event) => {
 });
 
 document.addEventListener('click', (event) => {
+    const toggle = event.target.closest('.search-expandable__toggle');
+    if (!toggle) return;
+
+    const wrapper = toggle.closest('[data-search-expandable]');
+    const field = wrapper.querySelector('.search-expandable__field');
+    const input = field.querySelector('input');
+    field.hidden = false;
+    toggle.setAttribute('aria-expanded', 'true');
+    input.focus();
+});
+
+document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    const input = event.target.closest('.search-expandable__field input');
+    if (!input) return;
+
+    const wrapper = input.closest('[data-search-expandable]');
+    input.value = '';
+    input.closest('.search-expandable__field').hidden = true;
+    wrapper.querySelector('.search-expandable__toggle').setAttribute('aria-expanded', 'false');
+    wrapper.querySelector('.search-expandable__toggle').focus();
+});
+
+document.addEventListener('click', (event) => {
     const clear = event.target.closest('.form-field-clear');
     if (!clear) return;
 
