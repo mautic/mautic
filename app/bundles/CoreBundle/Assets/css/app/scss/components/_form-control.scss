@@ -12,14 +12,6 @@ input:-webkit-autofill:hover {
 }
 
 .form-fluid .form-control,
-.form-fluid .form-select {
-    &:hover,
-    &:focus {
-        background-color: var(--field-hover);
-    }
-}
-
-.form-fluid .form-control,
 .form-fluid .input-group-text,
 .form-fluid .form-select {
     border-bottom: 1px solid var(--border-strong);

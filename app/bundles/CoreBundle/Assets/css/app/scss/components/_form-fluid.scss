@@ -42,7 +42,6 @@
         padding: 33px 16px 10px;
         border-radius: 0;
         background-color: transparent;
-        box-shadow: none;
         outline: 0;
     }
 
@@ -80,7 +79,6 @@
         padding-left: 16px;
         border-radius: 0;
         background-color: transparent;
-        box-shadow: none;
         outline: 0;
     }
 
@@ -142,27 +140,17 @@
         }
     }
 
-    .form-field-with-action > .form-control:focus {
-        outline: 2px solid var(--border-interactive);
-        outline-offset: -2px;
-    }
-
-    .form-field-with-action > .form-control.is-invalid:focus {
-        outline-color: var(--bs-danger);
-    }
-
-    > .form-control:hover:not(.is-invalid),
-    .form-field-with-action > .form-control:hover:not(.is-invalid),
-    .form-field-with-number > .form-control:hover:not(.is-invalid) {
-        box-shadow: 0 0 0 1000px var(--field-hover) inset, inset 0 -1px 0 var(--border-strong);
-    }
-
     &:has(.form-control:disabled, .form-select:disabled) > .form-fluid__label > label {
         color: var(--bs-gray-600);
     }
 
+    &:hover:not(:has(.form-control.is-invalid, .form-select.is-invalid)),
     &:has(.form-control:focus, .form-select:focus) {
-        outline: 2px solid var(--border-interactive);
+        background-color: var(--field-hover);
+    }
+
+    &:has(.form-control:focus, .form-select:focus) {
+        outline: 2px var(--outline-style) var(--focus);
         outline-offset: -2px;
     }
 
