@@ -95,9 +95,11 @@
     .form-field-clear {
         top: var(--spacing-06);
         right: var(--spacing-09);
-        width: var(--spacing-08);
-        height: var(--spacing-08);
         transform: none;
+    }
+
+    .form-field-with-action > .form-control:has(~ .form-field-clear) {
+        padding-right: 88px;
     }
 
     .form-field-toggle {
