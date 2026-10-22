@@ -1,6 +1,6 @@
 {% set id = id|default(name|default('input')|replace({'[': '-', ']': '', ' ': '-', '.': '-'})) %}
 {% set variant = variant|default('default') %}
-{% set labelText = labelText|default('') %}
+{% set labelText = labelText|default(null) %}
 {% set wrapperClass = wrapperClass|default(null) %}
 {% set invalid = invalid|default(false) %}
 {% set invalidText = invalidText|default(null) %}
@@ -51,15 +51,19 @@
 {% endset %}
 {% if variant == 'fluid' %}
 <div class="form-fluid{{ wrapperClass ? ' ' ~ wrapperClass : '' }}">
+    {% if labelText %}
     <div class="form-fluid__label text-helper">
         <label for="{{ id }}" class="form-label type-label-01 mb-0">{{ labelText|trans }}</label>
     </div>
+    {% endif %}
     {{ control|raw }}
     {{ feedback|raw }}
 </div>
 {% else %}
-<div class="{{ wrapperClass ?: '' }}">
+<div{% if wrapperClass %} class="{{ wrapperClass }}"{% endif %}>
+    {% if labelText %}
     <label for="{{ id }}" class="form-label type-label-01">{{ labelText|trans }}</label>
+    {% endif %}
     {{ control|raw }}
     {{ feedback|raw }}
 </div>
