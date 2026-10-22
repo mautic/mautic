@@ -1,0 +1,49 @@
+{% set id = id|default(name|default('input')|replace({'[': '-', ']': '', ' ': '-', '.': '-'})) %}
+{% set variant = variant|default('default') %}
+{% set labelText = labelText|default('') %}
+{% set wrapperClass = wrapperClass|default(null) %}
+{% set attributes = attributes|default({}) %}
+{% set control %}
+    {% include '@MauticCore/Components/form-control.html.twig' with {
+        id: id,
+        name: name|default('input'),
+        type: 'search',
+        label: null,
+        value: value|default(''),
+        placeholder: placeholder|default(null),
+        disabled: disabled|default(false),
+        readonly: readonly|default(false),
+        required: false,
+        wrapperClass: '',
+        attributes: attributes|merge({role: role|default('searchbox'), autocomplete: autoComplete|default('off')}),
+        validation: validation|default({})
+    } only %}
+{% endset %}
+{% set extra %}
+    <i class="ri-search-line form-field-icon" aria-hidden="true"></i>
+    <button type="button" class="form-field-clear" aria-label="{{ closeButtonLabelText|default('mautic.core.forms.field.clear_search')|trans }}" hidden>
+        <i class="ri-close-line" aria-hidden="true"></i>
+    </button>
+{% endset %}
+{% if variant == 'fluid' %}
+<div class="form-fluid form-fluid--search{{ wrapperClass ? ' ' ~ wrapperClass : '' }}">
+    <div class="form-fluid__label text-helper">
+        <label for="{{ id }}" class="form-label type-label-01 mb-0">{{ labelText|trans }}</label>
+    </div>
+    <div class="form-field-with-action">
+        {{ control|raw }}
+        {{ extra|raw }}
+    </div>
+</div>
+{% else %}
+<div class="{{ wrapperClass ?: '' }}">
+    <label for="{{ id }}" class="form-label type-label-01">{{ labelText|trans }}</label>
+    <div class="form-field-with-action">
+        {{ control|raw }}
+        <i class="ri-search-line form-field-icon" aria-hidden="true"></i>
+        <button type="button" class="form-field-clear" aria-label="{{ closeButtonLabelText|default('mautic.core.forms.field.clear_search')|trans }}" hidden>
+            <i class="ri-close-line" aria-hidden="true"></i>
+        </button>
+    </div>
+</div>
+{% endif %}
