@@ -45,16 +45,16 @@
     </button>
     <div class="search-expandable__field form-field-with-action flex-grow-1" hidden>
         <label for="{{ id }}" class="visually-hidden">{{ labelText|trans }}</label>
-        <i class="ri-search-line form-field-icon form-field-icon--start" aria-hidden="true"></i>
         {{ control|raw }}
+        <i class="ri-search-line form-field-icon form-field-icon--start" aria-hidden="true"></i>
         {{ clear|raw }}
     </div>
 </div>
 {% else %}
 <div class="form-field-with-action{{ wrapperClass ? ' ' ~ wrapperClass : '' }}" role="search" aria-labelledby="{{ label_id }}" data-size="{{ size }}">
     <label id="{{ label_id }}" for="{{ id }}" class="visually-hidden">{{ labelText|trans }}</label>
-    <i class="ri-search-line form-field-icon form-field-icon--start" aria-hidden="true"></i>
     {{ control|raw }}
+    <i class="ri-search-line form-field-icon form-field-icon--start" aria-hidden="true"></i>
     {{ clear|raw }}
 </div>
 {% endif %}
