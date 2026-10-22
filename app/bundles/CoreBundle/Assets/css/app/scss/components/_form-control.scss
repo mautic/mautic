@@ -67,7 +67,7 @@
 }
 
 .form-field-with-action > .form-control:has(~ .form-field-clear) {
-    padding-right: 68px;
+    padding-right: $input-height-base;
 }
 
 .form-field-with-number > .form-control {
@@ -87,6 +87,8 @@
     top: 50%;
     right: var(--spacing-04);
     transform: translateY(-50%);
+    font-size: 16px;
+    line-height: 16px;
     color: var(--text-helper);
     pointer-events: none;
 }
@@ -136,6 +138,23 @@
     transform: translateY(-50%);
     width: var(--spacing-07);
     height: var(--spacing-07);
+}
+
+.form-field-clear {
+    right: 0;
+    width: $input-height-base;
+    height: $input-height-base;
+    font-size: 16px;
+    line-height: 16px;
+
+    &:hover {
+        background-color: var(--field-hover);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: -2px;
+    }
 }
 
 .form-field-clear[hidden] {
