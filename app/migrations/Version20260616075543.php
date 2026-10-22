@@ -12,8 +12,9 @@ final class Version20260616075543 extends PreUpAssertionMigration
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->hasTable("{$this->prefix}point_insights"),
-            "Table {$this->prefix}point_insights already exists"
+            fn (Schema $schema): bool => $schema->hasTable("{$this->prefix}point_insights")
+                && $schema->getTable("{$this->prefix}point_insights")->hasForeignKey('FK_9894AA2612469DE2'),
+            "Table {$this->prefix}point_insights and foreign key FK_9894AA2612469DE2 already exist"
         );
     }
 
@@ -21,8 +22,16 @@ final class Version20260616075543 extends PreUpAssertionMigration
     {
         $categoryIdDataType = $this->getColumnTypeSignedOrUnsigned($schema, 'categories', 'id');
         $categoryIdType     = self::COLUMN_TYPE_UNSIGNED === $categoryIdDataType ? 'INT UNSIGNED' : 'INT';
+        $tableName           = "{$this->prefix}point_insights";
 
-        $this->addSql("CREATE TABLE `{$this->prefix}point_insights` (
+        if ($schema->hasTable($tableName)) {
+            $this->addSql("ALTER TABLE `{$tableName}` MODIFY `category_id` {$categoryIdType} DEFAULT NULL");
+            $this->addSql("ALTER TABLE `{$tableName}` ADD CONSTRAINT FK_9894AA2612469DE2 FOREIGN KEY (`category_id`) REFERENCES `{$this->prefix}categories` (`id`) ON DELETE SET NULL");
+
+            return;
+        }
+
+        $this->addSql("CREATE TABLE `{$tableName}` (
             `id`                  INT UNSIGNED AUTO_INCREMENT NOT NULL,
             `category_id`         {$categoryIdType} DEFAULT NULL,
             `is_published`        TINYINT(1) NOT NULL,
