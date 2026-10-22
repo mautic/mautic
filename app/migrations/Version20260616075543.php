@@ -9,6 +9,8 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20260616075543 extends PreUpAssertionMigration
 {
+    private const TABLE_COMMENT = 'Created by Version20260616075543';
+
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
@@ -52,19 +54,26 @@ final class Version20260616075543 extends PreUpAssertionMigration
             `point_groups`        LONGTEXT NOT NULL COMMENT '(DC2Type:json)',
             INDEX IDX_9894AA2612469DE2 (`category_id`),
             PRIMARY KEY(`id`)
-        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB ROW_FORMAT = DYNAMIC");
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB ROW_FORMAT = DYNAMIC COMMENT = '".self::TABLE_COMMENT."'");
 
         $this->addSql("ALTER TABLE `{$this->prefix}point_insights` ADD CONSTRAINT FK_9894AA2612469DE2 FOREIGN KEY (`category_id`) REFERENCES `{$this->prefix}categories` (`id`) ON DELETE SET NULL");
     }
 
     public function down(Schema $schema): void
     {
-        if ($schema->hasTable("{$this->prefix}point_insights")) {
-            $table = $schema->getTable("{$this->prefix}point_insights");
-            if ($table->hasForeignKey('FK_9894AA2612469DE2')) {
-                $this->addSql("ALTER TABLE `{$this->prefix}point_insights` DROP FOREIGN KEY FK_9894AA2612469DE2");
-            }
-            $this->addSql("DROP TABLE `{$this->prefix}point_insights`");
+        $tableName = "{$this->prefix}point_insights";
+
+        if (!$schema->hasTable($tableName)) {
+            return;
+        }
+
+        $table = $schema->getTable($tableName);
+        if ($table->hasForeignKey('FK_9894AA2612469DE2')) {
+            $this->addSql("ALTER TABLE `{$tableName}` DROP FOREIGN KEY FK_9894AA2612469DE2");
+        }
+
+        if (self::TABLE_COMMENT === $table->getComment()) {
+            $this->addSql("DROP TABLE `{$tableName}`");
         }
     }
 }
