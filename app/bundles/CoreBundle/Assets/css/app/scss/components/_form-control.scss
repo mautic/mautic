@@ -105,14 +105,20 @@ input:-webkit-autofill:hover {
     align-items: center;
 }
 
+.search-expandable.is-open {
+    display: flex;
+    width: 100%;
+}
+
 .search-expandable__toggle {
     width: 40px;
     height: 40px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--border-strong);
-    color: var(--text-helper);
+    padding: 0;
+    border: 0;
+    color: inherit;
 }
 
 .search-expandable__toggle > i {
@@ -120,12 +126,14 @@ input:-webkit-autofill:hover {
     line-height: 1;
 }
 
+.search-expandable__toggle[hidden],
 .search-expandable__field[hidden] {
     display: none;
 }
 
 .search-expandable__field {
-    width: 240px;
+    flex: 1;
+    min-width: 0;
 }
 
 .form-field-clear,

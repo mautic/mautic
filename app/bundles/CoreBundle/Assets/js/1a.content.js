@@ -2792,23 +2792,36 @@ document.addEventListener('click', (event) => {
     if (!toggle) return;
 
     const wrapper = toggle.closest('[data-search-expandable]');
-    const field = wrapper.querySelector('.search-expandable__field');
-    const input = field.querySelector('input');
-    field.hidden = false;
+    wrapper.classList.add('is-open');
+    toggle.hidden = true;
     toggle.setAttribute('aria-expanded', 'true');
-    input.focus();
+    wrapper.querySelector('.search-expandable__field').hidden = false;
+    wrapper.querySelector('.search-expandable__field input').focus();
 });
+
+const collapseSearchExpandable = (wrapper) => {
+    wrapper.classList.remove('is-open');
+    wrapper.querySelector('.search-expandable__field').hidden = true;
+    const toggle = wrapper.querySelector('.search-expandable__toggle');
+    toggle.hidden = false;
+    toggle.setAttribute('aria-expanded', 'false');
+    return toggle;
+};
 
 document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
     const input = event.target.closest('.search-expandable__field input');
     if (!input) return;
 
-    const wrapper = input.closest('[data-search-expandable]');
     input.value = '';
-    input.closest('.search-expandable__field').hidden = true;
-    wrapper.querySelector('.search-expandable__toggle').setAttribute('aria-expanded', 'false');
-    wrapper.querySelector('.search-expandable__toggle').focus();
+    collapseSearchExpandable(input.closest('[data-search-expandable]')).focus();
+});
+
+document.addEventListener('focusout', (event) => {
+    const input = event.target.closest('.search-expandable__field input');
+    if (!input || input.value !== '') return;
+
+    collapseSearchExpandable(input.closest('[data-search-expandable]'));
 });
 
 document.addEventListener('click', (event) => {
