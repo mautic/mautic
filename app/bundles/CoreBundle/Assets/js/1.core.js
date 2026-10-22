@@ -82,7 +82,6 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
     });
     mQuery('[data-quick-filter]').popover(Mautic.getQuickFilterPopoverOptions());
 
-    Mautic.initHelpTooltips();
 
     // Handle popover shown event
     mQuery('[data-toggle="popover"], [data-bs-toggle="popover"]').on('shown.bs.popover', function () {
@@ -103,7 +102,6 @@ mQuery( document ).ajaxStop(function(event) {
 });
 
 mQuery( document ).ready(function() {
-    Mautic.initHelpTooltips();
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
@@ -1112,22 +1110,6 @@ var Mautic = {
             return false;
         }
     }
-};
-
-Mautic.initHelpTooltips = function () {
-    mQuery('[data-toggle="popover"][data-content-source]').each(function () {
-        const source = document.getElementById(this.getAttribute('data-content-source'));
-        if (!source) return;
-        const existing = bootstrap.Popover.getInstance(this);
-        if (existing) existing.dispose();
-        new bootstrap.Popover(this, {
-            sanitize: false,
-            content: () => source.innerHTML,
-            html: this.getAttribute('data-html') === 'true'
-        });
-        this.addEventListener('shown.bs.popover', () => this.setAttribute('aria-expanded', 'true'));
-        this.addEventListener('hidden.bs.popover', () => this.setAttribute('aria-expanded', 'false'));
-    });
 };
 
 Mautic.initDismiss();
