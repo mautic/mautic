@@ -2778,7 +2778,6 @@ document.addEventListener('click', (event) => {
     const field = toggle.parentElement.querySelector('input');
     const shown = field.type === 'text';
     field.type = shown ? 'password' : 'text';
-    toggle.setAttribute('aria-pressed', String(!shown));
     toggle.setAttribute('aria-label', shown ? toggle.dataset.labelShow : toggle.dataset.labelHide);
     toggle.querySelector('i').className = shown ? 'ri-eye-line' : 'ri-eye-off-line';
 });

@@ -140,9 +140,9 @@
         }
     }
 
-    > .form-control:hover,
-    .form-field-with-action > .form-control:hover,
-    .form-field-with-number > .form-control:hover {
+    > .form-control:hover:not(.is-invalid),
+    .form-field-with-action > .form-control:hover:not(.is-invalid),
+    .form-field-with-number > .form-control:hover:not(.is-invalid) {
         box-shadow: 0 0 0 1000px var(--field-hover) inset, inset 0 -1px 0 var(--border-strong);
     }
 
