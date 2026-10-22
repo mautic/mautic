@@ -2779,6 +2779,24 @@ mQuery(document).off('click.passwordVisibility', '.form-field-toggle').on('click
     this.querySelector('i').className = shown ? 'ri-eye-line' : 'ri-eye-off-line';
 });
 
+document.addEventListener('input', (event) => {
+    const field = event.target;
+    if (!field.matches || !field.matches('.form-field-with-action > input')) return;
+
+    const clear = field.parentElement.querySelector('.form-field-clear');
+    if (clear) clear.hidden = field.value === '';
+});
+
+document.addEventListener('click', (event) => {
+    const clear = event.target.closest('.form-field-clear');
+    if (!clear) return;
+
+    const field = clear.parentElement.querySelector('input');
+    field.value = '';
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+    field.focus();
+});
+
 // Initialize filter commands on page load
 document.addEventListener('DOMContentLoaded', function () {
     Mautic.initFilterCommands();
