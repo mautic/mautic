@@ -3,7 +3,7 @@
 {% set id = id|default(name|replace({'[': '-', ']': '', ' ': '-', '.': '-'})) %}
 {% set label = label|default(null) %}
 {% set labelPosition = labelPosition|default('top') %}
-{% set value = value|default('') %}
+{% set value = value|default(null) %}
 {% set placeholder = placeholder|default(null) %}
 {% set helpText = helpText|default(null) %}
 {% set help_id = help_id|default(helpText ? id ~ '-help' : null) %}
