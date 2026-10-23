@@ -36,9 +36,12 @@ final class TransportFactoryTest extends TestCase
     public static function sendgridSchemes(): iterable
     {
         yield 'sendgrid' => ['sendgrid'];
+        yield 'brevo api' => ['brevo+api'];
+        yield 'mailer send api' => ['mailersend+api'];
+        yield 'mandrill api' => ['mandrill+api'];
+        yield 'postmark api' => ['postmark+api'];
+        yield 'resend api' => ['resend+api'];
         yield 'sendgrid api' => ['sendgrid+api'];
-        yield 'mailgun api' => ['mailgun+api'];
-        yield 'custom api bridge' => ['custom+api'];
     }
 
     public function testExistingSendgridUserIsNotChanged(): void
@@ -65,6 +68,31 @@ final class TransportFactoryTest extends TestCase
         self::assertNotNull($capturedDsn);
         self::assertNull($capturedDsn->getUser());
         self::assertSame('SG.secret', $capturedDsn->getPassword());
+    }
+
+    #[DataProvider('multiCredentialApiSchemes')]
+    public function testMultiCredentialApiDsnIsNotChanged(string $scheme): void
+    {
+        $capturedDsn = null;
+        $factory     = new CapturingTransportFactory($capturedDsn, $scheme);
+        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $transport->fromString(sprintf('%s://:secret@default', $scheme));
+
+        self::assertNotNull($capturedDsn);
+        self::assertNull($capturedDsn->getUser());
+        self::assertSame('secret', $capturedDsn->getPassword());
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function multiCredentialApiSchemes(): iterable
+    {
+        yield 'amazon ses api' => ['ses+api'];
+        yield 'mailgun api' => ['mailgun+api'];
+        yield 'mailjet api' => ['mailjet+api'];
+        yield 'scaleway api' => ['scaleway+api'];
     }
 
     public function testPasswordOnlySendgridDsnForValidationUsesThePasswordAsTheApiKey(): void
