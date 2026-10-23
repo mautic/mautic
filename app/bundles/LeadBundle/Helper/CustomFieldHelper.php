@@ -74,10 +74,10 @@ final class CustomFieldHelper
                         $value = $dtHelper->toUtcString('Y-m-d H:i:s');
                         break;
                     case 'date':
-                        $value = $dtHelper->toUtcString('Y-m-d');
+                        $value = $dtHelper->toLocalString('Y-m-d');
                         break;
                     case 'time':
-                        $value = $dtHelper->toUtcString('H:i:s');
+                        $value = $dtHelper->toLocalString('H:i:s');
                         break;
                 }
                 break;
