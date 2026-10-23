@@ -22,6 +22,7 @@ final class SegmentDependencyTreeFactory
     public function __construct(
         private readonly RouterInterface $router,
         private readonly LeadListRepository $leadListRepository,
+        // @phpstan-ignore-next-line mautic.noNullableServiceInConstructor
         private readonly ?CorePermissions $corePermissions = null,
     ) {
     }

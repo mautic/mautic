@@ -27,20 +27,21 @@ final class SegmentDependencyTreeFactoryTest extends TestCase
         $accessibleChild = $this->createSegment(2, 'Accessible child', 20, [
             $this->leadListFilter([4, 5]),
         ]);
-        $inaccessibleChild = $this->createSegment(3, 'Inaccessible child', 30);
+        $inaccessibleChild = $this->createSegment(3, 'Inaccessible child', 30, [
+            $this->leadListFilter([6]),
+        ]);
         $accessibleDescendant = $this->createSegment(4, 'Accessible descendant', 20);
         $inaccessibleDescendant = $this->createSegment(5, 'Inaccessible descendant', 30);
+        $this->createSegment(6, 'Accessible under inaccessible child', 20);
 
         $repository = $this->createMock(LeadListRepository::class);
         $repository->expects($this->exactly(2))
             ->method('findBy')
             ->willReturnCallback(
-                static function (array $criteria) use ($accessibleChild, $inaccessibleChild, $accessibleDescendant, $inaccessibleDescendant): array {
-                    return match ($criteria['id']) {
-                        [2, 3] => [$accessibleChild, $inaccessibleChild],
-                        [4, 5] => [$accessibleDescendant, $inaccessibleDescendant],
-                        default => [],
-                    };
+                static fn (array $criteria): array => match ($criteria['id']) {
+                    [2, 3] => [$accessibleChild, $inaccessibleChild],
+                    [4, 5] => [$accessibleDescendant, $inaccessibleDescendant],
+                    default => [],
                 }
             );
 
@@ -52,7 +53,7 @@ final class SegmentDependencyTreeFactoryTest extends TestCase
         $tree = (new SegmentDependencyTreeFactory($router, $repository, $permissions))->buildTree($root);
         $formatted = (new JsPlumbFormatter())->format($tree);
 
-        self::assertSame([
+        $this->assertSame([
             [
                 'nodes' => [
                     ['id' => '0-1', 'name' => 'Owned root', 'link' => '/s/segments/view/1'],
@@ -70,7 +71,7 @@ final class SegmentDependencyTreeFactoryTest extends TestCase
             ],
         ], $formatted['levels']);
 
-        self::assertSame([
+        $this->assertSame([
             ['source' => '0-1', 'target' => '1-2'],
             ['source' => '1-2', 'target' => '2-4'],
         ], $formatted['edges']);

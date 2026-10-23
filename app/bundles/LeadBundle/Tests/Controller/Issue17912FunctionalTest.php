@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
@@ -17,8 +16,32 @@ final class Issue17912FunctionalTest extends AbstractMauticTestCase
 {
     private const DEPENDENCY_TREE_PATH = '/s/ajax?action=lead:getSegmentDependencyTree&id=';
 
+    /** @var LeadList[] */
+    private array $createdSegments = [];
+
+    /** @var Role[] */
+    private array $createdRoles = [];
+
+    /** @var User[] */
+    private array $createdUsers = [];
+
     protected function tearDown(): void
     {
+        $this->logoutUser();
+
+        foreach ($this->createdSegments as $segment) {
+            $this->em->remove($segment);
+        }
+
+        foreach ($this->createdUsers as $user) {
+            $this->em->remove($user);
+        }
+
+        foreach ($this->createdRoles as $role) {
+            $this->em->remove($role);
+        }
+
+        $this->em->flush();
         parent::tearDown();
     }
 
@@ -43,17 +66,15 @@ final class Issue17912FunctionalTest extends AbstractMauticTestCase
 
         $this->loginUser($user);
         $this->client->request(Request::METHOD_GET, self::DEPENDENCY_TREE_PATH.$root->getId());
-        Assert::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $response = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $nodes    = array_merge(...array_map(static fn (array $level): array => $level['nodes'], $response['levels']));
         $names    = array_column($nodes, 'name');
 
-        Assert::assertContains($accessible->getName(), $names);
-        Assert::assertContains($grandchild->getName(), $names);
-        Assert::assertNotContains($inaccessible->getName(), $names);
-        Assert::assertSame(3, count($nodes));
-        restore_error_handler();
-        restore_exception_handler();
+        $this->assertContains($accessible->getName(), $names);
+        $this->assertContains($grandchild->getName(), $names);
+        $this->assertNotContains($inaccessible->getName(), $names);
+        $this->assertCount(3, $nodes);
     }
 
     public function testUnauthorizedRootIsRejected(): void
@@ -66,8 +87,8 @@ final class Issue17912FunctionalTest extends AbstractMauticTestCase
         $this->loginUser($user);
         $this->client->request(Request::METHOD_GET, self::DEPENDENCY_TREE_PATH.$root->getId());
 
-        Assert::assertSame(403, $this->client->getResponse()->getStatusCode());
-        Assert::assertStringNotContainsString('dependency-tree', (string) $this->client->getResponse()->getContent());
+        $this->assertSame(403, $this->client->getResponse()->getStatusCode());
+        $this->assertStringNotContainsString('dependency-tree', (string) $this->client->getResponse()->getContent());
     }
 
     public function testNonOwnerWithOtherListPermissionCanViewRoot(): void
@@ -80,9 +101,9 @@ final class Issue17912FunctionalTest extends AbstractMauticTestCase
         $this->loginUser($user);
         $this->client->request(Request::METHOD_GET, self::DEPENDENCY_TREE_PATH.$root->getId());
 
-        Assert::assertSame(200, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $response = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        Assert::assertSame($root->getName(), $response['levels'][0]['nodes'][0]['name']);
+        $this->assertSame($root->getName(), $response['levels'][0]['nodes'][0]['name']);
     }
 
     private function createRestrictedUser(): User
@@ -110,6 +131,8 @@ final class Issue17912FunctionalTest extends AbstractMauticTestCase
         $user->setPassword(self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user)->hash('mautic'));
         $this->em->persist($user);
         $this->em->flush();
+        $this->createdRoles[] = $role;
+        $this->createdUsers[] = $user;
 
         return $user;
     }
@@ -122,6 +145,7 @@ final class Issue17912FunctionalTest extends AbstractMauticTestCase
         $segment->setAlias(strtolower(str_replace(' ', '-', $name)));
         $segment->setCreatedBy($owner);
         $this->em->persist($segment);
+        $this->createdSegments[] = $segment;
 
         return $segment;
     }
@@ -129,7 +153,7 @@ final class Issue17912FunctionalTest extends AbstractMauticTestCase
     private function getUser(string $username): User
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['username' => $username]);
-        Assert::assertInstanceOf(User::class, $user);
+        $this->assertInstanceOf(User::class, $user);
 
         return $user;
     }
