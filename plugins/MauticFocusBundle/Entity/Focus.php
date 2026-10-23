@@ -56,30 +56,37 @@ class Focus extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['focus:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string|null
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string|null
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $editor;
 
     /**
      * @var string|null
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $html;
 
     /**
      * @var string|null
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(name: 'html_mode', type: 'string', length: 191, nullable: true)]
     private $htmlMode;
 
     /**
@@ -87,9 +94,12 @@ class Focus extends FormEntity implements UuidInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
@@ -97,12 +107,14 @@ class Focus extends FormEntity implements UuidInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
     #[NotBlank(message: 'mautic.focus.error.select_type')]
+    #[ORM\Column(name: 'focus_type', type: 'string', length: 191)]
     private $type;
 
     /**
      * @var string|null
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $website;
 
     /**
@@ -110,40 +122,47 @@ class Focus extends FormEntity implements UuidInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
     #[NotBlank(message: 'mautic.focus.error.select_style')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $style;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var array<mixed>
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private $properties = [];
 
     /**
      * @var array
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(name: 'utm_tags', type: 'array', nullable: true)]
     private $utmTags = [];
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'form_id', type: 'integer', nullable: true)]
     private $form;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $cache;
 
     public function __construct()
@@ -161,38 +180,6 @@ class Focus extends FormEntity implements UuidInterface
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->addCategory();
-
-        $builder->addNamedField('type', 'string', 'focus_type');
-
-        $builder->addField('style', 'string');
-
-        $builder->addNullableField('website', 'string');
-
-        $builder->addPublishDates();
-
-        $builder->addNullableField('properties', 'array');
-
-        $builder->createField('utmTags', 'array')
-            ->columnName('utm_tags')
-            ->nullable()
-            ->build();
-
-        $builder->addNamedField('form', 'integer', 'form_id', true);
-
-        $builder->addNullableField('cache', 'text');
-
-        $builder->createField('htmlMode', 'string')
-            ->columnName('html_mode')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('editor', 'text');
-
-        $builder->addNullableField('html', 'text');
 
         self::addProjectsField($builder, 'focus_projects_xref', 'focus_id');
     }

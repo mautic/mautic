@@ -27,9 +27,9 @@ final class LoadMetadataTableToDoctrineAttributeRector extends AbstractLoadMetad
 
         $this->initHybridState($node);
 
-        // Already mapped by an existing #[ORM\Table]: leave the call for a follow-up.
+        // Already mapped by an existing #[ORM\Table]: only drop a call that repeats it.
         if ($this->isHybrid && $this->hybridHasTable) {
-            return null;
+            return $this->removeCallDuplicatedByAttribute($node, $loadMetadata, 'setTable', 'Table', 'name');
         }
 
         $owned = [];

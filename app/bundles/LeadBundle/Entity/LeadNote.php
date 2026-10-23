@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -18,6 +17,9 @@ class LeadNote extends FormEntity
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -45,13 +47,6 @@ class LeadNote extends FormEntity
      */
     #[ORM\Column(name: 'date_time', type: 'datetime', nullable: true)]
     private $dateTime;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-    }
 
     /**
      * Prepares the metadata for API usage.

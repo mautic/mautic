@@ -7,7 +7,6 @@ namespace Mautic\WebhookBundle\Entity;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: WebhookQueueRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
@@ -16,19 +15,25 @@ class WebhookQueue
 {
     public const string TABLE_NAME = 'webhook_queue';
 
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private int|string|null $id = null;
 
     #[ORM\ManyToOne(targetEntity: Webhook::class)]
     #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
     private ?Webhook $webhook = null;
 
+    #[ORM\Column(name: 'date_added', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $dateAdded = null;
 
+    #[ORM\Column(name: 'date_modified', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $dateModified = null;
 
     /**
      * @var string|resource|null
      */
+    #[ORM\Column(name: 'payload_compressed', type: Types::BLOB, length: MySQLPlatform::LENGTH_LIMIT_MEDIUMBLOB, nullable: true)]
     private $payloadCompressed;
 
     #[ORM\ManyToOne(targetEntity: Event::class, inversedBy: 'queues')]
@@ -37,19 +42,6 @@ class WebhookQueue
 
     #[ORM\Column(type: Types::SMALLINT, options: ['unsigned' => true, 'default' => 0])]
     private int $retries = 0;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder->addBigIntIdField();
-        $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
-        $builder->addNullableField('dateModified', Types::DATETIME_IMMUTABLE, 'date_modified');
-        $builder->createField('payloadCompressed', Types::BLOB)
-            ->columnName('payload_compressed')
-            ->nullable()
-            ->length(MySQLPlatform::LENGTH_LIMIT_MEDIUMBLOB)
-            ->build();
-    }
 
     /**
      * The id is a bigint, so it comes back as int within PHP's integer range and as
