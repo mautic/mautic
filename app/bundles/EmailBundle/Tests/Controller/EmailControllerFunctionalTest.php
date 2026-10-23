@@ -32,6 +32,7 @@ use function Symfony\Component\Clock\now;
 
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -982,6 +983,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form['emailform[subject]']->setValue('Email publish test');
         $form['emailform[name]']->setValue('Email publish test');
         $form['emailform[template]']->setValue('blank');
+        $form['emailform[customHtml]']->setValue('<p>Test html</p>');
 
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
@@ -1027,6 +1029,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form['emailform[subject]']->setValue('Email publish test');
         $form['emailform[name]']->setValue('Email publish test');
         $form['emailform[template]']->setValue('blank');
+        $form['emailform[customHtml]']->setValue('<p>Test html</p>');
 
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
@@ -1211,7 +1214,58 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(1, $response['success']);
         $this->assertNotEmpty($response['subject']);
         $this->assertEquals($email->getSubject(), $response['subject']);
-        $this->assertNotEmpty($response['body']);
+        // Blank theme is MJML; with empty customHtml, MailHelper skips the theme
+        // fallback so the import body stays empty rather than raw uncompiled <mjml>.
+        $this->assertSame('', $response['body']);
+        $this->assertStringNotContainsString('<mjml>', $response['body']);
+    }
+
+    public function testSaveRejectsMjmlThemeWithEmptyCustomHtml(): void
+    {
+        $payload = [
+            'name'        => 'MJML empty customHtml test',
+            'subject'     => 'Test subject',
+            'template'    => 'blank',
+            'customHtml'  => '',
+            'emailType'   => 'template',
+            'isPublished' => 1,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        // The API must reject creating an email with an MJML theme and empty
+        // customHtml so the bad state is blocked at save time.
+        $this->assertSame(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
+        $content = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('errors', $content);
+        $this->assertStringContainsString('MJML', (string) $content['errors'][0]['message']);
+    }
+
+    public function testSaveAllowsPublishedPlainTextOnlyEmail(): void
+    {
+        $payload = [
+            'name'        => 'MJML plain text only test',
+            'subject'     => 'Test subject',
+            'template'    => 'blank',
+            'customHtml'  => '',
+            'plainText'   => 'Plain text body from the plain text field.',
+            'emailType'   => 'template',
+            'isPublished' => 1,
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/emails/new', $payload);
+        $response = $this->client->getResponse();
+
+        // MailHelper::setEmail() treats an email with empty customHtml and a
+        // plain text body as sendable (the MJML theme fallback is skipped, and
+        // the message goes out as text/plain). The save path must not be
+        // stricter than the send path, otherwise the email can never be
+        // published — and segment sends only pick up published emails.
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        $content = json_decode($response->getContent(), true);
+        $this->assertArrayHasKey('email', $content);
+        $this->assertSame($payload['plainText'], $content['email']['plainText']);
     }
 
     public function testSegmentEmailSendWithoutContinueSending(): void
