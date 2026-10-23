@@ -91,7 +91,7 @@
 {% endblock %}
 
 {% block dynamic_content_filter_entry_widget %}
-    <div class="tab-pane dynamic-content-filter bdr-w-0" id="{{ form.vars.id }}">
+    <div class="tab-pane dynamic-content-filter border-0" id="{{ form.vars.id }}">
         <div class="row form-group">
             <div class="col-xs-10">
                 {{ form_label(form.content) }}
@@ -158,7 +158,7 @@
 {% endblock %}
 
 {% block dynamic_content_filter_widget %}
-    <div class="tab-pane dynamic-content bdr-w-0 {{ '0' == form.vars.name ? 'active' : 'fade' }}" id="{{ form.vars.id }}">
+    <div class="tab-pane dynamic-content border-0 {{ '0' == form.vars.name ? 'active' : 'fade' }}" id="{{ form.vars.id }}">
         <div class="panel">
             <ul class="nav nav-tabs nav-tabs-contained" id="dynamicContentFilterTabs_{{ form.vars.name }}">
               <li>
@@ -173,7 +173,7 @@
             </ul>
 
             <div class="tab-content pa-md">
-              <div class="tab-pane bdr-w-0 active" id="emailform_dynamicContent_{{ form.vars.name }}_default">
+              <div class="tab-pane border-0 active" id="emailform_dynamicContent_{{ form.vars.name }}_default">
                 <div class="row hidden">
                   <div class="col-xs-10">{{ form_row(form.tokenName) }}</div>
                 </div>

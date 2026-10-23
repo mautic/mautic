@@ -65,15 +65,15 @@
       <!--/ step container -->
 
       <!-- container -->
-      <div class="col-md-9 height-auto bdr-l">
+      <div class="col-md-9 height-auto border-start">
           <div class="tab-content">
               <!-- pane -->
               {% for group in groups %}
                   {% if fields[group] is defined %}
                       {% set groupFields = fields[group] %}
                       {% if groupFields is not empty %}
-                          <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-rds-0 bdr-w-0" id="{{ group }}">
-                              <div class="col-lg-8 pa-md bg-light-xs bdr-b">
+                          <div class="tab-pane fade {% if loop.first %}in active{% endif %} rounded-0 border-0" id="{{ group }}">
+                              <div class="col-lg-8 pa-md bg-light-xs border-bottom">
                                 {% if not lead.id %}
                                     {{ include('@MauticCore/Notification/inline_notification.html.twig', {
                                         'title': 'mautic.contact.import.tip.title',

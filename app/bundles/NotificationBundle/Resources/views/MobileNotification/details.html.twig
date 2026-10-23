@@ -115,13 +115,13 @@
                         {% endif %}
                           <div class="panel">
                               <div class="panel-body box-layout">
-                                  <div class="col-md-3 va-m">
+                                  <div class="col-md-3 align-middle">
                                       <h5 class="text-white dark-md fw-sb mb-xs">
                                           <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.core.stats'|trans }}
                                       </h5>
                                   </div>
-                                  <div class="col-md-9 va-m">
+                                  <div class="col-md-9 align-middle">
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
@@ -160,7 +160,7 @@
 
           <!-- start: tab-content -->
           <div class="tab-content pa-md">
-              <div class="tab-pane active bdr-w-0" id="clicks-container">
+              <div class="tab-pane active border-0" id="clicks-container">
                   {{ include('@MauticPage/Trackable/click_counts.html.twig', {
                       'trackables': trackables,
                       'entity': notification,
@@ -168,12 +168,12 @@
                   }) }}
               </div>
 
-              <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">
+              <div class="tab-pane fade in border-0 page-list" id="contacts-container">
                   {{ contacts|raw }}
               </div>
 
               {% if showTranslations %}
-                  <div class="tab-pane bdr-w-0" id="translation-container">
+                  <div class="tab-pane border-0" id="translation-container">
                       {{ translationContent|raw }}
                   </div>
               {% endif %}

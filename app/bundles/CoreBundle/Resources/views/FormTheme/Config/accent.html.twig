@@ -3,7 +3,7 @@
     <div class="accent">
         <input type="radio" id="accent-{{ formatted_id }}" name="accent" value="{{ formatted_id }}"
                 class="hide" data-attribute-toggle="accent" data-attribute-value="{{ formatted_id }}" {% if formatted_id == configGetParameter('accent', '01') %}checked{% endif %}>
-        <label for="accent-{{ formatted_id }}" class="accent-color ma-0 bdr-rds-circle" style="background-color: var(--accent{{ formatted_id }});"></label>
+        <label for="accent-{{ formatted_id }}" class="accent-color ma-0 rounded-circle" style="background-color: var(--accent{{ formatted_id }});"></label>
     </div>
 {% endfor %}
 
@@ -22,7 +22,7 @@
                 <div class="d-inline-flex">
                     <input type="radio" id="accent-{{ formatted_id }}" name="accent" value="{{ formatted_id }}"
                             class="hide" data-attribute-toggle="accent" data-attribute-value="{{ formatted_id }}" {% if formatted_id == configGetParameter('accent', '01') %}checked{% endif %}>
-                    <label for="accent-{{ formatted_id }}" class="accent-color ma-0 bdr-rds-circle" style="background-color: var(--accent{{ formatted_id }});"></label>
+                    <label for="accent-{{ formatted_id }}" class="accent-color ma-0 rounded-circle" style="background-color: var(--accent{{ formatted_id }});"></label>
                 </div>
             {% endfor %}
         </div>

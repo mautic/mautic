@@ -75,13 +75,13 @@
                         <div class="col-sm-12">
                             <div class="panel">
                                 <div class="panel-body box-layout">
-                                    <div class="col-md-6 va-m">
+                                    <div class="col-md-6 align-middle">
                                         <h5 class="text-white dark-md fw-sb mb-xs">
                                             <div><i class="ri-line-chart-fill pull-left"></i>
                                                 <span class="pull-left"> {% trans %}mautic.messages.processed.messages{% endtrans %}</span></div>
                                         </h5>
                                     </div>
-                                    <div class="col-md-9 va-m">
+                                    <div class="col-md-9 align-middle">
                                         {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
                                     </div>
                                 </div>
@@ -114,7 +114,7 @@
             <div class="tab-content pa-md">
             {% set active = ' active in' %}
                 {% for channel, contacts in messagedLeads %}
-                <div class="tab-pane bdr-w-0 page-list{{ active }}" id="contacts-{{ channel }}">
+                <div class="tab-pane border-0 page-list{{ active }}" id="contacts-{{ channel }}">
                     {% set message = ('all' is same as(channel)) ? 'mautic.channel.message.all_contacts' : 'mautic.channel.message.channel_contacts' %}
                     <div class="alert alert-info"><strong>{{ message|trans }}</strong></div>
                     <div class="message-{{ channel }}">
@@ -126,7 +126,7 @@
             </div>
         </div>
         <!-- right section -->
-        <div class="col-md-3 bdr-l height-auto">
+        <div class="col-md-3 border-start height-auto">
             <!-- recent activity -->
             {{- include('@MauticCore/Helper/recentactivity.html.twig', {'logs' : logs}) -}}
             {% block rightFormContent %}
