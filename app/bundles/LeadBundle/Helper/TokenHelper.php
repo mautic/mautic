@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 
 final class TokenHelper
