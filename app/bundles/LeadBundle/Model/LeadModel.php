@@ -1922,7 +1922,7 @@ class LeadModel extends FormModel
      * @param \DateTime $dateTo
      * @param mixed[]   $filters
      */
-    public function getLeadMapData($dateFrom, $dateTo, $filters = [], bool $canViewOthers = true): array
+    public function getLeadMapData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         if (!$canViewOthers) {
             $filters['owner_id'] = $this->userHelper->getUser()->getId();
@@ -2026,10 +2026,9 @@ class LeadModel extends FormModel
     /**
      * Get a list of leads in a date range.
      *
-     * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getLeadList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getLeadList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], array $options = []): array
     {
         if (!empty($options['canViewOthers'])) {
             $filters['owner_id'] = $this->userHelper->getUser()->getId();

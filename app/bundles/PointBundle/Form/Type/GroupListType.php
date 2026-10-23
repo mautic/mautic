@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Form\Type;
 
 use Doctrine\ORM\EntityManagerInterface;
