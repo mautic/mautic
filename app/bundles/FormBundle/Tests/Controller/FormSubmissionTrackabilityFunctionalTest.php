@@ -222,7 +222,7 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $pointsChangeLogs = $this->em->getRepository(PointsChangeLog::class)->findBy(['lead' => $contact]);
         $this->assertEqualsCanonicalizing(['campaign', 'form'], array_map(static fn (PointsChangeLog $log): string => $log->getType(), $pointsChangeLogs));
         foreach ($pointsChangeLogs as $pointsChangeLog) {
-            $this->assertNull($pointsChangeLog->getIpAddress(), $pointsChangeLog->getType());
+            $this->assertNotInstanceOf(IpAddress::class, $pointsChangeLog->getIpAddress(), $pointsChangeLog->getType());
         }
         $this->assertNotInstanceOf(IpAddress::class, $this->em->getRepository(IpAddress::class)->findOneBy(['ipAddress' => '203.0.113.9']));
     }
@@ -287,6 +287,7 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $campaign = new Campaign();
         $campaign->setName('Change points on submit');
         $campaign->setIsPublished(true);
+        $this->assertInstanceOf(Form::class, $form);
         $campaign->addForm($form);
 
         $decision = new Event();
