@@ -88,7 +88,11 @@ final class ValidEmailLinksValidator extends ConstraintValidator
 
     private function isMauticToken(string $url): bool
     {
-        return 1 === preg_match('/^\{[^{}]+\}$/', $url);
+        if (1 !== preg_match('/^(\{+)([^{}]+)(\}+)$/', $url, $matches)) {
+            return false;
+        }
+
+        return strlen($matches[1]) === strlen($matches[3]);
     }
 
     private function hasValidScheme(string $url): bool
