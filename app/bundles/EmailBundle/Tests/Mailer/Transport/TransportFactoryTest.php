@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Mailer\Transport;
 use Mautic\EmailBundle\Mailer\Transport\TransportFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Transport as SymfonyTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
@@ -48,6 +49,17 @@ final class TransportFactoryTest extends TestCase
         $transport->fromString('future+api://:part1:part2@default');
 
         self::assertSame('part1:part2', $factory->capturedDsn->getUser());
+        self::assertNull($factory->capturedDsn->getPassword());
+    }
+
+    public function testPasswordOnlyApiKeyPreservesSpacesAndPlusSigns(): void
+    {
+        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $transport->fromString('future+api://:part%20one%2Btwo@default');
+
+        self::assertSame('part one+two', $factory->capturedDsn->getUser());
         self::assertNull($factory->capturedDsn->getPassword());
     }
 
@@ -105,6 +117,16 @@ final class TransportFactoryTest extends TestCase
         self::assertInstanceOf(RoundRobinTransport::class, $result);
         self::assertSame('SG.test', $factory->capturedDsn->getUser());
         self::assertNull($factory->capturedDsn->getPassword());
+    }
+
+    public function testCompoundDsnRejectsTrailingContent(): void
+    {
+        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('garbage at the end');
+        $transport->fromString('failover(future+api://:SG.test@default)?unexpected=true');
     }
 }
 

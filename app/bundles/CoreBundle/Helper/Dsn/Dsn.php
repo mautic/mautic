@@ -72,11 +72,11 @@ final class Dsn implements \Stringable
         $dsn = $this->scheme.'://';
 
         if ($this->user) {
-            $dsn .= urlencode($this->user);
+            $dsn .= rawurlencode($this->user);
         }
 
         if ($this->password) {
-            $dsn .= ':'.urlencode($this->password);
+            $dsn .= ':'.rawurlencode($this->password);
         }
 
         if ($this->user || $this->password) {
