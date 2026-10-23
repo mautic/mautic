@@ -36,7 +36,11 @@ final class HttpFactoryTest extends TestCase
         $client      = $httpFactory->getClient($credentials);
         $config      = $client->getConfig(); /** @phpstan-ignore-line Deprecated. Must be refactored for Guzzle 8 */
         $this->assertSame('oauth', $config['auth']);
-        $this->assertSame('AuthUrlValue', $config['base_uri']->getPath());
-        $this->assertTrue($config['handler']->hasHandler());
+        /** @var \Psr\Http\Message\UriInterface $baseUri */
+        $baseUri = $config['base_uri'];
+        $this->assertSame('AuthUrlValue', $baseUri->getPath());
+        /** @var \GuzzleHttp\HandlerStack $handler */
+        $handler = $config['handler'];
+        $this->assertTrue($handler->hasHandler());
     }
 }

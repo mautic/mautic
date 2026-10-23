@@ -3,6 +3,7 @@
 namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -115,7 +116,9 @@ trait FieldsTypeTrait
                     $fieldsName = $fieldObject.'Fields';
                 }
                 if (isset($fieldData[$fieldsName])) {
-                    $fieldData[$fieldsName] = $options['integration_object']->formatMatchedFields($fieldData[$fieldsName]);
+                    /** @var AbstractIntegration $integrationObject */
+                    $integrationObject      = $options['integration_object'];
+                    $fieldData[$fieldsName] = $integrationObject->formatMatchedFields($fieldData[$fieldsName]);
                 }
 
                 foreach ($paginatedFields as $field => $details) {
@@ -147,7 +150,9 @@ trait FieldsTypeTrait
                         }
 
                         $forceDirection = false;
-                        $disabled       = (isset($fieldData[$fieldsName][$field])) ? $options['integration_object']->isCompoundMauticField($fieldData[$fieldsName][$field]) : false;
+                        /** @var AbstractIntegration $integrationObject */
+                        $integrationObject = $options['integration_object'];
+                        $disabled          = (isset($fieldData[$fieldsName][$field])) ? $integrationObject->isCompoundMauticField($fieldData[$fieldsName][$field]) : false;
                         $data           = isset($fieldData[$updateName][$field]) ? (int) $fieldData[$updateName][$field] : 1;
 
                         // Force to use just one way for certainly fields
@@ -235,12 +240,16 @@ trait FieldsTypeTrait
         $resolver->setDefaults(
             [
                 'special_instructions' => function (Options $options) {
-                    [$specialInstructions, $alertType] = $options['integration_object']->getFormNotes('leadfield_match');
+                    /** @var AbstractIntegration $integrationObject */
+                    $integrationObject = $options['integration_object'];
+                    [$specialInstructions, $alertType] = $integrationObject->getFormNotes('leadfield_match');
 
                     return $specialInstructions;
                 },
                 'alert_type' => function (Options $options) {
-                    [$specialInstructions, $alertType] = $options['integration_object']->getFormNotes('leadfield_match');
+                    /** @var AbstractIntegration $integrationObject */
+                    $integrationObject = $options['integration_object'];
+                    [$specialInstructions, $alertType] = $integrationObject->getFormNotes('leadfield_match');
 
                     return $alertType;
                 },
