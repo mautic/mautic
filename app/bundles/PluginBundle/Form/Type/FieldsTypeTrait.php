@@ -152,7 +152,7 @@ trait FieldsTypeTrait
                         $forceDirection = false;
                         /** @var AbstractIntegration $integrationObject */
                         $integrationObject = $options['integration_object'];
-                        $disabled          = (isset($fieldData[$fieldsName][$field])) ? $integrationObject->isCompoundMauticField($fieldData[$fieldsName][$field]) : false;
+                        $disabled          = isset($fieldData[$fieldsName][$field]) && $integrationObject->isCompoundMauticField($fieldData[$fieldsName][$field]);
                         $data           = isset($fieldData[$updateName][$field]) ? (int) $fieldData[$updateName][$field] : 1;
 
                         // Force to use just one way for certainly fields
