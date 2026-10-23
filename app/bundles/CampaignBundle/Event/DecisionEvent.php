@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Event;
 
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\LeadBundle\Entity\Lead;
 
-final class DecisionEvent extends CampaignExecutionEvent
+final class DecisionEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     use ContextTrait;
 
@@ -21,19 +23,6 @@ final class DecisionEvent extends CampaignExecutionEvent
         private readonly LeadEventLog $eventLog,
         private $passthrough = null,
     ) {
-        // @deprecated support for pre 2.13.0; to be removed in 3.0
-        parent::__construct(
-            [
-                'eventSettings'   => $eventConfig->getConfig(),
-                'eventDetails'    => $passthrough,
-                'event'           => $eventLog->getEvent(),
-                'lead'            => $eventLog->getLead(),
-                'systemTriggered' => defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED'),
-                'dateScheduled'   => $eventLog->getTriggerDate(),
-            ],
-            null,
-            $eventLog
-        );
     }
 
     public function getEventConfig(): AbstractEventAccessor
@@ -44,6 +33,19 @@ final class DecisionEvent extends CampaignExecutionEvent
     public function getLog(): LeadEventLog
     {
         return $this->eventLog;
+    }
+
+    public function getEvent(): Event
+    {
+        $event = $this->eventLog->getEvent();
+        \assert($event instanceof Event);
+
+        return $event;
+    }
+
+    public function getLead(): ?Lead
+    {
+        return $this->eventLog->getLead();
     }
 
     /**

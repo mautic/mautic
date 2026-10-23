@@ -74,7 +74,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
-        $eventDetails = $event->getEventDetails();
+        $eventDetails = $event->getPassthrough();
 
         if (null === $eventDetails) {
             $event->setAsApplicable();
@@ -86,7 +86,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $limitToForms = $event->getConfig()['forms'];
+        $limitToForms = $event->getEvent()->getProperties()['forms'];
 
         // check against selected forms
         if (!empty($limitToForms) && !in_array($eventDetails->getId(), $limitToForms)) {
@@ -108,7 +108,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $operators = $this->formModel->getFilterExpressionFunctions();
-        $form      = $this->formRepository->findOneById($event->getConfig()['form']);
+        $form      = $this->formRepository->findOneById($event->getEvent()->getProperties()['form']);
 
         if (!$form || !$form->getId()) {
             $event->fail();
@@ -116,22 +116,23 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $field = $this->formModel->findFormFieldByAlias($form, $event->getConfig()['field']);
+        $field = $this->formModel->findFormFieldByAlias($form, $event->getEvent()->getProperties()['field']);
 
         $filter = $this->formFieldHelper->getFieldFilter($field->getType());
-        $value  = InputHelper::_($event->getConfig()['value'], $filter);
+        $value  = InputHelper::_($event->getEvent()->getProperties()['value'], $filter);
 
         $result = $this->submissionRepository->compareValue(
             $lead->getId(),
             $form->getId(),
             $form->getAlias(),
-            $event->getConfig()['field'],
+            $event->getEvent()->getProperties()['field'],
             $value,
-            $operators[$event->getConfig()['operator']]['expr'],
+            $operators[$event->getEvent()->getProperties()['operator']]['expr'],
             $field ? $field->getType() : null
         );
 
-        $event->setChannel('form', $form->getId());
+        $event->getLog()->setChannel('form');
+        $event->getLog()->setChannelId($form->getId());
 
         if ($result) {
             $event->pass();

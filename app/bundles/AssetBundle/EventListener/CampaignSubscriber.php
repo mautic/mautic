@@ -55,7 +55,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
-        $eventDetails = $event->getEventDetails();
+        $eventDetails = $event->getPassthrough();
 
         if (null == $eventDetails) {
             $event->setAsApplicable();
@@ -68,7 +68,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $assetId       = $eventDetails->getId();
-        $limitToAssets = $event->getConfig()['assets'];
+        $limitToAssets = $event->getEvent()->getProperties()['assets'];
 
         if (!empty($limitToAssets) && !in_array($assetId, $limitToAssets)) {
             return;

@@ -191,21 +191,21 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         /** @var Email $eventDetails */
-        $eventDetails = $event->getEventDetails();
-        $eventParent  = $event->getEvent()['parent'];
-        $eventConfig  = $event->getConfig();
+        $eventDetails = $event->getPassthrough();
+        $eventParent  = $event->getEvent()->getParent();
+        $eventConfig  = $event->getEvent()->getProperties();
 
         if (null == $eventDetails) {
             return;
         }
 
         // check to see if the parent event is a "send email" event and that it matches the current email opened or clicked
-        if (!empty($eventParent) && 'email.send' === $eventParent['type']) {
+        if (null !== $eventParent && 'email.send' === $eventParent->getType()) {
             // click decision
             if ($event->checkContext('email.click')) {
                 /** @var Hit $hit */
                 $hit = $eventDetails;
-                if (in_array((int) $eventParent['properties']['email'], $eventDetails->getEmail()->getRelatedEntityIds())) {
+                if (in_array((int) $eventParent->getProperties()['email'], $eventDetails->getEmail()->getRelatedEntityIds())) {
                     if (!empty($eventConfig['urls']['list'])) {
                         $limitToUrls = (array) $eventConfig['urls']['list'];
                         if (UrlMatcher::hasMatch($limitToUrls, $hit->getUrl())) {
@@ -223,14 +223,14 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
                 return;
             }
             if ($event->checkContext('email.open')) {
-                if (in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds())) {
+                if (in_array((int) $eventParent->getProperties()['email'], $eventDetails->getRelatedEntityIds())) {
                     $event->setAsApplicable();
                 }
 
                 return;
             }
             if ($event->checkContext('email.reply')) {
-                if (in_array((int) $eventParent['properties']['email'], $eventDetails->getRelatedEntityIds())) {
+                if (in_array((int) $eventParent->getProperties()['email'], $eventDetails->getRelatedEntityIds())) {
                     $event->setAsApplicable();
                 }
 

@@ -319,12 +319,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Entity/Result/CountResult.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Event\\CampaignExecutionEvent\:\:checkContext\(\) has parameter \$eventType with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Event/CampaignExecutionEvent.php
-
-		-
 			message: '#^Method Mautic\\CampaignBundle\\Event\\ConditionEvent\:\:checkContext\(\) has parameter \$eventType with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1

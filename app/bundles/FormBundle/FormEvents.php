@@ -91,7 +91,7 @@ final class FormEvents
      * The mautic.form.on_campaign_trigger_condition event is fired when the campaign condition triggers.
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * Mautic\CampaignBundle\Event\ConditionEvent
      */
     public const string ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.form.on_campaign_trigger_condition';
 
@@ -99,7 +99,7 @@ final class FormEvents
      * The mautic.form.on_campaign_trigger_decision event is fired when the campaign decision triggers.
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * Mautic\CampaignBundle\Event\DecisionEvent
      */
     public const string ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.form.on_campaign_trigger_decision';
 

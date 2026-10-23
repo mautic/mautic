@@ -71,7 +71,7 @@ final class PageEvents
      * The mautic.page.on_campaign_trigger_decision event is fired when the campaign decision triggers.
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * Mautic\CampaignBundle\Event\DecisionEvent
      */
     public const string ON_CAMPAIGN_TRIGGER_DECISION = 'mautic.page.on_campaign_trigger_decision';
 
