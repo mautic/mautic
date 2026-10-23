@@ -12,6 +12,19 @@ use Symfony\Component\Mailer\Transport\Transports;
 
 class TransportFactory
 {
+    /**
+     * @var list<string>
+     */
+    private const KEY_ONLY_API_SCHEMES = [
+        'brevo+api',
+        'mailersend+api',
+        'mandrill+api',
+        'postmark+api',
+        'resend+api',
+        'sendgrid',
+        'sendgrid+api',
+    ];
+
     public function __construct(
         private readonly SymfonyTransportFactory $transportFactory,
     ) {
@@ -52,9 +65,15 @@ class TransportFactory
 
     private function normalizeSendgridDsn(string $dsn): string
     {
-        return (string) preg_replace(
-            '/^((?:[a-z][a-z0-9.-]*\\+api)|sendgrid):\\/\\/:(.*?)@/i',
-            '$1://$2@',
+        return (string) preg_replace_callback(
+            '/^([^:]+):\\/\\/:(.*?)@/i',
+            static function (array $matches): string {
+                if (!in_array(strtolower($matches[1]), self::KEY_ONLY_API_SCHEMES, true)) {
+                    return $matches[0];
+                }
+
+                return $matches[1].'://'.$matches[2].'@';
+            },
             $dsn,
             1
         );
