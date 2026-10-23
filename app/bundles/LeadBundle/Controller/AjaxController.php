@@ -821,6 +821,14 @@ final class AjaxController extends CommonAjaxController
             return new JsonResponse($this->prepareJsonResponse(0, false), Response::HTTP_NOT_FOUND);
         }
 
+        if (!$corePermissions->hasEntityAccess(
+            LeadPermissions::LISTS_VIEW_OWN,
+            LeadPermissions::LISTS_VIEW_OTHER,
+            $leadList->getCreatedBy()
+        )) {
+            $this->throwAccessDenied();
+        }
+
         $leadCounts = $model->getSegmentContactCount([$id]);
         $leadCount  = $leadCounts[$id];
 
@@ -832,13 +840,26 @@ final class AjaxController extends CommonAjaxController
         );
     }
 
-    public function getSegmentDependencyTreeAction(Request $request, SegmentDependencyTreeFactory $segmentDependencyTreeFactory, ListModel $model): JsonResponse
+    public function getSegmentDependencyTreeAction(Request $request, SegmentDependencyTreeFactory $segmentDependencyTreeFactory, ListModel $model, CorePermissions $corePermissions): JsonResponse
     {
+        if (!$corePermissions->isGranted(LeadPermissions::LISTS_VIEW_OWN)
+            && !$corePermissions->isGranted(LeadPermissions::LISTS_VIEW_OTHER)) {
+            $this->throwAccessDenied();
+        }
+
         $id      = (int) $request->get('id');
         $segment = $model->getEntity($id);
 
         if (!$segment) {
             return new JsonResponse(['message' => "Segment {$id} could not be found."], Response::HTTP_NOT_FOUND);
+        }
+
+        if (!$corePermissions->hasEntityAccess(
+            LeadPermissions::LISTS_VIEW_OWN,
+            LeadPermissions::LISTS_VIEW_OTHER,
+            $segment->getCreatedBy()
+        )) {
+            $this->throwAccessDenied();
         }
 
         $parentNode = $segmentDependencyTreeFactory->buildTree($segment);
