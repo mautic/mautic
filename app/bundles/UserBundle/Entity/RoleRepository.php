@@ -41,10 +41,7 @@ class RoleRepository extends CommonRepository
      */
     public function getEntitiesForRecentActivity(): array
     {
-        return $this->createQueryBuilder('r')
-            ->select('r')
-            ->getQuery()
-            ->getResult();
+        return parent::getEntities(['ignore_paginator' => true]);
     }
 
     /**
