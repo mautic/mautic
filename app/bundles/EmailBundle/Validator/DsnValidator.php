@@ -44,7 +44,7 @@ final class DsnValidator extends ConstraintValidator
         }
 
         try {
-            $this->transportFactory->fromDsnObject($dsn);
+            $this->transportFactory->fromStringForValidation($value);
         } catch (UnsupportedSchemeException $e) {
             $this->context->addViolation($e->getMessage() ?: 'mautic.email.dsn.unsupported_scheme');
         } catch (ExceptionInterface $e) {
