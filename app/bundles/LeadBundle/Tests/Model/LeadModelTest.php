@@ -758,6 +758,8 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Creates a mock LeadModel for duplicate contact tests.
+     *
+     * @return MockObject&LeadModel
      */
     private function createMockLeadModelForDuplicateTest(): MockObject
     {

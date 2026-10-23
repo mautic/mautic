@@ -152,17 +152,8 @@ parameters:
                 - app/bundles/UserBundle/Security/Authenticator/Oauth2Authenticator.php
                 - app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
                 - app/bundles/WebhookBundle/Entity/Webhook.php
-                - app/bundles/WebhookBundle/Views/Notifications/webhook-failing.html.php
-                - app/bundles/WebhookBundle/Views/Notifications/webhook-killed.html.php
-                - app/config/config_dev.php
-                - app/config/config_prod.php
-                - app/config/config_test.php
-                - app/config/parameters.php
-                - app/config/routing_dev.php
-                - app/config/routing.php
-                - app/config/security_api.php
-                - app/config/security.php
-                - app/config/security_test.php
+                - *.html.php
+                - app/config/
                 - plugins/MauticCrmBundle/Api/SalesforceApi.php
                 - plugins/MauticCrmBundle/Api/SugarcrmApi.php
                 - plugins/MauticCrmBundle/Form/Type/IntegrationCampaignsTaskType.php
