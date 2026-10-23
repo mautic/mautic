@@ -11,12 +11,8 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
-use Mautic\LeadBundle\Event\TagPostDeleteEvent;
 use Mautic\LeadBundle\Event\TagPostMergeEvent;
-use Mautic\LeadBundle\Event\TagPostSaveEvent;
-use Mautic\LeadBundle\Event\TagPreDeleteEvent;
 use Mautic\LeadBundle\Event\TagPreMergeEvent;
-use Mautic\LeadBundle\Event\TagPreSaveEvent;
 use Mautic\LeadBundle\Form\Type\TagEntityType;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Entity\TriggerEventRepository;
@@ -24,7 +20,6 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\ReportRepository;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -114,34 +109,6 @@ class TagModel extends FormModel
         }
 
         return $this->formFactory->create(TagEntityType::class, $entity, $options);
-    }
-
-    /**
-     * @param Tag $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Tag) {
-            throw new MethodNotAllowedHttpException(['Tag']);
-        }
-
-        $event = match ($action) {
-            'pre_save'    => new TagPreSaveEvent($entity, $isNew),
-            'post_save'   => new TagPostSaveEvent($entity, $isNew),
-            'pre_delete'  => new TagPreDeleteEvent($entity, $isNew),
-            'post_delete' => new TagPostDeleteEvent($entity, $isNew),
-            default       => null,
-        };
-
-        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
-            return null;
-        }
-
-        $this->dispatcher->dispatch($event);
-
-        return $event;
     }
 
     public function tagMerge(Tag $primaryTag, Tag $secondaryTag): Tag

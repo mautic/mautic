@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreSave;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
-use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
-use Mautic\EmailBundle\Event\EmailPostDeleteEvent;
-use Mautic\EmailBundle\Event\EmailPostSaveEvent;
-use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
@@ -34,9 +34,9 @@ final class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailPreSaveEvent::class    => ['onEmailPreSave', 0],
-            EmailPostSaveEvent::class   => ['onEmailPostSave', 0],
-            EmailPostDeleteEvent::class => ['onEmailDelete', 0],
+            EntityPreSave::class        => ['onEmailPreSave', 0],
+            EntityPostSave::class       => ['onEmailPostSave', 0],
+            EntityPostDelete::class     => ['onEmailDelete', 0],
             EmailEditSubmitEvent::class => ['manageEmailDraft'],
         ];
     }

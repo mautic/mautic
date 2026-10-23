@@ -12,10 +12,8 @@ use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\PointBundle\Entity\GroupRepository;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Form\Type\GroupType;
-use Mautic\PointBundle\PointGroupEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -89,46 +87,6 @@ final class PointGroupModel extends CommonFormModel implements GlobalSearchInter
         }
 
         return parent::getEntity($id);
-    }
-
-    /**
-     * @param Group $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Group) {
-            throw new MethodNotAllowedHttpException(['Group']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = PointGroupEvents::GROUP_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = PointGroupEvents::GROUP_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = PointGroupEvents::GROUP_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = PointGroupEvents::GROUP_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new Events\GroupEvent($entity);
-            }
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
     }
 
     public function adjustPoints(Lead $contact, Group $group, int $points, string $operator = Lead::POINTS_ADD): Lead

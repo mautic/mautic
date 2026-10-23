@@ -159,46 +159,6 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
     }
 
     /**
-     * @param Campaign $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?\Symfony\Contracts\EventDispatcher\Event $event = null): ?\Symfony\Contracts\EventDispatcher\Event
-    {
-        if ($entity instanceof CampaignLead) {
-            return null;
-        }
-
-        if (!$entity instanceof Campaign) {
-            throw new MethodNotAllowedHttpException(['Campaign']);
-        }
-
-        $eventClass = match ($action) {
-            'pre_save'    => Events\CampaignPreSaveEvent::class,
-            'post_save'   => Events\CampaignPostSaveEvent::class,
-            'pre_delete'  => Events\CampaignPreDeleteEvent::class,
-            'post_delete' => Events\CampaignPostDeleteEvent::class,
-            default       => null,
-        };
-
-        if (null === $eventClass) {
-            return null;
-        }
-
-        if ($this->dispatcher->hasListeners($eventClass)) {
-            if (!$event instanceof $eventClass) {
-                $event = new $eventClass($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event);
-
-            return $event;
-        }
-
-        return null;
-    }
-
-    /**
      * @param mixed[]              $deletedEvents
      * @param array<string, mixed> $sessionConnections
      */
