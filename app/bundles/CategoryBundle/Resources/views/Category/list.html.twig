@@ -19,6 +19,7 @@
                 </div> #}
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
+                'searchPlaceholder': 'mautic.category.search.placeholder',
                 'searchScopes': searchScopes|default([]),
                 'searchScopeHint': searchScopeHint|default(null),
                 'filters': {

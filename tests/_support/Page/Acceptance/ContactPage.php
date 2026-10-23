@@ -98,7 +98,7 @@ final class ContactPage
     // Search bar
     public static $searchBar   = '#list-search';
 
-    public static $clearSearch = '#btn-filter';
+    public static $clearSearch = '.form-field-with-action .form-field-clear';
 
     // Clear all selection button
     public static $clearAllContactsSelection = '#form-cancel';
