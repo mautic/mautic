@@ -25,9 +25,9 @@ final class TransportFactoryTest extends TestCase
 
         $transport->fromString('future+api://:SG.test@default?region=eu');
 
-        self::assertSame('SG.test', $factory->capturedDsn->getUser());
-        self::assertNull($factory->capturedDsn->getPassword());
-        self::assertSame('eu', $factory->capturedDsn->getOption('region'));
+        $this->assertSame('SG.test', $factory->capturedDsn->getUser());
+        $this->assertNull($factory->capturedDsn->getPassword());
+        $this->assertSame('eu', $factory->capturedDsn->getOption('region'));
     }
 
     public function testExistingCredentialsAreNotChanged(): void
@@ -37,8 +37,8 @@ final class TransportFactoryTest extends TestCase
 
         $transport->fromString('future+api://user:secret@default');
 
-        self::assertSame('user', $factory->capturedDsn->getUser());
-        self::assertSame('secret', $factory->capturedDsn->getPassword());
+        $this->assertSame('user', $factory->capturedDsn->getUser());
+        $this->assertSame('secret', $factory->capturedDsn->getPassword());
     }
 
     public function testLiteralColonInPasswordOnlyApiKeyIsPreserved(): void
@@ -48,8 +48,8 @@ final class TransportFactoryTest extends TestCase
 
         $transport->fromString('future+api://:part1:part2@default');
 
-        self::assertSame('part1:part2', $factory->capturedDsn->getUser());
-        self::assertNull($factory->capturedDsn->getPassword());
+        $this->assertSame('part1:part2', $factory->capturedDsn->getUser());
+        $this->assertNull($factory->capturedDsn->getPassword());
     }
 
     public function testPasswordOnlyApiKeyPreservesSpacesAndPlusSigns(): void
@@ -59,8 +59,8 @@ final class TransportFactoryTest extends TestCase
 
         $transport->fromString('future+api://:part%20one%2Btwo@default');
 
-        self::assertSame('part one+two', $factory->capturedDsn->getUser());
-        self::assertNull($factory->capturedDsn->getPassword());
+        $this->assertSame('part one+two', $factory->capturedDsn->getUser());
+        $this->assertNull($factory->capturedDsn->getPassword());
     }
 
     public function testPasswordOnlyApiKeyPreservesAnUnescapedPlusSign(): void
@@ -70,7 +70,7 @@ final class TransportFactoryTest extends TestCase
 
         $transport->fromString('future+api://:part+one@default');
 
-        self::assertSame('part+one', $factory->capturedDsn->getUser());
+        $this->assertSame('part+one', $factory->capturedDsn->getUser());
     }
 
     public function testPasswordOnlyApiKeyPreservesZero(): void
@@ -80,8 +80,8 @@ final class TransportFactoryTest extends TestCase
 
         $transport->fromString('future+api://:0@default');
 
-        self::assertSame('0', $factory->capturedDsn->getUser());
-        self::assertNull($factory->capturedDsn->getPassword());
+        $this->assertSame('0', $factory->capturedDsn->getUser());
+        $this->assertNull($factory->capturedDsn->getPassword());
     }
 
     public function testSmtpCredentialsAreNotChanged(): void
@@ -91,8 +91,8 @@ final class TransportFactoryTest extends TestCase
 
         $transport->fromString('smtp://:secret@example.test');
 
-        self::assertNull($factory->capturedDsn->getUser());
-        self::assertSame('secret', $factory->capturedDsn->getPassword());
+        $this->assertNull($factory->capturedDsn->getUser());
+        $this->assertSame('secret', $factory->capturedDsn->getPassword());
     }
 
     public function testTwoCredentialApiDsnKeepsItsOriginalError(): void
@@ -112,32 +112,32 @@ final class TransportFactoryTest extends TestCase
 
         $transport->fromStringForValidation('future+api://:SG.test@default?region=eu');
 
-        self::assertSame('SG.test', $factory->capturedDsn->getUser());
-        self::assertNull($factory->capturedDsn->getPassword());
+        $this->assertSame('SG.test', $factory->capturedDsn->getUser());
+        $this->assertNull($factory->capturedDsn->getPassword());
     }
 
     public function testPasswordOnlyApiDsnWorksInsideFailoverTransport(): void
     {
         $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
-        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory, new CapturingTransportFactory('smtp')]));
 
         $result = $transport->fromString('failover(future+api://:SG.test@default smtp://relay.test)');
 
-        self::assertInstanceOf(FailoverTransport::class, $result);
-        self::assertSame('SG.test', $factory->capturedDsn->getUser());
-        self::assertNull($factory->capturedDsn->getPassword());
+        $this->assertInstanceOf(FailoverTransport::class, $result);
+        $this->assertSame('SG.test', $factory->capturedDsn->getUser());
+        $this->assertNull($factory->capturedDsn->getPassword());
     }
 
     public function testPasswordOnlyApiDsnWorksInsideRoundRobinTransport(): void
     {
         $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
-        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory, new CapturingTransportFactory('smtp')]));
 
         $result = $transport->fromString('roundrobin(future+api://:SG.test@default smtp://relay.test)?retry_period=90');
 
-        self::assertInstanceOf(RoundRobinTransport::class, $result);
-        self::assertSame('SG.test', $factory->capturedDsn->getUser());
-        self::assertNull($factory->capturedDsn->getPassword());
+        $this->assertInstanceOf(RoundRobinTransport::class, $result);
+        $this->assertSame('SG.test', $factory->capturedDsn->getUser());
+        $this->assertNull($factory->capturedDsn->getPassword());
     }
 
     public function testCompoundDsnRejectsTrailingContent(): void
