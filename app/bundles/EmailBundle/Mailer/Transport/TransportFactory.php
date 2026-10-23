@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Mailer\Transport;
 
+use Mautic\CoreBundle\Helper\Dsn\Dsn as MauticDsn;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport as SymfonyTransportFactory;
@@ -13,29 +14,6 @@ use Symfony\Component\Mailer\Transport\Transports;
 
 class TransportFactory
 {
-    /**
-     * @var list<string>
-     */
-    private const KEY_ONLY_API_SCHEMES = [
-        'brevo+api',
-        'mailersend+api',
-        'mandrill+api',
-        'postmark+api',
-        'resend+api',
-        'sendgrid',
-        'sendgrid+api',
-    ];
-
-    /**
-     * @var list<string>
-     */
-    private const MULTI_CREDENTIAL_API_SCHEMES = [
-        'mailgun+api',
-        'mailjet+api',
-        'scaleway+api',
-        'ses+api',
-    ];
-
     public function __construct(
         private readonly SymfonyTransportFactory $transportFactory,
     ) {
@@ -76,57 +54,23 @@ class TransportFactory
 
     private function fromStringWithoutUnsupportedSchemeFallback(string $dsn): TransportInterface
     {
-        $normalizedDsn = $this->normalizePasswordOnlyApiDsn($dsn);
-
         try {
-            return $this->transportFactory->fromString($normalizedDsn);
+            return $this->transportFactory->fromString($dsn);
         } catch (IncompleteDsnException $exception) {
-            if ($normalizedDsn === $dsn && $this->canRetryPasswordOnlyApiDsn($dsn, $exception)) {
-                return $this->transportFactory->fromString($this->movePasswordToUser($dsn));
+            $parsed = MauticDsn::fromString($dsn);
+
+            if (null !== $parsed->getUser()
+                || null === $parsed->getPassword()
+                || preg_match('/(?:^|\+)smtps?$/', $parsed->getScheme())
+            ) {
+                throw $exception;
             }
 
-            throw $exception;
+            try {
+                return $this->transportFactory->fromString((string) $parsed->setUser($parsed->getPassword())->setPassword(null));
+            } catch (IncompleteDsnException) {
+                throw $exception;
+            }
         }
-    }
-
-    private function normalizePasswordOnlyApiDsn(string $dsn): string
-    {
-        return (string) preg_replace_callback(
-            '/^([^:]+):\\/\\/:(.*?)@/i',
-            static function (array $matches): string {
-                if (!in_array(strtolower($matches[1]), self::KEY_ONLY_API_SCHEMES, true)) {
-                    return $matches[0];
-                }
-
-                return $matches[1].'://'.str_replace(':', '%3A', $matches[2]).'@';
-            },
-            $dsn,
-            1
-        );
-    }
-
-    private function canRetryPasswordOnlyApiDsn(string $dsn, IncompleteDsnException $exception): bool
-    {
-        if (!str_contains($exception->getMessage(), 'User is not set')) {
-            return false;
-        }
-
-        if (!preg_match('/^([^:]+):\/\/:([^@]+)@/i', $dsn, $matches)) {
-            return false;
-        }
-
-        $scheme = strtolower($matches[1]);
-
-        return str_ends_with($scheme, '+api') && !in_array($scheme, self::MULTI_CREDENTIAL_API_SCHEMES, true);
-    }
-
-    private function movePasswordToUser(string $dsn): string
-    {
-        return (string) preg_replace_callback(
-            '/^([^:]+):\/\/:([^@]+)@/i',
-            static fn (array $matches): string => $matches[1].'://'.str_replace(':', '%3A', $matches[2]).'@',
-            $dsn,
-            1
-        );
     }
 }

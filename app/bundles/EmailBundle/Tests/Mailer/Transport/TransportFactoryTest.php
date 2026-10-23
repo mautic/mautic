@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Mailer\Transport;
 
 use Mautic\EmailBundle\Mailer\Transport\TransportFactory;
-use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Transport as SymfonyTransportFactory;
@@ -16,156 +15,81 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 
 final class TransportFactoryTest extends TestCase
 {
-    #[DataProvider('sendgridSchemes')]
-    public function testPasswordOnlyApiDsnUsesThePasswordAsTheApiKey(string $scheme): void
+    public function testPasswordOnlyApiDsnUsesThePasswordAsTheApiKey(): void
     {
-        $capturedDsn = null;
-        $factory     = new CapturingTransportFactory($capturedDsn, $scheme);
-        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
+        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
 
-        $transport->fromString(sprintf('%s://:SG.test@default?region=eu', $scheme));
+        $transport->fromString('future+api://:SG.test@default?region=eu');
 
-        self::assertNotNull($capturedDsn);
-        self::assertSame('SG.test', $capturedDsn->getUser());
-        self::assertNull($capturedDsn->getPassword());
-        self::assertSame('eu', $capturedDsn->getOption('region'));
+        self::assertSame('SG.test', $factory->capturedDsn->getUser());
+        self::assertNull($factory->capturedDsn->getPassword());
+        self::assertSame('eu', $factory->capturedDsn->getOption('region'));
     }
 
-    /**
-     * @return iterable<string, array{string}>
-     */
-    public static function sendgridSchemes(): iterable
+    public function testExistingCredentialsAreNotChanged(): void
     {
-        yield 'sendgrid' => ['sendgrid'];
-        yield 'brevo api' => ['brevo+api'];
-        yield 'mailer send api' => ['mailersend+api'];
-        yield 'mandrill api' => ['mandrill+api'];
-        yield 'postmark api' => ['postmark+api'];
-        yield 'resend api' => ['resend+api'];
-        yield 'sendgrid api' => ['sendgrid+api'];
+        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $transport->fromString('future+api://user:secret@default');
+
+        self::assertSame('user', $factory->capturedDsn->getUser());
+        self::assertSame('secret', $factory->capturedDsn->getPassword());
     }
 
-    public function testExistingSendgridUserIsNotChanged(): void
+    public function testLiteralColonInPasswordOnlyApiKeyIsPreserved(): void
     {
-        $capturedDsn = null;
-        $factory     = new CapturingTransportFactory($capturedDsn, 'sendgrid+api');
-        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
+        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
 
-        $transport->fromString('sendgrid+api://SG.user:SG.secret@default');
+        $transport->fromString('future+api://:part1:part2@default');
 
-        self::assertNotNull($capturedDsn);
-        self::assertSame('SG.user', $capturedDsn->getUser());
-        self::assertSame('SG.secret', $capturedDsn->getPassword());
+        self::assertSame('part1:part2', $factory->capturedDsn->getUser());
+        self::assertNull($factory->capturedDsn->getPassword());
     }
 
-    public function testLiteralColonInPasswordOnlyApiKeyIsEncodedBeforeParsing(): void
+    public function testSmtpCredentialsAreNotChanged(): void
     {
-        $capturedDsn = null;
-        $factory     = new CapturingTransportFactory($capturedDsn, 'sendgrid+api');
-        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
-
-        $transport->fromString('sendgrid+api://:part1:part2@default');
-
-        self::assertNotNull($capturedDsn);
-        self::assertSame('part1:part2', $capturedDsn->getUser());
-        self::assertNull($capturedDsn->getPassword());
-    }
-
-    public function testSendgridSmtpCredentialsAreNotChanged(): void
-    {
-        $capturedDsn = null;
-        $factory     = new CapturingTransportFactory($capturedDsn, 'sendgrid+smtp');
-        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
-
-        $transport->fromString('sendgrid+smtp://:SG.secret@default');
-
-        self::assertNotNull($capturedDsn);
-        self::assertNull($capturedDsn->getUser());
-        self::assertSame('SG.secret', $capturedDsn->getPassword());
-    }
-
-    #[DataProvider('multiCredentialApiSchemes')]
-    public function testMultiCredentialApiDsnIsNotChanged(string $scheme): void
-    {
-        $capturedDsn = null;
-        $factory     = new CapturingTransportFactory($capturedDsn, $scheme);
-        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
-
-        $transport->fromString(sprintf('%s://:secret@default', $scheme));
-
-        self::assertNotNull($capturedDsn);
-        self::assertNull($capturedDsn->getUser());
-        self::assertSame('secret', $capturedDsn->getPassword());
-    }
-
-    /**
-     * @return iterable<string, array{string}>
-     */
-    public static function multiCredentialApiSchemes(): iterable
-    {
-        yield 'amazon ses api' => ['ses+api'];
-        yield 'mailgun api' => ['mailgun+api'];
-        yield 'mailjet api' => ['mailjet+api'];
-        yield 'scaleway api' => ['scaleway+api'];
-    }
-
-    public function testUnknownApiTransportCanUsePasswordOnlyCredentialsAfterUserMissingException(): void
-    {
-        $capturedDsn = null;
-        $factory     = new CapturingTransportFactory($capturedDsn, 'future+api', true);
-        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
-
-        $transport->fromString('future+api://:SG.test@default');
-
-        self::assertNotNull($capturedDsn);
-        self::assertSame('SG.test', $capturedDsn->getUser());
-        self::assertNull($capturedDsn->getPassword());
-    }
-
-    public function testAmazonSesIsNotRetriedWithPasswordAsUser(): void
-    {
-        $capturedDsn = null;
-        $factory     = new CapturingTransportFactory($capturedDsn, 'ses+api', true);
-        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
-
-        $this->expectException(IncompleteDsnException::class);
-        $transport->fromString('ses+api://:SG.test@default');
-    }
-
-    public function testPasswordOnlySendgridDsnForValidationUsesThePasswordAsTheApiKey(): void
-    {
-        $capturedDsn = null;
-        $factory     = new CapturingTransportFactory($capturedDsn, 'sendgrid+api');
-        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
-
-        $transport->fromStringForValidation('sendgrid+api://:SG.test@default?region=eu');
-
-        self::assertNotNull($capturedDsn);
-        self::assertSame('SG.test', $capturedDsn->getUser());
-        self::assertNull($capturedDsn->getPassword());
-        self::assertSame('eu', $capturedDsn->getOption('region'));
-    }
-
-    public function testNonSendgridDsnIsNotChanged(): void
-    {
-        $capturedDsn = null;
-        $factory     = new CapturingTransportFactory($capturedDsn, 'smtp');
-        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
+        $factory   = new CapturingTransportFactory('smtp');
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
 
         $transport->fromString('smtp://:secret@example.test');
 
-        self::assertNotNull($capturedDsn);
-        self::assertNull($capturedDsn->getUser());
-        self::assertSame('secret', $capturedDsn->getPassword());
+        self::assertNull($factory->capturedDsn->getUser());
+        self::assertSame('secret', $factory->capturedDsn->getPassword());
+    }
+
+    public function testTwoCredentialApiDsnKeepsItsOriginalError(): void
+    {
+        $factory   = new CapturingTransportFactory('ses+api', requiresUser: true, requiresPassword: true);
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $this->expectException(IncompleteDsnException::class);
+        $this->expectExceptionMessage('User is not set');
+        $transport->fromString('ses+api://:secret@default');
+    }
+
+    public function testPasswordOnlyApiDsnForValidationUsesTheFallback(): void
+    {
+        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $transport->fromStringForValidation('future+api://:SG.test@default?region=eu');
+
+        self::assertSame('SG.test', $factory->capturedDsn->getUser());
+        self::assertNull($factory->capturedDsn->getPassword());
     }
 }
 
 final class CapturingTransportFactory implements TransportFactoryInterface
 {
+    public Dsn $capturedDsn;
+
     public function __construct(
-        private ?Dsn &$capturedDsn,
         private readonly string $scheme,
         private readonly bool $requiresUser = false,
+        private readonly bool $requiresPassword = false,
     ) {
     }
 
@@ -173,6 +97,10 @@ final class CapturingTransportFactory implements TransportFactoryInterface
     {
         if ($this->requiresUser && null === $dsn->getUser()) {
             throw new IncompleteDsnException('User is not set');
+        }
+
+        if ($this->requiresPassword && null === $dsn->getPassword()) {
+            throw new IncompleteDsnException('Password is not set');
         }
 
         $this->capturedDsn = $dsn;

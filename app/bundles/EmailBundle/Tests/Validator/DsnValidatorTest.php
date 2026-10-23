@@ -17,13 +17,13 @@ final class DsnValidatorTest extends TestCase
     {
         $dsn               = 'sendgrid+api://:SG.test@default';
         $transportFactory  = $this->createMock(TransportFactory::class);
-        $transportFactory->expects(self::once())
+        $transportFactory->expects($this->once())
             ->method('fromStringForValidation')
             ->with($dsn)
             ->willReturn(new NullTransport());
 
         $context = $this->createMock(ExecutionContextInterface::class);
-        $context->expects(self::never())->method('addViolation');
+        $context->expects($this->never())->method('addViolation');
 
         $validator = new DsnValidator($transportFactory);
         $validator->initialize($context);
