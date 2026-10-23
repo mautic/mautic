@@ -35,6 +35,16 @@ class RoleRepository extends CommonRepository
     }
 
     /**
+     * Get roles as entities for user audit activity rendering.
+     *
+     * @return Role[]
+     */
+    public function getEntitiesForRecentActivity(): array
+    {
+        return parent::getEntities(['ignore_paginator' => true]);
+    }
+
+    /**
      * Get roles for global search without user count subquery.
      *
      * @param array<string, string|array<int, array<int|string, int|string|bool|null>>> $filter
