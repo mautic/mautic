@@ -19,13 +19,13 @@ final class UniqueUserAliasValidator extends ConstraintValidator
 
     public function validate(mixed $list, Constraint $constraint): void
     {
-        /** @var LeadList $list */
         $field = $constraint->field;
 
         if (empty($field)) {
             throw new ConstraintDefinitionException('A field has to be specified.');
         }
 
+        /** @var LeadList $list */
         if ($list->getAlias()) {
             $lists = $this->segmentRepository->getLists(
                 $this->userHelper->getUser(),
