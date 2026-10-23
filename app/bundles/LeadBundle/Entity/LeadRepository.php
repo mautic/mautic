@@ -489,13 +489,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         );
 
         $contactCount = isset($contacts['results']) ? count($contacts['results']) : count($contacts);
-        if ($contactCount && (!empty($args['withPrimaryCompany']) || !empty($args['withChannelRules']))) {
+        if ($contactCount && (!empty($args['withPrimaryCompany']) || !empty($args['withChannelRules']) || !empty($args['withStage']))) {
             $withTotalCount = (array_key_exists('withTotalCount', $args) && $args['withTotalCount']);
             /** @var Lead[] $tmpContacts */
             $tmpContacts = ($withTotalCount) ? $contacts['results'] : $contacts;
 
             $withCompanies   = !empty($args['withPrimaryCompany']);
             $withPreferences = !empty($args['withChannelRules']);
+            $withStage       = !empty($args['withStage']);
             $contactIds      = array_keys($tmpContacts);
 
             if ($withCompanies) {
@@ -505,6 +506,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             if ($withPreferences) {
                 $frequencyRules = $this->frequencyRuleRepository->getFrequencyRules(null, $contactIds);
                 $dncRules = $this->doNotContactRepository->getChannelList(null, $contactIds);
+            }
+
+            if ($withStage) {
+                $stageNames = $this->getStageNamesForContacts($contactIds);
             }
 
             foreach ($contactIds as $id) {
@@ -541,6 +546,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         $tmpContacts[$id]->setChannelRules($channelRules);
                     }
                 }
+
+                // Lead entities already carry their stage
+                if ($withStage && is_array($tmpContacts[$id])) {
+                    $tmpContacts[$id]['stage'] = $stageNames[$id] ?? null;
+                }
             }
 
             if ($withTotalCount) {
@@ -551,6 +561,23 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         return $contacts;
+    }
+
+    /**
+     * @param array<int|string> $contactIds
+     *
+     * @return array<int, string>
+     */
+    private function getStageNamesForContacts(array $contactIds): array
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('l.id, s.name')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->innerJoin('l', MAUTIC_TABLE_PREFIX.'stages', 's', 's.id = l.stage_id')
+            ->where($q->expr()->in('l.id', ':contactIds'))
+            ->setParameter('contactIds', $contactIds, ArrayParameterType::INTEGER);
+
+        return $q->executeQuery()->fetchAllKeyValue();
     }
 
     public function getFieldGroups(): array
