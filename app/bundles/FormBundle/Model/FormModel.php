@@ -299,12 +299,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
-    /**
-     * @param array $actions
-     */
-    public function deleteActions(Form $entity, $actions): void
+    public function deleteActions(Form $entity, array $actions): void
     {
-        if (empty($actions)) {
+        if ($actions === []) {
             return;
         }
 

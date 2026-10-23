@@ -398,7 +398,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param array<string> $content
      */
-    public function setContent($content): static
+    public function setContent(array $content): static
     {
         $this->isChanged('content', $content);
         $this->content = $content;

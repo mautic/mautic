@@ -196,10 +196,7 @@ class MessageQueue
         return $this->options;
     }
 
-    /**
-     * @param array $options
-     */
-    public function setOptions($options): void
+    public function setOptions(array $options): void
     {
         $this->options[] = $options;
     }

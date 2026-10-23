@@ -233,10 +233,7 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
         return null;
     }
 
-    /**
-     * @param array $sessionEvents
-     */
-    public function setEvents(Trigger $entity, $sessionEvents): void
+    public function setEvents(Trigger $entity, array $sessionEvents): void
     {
         $order           = 1;
         $existingActions = $entity->getEvents();

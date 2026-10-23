@@ -821,7 +821,7 @@ class Event implements ChannelInterface, UuidInterface
      *
      * @return LeadEventLog[]|Collection<int, LeadEventLog>
      */
-    public function getContactLog(?Contact $contact = null)
+    public function getContactLog(?Contact $contact = null): iterable
     {
         if ($this->contactLog) {
             return $this->contactLog;
@@ -840,7 +840,7 @@ class Event implements ChannelInterface, UuidInterface
      *
      * @param LeadEventLog[] $contactLog
      */
-    public function setContactLog($contactLog): static
+    public function setContactLog(array $contactLog): static
     {
         $this->contactLog = $contactLog;
 

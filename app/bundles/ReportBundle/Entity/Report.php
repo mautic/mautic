@@ -317,7 +317,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @param mixed[] $columns
      */
-    public function setColumns($columns): static
+    public function setColumns(array $columns): static
     {
         $this->isChanged('columns', $columns);
         $this->columns = $columns;
@@ -336,7 +336,7 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
     /**
      * @param mixed[] $filters
      */
-    public function setFilters($filters): static
+    public function setFilters(array $filters): static
     {
         $this->isChanged('filters', $filters);
         $this->filters = $filters;

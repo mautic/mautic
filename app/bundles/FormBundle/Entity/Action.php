@@ -176,10 +176,7 @@ class Action implements UuidInterface
         return $this->order;
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
 

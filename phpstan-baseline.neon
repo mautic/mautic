@@ -3031,24 +3031,6 @@ parameters:
 			path: app/bundles/FormBundle/Event/SubmissionEvent.php
 
 		-
-			message: '#^Parameter \#4 \$filters of method Mautic\\FormBundle\\Model\\SubmissionModel\:\:getTopSubmissionReferrers\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Parameter \#4 \$filters of method Mautic\\FormBundle\\Model\\SubmissionModel\:\:getTopSubmitters\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
-
-		-
-			message: '#^Parameter \#5 \$filter of method Mautic\\FormBundle\\Model\\SubmissionModel\:\:getSubmissionsLineChartData\(\) expects array, bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/FormBundle/EventListener/DashboardSubscriber.php
-
-		-
 			message: '#^Parameter \#1 \$response of method Mautic\\FormBundle\\EventListener\\FormSubscriber\:\:parseResponse\(\) expects GuzzleHttp\\Psr7\\Response, Psr\\Http\\Message\\ResponseInterface given\.$#'
 			identifier: argument.type
 			count: 2
@@ -4871,12 +4853,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/PageBundle/Controller/PageController.php
-
-		-
-			message: '#^Parameter \#5 \$query of method Mautic\\PageBundle\\Model\\PageModel\:\:hitPage\(\) expects array, string\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/PageBundle/Controller/PublicController.php
 
 		-
 			message: '#^Property Mautic\\PageBundle\\Entity\\Hit\:\:\$referer has no type specified\.$#'
