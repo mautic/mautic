@@ -613,13 +613,10 @@ final class WebhookModel extends FormModel
         return $event;
     }
 
-    /**
-     * @param array $groups
-     */
-    public function serializeData($payload, $groups = [], array $customExclusionStrategies = []): string
+    public function serializeData($payload, array $groups = [], array $customExclusionStrategies = []): string
     {
         $context = SerializationContext::create();
-        if (!empty($groups)) {
+        if ($groups !== []) {
             $context->setGroups($groups);
         }
 

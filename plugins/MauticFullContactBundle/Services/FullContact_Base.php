@@ -102,13 +102,12 @@ abstract class FullContact_Base
      * @author  Keith Casey <contrib@caseysoftware.com>
      * @author  David Boskovic <me@david.gs> @dboskovic
      *
-     * @param array                $postData
      * @param array<string, mixed> $params
      *
      * @throws NoCreditException
      * @throws NotImplementedException
      */
-    protected function _execute(array $params = [], $postData = null): ?object
+    protected function _execute(array $params = [], ?array $postData = null): ?object
     {
         if (null === $postData && !in_array($params['method'], $this->_supportedMethods, true)) {
             throw new NotImplementedException(self::class.' does not support the ['.$params['method'].'] method');

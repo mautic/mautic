@@ -58,8 +58,8 @@ final class IntegrationHelper
     /**
      * Get a list of integration helper classes.
      *
-     * @param array|string $specificIntegrations
-     * @param array        $withFeatures
+     * @param array|string      $specificIntegrations
+     * @param string[]|string|null $withFeatures
      * @param bool         $alphabetical
      * @param int|null     $pluginFilter
      * @param bool|false   $publishedOnly
@@ -408,13 +408,12 @@ final class IntegrationHelper
      * Get the user's social profile data from cache or integrations if indicated.
      *
      * @param Lead   $lead
-     * @param array  $fields
      * @param bool   $refresh
      * @param string $specificIntegration
      * @param bool   $persistLead
      * @param bool   $returnSettings
      */
-    public function getUserProfiles(object $lead, $fields = [], $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false): array
+    public function getUserProfiles(object $lead, array $fields = [], $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false): array
     {
         $socialCache     = $lead->getSocialCache();
         $featureSettings = [];
