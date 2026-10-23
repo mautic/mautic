@@ -58,6 +58,19 @@ final class TransportFactoryTest extends TestCase
         self::assertSame('SG.secret', $capturedDsn->getPassword());
     }
 
+    public function testLiteralColonInPasswordOnlyApiKeyIsEncodedBeforeParsing(): void
+    {
+        $capturedDsn = null;
+        $factory     = new CapturingTransportFactory($capturedDsn, 'sendgrid+api');
+        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $transport->fromString('sendgrid+api://:part1:part2@default');
+
+        self::assertNotNull($capturedDsn);
+        self::assertSame('part1:part2', $capturedDsn->getUser());
+        self::assertNull($capturedDsn->getPassword());
+    }
+
     public function testSendgridSmtpCredentialsAreNotChanged(): void
     {
         $capturedDsn = null;

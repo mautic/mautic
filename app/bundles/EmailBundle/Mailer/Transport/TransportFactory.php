@@ -98,7 +98,7 @@ class TransportFactory
                     return $matches[0];
                 }
 
-                return $matches[1].'://'.$matches[2].'@';
+                return $matches[1].'://'.str_replace(':', '%3A', $matches[2]).'@';
             },
             $dsn,
             1
@@ -122,6 +122,11 @@ class TransportFactory
 
     private function movePasswordToUser(string $dsn): string
     {
-        return (string) preg_replace('/^([^:]+):\/\/:((?:[^@])+?)@/i', '$1://$2@', $dsn, 1);
+        return (string) preg_replace_callback(
+            '/^([^:]+):\/\/:([^@]+)@/i',
+            static fn (array $matches): string => $matches[1].'://'.str_replace(':', '%3A', $matches[2]).'@',
+            $dsn,
+            1
+        );
     }
 }
