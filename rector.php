@@ -100,6 +100,12 @@ return RectorConfig::configure()
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
             __DIR__.'/app/bundles/PageBundle/Controller/AjaxController.php',
             __DIR__.'/app/bundles/EmailBundle/Controller/AjaxController.php',
+            __DIR__.'/app/bundles/DynamicContentBundle/Controller/AjaxController.php',
+        ],
+
+        // Called dynamically via method_exists() in parent::getBuilderTokensAction()
+        Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodRector::class => [
+            __DIR__.'/app/bundles/DynamicContentBundle/Controller/AjaxController.php',
         ],
 
         // modified with reflection

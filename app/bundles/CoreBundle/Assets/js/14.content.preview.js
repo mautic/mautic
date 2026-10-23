@@ -174,6 +174,11 @@ Mautic.activatePreviewCompanyLookupField = function (fieldOptions, filterId) {
     Mautic.activateLookupField (fieldOptions, filterId, 'content_preview_settings_company', '#content_preview_settings_company_id', 'lead.company');
 };
 
+
+Mautic.activatePreviewContactLookupField = function (fieldOptions, filterId) {
+    Mautic.activateLookupField (fieldOptions, filterId, 'content_preview_settings_contact', '#content_preview_settings_contact_id', 'lead.lead');
+};
+
 /**
  * Used in data-lookup-callback attr of form field in ContentPreviewSettingsType
  * Take a look at https://github.com/twitter/typeahead.js/

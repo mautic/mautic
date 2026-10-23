@@ -1,3 +1,5 @@
+Mautic.refreshDisplayOrderFlag = null;
+
 Mautic.toggleDwcFilters = function () {
     mQuery("#dwcFiltersTab, #slotNameDiv").toggleClass("hide");
     if (mQuery("#dwcFiltersTab").hasClass('hide')) {
@@ -162,10 +164,47 @@ Mautic.dynamicContentOnLoad = function (container, response) {
 
     var availableFilters = mQuery('div.dwc-filter').find('select[data-mautic="available_filters"]');
     Mautic.activateChosenSelect(availableFilters, false);
-
     Mautic.dynamicFiltersOnLoad('div.dwc-filter');
     Mautic.dwcGenerator.init();
 };
+
+Mautic.activateSlotNameLookupField = function (fieldOptions, filterId) {
+    Mautic.activateLookupField (fieldOptions, filterId, 'dwc_slotName');
+};
+
+mQuery( document ).ajaxComplete(function(event, xhr, settings) {
+    if (settings.type === 'POST' && (settings.url.indexOf('dwc/edit') > -1 || settings.url.indexOf('dwc/new') > -1)) {
+        if (!xhr.responseJSON.newContent.includes('help-block')) {
+            Mautic.refreshDisplayOrder();
+        }
+    }
+});
+
+Mautic.refreshDisplayOrder = function () {
+    const slotName = mQuery('#dwc_slotName').val();
+    Mautic.fetchDwcDisplayOrder(slotName);
+}
+
+Mautic.fetchDwcDisplayOrder = function(slotName) {
+    mQuery.ajax({
+        url: `${mauticAjaxUrl}?action=dynamicContent:getDwcTokensBySlotName&includeDefaultOption=true`,
+        data: { slotName: slotName, id: mQuery('#dwc_unlockId').val() },
+        success: function(response) {
+            const displayOrders = response.display_orders;
+            const orderField = mQuery('select#dwc_displayOrder').empty();
+
+            mQuery.each(displayOrders, function (label, dwc) {
+                mQuery('<option/>', {
+                    value: dwc.value,
+                    text: label,
+                    selected: dwc.selected
+                }).appendTo(orderField);
+            })
+            orderField.trigger('chosen:updated');
+        },
+        error: Mautic.processAjaxError
+    });
+}
 
 Mautic.dynamicFiltersOnLoad = function(container, response) {
 
