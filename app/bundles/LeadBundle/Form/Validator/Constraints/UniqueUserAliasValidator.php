@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -18,6 +19,7 @@ final class UniqueUserAliasValidator extends ConstraintValidator
 
     public function validate(mixed $list, Constraint $constraint): void
     {
+        /** @var LeadList $list */
         $field = $constraint->field;
 
         if (empty($field)) {
