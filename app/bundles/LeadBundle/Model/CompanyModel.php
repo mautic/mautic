@@ -897,10 +897,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param array                $fields
      * @param array<string, mixed> $data
      */
-    protected function getFieldData($fields, array $data): array
+    protected function getFieldData(array $fields, array $data): array
     {
         // Set profile data using the form so that values are validated
         $fieldData = [];

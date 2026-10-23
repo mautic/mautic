@@ -1003,7 +1003,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         $allLists   = $query->getCountQuery('leads', 'id', 'date_added');
-        $lists      = $query->count('leads', 'id', 'date_added', $filter, null);
+        $lists      = $query->count('leads', 'id', 'date_added', $filter, []);
         $all        = $query->fetchCount($allLists);
         $identified = $lists;
 
@@ -1155,9 +1155,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
-     * @param array  $filter
      */
-    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
+    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = []): array
     {
         $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query    = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $filter);
