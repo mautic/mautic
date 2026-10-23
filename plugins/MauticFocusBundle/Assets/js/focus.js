@@ -171,6 +171,13 @@ Mautic.focusOnLoad = function () {
         });
 
         Mautic.focusInitViewportSwitcher();
+
+        // Open the builder on a field that failed validation, which would otherwise stay hidden
+        var builderError = mQuery('.builder .has-error').first();
+        if (builderError.length) {
+            Mautic.launchFocusBuilder();
+            builderError.closest('.panel-collapse').collapse('show');
+        }
     } else {
         Mautic.initDateRangePicker();
     }
