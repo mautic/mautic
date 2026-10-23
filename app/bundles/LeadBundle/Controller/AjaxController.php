@@ -29,6 +29,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Services\ContactColumnsDictionary;
@@ -810,13 +811,27 @@ final class AjaxController extends CommonAjaxController
         );
     }
 
-    public function getSegmentDependencyTreeAction(Request $request, SegmentDependencyTreeFactory $segmentDependencyTreeFactory, ListModel $model): JsonResponse
+    public function getSegmentDependencyTreeAction(Request $request, SegmentDependencyTreeFactory $segmentDependencyTreeFactory, ListModel $model, CorePermissions $corePermissions): JsonResponse
     {
         $id      = (int) $request->get('id');
         $segment = $model->getEntity($id);
 
         if (!$segment) {
             return new JsonResponse(['message' => "Segment {$id} could not be found."], Response::HTTP_NOT_FOUND);
+        }
+
+        if (!$corePermissions->isGranted(LeadPermissions::LISTS_VIEW_OWN)
+            && !$corePermissions->isGranted(LeadPermissions::LISTS_VIEW_OTHER)
+        ) {
+            $this->throwAccessDenied();
+        }
+
+        if (!$corePermissions->hasEntityAccess(
+            LeadPermissions::LISTS_VIEW_OWN,
+            LeadPermissions::LISTS_VIEW_OTHER,
+            $segment->getCreatedBy()
+        )) {
+            $this->throwAccessDenied();
         }
 
         $parentNode = $segmentDependencyTreeFactory->buildTree($segment);
