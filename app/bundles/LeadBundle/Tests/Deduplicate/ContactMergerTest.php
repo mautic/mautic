@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -563,6 +564,29 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($loserOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
     }
 
+    public function testMergeStagesKeepsWinnerStageWhenBothHaveOne(): void
+    {
+        $winnerStage = new Stage();
+        $loserStage  = new Stage();
+        $winner      = (new Lead())->setStage($winnerStage);
+        $loser       = (new Lead())->setStage($loserStage);
+
+        $this->getMerger()->mergeStages($winner, $loser);
+
+        $this->assertSame($winnerStage, $winner->getStage());
+    }
+
+    public function testMergeStagesKeepsWinnerStageWhenLoserHasNone(): void
+    {
+        $winnerStage = new Stage();
+        $winner      = (new Lead())->setStage($winnerStage);
+        $loser       = new Lead();
+
+        $this->getMerger()->mergeStages($winner, $loser);
+
+        $this->assertSame($winnerStage, $winner->getStage());
+    }
+
     public function testMergePoints(): void
     {
         $winner = new Lead();
@@ -685,6 +709,13 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         // mergeOwners
         $winner->expects($this->never())
             ->method('setOwner');
+
+        // The winner inherits the loser's stage before it is saved
+        $stage = new Stage();
+        $loser->method('getStage')->willReturn($stage);
+        $winner->expects($this->once())
+            ->method('setStage')
+            ->with($stage);
 
         // mergePoints
         $loser->expects($this->once())
