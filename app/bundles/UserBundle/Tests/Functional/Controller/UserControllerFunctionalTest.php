@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private const HISTORICAL_ACTOR = self::HISTORICAL_ACTOR;
+    private const HISTORICAL_ACTOR = 'Historical actor';
 
     protected function setUp(): void
     {
