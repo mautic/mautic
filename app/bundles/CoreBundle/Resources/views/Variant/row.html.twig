@@ -34,7 +34,7 @@
 
 <li class="list-group-item bg-{% if isCurrent %}dark{% else %}light{% endif %}-xs">
     <div class="box-layout">
-        <div class="col-md-8 va-m">
+        <div class="col-md-8 align-middle">
             <div class="row">
                 <div class="col-xs-1">
                     {% if variants.parent.getId() == variant.getId() %}
@@ -93,7 +93,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 va-t text-right">
+        <div class="col-md-4 align-top text-right">
             <em class="text-white dark-sm">
                 {% if true == variants['configurationError'] %}
                     <div class="text-danger" data-toggle="label label-danger" title="{{ 'mautic.core.variant.misconfiguration'|trans }}">
