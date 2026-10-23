@@ -11,6 +11,9 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 final class FileEncodingValidator extends ConstraintValidator
 {
+    /**
+     * @param \SplFileInfo $field
+     */
     public function validate(mixed $field, Constraint $constraint): void
     {
         /*

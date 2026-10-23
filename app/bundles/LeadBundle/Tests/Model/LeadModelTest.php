@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Model\CategoryModel;
@@ -345,6 +346,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         [$contact, $fields] = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], true, true);
         $this->assertEquals(['email' => 'Email'], $mockLeadModel->getAvailableLeadFields());
+        /** @var Lead $contact */
         $this->assertEquals('john@doe.com', $contact->getEmail());
         $this->assertNull($contact->getFirstname());
         $this->assertEquals(['email' => 'john@doe.com'], $fields);
@@ -512,9 +514,11 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->saveEntity($contact);
 
         $eventLogReflection = new \ReflectionProperty($contact, 'eventLog');
-        $eventLogs          = $eventLogReflection->getValue($contact);
+        /** @var Collection<int, LeadEventLog> $eventLogs */
+        $eventLogs = $eventLogReflection->getValue($contact);
         $this->assertCount(1, $eventLogs);
 
+        /** @var LeadEventLog $leadEventLog */
         $leadEventLog = $eventLogs->first();
         $this->assertSame($contact, $leadEventLog->getLead());
         $this->assertSame('identified_contact', $leadEventLog->getAction());
@@ -754,6 +758,8 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Creates a mock LeadModel for duplicate contact tests.
+     *
+     * @return MockObject&LeadModel
      */
     private function createMockLeadModelForDuplicateTest(): MockObject
     {
