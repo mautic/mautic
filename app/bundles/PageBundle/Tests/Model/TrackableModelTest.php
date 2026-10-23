@@ -165,6 +165,7 @@ final class TrackableModelTest extends TestCase
         $this->assertCount(1, $trackables);
 
         // Assert that the URL redirect equals $url
+        /** @var non-empty-array<string, Trackable> $trackables */
         $redirect = $trackables[$match[0]]->getRedirect();
         $this->assertEquals(str_replace('&amp;', '&', $url), $redirect->getUrl());
     }
@@ -202,6 +203,7 @@ final class TrackableModelTest extends TestCase
         $this->assertCount(1, $trackables);
 
         // Assert that the URL redirect equals $url
+        /** @var non-empty-array<string, Trackable> $trackables */
         $redirect = $trackables[$match[0]]->getRedirect();
         $this->assertEquals($url, $redirect->getUrl());
     }
@@ -419,6 +421,7 @@ final class TrackableModelTest extends TestCase
         $this->assertArrayHasKey('{trackable='.$match[1].'}', $trackables);
 
         $this->assertCount(1, $trackables);
+        /** @var non-empty-array<string, Trackable> $trackables */
         $this->assertEquals('{contactfield=website|https://mautic.org}', $trackables[$trackableKey]->getRedirect()->getUrl());
     }
 

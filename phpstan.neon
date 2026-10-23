@@ -91,13 +91,89 @@ parameters:
                 - app/bundles/EmailBundle/EventListener/PointSubscriber.php
                 - app/bundles/PageBundle/EventListener/PointSubscriber.php
 
-        # type-perfect no_mixed_caller: rule enabled, violations typed incrementally; ignored wholesale for now
+        # type-perfect no_mixed_caller: rule enabled, remaining violations typed incrementally per file
         -
             identifier: typePerfect.noMixedMethodCaller
             paths:
-                - app/config
-                - app/bundles
-                - plugins
+                - app/bundles/ApiBundle/Form/Type/ClientType.php
+                - app/bundles/ApiBundle/Helper/BatchIdToEntityHelper.php
+                - app/bundles/ApiBundle/Tests/Controller/CommonApiControllerTest.php
+                - app/bundles/ApiBundle/Tests/Helper/BatchIdToEntityHelperTest.php
+                - app/bundles/AssetBundle/EventListener/DetermineWinnerSubscriber.php
+                - app/bundles/CampaignBundle/Entity/LeadEventLogRepository.php
+                - app/bundles/CoreBundle/Controller/Api/FileApiController.php
+                - app/bundles/CoreBundle/Controller/Api/ThemeApiController.php
+                - app/bundles/CoreBundle/Controller/FormErrorMessagesTrait.php
+                - app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
+                - app/bundles/CoreBundle/Entity/CommonEntity.php
+                - app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
+                - app/bundles/CoreBundle/Event/AbstractCustomRequestEvent.php
+                - app/bundles/CoreBundle/Form/DataTransformer/IdToEntityModelTransformer.php
+                - app/bundles/CoreBundle/Form/EventListener/FormExitSubscriber.php
+                - app/bundles/CoreBundle/Form/Type/IpLookupDownloadDataStoreButtonType.php
+                - app/bundles/CoreBundle/Tests/Functional/Controller/AjaxControllerTest.php
+                - app/bundles/CoreBundle/Tests/Translation/TranslatorTest.php
+                - app/bundles/CoreBundle/Twig/Extension/ButtonExtension.php
+                - app/bundles/DynamicContentBundle/Entity/DynamicContent.php
+                - app/bundles/DynamicContentBundle/EventListener/CampaignSubscriber.php
+                - app/bundles/EmailBundle/Entity/Email.php
+                - app/bundles/FormBundle/EventListener/DetermineWinnerSubscriber.php
+                - app/bundles/IntegrationsBundle/Tests/Unit/Auth/Provider/Oauth1aTwoLegged/HttpFactoryTest.php
+                - app/bundles/LeadBundle/Entity/Company.php
+                - app/bundles/LeadBundle/Entity/CompanyRepository.php
+                - app/bundles/LeadBundle/Entity/LeadDeviceRepository.php
+                - app/bundles/LeadBundle/Entity/Lead.php
+                - app/bundles/LeadBundle/EventListener/SegmentLogReportSubscriber.php
+                - app/bundles/LeadBundle/Field/Command/AnalyseCustomFieldCommand.php
+                - app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
+                - app/bundles/LeadBundle/Form/Type/FieldType.php
+                - app/bundles/LeadBundle/Form/Validator/Constraints/LeadListAccessValidator.php
+                - app/bundles/LeadBundle/Helper/IdentifyCompanyHelper.php
+                - app/bundles/LeadBundle/Model/LeadModel.php
+                - app/bundles/NotificationBundle/Entity/Notification.php
+                - app/bundles/NotificationBundle/EventListener/CampaignConditionSubscriber.php
+                - app/bundles/PageBundle/EventListener/DetermineWinnerSubscriber.php
+                - app/bundles/PageBundle/Form/Type/PageType.php
+                - app/bundles/PluginBundle/Form/Type/FeatureSettingsType.php
+                - app/bundles/PluginBundle/Form/Type/FieldsTypeTrait.php
+                - app/bundles/PluginBundle/Form/Type/IntegrationConfigType.php
+                - app/bundles/PluginBundle/Form/Type/KeysType.php
+                - app/bundles/PluginBundle/Helper/IntegrationHelper.php
+                - app/bundles/PluginBundle/Model/IntegrationEntityModel.php
+                - app/bundles/ReportBundle/Form/Type/DynamicFiltersType.php
+                - app/bundles/ReportBundle/Form/Type/ReportType.php
+                - app/bundles/ReportBundle/Scheduler/Date/DateBuilder.php
+                - app/bundles/ReportBundle/Tests/Event/ReportGeneratorEventTest.php
+                - app/bundles/ReportBundle/Tests/Scheduler/Builder/SchedulerBuilderTest.php
+                - app/bundles/SmsBundle/Entity/Sms.php
+                - app/bundles/UserBundle/Entity/User.php
+                - app/bundles/UserBundle/Entity/UserRepository.php
+                - app/bundles/UserBundle/Form/Type/PermissionsType.php
+                - app/bundles/UserBundle/Security/Authenticator/Oauth2Authenticator.php
+                - app/bundles/UserBundle/Tests/Controller/LoginUserWithSamlTrait.php
+                - app/bundles/WebhookBundle/Entity/Webhook.php
+                - app/bundles/WebhookBundle/Views/Notifications/webhook-failing.html.php
+                - app/bundles/WebhookBundle/Views/Notifications/webhook-killed.html.php
+                - app/config/config_dev.php
+                - app/config/config_prod.php
+                - app/config/config_test.php
+                - app/config/parameters.php
+                - app/config/routing_dev.php
+                - app/config/routing.php
+                - app/config/security_api.php
+                - app/config/security.php
+                - app/config/security_test.php
+                - plugins/MauticCrmBundle/Api/SalesforceApi.php
+                - plugins/MauticCrmBundle/Api/SugarcrmApi.php
+                - plugins/MauticCrmBundle/Form/Type/IntegrationCampaignsTaskType.php
+                - plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
+                - plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
+                - plugins/MauticCrmBundle/Integration/ZohoIntegration.php
+                - plugins/MauticFocusBundle/Controller/FocusController.php
+                - plugins/MauticFullContactBundle/EventListener/ButtonSubscriber.php
+                - plugins/MauticSocialBundle/Command/MauticSocialMonitoringCommand.php
+                - plugins/MauticSocialBundle/Model/PostCountModel.php
+                - plugins/MauticTagManagerBundle/Form/Type/TagEntityType.php
 
         -
             path: utils/phpstan/src/Rule/EntityParamConcreteTypeRule.php
