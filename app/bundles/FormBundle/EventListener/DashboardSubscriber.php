@@ -52,7 +52,6 @@ final class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
-        $event->hasPermission('form:forms:viewother');
 
         if ('submissions.in.time' == $event->getType()) {
             $widget = $event->getWidget();
