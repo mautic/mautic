@@ -368,6 +368,48 @@ HTML;
         $this->subscriber->decodeTokens($event);
     }
 
+    #[\PHPUnit\Framework\Attributes\DataProvider('srcActionTokenProvider')]
+    public function testDecodeTokensReplacesSrcAndActionTokens(string $html, string $tag, string $attribute): void
+    {
+        $contact = new Lead();
+        $event   = $this->createMock(PageDisplayEvent::class);
+
+        $event->method('getLead')->willReturn($contact);
+        $event->method('getContent')->willReturn($html);
+
+        $this->dynamicContentHelper->method('findDwcTokens')
+            ->willReturn([
+                '{dwc=link-token}' => [
+                    'content' => '<p>https://example.com/path</p>',
+                    'filters' => [],
+                ],
+            ]);
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->willReturnCallback(function (string $output) use ($tag, $attribute): void {
+                $dom = new \DOMDocument();
+                $dom->loadHTML($output, LIBXML_NOERROR | LIBXML_NOWARNING);
+                $element = $dom->getElementsByTagName($tag)->item(0);
+
+                $this->assertInstanceOf(\DOMElement::class, $element);
+                $this->assertSame('https://example.com/path', $element->getAttribute($attribute));
+            });
+
+        $this->subscriber->decodeTokens($event);
+    }
+
+    /**
+     * @return iterable<string, array{string, string, string}>
+     */
+    public static function srcActionTokenProvider(): iterable
+    {
+        yield 'plain src' => ['<html><body><img src="{dwc=link-token}"></body></html>', 'img', 'src'];
+        yield 'encoded src' => ['<html><body><img src="%7Bdwc=link-token%7D"></body></html>', 'img', 'src'];
+        yield 'plain action' => ['<html><body><form action="{dwc=link-token}"></form></body></html>', 'form', 'action'];
+        yield 'encoded action' => ['<html><body><form action="%7Bdwc=link-token%7D"></form></body></html>', 'form', 'action'];
+    }
+
     public function testDecodeTokensEscapesHrefAttributeContent(): void
     {
         $content    = '<html><body><a href="{dwc=link-token}">Click here</a>{dwc=link-token}</body></html>';
