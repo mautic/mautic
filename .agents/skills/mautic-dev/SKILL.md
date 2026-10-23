@@ -27,7 +27,6 @@ Features go to the current `a.x` branch (`7.x` today), bug fixes to the lowest s
 - **Schema**: run a new migration against a database that does not have the change yet, then `ddev exec php bin/console doctrine:schema:update --dump-sql` must print nothing for the entities you changed. Anything it prints is a change the migration does not cover. On a database that already has the change, `preUpAssertions()` skips the migration and the check proves nothing.
 - **Scaffolded files**: some root files are copies of templates in `app/assets/scaffold/files/`, mapped in `app/composer.json` under `extra.mautic-scaffold.file-mapping` (`.gitignore` is one). Change both, or the `scaffolded files mismatch` CI job fails.
 - **Rector** runs in CI as `bin/rector --dry-run`. Rebasing an old branch can surface rules that did not exist when it was written.
-- **SonarCloud** fails on duplicated new code. Near-identical test methods trip it; extract a helper.
 - **The PR description** follows `.github/PULL_REQUEST_TEMPLATE.md`. After the PR is opened, Promptless drafts the documentation PR from it, so describe the change completely and give real steps to test.
 
 ## Functional tests
