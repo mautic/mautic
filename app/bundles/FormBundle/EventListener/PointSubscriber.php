@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Form\Type\PointActionFormSubmitType;
 use Mautic\FormBundle\FormEvents;
@@ -17,6 +18,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private PointModel $pointModel,
+        private IpLookupHelper $ipLookupHelper,
     ) {
     }
 
@@ -46,6 +48,11 @@ final readonly class PointSubscriber implements EventSubscriberInterface
      */
     public function onFormSubmit(SubmissionEvent $event): void
     {
-        $this->pointModel->triggerAction('form.submit', $event->getSubmission());
+        if (null === $event->getLead()) {
+            return;
+        }
+
+        // Keep the IP of a submitter Mautic doesn't track out of the points log
+        $this->pointModel->triggerAction('form.submit', $event->getSubmission(), storeIpAddress: !$this->ipLookupHelper->isVisitorUntracked());
     }
 }
