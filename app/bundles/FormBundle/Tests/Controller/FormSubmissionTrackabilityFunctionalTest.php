@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller;
 
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -192,6 +195,46 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('visitor@example.com', $submission->getLead()?->getEmail());
     }
 
+    public function testPointsChangedByFormAndCampaignActionsKeepNoIpForUntrackedVisitor(): void
+    {
+        // The form's "Adjust contact's points" action and a campaign "Change points" action both log points with an IP
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', [
+            'name'        => 'Trackability form',
+            'formType'    => 'campaign',
+            'isPublished' => true,
+            'fields'      => [[
+                'label'        => 'Email',
+                'type'         => 'email',
+                'alias'        => 'email',
+                'mappedObject' => 'contact',
+                'mappedField'  => 'email',
+            ]],
+            'actions'     => [[
+                'name'       => 'Adjust points',
+                'type'       => 'lead.pointschange',
+                'properties' => ['operator' => 'plus', 'points' => 3],
+            ]],
+        ]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
+        $formId = (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+        $this->createCampaignChangingPointsOnSubmit($formId);
+
+        $this->logoutUser();
+        $this->submitForm($formId, ['mauticform[email]' => 'visitor@example.com'], ['HTTP_DNT' => '1', 'REMOTE_ADDR' => '203.0.113.9']);
+
+        $this->em->clear();
+        $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'visitor@example.com']);
+        $this->assertInstanceOf(Lead::class, $contact);
+        $this->assertSame(7, $contact->getPoints());
+
+        $pointsChangeLogs = $this->em->getRepository(PointsChangeLog::class)->findBy(['lead' => $contact]);
+        $this->assertEqualsCanonicalizing(['campaign', 'form'], array_map(static fn (PointsChangeLog $log): string => $log->getType(), $pointsChangeLogs));
+        foreach ($pointsChangeLogs as $pointsChangeLog) {
+            $this->assertNull($pointsChangeLog->getIpAddress(), $pointsChangeLog->getType());
+        }
+        $this->assertNotInstanceOf(IpAddress::class, $this->em->getRepository(IpAddress::class)->findOneBy(['ipAddress' => '203.0.113.9']));
+    }
+
     /**
      * @return iterable<string, array{bool, array<string, string>, bool}>
      */
@@ -246,6 +289,45 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $point->setProperties(['forms' => [$formId]]);
         $this->em->persist($point);
         $this->em->flush();
+    }
+
+    private function createCampaignChangingPointsOnSubmit(int $formId): void
+    {
+        $form = $this->em->getReference(Form::class, $formId);
+
+        $campaign = new Campaign();
+        $campaign->setName('Change points on submit');
+        $campaign->setIsPublished(true);
+        $campaign->addForm($form);
+
+        $decision = new Event();
+        $decision->setName('Submits the form');
+        $decision->setType('form.submit');
+        $decision->setEventType('decision');
+        $decision->setOrder(1);
+        $decision->setProperties(['forms' => [$formId]]);
+        $decision->setCampaign($campaign);
+
+        $action = new Event();
+        $action->setName('Add points');
+        $action->setType('lead.changepoints');
+        $action->setEventType('action');
+        $action->setOrder(2);
+        $action->setParent($decision);
+        $action->setDecisionPath('yes');
+        $action->setTriggerMode('immediate');
+        $action->setProperties(['points' => 4]);
+        $action->setCampaign($campaign);
+        $decision->addChild($action);
+
+        $campaign->addEvent(1, $decision);
+        $campaign->addEvent(2, $action);
+
+        $this->em->persist($campaign);
+        $this->em->persist($decision);
+        $this->em->persist($action);
+        $this->em->flush();
+        $this->em->clear();
     }
 
     private function createPointTrigger(): void

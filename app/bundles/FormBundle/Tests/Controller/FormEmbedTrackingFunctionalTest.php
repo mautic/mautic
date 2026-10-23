@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -59,6 +60,18 @@ final class FormEmbedTrackingFunctionalTest extends MauticMysqlTestCase
         $this->assertNotInstanceOf(Cookie::class, $cookieJar->get('mautic_device_id'));
         $this->assertNotInstanceOf(Cookie::class, $cookieJar->get('mtc_id'));
         $this->assertCount(0, $this->em->getRepository(Lead::class)->findAll());
+    }
+
+    public function testLoadingFormWithPrivacySignalStoresNoIpAddress(): void
+    {
+        // Looking up the visitor for auto-fill must not save the IP of a visitor Mautic doesn't track
+        $formId = $this->createProgressiveProfilingForm();
+
+        $this->logoutUser();
+        $this->client->request(Request::METHOD_GET, "/form/{$formId}", [], [], ['HTTP_SEC_GPC' => '1', 'REMOTE_ADDR' => '203.0.113.9']);
+        $this->assertResponseIsSuccessful();
+
+        $this->assertNotInstanceOf(IpAddress::class, $this->em->getRepository(IpAddress::class)->findOneBy(['ipAddress' => '203.0.113.9']));
     }
 
     private function createProgressiveProfilingForm(): int

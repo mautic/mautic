@@ -245,12 +245,14 @@ class ContactTracker
      */
     private function getContactByIpAddress()
     {
-        $ip = $this->ipLookupHelper->getIpAddress();
         // if no trackingId cookie set the lead is not tracked yet so create a new one
-        // Don't save leads from non-trackable requests (IP, bot, privacy signal, prefetch checks)
+        // Don't save leads from non-trackable requests (IP, bot, privacy signal, prefetch checks),
+        // and don't look up their IP either, since the lookup saves new addresses
         if (!$this->ipLookupHelper->isRequestTrackable()) {
-            return $this->createNewContact($ip, false);
+            return $this->createNewContact(null, false);
         }
+
+        $ip = $this->ipLookupHelper->getIpAddress();
 
         if ($this->coreParametersHelper->get('track_contact_by_ip')) {
             /** @var Lead[] $leads */
