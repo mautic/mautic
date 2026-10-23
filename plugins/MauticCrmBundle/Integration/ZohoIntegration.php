@@ -449,8 +449,10 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     $result   = $this->amendLeadDataBeforeMauticPopulate($data, $object);
                     $executed += count($result);
                     if (isset($params['output'])) {
-                        if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                            $params['output']->writeln($result);
+                        /** @var OutputInterface $output */
+                        $output = $params['output'];
+                        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                            $output->writeln($result);
                         } else {
                             $progress->advance();
                         }
@@ -518,8 +520,10 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     $result   = $this->amendLeadDataBeforeMauticPopulate($data, $object);
                     $executed += count($result);
                     if (isset($params['output'])) {
-                        if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                            $params['output']->writeln($result);
+                        /** @var OutputInterface $output */
+                        $output = $params['output'];
+                        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                            $output->writeln($result);
                         } else {
                             $progress->advance();
                         }
@@ -1173,9 +1177,6 @@ final class ZohoIntegration extends CrmAbstractIntegration
         return $parsedData;
     }
 
-    /**
-     * @param int $counter
-     */
     private function updateContactInZoho(Mapper $mapper, string $object, int|float &$counter, int &$errorCounter): void
     {
         $response     = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
@@ -1184,9 +1185,6 @@ final class ZohoIntegration extends CrmAbstractIntegration
         $errorCounter += $failed;
     }
 
-    /**
-     * @param int $counter
-     */
     private function createContactInZoho(Mapper $mapper, string $object, int|float &$counter, int &$errorCounter): void
     {
         $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);

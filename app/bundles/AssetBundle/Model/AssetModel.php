@@ -85,6 +85,9 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
+    /**
+     * @param Asset $entity
+     */
     public function saveEntity(object $entity, bool $unlock = true): void
     {
         if (!$entity->isNew()) {
@@ -313,7 +316,10 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
         return 'getTitle';
     }
 
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    /**
+     * @param Asset|array<string, mixed> $entity
+     */
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -339,9 +345,11 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Asset $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);

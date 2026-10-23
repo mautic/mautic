@@ -45,15 +45,23 @@ trait TimelineTrait
         }
 
         if (!empty($options['fromDate']) && !empty($options['toDate'])) {
+            /** @var \DateTimeInterface $fromDate */
+            $fromDate = $options['fromDate'];
+            /** @var \DateTimeInterface $toDate */
+            $toDate = $options['toDate'];
             $query->andWhere($timestampColumn.' BETWEEN :dateFrom AND :dateTo')
-                ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s'))
-                ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
+                ->setParameter('dateFrom', $fromDate->format('Y-m-d H:i:s'))
+                ->setParameter('dateTo', $toDate->format('Y-m-d H:i:s'));
         } elseif (!empty($options['fromDate'])) {
+            /** @var \DateTimeInterface $fromDate */
+            $fromDate = $options['fromDate'];
             $query->andWhere($query->expr()->gte($timestampColumn, ':dateFrom'))
-                ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s'));
+                ->setParameter('dateFrom', $fromDate->format('Y-m-d H:i:s'));
         } elseif (!empty($options['toDate'])) {
+            /** @var \DateTimeInterface $toDate */
+            $toDate = $options['toDate'];
             $query->andWhere($query->expr()->lte($timestampColumn, ':dateTo'))
-                ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
+                ->setParameter('dateTo', $toDate->format('Y-m-d H:i:s'));
         }
 
         if (isset($options['leadIds'])) {

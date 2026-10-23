@@ -21,17 +21,11 @@ final class ScheduledEvent extends Event
 
     private readonly ?Lead $lead;
 
-    /**
-     * @var CampaignEvent|null
-     */
-    private $event;
+    private readonly ?CampaignEvent $event;
 
     private bool $systemTriggered = true;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateScheduled;
+    private readonly ?\DateTimeInterface $dateScheduled;
 
     /**
      * @var array
@@ -89,10 +83,7 @@ final class ScheduledEvent extends Event
         return $this->systemTriggered;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateScheduled()
+    public function getDateScheduled(): ?\DateTimeInterface
     {
         return $this->dateScheduled;
     }

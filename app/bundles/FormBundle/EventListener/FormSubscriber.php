@@ -139,7 +139,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
 
         $config    = $event->getActionConfig();
         $lead      = $event->getSubmission()->getLead();
-        $leadEmail = null !== $lead ? $lead->getEmail() : null;
+        $leadEmail = $lead?->getEmail();
         $ccEmails  = $bccEmails = [];
         $emails    = $this->getEmailsFromString($config['to']);
 
@@ -180,7 +180,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             $this->mailer->send(true);
         }
 
-        $owner = null !== $lead ? $lead->getOwner() : null;
+        $owner = $lead?->getOwner();
         if (!empty($config['email_to_owner']) && null !== $owner) {
             // Send copy to owner
             $this->setMailer($config, $tokens, [$owner->getEmail() => null], $lead);

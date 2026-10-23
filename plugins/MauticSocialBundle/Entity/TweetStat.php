@@ -8,6 +8,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Lead as TheLead;
 
 #[ORM\Entity(repositoryClass: TweetStatRepository::class)]
@@ -39,22 +40,16 @@ class TweetStat
     #[ORM\JoinColumn(name: 'tweet_id', onDelete: 'SET NULL')]
     private ?Tweet $tweet = null;
 
-    /**
-     * @var TheLead|null
-     */
     #[ORM\ManyToOne(targetEntity: TheLead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?TheLead $lead = null;
 
     /**
      * @var string
      */
     private $handle;
 
-    /**
-     * @var \DateTime|null
-     */
-    private $dateSent;
+    private ?\DateTime $dateSent = null;
 
     private ?bool $isFailed = false;
 
@@ -174,18 +169,12 @@ class TweetStat
         return $this;
     }
 
-    /**
-     * @return \DateTime|null
-     */
-    public function getDateSent()
+    public function getDateSent(): ?\DateTime
     {
         return $this->dateSent;
     }
 
-    /**
-     * @param \DateTime|null $dateSent
-     */
-    public function setDateSent($dateSent): void
+    public function setDateSent(?\DateTime $dateSent): void
     {
         $this->dateSent = $dateSent;
     }
@@ -200,10 +189,7 @@ class TweetStat
         $this->tweet = $tweet;
     }
 
-    /**
-     * @return TheLead
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }

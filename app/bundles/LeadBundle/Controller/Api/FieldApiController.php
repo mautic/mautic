@@ -79,7 +79,7 @@ final class FieldApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    protected function saveEntity($entity, int $statusCode): int
+    protected function saveEntity(object $entity, int $statusCode): int
     {
         try {
             return parent::saveEntity($entity, $statusCode);
@@ -126,9 +126,8 @@ final class FieldApiController extends CommonApiController
      * @param LeadField            $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, array $parameters, $action = 'edit'): Response|array|null
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): Response|array|null
     {
         if (isset($parameters['properties'])) {
             $result = $this->model->setFieldProperties($entity, $parameters['properties']);

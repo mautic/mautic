@@ -113,7 +113,7 @@ final class SsoAuthenticator extends AbstractAuthenticator implements Interactiv
                     $authenticatingService,
                     $userIdentifier,
                     null !== $user ? ($credentials['password'] ?? null) : '',
-                    null !== $user ? $user->getRoles() : [],
+                    $user?->getRoles() ?? [],
                 );
 
                 $authEvent = new FormAuthenticationEvent(

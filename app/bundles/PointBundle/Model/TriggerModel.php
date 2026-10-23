@@ -80,9 +80,11 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
     }
 
     /**
+     * @param Trigger|array<string, mixed> $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -191,9 +193,11 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
     }
 
     /**
+     * @param Trigger $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -229,10 +233,7 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
         return null;
     }
 
-    /**
-     * @param array $sessionEvents
-     */
-    public function setEvents(Trigger $entity, $sessionEvents): void
+    public function setEvents(Trigger $entity, array $sessionEvents): void
     {
         $order           = 1;
         $existingActions = $entity->getEvents();

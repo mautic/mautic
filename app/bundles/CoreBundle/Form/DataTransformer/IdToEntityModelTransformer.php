@@ -24,28 +24,28 @@ final class IdToEntityModelTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param array<mixed>|object|null $entity
+     * @param array<mixed>|object|null $value
      *
      * @return array<mixed>|int|string
      */
-    public function transform(mixed $entity): mixed
+    public function transform(mixed $value): mixed
     {
         $func = 'get'.ucfirst($this->id);
 
         if (!$this->isArray) {
-            if (null === $entity || !is_object($entity) || !method_exists($entity, $func)) {
+            if (null === $value || !is_object($value) || !method_exists($value, $func)) {
                 return '';
             }
 
-            return $entity->{$func}();
+            return $value->{$func}();
         }
 
-        if (!is_array($entity) && !$entity instanceof PersistentCollection) {
+        if (!is_array($value) && !$value instanceof PersistentCollection) {
             return [];
         }
 
         $return = [];
-        foreach ($entity as $e) {
+        foreach ($value as $e) {
             $return[] = $e->{$func}();
         }
 

@@ -12,11 +12,10 @@ interface ChannelTimelineInterface
      * Return an empty value to ignore
      *
      * @param string $eventType
-     * @param array  $details
      *
      * @return mixed
      */
-    public function getChannelTimelineTemplate($eventType, $details);
+    public function getChannelTimelineTemplate($eventType, array $details);
 
     /**
      * Override the timeline name for this channel's timeline entry.
@@ -24,11 +23,10 @@ interface ChannelTimelineInterface
      * Return an empty value to ignore
      *
      * @param string $eventType
-     * @param array  $details
      *
      * @return mixed
      */
-    public function getChannelTimelineLabel($eventType, $details);
+    public function getChannelTimelineLabel($eventType, array $details);
 
     /**
      * Override the icon for this channel's timeline entry.
@@ -36,9 +34,8 @@ interface ChannelTimelineInterface
      * Return an empty value to ignore
      *
      * @param string $eventType
-     * @param array  $details
      *
      * @return mixed
      */
-    public function getChannelTimelineIcon($eventType, $details);
+    public function getChannelTimelineIcon($eventType, array $details);
 }

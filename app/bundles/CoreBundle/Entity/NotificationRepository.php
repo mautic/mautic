@@ -75,7 +75,7 @@ final class NotificationRepository extends CommonRepository
         /** @var Notification $result */
         $result = $qb->getQuery()->getOneOrNullResult();
 
-        return null === $result ? null : $result->getDateAdded();
+        return $result?->getDateAdded();
     }
 
     /**

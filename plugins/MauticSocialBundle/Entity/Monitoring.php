@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
@@ -63,11 +64,8 @@ class Monitoring extends FormEntity implements UuidInterface
     #[Groups(['monitoring:read', 'monitoring:write'])]
     private $description;
 
-    /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
-     */
     #[Groups(['monitoring:read', 'monitoring:write'])]
-    private $category;
+    private ?\Mautic\CategoryBundle\Entity\Category $category = null;
 
     /**
      * @var array
@@ -137,10 +135,7 @@ class Monitoring extends FormEntity implements UuidInterface
     /**
      * Constraints for required fields.
      */
-    /**
-     * @return mixed
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
@@ -221,10 +216,8 @@ class Monitoring extends FormEntity implements UuidInterface
 
     /**
      * Set the category id.
-     *
-     * @param \Mautic\CategoryBundle\Entity\Category|null $category
      */
-    public function setCategory($category): void
+    public function setCategory(?Category $category): void
     {
         $this->isChanged('category', $category);
         $this->category = $category;

@@ -273,7 +273,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Save an array of entities.
      */
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -284,15 +284,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
 
-            if ($dispatchEvent = $entity instanceof Email) {
-                $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-            }
+            $event = $this->dispatchEvent('pre_save', $entity, $isNew);
 
             $this->emailRepository->saveEntity($entity, false);
 
-            if ($dispatchEvent) {
-                $this->dispatchEvent('post_save', $entity, $isNew, $event);
-            }
+            $this->dispatchEvent('post_save', $entity, $isNew, $event);
 
             if (0 === ++$i % $batchSize) {
                 $this->em->flush();
@@ -314,12 +310,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
+     * @param Email|array<string, mixed> $entity
      * @param string|null $action
      * @param array       $options
      *
      * @return FormInterface<Email>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -369,9 +366,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
+     * @param Email $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -1213,6 +1212,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                     $totalAbWeight = array_sum(array_column($abTestSettings['variants'], 'weight'));
 
                     foreach ($childrenVariant as $child) {
+                        /** @var Email $child */
                         if ($child->isPublished()) {
                             $childWeight = $totalAbWeight > 0
                                 ? $abTestSettings['variants'][$child->getId()]['weight'] / $totalAbWeight
@@ -2142,11 +2142,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Send an email to lead(s).
      *
-     * @param array                   $assetAttachments
      * @param array<string>|Lead|null $leadFields
      *
      * @return false|mixed[]
-     *
      * @throws \Doctrine\ORM\Exception\ORMException
      */
     public function sendSampleEmailToUser(
@@ -2154,7 +2152,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         $users,
         $leadFields = null,
         array $tokens = [],
-        $assetAttachments = [],
+        array $assetAttachments = [],
         bool $saveStat = true,
     ): false|array {
         if (!$emailId = $email->getId()) {
@@ -2301,7 +2299,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return string
      */
-    public function buildUrl(string $route, array $routeParams = [], bool $absolute = true, $clickthrough = [])
+    public function buildUrl(string $route, array $routeParams = [], bool $absolute = true, array $clickthrough = [])
     {
         $parts = parse_url($this->coreParametersHelper->get('site_url') ?: '');
 
@@ -2345,7 +2343,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    protected function setCachedCount(mixed $entity): void
+    protected function setCachedCount(Email $entity): void
     {
         $queued = $this->cacheProvider->getSimpleCache()->get(sprintf('%s|%s|%s', 'email', $entity->getId(), 'queued'));
 

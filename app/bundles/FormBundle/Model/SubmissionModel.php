@@ -334,7 +334,7 @@ final class SubmissionModel extends CommonFormModel
         }
 
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-        $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+        $trackingId    = ($trackedDevice?->getTrackingId());
 
         // set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
@@ -492,6 +492,7 @@ final class SubmissionModel extends CommonFormModel
 
                         // build the data rows
                         foreach ($results as $k => $s) {
+                            /** @var array<string, mixed> $s */
                             $row = $this->getExportRow($s, $viewOnlyFields);
                             $this->putCsvExportRow($handle, $row);
 
@@ -539,6 +540,7 @@ final class SubmissionModel extends CommonFormModel
                             // build the data rows
                             $count = 2;
                             foreach ($results as $k => $s) {
+                                /** @var array<string, mixed> $s */
                                 $row = $this->getExportRow($s, $viewOnlyFields);
 
                                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
@@ -794,14 +796,13 @@ final class SubmissionModel extends CommonFormModel
      *
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
-     * @param array       $filter
      */
     public function getSubmissionsLineChartData(
         ?string $unit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         $dateFormat = null,
-        $filter = [],
+        array $filter = [],
         bool $canViewOthers = true,
     ): array {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -825,9 +826,8 @@ final class SubmissionModel extends CommonFormModel
      *
      * @param string $dateFrom
      * @param string $dateTo
-     * @param array  $filters
      */
-    public function getTopSubmissionReferrers(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmissionReferrers(int $limit = 10, $dateFrom = null, $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
@@ -854,9 +854,8 @@ final class SubmissionModel extends CommonFormModel
      *
      * @param string $dateFrom
      * @param string $dateTo
-     * @param array  $filters
      */
-    public function getTopSubmitters(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmitters(int $limit = 10, $dateFrom = null, $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')

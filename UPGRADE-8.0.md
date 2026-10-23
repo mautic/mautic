@@ -1174,3 +1174,26 @@
 - `Mautic\CoreBundle\Entity\VariantEntityInterface` and `VariantEntityTrait` now declare `getVariantStartDate(): ?\DateTime` and `setVariantStartDate(?\DateTime $variantStartDate): static`. The date getter's return type and setter's parameter type were previously `mixed`. Update implementations and overrides accordingly; pass a mutable `DateTime` or `null`, not a `DateTimeImmutable` or another value.
 - `Mautic\LeadBundle\Controller\FrequencyRuleTrait` now declares `protected array $leadLists = []` (previously untyped and initialized to `null`) and `protected bool $isPublicView = false`. Any class that redeclares these trait properties must use compatible types and defaults; code must no longer assign `null` to `$leadLists`.
 - `Mautic\CoreBundle\Test\AbstractMauticTestCase::$router` now has the native type `Symfony\Component\Routing\RouterInterface`. Plugin tests that redeclare this protected property must use the same type, and assigned test doubles must implement that interface.
+
+- Methods with a parameter named `$entity` now declare a native type on it instead of only a `@param` docblock: `object`, `object|array` (where an array is also accepted, e.g. `createForm()`), or `?object` (where the value may be null). A new PHPStan rule (`mautic.entityParamMustHaveType`) enforces this type on new code. If you extend one of these classes and override such a method, an untyped `$entity` override stays compatible with PHP - leaving a parameter untyped is always a valid widening, so no incompatible-declaration error occurs. Add the matching native type to satisfy the PHPStan rule and to keep the signature aligned with the parent; just do not declare a type narrower than the parent, which would break PHP compatibility:
+
+    ```diff
+    -public function createForm($entity, $action = null, $options = []): FormInterface
+    +public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+
+    -protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    +protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    ```
+
+    Affected base classes include `Mautic\CoreBundle\Model\FormModel` (`createForm()`, `dispatchEvent()`, `setTimestamps()`, `unlockEntity()`, `getUserContactSubject()`), `Mautic\ApiBundle\Controller\CommonApiController` (`createEntityForm()`, `processForm()`, `prePopulateForm()`, `preSaveEntity()`, `processBatchForm()`, `saveEntity()`, `setCategory()`), `Mautic\ApiBundle\Controller\FetchCommonApiController` (`checkEntityAccess()`, now `?object`), `Mautic\CoreBundle\Controller\AbstractStandardFormController` and `AbstractFormController` (`afterEntityClone()`, `afterEntitySave()`, `afterFormProcessed()`, `beforeEntitySave()`, `beforeFormProcessed()`, `checkActionPermission()`, `setOptimisticLockVersion()`, `checkOptimisticLockVersion()`, `isLocked()`, `canEdit()`), `Mautic\CoreBundle\Entity\CommonRepository` (`checkUniqueAlias()`) and `Mautic\CoreBundle\Model\VariantModelTrait` (`resetVariants()`).
+
+- A few `$entity` parameters that never held an entity object were renamed to describe their real value: `Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer::transform()` and `Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer::reverseTransform()` now take `$value`, and `Mautic\CampaignBundle\EventListener\CampaignImportExportSubscriber::updateFormRelatedData()` / `getSubDependencies()` now take `$entityName`. Only callers that passed these by name (named arguments) are affected.
+
+- The API controller form hooks gained native types on their remaining parameters: `$form` is now `Symfony\Component\Form\FormInterface`, and `$action` / `$method` are now `string`. This affects `Mautic\ApiBundle\Controller\CommonApiController::prePopulateForm()`, `preSaveEntity()` and `processForm()`. A subclass overriding one of these (`EmailApiController`, `FormApiController`, `CompanyApiController`, `DeviceApiController`, `FieldApiController`, `LeadApiController`, `NoteApiController`, `CampaignApiController`, `TriggerApiController`, `RoleApiController`, `UserApiController`, `WebhookApiController`, …) keeps working with untyped parameters - leaving them untyped is a valid widening, so PHP raises no incompatible-declaration error. Add the matching native types to satisfy the PHPStan rule and stay aligned with the parent:
+
+    ```diff
+    -protected function preSaveEntity(object &$entity, $form, array $parameters, $action = 'edit')
+    +protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit')
+    ```
+
+    `CommonApiController` and `FetchCommonApiController` also renamed their `@template`/`@extends` generic type parameter from `E` to `TEntity`; this only matters for static-analysis consumers that referenced the generic by name.

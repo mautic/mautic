@@ -269,7 +269,7 @@ final class CompanyController extends AbstractFormController
      *
      * @param Company $entity
      */
-    public function newAction(Request $request, $entity = null): Response
+    public function newAction(Request $request, ?object $entity = null): Response
     {
         if (!$entity instanceof Company) {
             /** @var Company $entity */

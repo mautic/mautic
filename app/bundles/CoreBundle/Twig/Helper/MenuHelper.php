@@ -27,7 +27,7 @@ final readonly class MenuHelper
      * @param array<string, mixed> $attributes
      * @param array<string, mixed> $overrides
      */
-    public function parseAttributes($attributes, $overrides = []): string
+    public function parseAttributes(array $attributes, array $overrides = []): string
     {
         if (!is_array($attributes)) {
             $attributes = [];

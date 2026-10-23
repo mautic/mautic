@@ -233,6 +233,7 @@ class PeakInteractionTimer
                 'form.submit' => 'dateSubmitted',
                 default       => throw new \Exception('Unhandled interaction type: '.$type),
             };
+            /** @var \DateTime $interactionDate */
             $interactionDate = $interaction[$dateKey];
             $interactionDate->setTimezone($dateTimeZone);
 

@@ -197,17 +197,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $emailType = 'template';
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $publishUp;
+    private ?\DateTimeInterface $publishUp = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $publishDown;
+    private ?\DateTimeInterface $publishDown = null;
 
     /**
      * @var bool|null
@@ -233,11 +227,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private $revision = 1;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['email:read', 'email:write'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<LeadList>
@@ -277,21 +268,15 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'download:read'])]
     private $variantReadCount = 0;
 
-    /**
-     * @var Form|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[ORM\ManyToOne(targetEntity: Form::class)]
     #[ORM\JoinColumn(name: 'unsubscribeform_id', onDelete: 'SET NULL')]
-    private $unsubscribeForm;
+    private ?Form $unsubscribeForm = null;
 
-    /**
-     * @var Page|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[ORM\ManyToOne(targetEntity: Page::class)]
     #[ORM\JoinColumn(name: 'preference_center_id', onDelete: 'SET NULL')]
-    private $preferenceCenter;
+    private ?Page $preferenceCenter = null;
 
     /**
      * @var ArrayCollection<Asset>
@@ -603,15 +588,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->id;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    public function setCategory($category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -637,10 +619,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->utmTags;
     }
 
-    /**
-     * @param array $utmTags
-     */
-    public function setUtmTags($utmTags): static
+    public function setUtmTags(array $utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;
@@ -850,10 +829,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getPublishDown()
+    public function getPublishDown(): ?\DateTimeInterface
     {
         if ($this->isSegmentEmail() && !$this->continueSending) {
             return null;
@@ -862,7 +838,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->publishDown;
     }
 
-    public function setPublishDown($publishDown): static
+    public function setPublishDown(?\DateTimeInterface $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -870,15 +846,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getPublishUp()
+    public function getPublishUp(): ?\DateTimeInterface
     {
         return $this->publishUp;
     }
 
-    public function setPublishUp($publishUp): static
+    public function setPublishUp(?\DateTimeInterface $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -1041,10 +1014,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return Form|null
-     */
-    public function getUnsubscribeForm()
+    public function getUnsubscribeForm(): ?Form
     {
         return $this->unsubscribeForm;
     }
@@ -1056,10 +1026,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return Page|null
-     */
-    public function getPreferenceCenter()
+    public function getPreferenceCenter(): ?Page
     {
         return $this->preferenceCenter;
     }
@@ -1121,10 +1088,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->headers;
     }
 
-    /**
-     * @param array $headers
-     */
-    public function setHeaders($headers): static
+    public function setHeaders(array $headers): static
     {
         $this->headers = $headers;
 
@@ -1241,7 +1205,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function isBackgroundSending(): bool
     {
-        return $this->isPublished() && !empty($this->publishUp) && ($this->publishUp < new \DateTime());
+        return $this->isPublished() && $this->publishUp instanceof \DateTimeInterface && ($this->publishUp < new \DateTime());
     }
 
     public function isSegmentEmail(): bool

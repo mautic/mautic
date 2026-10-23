@@ -109,10 +109,7 @@ final class MailHelper
 
     private bool $appendTrackingPixel = false;
 
-    /**
-     * @var array
-     */
-    private $source = [];
+    private array $source = [];
 
     private ?\Mautic\EmailBundle\Entity\Email $email = null;
 
@@ -481,7 +478,7 @@ final class MailHelper
      *
      * @return bool
      */
-    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
+    public function flushQueue(array $resetEmailTypes = ['To', 'Cc', 'Bcc'])
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
         $flushed = empty($this->fatal);
@@ -498,15 +495,18 @@ final class MailHelper
 
                 $email = $this->email;
 
+                /** @var AddressDTO $from */
+                $from = $metadatum['from'];
+
                 if (!empty($metadatum['from'])) {
-                    $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
-                    $this->setMessageFrom(new AddressDTO($metadatum['from']->getEmail(), $metadatum['from']->getName()));
+                    $this->setFrom($from->getEmail(), $from->getName());
+                    $this->setMessageFrom(new AddressDTO($from->getEmail(), $from->getName()));
                 } else {
                     $this->setMessageFrom($this->fromEmailHelper->getFrom($email));
                 }
                 $this->setReplyToForQueueMessage(
                     $email,
-                    ($email && $email->getUseOwnerAsMailer()) ? $metadatum['from']->getEmail() : null
+                    ($email && $email->getUseOwnerAsMailer()) ? $from->getEmail() : null
                 );
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
@@ -589,11 +589,8 @@ final class MailHelper
 
     /**
      * Adapted from \Swift_Plugins_DecoratorPlugin.
-     *
-     * @param array $search
-     * @param array $replace
      */
-    public static function searchReplaceTokens($search, $replace, MauticMessage $message): void
+    public static function searchReplaceTokens(array $search, array $replace, MauticMessage $message): void
     {
         // Body
         $body         = $message->getHtmlBody();
@@ -1131,10 +1128,7 @@ final class MailHelper
         return $this->source;
     }
 
-    /**
-     * @param array $source
-     */
-    public function setSource($source): void
+    public function setSource(array $source): void
     {
         $this->source = $source;
     }
@@ -1151,7 +1145,7 @@ final class MailHelper
      *
      * @return bool Returns false if there were errors with the email configuration
      */
-    public function setEmail(Email $email, bool $allowBcc = true, $assetAttachments = [], bool $ignoreTrackingPixel = false): bool
+    public function setEmail(Email $email, bool $allowBcc = true, array $assetAttachments = [], bool $ignoreTrackingPixel = false): bool
     {
         if ($this->coreParametersHelper->get(ConfigType::MINIFY_EMAIL_HTML)) {
             $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
@@ -1195,7 +1189,7 @@ final class MailHelper
 
         // Reset attachments
         $this->assets = $this->attachedAssets = [];
-        if (empty($assetAttachments)) {
+        if ($assetAttachments === []) {
             foreach ($email->getAssetAttachments() as $asset) {
                 $this->attachAsset($asset);
             }
@@ -1622,7 +1616,7 @@ final class MailHelper
         }
 
         $stat->setTrackingHash($this->idHash);
-        if (!empty($this->source)) {
+        if ($this->source !== []) {
             $stat->setSource($this->source[0]);
             $stat->setSourceId($this->source[1]);
         }

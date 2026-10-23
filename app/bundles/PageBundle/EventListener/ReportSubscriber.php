@@ -419,6 +419,8 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
+            /** @var TranslatorInterface $translator */
+            $translator = $options['translator'];
             $queryBuilder = clone $qb;
 
             /** @var ChartQuery $chartQuery */
@@ -430,7 +432,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_hit', 'ph');
                     $hits = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans($g), $hits);
+                    $chart->setDataset($translator->trans($g), $hits);
                     $data         = $chart->render();
                     $data['name'] = $g;
 
@@ -443,7 +445,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->andWhere($qb->expr()->isNotNull('ph.date_left'));
 
                     $hits = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans($g), $hits);
+                    $chart->setDataset($translator->trans($g), $hits);
                     $data         = $chart->render();
                     $data['name'] = $g;
 

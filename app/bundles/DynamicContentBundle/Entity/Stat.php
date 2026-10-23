@@ -22,19 +22,13 @@ class Stat
      */
     private $id;
 
-    /**
-     * @var DynamicContent|null
-     */
     #[ORM\ManyToOne(targetEntity: DynamicContent::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'dynamic_content_id', onDelete: 'SET NULL')]
-    private $dynamicContent;
+    private ?DynamicContent $dynamicContent = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var \DateTimeInterface
@@ -150,10 +144,7 @@ class Stat
         $this->id = (string) $id;
     }
 
-    /**
-     * @return DynamicContent|null
-     */
-    public function getDynamicContent()
+    public function getDynamicContent(): ?DynamicContent
     {
         return $this->dynamicContent;
     }
@@ -163,18 +154,12 @@ class Stat
         $this->dynamicContent = $dynamicContent;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function setLead($lead): void
+    public function setLead(?Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -232,10 +217,7 @@ class Stat
         return $this->sentDetails;
     }
 
-    /**
-     * @param array $sentDetails
-     */
-    public function setSentDetails($sentDetails): void
+    public function setSentDetails(array $sentDetails): void
     {
         $this->sentDetails = $sentDetails;
     }
@@ -277,10 +259,7 @@ class Stat
         return $this->tokens;
     }
 
-    /**
-     * @param array $tokens
-     */
-    public function setTokens($tokens): void
+    public function setTokens(array $tokens): void
     {
         $this->tokens = $tokens;
     }

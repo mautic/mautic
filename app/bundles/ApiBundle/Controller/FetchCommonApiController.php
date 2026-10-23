@@ -371,10 +371,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Checks if user has permission to access retrieved entity.
      *
-     * @param FormEntity $entity
-     * @param string     $action view|create|edit|publish|delete
+     * @param FormEntity|null $entity
+     * @param string       $action view|create|edit|publish|delete
      */
-    protected function checkEntityAccess($entity, $action = 'view'): bool|Response
+    protected function checkEntityAccess(?object $entity, $action = 'view'): bool|Response
     {
         $ownPerm   = "{$this->permissionBase}:{$action}own";
         $otherPerm = "{$this->permissionBase}:{$action}other";
@@ -534,7 +534,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return array{0: array<mixed>|\ArrayObject<int,mixed>, 1: int}
      */
-    protected function prepareEntitiesForView($results): array
+    protected function prepareEntitiesForView(iterable $results): array
     {
         return $this->prepareEntityResultsToArray(
             $results,
@@ -550,7 +550,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return array{0: array<mixed>|\ArrayObject<int,mixed>, 1: int}
      */
-    protected function prepareEntityResultsToArray($results, $callback = null): array
+    protected function prepareEntityResultsToArray(iterable $results, $callback = null): array
     {
         if (is_array($results) && isset($results['count'])) {
             $totalCount = $results['count'];

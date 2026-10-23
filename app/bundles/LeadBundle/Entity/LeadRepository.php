@@ -384,6 +384,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
             }
             $q->andWhere($this->getTableAlias().'.id = :id')
                 ->setParameter('id', (int) $contactId);
+            /** @var Lead $entity */
             $entity = $q->getQuery()->getSingleResult();
         } catch (\Exception) {
             $entity = null;
@@ -571,7 +572,6 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
      * @param array<string, mixed> $args             same as getEntity/getEntities
      * @param string               $joinTable
      * @param int                  $entityId
-     * @param array                $filters
      * @param string               $entityColumnName
      * @param array|null           $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      */
@@ -579,7 +579,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         array $args,
         $joinTable,
         $entityId,
-        $filters = [],
+        ?array $filters = [],
         $entityColumnName = 'id',
         ?array $additionalJoins = null,
         $contactColumnName = 'lead_id',
@@ -1117,12 +1117,9 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         return (bool) $q->executeQuery()->fetchOne();
     }
 
-    /**
-     * @param array $ownerIds
-     */
-    public function checkLeadOwner(Lead $lead, $ownerIds = []): bool
+    public function checkLeadOwner(Lead $lead, array $ownerIds = []): bool
     {
-        if (empty($ownerIds)) {
+        if ($ownerIds === []) {
             return false;
         }
 
@@ -1362,7 +1359,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
     /**
      * @param Lead $entity
      */
-    protected function postSaveEntity($entity): void
+    protected function postSaveEntity(object $entity): void
     {
         // Check if points need to be appended
         if ($entity->getPointChanges()) {

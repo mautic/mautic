@@ -48,10 +48,10 @@ final class ActionModel extends CommonFormModel
     }
 
     /**
-     * @param object $entity
+     * @param Action|array<string, mixed> $entity
      * @param array  $options
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Action) {
             throw new \InvalidArgumentException('Entity must be of class Action');
@@ -113,7 +113,6 @@ final class ActionModel extends CommonFormModel
             ]
         );
         $formIds = [];
-        /** @var Action $entity */
         foreach ($entities as $entity) {
             $properties = $entity->getProperties();
             if (isset($properties['email']) && (int) $properties['email'] === $emailId) {

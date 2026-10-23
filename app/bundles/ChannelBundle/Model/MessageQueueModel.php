@@ -116,23 +116,21 @@ final class MessageQueueModel extends FormModel
     /**
      * Adds messages to the queue.
      *
-     * @param array    $leads
      * @param string   $channel
      * @param int      $channelId
      * @param int      $maxAttempts
      * @param int      $priority
      * @param int|null $campaignEventId
-     * @param array    $options
      */
     public function queue(
-        $leads,
+        array $leads,
         $channel,
         $channelId,
         \DateInterval $scheduledInterval,
         $maxAttempts = 1,
         $priority = 1,
         $campaignEventId = null,
-        $options = [],
+        array $options = [],
     ): bool {
         $messageQueues = [];
 
@@ -287,6 +285,7 @@ final class MessageQueueModel extends FormModel
             return;
         }
 
+        /** @var MessageQueue $message */
         $message->setAttempts($message->getAttempts() + 1);
         $message->setLastAttempt(new \DateTime());
         $rescheduleTo = clone $message->getScheduledDate();
@@ -309,11 +308,11 @@ final class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param ?object $entity
+     * @param MessageQueue|null $entity
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, ?object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         switch ($action) {
             case 'process_message_queue':

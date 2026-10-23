@@ -51,10 +51,7 @@ class PointInsight extends FormEntity
      */
     private $pointGroups = [];
 
-    /**
-     * @var Category|null
-     */
-    private $category;
+    private ?Category $category = null;
 
     public function __clone()
     {
@@ -219,7 +216,7 @@ class PointInsight extends FormEntity
     /**
      * @param array<int> $pointGroups
      */
-    public function setPointGroups($pointGroups): static
+    public function setPointGroups(array $pointGroups): static
     {
         $this->isChanged('pointGroups', $pointGroups);
         $this->pointGroups = $pointGroups;
@@ -227,18 +224,12 @@ class PointInsight extends FormEntity
         return $this;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    /**
-     * @param Category|null $category
-     */
-    public function setCategory($category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;

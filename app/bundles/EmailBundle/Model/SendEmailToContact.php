@@ -203,8 +203,6 @@ final class SendEmailToContact
     }
 
     /**
-     * @param array $errorMessages
-     *
      * @throws FailedToSendToContactException
      */
     private function failContact(bool $hasBadEmail = true, array|null|string $errorMessages = null): void

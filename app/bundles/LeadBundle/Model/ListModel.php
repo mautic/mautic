@@ -216,12 +216,13 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param LeadList|array<string, mixed>    $entity
      * @param string|null $action
      * @param array       $options
      *
      * @return FormInterface<LeadList>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
@@ -252,9 +253,11 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param LeadList $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
@@ -645,6 +648,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 ]);
 
                 foreach ($listEntities as $list) {
+                    /** @var LeadList $list */
                     $this->leadChangeLists[$list->getId()] = $list;
                 }
             }
@@ -778,6 +782,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 ]);
 
                 foreach ($listEntities as $list) {
+                    /** @var LeadList $list */
                     $this->leadChangeLists[$list->getId()] = $list;
                 }
             }
@@ -998,7 +1003,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         $allLists   = $query->getCountQuery('leads', 'id', 'date_added');
-        $lists      = $query->count('leads', 'id', 'date_added', $filter, null);
+        $lists      = $query->count('leads', 'id', 'date_added', $filter, []);
         $all        = $query->fetchCount($allLists);
         $identified = $lists;
 
@@ -1150,9 +1155,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
-     * @param array  $filter
      */
-    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
+    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = []): array
     {
         $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query    = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $filter);
@@ -1206,6 +1210,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $dependents = [];
         $accessor   = PropertyAccess::createPropertyAccessor();
         foreach ($entities as $entity) {
+            /** @var LeadList $entity */
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
                 // BC support for old filters where the field existed outside of properties.
@@ -1246,6 +1251,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $emailFilterTypes = ['lead_email_received', 'lead_email_sent'];
 
         $dependents = [];
+        /** @var LeadList $entity */
         foreach ($entities as $entity) {
             foreach ($entity->getFilters() as $entityFilter) {
                 // BC support for old filters where the field existed outside of properties.
@@ -1280,6 +1286,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         );
 
         $dependents = [];
+        /** @var LeadList $entity */
         foreach ($entities as $entity) {
             foreach ($entity->getFilters() as $entityFilter) {
                 // BC support for old filters where the field existed outside of properties.
@@ -1314,6 +1321,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $dependency          = [];
 
         foreach ($entities as $entity) {
+            /** @var LeadList $entity */
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
                 if ('leadlist' !== $eachFilter['type']) {

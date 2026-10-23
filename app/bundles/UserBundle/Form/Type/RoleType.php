@@ -24,6 +24,9 @@ final class RoleType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('user.role', $options));
 
+        /** @var Role $role */
+        $role = $options['data'];
+
         $builder->add(
             'name',
             TextType::class,
@@ -54,7 +57,7 @@ final class RoleType extends AbstractType
         ]);
 
         // add a normal text field, but add your transformer to it
-        $hidden = ($options['data']->isAdmin()) ? ' hide' : '';
+        $hidden = ($role->isAdmin()) ? ' hide' : '';
 
         $builder->add(
             'permissions',

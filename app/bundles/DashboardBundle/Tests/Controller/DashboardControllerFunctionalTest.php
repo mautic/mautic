@@ -16,6 +16,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -174,6 +175,13 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $printResponse = fn (): string => print_r(json_decode($this->client->getResponse()->getContent(), true), true);
         $this->assertStringContainsString('created', $printResponse());
         $this->assertStringContainsString('deleted', $printResponse());
+    }
+
+    public function testEditActionReturnsNotFoundForMissingWidget(): void
+    {
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/dashboard/edit/999999');
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
     private function createSegment(string $name, string $alias, float $lastBuildTime = 0, ?User $user = null): LeadList

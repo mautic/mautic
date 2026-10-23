@@ -53,11 +53,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     private ?IpAddress $ipAddress = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[ORM\Column(name: 'date_triggered', type: 'datetime', nullable: true)]
-    private $dateTriggered;
+    private ?\DateTimeInterface $dateTriggered = null;
 
     /**
      * @var bool
@@ -65,11 +62,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     #[ORM\Column(name: 'is_scheduled', type: 'boolean')]
     private $isScheduled = false;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[ORM\Column(name: 'trigger_date', type: 'datetime', nullable: true)]
-    private $triggerDate;
+    private ?\DateTimeInterface $triggerDate = null;
 
     /**
      * @var bool
@@ -110,11 +104,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     #[ORM\Column(type: 'integer')]
     private $rotation = 1;
 
-    /**
-     * @var FailedLeadEventLog|null
-     */
     #[ORM\OneToOne(targetEntity: FailedLeadEventLog::class, mappedBy: 'log', cascade: ['all'], fetch: 'EXTRA_LAZY')]
-    private $failedLog;
+    private ?FailedLeadEventLog $failedLog = null;
 
     /**
      * Subscribers can fail log with custom reschedule interval.
@@ -183,10 +174,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return (int) $this->id;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateTriggered()
+    public function getDateTriggered(): ?\DateTimeInterface
     {
         return $this->dateTriggered;
     }
@@ -274,10 +262,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->previousScheduledState;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getTriggerDate()
+    public function getTriggerDate(): ?\DateTimeInterface
     {
         return $this->triggerDate;
     }
@@ -358,7 +343,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     }
 
     /**
-     * @param mixed[] $metadata
+     * @param mixed[]|string $metadata
      */
     public function appendToMetadata($metadata): void
     {
@@ -371,7 +356,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     }
 
     /**
-     * @param mixed[] $metadata
+     * @param mixed[]|string $metadata
      */
     public function setMetadata($metadata): static
     {
@@ -435,10 +420,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this;
     }
 
-    /**
-     * @return FailedLeadEventLog|null
-     */
-    public function getFailedLog()
+    public function getFailedLog(): ?FailedLeadEventLog
     {
         return $this->failedLog;
     }
@@ -452,7 +434,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     public function isFailed(): bool
     {
-        return !empty($this->failedLog);
+        return $this->failedLog instanceof \Mautic\CampaignBundle\Entity\FailedLeadEventLog;
     }
 
     public function isSuccess(): bool

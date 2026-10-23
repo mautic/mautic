@@ -143,7 +143,10 @@ final class DynamicContentController extends AbstractFormController
         );
     }
 
-    public function newAction(Request $request, $entity = null): Response
+    /**
+     * @param DynamicContent $entity
+     */
+    public function newAction(Request $request, ?object $entity = null): Response
     {
         if (!$this->security->isGranted('dynamiccontent:dynamiccontents:create')) {
             $this->throwAccessDenied();

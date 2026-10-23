@@ -215,7 +215,10 @@ final class PageModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    /**
+     * @param Page|array<string, mixed> $entity
+     */
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -250,9 +253,11 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Page $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -311,11 +316,10 @@ final class PageModel extends FormModel implements GlobalSearchInterface
      * Generate URL for a page.
      *
      * @param Page  $entity
-     * @param array $clickthrough
      *
      * @return string
      */
-    public function generateUrl($entity, bool $absolute = true, $clickthrough = [])
+    public function generateUrl(object $entity, bool $absolute = true, array $clickthrough = [])
     {
         // If this is a variant, then get the parent's URL
         $parent = $entity->getVariantParent();
@@ -330,8 +334,10 @@ final class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Generates slug string.
+     *
+     * @param Page $entity
      */
-    public function generateSlug($entity): string
+    public function generateSlug(object $entity): string
     {
         $pageSlug = $entity->getAlias();
 
@@ -384,13 +390,11 @@ final class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * @param string|int $code
-     * @param array      $query
      *
      * @return bool If hit is tracked or not
-     *
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, $query = [], ?\DateTime $dateTime = null): bool
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, array|string|null $query = [], ?\DateTime $dateTime = null): bool
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous() || $request->cookies->get('Blocked-Tracking')) {
@@ -404,7 +408,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
         $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Process the query
-        if (empty($query) || !is_array($query)) {
+        if ($query === [] || !is_array($query)) {
             $query = $this->getHitQuery($request, $page);
         }
 

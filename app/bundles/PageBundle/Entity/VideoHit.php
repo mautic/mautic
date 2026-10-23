@@ -60,17 +60,11 @@ class VideoHit
      */
     private $redirect;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var string|null
@@ -431,10 +425,7 @@ class VideoHit
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
@@ -460,7 +451,7 @@ class VideoHit
     /**
      * @param array<string> $browserLanguages
      */
-    public function setBrowserLanguages($browserLanguages): static
+    public function setBrowserLanguages(array $browserLanguages): static
     {
         $this->browserLanguages = $browserLanguages;
 
@@ -475,10 +466,7 @@ class VideoHit
         return $this->browserLanguages;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
@@ -546,10 +534,7 @@ class VideoHit
         return $this->query;
     }
 
-    /**
-     * @param array $query
-     */
-    public function setQuery($query): static
+    public function setQuery(array $query): static
     {
         $this->query = $query;
 

@@ -17,12 +17,9 @@ class PostCount
      */
     private $id;
 
-    /**
-     * @var Monitoring|null
-     */
     #[ORM\ManyToOne(targetEntity: Monitoring::class)]
     #[ORM\JoinColumn(name: 'monitor_id', onDelete: 'CASCADE')]
-    private $monitor;
+    private ?Monitoring $monitor = null;
 
     /**
      * @var \DateTimeInterface
@@ -53,18 +50,12 @@ class PostCount
         return $this->id;
     }
 
-    /**
-     * @return Monitoring
-     */
-    public function getMonitor()
+    public function getMonitor(): ?Monitoring
     {
         return $this->monitor;
     }
 
-    /**
-     * @param Monitoring $monitor
-     */
-    public function setMonitor($monitor): static
+    public function setMonitor(?Monitoring $monitor): static
     {
         $this->monitor = $monitor;
 

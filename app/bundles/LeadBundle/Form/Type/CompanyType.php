@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,6 +36,9 @@ final class CompanyType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var Company $company */
+        $company = $options['data'];
+
         $cleaningRules                 = $this->getFormFields($builder, $options, 'company');
         $cleaningRules['companyemail'] = 'email';
 
@@ -94,7 +99,7 @@ final class CompanyType extends AbstractType
             );
         }
 
-        if (null === $options['data']->getId()) {
+        if (null === $company->getId()) {
             $builder->add(
                 'buttons',
                 FormButtonsType::class
@@ -117,7 +122,7 @@ final class CompanyType extends AbstractType
                                 'href'        => $this->router->generate(
                                     'mautic_company_action',
                                     [
-                                        'objectId'     => $options['data']->getId(),
+                                        'objectId'     => $company->getId(),
                                         'objectAction' => 'merge',
                                     ]
                                 ),

@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 final class HtmlExtensionTest extends TestCase
 {
     /**
-     * @param array<string, mixed> $expected
+     * @param array<string, mixed>|bool $expected
      */
     #[DataProvider('convertStringToArrayProvider')]
     public function testConvertStringToArray(string $input, array|bool $expected): void

@@ -264,7 +264,7 @@ final class NotificationController extends AbstractFormController
      *
      * @param Notification $entity
      */
-    public function newAction(Request $request, $entity = null): Response
+    public function newAction(Request $request, ?object $entity = null): Response
     {
         if (!$entity instanceof Notification) {
             /** @var Notification $entity */

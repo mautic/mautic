@@ -26,9 +26,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * @template E of object
+ * @template TEntity of object
  *
- * @extends FetchCommonApiController<E>
+ * @extends FetchCommonApiController<TEntity>
  */
 class CommonApiController extends FetchCommonApiController
 {
@@ -40,7 +40,7 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Model object for processing the entity.
      *
-     * @var FormModel<E>|null
+     * @var FormModel<TEntity>|null
      */
     protected $model;
 
@@ -342,9 +342,10 @@ class CommonApiController extends FetchCommonApiController
     }
 
     /**
+     * @param TEntity $entity
      * @return FormInterface<mixed>
      */
-    protected function createEntityForm($entity): FormInterface
+    protected function createEntityForm(object $entity): FormInterface
     {
         return $this->model->createForm(
             $entity,
@@ -362,31 +363,31 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before populating the form.
      *
-     * @param string $action
+     * @param TEntity      $entity
      *
      * @return mixed
      */
-    protected function prePopulateForm($entity, array $parameters, $action = 'edit')
+    protected function prePopulateForm(object $entity, array $parameters, string $action = 'edit')
     {
     }
 
     /**
      * Give the controller an opportunity to process the entity before persisting.
      *
-     * @param E                    $entity
+     * @param TEntity                    $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      *
      * @return mixed
      */
-    protected function preSaveEntity(&$entity, $form, array $parameters, $action = 'edit')
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit')
     {
     }
 
     /**
      * Convert posted parameters into what the form needs in order to successfully bind.
      *
+     * @param TEntity $entity
      * @param mixed[] $parameters
      */
     protected function prepareParametersForBinding(Request $request, array $parameters, object $entity, string $action): array|Response
@@ -395,10 +396,11 @@ class CommonApiController extends FetchCommonApiController
     }
 
     /**
+     * @param TEntity            $entity
      * @param mixed[][]          $errors
      * @param array<object|null> $entities
      */
-    protected function processBatchForm(Request $request, $key, $entity, ?array $params, $method, array &$errors, array &$entities)
+    protected function processBatchForm(Request $request, $key, object $entity, ?array $params, string $method, array &$errors, array &$entities)
     {
         $this->inBatchMode = true;
         $formResponse      = $this->processForm($request, $entity, $params, $method);
@@ -441,12 +443,12 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Processes API Form.
      *
+     * @param TEntity          $entity
      * @param array<mixed>|null $parameters
-     * @param string            $method
      *
      * @return mixed
      */
-    protected function processForm(Request $request, $entity, ?array $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, object $entity, ?array $parameters = null, string $method = 'PUT')
     {
         $categoryId = null;
 
@@ -605,7 +607,10 @@ class CommonApiController extends FetchCommonApiController
         return $this->handleView($view);
     }
 
-    protected function saveEntity($entity, int $statusCode): int
+    /**
+     * @param TEntity $entity
+     */
+    protected function saveEntity(object $entity, int $statusCode): int
     {
         $this->model->saveEntity($entity);
 
@@ -613,12 +618,12 @@ class CommonApiController extends FetchCommonApiController
     }
 
     /**
-     * @param object $entity
+     * @param TEntity $entity
      * @param int    $categoryId
      *
      * @throws \UnexpectedValueException
      */
-    protected function setCategory($entity, $categoryId)
+    protected function setCategory(object $entity, $categoryId)
     {
         if (!empty($categoryId) && method_exists($entity, 'setCategory')) {
             $category = $this->doctrine->getManager()->find(Category::class, $categoryId);

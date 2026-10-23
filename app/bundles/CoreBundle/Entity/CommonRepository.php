@@ -73,9 +73,8 @@ abstract class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param string $alias
-     * @param object $entity
      */
-    public function checkUniqueAlias($alias, $entity = null): int
+    public function checkUniqueAlias($alias, ?object $entity = null): int
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as aliascount')
@@ -171,10 +170,8 @@ abstract class CommonRepository extends ServiceEntityRepository
 
     /**
      * Delete an array of entities.
-     *
-     * @param array $entities
      */
-    public function deleteEntities($entities): void
+    public function deleteEntities(array $entities): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -348,6 +345,7 @@ abstract class CommonRepository extends ServiceEntityRepository
         $alias = $this->getTableAlias();
 
         if (isset($args['qb'])) {
+            /** @var QueryBuilder $q */
             $q = $args['qb'];
         } else {
             $q = $this->getEntityManager()
@@ -812,7 +810,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      *
      * @param TObject[]|ArrayCollection<int, TObject> $entities
      */
-    public function saveEntities($entities): void
+    public function saveEntities(iterable $entities): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;

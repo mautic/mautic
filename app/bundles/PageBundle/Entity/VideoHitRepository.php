@@ -72,11 +72,9 @@ final class VideoHitRepository extends CommonRepository
     /**
      * Count stats from hit times.
      *
-     * @param array $times
-     *
      * @return array<string, mixed>
      */
-    public function countStats($times): array
+    public function countStats(array $times): array
     {
         return [
             'sum'     => array_sum($times),

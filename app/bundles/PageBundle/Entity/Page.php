@@ -116,17 +116,11 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     #[ORM\Column(type: 'array', nullable: true)]
     private $content = [];
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
-    private $publishUp;
+    private ?\DateTimeInterface $publishUp = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
-    private $publishDown;
+    private ?\DateTimeInterface $publishDown = null;
 
     /**
      * @var int
@@ -191,11 +185,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     #[ORM\Column(name: 'redirect_url', type: 'string', length: 2048, nullable: true)]
     private $redirectUrl;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var bool|null
@@ -407,7 +398,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param array<string> $content
      */
-    public function setContent($content): static
+    public function setContent(array $content): static
     {
         $this->isChanged('content', $content);
         $this->content = $content;
@@ -426,7 +417,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param \DateTime $publishUp
      */
-    public function setPublishUp($publishUp): static
+    public function setPublishUp(?\DateTimeInterface $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -434,10 +425,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getPublishUp()
+    public function getPublishUp(): ?\DateTimeInterface
     {
         return $this->publishUp;
     }
@@ -445,7 +433,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param \DateTime $publishDown
      */
-    public function setPublishDown($publishDown): static
+    public function setPublishDown(?\DateTimeInterface $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -453,10 +441,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getPublishDown()
+    public function getPublishDown(): ?\DateTimeInterface
     {
         return $this->publishDown;
     }
@@ -598,10 +583,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }

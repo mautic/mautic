@@ -19,7 +19,7 @@ final class CompanyLeadRepository extends CommonRepository
     /**
      * @param CompanyLead[] $entities
      */
-    public function saveEntities($entities, bool $new = true): void
+    public function saveEntities(iterable $entities, bool $new = true): void
     {
         // Get a list of contacts and set primary to 0
         if ($new) {

@@ -81,6 +81,8 @@ final class UserModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param User $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     public function saveEntity(object $entity, bool $unlock = true): void
@@ -121,7 +123,10 @@ final class UserModel extends FormModel implements GlobalSearchInterface
         return $entity->getPassword();
     }
 
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    /**
+     * @param User|array<string, mixed> $entity
+     */
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));
@@ -167,9 +172,11 @@ final class UserModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param User $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], $this->translator->trans('mautic.user.entity.must.be.user', [], 'validators'));
@@ -200,7 +207,6 @@ final class UserModel extends FormModel implements GlobalSearchInterface
      * Get list of entities for autopopulate fields.
      *
      * @param string $type
-     * @param int    $limit
      */
     public function getLookupResults($type, ?string $filter = '', int|string|null $limit = 10): array
     {
