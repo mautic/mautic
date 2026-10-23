@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Mailer\Transport;
 
 use Mautic\CoreBundle\Helper\Dsn\Dsn as MauticDsn;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
+use Symfony\Component\Mailer\Exception\InvalidArgumentException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport as SymfonyTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -111,12 +112,14 @@ class TransportFactory
         $scheme       = str_starts_with($dsn, 'failover(') ? 'failover' : 'roundrobin';
         $openingIndex = strlen($scheme);
         $closingIndex = $this->findCompoundClosingParenthesis($dsn, $openingIndex);
-        $arguments    = $this->splitCompoundArguments(substr($dsn, $openingIndex + 1, $closingIndex - $openingIndex - 1));
-        $query        = [];
+        $arguments = $this->splitCompoundArguments(substr($dsn, $openingIndex + 1, $closingIndex - $openingIndex - 1));
+        $suffix    = substr($dsn, $closingIndex + 1);
 
-        parse_str(ltrim(substr($dsn, $closingIndex + 1), '?'), $query);
+        if ('' !== $suffix && !preg_match('/^\?retry_period=(\d+)$/', $suffix, $matches)) {
+            throw new InvalidArgumentException('The mailer DSN has some garbage at the end.');
+        }
 
-        return [$scheme, $arguments, (int) ($query['retry_period'] ?? 60)];
+        return [$scheme, $arguments, isset($matches[1]) && 0 !== (int) $matches[1] ? (int) $matches[1] : 60];
     }
 
     private function findCompoundClosingParenthesis(string $dsn, int $openingIndex): int
