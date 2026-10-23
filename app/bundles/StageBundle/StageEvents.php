@@ -10,34 +10,6 @@ namespace Mautic\StageBundle;
 final class StageEvents
 {
     /**
-     * The mautic.stage_pre_save event is thrown right before a form is persisted.
-     *
-     * The event listener receives a Mautic\StageBundle\Event\StageEvent instance.
-     */
-    public const string STAGE_PRE_SAVE = 'mautic.stage_pre_save';
-
-    /**
-     * The mautic.stage_post_save event is thrown right after a form is persisted.
-     *
-     * The event listener receives a Mautic\StageBundle\Event\StageEvent instance.
-     */
-    public const string STAGE_POST_SAVE = 'mautic.stage_post_save';
-
-    /**
-     * The mautic.stage_pre_delete event is thrown before a form is deleted.
-     *
-     * The event listener receives a Mautic\StageBundle\Event\StageEvent instance.
-     */
-    public const string STAGE_PRE_DELETE = 'mautic.stage_pre_delete';
-
-    /**
-     * The mautic.stage_post_delete event is thrown after a form is deleted.
-     *
-     * The event listener receives a Mautic\StageBundle\Event\StageEvent instance.
-     */
-    public const string STAGE_POST_DELETE = 'mautic.stage_post_delete';
-
-    /**
      * The mautic.stage_on_build event is thrown before displaying the stage builder form to allow adding of custom actions.
      *
      * The event listener receives a Mautic\StageBundle\Event\StageBuilderEvent instance.
