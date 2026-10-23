@@ -118,7 +118,7 @@ class IpAddress
     /**
      * @param array<string,string> $ipDetails
      */
-    public function setIpDetails($ipDetails): static
+    public function setIpDetails(array $ipDetails): static
     {
         $this->ipDetails = $ipDetails;
 

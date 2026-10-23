@@ -184,7 +184,7 @@ class BuilderEvent extends Event
      *
      * @param array $tokens array('token' => 'label')
      */
-    public function filterTokens($tokens): array
+    public function filterTokens(array $tokens): array
     {
         $filter = $this->tokenFilter;
 

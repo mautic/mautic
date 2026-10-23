@@ -85,10 +85,7 @@ class LeadBuildSearchEvent extends CommonEvent
         return $this->subQuery;
     }
 
-    /**
-     * @param array $string
-     */
-    public function setString($string): void
+    public function setString(array $string): void
     {
         $this->string = $string;
     }
