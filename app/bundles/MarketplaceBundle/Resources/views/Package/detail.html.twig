@@ -242,14 +242,14 @@
         </div>
         {% for maintainer in packageDetail.maintainers %}
         <div class="box-layout">
-            <div class="col-xs-3 va-m">
+            <div class="col-xs-3 align-middle">
                 <div class="panel-body">
                     <span class="img-wrapper img-rounded">
                         <img class="img" src="{{ maintainer.avatar|escape }}">
                     </span>
                 </div>
             </div>
-            <div class="col-xs-9 va-t">
+            <div class="col-xs-9 align-top">
                 <div class="panel-body">
                     <h4 class="fw-sb mb-xs ellipsis">
                         {{ maintainer.name|title|escape }}
