@@ -218,7 +218,7 @@ final class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @param Page|array<string, mixed> $entity
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);

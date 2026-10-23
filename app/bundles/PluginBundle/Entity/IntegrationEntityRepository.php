@@ -155,7 +155,6 @@ final class IntegrationEntityRepository extends CommonRepository
     /**
      * @param int          $limit
      * @param array|string $integrationEntity
-     * @param array        $excludeIntegrationIds
      *
      * @return mixed[]
      */
@@ -167,7 +166,7 @@ final class IntegrationEntityRepository extends CommonRepository
         $fromDate = null,
         $toDate = null,
         $integrationEntity = ['Contact', 'Lead'],
-        $excludeIntegrationIds = [],
+        array $excludeIntegrationIds = [],
     ): array {
         if ('company' == $internalEntity) {
             $joinTable = 'companies';

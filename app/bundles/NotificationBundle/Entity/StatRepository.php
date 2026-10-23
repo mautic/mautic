@@ -143,10 +143,8 @@ final class StatRepository extends CommonRepository
 
     /**
      * Get sent counts based grouped by notification Id.
-     *
-     * @param array $notificationIds
      */
-    public function getSentCounts($notificationIds = [], ?\DateTime $fromDate = null): array
+    public function getSentCounts(array $notificationIds = [], ?\DateTime $fromDate = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.notification_id, count(n.id) as sentcount')

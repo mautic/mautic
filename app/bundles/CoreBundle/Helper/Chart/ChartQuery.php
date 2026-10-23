@@ -80,10 +80,8 @@ class ChartQuery extends AbstractChart
 
     /**
      * Apply where filters to the query.
-     *
-     * @param array $filters
      */
-    public function applyFilters(TrackingQueryBuilder $query, $filters): void
+    public function applyFilters(TrackingQueryBuilder $query, array $filters): void
     {
         if ($filters && is_array($filters)) {
             foreach ($filters as $column => $value) {
@@ -199,7 +197,7 @@ class ChartQuery extends AbstractChart
      * @param string $column  name. The column must be type of datetime
      * @param array $filters will be added to where claues
      */
-    public function prepareTimeDataQuery(string $table, string $column, $filters = [], string $countColumn = '*', bool|string $isEnumerable = true, bool|string $useSqlOrder = true): TrackingQueryBuilder
+    public function prepareTimeDataQuery(string $table, string $column, array $filters = [], string $countColumn = '*', bool|string $isEnumerable = true, bool|string $useSqlOrder = true): TrackingQueryBuilder
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
@@ -411,7 +409,7 @@ class ChartQuery extends AbstractChart
      * @param mixed[] $filters      will be added to where claues
      * @param mixed[] $options      for special behavior
      */
-    public function getCountQuery(string $table, string $uniqueColumn, ?string $dateColumn = null, $filters = [], array $options = [], string $tablePrefix = 't'): TrackingQueryBuilder
+    public function getCountQuery(string $table, string $uniqueColumn, ?string $dateColumn = null, array $filters = [], array $options = [], string $tablePrefix = 't'): TrackingQueryBuilder
     {
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), $tablePrefix);
@@ -469,7 +467,7 @@ class ChartQuery extends AbstractChart
      * @param array  $filters      will be added to where claues
      * @param array  $options      for special behavior
      */
-    public function count(string $table, string $uniqueColumn, ?string $dateColumn = null, $filters = [], $options = []): int
+    public function count(string $table, string $uniqueColumn, ?string $dateColumn = null, array $filters = [], array $options = []): int
     {
         $query = $this->getCountQuery($table, $uniqueColumn, $dateColumn, $filters);
 
