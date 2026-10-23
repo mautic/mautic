@@ -84,6 +84,48 @@ final class LeadTest extends TestCase
         $this->assertSame(['channel2', 'channel3', 'channel5', 'channel6', 'channel1', 'channel4'], array_keys($channelRules));
     }
 
+    public function testPrimaryIdentifierDefaultOrderPrefersCompanyOverEmail(): void
+    {
+        $lead = new Lead();
+        $lead->setCompany('Acme');
+        $lead->setEmail('john@acme.com');
+
+        $this->assertSame('Acme', $lead->getPrimaryIdentifier());
+    }
+
+    public function testPrimaryIdentifierOrderCanBeChanged(): void
+    {
+        $lead = new Lead();
+        $lead->setCompany('Acme');
+        $lead->setEmail('john@acme.com');
+        $lead->setPrimaryIdentifierOrder(['name', 'email', 'company', 'social', 'ip']);
+
+        $this->assertSame('john@acme.com', $lead->getPrimaryIdentifier());
+
+        $lead->setFirstname('John');
+        $this->assertSame('John', $lead->getPrimaryIdentifier());
+    }
+
+    public function testPrimaryIdentifierSupportsCustomFieldAlias(): void
+    {
+        $lead = new Lead();
+        $lead->setEmail('john@acme.com');
+        $lead->setFields(['core' => ['customer_number' => ['value' => 4711, 'type' => 'number']]]);
+        $lead->setPrimaryIdentifierOrder(['customer_number', 'email']);
+
+        $this->assertSame('4711', $lead->getPrimaryIdentifier());
+    }
+
+    public function testPrimaryIdentifierSkipsNonScalarAndUnknownAliases(): void
+    {
+        $lead = new Lead();
+        $lead->setEmail('john@acme.com');
+        $lead->setFields(['core' => ['interests' => ['value' => ['a', 'b'], 'type' => 'multiselect']]]);
+        $lead->setPrimaryIdentifierOrder(['interests', 'unknown_alias', 'imported', 'email']);
+
+        $this->assertSame('john@acme.com', $lead->getPrimaryIdentifier());
+    }
+
     public function testAdjustPoints(): void
     {
         // new lead
