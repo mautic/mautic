@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Mailer\Transport;
 use Mautic\EmailBundle\Mailer\Transport\TransportFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Transport as SymfonyTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\NullTransport;
@@ -95,6 +96,29 @@ final class TransportFactoryTest extends TestCase
         yield 'scaleway api' => ['scaleway+api'];
     }
 
+    public function testUnknownApiTransportCanUsePasswordOnlyCredentialsAfterUserMissingException(): void
+    {
+        $capturedDsn = null;
+        $factory     = new CapturingTransportFactory($capturedDsn, 'future+api', true);
+        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $transport->fromString('future+api://:SG.test@default');
+
+        self::assertNotNull($capturedDsn);
+        self::assertSame('SG.test', $capturedDsn->getUser());
+        self::assertNull($capturedDsn->getPassword());
+    }
+
+    public function testAmazonSesIsNotRetriedWithPasswordAsUser(): void
+    {
+        $capturedDsn = null;
+        $factory     = new CapturingTransportFactory($capturedDsn, 'ses+api', true);
+        $transport   = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $this->expectException(IncompleteDsnException::class);
+        $transport->fromString('ses+api://:SG.test@default');
+    }
+
     public function testPasswordOnlySendgridDsnForValidationUsesThePasswordAsTheApiKey(): void
     {
         $capturedDsn = null;
@@ -128,11 +152,16 @@ final class CapturingTransportFactory implements TransportFactoryInterface
     public function __construct(
         private ?Dsn &$capturedDsn,
         private readonly string $scheme,
+        private readonly bool $requiresUser = false,
     ) {
     }
 
     public function create(Dsn $dsn): TransportInterface
     {
+        if ($this->requiresUser && null === $dsn->getUser()) {
+            throw new IncompleteDsnException('User is not set');
+        }
+
         $this->capturedDsn = $dsn;
 
         return new NullTransport();
