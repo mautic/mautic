@@ -235,6 +235,51 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->assertNotInstanceOf(IpAddress::class, $this->em->getRepository(IpAddress::class)->findOneBy(['ipAddress' => '203.0.113.9']));
     }
 
+    public function testFormActionsUpdateTheExistingContactMatchedByEmailForUntrackedVisitor(): void
+    {
+        $existingContact = new Lead();
+        $existingContact->setEmail('returning@example.com');
+        $this->em->persist($existingContact);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', [
+            'name'        => 'Trackability form',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [[
+                'label'        => 'Email',
+                'type'         => 'email',
+                'alias'        => 'email',
+                'mappedObject' => 'contact',
+                'mappedField'  => 'email',
+            ]],
+            'actions'     => [
+                [
+                    'name'       => 'Adjust points',
+                    'type'       => 'lead.pointschange',
+                    'properties' => ['operator' => 'plus', 'points' => 3],
+                ],
+                [
+                    'name'       => 'Update contact',
+                    'type'       => 'lead.updatelead',
+                    'properties' => ['lastname' => 'Returning'],
+                ],
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
+        $formId = (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+
+        $this->logoutUser();
+        $this->submitForm($formId, ['mauticform[email]' => 'returning@example.com'], ['HTTP_DNT' => '1']);
+
+        $this->em->clear();
+        $contacts = $this->em->getRepository(Lead::class)->findAll();
+        $this->assertCount(1, $contacts);
+        $this->assertSame($existingContact->getId(), $contacts[0]->getId());
+        $this->assertSame(3, $contacts[0]->getPoints());
+        $this->assertSame('Returning', $contacts[0]->getLastname());
+    }
+
     /**
      * @return iterable<string, array{bool, array<string, string>, bool}>
      */
