@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Symfony\Component\Form\FormBuilderInterface;
