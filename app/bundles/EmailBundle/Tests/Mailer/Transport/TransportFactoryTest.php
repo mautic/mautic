@@ -9,7 +9,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Transport as SymfonyTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mailer\Transport\FailoverTransport;
 use Symfony\Component\Mailer\Transport\NullTransport;
+use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 
@@ -77,6 +79,30 @@ final class TransportFactoryTest extends TestCase
 
         $transport->fromStringForValidation('future+api://:SG.test@default?region=eu');
 
+        self::assertSame('SG.test', $factory->capturedDsn->getUser());
+        self::assertNull($factory->capturedDsn->getPassword());
+    }
+
+    public function testPasswordOnlyApiDsnWorksInsideFailoverTransport(): void
+    {
+        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $result = $transport->fromString('failover(future+api://:SG.test@default smtp://relay.test)');
+
+        self::assertInstanceOf(FailoverTransport::class, $result);
+        self::assertSame('SG.test', $factory->capturedDsn->getUser());
+        self::assertNull($factory->capturedDsn->getPassword());
+    }
+
+    public function testPasswordOnlyApiDsnWorksInsideRoundRobinTransport(): void
+    {
+        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $result = $transport->fromString('roundrobin(future+api://:SG.test@default smtp://relay.test)?retry_period=90');
+
+        self::assertInstanceOf(RoundRobinTransport::class, $result);
         self::assertSame('SG.test', $factory->capturedDsn->getUser());
         self::assertNull($factory->capturedDsn->getPassword());
     }
