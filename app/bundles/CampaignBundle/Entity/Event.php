@@ -819,7 +819,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Used by the API.
      *
-     * @return LeadEventLog[]|Collection<int, LeadEventLog>
+     * @return iterable<LeadEventLog>|Collection<int, LeadEventLog>
      */
     public function getContactLog(?Contact $contact = null): iterable
     {

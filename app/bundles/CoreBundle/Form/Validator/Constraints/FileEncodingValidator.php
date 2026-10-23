@@ -11,9 +11,11 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 final class FileEncodingValidator extends ConstraintValidator
 {
+    /**
+     * @param \SplFileInfo $field
+     */
     public function validate(mixed $field, Constraint $constraint): void
     {
-        /** @var \SplFileInfo $field */
         /*
             If the file uploaded exceeds the max size, it will not be considered,
             and the file path will be an empty string "". If that is the case

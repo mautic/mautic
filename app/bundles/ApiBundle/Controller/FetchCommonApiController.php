@@ -410,7 +410,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             return [];
         }
 
-        /** @var AbstractCommonModel<object> $model */
+        /** @var AbstractCommonModel<TEntity> $model */
         $model    = $model ?: $this->model;
         $entities = $model->getEntities(
             [
