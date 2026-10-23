@@ -82,14 +82,17 @@ trait VariantEntityTrait
     }
 
     /**
-     * Remove variant.
+     * @param TEntity $child
      */
     public function removeVariantChild(VariantEntityInterface $child): void
     {
         $this->getVariantChildren()->removeElement($child);
     }
 
-    public function getVariantChildren(): ArrayCollection|Collection
+    /**
+     * @return Collection<int, TEntity>
+     */
+    public function getVariantChildren(): Collection
     {
         return $this->variantChildren;
     }

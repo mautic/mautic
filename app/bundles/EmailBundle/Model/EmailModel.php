@@ -1212,6 +1212,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
                     $totalAbWeight = array_sum(array_column($abTestSettings['variants'], 'weight'));
 
                     foreach ($childrenVariant as $child) {
+                        /** @var Email $child */
                         if ($child->isPublished()) {
                             $childWeight = $totalAbWeight > 0
                                 ? $abTestSettings['variants'][$child->getId()]['weight'] / $totalAbWeight
