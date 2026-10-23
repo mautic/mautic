@@ -1171,7 +1171,7 @@
     | `Mautic\CampaignBundle\Entity\Event` | `getCampaign()` | `?Mautic\CampaignBundle\Entity\Campaign` |
     | `Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter` | `createFormatter()` | `self` (`AbstractFormatter`) |
 
-- `Mautic\CoreBundle\Entity\VariantEntityInterface` and `VariantEntityTrait` now declare `getVariantStartDate(): ?\DateTime` and `setVariantStartDate(?\DateTime $variantStartDate): static`. The date getter's return type and setter's parameter type were previously `mixed`. Update implementations and overrides accordingly; pass a mutable `DateTime` or `null`, not a `DateTimeImmutable` or another value.
+- `Mautic\CoreBundle\Entity\VariantEntityInterface` and `VariantEntityTrait` now declare `getVariantStartDate(): ?\DateTimeInterface` and `setVariantStartDate(?\DateTimeInterface $variantStartDate): static`. The date getter's return type and setter's parameter type were previously `mixed`. Update implementations and overrides accordingly; pass a mutable `DateTimeInterface` or `null`, not a `DateTimeImmutable` or another value.
 - `Mautic\LeadBundle\Controller\FrequencyRuleTrait` now declares `protected array $leadLists = []` (previously untyped and initialized to `null`) and `protected bool $isPublicView = false`. Any class that redeclares these trait properties must use compatible types and defaults; code must no longer assign `null` to `$leadLists`.
 - `Mautic\CoreBundle\Test\AbstractMauticTestCase::$router` now has the native type `Symfony\Component\Routing\RouterInterface`. Plugin tests that redeclare this protected property must use the same type, and assigned test doubles must implement that interface.
 
