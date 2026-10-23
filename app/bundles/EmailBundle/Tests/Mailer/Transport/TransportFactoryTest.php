@@ -63,6 +63,27 @@ final class TransportFactoryTest extends TestCase
         self::assertNull($factory->capturedDsn->getPassword());
     }
 
+    public function testPasswordOnlyApiKeyPreservesAnUnescapedPlusSign(): void
+    {
+        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $transport->fromString('future+api://:part+one@default');
+
+        self::assertSame('part+one', $factory->capturedDsn->getUser());
+    }
+
+    public function testPasswordOnlyApiKeyPreservesZero(): void
+    {
+        $factory   = new CapturingTransportFactory('future+api', requiresUser: true);
+        $transport = new TransportFactory(new SymfonyTransportFactory([$factory]));
+
+        $transport->fromString('future+api://:0@default');
+
+        self::assertSame('0', $factory->capturedDsn->getUser());
+        self::assertNull($factory->capturedDsn->getPassword());
+    }
+
     public function testSmtpCredentialsAreNotChanged(): void
     {
         $factory   = new CapturingTransportFactory('smtp');
