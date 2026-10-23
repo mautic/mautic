@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
 use Mautic\FormBundle\Event\FieldCollectEvent;
@@ -10,6 +9,7 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\ObjectCollectEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -35,7 +35,6 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     public function __construct(
         private LeadModel $leadModel,
         private ContactTracker $contactTracker,
-        private IpLookupHelper $ipLookupHelper,
         private LeadFieldRepository $leadFieldRepository,
         private PointGroupModel $groupModel,
         private DoNotContact $doNotContact,
@@ -167,7 +166,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -177,8 +176,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $pointsChangeLog->setType('form');
         $pointsChangeLog->setEventName($form->getId().':'.$form->getName());
         $pointsChangeLog->setActionName($event->getAction()->getName());
-        // No IP for a form submitter Mautic doesn't track
-        $pointsChangeLog->setIpAddress($this->ipLookupHelper->isVisitorUntracked() ? null : $this->ipLookupHelper->getIpAddress());
+        $pointsChangeLog->setIpAddress($event->getSubmission()->getIpAddress());
         $pointsChangeLog->setDateAdded(new \DateTime());
         $pointsChangeLog->setLead($contact);
 
@@ -212,7 +210,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -235,7 +233,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -252,7 +250,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -292,7 +290,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!$contact = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -337,7 +335,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$lead = $this->contactTracker->getContact()) {
+        if (!$lead = $this->getSubmissionContact($event)) {
             return;
         }
 
@@ -371,5 +369,17 @@ final readonly class FormSubscriber implements EventSubscriberInterface
 
         $this->leadModel->setFieldValues($lead, CustomFieldHelper::fieldsValuesTransformer($fields, $processedValues), false);
         $this->leadModel->saveEntity($lead);
+    }
+
+    /**
+     * A kiosk mode submission without contact fields has no contact, so the actions must not fall back to the contact the device cookie points to.
+     */
+    private function getSubmissionContact(SubmissionEvent $event): ?Lead
+    {
+        if (!$event->getSubmission()->getLead()) {
+            return null;
+        }
+
+        return $this->contactTracker->getContact();
     }
 }
