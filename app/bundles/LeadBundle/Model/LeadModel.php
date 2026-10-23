@@ -1895,17 +1895,15 @@ class LeadModel extends FormModel
     /**
      * Get pie chart data of dwell times.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
-     * @param array  $filters
+     * @param array<string, mixed> $filters
      */
-    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, $filters = [], bool $canViewOthers = true): array
+    public function getAnonymousVsIdentifiedPieChartData(\DateTime $dateFrom, \DateTime $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
         if (!$canViewOthers) {
-            $filter             = ['owner_id' => $this->userHelper->getUser()->getId()];
+            $filters['owner_id'] = $this->userHelper->getUser()->getId();
         }
 
         $identified = $query->count('leads', 'date_identified', 'date_added', $filters);
@@ -1924,10 +1922,10 @@ class LeadModel extends FormModel
      * @param \DateTime $dateTo
      * @param mixed[]   $filters
      */
-    public function getLeadMapData($dateFrom, $dateTo, $filters = [], bool $canViewOthers = true): array
+    public function getLeadMapData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         if (!$canViewOthers) {
-            $filter             = ['owner_id' => $this->userHelper->getUser()->getId()];
+            $filters['owner_id'] = $this->userHelper->getUser()->getId();
         }
 
         $q = $this->em->getConnection()->createQueryBuilder();
@@ -2028,13 +2026,12 @@ class LeadModel extends FormModel
     /**
      * Get a list of leads in a date range.
      *
-     * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getLeadList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getLeadList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], array $options = []): array
     {
         if (!empty($options['canViewOthers'])) {
-            $filter             = ['owner_id' => $this->userHelper->getUser()->getId()];
+            $filters['owner_id'] = $this->userHelper->getUser()->getId();
         }
 
         $q = $this->em->getConnection()->createQueryBuilder();

@@ -151,6 +151,7 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Determines if ajax content should be returned or direct content (page refresh).
+     * @param array<string, mixed> $args
      */
     protected function delegateView(array $args): Response
     {
@@ -160,15 +161,6 @@ class CommonController extends AbstractController implements MauticController
 
         // Used for error handling
         defined('MAUTIC_DELEGATE_VIEW') || define('MAUTIC_DELEGATE_VIEW', 1);
-
-        if (!is_array($args)) {
-            $args = [
-                'contentTemplate' => $args,
-                'passthroughVars' => [
-                    'mauticContent' => $bundle,
-                ],
-            ];
-        }
 
         if (!isset($args['viewParameters']['currentRoute']) && isset($args['passthroughVars']['route'])) {
             $args['viewParameters']['currentRoute'] = $args['passthroughVars']['route'];
@@ -613,10 +605,7 @@ class CommonController extends AbstractController implements MauticController
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }
 
-    /**
-     * @param array|\Iterator $toExport
-     */
-    protected function exportResultsAs(iterable $toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
+    protected function exportResultsAs(array|\Iterator $toExport, $type, $filename, ExportHelper $exportHelper): StreamedResponse
     {
         if (!in_array($type, $exportHelper->getSupportedExportTypes())) {
             throw new BadRequestHttpException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
