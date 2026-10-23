@@ -60,7 +60,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $lead   = $event->getLead();
         $leadId = (int) (null !== $lead ? $lead['id'] : null);
         $email  = $event->getEmail();
-        $tokens = $this->generateTokensFromContent($event, $leadId, $event->getSource(), null === $email ? null : $email->getId());
+        $tokens = $this->generateTokensFromContent($event, $leadId, $event->getSource(), $email?->getId());
         $event->addTokens($tokens);
     }
 

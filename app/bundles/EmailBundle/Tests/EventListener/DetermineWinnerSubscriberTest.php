@@ -92,7 +92,7 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $abTestResults = $event->getAbTestResults();
 
-        $this->assertEquals($abTestResults['winners'], [2]);
+        $this->assertEquals([2], $abTestResults['winners']);
         $this->assertEquals($abTestResults['support']['data'], $expectedData);
     }
 
@@ -149,7 +149,7 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $abTestResults = $event->getAbTestResults();
 
-        $this->assertEquals($abTestResults['winners'], [2]);
+        $this->assertEquals([2], $abTestResults['winners']);
         $this->assertEquals($abTestResults['support']['data'], $expectedData);
     }
 }

@@ -41,7 +41,7 @@ final class ContactFinderTest extends \PHPUnit\Framework\TestCase
         $finder = new ContactFinder($statRepository, $leadRepository, $logger);
         $result = $finder->find($lead->getEmail(), 'contact@test.com');
 
-        $this->assertEquals($result->getContacts(), [$lead]);
+        $this->assertEquals([$lead], $result->getContacts());
     }
 
     #[TestDox('Contact should be found via a hash in to email address')]
@@ -78,6 +78,6 @@ final class ContactFinderTest extends \PHPUnit\Framework\TestCase
         $result = $finder->find($lead->getEmail(), 'test+unsubscribe_123abc@test.com');
 
         $this->assertEquals($result->getStat(), $stat);
-        $this->assertEquals($result->getContacts(), [$lead]);
+        $this->assertEquals([$lead], $result->getContacts());
     }
 }

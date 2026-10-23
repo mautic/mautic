@@ -117,6 +117,7 @@ final class ApiUserSubscriberTest extends TestCase
                 }
 
                 self::fail('Unknown badge class '.$className);
+                return false;
             });
         $passport->expects($this->once())
             ->method('getBadge')
@@ -166,6 +167,7 @@ final class ApiUserSubscriberTest extends TestCase
                 }
 
                 self::fail('Unknown badge class '.$className);
+                return false;
             });
         $passport->expects($this->exactly(2))
             ->method('getBadge')
@@ -240,6 +242,7 @@ final class ApiUserSubscriberTest extends TestCase
                 }
 
                 self::fail('Unknown badge class '.$className);
+                return false;
             });
         $passport->expects($this->exactly(2))
             ->method('getBadge')
@@ -311,6 +314,7 @@ final class ApiUserSubscriberTest extends TestCase
                 }
 
                 self::fail('Unknown badge class '.$className);
+                return false;
             });
         $passport->expects($this->exactly(2))
             ->method('getBadge')

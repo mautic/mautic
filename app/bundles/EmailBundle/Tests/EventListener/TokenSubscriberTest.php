@@ -177,11 +177,11 @@ CONTENT
 
         $eventTokens = $event->getTokens(false);
         $this->assertEquals(
-            $eventTokens,
             [
                 '{dynamiccontent="Dynamic Content 1"}' => 'Default Dynamic Content',
                 '{dynamiccontent="Dynamic Content 2"}' => 'DEC value',
-            ]
+            ],
+            $eventTokens
         );
         $mailHelper->addTokens($eventTokens);
         $mailerTokens = $mailHelper->getTokens();
