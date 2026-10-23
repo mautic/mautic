@@ -325,6 +325,49 @@ HTML;
         $this->subscriber->decodeTokens($event);
     }
 
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function hrefTokenFormatProvider(): iterable
+    {
+        yield 'url-encoded token' => ['%7Bdwc=link-token%7D', 'https://example.com/path'];
+        yield 'plain token' => ['{dwc=link-token}', 'https://example.com/path'];
+        yield 'url-encoded token inside url' => ['https://example.com/?a=%7Bdwc=link-token%7D&b=1', 'https://example.com/?a=https://example.com/path&b=1'];
+        yield 'plain token inside url' => ['https://example.com/?a={dwc=link-token}&b=1', 'https://example.com/?a=https://example.com/path&b=1'];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('hrefTokenFormatProvider')]
+    public function testDecodeTokensReplacesHrefTokenInAnyEncoding(string $href, string $expectedHref): void
+    {
+        $content = '<html><body><a href="'.$href.'">Click here</a></body></html>';
+        $contact = new Lead();
+        $event   = $this->createMock(PageDisplayEvent::class);
+
+        $event->method('getLead')->willReturn($contact);
+        $event->method('getContent')->willReturn($content);
+
+        $this->dynamicContentHelper->method('findDwcTokens')
+            ->willReturn([
+                '{dwc=link-token}' => [
+                    'content' => '<p>https://example.com/path</p>',
+                    'filters' => [],
+                ],
+            ]);
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->willReturnCallback(function (string $output) use ($expectedHref): void {
+                $dom = new \DOMDocument();
+                $dom->loadHTML($output, LIBXML_NOERROR | LIBXML_NOWARNING);
+                $link = $dom->getElementsByTagName('a')->item(0);
+
+                $this->assertInstanceOf(\DOMElement::class, $link);
+                $this->assertSame($expectedHref, $link->getAttribute('href'));
+            });
+
+        $this->subscriber->decodeTokens($event);
+    }
+
     public function testDecodeTokensEscapesHrefAttributeContent(): void
     {
         $content    = '<html><body><a href="{dwc=link-token}">Click here</a>{dwc=link-token}</body></html>';
