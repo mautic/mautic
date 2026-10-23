@@ -22,7 +22,7 @@ final class SegmentDependencyTreeFactory
     public function __construct(
         private readonly RouterInterface $router,
         private readonly LeadListRepository $leadListRepository,
-        private readonly CorePermissions $corePermissions,
+        private readonly ?CorePermissions $corePermissions = null,
     ) {
     }
 
@@ -80,7 +80,7 @@ final class SegmentDependencyTreeFactory
 
         return array_values(array_filter(
             $this->leadListRepository->findBy(['id' => $childSegmentIds]),
-            fn (LeadList $childSegment): bool => $this->corePermissions->hasEntityAccess(
+            fn (LeadList $childSegment): bool => null === $this->corePermissions || $this->corePermissions->hasEntityAccess(
                 LeadPermissions::LISTS_VIEW_OWN,
                 LeadPermissions::LISTS_VIEW_OTHER,
                 $childSegment->getCreatedBy()
