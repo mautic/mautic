@@ -58,8 +58,8 @@ final class Dsn implements \Stringable
         }
 
         $host     = urldecode($parsedDsn['host']);
-        $user     = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
-        $password = '' !== ($parsedDsn['pass'] ?? '') ? urldecode($parsedDsn['pass']) : null;
+        $user     = '' !== ($parsedDsn['user'] ?? '') ? rawurldecode($parsedDsn['user']) : null;
+        $password = '' !== ($parsedDsn['pass'] ?? '') ? rawurldecode($parsedDsn['pass']) : null;
         $port     = $parsedDsn['port'] ?? null;
         $path     = isset($parsedDsn['path']) ? ltrim(urldecode($parsedDsn['path']), '/') : null;
         parse_str($parsedDsn['query'] ?? '', $query);
@@ -71,15 +71,15 @@ final class Dsn implements \Stringable
     {
         $dsn = $this->scheme.'://';
 
-        if ($this->user) {
+        if (null !== $this->user) {
             $dsn .= rawurlencode($this->user);
         }
 
-        if ($this->password) {
+        if (null !== $this->password) {
             $dsn .= ':'.rawurlencode($this->password);
         }
 
-        if ($this->user || $this->password) {
+        if (null !== $this->user || null !== $this->password) {
             $dsn .= '@';
         }
 
