@@ -47,6 +47,16 @@ final class ValidEmailLinksValidatorTest extends TestCase
         $this->validator->validate($email, new ValidEmailLinks());
     }
 
+    public function testUnbalancedCurlyBraceTokenAddsViolation(): void
+    {
+        $email = new Email();
+        $email->setCustomHtml('<a href="{{{pm:unsubscribe}}">Unsubscribe</a>');
+
+        $this->expectViolation('customHtml', '{{{pm:unsubscribe}}');
+
+        $this->validator->validate($email, new ValidEmailLinks());
+    }
+
     public function testCustomHtmlTakesPrecedenceOverStaleBuilderContent(): void
     {
         $email = new Email();
@@ -80,6 +90,8 @@ final class ValidEmailLinksValidatorTest extends TestCase
         yield 'URL with a token' => ['https://example.com/path?{contactfield=customfield-a}={contactfield=customfield-b}&array[]=value1#footer'];
         yield 'mailto URL' => ['mailto:test@example.com'];
         yield 'Mautic token' => ['{unsubscribe_url}'];
+        yield 'double-braced external token' => ['{{pm:unsubscribe}}'];
+        yield 'triple-braced external token' => ['{{{pm:unsubscribe}}}'];
     }
 
     public function testUnexpectedConstraintThrows(): void
