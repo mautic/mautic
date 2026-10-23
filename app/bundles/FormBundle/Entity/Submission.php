@@ -127,10 +127,7 @@ class Submission
         return (int) $this->id;
     }
 
-    /**
-     * @param \DateTime $dateSubmitted
-     */
-    public function setDateSubmitted($dateSubmitted): static
+    public function setDateSubmitted(?\DateTime $dateSubmitted): static
     {
         $this->dateSubmitted = $dateSubmitted;
 

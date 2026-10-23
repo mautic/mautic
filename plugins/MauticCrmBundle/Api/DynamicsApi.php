@@ -89,9 +89,8 @@ final class DynamicsApi extends CrmApi
 
     /**
      * @param mixed[] $data
-     * @param Lead    $lead
      */
-    public function createLead(array $data, $lead, $object = 'contacts'): ResponseInterface
+    public function createLead(array $data, Lead $lead, $object = 'contacts'): ResponseInterface
     {
         return $this->request('', $data, 'POST', $object);
     }

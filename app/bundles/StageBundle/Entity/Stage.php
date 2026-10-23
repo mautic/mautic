@@ -233,10 +233,7 @@ class Stage extends FormEntity implements UuidInterface
         return $this->log;
     }
 
-    /**
-     * @param \DateTime $publishUp
-     */
-    public function setPublishUp($publishUp): self
+    public function setPublishUp(?\DateTime $publishUp): self
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -252,10 +249,7 @@ class Stage extends FormEntity implements UuidInterface
         return $this->publishUp;
     }
 
-    /**
-     * @param \DateTime $publishDown
-     */
-    public function setPublishDown($publishDown): self
+    public function setPublishDown(?\DateTime $publishDown): self
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;

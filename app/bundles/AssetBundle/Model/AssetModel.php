@@ -519,11 +519,9 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
      * Get pie chart data of unique vs repetitive downloads.
      * Repetitive in this case mean if a lead downloaded any of the assets more than once.
      *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
      * @param mixed[]   $filters
      */
-    public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
+    public function getUniqueVsRepetitivePieChartData(\DateTime $dateFrom, \DateTime $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         $chart   = new PieChart();
         $query   = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

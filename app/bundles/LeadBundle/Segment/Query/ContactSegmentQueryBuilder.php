@@ -37,11 +37,9 @@ final class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param ContactSegmentFilters $segmentFilters
-     *
      * @throws SegmentQueryException
      */
-    public function assembleContactsSegmentQueryBuilder(int $segmentId, $segmentFilters, bool $changeAlias = false): QueryBuilder
+    public function assembleContactsSegmentQueryBuilder(int $segmentId, ContactSegmentFilters $segmentFilters, bool $changeAlias = false): QueryBuilder
     {
         $connection = $this->entityManager->getConnection();
         if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {

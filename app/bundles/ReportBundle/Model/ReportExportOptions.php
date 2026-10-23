@@ -10,15 +10,9 @@ final class ReportExportOptions
 
     private int $page = 1;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateFrom;
+    private ?\DateTime $dateFrom = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateTo;
+    private ?\DateTime $dateTo = null;
 
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
@@ -50,34 +44,22 @@ final class ReportExportOptions
         return $this->page * $this->batchSize;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateFrom()
+    public function getDateFrom(): ?\DateTime
     {
         return $this->dateFrom;
     }
 
-    /**
-     * @param \DateTime $dateFrom
-     */
-    public function setDateFrom($dateFrom): void
+    public function setDateFrom(\DateTime $dateFrom): void
     {
         $this->dateFrom = $dateFrom;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateTo()
+    public function getDateTo(): ?\DateTime
     {
         return $this->dateTo;
     }
 
-    /**
-     * @param \DateTime $dateTo
-     */
-    public function setDateTo($dateTo): void
+    public function setDateTo(\DateTime $dateTo): void
     {
         $this->dateTo = $dateTo;
     }

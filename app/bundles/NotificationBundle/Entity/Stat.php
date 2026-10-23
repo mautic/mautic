@@ -435,10 +435,7 @@ class Stat
         return $this->dateRead;
     }
 
-    /**
-     * @param \DateTime $dateRead
-     */
-    public function setDateRead($dateRead): static
+    public function setDateRead(?\DateTime $dateRead): static
     {
         $this->dateRead = $dateRead;
 
