@@ -192,11 +192,11 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
             $result[$token] = $dwc['content'];
         }
 
-        // Depending on the libxml version, DOMDocument may URL-encode { -> %7B and } -> %7D inside href values.
-        // Replace tokens (encoded or plain) inside href attributes with HTML-stripped, attribute-escaped content
+        // Depending on the libxml version, DOMDocument may URL-encode { -> %7B and } -> %7D inside href, src and action values.
+        // Replace tokens (encoded or plain) inside those attributes with HTML-stripped, attribute-escaped content
         // to avoid injecting HTML markup into attribute values, then replace the remaining tokens normally.
         $content = preg_replace_callback(
-            '/(\bhref\s*=\s*")([^"]*)(")/i',
+            '/(\b(?:href|src|action)\s*=\s*")([^"]*)(")/i',
             static function (array $matches) use ($result): string {
                 $value = $matches[2];
                 foreach ($result as $token => $replacement) {
