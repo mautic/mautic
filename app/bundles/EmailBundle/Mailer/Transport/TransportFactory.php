@@ -34,7 +34,7 @@ class TransportFactory
     public function fromString(string $dsn): TransportInterface
     {
         try {
-            return $this->transportFactory->fromString($dsn);
+            return $this->transportFactory->fromString($this->normalizeSendgridDsn($dsn));
         } catch (UnsupportedSchemeException) {
             return new InvalidTransport();
         }
@@ -44,4 +44,20 @@ class TransportFactory
     {
         return $this->transportFactory->fromDsnObject($dsn);
     }
+
+    public function fromStringForValidation(string $dsn): TransportInterface
+    {
+        return $this->transportFactory->fromString($this->normalizeSendgridDsn($dsn));
+    }
+
+    private function normalizeSendgridDsn(string $dsn): string
+    {
+        return (string) preg_replace(
+            '/^((?:[a-z][a-z0-9.-]*\\+api)|sendgrid):\\/\\/:(.*?)@/i',
+            '$1://$2@',
+            $dsn,
+            1
+        );
+    }
+
 }
