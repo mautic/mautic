@@ -15,10 +15,11 @@ use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 final class Issue17912FunctionalTest extends AbstractMauticTestCase
 {
+    private const DEPENDENCY_TREE_PATH = '/s/ajax?action=lead:getSegmentDependencyTree&id=';
+
     protected function tearDown(): void
     {
         parent::tearDown();
-        restore_exception_handler();
     }
 
     public function testInaccessibleChildrenAreOmittedAndInaccessibleRootsAreDenied(): void
@@ -41,7 +42,7 @@ final class Issue17912FunctionalTest extends AbstractMauticTestCase
         $this->em->flush();
 
         $this->loginUser($user);
-        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getSegmentDependencyTree&id='.$root->getId());
+        $this->client->request(Request::METHOD_GET, self::DEPENDENCY_TREE_PATH.$root->getId());
         Assert::assertSame(200, $this->client->getResponse()->getStatusCode());
         $response = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $nodes    = array_merge(...array_map(static fn (array $level): array => $level['nodes'], $response['levels']));
@@ -52,6 +53,7 @@ final class Issue17912FunctionalTest extends AbstractMauticTestCase
         Assert::assertNotContains($inaccessible->getName(), $names);
         Assert::assertSame(3, count($nodes));
         restore_error_handler();
+        restore_exception_handler();
     }
 
     public function testUnauthorizedRootIsRejected(): void
@@ -62,7 +64,7 @@ final class Issue17912FunctionalTest extends AbstractMauticTestCase
         $this->em->flush();
 
         $this->loginUser($user);
-        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getSegmentDependencyTree&id='.$root->getId());
+        $this->client->request(Request::METHOD_GET, self::DEPENDENCY_TREE_PATH.$root->getId());
 
         Assert::assertSame(403, $this->client->getResponse()->getStatusCode());
         Assert::assertStringNotContainsString('dependency-tree', (string) $this->client->getResponse()->getContent());
@@ -76,7 +78,7 @@ final class Issue17912FunctionalTest extends AbstractMauticTestCase
         $this->em->flush();
 
         $this->loginUser($user);
-        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getSegmentDependencyTree&id='.$root->getId());
+        $this->client->request(Request::METHOD_GET, self::DEPENDENCY_TREE_PATH.$root->getId());
 
         Assert::assertSame(200, $this->client->getResponse()->getStatusCode());
         $response = json_decode((string) $this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
