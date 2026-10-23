@@ -13,6 +13,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
     final class ErrorHandler
     {
+        /**
+         * @var self
+         */
         public static $handler;
 
         /**
@@ -35,6 +38,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private $logger;
 
+        /**
+         * @var LoggerInterface
+         */
         private $mainLogger;
 
         private static string $root;
@@ -86,7 +92,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @return mixed
+         * @return LoggerInterface
          */
         public function getDebugLogger()
         {

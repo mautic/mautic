@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -43,6 +44,7 @@ final class ThemeApiController extends CommonApiController
         }
 
         $response  = ['success' => false];
+        /** @var UploadedFile $themeZip */
         $themeZip  = $request->files->get('file');
         $extension = $themeZip->getClientOriginalExtension();
 

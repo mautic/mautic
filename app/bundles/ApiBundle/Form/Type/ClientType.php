@@ -45,10 +45,12 @@ final class ClientType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $apiMode = $this->getApiMode();
+        /** @var Client $client */
+        $client = $options['data'];
         $builder->addEventSubscriber(new CleanFormSubscriber([]));
         $builder->addEventSubscriber(new FormExitSubscriber('api.client', $options));
 
-        if (!$options['data']->getId()) {
+        if (!$client->getId()) {
             $builder->add(
                 'api_mode',
                 ChoiceType::class,
@@ -107,7 +109,7 @@ final class ClientType extends AbstractType
                 'disabled'   => true,
                 'required'   => false,
                 'mapped'     => false,
-                'data'       => $options['data']->getPublicId(),
+                'data'       => $client->getPublicId(),
             ]
         );
 

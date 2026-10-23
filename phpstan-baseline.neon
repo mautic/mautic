@@ -1141,18 +1141,6 @@ parameters:
 			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
 
 		-
-			message: '#^Property Mautic\\CoreBundle\\ErrorHandler\\ErrorHandler\:\:\$handler has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\ErrorHandler\\ErrorHandler\:\:\$mainLogger has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Event\\AbstractCustomRequestEvent\:\:checkRouteContext\(\) has parameter \$route with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1

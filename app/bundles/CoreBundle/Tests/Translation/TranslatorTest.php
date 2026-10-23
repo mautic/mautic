@@ -20,6 +20,7 @@ final class TranslatorTest extends AbstractMauticTestCase
 
         $reflection         = new \ReflectionClass($translator);
         $property           = $reflection->getProperty('translator');
+        /** @var \Symfony\Component\Translation\Translator $internalTranslator */
         $internalTranslator = $property->getValue($translator);
 
         $internalTranslator->addLoader('array', new ArrayLoader());
