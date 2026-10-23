@@ -55,10 +55,8 @@ final readonly class ExportHelper
 
     /**
      * Exports data as the given export type. You can get available export types with getSupportedExportTypes().
-     *
-     * @param array|\Iterator $data
      */
-    public function exportDataAs(iterable $data, string $type, string $filename): StreamedResponse
+    public function exportDataAs(array|\Iterator $data, string $type, string $filename): StreamedResponse
     {
         if (is_array($data)) {
             $data = new \ArrayIterator($data);
