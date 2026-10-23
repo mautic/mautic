@@ -472,7 +472,7 @@ final class PublicController extends CommonFormController
             $form = $submissionResult['form'];
             $hash = ($form instanceof Form) ? '#'.strtolower($form->getAlias()) : '';
 
-            $response = $this->redirect($context['return'].$context['query'].'mauticError='.rawurlencode((string) $error).$hash); // NOSONAR return URL is sanitized in createSubmitContext().
+            $response = $this->redirect($context['return'].$context['query'].'mauticError='.rawurlencode((string) $error).$hash);
         } elseif ('redirect' === $submissionResult['postAction']) {
             $response = $this->redirect((string) $submissionResult['postActionProperty']);
         } elseif ('return' === $submissionResult['postAction'] && !empty($context['return'])) {
@@ -481,7 +481,7 @@ final class PublicController extends CommonFormController
                 $return .= $context['query'].'mauticMessage='.rawurlencode((string) $submissionResult['postActionProperty']);
             }
 
-            $response = $this->redirect($return); // NOSONAR return URL is sanitized in createSubmitContext().
+            $response = $this->redirect($return);
         }
 
         return $response;
