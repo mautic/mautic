@@ -211,7 +211,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getLead()
     {
-        return (null !== $this->helper) ? $this->helper->getLead() : $this->lead;
+        return $this->helper?->getLead() ?? $this->lead;
     }
 
     /**
@@ -224,7 +224,7 @@ class EmailSendEvent extends CommonEvent
 
     public function getSource(): array
     {
-        return (null !== $this->helper) ? $this->helper->getSource() : $this->source;
+        return $this->helper?->getSource() ?? $this->source;
     }
 
     public function addTokens(array $tokens): void
@@ -260,7 +260,7 @@ class EmailSendEvent extends CommonEvent
 
     public function getTextHeaders(): array
     {
-        return (null !== $this->helper) ? $this->helper->getCustomHeaders() : $this->textHeaders;
+        return $this->helper?->getCustomHeaders() ?? $this->textHeaders;
     }
 
     /**

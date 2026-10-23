@@ -334,7 +334,7 @@ final class SubmissionModel extends CommonFormModel
         }
 
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-        $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+        $trackingId    = ($trackedDevice?->getTrackingId());
 
         // set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
