@@ -62,7 +62,7 @@ Mautic.chartTickLabel = function(scale, value) {
 
 Mautic.chartYAxisTicks = function(scale) {
     scale.ticks = [scale.min, (scale.max - scale.min) / 2, scale.max].map(function(value) {
-        return {value: value};
+        return {value};
     });
 };
 
@@ -191,6 +191,10 @@ Mautic.renderBarChart = function(canvas) {
         type: 'bar',
         data: data,
         options: {
+            interaction: {
+                mode: 'index',
+                intersect: true
+            },
             datasets: {
                 bar: {barPercentage: 0.9}
             }
@@ -212,6 +216,10 @@ Mautic.renderLifechartBarChart = function(canvas) {
         type: 'bar',
         data: data,
         options: {
+            interaction: {
+                mode: 'index',
+                intersect: true
+            },
             datasets: {
                 bar: {barThickness: barWidth}
             }
