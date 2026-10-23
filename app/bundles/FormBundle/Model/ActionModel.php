@@ -113,7 +113,6 @@ final class ActionModel extends CommonFormModel
             ]
         );
         $formIds = [];
-        /** @var Action $entity */
         foreach ($entities as $entity) {
             $properties = $entity->getProperties();
             if (isset($properties['email']) && (int) $properties['email'] === $emailId) {

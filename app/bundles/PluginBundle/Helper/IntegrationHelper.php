@@ -120,11 +120,14 @@ final class IntegrationHelper
                             if ($this->container->has($integrationContainerKey)) {
                                 $this->integrations[$integrationName] = $this->container->get($integrationContainerKey);
 
-                                $features = $this->integrations[$integrationName]->getSupportedFeatures();
+                                /** @var AbstractIntegration $integration */
+                                $integration = $this->integrations[$integrationName];
+
+                                $features = $integration->getSupportedFeatures();
                                 $newIntegration->setSupportedFeatures($features);
 
                                 // Go ahead and stash it since it's built already
-                                $this->integrations[$integrationName]->setIntegrationSettings($newIntegration);
+                                $integration->setIntegrationSettings($newIntegration);
 
                                 $newIntegrations[] = $newIntegration;
 
@@ -180,11 +183,15 @@ final class IntegrationHelper
                             // Initiate the class in order to get the features supported
                             if ($this->container->has($integrationContainerKey)) {
                                 $this->integrations[$integrationName] = $this->container->get($integrationContainerKey);
-                                $features                             = $this->integrations[$integrationName]->getSupportedFeatures();
+
+                                /** @var AbstractIntegration $integration */
+                                $integration = $this->integrations[$integrationName];
+
+                                $features = $integration->getSupportedFeatures();
                                 $newIntegration->setSupportedFeatures($features);
 
                                 // Go ahead and stash it since it's built already
-                                $this->integrations[$integrationName]->setIntegrationSettings($newIntegration);
+                                $integration->setIntegrationSettings($newIntegration);
 
                                 $newIntegrations[] = $newIntegration;
                             } else {
@@ -258,7 +265,10 @@ final class IntegrationHelper
 
                 if ($this->container->has($integrationContainerKey)) {
                     $this->integrations[$integrationName] = $this->container->get($integrationContainerKey);
-                    $this->integrations[$integrationName]->setIntegrationSettings($integration['settings']);
+
+                    /** @var AbstractIntegration $integrationObject */
+                    $integrationObject = $this->integrations[$integrationName];
+                    $integrationObject->setIntegrationSettings($integration['settings']);
                 }
             }
 
@@ -276,6 +286,8 @@ final class IntegrationHelper
         if (empty($alphabetical)) {
             // Sort by priority
             uasort($returnServices, function ($a, $b): int {
+                /** @var AbstractIntegration $a */
+                /** @var AbstractIntegration $b */
                 $aP = (int) $a->getPriority();
                 $bP = (int) $b->getPriority();
 
@@ -284,6 +296,8 @@ final class IntegrationHelper
         } else {
             // Sort by display name
             uasort($returnServices, function ($a, $b): int {
+                /** @var AbstractIntegration $a */
+                /** @var AbstractIntegration $b */
                 $aName = $a->getDisplayName();
                 $bName = $b->getDisplayName();
 

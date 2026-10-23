@@ -920,6 +920,7 @@ final class LeadController extends AbstractFormController
     private function uploadAvatar(Request $request, AvatarHelper $avatarHelper, Lead $lead): void
     {
         $leadInformation = $request->files->get('lead', []);
+        /** @var UploadedFile $file */
         $file            = $leadInformation['custom_avatar'] ?? null;
         $avatarDir       = $avatarHelper->getAvatarPath(true);
 
@@ -1006,6 +1007,7 @@ final class LeadController extends AbstractFormController
         }
 
         $leadChoices = [];
+        /** @var Lead $l */
         foreach ($leads as $l) {
             $leadChoices[$l->getPrimaryIdentifier()] = $l->getId();
         }
@@ -1646,6 +1648,7 @@ final class LeadController extends AbstractFormController
                 );
             }
 
+            /** @var Lead $lead */
             foreach ($entities as $key => $lead) {
                 if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                     unset($entities[$key]);
@@ -1764,6 +1767,7 @@ final class LeadController extends AbstractFormController
             $count = count($entities);
 
             if ($count) {
+                /** @var Lead $lead */
                 foreach ($entities as $lead) {
                     if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                         $doNotContact->addDncForContact($lead->getId(), 'email', DoNotContact::MANUAL, $data['reason']);
@@ -1836,6 +1840,7 @@ final class LeadController extends AbstractFormController
             }
 
             $count = 0;
+            /** @var Lead $lead */
             foreach ($entities as $lead) {
                 if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                     ++$count;
@@ -1942,6 +1947,7 @@ final class LeadController extends AbstractFormController
                 );
             }
             $count = 0;
+            /** @var Lead $lead */
             foreach ($entities as $lead) {
                 if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
                     ++$count;

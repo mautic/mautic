@@ -379,14 +379,19 @@ final class ReportGeneratorEvent extends AbstractReportEvent
             $this->options['dateTo'] = new \DateTime();
         }
 
+        /** @var \DateTimeInterface $dateFrom */
+        $dateFrom = $this->options['dateFrom'];
+        /** @var \DateTimeInterface $dateTo */
+        $dateTo = $this->options['dateTo'];
+
         if ($dateOnly) {
             $queryBuilder->andWhere(sprintf($dateOnlyFilter, $tablePrefix.$dateColumn));
-            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
-            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));
+            $queryBuilder->setParameter('dateFrom', $dateFrom->format('Y-m-d'));
+            $queryBuilder->setParameter('dateTo', $dateTo->format('Y-m-d'));
         } else {
             $queryBuilder->andWhere(sprintf($dateTimeFilter, $tablePrefix.$dateColumn));
-            $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
-            $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
+            $queryBuilder->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
+            $queryBuilder->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
         }
     }
 

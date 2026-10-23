@@ -492,6 +492,7 @@ final class SubmissionModel extends CommonFormModel
 
                         // build the data rows
                         foreach ($results as $k => $s) {
+                            /** @var array<string, mixed> $s */
                             $row = $this->getExportRow($s, $viewOnlyFields);
                             $this->putCsvExportRow($handle, $row);
 
@@ -539,6 +540,7 @@ final class SubmissionModel extends CommonFormModel
                             // build the data rows
                             $count = 2;
                             foreach ($results as $k => $s) {
+                                /** @var array<string, mixed> $s */
                                 $row = $this->getExportRow($s, $viewOnlyFields);
 
                                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");

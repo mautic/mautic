@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\UserBundle\Entity\RoleRepository;
@@ -54,7 +56,7 @@ final class RoleListType extends AbstractType
 
         foreach ($roles as $result) {
             $role                          = is_array($result) ? $result[0] : $result;
-            $choices[$role->getName(true)] = $role->getId();
+            $choices[$role->getName()] = $role->getId();
         }
 
         // sort by name
