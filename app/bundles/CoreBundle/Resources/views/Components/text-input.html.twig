@@ -18,7 +18,7 @@
         name: name|default('input'),
         type: 'text',
         label: null,
-        value: value|default(''),
+        value: value is defined ? value : '',
         placeholder: placeholder|default(null),
         disabled: disabled|default(false),
         readonly: readonly|default(false),
