@@ -147,7 +147,9 @@ class TransportFactory
         $start = 0;
         $length = strlen($arguments);
 
-        for ($index = 0; $index < $length; ++$index) {
+        $index = 0;
+
+        while ($index < $length) {
             if ('(' === $arguments[$index]) {
                 ++$depth;
             } elseif (')' === $arguments[$index]) {
@@ -157,12 +159,15 @@ class TransportFactory
                     $result[] = substr($arguments, $start, $index - $start);
                 }
 
-                while ($index + 1 < $length && ctype_space($arguments[$index + 1])) {
+                do {
                     ++$index;
-                }
+                } while ($index < $length && ctype_space($arguments[$index]));
 
-                $start = $index + 1;
+                $start = $index;
+                continue;
             }
+
+            ++$index;
         }
 
         if ($start < $length) {
