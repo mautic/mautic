@@ -177,7 +177,8 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $pointsChangeLog->setType('form');
         $pointsChangeLog->setEventName($form->getId().':'.$form->getName());
         $pointsChangeLog->setActionName($event->getAction()->getName());
-        $pointsChangeLog->setIpAddress($this->ipLookupHelper->getIpAddress());
+        // No IP for a form submitter Mautic doesn't track
+        $pointsChangeLog->setIpAddress($this->ipLookupHelper->isVisitorUntracked() ? null : $this->ipLookupHelper->getIpAddress());
         $pointsChangeLog->setDateAdded(new \DateTime());
         $pointsChangeLog->setLead($contact);
 
