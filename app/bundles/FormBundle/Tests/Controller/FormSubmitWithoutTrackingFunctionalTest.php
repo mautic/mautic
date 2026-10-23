@@ -111,6 +111,39 @@ final class FormSubmitWithoutTrackingFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([], $this->em->getRepository(Lead::class)->findAll());
     }
 
+    /**
+     * New installs turn the option off, so a new visitor gets no cookie before consent, neither on load nor on submit.
+     */
+    public function testNewVisitorGetsNoCookieWhileTheOptionIsOff(): void
+    {
+        $formId = $this->createForm();
+
+        $this->logoutUser();
+        $this->client->getCookieJar()->clear();
+        foreach (['/form/%d', '/form/embed/%d'] as $url) {
+            $this->client->request(Request::METHOD_GET, sprintf($url, $formId), [], [], ['REMOTE_ADDR' => '203.0.113.10']);
+            $this->assertResponseIsSuccessful();
+            $this->assertNoTrackingCookie($this->client->getResponse()->headers->getCookies());
+        }
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/form/{$formId}", [], [], ['REMOTE_ADDR' => '203.0.113.10']);
+        $form    = $crawler->filter('form[id=mauticform_withouttrackingform]')->form();
+        $form->setValues(['mauticform[email]' => 'visitor@example.com']);
+        $this->client->submit($form, [], ['REMOTE_ADDR' => '203.0.113.10']);
+        $this->assertResponseIsSuccessful();
+        $this->assertNoTrackingCookie($this->client->getCookieJar()->all());
+
+        // The submitted data still creates the contact, without an IP address or device
+        $this->em->clear();
+        $submission = $this->em->getRepository(Submission::class)->findOneBy(['form' => $formId]);
+        $this->assertInstanceOf(Submission::class, $submission);
+        $this->assertNull($submission->getTrackingId());
+        $this->assertNotInstanceOf(IpAddress::class, $submission->getIpAddress());
+        $this->assertSame('visitor@example.com', $submission->getLead()?->getEmail());
+        $this->assertSame([], $this->em->getRepository(LeadDevice::class)->findAll());
+        $this->assertNotInstanceOf(IpAddress::class, $this->em->getRepository(IpAddress::class)->findOneBy(['ipAddress' => '203.0.113.10']));
+    }
+
     public function testTrackedVisitorIsStillTrackedWhileTheOptionIsOn(): void
     {
         $formId         = $this->createForm();
