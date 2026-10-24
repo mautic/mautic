@@ -320,7 +320,8 @@ final class LeadSubscriber implements EventSubscriberInterface
         // UTM tags loaded or added in this request are removed with the loser
         // through the cascade, so move them in memory and empty the collection
         // without scheduling them for orphan removal.
-        $utmTags = $loser->getUtmTags();
+        $movedTags = [];
+        $utmTags   = $loser->getUtmTags();
         if ($utmTags instanceof PersistentCollection) {
             $utmTags = $utmTags->unwrap();
         }
@@ -328,11 +329,29 @@ final class LeadSubscriber implements EventSubscriberInterface
         if ($utmTags instanceof Collection) {
             foreach ($utmTags as $utmTag) {
                 $utmTag->setLead($victor);
+                $movedTags[] = $utmTag;
             }
             $utmTags->clear();
         }
 
         $this->utmTagRepository->updateLead($loser->getId(), $victor->getId());
+
+        // A victor collection this request already loaded would not see the
+        // moved rows, so add them. An uninitialized one loads them from the
+        // database when first used.
+        $victorTags = $victor->getUtmTags();
+        if (!$victorTags instanceof Collection
+            || ($victorTags instanceof PersistentCollection && !$victorTags->isInitialized())) {
+            return;
+        }
+
+        $movedTags = array_merge($movedTags, $this->utmTagRepository->findBy(['lead' => $victor]));
+        foreach ($movedTags as $utmTag) {
+            $utmTag->setLead($victor);
+            if (!$victorTags->contains($utmTag)) {
+                $victorTags->add($utmTag);
+            }
+        }
     }
 
     /**
