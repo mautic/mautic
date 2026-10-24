@@ -18,7 +18,10 @@ final class AvatarExtensionTest extends TestCase
         $image = $this->createExtension()->getImage(1);
 
         $this->assertStringStartsWith('data:image/svg+xml;', $image);
-        $this->assertStringContainsString('<svg', rawurldecode(substr($image, (int) strpos($image, ',') + 1)));
+        $this->assertSame(
+            file_get_contents(__DIR__.'/../../../Fixtures/line-face-user.svg'),
+            rawurldecode(substr($image, (int) strpos($image, ',') + 1))
+        );
     }
 
     public function testAvatarsAreStableAndVaryBetweenUsers(): void

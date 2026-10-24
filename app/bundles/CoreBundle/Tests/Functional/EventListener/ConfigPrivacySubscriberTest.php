@@ -63,6 +63,7 @@ final class ConfigPrivacySubscriberTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->assertStringStartsWith('data:image/svg+xml;', (string) $crawler->filter('img.media-object')->attr('src'));
+        $this->assertStringNotContainsString('gravatar.com', (string) $this->client->getResponse()->getContent());
     }
 
     /**
