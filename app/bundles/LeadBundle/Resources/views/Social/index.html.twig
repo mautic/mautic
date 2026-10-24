@@ -17,7 +17,7 @@
       {{ cycle(['', '</div><div class="row">'], loop.index0) }}
       <div class="col-md-6">
           <div class="panel panel-default panel-{{ integrationName|lower }}">
-              <div class="panel-heading pr-0">
+              <div class="panel-heading pe-0">
                   <h3 class="panel-title">{{ ('mautic.integration.'~integrationName)|trans }}</h3>
                   <div class="panel-toolbar text-right">
                       <a href="javascript:void(0);" class="btn" data-toggle="tooltip" onclick="Mautic.refreshLeadSocialProfile('{{ integrationName }}', '{{ lead.id }}', event);"
@@ -49,5 +49,5 @@
     'id': 'socialImageModal',
     'body': '<img class="img-responsive img-thumbnail" />',
     'header': false,
-    'padding': 'np',
+    'padding': 'p-0',
 }) }}

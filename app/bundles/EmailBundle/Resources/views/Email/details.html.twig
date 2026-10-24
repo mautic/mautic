@@ -489,7 +489,7 @@
       <!-- right section -->
       <div class="col-md-3 bdr-l height-auto">
           <!-- email preview -->
-          <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+          <div class="panel shd-none rounded-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.email.preview.url'|trans }}</div>
               </div>
@@ -573,11 +573,11 @@
           <!--/ email preview -->
 
           {% if emailType == 'list' and email.lists|length > 0 %}
-              <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0" id="email-segments-used">
+              <div class="panel shd-none rounded-0 bdr-w-0 mt-sm mb-0" id="email-segments-used">
                   <div class="panel-heading">
                       <div class="panel-title">{{ 'mautic.email.segments.used'|trans }}</div>
                   </div>
-                  <div class="panel-body pt-xs d-flex fw-wrap gap-xs">
+                  <div class="panel-body pt-xs d-flex flex-wrap gap-xs">
                       {% set segmentTagColors = ['gray', 'red', 'magenta', 'purple', 'blue', 'cyan', 'teal', 'green'] %}
                       {% for segment in email.lists %}
                           {% set canViewSegment = securityHasEntityAccess(
@@ -607,7 +607,7 @@
 
           <!-- Draft preview URL -->
           {% if draftPreviewUrl is defined and draftPreviewUrl is not empty %}
-          <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+          <div class="panel bg-transparent shd-none rounded-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.email.draft.preview.url'|trans }}</div>
               </div>
@@ -634,7 +634,7 @@
           {% endif %}
 
           <!-- email usages -->
-          <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0" data-fetch-email-usages="{{ email.id }}">
+          <div class="panel shd-none rounded-0 bdr-w-0 mt-sm mb-0" data-fetch-email-usages="{{ email.id }}">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.email.usages'|trans }}</div>
               </div>

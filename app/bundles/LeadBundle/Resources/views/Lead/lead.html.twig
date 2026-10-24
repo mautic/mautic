@@ -270,7 +270,7 @@
                                         <h3 class="text-white dark-sm"><span class="ri-eye-line"></span></h3>
                                     </div>
                                 </div>
-                                <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                                <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                     {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': engagementData, 'chartType': 'line', 'chartHeight': 250}) }}
                                 </div>
                             </div>
@@ -405,7 +405,7 @@
     <!-- right section -->
     <div class="col-md-3 bdr-l height-auto">
         <!-- form HTML -->
-        <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
+        <div class="panel shd-none rounded-0 bdr-w-0 mb-0">
             {% if not lead.isAnonymous %}
                 <div class="lead-avatar-panel">
                     <div class="avatar-collapser hr-expand nm">
@@ -498,7 +498,7 @@
 
         <hr class="hr-w-2" style="width:50%">
 
-        <div class="panel shd-none bdr-rds-0 bdr-w-0">
+        <div class="panel shd-none rounded-0 bdr-w-0">
                 <div class="panel-heading">
                     <div class="panel-title">{{ 'mautic.lead.lead.upcoming.events'|trans }}</div>
                 </div>
@@ -548,7 +548,7 @@
             {% set isExpandable = tagCount > maxVisibleTagsCount %}
             
             {% set tagHeader %}
-                <div class="d-flex jc-space-between">
+                <div class="d-flex justify-content-between">
                     <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.tags'|trans }}</span>
                     <i class="ri-hashtag" aria-hidden="true"></i>
                 </div>
@@ -559,7 +559,7 @@
                 {% set tagContent %}
                     {{ tagHeader }}
                     
-                    <div class="d-flex fw-wrap gap-xs mt-xs">
+                    <div class="d-flex flex-wrap gap-xs mt-xs">
                         {% if tagCount > 0 %}
                             {% for tag in lead.tags %}
                                 {{ _self.render_tag(tag, lead.id) }}
@@ -585,7 +585,7 @@
                 {% set aboveContent %}
                     {{ tagHeader }}
                     
-                    <div class="d-flex fw-wrap gap-xs">
+                    <div class="d-flex flex-wrap gap-xs">
                         {% for tag in firstEightTags %}
                             {{ _self.render_tag(tag, lead.id) }}
                         {% endfor %}
@@ -593,7 +593,7 @@
                 {% endset %}
                 
                 {% set belowContent %}
-                    <div class="d-flex fw-wrap gap-xs mt-xs">
+                    <div class="d-flex flex-wrap gap-xs mt-xs">
                         {% for tag in remainingTags %}
                             {{ _self.render_tag(tag, lead.id) }}
                         {% endfor %}
@@ -615,7 +615,7 @@
             {% set companyClasses = ['gray', 'red', 'magenta', 'purple', 'blue', 'cyan', 'teal', 'green'] %}
 
             {% set companyHeader %}
-                <div class="d-flex jc-space-between">
+                <div class="d-flex justify-content-between">
                     <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.lead.companies'|trans }}</span>
                     <i class="ri-building-line" aria-hidden="true"></i>
                 </div>
@@ -625,7 +625,7 @@
                 {% if companyCount <= maxVisibleCompaniesCount %}
                     {% set content %}
                         {{ companyHeader }}
-                        <div class="d-flex fw-wrap gap-xs">
+                        <div class="d-flex flex-wrap gap-xs">
                             {% for company in companies %}
                                 {{ _self.render_company(company, lead.id, cycle(companyClasses, loop.index0)) }}
                             {% endfor %}
@@ -636,7 +636,7 @@
                 {% else %}
                     {% set aboveContent %}
                         {{ companyHeader }}
-                        <div class="d-flex fw-wrap gap-xs">
+                        <div class="d-flex flex-wrap gap-xs">
                             {% for company in companies|slice(0, maxVisibleCompaniesCount) %}
                                 {{ _self.render_company(company, lead.id, cycle(companyClasses, loop.index0)) }}
                             {% endfor %}
@@ -644,7 +644,7 @@
                     {% endset %}
 
                     {% set belowContent %}
-                        <div class="d-flex fw-wrap gap-xs mt-xs">
+                        <div class="d-flex flex-wrap gap-xs mt-xs">
                             {% for company in companies|slice(maxVisibleCompaniesCount) %}
                                 {{ _self.render_company(company, lead.id, cycle(companyClasses, loop.index0 + maxVisibleCompaniesCount)) }}
                             {% endfor %}
@@ -674,11 +674,11 @@
                 
                 {% if segments|length <= 8 %}
                     {% set content %}
-                        <div class="d-flex jc-space-between">
+                        <div class="d-flex justify-content-between">
                             <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.lead.lists'|trans }}</span>
                             <i class="ri-pie-chart-line" aria-hidden="true"></i>
                         </div>
-                        <div class="d-flex fw-wrap gap-xs">
+                        <div class="d-flex flex-wrap gap-xs">
                             {% for key, list in segments %}
                                 {% set tag = {
                                     'label': list.name|purify,
@@ -696,11 +696,11 @@
                     {% include '@MauticCore/Components/tile.html.twig' with {'type': 'base', 'content': content} %}
                 {% else %}
                     {% set aboveContent %}
-                        <div class="d-flex jc-space-between">
+                        <div class="d-flex justify-content-between">
                             <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.lead.lists'|trans }}</span>
                             <i class="ri-pie-chart-line" aria-hidden="true"></i>
                         </div>
-                        <div class="d-flex fw-wrap gap-xs">
+                        <div class="d-flex flex-wrap gap-xs">
                             {% for key, list in segments|slice(0, 8) %}
                                 {% set tag = {
                                     'label': list.name|purify,
@@ -716,7 +716,7 @@
                     {% endset %}
                     
                     {% set belowContent %}
-                        <div class="d-flex fw-wrap gap-xs mt-xs">
+                        <div class="d-flex flex-wrap gap-xs mt-xs">
                         {% for key, list in segments|slice(8) %}
                             {% set tag = {
                                 'label': list.name|purify,
@@ -739,7 +739,7 @@
                 {% endif %}
             {% else %}
                 {% set content %}
-                <div class="d-flex jc-space-between">
+                <div class="d-flex justify-content-between">
                     <span class="fw-b ellipsis mb-md">{{ 'mautic.lead.lead.lists'|trans }}</span>
                     <i class="ri-pie-chart-line" aria-hidden="true"></i>
                 </div>
@@ -761,7 +761,7 @@
 
 {% macro render_company(company, leadId, color) %}
     {% set companyName = htmlEntityDecode(company.companyname) %}
-    <div data-company-id="{{ company.id }}" class="d-flex ai-center gap-xs">
+    <div data-company-id="{{ company.id }}" class="d-flex align-items-center gap-xs">
         <a id="company-{{ company.id }}" class="label label-{{ color }}" href="{{ path('mautic_company_action', {'objectAction': 'view', 'objectId': company.id}) }}" data-toggle="ajax">
             {% if company.is_primary == 1 %}
                 <i class="ri-user-star-fill company-primary-icon primary" aria-hidden="true" focusable="false"></i>

@@ -1,13 +1,13 @@
 <div aria-hidden="true"
-    class="gsearch--interaction-helper d-flex jc-space-between pr-md pl-md pt-sm pb-sm text-secondary">
-    <div class="gsearch--interaction-navigate d-flex ai-center gap-5">
+    class="gsearch--interaction-helper d-flex justify-content-between pr-md pl-md pt-sm pb-sm text-secondary">
+    <div class="gsearch--interaction-navigate d-flex align-items-center gap-5">
         <span class="fs-16">{{ 'mautic.core.navigate'|trans }}</span>
         <kbd><i class="ri-arrow-up-line"></i></kbd>
         <kbd><i class="ri-arrow-down-line"></i></kbd>
         <span class="fs-16">{{ 'mautic.core.or'|trans }}</span>
         <kbd>tab</kbd>
     </div>
-    <div class="gsearch--interaction-close d-flex ai-center gap-5">
+    <div class="gsearch--interaction-close d-flex align-items-center gap-5">
         <span class="fs-16">{{ 'mautic.core.close'|trans }}</span>
         <kbd>esc</kbd>
     </div>
@@ -27,8 +27,8 @@
                 {% endif %}
             </div>
 
-            <div class="np">
-                <ul class="pa-0">
+            <div class="p-0">
+                <ul class="p-0">
                     {% for k, r in result %}
                         {% if 'count' is not same as k %}
                             <li class="list-group-item gsearch--results-item mb-3">

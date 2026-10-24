@@ -12,16 +12,16 @@
 {% set isCurrent = variant.id == activeEntity.id %}
 
 {# Render variant list item #}
-<div class="list-group-item variant-item d-flex ai-center {% if isCurrent %}bg-aut bg-dark-xs{% endif %}" style="padding: 4px 8px;">
+<div class="list-group-item variant-item d-flex align-items-center {% if isCurrent %}bg-aut bg-dark-xs{% endif %}" style="padding: 4px 8px;">
     {# Variant indicator #}
     <div class="variant-indicator">
         <i class="ri-arrow-right-line"></i>
     </div>
 
     {# Main content #}
-    <div class="variant-content fg-1" style="min-width: 0;">
+    <div class="variant-content flex-grow-1" style="min-width: 0;">
         {# Title and status #}
-        <div class="variant-title d-flex ai-center fs-14" style="min-width: 0; overflow: hidden;">
+        <div class="variant-title d-flex align-items-center fs-14" style="min-width: 0; overflow: hidden;">
             <a href="{{ path(actionRoute, {'objectAction': 'view', 'objectId': variant.id}) }}"
                data-toggle="ajax"
                title="{{ variant.subject }}"
