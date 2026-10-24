@@ -67,7 +67,7 @@
                       {% set pluginTitle = item.name ~ ' - ' ~ item.display %}
                   {% endif %}
                   <div class="shuffle shuffle-item grid ma-10 pull-left text-center integration plugin{{ item.plugin }} integration-{{ item.name }} {% if not item.enabled %}integration-disabled{% endif %}">
-                      <div class="panel ovf-h pa-10">
+                      <div class="panel overflow-hidden pa-10">
                           <a href="{{ path((item.isBundle ? 'mautic_plugin_info' : 'mautic_plugin_config'), {'name': item.name}) }}"
                              {% if item.isBundle %}data-footer="false"{% endif %}
                              data-prevent-dismiss="true"
