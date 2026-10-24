@@ -19,7 +19,7 @@ final class FormFieldSliderType extends AbstractType
     {
         $builder->add('min', ConstrainedIntegerType::class, [
             'label'      => 'mautic.form.field.form.slider_min',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'required'   => false,
             'attr'       => ['class' => 'form-control'],
             'data'       => $options['data']['min'] ?? 0,
@@ -27,7 +27,7 @@ final class FormFieldSliderType extends AbstractType
 
         $builder->add('max', ConstrainedIntegerType::class, [
             'label'       => 'mautic.form.field.form.slider_max',
-            'label_attr'  => ['class' => 'control-label'],
+            'label_attr'  => ['class' => 'form-label'],
             'required'    => false,
             'attr'        => ['class' => 'form-control'],
             'data'        => $options['data']['max'] ?? 100,
@@ -38,7 +38,7 @@ final class FormFieldSliderType extends AbstractType
 
         $builder->add('step', ConstrainedIntegerType::class, [
             'label'       => 'mautic.form.field.form.slider_step',
-            'label_attr'  => ['class' => 'control-label'],
+            'label_attr'  => ['class' => 'form-label'],
             'required'    => false,
             'attr'        => ['class' => 'form-control'],
             'data'        => $options['data']['step'] ?? 1,

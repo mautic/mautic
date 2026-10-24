@@ -148,7 +148,7 @@ final class ConfigSubscriberTest extends MauticMysqlTestCase
 
     private function setImagePathRequest(string $value): Crawler
     {
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/coreconfig');
         self::assertResponseIsSuccessful();
 
         // Find save & close button
@@ -156,10 +156,8 @@ final class ConfigSubscriberTest extends MauticMysqlTestCase
         $form          = $buttonCrawler->form();
         $form->setValues(
             [
-                'config[coreconfig][site_url]'                       => 'https://mautic-community.local', // required
-                'config[leadconfig][contact_columns]'                => ['name', 'email', 'id'],
-                'config[companyconfig][company_columns]'             => ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'],
-                'config[coreconfig][image_path]'                     => $value,
+                'config[coreconfig][site_url]'   => 'https://mautic-community.local', // required
+                'config[coreconfig][image_path]' => $value,
             ]
         );
 

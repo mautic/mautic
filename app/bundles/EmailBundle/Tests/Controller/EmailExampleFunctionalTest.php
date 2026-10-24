@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -24,7 +25,8 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $secondEmail = $this->createEmail();
         $this->em->flush();
 
-        $ids = json_encode([$firstEmail->getId(), $secondEmail->getId()]);
+        $ids = json_encode([$firstEmail->getId(), $secondEmail->getId(), $firstEmail->getId(), [], null, 0]);
+        $this->setCsrfHeader();
         $this->client->request(Request::METHOD_POST, '/s/emails/batchSendExample?ids='.urlencode($ids));
 
         self::assertResponseIsSuccessful();
@@ -37,6 +39,22 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('[TEST] Email subject', $messages[0]->getSubject());
         $this->assertSame('[TEST] Email subject', $messages[1]->getSubject());
         $this->assertStringContainsString('2 test emails were sent to', $content);
+    }
+
+    #[TestWith([null])]
+    #[TestWith(['invalid'])]
+    public function testBatchSendExampleRejectsInvalidCsrfToken(?string $token): void
+    {
+        $email = $this->createEmail();
+        $this->em->flush();
+
+        $ids = json_encode([$email->getId()]);
+        $this->client->request(Request::METHOD_POST, '/s/emails/batchSendExample?ids='.urlencode($ids), [], [], [
+            'HTTP_X-CSRF-Token' => $token ?? '',
+        ]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+        $this->assertCount(0, self::getMailerMessages());
     }
 
     public function testEmailListOffersBatchExampleSendingWithExplicitRecipient(): void
