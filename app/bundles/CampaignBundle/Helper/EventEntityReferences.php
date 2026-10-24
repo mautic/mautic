@@ -121,6 +121,7 @@ final class EventEntityReferences
     private const CHANNEL_REFERENCES = [
         'channel.message'     => self::MESSAGE,
         'dynamicContent'      => DynamicContent::ENTITY_NAME,
+        'form'                => Form::ENTITY_NAME,
         'mobile_notification' => self::NOTIFICATION,
     ];
 

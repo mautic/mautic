@@ -157,6 +157,14 @@ final class EventEntityReferencesTest extends TestCase
         );
         $this->assertSame(201, $event['channel_id']);
 
+        // The builder stores no channel for a form submit, events created another way can have one
+        $event = $this->references->remapEvent(
+            ['type' => 'form.submit', 'channel' => 'form', 'channel_id' => 4, 'properties' => ['forms' => [4]]],
+            [Form::ENTITY_NAME => [4 => 404]]
+        );
+        $this->assertSame(404, $event['channel_id']);
+        $this->assertSame([404], $event['properties']['forms']);
+
         $event = $this->references->remapEvent(
             ['type' => 'page.pagehit', 'channel' => 'page', 'channel_id' => 9, 'properties' => ['pages' => [9]]],
             []
