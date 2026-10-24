@@ -2771,6 +2771,14 @@ Mautic.handlePopoverInsertion = function () {
     });
 };
 
+mQuery(document).off('click.passwordVisibility', '.form-field-toggle').on('click.passwordVisibility', '.form-field-toggle', function () {
+    const field = this.parentElement.querySelector('input');
+    const shown = field.type === 'text';
+    field.type = shown ? 'password' : 'text';
+    this.setAttribute('aria-label', shown ? this.dataset.labelShow : this.dataset.labelHide);
+    this.querySelector('i').className = shown ? 'ri-eye-line' : 'ri-eye-off-line';
+});
+
 // Initialize filter commands on page load
 document.addEventListener('DOMContentLoaded', function () {
     Mautic.initFilterCommands();
