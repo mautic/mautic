@@ -387,7 +387,8 @@ code:hover > .copy-icon {
   width: 100%;
   overflow: hidden;
 
-  &.pull-left {
+  &.pull-left,
+  &.float-start {
     width: 75%;
   }
 
