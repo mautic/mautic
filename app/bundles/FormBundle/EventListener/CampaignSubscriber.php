@@ -120,6 +120,13 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
         $field = $this->formModel->findFormFieldByAlias($form, $event->getConfig()['field']);
 
+        // The field can be gone from the form, e.g. after it was edited
+        if (!$field) {
+            $event->setResult(false);
+
+            return;
+        }
+
         $filter = $this->formFieldHelper->getFieldFilter($field->getType());
         $value  = InputHelper::_($event->getConfig()['value'], $filter);
 
@@ -130,7 +137,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             $event->getConfig()['field'],
             $value,
             $operators[$event->getConfig()['operator']]['expr'],
-            $field ? $field->getType() : null
+            $field->getType()
         );
 
         $event->setChannel('form', $form->getId());

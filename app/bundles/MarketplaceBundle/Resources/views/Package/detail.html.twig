@@ -244,9 +244,11 @@
         <div class="box-layout">
             <div class="col-xs-3 align-middle">
                 <div class="panel-body">
+                    {% if maintainer.avatar %}
                     <span class="img-wrapper img-rounded">
                         <img class="img" src="{{ maintainer.avatar|escape }}">
                     </span>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-xs-9 align-top">
