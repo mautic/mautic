@@ -224,7 +224,19 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $model->setUtmTags($visitor, $this->createUtmTag($visitor, 'whitepaper'));
 
+        // The winner's collection is already loaded in this request
+        $this->assertCount(1, $jane->getUtmTags()->toArray());
+
         $winner = $merger->merge($jane, $visitor);
+
+        $loaded = $winner->getUtmTags()->toArray();
+        foreach ($loaded as $utmTag) {
+            $this->assertSame($winner, $utmTag->getLead());
+        }
+        $campaigns = array_map(static fn (UtmTag $utmTag): ?string => $utmTag->getUtmCampaign(), $loaded);
+        sort($campaigns);
+        $this->assertSame(['newsletter', 'webinar', 'whitepaper'], $campaigns);
+
         $this->em->clear();
 
         /** @var UtmTagRepository $utmTagRepository */
