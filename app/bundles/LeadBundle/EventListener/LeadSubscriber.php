@@ -2,7 +2,9 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Exception;
+use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -300,6 +302,8 @@ final class LeadSubscriber implements EventSubscriberInterface
             $event->getVictor()->getId()
         );
 
+        $this->moveUtmTags($event->getLoser(), $event->getVictor());
+
         $log = [
             'bundle'    => 'lead',
             'object'    => 'lead',
@@ -309,6 +313,45 @@ final class LeadSubscriber implements EventSubscriberInterface
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ];
         $this->auditLogModel->writeToLog($log);
+    }
+
+    private function moveUtmTags(Lead $loser, Lead $victor): void
+    {
+        // UTM tags loaded or added in this request are removed with the loser
+        // through the cascade, so move them in memory and empty the collection
+        // without scheduling them for orphan removal.
+        $movedTags = [];
+        $utmTags   = $loser->getUtmTags();
+        if ($utmTags instanceof PersistentCollection) {
+            $utmTags = $utmTags->unwrap();
+        }
+
+        if ($utmTags instanceof Collection) {
+            foreach ($utmTags as $utmTag) {
+                $utmTag->setLead($victor);
+                $movedTags[] = $utmTag;
+            }
+            $utmTags->clear();
+        }
+
+        $this->utmTagRepository->updateLead($loser->getId(), $victor->getId());
+
+        // A victor collection this request already loaded would not see the
+        // moved rows, so add them. An uninitialized one loads them from the
+        // database when first used.
+        $victorTags = $victor->getUtmTags();
+        if (!$victorTags instanceof Collection
+            || ($victorTags instanceof PersistentCollection && !$victorTags->isInitialized())) {
+            return;
+        }
+
+        $movedTags = array_merge($movedTags, $this->utmTagRepository->findBy(['lead' => $victor]));
+        foreach ($movedTags as $utmTag) {
+            $utmTag->setLead($victor);
+            if (!$victorTags->contains($utmTag)) {
+                $victorTags->add($utmTag);
+            }
+        }
     }
 
     /**
