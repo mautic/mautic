@@ -11,24 +11,48 @@ final class Version20241212090146 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME = 'sync_object_mapping';
 
-    private string $indexName = MAUTIC_TABLE_PREFIX.'internal_object_id_idx';
+    private function getTableName(): string
+    {
+        return $this->prefix.self::TABLE_NAME;
+    }
+
+    private function getIndexName(): string
+    {
+        return $this->prefix.'internal_object_id_idx';
+    }
 
     protected function preUpAssertions(): void
     {
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
         $this->skipAssertion(
-            fn (Schema $schema) => !$schema->hasTable($this->getPrefixedTableName(self::TABLE_NAME))
-                || $schema->getTable($this->getPrefixedTableName(self::TABLE_NAME))->hasIndex($this->indexName),
-            "Table {$this->getPrefixedTableName(self::TABLE_NAME)} does not exist or the index {$this->indexName} already exists."
+            fn (Schema $schema) => !$schema->hasTable($tableName) || $this->indexExists($tableName, $indexName),
+            sprintf('Table %s does not exist or the index %s already exists.', $tableName, $indexName)
         );
     }
 
     public function up(Schema $schema): void
     {
-        $this->addSql("CREATE INDEX {$this->indexName} ON {$this->getPrefixedTableName(self::TABLE_NAME)} (internal_object_id);");
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+        if (!$schema->hasTable($tableName) || $this->indexExists($tableName, $indexName)) {
+            return;
+        }
+
+        $table = $schema->getTable($tableName);
+        $table->addIndex(['internal_object_id'], $indexName);
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("DROP INDEX {$this->indexName} ON {$this->getPrefixedTableName(self::TABLE_NAME)};");
+        $tableName = $this->getTableName();
+        $indexName = $this->getIndexName();
+
+        if (!$schema->hasTable($tableName) || !$this->indexExists($tableName, $indexName)) {
+            return;
+        }
+
+        $table = $schema->getTable($tableName);
+        $table->dropIndex($indexName);
     }
 }

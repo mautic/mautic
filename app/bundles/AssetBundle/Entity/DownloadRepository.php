@@ -51,8 +51,13 @@ class DownloadRepository extends CommonRepository
      */
     public function getLeadDownloads($leadId = null, array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('a.id as asset_id, d.date_download as dateDownload, a.title, d.id as download_id, d.lead_id')
+        $connection = $this->getEntityManager()->getConnection();
+        $query      = $connection->createQueryBuilder()
+            ->select('a.id as '.$connection->quoteIdentifier('asset_id'),
+                'd.date_download as '.$connection->quoteIdentifier('dateDownload'),
+                'a.title',
+                'd.id as '.$connection->quoteIdentifier('download_id'),
+                'd.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'asset_downloads', 'd')
             ->leftJoin('d', MAUTIC_TABLE_PREFIX.'assets', 'a', 'd.asset_id = a.id');
 
@@ -155,7 +160,8 @@ class DownloadRepository extends CommonRepository
                 ->setParameter('page', (int) $pageId);
         }
 
-        $q->andWhere('a.source = "page"')
+        $q->andWhere($q->expr()->eq('a.source', ':source'))
+            ->setParameter('source', 'page')
             ->andWhere('a.code = 200');
 
         if (null !== $fromDate) {
@@ -163,6 +169,10 @@ class DownloadRepository extends CommonRepository
             $q->andWhere($q->expr()->gte('a.date_download', ':date'))
                 ->setParameter('date', $dh->toUtcString());
         }
+
+        // PDOException: SQLSTATE[42803]: Grouping error: 7 ERROR:
+        // columns must appear in the GROUP BY clause or be used in an aggregate function
+        $q->groupBy('p.id, a.source_id, p.title, p.hits');
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
@@ -210,6 +220,10 @@ class DownloadRepository extends CommonRepository
             $q->andWhere($q->expr()->lte('a.date_download', ':dateTo'))
                 ->setParameter('dateTo', $dh->toUtcString());
         }
+
+        // PDOException: SQLSTATE[42803]: Grouping error: 7 ERROR:
+        // columns must appear in the GROUP BY clause or be used in an aggregate function
+        $q->groupBy('e.id, e.subject, e.variant_sent_count');
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
