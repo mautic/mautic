@@ -89,7 +89,7 @@
 
 {% block content %}
   <div class="page-list">
-    {% set bulkActionsCustom = [
+  {% set bulkActionsCustom = [
         {
             'attr': {
                 'class': 'btn btn-ghost btn-sm btn-nospin',
@@ -102,6 +102,20 @@
             'iconClass': 'ri-pie-chart-line',
         }
       ] %}
+      {% if canBlockDomains %}
+        {% set bulkActionsCustom = bulkActionsCustom|merge([{
+            'confirm': {
+                'message': 'mautic.form.result.markspam.confirm_batch'|trans,
+                'confirmText': 'mautic.form.result.markspam.batch'|trans,
+                'confirmAction': path('mautic_form_results_action', {'objectAction': 'batchMarkSpam', 'formId': form.id}),
+                'iconClass': 'ri-spam-2-line',
+                'btnText': 'mautic.form.result.markspam.batch'|trans,
+                'precheck': 'batchActionPrecheck',
+                'confirmCallback': 'executeBatchAction',
+                'id': 'batchMarkSpam',
+            }
+        }]) %}
+      {% endif %}
           {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
         'bulk_actions': {
             'target': '#formResultTable',
