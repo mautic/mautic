@@ -94,13 +94,10 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $responseContent = json_decode($clientResponse->getContent(), true);
-        $contentDom      = new \DOMDocument();
-        $contentDom->loadHTML($responseContent['newContent']);
-
-        $xpath = new \DOMXPath($contentDom);
+        $crawler         = new Crawler($responseContent['newContent']);
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals(1, $xpath->query("//option[@value='segment']")->count());
+        $this->assertCount(1, $crawler->filter('option[value="segment"]'));
     }
 
     public function testAddCategorizedLeadList(): void
