@@ -19,7 +19,9 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
     protected $useCleanupRollback = false;
 
-    public function testBatchSendExampleEmailsToCurrentUser(): void
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testBatchSendExampleEmailsToCurrentUser(bool $isAjax): void
     {
         $firstEmail  = $this->createEmail();
         $secondEmail = $this->createEmail();
@@ -27,7 +29,9 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $ids = json_encode([$firstEmail->getId(), $secondEmail->getId(), $firstEmail->getId(), [], null, 0]);
         $this->setCsrfHeader();
-        $this->client->request(Request::METHOD_POST, '/s/emails/batchSendExample?ids='.urlencode($ids));
+        $this->client->request(Request::METHOD_POST, '/s/emails/batchSendExample?ids='.urlencode($ids), [], [], [
+            'HTTP_X-Requested-With' => $isAjax ? 'XMLHttpRequest' : '',
+        ]);
 
         self::assertResponseIsSuccessful();
         $content = (string) $this->client->getResponse()->getContent();
@@ -41,19 +45,22 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('2 test emails were sent to', $content);
     }
 
-    #[TestWith([null])]
-    #[TestWith(['invalid'])]
-    public function testBatchSendExampleRejectsInvalidCsrfToken(?string $token): void
+    #[TestWith([null, false, Response::HTTP_FORBIDDEN])]
+    #[TestWith(['invalid', false, Response::HTTP_FORBIDDEN])]
+    #[TestWith([null, true, Response::HTTP_OK])]
+    #[TestWith(['invalid', true, Response::HTTP_OK])]
+    public function testBatchSendExampleRejectsInvalidCsrfToken(?string $token, bool $isAjax, int $expectedStatus): void
     {
         $email = $this->createEmail();
         $this->em->flush();
 
         $ids = json_encode([$email->getId()]);
         $this->client->request(Request::METHOD_POST, '/s/emails/batchSendExample?ids='.urlencode($ids), [], [], [
-            'HTTP_X-CSRF-Token' => $token ?? '',
+            'HTTP_X-CSRF-Token'     => $token ?? '',
+            'HTTP_X-Requested-With' => $isAjax ? 'XMLHttpRequest' : '',
         ]);
 
-        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+        self::assertResponseStatusCodeSame($expectedStatus);
         $this->assertCount(0, self::getMailerMessages());
     }
 
