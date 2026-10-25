@@ -37,6 +37,66 @@ final class DetailControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString($latestVersion, (string) $responseContent);
     }
 
+    #[DataProvider('invalidDetailedDescriptions')]
+    public function testInvalidDetailedDescriptionFallsBackToBaseDescription(mixed $description): void
+    {
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), true, 512, JSON_THROW_ON_ERROR);
+        foreach ($payload['package']['versions'] as &$version) {
+            $version['extra']['detailed_description'] = $description;
+            $version['extra']['expected_outcomes'] = ['unexpected' => 'Invalid outcomes'];
+        }
+        unset($version);
+        $this->getClientMockHandler()->append(new Response(200, [], json_encode($payload, JSON_THROW_ON_ERROR)));
+
+        $crawler = $this->client->request('GET', '/s/marketplace/detail/koco/mautic-recaptcha-bundle');
+        $this->assertResponseIsSuccessful();
+        $this->assertSame($payload['package']['description'], trim($crawler->filter('.marketplace-description')->text()));
+        $this->assertStringNotContainsString('Invalid outcomes', $crawler->text());
+        $this->assertStringNotContainsString('<script>alert(1)</script>', (string) $this->client->getResponse()->getContent());
+    }
+
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function invalidDetailedDescriptions(): iterable
+    {
+        yield 'array' => [['unexpected' => '<script>alert(1)</script>']];
+        yield 'boolean' => [true];
+        yield 'number' => [42];
+        yield 'null' => [null];
+        yield 'empty string' => [''];
+        yield 'whitespace' => [" \n\t"];
+    }
+
+    public function testRichPackageMetadataAndMarkdown(): void
+    {
+        $payload = json_decode(file_get_contents(__DIR__.'/../../ApiResponse/detail.json'), true, 512, JSON_THROW_ON_ERROR);
+        foreach ($payload['package']['versions'] as &$version) {
+            $version['extra'] = [
+                'display_name' => 'Campaign example',
+                'detailed_description' => "## Included features\n\n- **Recovery emails**\n\n<script>alert(1)</script>\n\n[Unsafe](javascript:alert(1))",
+                'expected_outcomes' => 'More **conversions**',
+                'industry' => ['Retail'],
+                'mautic' => ['headline' => 'Bring customers back', 'languages' => ['en'], 'works-with' => ['^7.0']],
+            ];
+            $version['require'] = ['mautic/core-lib' => '^7.0'];
+        }
+        unset($version);
+        $payload['package']['reviews'] = ['no reviews' => ['name' => null, 'rating' => null, 'review' => null]];
+        $this->getClientMockHandler()->append(new Response(200, [], json_encode($payload, JSON_THROW_ON_ERROR)));
+        $crawler = $this->client->request('GET', '/s/marketplace/detail/koco/mautic-recaptcha-bundle');
+        self::assertResponseIsSuccessful();
+        $this->assertCount(0, $crawler->filter('blockquote'));
+        $this->assertSame('Included features', $crawler->filter('.marketplace-description h2')->text());
+        $this->assertSame('Recovery emails', $crawler->filter('.marketplace-description li strong')->text());
+        $this->assertCount(0, $crawler->filter('.marketplace-description script'));
+        $this->assertCount(0, $crawler->filter('.marketplace-description a[href^="javascript:"]'));
+        $this->assertStringContainsString('Campaign example', $crawler->filter('.marketplace-header h1')->text());
+        $this->assertStringContainsString('Retail', $crawler->text());
+        $this->assertStringContainsString('^7.0', $crawler->text());
+        $this->assertStringContainsString('conversions', $crawler->text());
+    }
+
     /**
      * A 404 from the registry API must render Mautic's normal "not found" page rather than
      * leaking the upstream registry URL/response body through an uncaught ApiException.
