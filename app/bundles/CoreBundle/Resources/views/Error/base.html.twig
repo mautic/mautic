@@ -11,7 +11,7 @@
 
 {% set isInline = inline ?? false %}
 {% set isAjax = app.request.isxmlhttprequest ?? false %}
-{% set src = src|default(mautibotGetImage('wave'))  %}
+{% set src = src|default(mautibotGetImage('welcome'))  %}
 {% set message = message|default('mautic.core.error.generic') %}
 {% set status_code = status_code | default('') %}
 
