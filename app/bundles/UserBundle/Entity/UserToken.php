@@ -73,10 +73,7 @@ class UserToken
         return $this->user;
     }
 
-    /**
-     * @param User $user
-     */
-    public function setUser($user): static
+    public function setUser(User $user): static
     {
         $this->user = $user;
 
