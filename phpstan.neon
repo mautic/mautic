@@ -386,6 +386,7 @@ rules:
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
     - Utils\PHPStan\Rule\NoUselessReferenceParamRule
     - Utils\PHPStan\Rule\NoUselessReferenceForeachRule
+    - Utils\PHPStan\Rule\ExplicitNullableParamTypeRule
 
     - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
     - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
@@ -417,6 +418,15 @@ rules:
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
+    - Utils\PHPStan\ServiceTypeDetector
+    -
+        class: Utils\PHPStan\Rule\MoveObjectParamDocblockToNativeTypeRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Utils\PHPStan\Collector\ObjectParamDocblockCollector
+        tags:
+            - phpstan.collector
     -
         class: Utils\PHPStan\Rule\ParamTypeByVariableNameRule
         tags:
