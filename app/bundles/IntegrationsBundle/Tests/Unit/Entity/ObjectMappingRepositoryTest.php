@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parameter;
@@ -60,7 +60,7 @@ final class ObjectMappingRepositoryTest extends TestCase
 
         $this->query->expects($this->once())
             ->method('setParameters')
-            ->with($this->callback(function (ArrayCollection $collection): true {
+            ->with($this->callback(function (Collection $collection): true {
                 /** @var Parameter $parameter */
                 $parameter = $collection[0];
                 $this->assertSame('internalObject', $parameter->getName());
