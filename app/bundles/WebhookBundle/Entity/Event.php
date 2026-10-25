@@ -103,7 +103,10 @@ class Event
         return $this;
     }
 
-    public function setQueues(ArrayCollection $queues): static
+    /**
+     * @param Collection<int, WebhookQueue> $queues
+     */
+    public function setQueues(Collection $queues): static
     {
         $this->queues = $queues;
 

@@ -418,7 +418,10 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this->logs->matching($criteria);
     }
 
-    public function addLogs(ArrayCollection $logs): static
+    /**
+     * @param Collection<int, Log> $logs
+     */
+    public function addLogs(Collection $logs): static
     {
         $this->logs = $logs;
 

@@ -387,6 +387,7 @@ rules:
     - Utils\PHPStan\Rule\NoUselessReferenceParamRule
     - Utils\PHPStan\Rule\NoUselessReferenceForeachRule
     - Utils\PHPStan\Rule\ExplicitNullableParamTypeRule
+    - Utils\PHPStan\Rule\EntityCollectionParamMustUseInterfaceRule
 
     - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
     - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
