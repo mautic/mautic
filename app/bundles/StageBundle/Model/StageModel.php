@@ -228,11 +228,9 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
 
         foreach ($paginator as $row) {
             /** @var Stage $stage */
-            $stage                          = is_array($row) ? $row[0] : $row;
+            $stage                          = $row[0];
             $entities[]                     = $stage;
-            $contactCounts[$stage->getId()] = is_array($row) && isset($row['contactCount'])
-                ? (int) $row['contactCount']
-                : 0;
+            $contactCounts[$stage->getId()] = (int) $row['contactCount'];
         }
 
         return [$entities, $contactCounts, count($paginator)];

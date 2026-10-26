@@ -195,7 +195,7 @@
                                     id: 'page-results-count-' ~ item.id,
                                     href: path('mautic_page_results', {'objectId': item.id}),
                                     'data-toggle': 'ajax',
-                                    'data-menu-link': 'mautic_form_index'
+                                    'data-menu-link': 'mautic_page_index'
                                 }|merge(0 == i.submission_count ? {disabled: 'disabled'} : {})
                             }]
                         } %}
