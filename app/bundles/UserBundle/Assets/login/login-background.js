@@ -77,13 +77,16 @@ const prog = fs => {
     const x = gl.createShader(t); gl.shaderSource(x, s); gl.compileShader(x); gl.attachShader(p, x);
   }
   gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) return null;
   for (let i = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS); i--;) {
     const n = gl.getActiveUniform(p, i).name.replace('[0]', '');
     u[n] = gl.getUniformLocation(p, n);
   }
   return [p, u];
 };
-const [cp, cu] = prog(CELL), [mp, mu] = prog(MAIN);
+const cell = prog(CELL), main = prog(MAIN);
+if (!cell || !main) return;
+const [cp, cu] = cell, [mp, mu] = main;
 const rgb = v => {
   const h = /^#([0-9a-f]{6})$/i.exec(v);
   if (h) { const n = parseInt(h[1], 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
@@ -126,7 +129,11 @@ const resize = () => {
   }
 };
 
+let lost = false;
+cv.addEventListener('webglcontextlost', e => { e.preventDefault(); lost = true; });
+
 const frame = now => {
+  if (lost) return;
   requestAnimationFrame(frame);
   const dt = last ? Math.min(Math.max((now - last) / 1000, 0), 0.05) : 0;
   last = now;
