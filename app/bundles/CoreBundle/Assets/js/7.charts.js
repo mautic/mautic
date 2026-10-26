@@ -56,27 +56,23 @@ Mautic.renderCharts = function(scope) {
     }
 };
 
-Mautic.chartTickLabel = function(scale, value) {
-    return scale.getLabelForValue(value);
+Mautic.chartTickLabel = (scale, value) => scale.getLabelForValue(value);
+
+Mautic.chartYAxisTicks = (scale) => {
+  scale.ticks = [scale.min, (scale.max - scale.min) / 2, scale.max].map((value) => ({value}));
 };
 
-Mautic.chartYAxisTicks = function(scale) {
-    scale.ticks = [scale.min, (scale.max - scale.min) / 2, scale.max].map(function(value) {
-        return {value};
-    });
-};
-
-Mautic.chartYAxisTickLabel = function(value, index, values) {
-    if (index === 0 || index === values.length - 1) {
-        return value;
-    }
-    if (/^\d+\.5$/.test(value.toString())) {
-        return '';
-    }
-    if (index === Math.floor(values.length / 2)) {
-        return value !== 0.5 ? value : '';
-    }
+Mautic.chartYAxisTickLabel = (value, index, values) => {
+  if (index === 0 || index === values.length - 1) {
+    return value;
+  }
+  if (/^\d+\.5$/.test(value.toString())) {
     return '';
+  }
+  if (index === Math.floor(values.length / 2)) {
+    return value !== 0.5 ? value : '';
+  }
+  return '';
 };
 
 /**
@@ -167,7 +163,7 @@ Mautic.renderHourChart = function(canvas) {
  */
 Mautic.renderPieChart = function(canvas) {
     var data = JSON.parse(canvas.text());
-    var options = {};
+    const options = {};
     var disableLegend = canvas.attr('data-disable-legend');
     if (typeof disableLegend !== 'undefined' && disableLegend !== false) {
         options.plugins = {legend: {display: false}};
@@ -296,12 +292,8 @@ Mautic.renderHorizontalBarChart = function(canvas) {
                     bodyFont: {size: 9},
                     bodySpacing: 0,
                     callbacks: {
-                        title: function() {
-                            return '';
-                        },
-                        label: function(context) {
-                            return context.parsed.x + ': ' + context.label;
-                        }
+                        title: () => '',
+                        label: (context) => `${context.parsed.x}: ${context.label}`
                     }
                 }
             }
