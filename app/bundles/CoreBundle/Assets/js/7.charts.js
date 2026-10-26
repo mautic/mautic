@@ -1,15 +1,39 @@
 //set global Chart defaults
 if (typeof Chart != 'undefined') {
     // configure global Chart options
-    Chart.defaults.elements.line.borderWidth = 2;
+    Chart.defaults.elements.line.borderWidth = 2.5;
     Chart.defaults.elements.line.fill = true;
-    Chart.defaults.elements.line.tension = 0.4;
+    Chart.defaults.elements.line.cubicInterpolationMode = 'monotone';
+    Chart.defaults.elements.bar.borderRadius = 4;
+    Chart.defaults.elements.bar.borderSkipped = false;
     Chart.defaults.elements.point.radius = 0;
     Chart.defaults.elements.point.hoverRadius = 6;
     Chart.defaults.elements.point.hitRadius = 20;
-    Chart.defaults.plugins.legend.labels.boxWidth = 12;
+    Chart.defaults.elements.point.hoverBorderWidth = 3;
+    Chart.defaults.plugins.tooltip.backgroundColor = '#161616';
+    Chart.defaults.plugins.tooltip.padding = 12;
+    Chart.defaults.plugins.tooltip.cornerRadius = 4;
+    Chart.defaults.plugins.tooltip.boxPadding = 4;
+    Chart.defaults.plugins.tooltip.usePointStyle = true;
+    Chart.defaults.plugins.legend.labels.font = {size: 11};
+    Chart.defaults.plugins.legend.labels.boxWidth = 8;
+    Chart.defaults.plugins.legend.labels.boxHeight = 8;
     Chart.defaults.plugins.legend.labels.usePointStyle = true;
     Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
+    const flatLegendLabels = (generateLabels) => function(chart) {
+        return generateLabels.call(this, chart).map((label) => {
+            if (chart.config.type === 'line') {
+                label.fillStyle = label.strokeStyle;
+            }
+            label.lineWidth = 0;
+            return label;
+        });
+    };
+    Chart.defaults.plugins.legend.labels.generateLabels = flatLegendLabels(Chart.defaults.plugins.legend.labels.generateLabels);
+    ['doughnut', 'pie'].forEach((type) => {
+        const {labels} = Chart.overrides[type].plugins.legend;
+        labels.generateLabels = flatLegendLabels(labels.generateLabels);
+    });
     Chart.defaults.maintainAspectRatio = false;
     Chart.defaults.scale.ticks.padding = 10;
 }
@@ -56,6 +80,30 @@ Mautic.renderCharts = function(scope) {
     }
 };
 
+Mautic.chartGridStyle = {color: 'rgba(0, 0, 0, 0.06)', drawTicks: false};
+
+Mautic.chartAxisBorder = {display: false, dash: [3, 3]};
+
+Mautic.chartGradientFill = (datasets) => {
+  datasets.forEach((dataset) => {
+    const color = String(dataset.borderColor);
+    if (!/^rgba\(/.test(color)) {
+      return;
+    }
+    dataset.pointBackgroundColor = color;
+    dataset.backgroundColor = ({chart}) => {
+      const area = chart.chartArea;
+      if (!area) {
+        return;
+      }
+      const gradient = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
+      gradient.addColorStop(0, color.replace(/[\d.]+\)$/, '0.35)'));
+      gradient.addColorStop(1, color.replace(/[\d.]+\)$/, '0)'));
+      return gradient;
+    };
+  });
+};
+
 Mautic.chartTickLabel = (scale, value) => scale.getLabelForValue(value);
 
 Mautic.chartYAxisTicks = (scale) => {
@@ -83,6 +131,7 @@ Mautic.chartYAxisTickLabel = (value, index, values) => {
 Mautic.renderLineChart = function(canvas) {
     var data = JSON.parse(canvas.text());
     if (!data.labels.length || !data.datasets.length) return;
+    Mautic.chartGradientFill(data.datasets);
     var chart = new Chart(canvas, {
         type: 'line',
         data: data,
@@ -109,9 +158,8 @@ Mautic.renderLineChart = function(canvas) {
                 y: {
                     beginAtZero: true,
                     afterBuildTicks: Mautic.chartYAxisTicks,
-                    border: {
-                        display: false
-                    },
+                    border: Mautic.chartAxisBorder,
+                    grid: Mautic.chartGridStyle,
                     ticks: {
                         callback: Mautic.chartYAxisTickLabel
                     }
@@ -124,6 +172,7 @@ Mautic.renderLineChart = function(canvas) {
 
 Mautic.renderHourChart = function(canvas) {
     const data = JSON.parse(canvas.text());
+    Mautic.chartGradientFill(data.datasets);
     const chart = new Chart(canvas, {
         type: 'line',
         data,
@@ -144,7 +193,8 @@ Mautic.renderHourChart = function(canvas) {
                 y: {
                     beginAtZero: true,
                     afterBuildTicks: Mautic.chartYAxisTicks,
-                    border: {display: false},
+                    border: Mautic.chartAxisBorder,
+                    grid: Mautic.chartGridStyle,
                     ticks: {
                         callback: Mautic.chartYAxisTickLabel
                     }
@@ -193,6 +243,10 @@ Mautic.renderBarChart = function(canvas) {
             },
             datasets: {
                 bar: {barPercentage: 0.9}
+            },
+            scales: {
+                x: {border: {display: false}, grid: {display: false}},
+                y: {border: Mautic.chartAxisBorder, grid: Mautic.chartGridStyle, ticks: {maxTicksLimit: 4}}
             }
         }
     });
