@@ -197,6 +197,46 @@ final class EventControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->assertContactTagSelectedInEditResponse($tagId);
+
+        // Re-submit the reopened condition and verify the top-level runtime configuration.
+        $responseData = json_decode(
+            (string) $this->client->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+        $crawler = new Crawler(
+            $responseData['newContent'],
+            $this->client->getInternalRequest()->getUri()
+        );
+        $form = $crawler->filterXPath('//form[@name="campaignevent"]')->form();
+        $formData = $form->getPhpValues();
+        $formData['submit'] = '1';
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(
+            $form->getMethod(),
+            $form->getUri(),
+            $formData
+        );
+        $this->assertResponseIsSuccessful();
+
+        $responseData = json_decode(
+            (string) $this->client->getResponse()->getContent(),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+        $this->assertTrue($responseData['success'], print_r($responseData, true));
+
+        $this->em->clear();
+        $savedEvent = $this->em->getRepository(Event::class)->find($eventId);
+        $this->assertInstanceOf(Event::class, $savedEvent);
+        $this->assertSame(
+            [$tagId],
+            $savedEvent->getProperties()['tags'] ?? null,
+            'The top-level tags read by the campaign runtime must survive an Update.'
+        );
     }
 
     /**
