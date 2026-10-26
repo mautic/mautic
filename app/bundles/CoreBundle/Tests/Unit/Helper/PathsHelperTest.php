@@ -73,6 +73,44 @@ final class PathsHelperTest extends TestCase
         $this->assertSame(__DIR__.'/resource/paths/media/images', $this->helper->getImagePath());
     }
 
+    public function testExplicitImagesRootTakesPrecedenceOverLocalRoot(): void
+    {
+        $pathsProperty = new \ReflectionProperty(PathsHelper::class, 'paths');
+        $paths         = $pathsProperty->getValue($this->helper);
+        $paths['images_root'] = __DIR__.'/resource/paths/public-images';
+        $pathsProperty->setValue($this->helper, $paths);
+
+        $this->assertSame(
+            __DIR__.'/resource/paths/public-images/media/images',
+            $this->helper->getImagePath(),
+        );
+    }
+
+    public function testConfiguredRootMustBeAtTheStartOfThePath(): void
+    {
+        $pathsProperty = new \ReflectionProperty(PathsHelper::class, 'paths');
+        $paths         = $pathsProperty->getValue($this->helper);
+        $paths['translations_root'] = '/configured-root';
+        $paths['translations']      = 'prefix/configured-root/translations';
+        $pathsProperty->setValue($this->helper, $paths);
+
+        $this->assertSame(
+            '/configured-root/prefix/configured-root/translations',
+            $this->helper->getTranslationsPath(),
+        );
+    }
+
+    public function testPathBeginningWithConfiguredRootIsUnchanged(): void
+    {
+        $pathsProperty = new \ReflectionProperty(PathsHelper::class, 'paths');
+        $paths         = $pathsProperty->getValue($this->helper);
+        $paths['translations_root'] = '/configured-root';
+        $paths['translations']      = '/configured-root/translations';
+        $pathsProperty->setValue($this->helper, $paths);
+
+        $this->assertSame('/configured-root/translations', $this->helper->getTranslationsPath());
+    }
+
     public function testGetTranslationsPath(): void
     {
         $this->assertSame(__DIR__.'/resource/paths/translations', $this->helper->getTranslationsPath());
