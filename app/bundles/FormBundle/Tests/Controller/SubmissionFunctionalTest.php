@@ -97,6 +97,223 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals('bar', $queryParams['foo']);
     }
 
+    /**
+     * @return iterable<string, array{returnUrl: string, corsValidDomains: list<string>, expectedRedirectContains: string, expectedRedirectNotContains: string|null}>
+     */
+    public static function returnUrlTrustProvider(): iterable
+    {
+        yield 'same origin' => [
+            'returnUrl'                   => 'https://localhost/landing',
+            'corsValidDomains'            => [],
+            'expectedRedirectContains'    => 'https://localhost/landing',
+            'expectedRedirectNotContains' => null,
+        ];
+
+        yield 'different scheme' => [
+            'returnUrl'                   => 'http://localhost/landing',
+            'corsValidDomains'            => [],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => 'http://localhost/landing',
+        ];
+
+        yield 'different port' => [
+            'returnUrl'                   => 'https://localhost:8443/landing',
+            'corsValidDomains'            => [],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => ':8443',
+        ];
+
+        yield 'protocol relative external' => [
+            'returnUrl'                   => '//attacker.example/landing',
+            'corsValidDomains'            => [],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => 'attacker.example',
+        ];
+
+        yield 'malicious external URL is rejected' => [
+            'returnUrl'                   => 'https://attacker.com/phishing',
+            'corsValidDomains'            => [],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => 'attacker.com',
+        ];
+
+        yield 'relative URL is allowed' => [
+            'returnUrl'                   => '/my-landing-page',
+            'corsValidDomains'            => [],
+            'expectedRedirectContains'    => '/my-landing-page',
+            'expectedRedirectNotContains' => null,
+        ];
+
+        yield 'exact CORS domain is allowed' => [
+            'returnUrl'                   => 'https://trusted.example.com/landing',
+            'corsValidDomains'            => ['https://trusted.example.com'],
+            'expectedRedirectContains'    => 'trusted.example.com/landing',
+            'expectedRedirectNotContains' => null,
+        ];
+
+        yield 'wildcard CORS domain is allowed' => [
+            'returnUrl'                   => 'https://sub.wildcard.org/page',
+            'corsValidDomains'            => ['https://*.wildcard.org'],
+            'expectedRedirectContains'    => 'sub.wildcard.org/page',
+            'expectedRedirectNotContains' => null,
+        ];
+
+        yield 'URL not in CORS config is rejected' => [
+            'returnUrl'                   => 'https://evil.com/phish',
+            'corsValidDomains'            => ['https://trusted.example.com'],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => 'evil.com',
+        ];
+
+        yield 'unrestricted CORS mode still requires valid domains' => [
+            'returnUrl'                   => 'https://any-domain.com/page',
+            'corsValidDomains'            => [],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => 'any-domain.com',
+        ];
+
+        yield 'relative URL with backslash is rejected' => [
+            'returnUrl'                   => '/\attacker.example/evil',
+            'corsValidDomains'            => [],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => 'attacker.example',
+        ];
+
+        yield 'absolute URL with backslash is rejected' => [
+            'returnUrl'                   => 'https://attacker.example\@mautic7.ddev.site/evil',
+            'corsValidDomains'            => ['https://mautic7.ddev.site'],
+            'expectedRedirectContains'    => '/form/message',
+            'expectedRedirectNotContains' => 'attacker.example',
+        ];
+    }
+
+    /**
+     * @param list<string> $corsValidDomains
+     *
+     * @dataProvider returnUrlTrustProvider
+     */
+    public function testReturnUrlTrustValidation(string $returnUrl, array $corsValidDomains, string $expectedRedirectContains, ?string $expectedRedirectNotContains): void
+    {
+        $this->configParams['site_url']           = 'https://localhost';
+        $this->configParams['cors_valid_domains'] = $corsValidDomains;
+        $this->setUpSymfony($this->configParams);
+
+        $payload = [
+            'name'        => 'Return URL trust test form',
+            'description' => 'Form created via submission test',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'postAction'  => 'return',
+            'fields'      => [
+                [
+                    'label'      => 'Email',
+                    'type'       => 'email',
+                    'alias'      => 'email',
+                    'isRequired' => true,
+                    'leadField'  => 'email',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $formId   = $response['form']['id'];
+
+        $this->client->followRedirects(false);
+        foreach (['', 'trusted-return@example.com'] as $email) {
+            $this->client->request(
+                Request::METHOD_POST,
+                "/form/submit?formId={$formId}",
+                [
+                    'mauticform' => [
+                        'formId' => $formId,
+                        'return' => $returnUrl,
+                        'email'  => $email,
+                    ],
+                ]
+            );
+
+            $submitResponse = $this->client->getResponse();
+            $this->assertSame(Response::HTTP_FOUND, $submitResponse->getStatusCode());
+
+            $redirectUrl = $submitResponse->headers->get('Location');
+            $this->assertNotNull($redirectUrl);
+            $this->assertStringContainsString($expectedRedirectContains, $redirectUrl);
+
+            if (null !== $expectedRedirectNotContains) {
+                $this->assertStringNotContainsString($expectedRedirectNotContains, $redirectUrl);
+            }
+        }
+
+        $submissions = $this->em->getRepository(Submission::class)->findBy(['form' => $formId]);
+        $this->assertCount(1, $submissions);
+        if (null !== $expectedRedirectNotContains) {
+            $this->assertStringNotContainsString($expectedRedirectNotContains, (string) $submissions[0]->getReferer());
+        }
+
+        $this->client->followRedirects(true);
+    }
+
+    public function testMaliciousReturnUrlIsNotStoredAsReferrer(): void
+    {
+        $payload = [
+            'name'        => 'Referrer security test form',
+            'description' => 'Form created via submission test',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'postAction'  => 'return',
+            'fields'      => [
+                [
+                    'label'     => 'Email',
+                    'type'      => 'email',
+                    'alias'     => 'email',
+                    'leadField' => 'email',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $formId   = $response['form']['id'];
+
+        $this->client->request(
+            Request::METHOD_POST,
+            "/form/submit?formId={$formId}",
+            [
+                'mauticform' => [
+                    'formId' => $formId,
+                    'email'  => 'test@example.com',
+                    'return' => 'https://attacker.com/phishing',
+                ],
+            ],
+            [],
+            ['HTTP_REFERER' => 'https://attacker.com/referrer']
+        );
+
+        $submissionRepository = $this->em->getRepository(Submission::class);
+        $this->assertInstanceOf(SubmissionRepository::class, $submissionRepository);
+
+        $submissions = $submissionRepository->findBy(['form' => $formId]);
+
+        $this->assertCount(1, $submissions);
+        $this->assertStringNotContainsString('attacker.com', (string) $submissions[0]->getReferer());
+    }
+
     public function testRequiredConditionalFieldIfNotEmpty(): void
     {
         // Create the test form via API.
