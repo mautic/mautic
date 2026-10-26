@@ -73,6 +73,19 @@ final class PathsHelperTest extends TestCase
         $this->assertSame(__DIR__.'/resource/paths/media/images', $this->helper->getImagePath());
     }
 
+    public function testExplicitImagesRootTakesPrecedenceOverLocalRoot(): void
+    {
+        $pathsProperty = new \ReflectionProperty(PathsHelper::class, 'paths');
+        $paths         = $pathsProperty->getValue($this->helper);
+        $paths['images_root'] = __DIR__.'/resource/paths/public-images';
+        $pathsProperty->setValue($this->helper, $paths);
+
+        $this->assertSame(
+            __DIR__.'/resource/paths/public-images/media/images',
+            $this->helper->getImagePath(),
+        );
+    }
+
     public function testGetTranslationsPath(): void
     {
         $this->assertSame(__DIR__.'/resource/paths/translations', $this->helper->getTranslationsPath());

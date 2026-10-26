@@ -241,14 +241,15 @@ class PathsHelper
             return $path;
         }
 
-        // Webroot-relative paths should resolve from local_root (the actual webroot directory)
-        // for recommended-project installations where webroot is a subdirectory.
-        // Other paths resolve from the project root as before.
+        // Explicit per-path roots take precedence. Otherwise, webroot-relative paths resolve
+        // from local_root, and all other paths resolve from the project root as before.
         $webrootRelativePaths = ['themes', 'media', 'plugins', 'assets', 'images', 'translations'];
-        if (in_array($name, $webrootRelativePaths, true)) {
+        if (!empty($this->paths[$name.'_root'])) {
+            $rootPath = $this->paths[$name.'_root'];
+        } elseif (in_array($name, $webrootRelativePaths, true)) {
             $rootPath = $this->localRoot;
         } else {
-            $rootPath = (!empty($this->paths[$name.'_root'])) ? $this->paths[$name.'_root'] : $this->paths['root'];
+            $rootPath = $this->paths['root'];
         }
 
         if (!str_contains($path, $rootPath)) {
