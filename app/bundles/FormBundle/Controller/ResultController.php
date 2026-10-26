@@ -426,14 +426,20 @@ final class ResultController extends CommonFormController
                 $domain = $submission->getEmailDomain();
 
                 if ($domain) {
-                    $this->saveNewBlockedDomains($configurator, $cacheHelper, [$domain]);
-                    $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
+                    if ($this->saveNewBlockedDomains($configurator, $cacheHelper, [$domain])) {
+                        $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
 
-                    $flashes[] = [
-                        'type'    => 'notice',
-                        'msg'     => 'mautic.form.result.markspam.success',
-                        'msgVars' => ['%domain%' => $domain],
-                    ];
+                        $flashes[] = [
+                            'type'    => 'notice',
+                            'msg'     => 'mautic.form.result.markspam.success',
+                            'msgVars' => ['%domain%' => $domain],
+                        ];
+                    } else {
+                        $flashes[] = [
+                            'type' => 'error',
+                            'msg'  => 'mautic.config.notwritable',
+                        ];
+                    }
                 } else {
                     $flashes[] = [
                         'type' => 'error',
@@ -467,13 +473,17 @@ final class ResultController extends CommonFormController
                     'type' => 'notice',
                     'msg'  => 'mautic.form.result.markspam.batch.none',
                 ];
-            } else {
-                $this->saveNewBlockedDomains($configurator, $cacheHelper, array_keys($domainsToSave));
+            } elseif ($this->saveNewBlockedDomains($configurator, $cacheHelper, array_keys($domainsToSave))) {
                 $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
 
                 $flashes[] = [
                     'type' => 'notice',
                     'msg'  => 'mautic.form.result.markspam.batch.success',
+                ];
+            } else {
+                $flashes[] = [
+                    'type' => 'error',
+                    'msg'  => 'mautic.config.notwritable',
                 ];
             }
         }
@@ -517,18 +527,24 @@ final class ResultController extends CommonFormController
     /**
      * @param array<string> $domains
      */
-    private function saveNewBlockedDomains(Configurator $configurator, CacheHelper $cacheHelper, array $domains): void
+    private function saveNewBlockedDomains(Configurator $configurator, CacheHelper $cacheHelper, array $domains): bool
     {
         $existingDomains = (array) ($configurator->getParameters()['do_not_submit_emails'] ?? []);
         $mergedDomains   = array_values(array_unique(array_merge($existingDomains, $domains)));
 
         if ($existingDomains === $mergedDomains) {
-            return;
+            return true;
+        }
+
+        if (!$configurator->isFileWritable()) {
+            return false;
         }
 
         $configurator->mergeParameters(['do_not_submit_emails' => $mergedDomains]);
         $configurator->write();
         $cacheHelper->refreshConfig();
+
+        return true;
     }
 
     private function enableDonotSubmitValidationOnUnconfiguredForms(FormModel $formModel): void
