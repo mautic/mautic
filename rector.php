@@ -52,13 +52,7 @@ return RectorConfig::configure()
         '*/Fixture/*',
 
         // prefer implicit compare on object|null
-        Rector\TypeDeclaration\Rector\BooleanAnd\BinaryOpNullableToInstanceofRector::class,
-        Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
-        Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
-
-        \Rector\TypeDeclaration\Rector\ClassMethod\AddParamStringTypeFromSprintfUseRector::class => [
-            __DIR__ . '/app/bundles/DashboardBundle/Controller/DashboardController.php',
-        ],
+        Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector::class,
 
         // adds dead "return false" after self::fail(); fixed upstream in rector-phpunit #801, drop after next tag
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\WillReturnCallbackFallbackToReturnFalseRector::class => [
