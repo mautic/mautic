@@ -547,7 +547,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
     /**
      * @param array $data
      */
-    public function populateMauticLeadData($data, ?array $config = [], $object = 'Leads'): array
+    public function populateMauticLeadData($data, array $config = [], $object = 'Leads'): array
     {
         // Match that data with mapped lead fields
         $aFields       = $this->getAvailableLeadFields($config);
