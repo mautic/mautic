@@ -501,7 +501,7 @@ final class ResultController extends CommonFormController
             }
 
             if (!$this->security->hasEntityAccess('form:forms:editown', 'form:forms:editother', $submission->getCreatedBy())) {
-                $flashes[] = $this->accessDenied(true);
+                $flashes[] = $this->getAccessDeniedFlash();
                 continue;
             }
 
@@ -565,9 +565,6 @@ final class ResultController extends CommonFormController
         return (int) $request->getSession()->get('mautic.formresult.'.$formId.self::FORM_RESULT_PAGE_SUFFIX, 1);
     }
 
-    /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
     public function batchDeleteAction(Request $request): Response
     {
         return $this->batchDeleteStandard($request);

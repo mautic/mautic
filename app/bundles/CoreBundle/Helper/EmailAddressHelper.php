@@ -20,6 +20,7 @@ final class EmailAddressHelper
     public function getVariations(string $email): array
     {
         $emails = [$email, $this->cleanEmail($email)];
+        // email without suffix
         preg_match('#^(.*?)\+(.*?)@(.*?)$#', $email, $parts);
         if ([] !== $parts) {
             $emails[] = $parts[1].'@'.$parts[3];
