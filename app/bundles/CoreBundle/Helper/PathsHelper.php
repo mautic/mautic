@@ -252,7 +252,7 @@ class PathsHelper
             $rootPath = $this->paths['root'];
         }
 
-        if (!str_contains($path, $rootPath)) {
+        if (!str_starts_with($path, $rootPath)) {
             return $rootPath.'/'.$path;
         }
 
