@@ -19,24 +19,29 @@ export default class ButtonApplyCommand {
     ButtonApplyCommand.prepareDynamicContentForSubmit(editor);
     editor.runCommand('preset-mautic:dynamic-content-components-to-tokens');
 
-    if (ContentService.isMjmlMode(editor)) {
-      const htmlCode = MjmlService.getEditorHtmlContent(editor);
-      const mjmlCode = MjmlService.getEditorMjmlContent(editor);
+    try {
+      if (ContentService.isMjmlMode(editor)) {
+        const htmlCode = MjmlService.getEditorHtmlContent(editor);
+        const mjmlCode = MjmlService.getEditorMjmlContent(editor);
 
-      if (!htmlCode || !mjmlCode) {
-        throw new Error('Could not generate html from MJML');
+        if (!htmlCode || !mjmlCode) {
+          return false;
+        }
+
+        ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode);
+      } else {
+        const html = ContentService.getEditorHtmlContent(editor);
+        ButtonCloseCommands.returnContentToTextarea(editor, html);
       }
-
-      ButtonCloseCommands.returnContentToTextarea(editor, htmlCode, mjmlCode);
-    } else {
-      const html = ContentService.getEditorHtmlContent(editor);
-      ButtonCloseCommands.returnContentToTextarea(editor, html);
+    } finally {
+      // Always restore dynamic content components, including after a failed conversion,
+      // so the editor remains usable for a subsequent Apply attempt.
+      editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
     }
 
-    // Tokens are captured in the textarea; restore human readable content on the canvas
-    editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
-
     ButtonApplyCommand.postForm(editor, sender);
+
+    return true;
   }
 
   /**

@@ -85,13 +85,12 @@ class CodeEditor {
     const code = this.codeEditor.editor.getValue();
     const isMjmlMode = ContentService.isMjmlMode(this.editor);
     let updateSuccessful = false;
-    // validate MJML code
-    if (isMjmlMode) {
-      MjmlService.mjmlToHtml(code);
-    }
 
     try {
       if (isMjmlMode) {
+        // Validate MJML code inside the existing error boundary so invalid
+        // source is reported instead of silently aborting the update.
+        MjmlService.mjmlToHtml(code);
         this.editor.trigger('mautic:code-editor-update:before', code);
       }
 
