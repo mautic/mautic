@@ -37,7 +37,7 @@ final class EmailType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.email.subject',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'constraints' => [
                     new NotBlank(message: 'mautic.core.subject.required'),
@@ -53,7 +53,7 @@ final class EmailType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.lead.email.from_name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'preaddon' => 'ri-user-6-fill',
@@ -69,7 +69,7 @@ final class EmailType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.lead.email.from_email',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => [
                     'class'    => 'form-control',
                     'preaddon' => 'ri-mail-line',
@@ -88,7 +88,7 @@ final class EmailType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.reply_to_email',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'preaddon' => 'ri-mail-line',
@@ -103,7 +103,7 @@ final class EmailType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.email.form.body',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'                => 'form-control editor editor-basic-fullpage editor-builder-tokens editor-email',
                     'data-token-callback'  => 'email:getBuilderTokens',
@@ -127,7 +127,7 @@ final class EmailType extends AbstractType
             EmailListType::class,
             [
                 'label'      => 'mautic.lead.email.template',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class'    => 'form-control',
