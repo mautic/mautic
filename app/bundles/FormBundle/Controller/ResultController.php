@@ -51,7 +51,6 @@ final class ResultController extends CommonFormController
         private readonly FormModel $formModel,
         private readonly SubmissionResultLoader $submissionResultLoader,
         private readonly SubmissionModel $submissionModel,
-        private readonly CacheHelper $cacheHelper,
     ) {
         $this->setStandardParameters(
             'form.submission', // model name
@@ -400,7 +399,7 @@ final class ResultController extends CommonFormController
         );
     }
 
-    public function markSpamAction(Request $request, Configurator $configurator, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function markSpamAction(Request $request, Configurator $configurator, CacheHelper $cacheHelper, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         if (!$this->security->isAdmin()) {
             $this->throwAccessDenied();
@@ -427,9 +426,8 @@ final class ResultController extends CommonFormController
                 $domain = $submission->getEmailDomain();
 
                 if ($domain) {
-                    if ($this->saveNewBlockedDomains($configurator, [$domain])) {
-                        $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
-                    }
+                    $this->saveNewBlockedDomains($configurator, $cacheHelper, [$domain]);
+                    $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
 
                     $flashes[] = [
                         'type'    => 'notice',
@@ -448,7 +446,7 @@ final class ResultController extends CommonFormController
         return $this->getFormResultRedirectResponse($formId, $page, $flashes);
     }
 
-    public function batchMarkSpamAction(Request $request, Configurator $configurator, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function batchMarkSpamAction(Request $request, Configurator $configurator, CacheHelper $cacheHelper, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
     {
         if (!$this->security->isAdmin()) {
             $this->throwAccessDenied();
@@ -470,9 +468,8 @@ final class ResultController extends CommonFormController
                     'msg'  => 'mautic.form.result.markspam.batch.none',
                 ];
             } else {
-                if ($this->saveNewBlockedDomains($configurator, array_keys($domainsToSave))) {
-                    $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
-                }
+                $this->saveNewBlockedDomains($configurator, $cacheHelper, array_keys($domainsToSave));
+                $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
 
                 $flashes[] = [
                     'type' => 'notice',
@@ -520,20 +517,18 @@ final class ResultController extends CommonFormController
     /**
      * @param array<string> $domains
      */
-    private function saveNewBlockedDomains(Configurator $configurator, array $domains): bool
+    private function saveNewBlockedDomains(Configurator $configurator, CacheHelper $cacheHelper, array $domains): void
     {
-        $existingDomains = $this->coreParametersHelper->get('do_not_submit_emails', []);
+        $existingDomains = (array) ($configurator->getParameters()['do_not_submit_emails'] ?? []);
         $mergedDomains   = array_values(array_unique(array_merge($existingDomains, $domains)));
 
         if ($existingDomains === $mergedDomains) {
-            return false;
+            return;
         }
 
         $configurator->mergeParameters(['do_not_submit_emails' => $mergedDomains]);
         $configurator->write();
-        $this->cacheHelper->refreshConfig();
-
-        return true;
+        $cacheHelper->refreshConfig();
     }
 
     private function enableDonotSubmitValidationOnUnconfiguredForms(FormModel $formModel): void

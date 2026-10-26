@@ -49,6 +49,8 @@ use Twig\Environment;
  */
 class FormModel extends CommonFormModel implements GlobalSearchInterface
 {
+    private const DONOTSUBMIT_BATCH_SIZE = 500;
+
     public function __construct(
         protected RequestStack $requestStack,
         protected Environment $twig,
@@ -736,40 +738,37 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $connection = $this->em->getConnection();
         $tableName  = MAUTIC_TABLE_PREFIX.Field::TABLE_NAME;
 
-        $fieldsToUpdate = $connection->executeQuery(
-            'SELECT ff.id, ff.form_id, ff.validation
-             FROM '.$tableName.' ff
-             WHERE ff.type = ?
-             AND JSON_CONTAINS_PATH(COALESCE(ff.validation, ?), ?, ?) = 0',
-            ['email', '{}', 'one', '$.donotsubmit']
-        )->fetchAllAssociative();
+        $fieldsToUpdate = [];
+        $lastId         = 0;
 
-        if (empty($fieldsToUpdate)) {
-            return [];
-        }
+        do {
+            $batch = $connection->executeQuery(
+                'SELECT ff.id, ff.form_id, ff.validation
+                 FROM '.$tableName.' ff
+                 WHERE ff.type = ?
+                 AND ff.id > ?
+                 AND JSON_CONTAINS_PATH(COALESCE(ff.validation, ?), ?, ?) = 0
+                 ORDER BY ff.id
+                 LIMIT '.self::DONOTSUBMIT_BATCH_SIZE,
+                ['email', $lastId, '{}', 'one', '$.donotsubmit']
+            )->fetchAllAssociative();
 
-        $fieldIds = [];
-
-        foreach ($fieldsToUpdate as $fieldData) {
-            $validation = json_decode($fieldData['validation'] ?? '[]', true) ?: [];
-
-            if (!array_key_exists('donotsubmit', $validation)) {
-                $fieldIds[] = $fieldData['id'];
+            if ([] === $batch) {
+                break;
             }
-        }
 
-        if ([] === $fieldIds) {
-            return [];
-        }
+            $lastId       = (int) $batch[array_key_last($batch)]['id'];
+            $placeholders = implode(',', array_fill(0, count($batch), '?'));
 
-        $placeholders = str_repeat('?,', count($fieldIds) - 1).'?';
+            $connection->executeStatement(
+                "UPDATE {$tableName}
+                 SET validation = JSON_SET(COALESCE(NULLIF(validation, '[]'), '{}'), '$.donotsubmit', true)
+                 WHERE id IN ($placeholders)",
+                array_column($batch, 'id')
+            );
 
-        $connection->executeStatement(
-            "UPDATE {$tableName}
-             SET validation = JSON_SET(COALESCE(NULLIF(validation, '[]'), '{}'), '$.donotsubmit', true)
-             WHERE id IN ($placeholders)",
-            $fieldIds
-        );
+            $fieldsToUpdate = array_merge($fieldsToUpdate, $batch);
+        } while (self::DONOTSUBMIT_BATCH_SIZE === count($batch));
 
         return $fieldsToUpdate;
     }
@@ -794,7 +793,6 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
             $form->setCachedHtml('');
             $this->saveEntity($form);
-            $this->generateHtml($form);
         }
     }
 

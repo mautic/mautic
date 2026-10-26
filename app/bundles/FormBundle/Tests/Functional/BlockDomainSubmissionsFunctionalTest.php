@@ -106,12 +106,23 @@ final class BlockDomainSubmissionsFunctionalTest extends MauticMysqlTestCase
         ), true, 512, JSON_THROW_ON_ERROR);
         $this->assertFalse((bool) $optionalValidation['donotsubmit']);
 
+        $this->connection->executeStatement(
+            'UPDATE '.MAUTIC_TABLE_PREFIX.Field::TABLE_NAME.' SET validation = ? WHERE form_id = ? AND alias = ?',
+            ['{"blockfreeemail":true}', $formId, 'email']
+        );
+
         $batchIds = urlencode(json_encode([$submission->getId()], JSON_THROW_ON_ERROR));
         $this->client->request(
             Request::METHOD_POST,
             "/s/forms/results/{$formId}/batchMarkSpam?ids={$batchIds}"
         );
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+
+        $repairedValidation = json_decode($this->connection->fetchOne(
+            'SELECT validation FROM '.MAUTIC_TABLE_PREFIX.Field::TABLE_NAME.' WHERE form_id = ? AND alias = ?',
+            [$formId, 'email']
+        ), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertTrue((bool) $repairedValidation['donotsubmit']);
 
         $editor = $this->createUserWithPermission([
             'email'      => 'form-editor@mautic-test.com',
