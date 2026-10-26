@@ -436,8 +436,9 @@ final class ResultController extends CommonFormController
                         ];
                     } else {
                         $flashes[] = [
-                            'type' => 'error',
-                            'msg'  => 'mautic.config.notwritable',
+                            'type'   => 'error',
+                            'msg'    => 'mautic.config.notwritable',
+                            'domain' => 'messages',
                         ];
                     }
                 } else {
@@ -482,8 +483,9 @@ final class ResultController extends CommonFormController
                 ];
             } else {
                 $flashes[] = [
-                    'type' => 'error',
-                    'msg'  => 'mautic.config.notwritable',
+                    'type'   => 'error',
+                    'msg'    => 'mautic.config.notwritable',
+                    'domain' => 'messages',
                 ];
             }
         }
