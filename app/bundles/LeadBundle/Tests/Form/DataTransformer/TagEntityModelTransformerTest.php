@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,7 +15,7 @@ final class TagEntityModelTransformerTest extends TestCase
     public function testReverseTransformAcceptsArrayCollection(): void
     {
         $transformer = new TagEntityModelTransformer(
-            $this->createMock(EntityManagerInterface::class),
+            $this->createStub(EntityManagerInterface::class),
             Tag::class,
             true
         );
@@ -32,7 +34,7 @@ final class TagEntityModelTransformerTest extends TestCase
     public function testReverseTransformReturnsEmptyArrayForNull(): void
     {
         $transformer = new TagEntityModelTransformer(
-            $this->createMock(EntityManagerInterface::class),
+            $this->createStub(EntityManagerInterface::class),
             Tag::class,
             true
         );
