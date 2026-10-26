@@ -28,6 +28,165 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 #[CoversClass(TrackableModel::class)]
 final class TrackableModelTest extends TestCase
 {
+    #[DataProvider('multilineLinkAttributesProvider')]
+    public function testMultilineLinkAttributesAreTracked(string $attributes): void
+    {
+        $url   = 'https://example.org/button';
+        $model = $this->getModel();
+        $html  = '<a'.$attributes.'>Button</a><a href="https://example.org/footer">Footer</a>';
+
+        [$content, $trackables] = $model->parseContentForTrackables($html, [], 'email', 1);
+
+        $this->assertCount(2, $trackables);
+        $document = new \DOMDocument();
+        $document->loadHTML($content);
+        $href = $document->getElementsByTagName('a')->item(0)->getAttribute('href');
+        $this->assertArrayHasKey($href, $trackables);
+        $this->assertSame($url, $trackables[$href]->getRedirect()->getUrl());
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function multilineLinkAttributesProvider(): iterable
+    {
+        yield 'indented href' => ["\n    href=\"https://example.org/button\"\n    target=\"_blank\"\n"];
+        yield 'unindented href' => ["\nhref=\"https://example.org/button\""];
+        yield 'CRLF and tabs' => ["\r\n\thref=\"https://example.org/button\"\r\n"];
+        yield 'spaces around equals' => ["\n    href = \"https://example.org/button\""];
+        yield 'uppercase and single quotes' => ["\n    HREF = 'https://example.org/button'"];
+        yield 'newline inside href value' => ["\n    href=\"\n    https://example.org/button\n    \"\n"];
+    }
+
+    public function testMultilineOnlyHtmlDoesNotReplaceImageSourcesOrBodyText(): void
+    {
+        $url   = 'https://example.org/button';
+        $model = $this->getModel();
+        $html  = '<html><body><img src="'.$url.'"><p>'.$url.'</p><a'."\n".'href="'.$url.'">Button</a></body></html>';
+
+        [$content, $trackables] = $model->parseContentForTrackables($html, [], 'email', 1);
+
+        $this->assertCount(1, $trackables);
+        $document = new \DOMDocument();
+        $document->loadHTML($content);
+        $this->assertSame($url, $document->getElementsByTagName('img')->item(0)->getAttribute('src'));
+        $this->assertSame($url, $document->getElementsByTagName('p')->item(0)->textContent);
+        $this->assertArrayHasKey($document->getElementsByTagName('a')->item(0)->getAttribute('href'), $trackables);
+    }
+
+    #[DataProvider('nonAttributeHrefProvider')]
+    public function testLinkTrackingPreservesHrefOutsideOpeningTags(string $fragment): void
+    {
+        $url   = 'https://example.org/button';
+        $model = $this->getModel();
+        $html  = $fragment.'<a'."\n".'href="'.$url.'">Button</a>';
+
+        [$content, $trackables] = $model->parseContentForTrackables($html, [], 'email', 1);
+
+        $this->assertCount(1, $trackables);
+        $token = array_key_first($trackables);
+        $this->assertSame($url, $trackables[$token]->getRedirect()->getUrl());
+        $this->assertSame($fragment.'<a href="'.$token.'">Button</a>', $content);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function nonAttributeHrefProvider(): iterable
+    {
+        yield 'multiline body text' => ["<p>Example:\nhref=\"https://example.org/button\"</p>"];
+        yield 'multiline comment text' => ["<!-- Example:\nhref=\"https://example.org/button\" -->"];
+        yield 'link inside comment' => ["<!-- <a\nhref=\"https://example.org/button\">Commented out</a> -->"];
+        yield 'body text after nested tag' => ["<p><span>Example:</span>\nhref=\"https://example.org/button\"</p>"];
+        yield 'link markup inside quoted attribute' => ['<div title=\'<a href="https://example.org/button">\'>Example</div>'];
+    }
+
+    #[DataProvider('quotedLinkAttributesProvider')]
+    public function testLinkTrackingPreservesQuotedAttributes(string $attributes, string $title): void
+    {
+        $url   = 'https://example.org/button';
+        $model = $this->getModel();
+        $html  = '<a'."\n".$attributes.'>Button</a>';
+
+        [$content, $trackables] = $model->parseContentForTrackables($html, [], 'email', 1);
+
+        $this->assertCount(1, $trackables);
+        $document = new \DOMDocument();
+        $document->loadHTML($content);
+        $link = $document->getElementsByTagName('a')->item(0);
+        $this->assertInstanceOf(\DOMElement::class, $link);
+        $this->assertSame($title, $link->getAttribute('title'));
+        $this->assertArrayHasKey($link->getAttribute('href'), $trackables);
+        $this->assertSame($url, $trackables[$link->getAttribute('href')]->getRedirect()->getUrl());
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function quotedLinkAttributesProvider(): iterable
+    {
+        yield 'href-like text in single-quoted title' => [
+            'title=\'Use href="https://example.org/button"\''."\n".'href="https://example.org/button"',
+            'Use href="https://example.org/button"',
+        ];
+        yield 'href-like text in double-quoted title' => [
+            'title="Use href=\'https://example.org/button\'"'."\n".'href=\'https://example.org/button\'',
+            'Use href=\'https://example.org/button\'',
+        ];
+        yield 'tag boundaries in title before href' => [
+            'title="1 < 2 > 0"'."\n".'href="https://example.org/button"',
+            '1 < 2 > 0',
+        ];
+        yield 'href-like text in title after href' => [
+            'href="https://example.org/button"'."\n".'title=\'Use href="https://example.org/button"\'',
+            'Use href="https://example.org/button"',
+        ];
+    }
+
+    #[DataProvider('disabledUrlWithSharedPrefixProvider')]
+    public function testLinkTrackingPreservesDisabledUrlsWithSharedPrefix(string $suffix, bool $disabledFirst): void
+    {
+        $url      = 'https://example.org/button';
+        $model    = $this->getModel();
+        $tracked  = '<a href="'.$url.'">Tracked</a>';
+        $disabled = '<a'."\n".'href="'.$url.$suffix.'" data-mautic-disable-tracking="true">Private</a>';
+        $html     = $disabledFirst ? $disabled.$tracked : $tracked.$disabled;
+
+        [$content, $trackables] = $model->parseContentForTrackables($html, [], 'email', 1);
+
+        $this->assertCount(1, $trackables);
+        $this->assertStringContainsString($disabled, (string) $content);
+        $this->assertStringContainsString('<a href="'.array_key_first($trackables).'">Tracked</a>', (string) $content);
+    }
+
+    /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function disabledUrlWithSharedPrefixProvider(): iterable
+    {
+        foreach (['#private', '?private=1', '/private'] as $suffix) {
+            yield $suffix.' disabled first' => [$suffix, true];
+            yield $suffix.' disabled last' => [$suffix, false];
+        }
+    }
+
+    public function testMultilineLinkTrackingPreservesDisabledLinksAndAnchors(): void
+    {
+        $model = $this->getModel(['^#']);
+        $html  = '<a'."\n".'href="https://example.org/preferences" data-mautic-disable-tracking="true">Preferences</a>'
+            .'<a href="#details">Details</a><a'."\n".'href="https://example.org/button">Button</a>';
+
+        [$content, $trackables] = $model->parseContentForTrackables($html, [], 'email', 1);
+
+        $this->assertCount(1, $trackables);
+        $document = new \DOMDocument();
+        $document->loadHTML($content);
+        $links = $document->getElementsByTagName('a');
+        $this->assertSame('https://example.org/preferences', $links->item(0)->getAttribute('href'));
+        $this->assertSame('#details', $links->item(1)->getAttribute('href'));
+        $this->assertArrayHasKey($links->item(2)->getAttribute('href'), $trackables);
+    }
+
     #[TestDox('Test that content is detected as HTML')]
     public function testHtmlIsDetectedInContent(): void
     {
