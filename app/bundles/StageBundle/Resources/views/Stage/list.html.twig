@@ -113,7 +113,7 @@
                         {
                             'attr' : {
                                 'data-toggle' : 'ajax',
-                                'href'        : path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.stage'|trans ~ ':"' ~ item.name ~ '"'}),
+                                'href'        : path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.stage_id'|trans ~ ':' ~ item.id}),
                             },
                             'btnText'   : 'mautic.lead.list.view_contacts'|trans,
                             'iconClass' : 'ri-team-line',
@@ -180,7 +180,7 @@
                                 size: 'sm',
                                 attributes: {
                                     id: 'stage-contacts-count-' ~ item.id,
-                                    href: path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.stage'|trans ~ ':"' ~ item.name ~ '"'}),
+                                    href: path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.stage_id'|trans ~ ':' ~ item.id}),
                                     'data-toggle': 'ajax'
                                 }|merge(0 == stageContactCount ? {disabled: 'disabled'} : {})
                             }]
