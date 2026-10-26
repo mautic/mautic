@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -129,6 +130,39 @@ class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $contentArray = json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertCount($expectedCount, $contentArray['items']);
+    }
+
+    /**
+     * @dataProvider dataForRejectedLeadFields
+     */
+    public function testAjaxGetLeadsByFieldValueRejectsInvalidField(string $field): void
+    {
+        $this->lead->setFirstname('a');
+        $this->em->flush();
+
+        $leadModel = $this->createMock(LeadModel::class);
+        $leadModel->expects($this->never())->method('getRepository');
+        static::getContainer()->set(LeadModel::class, $leadModel);
+
+        $this->client->request(Request::METHOD_GET, '/s/ajax', [
+            'action' => 'lead:getLeadIdsByFieldValue',
+            'field'  => $field,
+            'value'  => 'a',
+        ], [], $this->createAjaxHeaders());
+
+        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $contentArray = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertSame([], $contentArray['items']);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public function dataForRejectedLeadFields(): iterable
+    {
+        yield 'SQL injection payload' => ['email OR 1=1-- -'];
+        yield 'non-unique field' => ['firstname'];
     }
 
     /**

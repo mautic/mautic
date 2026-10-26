@@ -67,6 +67,11 @@ return static function (RectorConfig $rectorConfig): void {
             __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php',
         ],
 
+        // BC break: adding return types to public methods in older branches
+        Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromStrictScalarReturnExprRector::class => [
+            __DIR__.'/app/bundles/AssetBundle/Entity/Asset.php',
+        ],
+
         RemoveUnusedVariableAssignRector::class => [
             // unset variable to clear garbage collector
             __DIR__.'/app/bundles/LeadBundle/Model/ImportModel.php',

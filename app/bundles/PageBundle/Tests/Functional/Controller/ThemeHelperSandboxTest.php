@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Functional\Controller;
 
+use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
@@ -77,6 +78,53 @@ final class ThemeHelperSandboxTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('uid=', $content, 'RCE output must not appear in response');
         $this->assertStringNotContainsString('root:', $content, 'File read output must not appear in response');
         $this->assertStringNotContainsString('db_password', $content, 'DB password must not be leaked');
+    }
+
+    public function testLegitimateEntityAccessorStillRendersInTheme(): void
+    {
+        // Reading a scalar accessor on the entity passed to the render context
+        // ({{ page.title }} resolves to Page::getTitle) must keep working so
+        // that the allowlist introduced for GHSA-h7pm-79gc-8867 does not break
+        // legitimate personalization in custom themes.
+        $themeName = $this->createMaliciousTheme(
+            '{% block content %}<h1>{{ page.title }}</h1>{% endblock %}'
+        );
+        $page = $this->createPage($themeName);
+
+        $this->client->request(Request::METHOD_GET, '/page/preview/'.$page->getId());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString(
+            $page->getTitle(),
+            (string) $this->client->getResponse()->getContent()
+        );
+    }
+
+    /**
+     * A real shipped theme extends @MauticCore/Theme/base.html.twig and is
+     * rendered entirely inside the sandbox (e.g. by the GrapesJS builder and
+     * page preview). This guards against the allowlist introduced for
+     * GHSA-h7pm-79gc-8867 breaking legitimate theme rendering, which passes a
+     * live Page entity plus framework globals into the sandboxed environment.
+     */
+    public function testRealShippedThemeRendersThroughSandbox(): void
+    {
+        $themeHelper = self::getContainer()->get(ThemeHelper::class);
+
+        $page = $this->createPage('blank');
+
+        $html = $themeHelper->renderThemeTemplate(
+            '@themes/blank/html/page.html.twig',
+            [
+                'isNew'    => true,
+                'content'  => [],
+                'page'     => $page,
+                'template' => 'blank',
+                'basePath' => '',
+            ]
+        );
+
+        $this->assertStringContainsString('Hello there!', (string) $html);
     }
 
     public function testSafeThemeTemplateRendersSuccessfully(): void

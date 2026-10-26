@@ -12,9 +12,12 @@ class StatsSubscriber extends CommonStatsSubscriber
     public function __construct(CorePermissions $security, EntityManager $entityManager)
     {
         parent::__construct($security, $entityManager);
-        $this->repositories['MauticCoreBundle:AuditLog'] = $entityManager->getRepository(AuditLog::class);
-        $this->permissions['MauticCoreBundle:AuditLog']  = ['admin'];
-
-        $this->repositories['MauticCoreBundle:IpAddress'] = $entityManager->getRepository(IpAddress::class);
+        $this->addRestrictedRepostories(
+            [
+                AuditLog::class,
+                IpAddress::class,
+            ],
+            ['admin']
+        );
     }
 }
