@@ -140,6 +140,7 @@ Mautic.renderLineChart = function(canvas) {
                 mode: 'index',
                 intersect: false
             },
+            layout: {padding: {top: 8}},
             scales: {
                 x: {
                     grid: {
@@ -178,6 +179,7 @@ Mautic.renderHourChart = function(canvas) {
         data,
         options: {
             interaction: {mode: 'index', intersect: false},
+            layout: {padding: {top: 8}},
             scales: {
                 x: {
                     grid: {display: false},
