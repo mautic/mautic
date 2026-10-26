@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Helper;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
@@ -19,11 +20,13 @@ use Mautic\StageBundle\Entity\Stage;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 
 /**
- * Campaign event properties that refer to other entities, so the export can take those entities along
+ * Campaign event and form action properties that refer to other entities, so the export can take those entities along
  * and the import can point the properties to the right entities on the target instance.
  */
 final class EventEntityReferences
 {
+    public const CATEGORY = 'category';
+
     public const COMPANY = 'company';
 
     public const FOCUS = 'focus';
@@ -37,6 +40,11 @@ final class EventEntityReferences
     public const STAGE = 'stage';
 
     public const TAG = 'tag';
+
+    /**
+     * Tags referred to by ID, which the export takes along by name.
+     */
+    public const TAG_ID = 'tag_id';
 
     public const USER = 'user';
 
@@ -58,6 +66,7 @@ final class EventEntityReferences
      */
     public const LINKED = [
         Campaign::ENTITY_NAME => Campaign::class,
+        self::CATEGORY        => Category::class,
         self::FOCUS           => Focus::class,
         self::MESSAGE         => Message::class,
         self::NOTIFICATION    => Notification::class,
@@ -66,8 +75,15 @@ final class EventEntityReferences
     ];
 
     /**
+     * Entities that are not exported, but can be found or created on the target instance by their name.
+     */
+    public const NAMED = [
+        self::COMPANY,
+    ];
+
+    /**
      * Property paths per event type, with what they refer to. Tags are referred to by name.
-     * Companies and users are neither exported nor identifiable on the target instance, so the import removes them.
+     * Users are not identifiable on the target instance without their email, which an export must not contain, so the import removes them.
      */
     private const REFERENCES = [
         'asset.download'                        => ['assets' => Asset::ENTITY_NAME],
@@ -98,6 +114,33 @@ final class EventEntityReferences
         'page.pagehit'                          => ['pages' => Page::ENTITY_NAME],
         'sms.send_text_sms'                     => ['sms' => self::SMS],
         'stage.change'                          => ['stage' => self::STAGE],
+    ];
+
+    /**
+     * Property paths per form submit action type, with what they refer to, like self::REFERENCES.
+     */
+    private const FORM_ACTION_REFERENCES = [
+        'asset.download'    => ['asset' => Asset::ENTITY_NAME, 'category' => self::CATEGORY],
+        'email.send.lead'   => ['email' => Email::ENTITY_NAME],
+        'email.send.user'   => ['useremail.email' => Email::ENTITY_NAME, 'user_id' => self::USER],
+        'lead.changelist'   => ['addToLists' => LeadList::ENTITY_NAME, 'removeFromLists' => LeadList::ENTITY_NAME],
+        'lead.changetags'   => ['add_tags' => self::TAG, 'remove_tags' => self::TAG],
+        'lead.pointschange' => ['group' => Group::ENTITY_NAME],
+    ];
+
+    /**
+     * Segment filter fields that refer to other entities by ID, with what they refer to, like self::REFERENCES.
+     */
+    private const SEGMENT_FILTER_REFERENCES = [
+        'campaign'            => Campaign::ENTITY_NAME,
+        'globalcategory'      => self::CATEGORY,
+        'lead_asset_download' => Asset::ENTITY_NAME,
+        'lead_email_received' => Email::ENTITY_NAME,
+        'lead_email_sent'     => Email::ENTITY_NAME,
+        'leadlist'            => LeadList::ENTITY_NAME,
+        'owner_id'            => self::USER,
+        'stage'               => self::STAGE,
+        'tags'                => self::TAG_ID,
     ];
 
     /**
@@ -137,7 +180,7 @@ final class EventEntityReferences
      */
     public function getExportedIds(string $eventType, array $properties): array
     {
-        return $this->getIds($eventType, $properties, self::EXPORTED);
+        return $this->getIds(self::REFERENCES[$eventType] ?? [], $properties, self::EXPORTED);
     }
 
     /**
@@ -147,7 +190,17 @@ final class EventEntityReferences
      */
     public function getLinkedIds(string $eventType, array $properties): array
     {
-        return $this->getIds($eventType, $properties, array_keys(self::LINKED));
+        return $this->getIds(self::REFERENCES[$eventType] ?? [], $properties, array_keys(self::LINKED));
+    }
+
+    /**
+     * @param array<string, mixed> $properties
+     *
+     * @return array<string, list<int>> the IDs of the entities to find or create by name on import, per item of self::NAMED
+     */
+    public function getNamedIds(string $eventType, array $properties): array
+    {
+        return $this->getIds(self::REFERENCES[$eventType] ?? [], $properties, self::NAMED);
     }
 
     /**
@@ -157,9 +210,160 @@ final class EventEntityReferences
      */
     public function getTagNames(string $eventType, array $properties): array
     {
+        return $this->getTagNamesFrom(self::REFERENCES[$eventType] ?? [], $properties);
+    }
+
+    /**
+     * @param array<string, mixed> $properties
+     *
+     * @return array<string, list<int>> the IDs of the entities to export per entity name
+     */
+    public function getFormActionExportedIds(string $actionType, array $properties): array
+    {
+        return $this->getIds(self::FORM_ACTION_REFERENCES[$actionType] ?? [], $properties, self::EXPORTED);
+    }
+
+    /**
+     * @param array<string, mixed> $properties
+     *
+     * @return array<string, list<int>> the IDs of the entities to find by UUID on import, per key of self::LINKED
+     */
+    public function getFormActionLinkedIds(string $actionType, array $properties): array
+    {
+        return $this->getIds(self::FORM_ACTION_REFERENCES[$actionType] ?? [], $properties, array_keys(self::LINKED));
+    }
+
+    /**
+     * @param array<string, mixed> $properties
+     *
+     * @return list<string>
+     */
+    public function getFormActionTagNames(string $actionType, array $properties): array
+    {
+        return $this->getTagNamesFrom(self::FORM_ACTION_REFERENCES[$actionType] ?? [], $properties);
+    }
+
+    /**
+     * Points the references of an exported form action to the entities on the target instance, like self::remapEvent().
+     *
+     * @param array<string, mixed>                  $properties
+     * @param array<string, array<int|string, int>> $idMaps     the new IDs by the old IDs per entity name
+     *
+     * @return array<string, mixed>
+     */
+    public function remapFormActionProperties(string $actionType, array $properties, array $idMaps): array
+    {
+        foreach (self::FORM_ACTION_REFERENCES[$actionType] ?? [] as $path => $kind) {
+            $properties = $this->remapValue($properties, $path, $idMaps[$kind] ?? []);
+        }
+
+        return $properties;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $filters
+     *
+     * @return array<string, list<int>> the IDs of the entities to export per entity name
+     */
+    public function getSegmentFilterExportedIds(array $filters): array
+    {
+        return $this->getSegmentFilterIds($filters, self::EXPORTED);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $filters
+     *
+     * @return array<string, list<int>> the IDs of the entities to find by UUID on import, per key of self::LINKED
+     */
+    public function getSegmentFilterLinkedIds(array $filters): array
+    {
+        return $this->getSegmentFilterIds($filters, array_keys(self::LINKED));
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $filters
+     *
+     * @return list<int>
+     */
+    public function getSegmentFilterTagIds(array $filters): array
+    {
+        return $this->getSegmentFilterIds($filters, [self::TAG_ID])[self::TAG_ID] ?? [];
+    }
+
+    /**
+     * Points the segment filters to the entities on the target instance. An ID without a new one is removed,
+     * as it could belong to an unrelated entity.
+     *
+     * @param array<int, array<string, mixed>>      $filters
+     * @param array<string, array<int|string, int>> $idMaps  the new IDs by the old IDs per entity name or kind
+     *
+     * @return array{0: array<int, array<string, mixed>>, 1: bool} the filters, and whether every filter that had a value still has one
+     */
+    public function remapSegmentFilters(array $filters, array $idMaps): array
+    {
+        $complete = true;
+
+        foreach ($filters as &$filter) {
+            $kind = is_array($filter) ? (self::SEGMENT_FILTER_REFERENCES[$filter['field'] ?? ''] ?? null) : null;
+
+            if (null === $kind) {
+                continue;
+            }
+
+            // Older filters keep the value outside of the properties
+            foreach (['properties.filter', 'filter'] as $path) {
+                $value = $this->getValue($filter, $path);
+
+                if (null === $value || '' === $value || [] === $value) {
+                    continue;
+                }
+
+                $filter   = $this->remapValue($filter, $path, $idMaps[$kind] ?? []);
+                $newValue = $this->getValue($filter, $path);
+                $complete = $complete && null !== $newValue && [] !== $newValue;
+            }
+        }
+        unset($filter);
+
+        return [$filters, $complete];
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $filters
+     * @param list<string>                     $kinds
+     *
+     * @return array<string, list<int>>
+     */
+    private function getSegmentFilterIds(array $filters, array $kinds): array
+    {
+        $ids = [];
+
+        foreach ($filters as $filter) {
+            $kind = is_array($filter) ? (self::SEGMENT_FILTER_REFERENCES[$filter['field'] ?? ''] ?? null) : null;
+
+            if (null === $kind || !in_array($kind, $kinds, true)) {
+                continue;
+            }
+
+            foreach ($this->toIds($this->getValue($filter, 'properties.filter') ?? $this->getValue($filter, 'filter')) as $id) {
+                $ids[$kind][] = $id;
+            }
+        }
+
+        return array_map(static fn (array $entityIds): array => array_values(array_unique($entityIds)), $ids);
+    }
+
+    /**
+     * @param array<string, string> $references
+     * @param array<string, mixed>  $properties
+     *
+     * @return list<string>
+     */
+    private function getTagNamesFrom(array $references, array $properties): array
+    {
         $names = [];
 
-        foreach (self::REFERENCES[$eventType] ?? [] as $path => $kind) {
+        foreach ($references as $path => $kind) {
             if (self::TAG !== $kind) {
                 continue;
             }
@@ -247,16 +451,17 @@ final class EventEntityReferences
     }
 
     /**
-     * @param array<string, mixed> $properties
-     * @param list<string>         $kinds
+     * @param array<string, string> $references
+     * @param array<string, mixed>  $properties
+     * @param list<string>          $kinds
      *
      * @return array<string, list<int>>
      */
-    private function getIds(string $eventType, array $properties, array $kinds): array
+    private function getIds(array $references, array $properties, array $kinds): array
     {
         $ids = [];
 
-        foreach (self::REFERENCES[$eventType] ?? [] as $path => $kind) {
+        foreach ($references as $path => $kind) {
             if (!in_array($kind, $kinds, true)) {
                 continue;
             }

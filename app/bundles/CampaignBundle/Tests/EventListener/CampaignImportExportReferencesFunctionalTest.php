@@ -7,22 +7,27 @@ namespace Mautic\CampaignBundle\Tests\EventListener;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\StageBundle\Entity\Stage;
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -112,10 +117,13 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
             'lead.stages'            => ['condition', ['stages' => [$sameStage->getId(), $unrelatedStage->getId()]]],
             'campaign.addremovelead' => ['action', ['addTo' => [$otherCampaign->getId()], 'removeFrom' => ['this']]],
             'lead.changeowner'       => ['action', ['owner' => 1]],
+            'lead.owner'             => ['condition', ['owner' => [1, 2]]],
             'lead.addtocompany'      => ['action', ['company' => 1]],
         ]);
 
         $export = $this->exportCampaign($campaign);
+        // A shared campaign must not carry the email addresses of the users
+        $this->assertStringNotContainsString('@yoursite.com', (string) json_encode($export));
         // On the target, the stage with the old ID is another stage
         $this->connection->executeStatement('UPDATE '.MAUTIC_TABLE_PREFIX.'stages SET uuid = ? WHERE id = ?', [Uuid::uuid4()->toString(), $unrelatedStage->getId()]);
 
@@ -126,9 +134,164 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $this->assertReference([$sameStage->getId()], $events['lead.stages'], 'stages');
         $this->assertReference([$otherCampaign->getId()], $events['campaign.addremovelead'], 'addTo');
         $this->assertReference(['this'], $events['campaign.addremovelead'], 'removeFrom');
-        // Companies and users cannot be identified on another instance
+        // Users cannot be identified on another instance, and the company with the old ID does not exist
         $this->assertReference(null, $events['lead.changeowner'], 'owner');
+        $this->assertReference([], $events['lead.owner'], 'owner');
         $this->assertReference(null, $events['lead.addtocompany'], 'company');
+    }
+
+    public function testImportFindsTheCompanyByNameOrCreatesIt(): void
+    {
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $company      = new Company();
+        $companyModel->setFieldValues($company, ['companyname' => 'Imported company'], true);
+        $companyModel->saveEntity($company);
+
+        $campaign = $this->createCampaign([
+            'lead.addtocompany' => ['action', ['company' => $company->getId()]],
+        ]);
+        $export = $this->exportCampaign($campaign);
+
+        $newIds = $this->importAsAnotherInstance($export);
+        $events = $this->getImportedEvents($newIds[Campaign::ENTITY_NAME][$campaign->getId()]);
+        $this->assertReference($company->getId(), $events['lead.addtocompany'], 'company');
+
+        // On a target without the company, the import creates it
+        $this->connection->executeStatement('UPDATE '.MAUTIC_TABLE_PREFIX.'companies SET companyname = ? WHERE id = ?', ['Renamed company', $company->getId()]);
+
+        $newIds    = $this->importAsAnotherInstance($export);
+        $events    = $this->getImportedEvents($newIds[Campaign::ENTITY_NAME][$campaign->getId()]);
+        $companyId = $events['lead.addtocompany']->getProperties()['company'];
+        $this->assertIsInt($companyId);
+        $this->assertNotSame($company->getId(), $companyId);
+        $this->assertSame('Imported company', $companyModel->getEntity($companyId)->getName());
+    }
+
+    public function testImportedFormActionsReferToTheImportedEntities(): void
+    {
+        $form    = $this->createForm('Actions');
+        $segment = $this->createSegment('Form action');
+        $group   = $this->createPointGroup();
+        // The email leads back to the form through its unsubscribe form
+        $email   = $this->createEmail();
+        $email->setUnsubscribeForm($form);
+        $this->save($email);
+
+        $this->addFormAction($form, 'email.send.lead', ['email' => $email->getId()]);
+        $this->addFormAction($form, 'lead.changelist', ['addToLists' => [$segment->getId()], 'removeFromLists' => []]);
+        $this->addFormAction($form, 'lead.changetags', ['add_tags' => ['form-action-tag'], 'remove_tags' => []]);
+        $this->addFormAction($form, 'lead.pointschange', ['operator' => 'plus', 'points' => 3, 'group' => $group->getId()]);
+        $this->addFormAction($form, 'email.send.user', ['useremail' => ['email' => $email->getId()], 'user_id' => [1]]);
+
+        $campaign = $this->createCampaign([
+            'form.submit' => ['decision', ['forms' => [$form->getId()]]],
+        ]);
+
+        $newIds  = $this->importAsAnotherInstance($this->exportCampaign($campaign));
+        $newForm = $this->em->find(Form::class, $newIds[Form::ENTITY_NAME][$form->getId()]);
+        $this->assertInstanceOf(Form::class, $newForm);
+
+        $actions = [];
+        foreach ($newForm->getActions() as $action) {
+            $actions[$action->getType()] = $action->getProperties();
+        }
+
+        $this->assertSame($newIds[Email::ENTITY_NAME][$email->getId()], $actions['email.send.lead']['email']);
+        $this->assertSame([$newIds[LeadList::ENTITY_NAME][$segment->getId()]], $actions['lead.changelist']['addToLists']);
+        $this->assertSame(['form-action-tag'], $actions['lead.changetags']['add_tags']);
+        $this->assertInstanceOf(Tag::class, $this->em->getRepository(Tag::class)->findOneBy(['tag' => 'form-action-tag']));
+        $this->assertSame($newIds[Group::ENTITY_NAME][$group->getId()], $actions['lead.pointschange']['group']);
+        $this->assertSame(['email' => $newIds[Email::ENTITY_NAME][$email->getId()]], $actions['email.send.user']['useremail']);
+        $this->assertSame([], $actions['email.send.user']['user_id']);
+
+        // The form page shows the actions with their emails
+        $this->client->request('GET', '/s/forms/view/'.$newForm->getId());
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testImportedSegmentFiltersReferToTheImportedEntities(): void
+    {
+        $member = $this->createSegment('Member');
+        $email  = $this->createEmail();
+        $tag    = $this->save(new Tag('segment-filter-tag'));
+
+        $segment = $this->createSegment('Filtered');
+        $segment->setFilters([
+            $this->segmentFilter('leadlist', [$member->getId()]),
+            $this->segmentFilter('lead_email_received', [$email->getId()]),
+            $this->segmentFilter('tags', [$tag->getId()]),
+        ]);
+        $this->save($segment);
+
+        $byCategory = $this->createSegment('Category');
+        $byCategory->setFilters([$this->segmentFilter('globalcategory', [999999])]);
+        $this->save($byCategory);
+
+        $category = new Category();
+        $category->setTitle('Known category');
+        $category->setAlias('known-category');
+        $category->setBundle('global');
+        $this->save($category);
+        $byKnownCategory = $this->createSegment('Known category');
+        $byKnownCategory->setFilters([$this->segmentFilter('globalcategory', [$category->getId()])]);
+        $this->save($byKnownCategory);
+
+        $campaign = $this->createCampaign([
+            'lead.segments' => ['condition', ['segments' => [$segment->getId(), $byCategory->getId(), $byKnownCategory->getId()]]],
+        ]);
+        $export = $this->exportCampaign($campaign);
+
+        // On the target, the tag does not exist
+        $this->connection->executeStatement('DELETE FROM '.MAUTIC_TABLE_PREFIX.'lead_tags WHERE id = ?', [$tag->getId()]);
+
+        $newIds = $this->importAsAnotherInstance($export);
+
+        $imported = $this->em->find(LeadList::class, $newIds[LeadList::ENTITY_NAME][$segment->getId()]);
+        $newTag   = $this->em->getRepository(Tag::class)->findOneBy(['tag' => 'segment-filter-tag']);
+        $this->assertInstanceOf(Tag::class, $newTag);
+        $this->assertInstanceOf(LeadList::class, $imported);
+
+        $values = array_map(static fn (array $filter): mixed => $filter['properties']['filter'], $imported->getFilters());
+        $this->assertSame([
+            [$newIds[LeadList::ENTITY_NAME][$member->getId()]],
+            [$newIds[Email::ENTITY_NAME][$email->getId()]],
+            [$newTag->getId()],
+        ], $values);
+        $this->assertTrue($imported->getIsPublished());
+
+        // A category that is not on this instance is removed, so the segment is not built with other rules
+        $importedByCategory = $this->em->find(LeadList::class, $newIds[LeadList::ENTITY_NAME][$byCategory->getId()]);
+        $this->assertInstanceOf(LeadList::class, $importedByCategory);
+        $this->assertSame([], $importedByCategory->getFilters()[0]['properties']['filter']);
+        $this->assertFalse($importedByCategory->getIsPublished());
+
+        // A category that is here is found by its UUID
+        $importedByKnownCategory = $this->em->find(LeadList::class, $newIds[LeadList::ENTITY_NAME][$byKnownCategory->getId()]);
+        $this->assertInstanceOf(LeadList::class, $importedByKnownCategory);
+        $this->assertSame([$category->getId()], $importedByKnownCategory->getFilters()[0]['properties']['filter']);
+        $this->assertTrue($importedByKnownCategory->getIsPublished());
+    }
+
+    public function testImportedEmailKeepsItsBuilderMjml(): void
+    {
+        $email = $this->createEmail();
+        $mjml  = '<mjml><mj-body><mj-section><mj-column><mj-text>Builder email</mj-text></mj-column></mj-section></mj-body></mjml>';
+
+        $grapesJsBuilder = new GrapesJsBuilder();
+        $grapesJsBuilder->setEmail($email);
+        $grapesJsBuilder->setCustomMjml($mjml);
+        $this->save($grapesJsBuilder);
+
+        $campaign = $this->createCampaign([
+            'email.send' => ['action', ['email' => $email->getId()], 'email', $email->getId()],
+        ]);
+
+        $newIds = $this->importAsAnotherInstance($this->exportCampaign($campaign));
+
+        // Without the MJML, the builder reads the email as HTML and breaks its layout
+        $imported = $this->em->getRepository(GrapesJsBuilder::class)->findOneBy(['email' => $newIds[Email::ENTITY_NAME][$email->getId()]]);
+        $this->assertInstanceOf(GrapesJsBuilder::class, $imported);
+        $this->assertSame($mjml, $imported->getCustomMjml());
     }
 
     public function testImportCreatesTheTagsAndCustomFieldsTheEventsUse(): void
@@ -161,6 +324,11 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $this->assertNotSame('imported_custom', $importedAlias);
         $this->assertReference($importedAlias, $events['lead.field_value'], 'field');
         $this->assertSame([$importedAlias => 'value', 'firstname' => ''], $events['lead.updatelead']->getProperties()['properties']);
+
+        // Field lists are keyed by label, so the imported field needs its own label to be selectable in the event forms
+        $fieldList = self::getContainer()->get(FieldModel::class)->getFieldList(false);
+        $this->assertSame('Imported custom', $fieldList['imported_custom']);
+        $this->assertSame("Imported custom ({$importedAlias})", $fieldList[$importedAlias]);
     }
 
     public function testImportedFormCanBeSubmitted(): void
@@ -191,6 +359,11 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $table   = MAUTIC_TABLE_PREFIX.'form_results_'.$newForm->getId().'_'.$newForm->getAlias();
         $columns = $this->connection->fetchFirstColumn('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?', [$table]);
         $this->assertContains('email', $columns);
+
+        // The cached form HTML is built before the fields are imported, so the public page needs it rebuilt
+        $crawler = $this->client->request('GET', '/form/'.$newForm->getId());
+        $this->assertCount(1, $crawler->filter('input[name="mauticform[email]"]'));
+        $this->assertSame((string) $newForm->getId(), $crawler->filter('input[name="mauticform[formId]"]')->attr('value'));
 
         $this->client->request('POST', '/form/submit?formId='.$newForm->getId(), ['mauticform' => [
             'formId'    => $newForm->getId(),
@@ -266,6 +439,38 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $importedAlias = $this->em->find(LeadField::class, $newIds[LeadField::ENTITY_NAME][(int) $field->getId()])->getAlias();
         $this->assertSame('done', $contactRow[$importedAlias]);
         $this->assertNull($contactRow['run_custom']);
+    }
+
+    /**
+     * @param array<string, mixed> $properties
+     */
+    private function addFormAction(Form $form, string $type, array $properties): void
+    {
+        $action = new Action();
+        $action->setName($type);
+        $action->setType($type);
+        $action->setOrder(count($form->getActions()) + 1);
+        $action->setProperties($properties);
+        $action->setForm($form);
+        $form->addAction($type, $action);
+        $this->save($action);
+    }
+
+    /**
+     * @param int|list<int> $value
+     *
+     * @return array<string, mixed>
+     */
+    private function segmentFilter(string $field, int|array $value): array
+    {
+        return [
+            'glue'       => 'and',
+            'field'      => $field,
+            'object'     => 'lead',
+            'type'       => $field,
+            'operator'   => 'in',
+            'properties' => ['filter' => $value],
+        ];
     }
 
     /**

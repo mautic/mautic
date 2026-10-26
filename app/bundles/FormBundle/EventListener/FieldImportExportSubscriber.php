@@ -180,11 +180,12 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
             $this->logAction('import', $field->getId(), $fieldData, 'formField');
         }
 
-        // The form is imported before its fields, so its results table has no columns for them yet
+        // The form is imported before its fields, so its results table and its cached HTML have no fields yet
         foreach ($forms as $form) {
             // Loads the fields that were just saved
             $this->entityManager->refresh($form);
             $this->formModel->createTableSchema($form);
+            $this->formModel->generateHtml($form);
         }
 
         foreach ($stats as $status => $info) {

@@ -26,13 +26,13 @@ class ImportHelper
         // Zip Bomb protection constants
         $maxFiles     = 1000;  // Maximum number of files
         $maxSize      = 100 * 1024 * 1024;  // 100MB total uncompressed size
-        $maxRatio     = 10;    // Maximum compression ratio (1:10)
+        $maxRatio     = 100;   // Maximum compression ratio (1:100)
         $readLength   = 1024;  // Read buffer size
 
         // The ratio check only makes sense for sizable entries: legitimate text payloads such as
-        // the exported entity_data.json compress far better than 1:10, so enforcing the ratio on
-        // small files yields false positives. A real zip bomb still trips the absolute $maxSize
-        // and per-file streaming caps below, so we skip the ratio check under this threshold.
+        // the exported entity_data.json compress around 1:20, so a tight ratio rejects real exports.
+        // A zip bomb compresses far beyond 1:100 and still trips the absolute $maxSize and
+        // per-file streaming caps below, so we skip the ratio check under this threshold.
         $minRatioCheckSize = 1024 * 1024; // 1MB
 
         if (true !== $zip->open($filePath)) {

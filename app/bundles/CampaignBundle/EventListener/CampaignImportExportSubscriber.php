@@ -26,9 +26,12 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\TagRepository;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\UserBundle\Model\UserModel;
 use Psr\Log\LoggerInterface;
@@ -50,6 +53,8 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         private IpLookupHelper $ipLookupHelper,
         private EventEntityReferences $eventEntityReferences,
         private TagRepository $tagRepository,
+        private CompanyModel $companyModel,
+        private CompanyRepository $companyRepository,
     ) {
     }
 
@@ -265,21 +270,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $this->updateDependencies($entityData['dependencies'], $subEvent->getEntityIdMap(), $entity);
         }
 
-        foreach ([Field::ENTITY_NAME, Action::ENTITY_NAME] as $entity) {
-            if (!isset($entityData[$entity])) {
-                continue;
-            }
-            $this->updateFormRelatedData($entityData, $entityData['dependencies'], $entity);
-
-            $subEvent = new EntityImportEvent($entity, $entityData[$entity], $userId);
-            $subEvent = $this->dispatcher->dispatch($subEvent);
-            $this->mergeStatus($event, $subEvent);
-
-            $this->logger->info('Imported dependent entity: '.$entity, ['entityIdMap' => $subEvent->getEntityIdMap()]);
-
-            $this->updateDependencies($entityData['dependencies'], $subEvent->getEntityIdMap(), $entity);
-        }
-
+        // Before the form actions, as they can send emails
         if (isset($entityData[Email::ENTITY_NAME])) {
             $this->updateEmails($entityData, $entityData['dependencies']);
 
@@ -291,6 +282,28 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $this->logger->info('Imported dependent entity: '.Email::ENTITY_NAME, ['entityIdMap' => $emailEvent->getEntityIdMap()]);
 
             $this->updateDependencies($entityData['dependencies'], $emailEvent->getEntityIdMap(), Email::ENTITY_NAME);
+        }
+
+        // Once the segments, emails and assets the filters refer to are all imported
+        $this->updateSegmentFilters($entityData, $idMaps);
+
+        foreach ([Field::ENTITY_NAME, Action::ENTITY_NAME] as $entity) {
+            if (!isset($entityData[$entity])) {
+                continue;
+            }
+            $this->updateFormRelatedData($entityData, $entityData['dependencies'], $entity);
+
+            if (Action::ENTITY_NAME === $entity) {
+                $this->updateFormActions($entityData, $idMaps);
+            }
+
+            $subEvent = new EntityImportEvent($entity, $entityData[$entity], $userId);
+            $subEvent = $this->dispatcher->dispatch($subEvent);
+            $this->mergeStatus($event, $subEvent);
+
+            $this->logger->info('Imported dependent entity: '.$entity, ['entityIdMap' => $subEvent->getEntityIdMap()]);
+
+            $this->updateDependencies($entityData['dependencies'], $subEvent->getEntityIdMap(), $entity);
         }
 
         $this->processDependencies($entityData['dependencies']);
@@ -549,6 +562,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
         $eventDependencies = $this->getSubDependencies($dependencies, Event::ENTITY_NAME);
         $idMaps            = $this->findLinkedEntities($data[Event::ENTITY_NAME], $idMaps);
+        $idMaps            = $this->findNamedEntities($data[Event::ENTITY_NAME], $idMaps);
         $fieldAliases      = $this->getChangedFieldAliases($data[LeadField::ENTITY_NAME] ?? [], $idMaps[LeadField::ENTITY_NAME] ?? []);
 
         $this->createMissingTags($data[Event::ENTITY_NAME]);
@@ -560,10 +574,112 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
                 }
             }
 
-            unset($event['linked_uuids']);
+            unset($event['linked_uuids'], $event['linked_names']);
             $event = $this->eventEntityReferences->remapEvent($event, $idMaps, $fieldAliases);
         }
         unset($event);
+    }
+
+    /**
+     * Points the filters of the imported segments to the entities on this instance. A segment with a filter that lost
+     * its value is unpublished, so it is not built with different rules than on the source instance.
+     *
+     * @param array<string, mixed>                  $data
+     * @param array<string, array<int|string, int>> $idMaps
+     */
+    private function updateSegmentFilters(array $data, array $idMaps): void
+    {
+        if (empty($data[LeadList::ENTITY_NAME]) || empty($idMaps[LeadList::ENTITY_NAME])) {
+            return;
+        }
+
+        $idMaps = $this->findLinkedEntities($data[LeadList::ENTITY_NAME], $idMaps);
+        $idMaps = $this->findTags($data[LeadList::ENTITY_NAME], $idMaps);
+
+        foreach ($data[LeadList::ENTITY_NAME] as $segmentData) {
+            $newId   = $idMaps[LeadList::ENTITY_NAME][(int) ($segmentData['id'] ?? 0)] ?? null;
+            $segment = $newId ? $this->entityManager->find(LeadList::class, $newId) : null;
+
+            if (!$segment instanceof LeadList || empty($segmentData['filters']) || !is_array($segmentData['filters'])) {
+                continue;
+            }
+
+            [$filters, $complete] = $this->eventEntityReferences->remapSegmentFilters($segmentData['filters'], $idMaps);
+
+            $segment->setFilters($filters);
+            if (!$complete) {
+                $segment->setIsPublished(false);
+            }
+            $this->entityManager->persist($segment);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Finds or creates the tags the segment filters refer to by their name.
+     *
+     * @param array<int, array<string, mixed>>      $segments
+     * @param array<string, array<int|string, int>> $idMaps
+     *
+     * @return array<string, array<int|string, int>>
+     */
+    private function findTags(array $segments, array $idMaps): array
+    {
+        foreach ($segments as $segment) {
+            $names = $segment['linked_names'][EventEntityReferences::TAG_ID] ?? [];
+
+            if (!is_array($names)) {
+                continue;
+            }
+
+            foreach ($names as $oldId => $name) {
+                if (!is_string($name) || '' === trim($name)) {
+                    continue;
+                }
+
+                $tag = $this->tagRepository->getTagByNameOrCreateNewOne($name);
+                if (!$tag->getId()) {
+                    $this->entityManager->persist($tag);
+                    $this->entityManager->flush();
+                }
+
+                $idMaps[EventEntityReferences::TAG_ID][(int) $oldId] = (int) $tag->getId();
+            }
+        }
+
+        return $idMaps;
+    }
+
+    /**
+     * Points the form actions to the imported emails, segments and other entities they use.
+     *
+     * @param array<string, mixed>                  $data
+     * @param array<string, array<int|string, int>> $idMaps
+     */
+    private function updateFormActions(array &$data, array $idMaps): void
+    {
+        $tagNames = [];
+        $idMaps   = $this->findLinkedEntities($data[Action::ENTITY_NAME], $idMaps);
+
+        foreach ($data[Action::ENTITY_NAME] as &$action) {
+            unset($action['linked_uuids']);
+
+            $properties = $action['properties'] ?? [];
+            if (is_string($properties)) {
+                $properties = json_decode($properties, true);
+            }
+            if (!is_array($properties)) {
+                continue;
+            }
+
+            $type                 = (string) ($action['type'] ?? '');
+            $tagNames             = array_merge($tagNames, $this->eventEntityReferences->getFormActionTagNames($type, $properties));
+            $action['properties'] = $this->eventEntityReferences->remapFormActionProperties($type, $properties, $idMaps);
+        }
+        unset($action);
+
+        $this->createTags($tagNames);
     }
 
     /**
@@ -607,6 +723,46 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * Finds the companies the events refer to by their name on this instance, and creates the ones that are not here.
+     *
+     * @param array<int, array<string, mixed>>      $events
+     * @param array<string, array<int|string, int>> $idMaps
+     *
+     * @return array<string, array<int|string, int>>
+     */
+    private function findNamedEntities(array $events, array $idMaps): array
+    {
+        foreach ($events as $event) {
+            $names = $event['linked_names'][EventEntityReferences::COMPANY] ?? [];
+
+            if (!is_array($names)) {
+                continue;
+            }
+
+            foreach ($names as $oldId => $name) {
+                if (isset($idMaps[EventEntityReferences::COMPANY][(int) $oldId]) || !is_string($name) || '' === trim($name)) {
+                    continue;
+                }
+
+                $existing = $this->companyRepository->identifyCompany($name);
+
+                if (isset($existing['id'])) {
+                    $idMaps[EventEntityReferences::COMPANY][(int) $oldId] = (int) $existing['id'];
+                    continue;
+                }
+
+                $company = new Company();
+                $this->companyModel->setFieldValues($company, ['companyname' => $name], true);
+                $this->companyModel->saveEntity($company);
+
+                $idMaps[EventEntityReferences::COMPANY][(int) $oldId] = (int) $company->getId();
+            }
+        }
+
+        return $idMaps;
+    }
+
+    /**
      * The import gives a custom field a new alias when another field here already has its alias.
      *
      * @param array<int, array<string, mixed>> $fields
@@ -643,6 +799,14 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
             $names      = array_merge($names, $this->eventEntityReferences->getTagNames((string) ($event['type'] ?? ''), $properties));
         }
 
+        $this->createTags($names);
+    }
+
+    /**
+     * @param list<string> $names
+     */
+    private function createTags(array $names): void
+    {
         if ([] === $names) {
             return;
         }

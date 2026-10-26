@@ -19,8 +19,10 @@ use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UuidHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -37,6 +39,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         private EventModel $eventModel,
         private EventEntityReferences $eventEntityReferences,
         private LeadFieldRepository $leadFieldRepository,
+        private CompanyModel $companyModel,
     ) {
     }
 
@@ -75,6 +78,10 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
 
             if ($linkedUuids = $this->getLinkedUuids($campaignEvent)) {
                 $eventData['linked_uuids'] = $linkedUuids;
+            }
+
+            if ($linkedNames = $this->getLinkedNames($campaignEvent)) {
+                $eventData['linked_names'] = $linkedNames;
             }
 
             $this->handleChannelExport($campaignEvent, $data, $event);
@@ -203,6 +210,29 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         }
 
         return $uuids;
+    }
+
+    /**
+     * The names of the entities the event refers to that have no UUID, like companies, so the import can find or create them.
+     *
+     * @return array<string, array<int, string>>
+     */
+    private function getLinkedNames(Event $campaignEvent): array
+    {
+        $names = [];
+
+        foreach ($this->eventEntityReferences->getNamedIds($campaignEvent->getType(), $campaignEvent->getProperties()) as $kind => $ids) {
+            foreach ($ids as $id) {
+                // The model loads the company name, which is a company field
+                $company = EventEntityReferences::COMPANY === $kind ? $this->companyModel->getEntity($id) : null;
+
+                if ($company instanceof Company && $company->getName()) {
+                    $names[$kind][$id] = $company->getName();
+                }
+            }
+        }
+
+        return $names;
     }
 
     /**
