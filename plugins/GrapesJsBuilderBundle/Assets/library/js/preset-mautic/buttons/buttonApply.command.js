@@ -52,6 +52,9 @@ export default class ButtonApplyCommand {
       editor.runCommand('preset-mautic:update-dc-components-from-dc-store');
     }
 
+    ButtonApplyCommand.postForm(editor, sender);
+
+    return true;
   }
 
   /**
