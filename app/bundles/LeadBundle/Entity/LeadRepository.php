@@ -128,7 +128,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     protected function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null)
     {
-        $col = 'l.'.$field;
+        $col = $this->getEntityManager()->getConnection()->quoteIdentifier('l.'.$field);
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')

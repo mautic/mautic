@@ -10,7 +10,9 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\EventListener\ReportDevicesSubscriber;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -218,6 +220,40 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($queryBuilderMock);
 
         $reportDevicesSubscriber->onReportGenerate($reportGeneratorEventMock);
+    }
+
+    public function testReportDisplayShowsClientName(): void
+    {
+        $event = $this->getReportDataEvent([
+            ['client_info' => serialize(['name' => 'Firefox', 'version' => '120.0'])],
+            ['client_info' => serialize('not an array')],
+        ]);
+
+        $this->getReportDevicesSubscriber()->onReportDisplay($event);
+
+        $this->assertSame([['client_info' => 'Firefox'], ['client_info' => '']], $event->getData());
+    }
+
+    public function testReportDisplayRejectsSerializedObject(): void
+    {
+        $event = $this->getReportDataEvent([
+            ['client_info' => serialize(new \ArrayObject(['name' => 'Firefox']))],
+        ]);
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->getReportDevicesSubscriber()->onReportDisplay($event);
+    }
+
+    /**
+     * @param array<int, array<string, string>> $data
+     */
+    private function getReportDataEvent(array $data): ReportDataEvent
+    {
+        $report = new Report();
+        $report->setSource(ReportDevicesSubscriber::DEVICES);
+
+        return new ReportDataEvent($report, $data, count($data), []);
     }
 
     private function getReportDevicesSubscriber(): ReportDevicesSubscriber

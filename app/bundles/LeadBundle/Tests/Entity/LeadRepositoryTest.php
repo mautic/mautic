@@ -75,6 +75,27 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(2, $parameters, 'There should be two parameters bound because that\'s the number of emails we passed into the method.');
     }
 
+    public function testBuildQueryForGetLeadsByFieldValueQuotesFieldIdentifier(): void
+    {
+        $dbalMock = new DBALMocker($this);
+
+        $repository = $this->getMockBuilder(LeadRepository::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getEntityManager'])
+            ->getMock();
+
+        $repository->method('getEntityManager')->willReturn($dbalMock->getMockEm());
+
+        $reflection = new \ReflectionClass(LeadRepository::class);
+        $method     = $reflection->getMethod('buildQueryForGetLeadsByFieldValue');
+        $method->setAccessible(true);
+        $method->invoke($repository, 'email OR 1=1-- -', 'a');
+
+        $where = $dbalMock->getQueryPart('where');
+
+        $this->assertSame('`l`.`email OR 1=1-- -` = :search', (string) $where[0][0]);
+    }
+
     /**
      * Ensure that the array_combine return value matches the old style.
      */

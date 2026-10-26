@@ -128,6 +128,7 @@ class DBALMocker
                 ->setMethods([
                     'createQueryBuilder',
                     'quote',
+                    'quoteIdentifier',
                     'update',
                     'insert',
                 ])
@@ -140,6 +141,17 @@ class DBALMocker
             $mock->expects($this->testCase->any())
                 ->method('quote')
                 ->willReturnArgument(0);
+            $mock->expects($this->testCase->any())
+                ->method('quoteIdentifier')
+                ->willReturnCallback(
+                    fn (string $identifier): string => implode(
+                        '.',
+                        array_map(
+                            static fn (string $part): string => '`'.str_replace('`', '``', $part).'`',
+                            explode('.', $identifier)
+                        )
+                    )
+                );
 
             $mock->expects($this->testCase->any())
                 ->method('update')

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -132,7 +133,7 @@ class ReportDevicesSubscriber implements EventSubscriberInterface
         $data = $event->getData();
         if (isset($data[0]['client_info'])) {
             foreach ($data as &$row) {
-                $clientInfo         = unserialize($row['client_info']);
+                $clientInfo         = Serializer::decode($row['client_info']);
                 $row['client_info'] = (is_array($clientInfo) && isset($clientInfo['name'])) ? $clientInfo['name'] : '';
             }
             $event->setData($data);

@@ -344,4 +344,46 @@ class ChartQueryTest extends \PHPUnit\Framework\TestCase
         $query = $this->chartQuery->prepareTimeDataQuery($table, $column, $filters);
         $this->assertInstanceOf(QueryBuilder::class, $query);
     }
+
+    public function testApplyFiltersRejectsRawSubquery(): void
+    {
+        $this->createChartQuery();
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $filters = [
+            'x' => [
+                'subquery' => '(SELECT IF(ASCII(SUBSTRING(database(),1,1))=109,SLEEP(3),0))',
+            ],
+        ];
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->chartQuery->applyFilters($queryBuilder, $filters);
+    }
+
+    public function testApplyFiltersRejectsInjectedColumnKey(): void
+    {
+        $this->createChartQuery();
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $filters      = ['SLEEP(3)' => '1'];
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->chartQuery->applyFilters($queryBuilder, $filters);
+    }
+
+    public function testApplyFiltersRejectsInjectedLeadListColumnName(): void
+    {
+        $this->createChartQuery();
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $filters = [
+            'leadlist_id' => [
+                'value'            => '1',
+                'list_column_name' => 't.id OR SLEEP(3)',
+            ],
+        ];
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->chartQuery->applyFilters($queryBuilder, $filters);
+    }
 }
