@@ -23,8 +23,14 @@
         }
 
         > a {
+            font-size: 12px;
+            line-height: 16px;
             pointer-events: auto;
         }
+    }
+
+    &.form-fluid--password > .form-fluid__label {
+        right: 16px;
     }
 
     .form-fluid__help {
