@@ -109,9 +109,19 @@
             {% for item in items %}
                 <tr>
                     <td>
-                    {% set customButtons = [] %}
+                    {% set customButtons = [
+                        {
+                            'attr' : {
+                                'data-toggle' : 'ajax',
+                                'href'        : path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.stage'|trans ~ ':"' ~ item.name ~ '"'}),
+                            },
+                            'btnText'   : 'mautic.lead.list.view_contacts'|trans,
+                            'iconClass' : 'ri-team-line',
+                            'priority'  : 100,
+                        }
+                    ] %}
                     {% if permissions['stage:stages:edit'] and permissions['stage:stages:delete'] %}
-                        {% set customButtons = [
+                        {% set customButtons = customButtons|merge([
                             {
                                 'attr' : {
                                     'data-toggle' : 'ajaxmodal',
@@ -123,7 +133,7 @@
                                 'iconClass' : 'ri-flag-line',
                                 'priority'  : 100,
                             }
-                        ] %}
+                        ]) %}
                     {% endif %}
                     {{- include('@MauticCore/Helper/list_actions.html.twig',
                             {
@@ -135,17 +145,6 @@
                                 },
                                 'customButtons'   : customButtons,
                                 'routeBase' : 'stage',
-                                'customButtons': {
-                                    'viewcontacts': {
-                                        'attr': {
-                                            'data-toggle': 'ajax',
-                                            'href': path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.stage'|trans ~ ':"' ~ item.name ~ '"'}),
-                                        },
-                                        'iconClass': 'ri-team-line',
-                                        'btnText': 'mautic.lead.list.view_contacts'|trans,
-                                        'priority': 100
-                                    }
-                                }
                             }) -}}
                     </td>
                     <td>
@@ -180,6 +179,7 @@
                                 color: 'gray',
                                 size: 'sm',
                                 attributes: {
+                                    id: 'stage-contacts-count-' ~ item.id,
                                     href: path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.stage'|trans ~ ':"' ~ item.name ~ '"'}),
                                     'data-toggle': 'ajax'
                                 }|merge(0 == stageContactCount ? {disabled: 'disabled'} : {})

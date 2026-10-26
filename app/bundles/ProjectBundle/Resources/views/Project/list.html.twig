@@ -127,6 +127,7 @@
                                     color: 'gray',
                                     size: 'sm',
                                     attributes: {
+                                        id: 'project-entities-count-' ~ item.getId(),
                                         href: path('mautic_project_action', {'objectAction': 'view', 'objectId': item.getId()}),
                                         'data-toggle': 'ajax',
                                         'data-menu-link': 'mautic_project_index'
