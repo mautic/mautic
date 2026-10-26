@@ -145,7 +145,7 @@
                                     href: path('mautic_form_action', {'objectAction': 'results', 'objectId': item.id}),
                                     'data-toggle': 'ajax',
                                     'data-menu-link': 'mautic_form_index'
-                                }|merge(0 == i.submission_count ? {disabled: 'disabled'} : {})
+                                }|filter((v, k) => 0 != (i.submission_count) or (k != 'href' and k != 'data-toggle'))
                             }]
                         } %}
                     </td>

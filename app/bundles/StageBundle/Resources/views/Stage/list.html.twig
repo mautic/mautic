@@ -109,7 +109,7 @@
             {% for item in items %}
                 <tr>
                     <td>
-                    {% set customButtons = [
+                    {% set customButtons = (permissions['lead:leads:viewown'] or permissions['lead:leads:viewother']) ? [
                         {
                             'attr' : {
                                 'data-toggle' : 'ajax',
@@ -119,7 +119,7 @@
                             'iconClass' : 'ri-team-line',
                             'priority'  : 100,
                         }
-                    ] %}
+                    ] : [] %}
                     {% if permissions['stage:stages:edit'] and permissions['stage:stages:delete'] %}
                         {% set customButtons = customButtons|merge([
                             {
@@ -172,6 +172,7 @@
                         {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
                     </td>
                     <td class="visible-md visible-lg">
+                        {% if permissions['lead:leads:viewother'] %}
                         {% set stageContactCount = contactCounts[item.id]|default(0) %}
                         {% include '@MauticCore/Helper/_tag.html.twig' with {
                             tags: [{
@@ -182,9 +183,10 @@
                                     id: 'stage-contacts-count-' ~ item.id,
                                     href: path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.stage_id'|trans ~ ':' ~ item.id}),
                                     'data-toggle': 'ajax'
-                                }|merge(0 == stageContactCount ? {disabled: 'disabled'} : {})
+                                }|filter((v, k) => 0 != (stageContactCount) or (k != 'href' and k != 'data-toggle'))
                             }]
                         } %}
+                        {% endif %}
                     </td>
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                 </tr>

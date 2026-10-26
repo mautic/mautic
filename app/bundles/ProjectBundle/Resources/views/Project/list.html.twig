@@ -131,7 +131,7 @@
                                         href: path('mautic_project_action', {'objectAction': 'view', 'objectId': item.getId()}),
                                         'data-toggle': 'ajax',
                                         'data-menu-link': 'mautic_project_index'
-                                    }|merge(0 == item.entitiesCount|default(0) ? {disabled: 'disabled'} : {})
+                                    }|filter((v, k) => 0 != (item.entitiesCount|default(0)) or (k != 'href' and k != 'data-toggle'))
                                 }]
                             } %}
                         </td>

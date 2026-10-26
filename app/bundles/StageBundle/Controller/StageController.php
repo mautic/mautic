@@ -45,6 +45,8 @@ final class StageController extends AbstractFormController
                 'stage:stages:edit',
                 'stage:stages:delete',
                 'stage:stages:publish',
+                'lead:leads:viewown',
+                'lead:leads:viewother',
             ],
             'RETURN_ARRAY'
         );
