@@ -78,6 +78,11 @@ final class GenerateProductionAssetsCommand extends Command
         $this->installElFinderAssets($relativeMediaPath);
 
         // Combine and minify bundle assets
+        $librariesCssFile = $mediaDir.'/css/libraries.css';
+        if ($this->filesystem->exists($librariesCssFile)) {
+            $this->filesystem->remove($librariesCssFile);
+        }
+
         $this->assetGenerationHelper->getAssets(true);
         $this->ensureStylesheetCompatibilityFiles($mediaDir, $vendorDir);
 
