@@ -135,6 +135,35 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         unlink($assetsPath.'/file.txt');
     }
 
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function dataCreateNewLocalAssetWithTraversalPath(): iterable
+    {
+        yield 'system file' => ['../../../../../../../../etc/passwd'];
+        yield 'app config' => ['../../config/local.php'];
+        yield 'hidden behind a subdir' => ['subdir/../../../../etc/passwd'];
+    }
+
+    #[DataProvider('dataCreateNewLocalAssetWithTraversalPath')]
+    public function testCreateNewLocalAssetWithTraversalPathIsRejected(string $file): void
+    {
+        $payload = [
+            'file'            => $file,
+            'storageLocation' => 'local',
+            'title'           => 'traversal',
+        ];
+        $this->client->request('POST', 'api/assets/new', $payload);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertSame(400, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(
+            0,
+            (int) $this->em->getConnection()->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'assets'),
+            'No asset should have been persisted for a traversal path.'
+        );
+    }
+
     public function testDeleteAssetReturnsSuccessAndEntityIsRemoved(): void
     {
         $payload = [

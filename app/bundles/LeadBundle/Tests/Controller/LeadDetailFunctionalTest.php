@@ -8,10 +8,16 @@ use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadDetailFunctionalTest extends MauticMysqlTestCase
 {
+    // Creating a custom field alters the leads table (DDL), which commits the transaction, so rollback cleanup must be disabled.
+    protected $useCleanupRollback = false;
+
     public function testCustomFieldOrderIsRespected(): void
     {
         $lead = new Lead();
@@ -111,6 +117,48 @@ final class LeadDetailFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         // Make sure the data-target-url is not an absolute URL
         $this->assertStringContainsString(sprintf('data-target-url="/s/contacts/view/%s/stats"', $lead->getId()), (string) $response->getContent());
+    }
+
+    public function testHtmlContactFieldIsPurifiedOnLeadDetailPage(): void
+    {
+        $htmlField = new LeadField();
+        $htmlField->setName('HTML Bio')
+            ->setAlias('html_bio')
+            ->setType('html')
+            ->setObject('lead')
+            ->setIsPublished(true)
+            ->setIsVisible(true);
+        $htmlField->setGroup('core');
+
+        $fieldModel = self::getContainer()->get(FieldModel::class);
+        $this->assertInstanceOf(FieldModel::class, $fieldModel);
+        $fieldModel->saveEntity($htmlField);
+
+        $payload = '<p>Safe Bio</p><script>alert("xss")</script><img src=x onerror=alert(1)><a href="javascript:alert(2)">bad</a><a href="https://example.com">good</a>';
+
+        $lead = new Lead();
+        $lead->setEmail('html-field-xss@example.com');
+        $lead->addUpdatedField('html_bio', $payload);
+
+        $leadModel = self::getContainer()->get(LeadModel::class);
+        $this->assertInstanceOf(LeadModel::class, $leadModel);
+        $leadModel->saveEntity($lead);
+
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', sprintf('/s/contacts/view/%d', $lead->getId()));
+
+        // The rendered custom-field value cell (the audit-trail table echoes the raw payload escaped, so scope to the field).
+        $labelCell    = $crawler->filter('td span.fw-b')->reduce(fn (Crawler $node): bool => 'HTML Bio' === trim($node->text()));
+        $fieldContent = $labelCell->count()
+            ? $labelCell->closest('td')->nextAll()->first()->html()
+            : '';
+
+        // The sanitized output proves the field is no longer rendered with |raw.
+        $sanitized = '<p>Safe Bio</p><img src="x" alt="x"><a>bad</a><a href="https://example.com">good</a>';
+
+        $this->assertStringContainsString($sanitized, $fieldContent);
+        $this->assertStringNotContainsString('<script>', $fieldContent);
     }
 
     public function testLeadDetailPageForSocialTabInDetailsCollapsibleForNoData(): void
