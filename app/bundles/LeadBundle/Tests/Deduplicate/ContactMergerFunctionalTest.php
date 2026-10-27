@@ -11,6 +11,8 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 
@@ -196,5 +198,66 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $winnerCompanies);
         $this->assertEquals($company->getId(), $winnerCompanies[0]['company_id']);
         $this->assertEquals(1, $winnerCompanies[0]['is_primary']);
+    }
+
+    public function testMergedContactKeepsUtmTags(): void
+    {
+        /** @var LeadModel $model */
+        $model = self::getContainer()->get(LeadModel::class);
+        $this->assertInstanceOf(LeadModel::class, $model);
+
+        /** @var ContactMerger $merger */
+        $merger = self::getContainer()->get(ContactMerger::class);
+        $this->assertInstanceOf(ContactMerger::class, $merger);
+
+        $jane = new Lead();
+        $jane->setEmail('jane.smith@test.com');
+        $model->saveEntity($jane);
+        $model->setUtmTags($jane, $this->createUtmTag($jane, 'newsletter'));
+
+        // An anonymous visitor with a UTM tag from an earlier request, stored
+        // only in the database, and one added in this request
+        $visitor = new Lead();
+        $model->saveEntity($visitor);
+        $earlierTag = $this->createUtmTag($visitor, 'webinar');
+        $this->em->persist($earlierTag);
+        $this->em->flush();
+        $model->setUtmTags($visitor, $this->createUtmTag($visitor, 'whitepaper'));
+
+        // The winner's collection is already loaded in this request
+        $this->assertCount(1, $jane->getUtmTags()->toArray());
+
+        $winner = $merger->merge($jane, $visitor);
+
+        $loaded = $winner->getUtmTags()->toArray();
+        foreach ($loaded as $utmTag) {
+            $this->assertSame($winner, $utmTag->getLead());
+        }
+        $campaigns = array_map(static fn (UtmTag $utmTag): ?string => $utmTag->getUtmCampaign(), $loaded);
+        sort($campaigns);
+        $this->assertSame(['newsletter', 'webinar', 'whitepaper'], $campaigns);
+
+        $this->em->clear();
+
+        /** @var UtmTagRepository $utmTagRepository */
+        $utmTagRepository = $this->em->getRepository(UtmTag::class);
+        $campaigns        = array_map(
+            static fn (UtmTag $utmTag): ?string => $utmTag->getUtmCampaign(),
+            $utmTagRepository->findBy(['lead' => $winner->getId()])
+        );
+        sort($campaigns);
+
+        $this->assertSame(['newsletter', 'webinar', 'whitepaper'], $campaigns);
+    }
+
+    private function createUtmTag(Lead $lead, string $campaign): UtmTag
+    {
+        $utmTag = new UtmTag();
+        $utmTag->setLead($lead)
+            ->setDateAdded(new \DateTime())
+            ->setUrl('https://example.com/?utm_campaign='.$campaign)
+            ->setUtmCampaign($campaign);
+
+        return $utmTag;
     }
 }
