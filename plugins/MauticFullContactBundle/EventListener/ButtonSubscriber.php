@@ -4,6 +4,8 @@ namespace MauticPlugin\MauticFullContactBundle\EventListener;
 
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
+use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -57,7 +59,8 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
                 ButtonHelper::LOCATION_BULK_ACTIONS
             );
 
-            if ($item = $event->getItem()) {
+            $item = $event->getItem();
+            if ($item instanceof Lead) {
                 $lookupContactButton = [
                     'attr' => [
                         'data-toggle' => 'ajaxmodal',
@@ -111,7 +114,8 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
                     ButtonHelper::LOCATION_BULK_ACTIONS
                 );
 
-                if ($item = $event->getItem()) {
+                $item = $event->getItem();
+                if ($item instanceof Company) {
                     $lookupCompanyButton = [
                         'attr' => [
                             'data-toggle' => 'ajaxmodal',
