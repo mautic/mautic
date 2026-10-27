@@ -443,7 +443,7 @@ final class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
         $zip     = new \ZipArchive();
         $zipPath = tempnam($systemTempDir, 'mautic_zip_test').'.zip';
 
-        $asset = tempnam($systemTempDir, 'mautic_import_asset');
+        $asset = $systemTempDir.'/mautic_import_asset_'.bin2hex(random_bytes(8)).'.txt';
         file_put_contents($asset, 'The test file');
 
         if (true === $zip->open($zipPath, \ZipArchive::CREATE)) {
