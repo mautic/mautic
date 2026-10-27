@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper\DateTime;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class DateTimeToken
+final readonly class DateTimeToken
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,

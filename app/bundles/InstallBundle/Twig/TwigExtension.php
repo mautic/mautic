@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\InstallBundle\Twig;
 
 use Twig\Extension\AbstractExtension;
@@ -8,17 +10,17 @@ use Twig\TwigFilter;
 /**
  * TwigExtension class.
  */
-class TwigExtension extends AbstractExtension
+final class TwigExtension extends AbstractExtension
 {
     /**
      * getFilters function.
      *
      * @return mixed[]
      */
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
-            new TwigFilter('phpversion', [$this, 'phpversion']),
+            new TwigFilter('phpversion', $this->phpversion(...)),
         ];
     }
 

@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token;
 
 use kamermans\OAuth2\Token\TokenInterface;
 
-class IntegrationTokenFactory implements TokenFactoryInterface
+final readonly class IntegrationTokenFactory implements TokenFactoryInterface
 {
     /**
      * @param mixed[]  $extraKeysToStore Extra keys returned by the service during the token process that needs to be captured

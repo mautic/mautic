@@ -8,6 +8,7 @@ use Mautic\NotificationBundle\Form\Type\MobileNotificationDetailsType;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
@@ -15,7 +16,7 @@ use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 
-class MobileNotificationDetailsTypeTest extends TypeTestCase
+final class MobileNotificationDetailsTypeTest extends TypeTestCase
 {
     /**
      * @var MockObject&Integration
@@ -59,15 +60,15 @@ class MobileNotificationDetailsTypeTest extends TypeTestCase
 
         $view = $form->createView();
         // test only field is "additional_data"
-        self::assertCount(1, $view->children);
-        self::assertArrayHasKey('additional_data', $view->children);
+        $this->assertCount(1, $view->children);
+        $this->assertArrayHasKey('additional_data', $view->children);
     }
 
     /**
      * @param array<int, string> $platforms
      * @param array<int, string> $settings
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('platformProvider')]
+    #[DataProvider('platformProvider')]
     public function testPlatformSelected(array $platforms, array $settings): void
     {
         $this->integrationSettings->method('getFeatureSettings')
@@ -76,11 +77,11 @@ class MobileNotificationDetailsTypeTest extends TypeTestCase
         $form = $this->factory->create(MobileNotificationDetailsType::class);
 
         $view = $form->createView();
-        self::assertCount(1 + count($settings), $view->children);
-        self::assertArrayHasKey('additional_data', $view->children);
+        $this->assertCount(1 + count($settings), $view->children);
+        $this->assertArrayHasKey('additional_data', $view->children);
 
         foreach ($settings as $settingField) {
-            self::assertArrayHasKey($settingField, $view->children);
+            $this->assertArrayHasKey($settingField, $view->children);
         }
     }
 

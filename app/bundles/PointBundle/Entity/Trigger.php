@@ -98,7 +98,7 @@ class Trigger extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['trigger:read', 'trigger:write'])]
     private $category;
 
@@ -165,9 +165,7 @@ class Trigger extends FormEntity implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
     }
 
     /**
@@ -203,7 +201,7 @@ class Trigger extends FormEntity implements UuidInterface
      * @param string $prop
      * @param mixed  $val
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         if ('events' == $prop) {
             // changes are already computed so just add them
@@ -214,8 +212,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -224,13 +220,9 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
-     *
-     * @return Trigger
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -239,8 +231,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get description.
-     *
      * @return string|null
      */
     public function getDescription()
@@ -249,13 +239,9 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
-     *
-     * @return Trigger
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -264,8 +250,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get name.
-     *
      * @return string|null
      */
     public function getName()
@@ -275,10 +259,8 @@ class Trigger extends FormEntity implements UuidInterface
 
     /**
      * Add events.
-     *
-     * @return Point
      */
-    public function addTriggerEvent($key, TriggerEvent $event)
+    public function addTriggerEvent($key, TriggerEvent $event): static
     {
         if ($changes = $event->getChanges()) {
             $this->isChanged('events', [$key, $changes]);
@@ -297,8 +279,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get events.
-     *
      * @return \Doctrine\Common\Collections\Collection
      */
     public function getEvents()
@@ -307,13 +287,9 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set publishUp.
-     *
      * @param \DateTime $publishUp
-     *
-     * @return Point
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -322,8 +298,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publishUp.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishUp()
@@ -332,13 +306,9 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set publishDown.
-     *
      * @param \DateTime $publishDown
-     *
-     * @return Point
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -347,8 +317,6 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get publishDown.
-     *
      * @return \DateTimeInterface|null
      */
     public function getPublishDown()

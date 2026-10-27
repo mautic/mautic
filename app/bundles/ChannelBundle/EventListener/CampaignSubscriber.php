@@ -22,7 +22,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final class CampaignSubscriber implements EventSubscriberInterface
 {
     private ?Event $pseudoEvent = null;
 
@@ -34,11 +34,11 @@ class CampaignSubscriber implements EventSubscriberInterface
     private array $messageChannels = [];
 
     public function __construct(
-        private MessageModel $messageModel,
-        private ActionDispatcher $actionDispatcher,
-        private EventCollector $eventCollector,
-        private LoggerInterface $logger,
-        private TranslatorInterface $translator,
+        private readonly MessageModel $messageModel,
+        private readonly ActionDispatcher $actionDispatcher,
+        private readonly EventCollector $eventCollector,
+        private readonly LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -65,6 +65,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'description'            => 'mautic.channel.message.send.marketing.message.descr',
             'batchEventName'         => ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
             'formType'               => MessageSendType::class,
+            'formTheme'              => '@MauticChannel/FormTheme/MessageSend/message_send_row.html.twig',
             'channel'                => 'channel.message',
             'channelIdField'         => 'marketingMessage',
             'connectionRestrictions' => [
@@ -148,7 +149,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    private function sendChannelMessage(ArrayCollection $logs, $channel, array $messageChannel)
+    private function sendChannelMessage(ArrayCollection $logs, int|string $channel, array $messageChannel)
     {
         /** @var ActionAccessor $config */
         $config = $this->eventCollector->getEventConfig($this->pseudoEvent);

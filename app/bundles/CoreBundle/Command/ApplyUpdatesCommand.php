@@ -21,19 +21,32 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 #[AsCommand(
     name: 'mautic:update:apply',
-    description: 'Updates the Mautic application'
+    description: 'Updates the Mautic application',
+    help: <<<'TXT'
+                The <info>%command.name%</info> command updates the Mautic application.
+
+<info>php %command.full_name%</info>
+
+You can optionally specify to bypass the verification check with the --force option:
+
+<info>php %command.full_name% --force</info>
+
+To force install a local package, pass the full path to the package as follows:
+
+<info>php %command.full_name% --update-package=/path/to/updatepackage.zip</info>
+TXT
 )]
-class ApplyUpdatesCommand extends Command
+final class ApplyUpdatesCommand extends Command
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private StepProvider $stepProvider,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly StepProvider $stepProvider,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDefinition(
@@ -51,21 +64,6 @@ class ApplyUpdatesCommand extends Command
                         'Finalize the upgrade.'
                     ),
                 ]
-            )
-            ->setHelp(
-                <<<'EOT'
-                The <info>%command.name%</info> command updates the Mautic application.
-
-<info>php %command.full_name%</info>
-
-You can optionally specify to bypass the verification check with the --force option:
-
-<info>php %command.full_name% --force</info>
-
-To force install a local package, pass the full path to the package as follows:
-
-<info>php %command.full_name% --update-package=/path/to/updatepackage.zip</info>
-EOT
             );
     }
 

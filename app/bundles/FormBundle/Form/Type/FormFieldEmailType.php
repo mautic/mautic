@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -11,10 +13,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldEmailType extends AbstractType
+final class FormFieldEmailType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -34,7 +36,7 @@ class FormFieldEmailType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.validationmsg',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'data-show-on' => '{"formfield_validation_donotsubmit_1": "checked"}',
@@ -61,7 +63,7 @@ class FormFieldEmailType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.validationmsg',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control',
                     'data-show-on' => '{"formfield_validation_blockfreeemail_1": "checked"}',

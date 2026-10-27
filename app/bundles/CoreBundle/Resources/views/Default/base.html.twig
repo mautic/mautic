@@ -42,19 +42,6 @@
 
             <script>
                 Mautic.onPageLoad('body');
-                {% if app.environment is same as 'dev' %}
-                mQuery( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
-                    if(XMLHttpRequest.responseJSON && typeof XMLHttpRequest.responseJSON.ignore_wdt == 'undefined' && XMLHttpRequest.getResponseHeader('x-debug-token')) {
-                        if (mQuery('[class*="sf-tool"]').length) {
-                            mQuery('[class*="sf-tool"]').remove();
-                        }
-
-                        mQuery.get(mauticBaseUrl + '_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
-                            mQuery('body').append('<div class="sf-toolbar-reload">'+data+'</div>');
-                        });
-                    }
-                });
-                {% endif %}
             </script>
             {{ outputScripts('bodyClose') }}
             {{ include('@MauticCore/Helper/modal.html.twig', {

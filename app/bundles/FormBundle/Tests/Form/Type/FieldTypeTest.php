@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Form\Type;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Collection\ObjectCollection;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
@@ -20,19 +21,22 @@ use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FieldTypeTest extends TypeTestCase
+final class FieldTypeTest extends TypeTestCase
 {
-    private TranslatorInterface $translator;
-    private ObjectCollectorInterface $objectCollector;
-    private FieldCollectorInterface $fieldCollector;
-    private AlreadyMappedFieldCollectorInterface $mappedFieldCollector;
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&ObjectCollectorInterface
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $objectCollector;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject&FieldCollectorInterface
+     */
+    private \PHPUnit\Framework\MockObject\MockObject $fieldCollector;
 
     protected function setUp(): void
     {
-        $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->objectCollector      = $this->createMock(ObjectCollectorInterface::class);
         $this->fieldCollector       = $this->createMock(FieldCollectorInterface::class);
-        $this->mappedFieldCollector = $this->createMock(AlreadyMappedFieldCollectorInterface::class);
 
         // Set up expected behavior for objectCollector
         $objectCollection = new ObjectCollection();
@@ -57,12 +61,13 @@ class FieldTypeTest extends TypeTestCase
             new ValidatorExtension(Validation::createValidator()),
             new PreloadedExtension([
                 FieldType::class => new FieldType(
-                    $this->translator,
+                    $this->createStub(TranslatorInterface::class),
                     $this->objectCollector,
                     $this->fieldCollector,
-                    $this->mappedFieldCollector
+                    $this->createStub(AlreadyMappedFieldCollectorInterface::class),
+                    $this->createStub(CoreParametersHelper::class)
                 ),
-                FormFieldRatingType::class => new FormFieldRatingType($this->translator),
+                FormFieldRatingType::class => new FormFieldRatingType($this->createStub(TranslatorInterface::class)),
             ], []),
         ];
     }

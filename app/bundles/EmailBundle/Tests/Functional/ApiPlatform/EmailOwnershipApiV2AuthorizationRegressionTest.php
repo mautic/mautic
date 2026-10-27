@@ -47,7 +47,7 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
         $this->em->clear();
 
         $restrictedUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'restricted.user']);
-        \assert($restrictedUser instanceof User);
+        $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
@@ -60,9 +60,9 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
         $data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
         $emails = $data['member'];
-        self::assertCount(1, $emails, 'Expected exactly 1 email');
-        self::assertSame($restrictedUserEmail->getId(), $emails[0]['id']);
-        self::assertSame('Restricted User Email', $emails[0]['name']);
+        $this->assertCount(1, $emails, 'Expected exactly 1 email');
+        $this->assertSame($restrictedUserEmail->getId(), $emails[0]['id']);
+        $this->assertSame('Restricted User Email', $emails[0]['name']);
     }
 
     public function testViewOwnCollectionReportsOwnedTotalAcrossPagesOnApiV2(): void
@@ -108,7 +108,7 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
         $this->em->clear();
 
         $restrictedUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'restricted.user']);
-        \assert($restrictedUser instanceof User);
+        $this->assertInstanceOf(User::class, $restrictedUser);
         $this->loginUser($restrictedUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $restrictedUser->getUserIdentifier());
         $this->client->setServerParameter('PHP_AUTH_PW', 'Maut1cR0cks!');
@@ -121,14 +121,14 @@ final class EmailOwnershipApiV2AuthorizationRegressionTest extends OwnershipScop
 
         $page1Data = json_decode($response->getContent(), true, 512, \JSON_THROW_ON_ERROR);
 
-        self::assertArrayHasKey('member', $page1Data);
-        self::assertArrayHasKey('totalItems', $page1Data);
-        self::assertSame(4, $page1Data['totalItems'], 'Should report totalItems 4 owned emails');
-        self::assertCount(4, $page1Data['member'], 'Should return all 4 owned emails on single page');
+        $this->assertArrayHasKey('member', $page1Data);
+        $this->assertArrayHasKey('totalItems', $page1Data);
+        $this->assertSame(4, $page1Data['totalItems'], 'Should report totalItems 4 owned emails');
+        $this->assertCount(4, $page1Data['member'], 'Should return all 4 owned emails on single page');
 
         // Verify all items belong to restricted user
         foreach ($page1Data['member'] as $email) {
-            self::assertStringStartsWith('Restricted User Email', $email['name']);
+            $this->assertStringStartsWith('Restricted User Email', $email['name']);
         }
     }
 }

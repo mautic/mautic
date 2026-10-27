@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Exception;
 
-class FilePathException extends \Exception
+final class FilePathException extends \Exception
 {
 }

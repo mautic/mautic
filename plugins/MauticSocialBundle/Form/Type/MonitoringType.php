@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -20,10 +21,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class MonitoringType extends AbstractType
+final class MonitoringType extends AbstractType
 {
     public function __construct(
-        private MonitoringModel $monitoringModel,
+        private readonly MonitoringModel $monitoringModel,
     ) {
     }
 
@@ -33,13 +34,13 @@ class MonitoringType extends AbstractType
 
         $builder->add('title', TextType::class, [
             'label'      => 'mautic.core.name',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
 
         $builder->add('description', TextareaType::class, [
             'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => ['class' => 'form-control editor'],
             'required'   => false,
         ]);
@@ -49,7 +50,7 @@ class MonitoringType extends AbstractType
         $builder->add('publishDown', PublishDownDateType::class);
         $builder->add('networkType', ChoiceType::class, [
             'label'      => 'mautic.social.monitoring.type.list',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.getNetworkFormAction(this)',
@@ -78,7 +79,7 @@ class MonitoringType extends AbstractType
             LeadListType::class,
             [
                 'label'      => 'mautic.lead.lead.events.addtolists',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -98,7 +99,7 @@ class MonitoringType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => \MauticPlugin\MauticSocialBundle\Entity\Monitoring::class,
+            'data_class' => Monitoring::class,
         ]);
 
         // allow network types to be sent through - list

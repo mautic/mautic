@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-class UniqueCustomFieldValidator extends ConstraintValidator
+final class UniqueCustomFieldValidator extends ConstraintValidator
 {
     public function __construct(
-        private LeadModel $leadModel,
-        private CompanyModel $companyModel,
-        private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        private readonly LeadRepository $leadRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
     }
 
@@ -88,22 +88,21 @@ class UniqueCustomFieldValidator extends ConstraintValidator
      */
     private function getLeadFieldsValid(Lead $lead, array $fieldsData): array
     {
-        $leadRepository = $this->leadModel->getRepository();
-        if ('orWhere' === $leadRepository->getUniqueIdentifiersWherePart()) {
+        if ('orWhere' === $this->leadRepository->getUniqueIdentifiersWherePart()) {
             $fieldsValidation = [];
             foreach ($fieldsData as $field => $data) {
-                $leads = $leadRepository->getLeadIdsByUniqueFields([$field => $data]);
+                $leads = $this->leadRepository->getLeadIdsByUniqueFields([$field => $data]);
 
-                $fieldsValidation[] = $this->isValid($leads, [$field], (int) $lead->getId());
+                $fieldsValidation[] = $this->isValid($leads, [$field], $lead->getId());
             }
 
             return array_merge(...$fieldsValidation);
         }
 
         // Can't use getEntities, because it refreshes some field data, that can be used in the form
-        $leads = $leadRepository->getLeadIdsByUniqueFields($fieldsData);
+        $leads = $this->leadRepository->getLeadIdsByUniqueFields($fieldsData);
 
-        return $this->isValid($leads, array_keys($fieldsData), (int) $lead->getId());
+        return $this->isValid($leads, array_keys($fieldsData), $lead->getId());
     }
 
     /**
@@ -113,11 +112,10 @@ class UniqueCustomFieldValidator extends ConstraintValidator
      */
     private function getCompanyFieldsValid(Company $company, array $fieldsData): array
     {
-        $companyRepository = $this->companyModel->getRepository();
-        if ('orWhere' === $companyRepository->getUniqueIdentifiersWherePart()) {
+        if ('orWhere' === $this->companyRepository->getUniqueIdentifiersWherePart()) {
             $fieldsValidation = [];
             foreach ($fieldsData as $field => $data) {
-                $companies = $companyRepository->getCompanyIdsByUniqueFields([$field => $data]);
+                $companies = $this->companyRepository->getCompanyIdsByUniqueFields([$field => $data]);
 
                 $fieldsValidation[] = $this->isValid($companies, [$field], (int) $company->getId());
             }
@@ -126,7 +124,7 @@ class UniqueCustomFieldValidator extends ConstraintValidator
         }
 
         // Can't use getEntities, because it refreshes some field data, that can be used in the form
-        $companies = $companyRepository->getCompanyIdsByUniqueFields($fieldsData);
+        $companies = $this->companyRepository->getCompanyIdsByUniqueFields($fieldsData);
 
         return $this->isValid($companies, array_keys($fieldsData), (int) $company->getId());
     }

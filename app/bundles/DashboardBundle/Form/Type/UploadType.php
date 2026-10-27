@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class UploadType extends AbstractType
+final class UploadType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

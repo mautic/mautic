@@ -6,7 +6,6 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\DAO\Sync\Order;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class OrderDAOTest extends TestCase
@@ -24,9 +23,6 @@ final class OrderDAOTest extends TestCase
         $orderDAO->addObjectChange($retryObject);
         $orderDAO->retrySyncLater($retryObject);
 
-        Assert::assertSame(
-            [$successObject],
-            $orderDAO->getSuccessfullySyncedObjects()
-        );
+        $this->assertSame([$successObject], $orderDAO->getSuccessfullySyncedObjects());
     }
 }

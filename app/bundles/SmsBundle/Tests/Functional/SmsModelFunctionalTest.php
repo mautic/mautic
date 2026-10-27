@@ -36,6 +36,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         $contact = $this->em->find(Lead::class, $contactId);
         $sms     = $this->em->find(Sms::class, $sms->getId());
+        $this->assertInstanceOf(Lead::class, $contact);
 
         // Set locale
         $contact->addUpdatedField('preferred_locale', $contactLocale);
@@ -48,18 +49,15 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
             ->method('sendBatchSms')
             ->with(
                 $this->anything(),
-                $this->callback(function (string $template) use ($expectedMessage) {
-                    $this->assertSame($expectedMessage, $template);
-
-                    return true;
-                })
+                $expectedMessage
             )
             ->willReturn(new RecipientCollection($sms));
 
         $this->getContainer()->set('mautic.sms.transport_chain', $transportMock);
 
         /** @var SmsModel $smsModel */
-        $smsModel = $this->getContainer()->get('mautic.sms.model.sms');
+        $smsModel = $this->getContainer()->get(SmsModel::class);
+        $this->assertInstanceOf(Sms::class, $sms);
 
         // 4. Send SMS
         $smsModel->sendSms($sms, $contact);
@@ -98,9 +96,11 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $contact1 = $this->em->find(Lead::class, $englishLead->getId());
         $contact2 = $this->em->find(Lead::class, $frenchLead->getId());
         $contact3 = $this->em->find(Lead::class, $frenchLead2->getId());
+        $this->assertInstanceOf(Lead::class, $contact2);
 
         // 4. Update locale for the second contact
         $contact2->addUpdatedField('preferred_locale', 'fr_FR');
+        $this->assertInstanceOf(Lead::class, $contact3);
         $contact3->addUpdatedField('preferred_locale', 'fr_FR');
         $this->em->flush();
 
@@ -140,7 +140,7 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
 
                     return true;
                 }),
-                $this->callback(function (string $message) use (&$callIndex, $expectedBatches) {
+                $this->callback(function (string $message) use (&$callIndex, $expectedBatches): true {
                     $this->assertSame($expectedBatches[$callIndex]['message'], $message);
                     ++$callIndex;
 
@@ -158,7 +158,8 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
         $this->getContainer()->set('mautic.sms.transport_chain', $transportMock);
 
         /** @var SmsModel $smsModel */
-        $smsModel = $this->getContainer()->get('mautic.sms.model.sms');
+        $smsModel = $this->getContainer()->get(SmsModel::class);
+        $this->assertInstanceOf(Sms::class, $sms);
 
         // 6. Send SMS
         $results = $smsModel->sendSms($sms, [$contact1, $contact2, $contact3]);
@@ -166,20 +167,24 @@ final class SmsModelFunctionalTest extends MauticMysqlTestCase
 
         // 7. Validate SMS stats per contact
         $statRepo = $smsModel->getStatRepository();
+        $this->assertInstanceOf(Lead::class, $contact1);
 
         $stat1 = $statRepo->getLeadStats($contact1->getId());
         $this->assertSame((string) $sms->getId(), $stat1[0]['sms_id'], 'English contact should map to base SMS.');
 
         $stat2 = $statRepo->getLeadStats($contact2->getId());
+        $this->assertInstanceOf(Sms::class, $smsFr);
         $this->assertSame((string) $smsFr->getId(), $stat2[0]['sms_id'], 'French contact should map to translated SMS.');
 
         // 8. Validate SMS stats for translation and parent
         $this->em->clear();
         $sms      = $this->em->find(Sms::class, $sms->getId());
         $smsFr    = $this->em->find(Sms::class, $smsFr->getId());
+        $this->assertInstanceOf(Sms::class, $sms);
 
         $this->assertSame(3, $sms->getSentCount(true), 'Total sent count for base SMS including translations should be 3.');
         $this->assertSame(1, $sms->getSentCount(), 'Sent count for base SMS (excluding translations) should be 1.');
+        $this->assertInstanceOf(Sms::class, $smsFr);
         $this->assertSame(2, $smsFr->getSentCount(), 'Sent count for French translated SMS should be 2.');
     }
 

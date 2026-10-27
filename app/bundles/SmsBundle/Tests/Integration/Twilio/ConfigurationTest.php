@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
 use Mautic\PluginBundle\Entity\Integration;
@@ -9,7 +11,7 @@ use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use PHPUnit\Framework\MockObject\MockObject;
 use Twilio\Exceptions\ConfigurationException;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+final class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     private MockObject&IntegrationHelper $integrationHelper;
 
@@ -117,10 +119,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
         $this->getConfiguration()->getMessagingServiceSid();
     }
 
-    /**
-     * @return Configuration
-     */
-    private function getConfiguration()
+    private function getConfiguration(): Configuration
     {
         return new Configuration($this->integrationHelper);
     }

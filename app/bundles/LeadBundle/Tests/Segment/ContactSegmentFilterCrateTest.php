@@ -1,11 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Segment;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(ContactSegmentFilterCrate::class)]
-class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(ContactSegmentFilterCrate::class)]
+final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 {
     public function testEmptyFilter(): void
     {
@@ -99,7 +103,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
 
-        $this->assertSame(2.0, $contactSegmentFilterCrate->getFilter());
+        $this->assertEqualsWithDelta(2.0, $contactSegmentFilterCrate->getFilter(), PHP_FLOAT_EPSILON);
         $this->assertTrue($contactSegmentFilterCrate->isNumberType());
         $this->assertFalse($contactSegmentFilterCrate->isDateType());
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
@@ -116,6 +120,20 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($contactSegmentFilterCrate->isContactType());
         $this->assertTrue($contactSegmentFilterCrate->isCompanyType());
+        $this->assertSame(ContactSegmentFilterCrate::COMPANY_OBJECT, $contactSegmentFilterCrate->getObject());
+    }
+
+    public function testCompanyAllTypeFilter(): void
+    {
+        $filter = [
+            'object' => ContactSegmentFilterCrate::COMPANY_ALL_OBJECT,
+        ];
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+
+        $this->assertFalse($contactSegmentFilterCrate->isContactType());
+        $this->assertTrue($contactSegmentFilterCrate->isCompanyType());
+        $this->assertSame(ContactSegmentFilterCrate::COMPANY_ALL_OBJECT, $contactSegmentFilterCrate->getObject());
     }
 
     public function testMultiselectFilter(): void
@@ -193,7 +211,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('specialFieldsToConvertToEmptyProvider')]
+    #[DataProvider('specialFieldsToConvertToEmptyProvider')]
     public function testSpecialFieldsToConvertToNotEmpty(string $field): void
     {
         $filter = [
@@ -219,7 +237,7 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('specialFieldsToConvertToEmptyProvider')]
+    #[DataProvider('specialFieldsToConvertToEmptyProvider')]
     public function testSpecialFieldsToConvertToEmpty(string $field): void
     {
         $filter = [
@@ -245,15 +263,15 @@ class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($contactSegmentFilterCrate->hasTimeParts());
     }
 
-    /** @return array<int, array{0: string}> */
-    public static function specialFieldsToConvertToEmptyProvider(): array
+    /**
+     * @return \Iterator<int, array{string}>
+     */
+    public static function specialFieldsToConvertToEmptyProvider(): \Iterator
     {
-        return [
-            ['page_id'],
-            ['email_id'],
-            ['redirect_id'],
-            ['notification'],
-        ];
+        yield ['page_id'];
+        yield ['email_id'];
+        yield ['redirect_id'];
+        yield ['notification'];
     }
 
     public function testBehaviorsTypeFilter(): void

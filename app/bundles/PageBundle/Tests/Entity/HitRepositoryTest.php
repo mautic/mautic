@@ -11,9 +11,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 
-class HitRepositoryTest extends MauticMysqlTestCase
+final class HitRepositoryTest extends MauticMysqlTestCase
 {
     private HitRepository $hitRepository;
 
@@ -23,13 +22,13 @@ class HitRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->hitRepository = $this->em->getRepository(Hit::class);
+        $this->hitRepository = self::getContainer()->get(HitRepository::class);
     }
 
     public function testGetLatestHitDateByLead(): void
     {
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLead(1, 'someId'));
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLead(1));
+        $this->assertNotInstanceOf(\DateTime::class, $this->hitRepository->getLatestHitDateByLead(1, 'someId'));
+        $this->assertNotInstanceOf(\DateTime::class, $this->hitRepository->getLatestHitDateByLead(1));
 
         $leadOne  = $this->createLead();
         $leadTwo  = $this->createLead();
@@ -46,8 +45,8 @@ class HitRepositoryTest extends MauticMysqlTestCase
         $this->assertHitDate($dateThree, $leadOne, null);
         $this->assertHitDate($dateFive, $leadTwo, null);
 
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLead((int) $leadOne->getId(), 'two-first'));
-        Assert::assertNull($this->hitRepository->getLatestHitDateByLead((int) $leadTwo->getId(), 'one-second'));
+        $this->assertNotInstanceOf(\DateTime::class, $this->hitRepository->getLatestHitDateByLead($leadOne->getId(), 'two-first'));
+        $this->assertNotInstanceOf(\DateTime::class, $this->hitRepository->getLatestHitDateByLead($leadTwo->getId(), 'one-second'));
     }
 
     public function testGetEmailClickthroughHitCount(): void
@@ -75,6 +74,32 @@ class HitRepositoryTest extends MauticMysqlTestCase
         $this->assertSame('2', $counts[$emailOne->getId()]);
         $this->assertSame('2', $counts[$emailTwo->getId()]);
         $this->assertSame('1', $counts[$emailThree->getId()]);
+    }
+
+    public function testGetEmailClickthroughHitCountRespectsToDateFilter(): void
+    {
+        $lead  = $this->createLead();
+        $email = new Email();
+        $email->setName('Email A/B');
+        $email->setSubject('Email A/B Subject');
+        $email->setEmailType('list');
+        $this->em->persist($email);
+
+        $this->createEmailHit($lead, $email, new \DateTime('2026-03-10 12:00:00', new \DateTimeZone('UTC')), 'in-range', 200);
+        $this->createEmailHit($lead, $email, new \DateTime('2026-03-30 12:00:00', new \DateTimeZone('UTC')), 'in-range-2', 200);
+        $this->createEmailHit($lead, $email, new \DateTime('2026-04-10 12:00:00', new \DateTimeZone('UTC')), 'after-range', 200);
+        $this->createEmailHit($lead, $email, new \DateTime('2026-03-15 12:00:00', new \DateTimeZone('UTC')), 'wrong-code', 404);
+        $this->em->flush();
+
+        $result = $this->hitRepository->getEmailClickthroughHitCount(
+            [(int) $email->getId()],
+            new \DateTime('2026-03-01 00:00:00', new \DateTimeZone('UTC')),
+            200,
+            new \DateTime('2026-03-31 23:59:59', new \DateTimeZone('UTC'))
+        );
+
+        $this->assertArrayHasKey((string) $email->getId(), $result);
+        $this->assertSame('2', (string) $result[(string) $email->getId()]);
     }
 
     public function testGetDwellTimesForPages(): void
@@ -106,10 +131,10 @@ class HitRepositoryTest extends MauticMysqlTestCase
 
     private function assertHitDate(\DateTime $expectedHitDate, Lead $lead, ?string $trackingId): void
     {
-        $hitDate = $this->hitRepository->getLatestHitDateByLead((int) $lead->getId(), $trackingId);
+        $hitDate = $this->hitRepository->getLatestHitDateByLead($lead->getId(), $trackingId);
 
-        Assert::assertInstanceOf(\DateTime::class, $hitDate);
-        Assert::assertSame($expectedHitDate->getTimestamp(), $hitDate->getTimestamp());
+        $this->assertInstanceOf(\DateTime::class, $hitDate);
+        $this->assertSame($expectedHitDate->getTimestamp(), $hitDate->getTimestamp());
     }
 
     /**
@@ -145,6 +170,18 @@ class HitRepositoryTest extends MauticMysqlTestCase
         $this->em->persist($lead);
 
         return $lead;
+    }
+
+    private function createEmailHit(Lead $lead, Email $email, \DateTime $dateHit, string $trackingId, int $code): void
+    {
+        $hit = new Hit();
+        $hit->setLead($lead);
+        $hit->setEmail($email);
+        $hit->setIpAddress($this->getIpAddress());
+        $hit->setDateHit($dateHit);
+        $hit->setTrackingId($trackingId);
+        $hit->setCode($code);
+        $this->em->persist($hit);
     }
 
     private function getIpAddress(): IpAddress

@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryException;
 
-class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
+final class DoNotContactFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     use LeadBatchLimiterTrait;
 

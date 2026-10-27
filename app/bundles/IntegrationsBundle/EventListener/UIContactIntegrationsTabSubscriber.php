@@ -11,7 +11,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface
+final readonly class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private ObjectMappingRepository $objectMappingRepository,

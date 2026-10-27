@@ -12,12 +12,12 @@ use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testViewsCount(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get('mautic.focus.model.focus');
+        $focusModel = self::getContainer()->get(FocusModel::class);
         $focus      = $this->createFocus('popup');
         $focusModel->saveEntity($focus);
 
@@ -43,7 +43,7 @@ class FocusAjaxControllerFunctionalTest extends MauticMysqlTestCase
     public function testClickThroughCount(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get('mautic.focus.model.focus');
+        $focusModel = self::getContainer()->get(FocusModel::class);
         $focus      = $this->createFocus('popup');
         $focusModel->saveEntity($focus);
 

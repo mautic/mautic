@@ -62,7 +62,7 @@ final class SegmentNumberFilterWithOrsCommandFunctionalTest extends MauticMysqlT
         $this->em->flush();
 
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segment->getId()]);
-        self::assertCount(3, $this->em->getRepository(ListLead::class)->findBy(['list' => $segment]));
+        $this->assertCount(3, $this->em->getRepository(ListLead::class)->findBy(['list' => $segment]));
     }
 
     public function testSegmentNuberFilterWithRegexCommand(): void
@@ -97,6 +97,6 @@ final class SegmentNumberFilterWithOrsCommandFunctionalTest extends MauticMysqlT
         $this->em->flush();
 
         $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segment->getId()]);
-        self::assertCount(2, $this->em->getRepository(ListLead::class)->findBy(['list' => $segment]));
+        $this->assertCount(2, $this->em->getRepository(ListLead::class)->findBy(['list' => $segment]));
     }
 }

@@ -16,7 +16,7 @@ use Mautic\IntegrationsBundle\Tests\Functional\Services\SyncService\TestExamples
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Lead;
 
-class NotifierTest extends MauticMysqlTestCase
+final class NotifierTest extends MauticMysqlTestCase
 {
     public function testNotifications(): void
     {
@@ -27,11 +27,11 @@ class NotifierTest extends MauticMysqlTestCase
         $leads = $leadRepository->findBy([], [], 2);
 
         /** @var SyncIntegrationsHelper $syncIntegrationsHelper */
-        $syncIntegrationsHelper = static::getContainer()->get('mautic.integrations.helper.sync_integrations');
+        $syncIntegrationsHelper = self::getContainer()->get(SyncIntegrationsHelper::class);
         $syncIntegrationsHelper->addIntegration(new ExampleIntegration(new ExampleSyncDataExchange()));
 
         /** @var Notifier $notifier */
-        $notifier = static::getContainer()->get('mautic.integrations.sync.notifier');
+        $notifier = self::getContainer()->get(Notifier::class);
 
         $contactNotification = new NotificationDAO(
             new ObjectChangeDAO(

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
@@ -22,61 +21,37 @@ use Mautic\PointBundle\Model\PointGroupModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
-class FormSubscriberTest extends \PHPUnit\Framework\TestCase
+final class FormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var DoNotContact|(DoNotContact&MockObject)|MockObject
-     */
-    private DoNotContact|MockObject $doNotContact;
-
-    /**
-     * @var LeadModel|MockObject
+     * @var MockObject&LeadModel
      */
     private MockObject $leadModel;
-
-    /**
-     * @var PointGroupModel|(PointGroupModel&object&MockObject)|(PointGroupModel&MockObject)|(object&MockObject)|MockObject
-     */
-    private MockObject|PointGroupModel $pointGroupModel;
 
     private FormSubscriber $subscriber;
 
     /**
-     * @var MockObject|ContactTracker
+     * @var MockObject&ContactTracker
      */
     private MockObject $contactTracker;
 
     /**
-     * @var MockObject|LeadFieldRepository
+     * @var MockObject&SubmissionEvent
      */
-    private MockObject $leadFieldRepostory;
-
-    /**
-     * @var MockObject|IpLookupHelper
-     */
-    private MockObject $ipLookupHelper;
-
     private MockObject $submissionEvent;
-    private MockObject $fieldModel;
 
     protected function setUp(): void
     {
         $this->leadModel          = $this->createMock(LeadModel::class);
         $this->contactTracker     = $this->createMock(ContactTracker::class);
-        $this->ipLookupHelper     = $this->createMock(IpLookupHelper::class);
-        $this->leadFieldRepostory = $this->createMock(LeadFieldRepository::class);
-        $this->pointGroupModel    = $this->createMock(PointGroupModel::class);
-        $this->doNotContact       = $this->createMock(DoNotContact::class);
         $this->submissionEvent    = $this->createMock(SubmissionEvent::class);
-        $this->fieldModel         = $this->createMock(FieldModel::class);
         $this->subscriber         = new FormSubscriber(
             $this->leadModel,
             $this->contactTracker,
-            $this->ipLookupHelper,
-            $this->leadFieldRepostory,
-            $this->pointGroupModel,
-            $this->doNotContact,
-            $this->fieldModel
+            $this->createStub(LeadFieldRepository::class),
+            $this->createStub(PointGroupModel::class),
+            $this->createStub(DoNotContact::class),
+            $this->createStub(FieldModel::class)
         );
     }
 
@@ -84,11 +59,11 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $this->contactTracker->method('getContact')->willReturn(new Lead());
 
-        $this->ipLookupHelper->method('getIpAddress')->willReturn(new IpAddress());
-
+        $ipAddress  = new IpAddress('203.0.113.8');
         $submission = new Submission();
         $submission->setForm(new Form());
         $submission->setLead(new Lead());
+        $submission->setIpAddress($ipAddress);
 
         $submissionEvent = new SubmissionEvent($submission, [], [], new Request());
 
@@ -100,6 +75,44 @@ class FormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onFormSubmitActionChangePoints($submissionEvent);
 
         $this->assertEquals(1, $submissionEvent->getSubmission()->getLead()->getPoints());
+        $this->assertSame($ipAddress, $this->contactTracker->getContact()->getPointsChangeLog()->first()->getIpAddress());
+    }
+
+    /**
+     * A kiosk mode submission without contact fields has no contact, so the actions must leave the tracked contact alone.
+     */
+    public function testContactActionsAreSkippedWhenTheSubmissionHasNoContact(): void
+    {
+        $this->contactTracker->expects($this->never())->method('getContact');
+        $this->leadModel->expects($this->never())->method($this->anything());
+
+        $submission = new Submission();
+        $submission->setForm(new Form());
+
+        $actions = [
+            'lead.pointschange'           => ['points' => 1, 'operator' => 'plus'],
+            'lead.changelist'             => ['addToLists' => [1], 'removeFromLists' => []],
+            'lead.changetags'             => ['add_tags' => ['kiosk'], 'remove_tags' => []],
+            'lead.addutmtags'             => [],
+            'lead.scorecontactscompanies' => ['score' => 1],
+            'lead.updatelead'             => ['lastname' => 'Updated'],
+        ];
+
+        foreach ($actions as $type => $properties) {
+            $action = new Action();
+            $action->setType($type);
+            $action->setProperties($properties);
+
+            $submissionEvent = new SubmissionEvent($submission, [], [], new Request());
+            $submissionEvent->setAction($action);
+
+            $this->subscriber->onFormSubmitActionChangePoints($submissionEvent);
+            $this->subscriber->onFormSubmitActionChangeList($submissionEvent);
+            $this->subscriber->onFormSubmitActionChangeTags($submissionEvent);
+            $this->subscriber->onFormSubmitActionAddUtmTags($submissionEvent);
+            $this->subscriber->onFormSubmitActionScoreContactsCompanies($submissionEvent);
+            $this->subscriber->onFormSubmitActionUpdateLead($submissionEvent);
+        }
     }
 
     public function testThatTheLeadIsAddedToTheSegmentOnLeadOnSegmentsChangeEvent(): void

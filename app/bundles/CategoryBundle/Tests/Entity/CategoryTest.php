@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CategoryBundle\Tests\Entity;
 
 use Mautic\CategoryBundle\Entity\Category;
 use PHPUnit\Framework\TestCase;
 
-class CategoryTest extends TestCase
+final class CategoryTest extends TestCase
 {
     public function testCategoryUpdatesReflectsInChanges(): void
     {

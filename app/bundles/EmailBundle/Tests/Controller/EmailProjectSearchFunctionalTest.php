@@ -6,10 +6,11 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class EmailProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('searchDataProvider')]
+    #[DataProvider('searchDataProvider')]
     public function testProjectSearch(string $searchTerm, array $expectedEntities, array $unexpectedEntities): void
     {
         $projectOne   = $this->createProject('Project One');

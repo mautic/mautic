@@ -25,7 +25,7 @@ final class ProjectPermissions extends AbstractPermissions
     /**
      * @param mixed[] $params
      */
-    public function __construct($params)
+    public function __construct(array $params)
     {
         parent::__construct($params);
 

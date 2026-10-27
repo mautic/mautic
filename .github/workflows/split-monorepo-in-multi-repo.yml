@@ -92,16 +92,19 @@ jobs:
                     - theme-mono
                     - theme-capture
                     - theme-multi-step
+                # GrapesJS tags are published by publish-grapesjs-package.yml. Tag deletions still sync here.
+                exclude:
+                    - config: ${{ github.event_name == 'create' && github.ref_type == 'tag' && 'plugin-grapesjs' || '' }}
 
         name: Sync commits into mautic/${{ matrix.config }}
         steps:
-            -   uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+            -   uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
                 with:
                     persist-credentials: false
                     fetch-depth: 0
 
             # Add a personal access token to the repository secrets. This will allow the splitter action to push the new commits
-            -   uses: frankdejonge/use-github-token@15e6289d07c12b3b1603268a628bb74f2e9765f4 # 1.1.0
+            -   uses: frankdejonge/use-github-token@ae451b947d7d5975ca9aaadf04655bbd75dfbd85 # 1.1.1
                 with:
                     authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
                     user_name: 'Mautic CI'
@@ -109,7 +112,7 @@ jobs:
 
             # Cache the splitsh executable to speedup future runs
             -   name: Cache splitsh-lite
-                uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+                uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
                 with:
                     path: './splitsh'
                     key: '${{ runner.os }}-${{ matrix.config }}-splitsh-v101'

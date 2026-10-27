@@ -18,7 +18,7 @@ final class FieldCollector implements FieldCollectorInterface, ResetInterface
     private array $fieldCollections = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

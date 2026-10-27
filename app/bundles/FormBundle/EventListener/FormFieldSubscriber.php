@@ -9,10 +9,11 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class FormFieldSubscriber implements EventSubscriberInterface
+final readonly class FormFieldSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private FieldModel $fieldModel)
-    {
+    public function __construct(
+        private FieldModel $fieldModel,
+    ) {
     }
 
     /**
@@ -29,7 +30,7 @@ final class FormFieldSubscriber implements EventSubscriberInterface
     {
         $field = $event->getField();
 
-        if (isset($field->deletedId)) {
+        if (null !== $field->deletedId) {
             $this->fieldModel->removeFieldColumn($field);
         }
     }

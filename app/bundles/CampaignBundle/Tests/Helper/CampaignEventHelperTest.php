@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Helper;
 
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -7,7 +9,7 @@ use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
 use Mautic\CampaignBundle\Helper\CampaignEventHelper;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
 
-class CampaignEventHelperTest extends CampaignTestAbstract
+final class CampaignEventHelperTest extends CampaignTestAbstract
 {
     public function testValidateLeadChangeTriggerWithEmptyCampaigns(): void
     {

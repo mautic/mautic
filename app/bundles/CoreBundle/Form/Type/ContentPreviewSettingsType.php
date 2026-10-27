@@ -18,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Preview settings form used for pages and emails in detail view page.
  */
-class ContentPreviewSettingsType extends AbstractType
+final class ContentPreviewSettingsType extends AbstractType
 {
     public const TYPE_EMAIL = 'email';
 
@@ -28,8 +28,11 @@ class ContentPreviewSettingsType extends AbstractType
 
     private const CHOICE_TYPE_VARIANT     = 'variant';
 
-    public function __construct(private TranslatorInterface $translator, private CorePermissions $security, private UserHelper $userHelper)
-    {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly CorePermissions $security,
+        private readonly UserHelper $userHelper,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -57,6 +60,26 @@ class ContentPreviewSettingsType extends AbstractType
                         'data-toggle'          => 'field-lookup',
                         'data-lookup-callback' => 'updatePreviewContactLookupListFilter',
                         'data-chosen-lookup'   => 'lead:contactList',
+                        'placeholder'          => $this->translator->trans(
+                            'mautic.lead.list.form.startTyping'
+                        ),
+                        'data-no-record-message' => $this->translator->trans(
+                            'mautic.core.form.nomatches'
+                        ),
+                    ],
+                ]
+            );
+
+            $builder->add(
+                'company',
+                LookupType::class,
+                [
+                    'attr' => [
+                        'class'                => 'form-control',
+                        'data-callback'        => 'activatePreviewCompanyLookupField',
+                        'data-toggle'          => 'field-lookup',
+                        'data-lookup-callback' => 'updatePreviewCompanyLookupListFilter',
+                        'data-chosen-lookup'   => 'lead:companyList',
                         'placeholder'          => $this->translator->trans(
                             'mautic.lead.list.form.startTyping'
                         ),
@@ -98,7 +121,7 @@ class ContentPreviewSettingsType extends AbstractType
             return;
         }
 
-        /** @var Email|Page */
+        /** @var Email|Page $child */
         $child = $variants['parent'];
 
         $variantChoices = [

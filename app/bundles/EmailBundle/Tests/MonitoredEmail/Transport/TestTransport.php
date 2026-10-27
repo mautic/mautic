@@ -13,7 +13,7 @@ use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
 
-class TestTransport implements TransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
+final readonly class TestTransport implements TransportInterface, BounceProcessorInterface, UnsubscriptionProcessorInterface
 {
     private NullTransport $nullTransport;
 

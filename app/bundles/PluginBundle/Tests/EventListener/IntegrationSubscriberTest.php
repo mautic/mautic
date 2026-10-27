@@ -27,7 +27,7 @@ final class IntegrationSubscriberTest extends TestCase
         $logger  = $this->createMock(LoggerInterface::class);
         $matcher = $this->exactly(4);
         $logger->expects($matcher)
-            ->method('debug')->willReturnCallback(function (...$parameters) use ($matcher, $authorization) {
+            ->method('debug')->willReturnCallback(function (...$parameters) use ($matcher, $authorization): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('INTEGRATION REQUEST URL: POST https://mautic.org', $parameters[0]);
                 }

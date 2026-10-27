@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ConfigBundle\Mapper\Helper;
 
-class ConfigHelper
+final class ConfigHelper
 {
     /**
      * Map local config values with form fields.

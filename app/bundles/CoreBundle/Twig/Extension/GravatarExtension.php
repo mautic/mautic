@@ -8,17 +8,17 @@ use Mautic\CoreBundle\Twig\Helper\GravatarHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-class GravatarExtension extends AbstractExtension
+final class GravatarExtension extends AbstractExtension
 {
     public function __construct(
-        protected GravatarHelper $gravatarHelper,
+        private readonly GravatarHelper $gravatarHelper,
     ) {
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
-            new TwigFunction('gravatarGetImage', [$this, 'getImage'], ['is_safe' => ['all']]),
+            new TwigFunction('gravatarGetImage', $this->getImage(...), ['is_safe' => ['all']]),
         ];
     }
 

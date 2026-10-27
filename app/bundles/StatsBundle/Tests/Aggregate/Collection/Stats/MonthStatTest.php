@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection\Stats;
 
 use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\MonthStat;
 use PHPUnit\Framework\TestCase;
 
-class MonthStatTest extends TestCase
+final class MonthStatTest extends TestCase
 {
     private string $month = '2019-12';
 
@@ -24,7 +26,6 @@ class MonthStatTest extends TestCase
 
     public function testGetDay(): void
     {
-        $this->assertInstanceOf(DayStat::class, $this->dayStat);
         $day = $this->monthStat->getDay($this->day);
         $this->assertInstanceOf(DayStat::class, $day);
         $this->assertSame([], $day->getStats());
@@ -38,7 +39,7 @@ class MonthStatTest extends TestCase
     public function testGetStats(): void
     {
         $result = $this->monthStat->getStats();
-        $this->assertSame(["$this->month-$this->day" => $this->dayStat], $result);
+        $this->assertSame(["{$this->month}-{$this->day}" => $this->dayStat], $result);
     }
 
     public function testGetSum(): void

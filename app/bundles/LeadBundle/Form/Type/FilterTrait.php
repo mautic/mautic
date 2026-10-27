@@ -16,6 +16,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * This trait is consumed dynamically by multiple form types at runtime.
+ *
+ * @phpstan-ignore-next-line trait.unused
+ */
 trait FilterTrait
 {
     use RegexTrait;
@@ -305,9 +310,7 @@ trait FilterTrait
             $attr['disabled'] = 'disabled';
         } elseif ($operator) {
             $customOptions['constraints'][] = new NotBlank(
-                [
-                    'message' => 'mautic.core.value.required',
-                ]
+                message: 'mautic.core.value.required'
             );
 
             if (in_array($operator, ['regexp', '!regexp']) && $this->connection) {

@@ -4,19 +4,31 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
     versioning-strategy: "lockfile-only"
     groups:
-      all-dependencies:
+      composer-prod-dependencies:
+        dependency-type: "production"
         patterns:
           - "*"
+      composer-dev-dependencies:
+        dependency-type: "development"
+        patterns:
+          - "*"
+        exclude-patterns:
+          - "phpstan/*"
+      composer-phpstan-dependencies:
+        patterns:
+          - "phpstan/*"
 
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
     versioning-strategy: "lockfile-only"
     groups:
-      all-dependencies:
+      npm-dependencies:
         patterns:
           - "*"
 
@@ -24,7 +36,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
     groups:
-      all-dependencies:
+      github-actions:
         patterns:
           - "*"

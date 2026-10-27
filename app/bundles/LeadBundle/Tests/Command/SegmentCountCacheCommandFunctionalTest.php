@@ -10,9 +10,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
+final class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
 {
     /**
      * @throws \Exception
@@ -30,9 +31,10 @@ class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
 
         // Check segment cached contact count using the SegmentCountCacheHelper directly
-        $segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
+        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
+        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
         $count                   = $segmentCountCacheHelper->getSegmentContactCount($segmentId);
-        self::assertEquals(5, $count, "Expected segment $segmentId to have 5 contacts");
+        $this->assertEquals(5, $count, "Expected segment {$segmentId} to have 5 contacts");
 
         // Delete 1 contact.
         $contact = $contacts[0];
@@ -43,9 +45,10 @@ class SegmentCountCacheCommandFunctionalTest extends MauticMysqlTestCase
         $this->testSymfonyCommand(SegmentCountCacheCommand::COMMAND_NAME);
 
         // Check segment cached contact count using the SegmentCountCacheHelper directly
-        $segmentCountCacheHelper = static::getContainer()->get('mautic.helper.segment.count.cache');
+        /** @var SegmentCountCacheHelper $segmentCountCacheHelper */
+        $segmentCountCacheHelper = self::getContainer()->get(SegmentCountCacheHelper::class);
         $count                   = $segmentCountCacheHelper->getSegmentContactCount($segmentId);
-        self::assertEquals(4, $count, "Expected segment $segmentId to have 4 contacts");
+        $this->assertEquals(4, $count, "Expected segment {$segmentId} to have 4 contacts");
     }
 
     /**

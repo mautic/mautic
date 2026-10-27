@@ -22,7 +22,7 @@ final class DynamicContentCloneTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $this->assertStringContainsString($dwc->getName(), $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($dwc->getName(), (string) $this->client->getResponse()->getContent());
     }
 
     public function testCloneActionForTranslatedDynamicContent(): void
@@ -42,7 +42,7 @@ final class DynamicContentCloneTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $this->assertStringContainsString($dwc->getName(), $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($dwc->getName(), (string) $this->client->getResponse()->getContent());
     }
 
     private function createDynamicContent(string $name, string $language = 'en'): DynamicContent

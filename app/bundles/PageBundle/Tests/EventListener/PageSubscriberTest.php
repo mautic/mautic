@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -20,16 +22,16 @@ use Symfony\Component\Asset\Packages;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageSubscriberTest extends TestCase
+final class PageSubscriberTest extends TestCase
 {
     public function testGetTokensWhenCalledReturnsValidTokens(): void
     {
-        $translator       = $this->createMock(Translator::class);
+        $translator       = $this->createStub(Translator::class);
         $pageBuilderEvent = new PageBuilderEvent($translator);
         $pageBuilderEvent->addToken('{token_test}', 'TOKEN VALUE');
         $tokens = $pageBuilderEvent->getTokens();
         $this->assertArrayHasKey('{token_test}', $tokens);
-        $this->assertEquals($tokens['{token_test}'], 'TOKEN VALUE');
+        $this->assertEquals('TOKEN VALUE', $tokens['{token_test}']);
     }
 
     public function testOnPageDisplayBodyTagRegex(): void
@@ -44,7 +46,7 @@ class PageSubscriberTest extends TestCase
 EOF;
         $event = new PageDisplayEvent(
             $dummyPageContent,
-            $this->createMock(Page::class)
+            $this->createStub(Page::class)
         );
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getPageSubscriber();
@@ -53,8 +55,7 @@ EOF;
 
         $dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
 
-        $this->assertEquals(
-            $event->getContent(),
+        $this->assertSame(
             <<<EOF
 <html>
     <head>
@@ -66,7 +67,8 @@ const foo='bar';
 
     </body>
 </html>
-EOF
+EOF,
+            $event->getContent()
         );
     }
 
@@ -75,25 +77,17 @@ EOF
      */
     protected function getPageSubscriber(): PageSubscriber
     {
-        /** @var Packages&MockObject $packagesMock */
-        $packagesMock = $this->createMock(Packages::class);
-
-        $assetsHelperMock   = new AssetsHelper($packagesMock);
-        $ipLookupHelperMock = $this->createMock(IpLookupHelper::class);
-        $auditLogModelMock  = $this->createMock(AuditLogModel::class);
-        $pageModel          = $this->createMock(PageModel::class);
-        $languageHelper     = $this->createMock(LanguageHelper::class);
-        $pageDraftModel     = $this->createMock(PageDraftModel::class);
+        $assetsHelperMock   = new AssetsHelper($this->createStub(Packages::class));
 
         $assetsHelperMock->addScriptDeclaration("const foo='bar';", 'onPageDisplay_bodyOpen');
 
         return new PageSubscriber(
             $assetsHelperMock,
-            $ipLookupHelperMock,
-            $auditLogModelMock,
-            $languageHelper,
-            $pageModel,
-            $pageDraftModel,
+            $this->createStub(IpLookupHelper::class),
+            $this->createStub(AuditLogModel::class),
+            $this->createStub(LanguageHelper::class),
+            $this->createStub(PageModel::class),
+            $this->createStub(PageDraftModel::class),
         );
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
@@ -17,7 +19,7 @@ const CHANNEL_COLUMN_DATE_ADDED      = 'date_added';
 const CHANNEL_COLUMN_CREATED_BY      = 'created_by';
 const CHANNEL_COLUMN_CREATED_BY_USER = 'created_by_user';
 
-class ChannelSubscriber implements EventSubscriberInterface
+final class ChannelSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

@@ -12,13 +12,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SendSchedule
 {
-    private MailHelper $mailer;
+    private readonly MailHelper $mailer;
 
     public function __construct(
         MailHelper $mailer,
-        private MessageSchedule $messageSchedule,
-        private FileHandler $fileHandler,
-        private EventDispatcherInterface $eventDispatcher,
+        private readonly MessageSchedule $messageSchedule,
+        private readonly FileHandler $fileHandler,
+        private readonly EventDispatcherInterface $eventDispatcher,
     ) {
         $this->mailer = $mailer->getMailer();
     }

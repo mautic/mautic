@@ -11,7 +11,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
-class PasswordStrengthSubscriberTest extends TestCase
+final class PasswordStrengthSubscriberTest extends TestCase
 {
     public function testNoCheckPassportEvent(): void
     {
@@ -19,7 +19,7 @@ class PasswordStrengthSubscriberTest extends TestCase
         $passport->method('hasBadge')
             ->with(PasswordCredentials::class)
             ->willReturn(false);
-        $passport->expects(self::never())
+        $passport->expects($this->never())
             ->method('getBadge');
 
         $event = $this->createMock(CheckPassportEvent::class);
@@ -41,11 +41,11 @@ class PasswordStrengthSubscriberTest extends TestCase
         $passport->method('hasBadge')
             ->with(PasswordCredentials::class)
             ->willReturn(true);
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('getBadge')
             ->with(PasswordCredentials::class)
             ->willReturn($passwordCredentialsBadge);
-        $passport->expects(self::once())
+        $passport->expects($this->once())
             ->method('addBadge')
             ->willReturnCallback(static function (PasswordStrengthBadge $badge) use ($passport, $password): Passport {
                 self::assertSame($password, $badge->getPresentedPassword());

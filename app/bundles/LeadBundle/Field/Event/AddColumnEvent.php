@@ -10,8 +10,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class AddColumnEvent extends Event
 {
     public function __construct(
-        private LeadField $leadField,
-        private bool $shouldProcessInBackground,
+        private readonly LeadField $leadField,
+        private readonly bool $shouldProcessInBackground,
     ) {
     }
 

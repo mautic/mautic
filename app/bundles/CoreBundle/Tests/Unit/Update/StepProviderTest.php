@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Update;
 
 use Mautic\CoreBundle\Update\Step\StepInterface;
@@ -7,21 +9,18 @@ use Mautic\CoreBundle\Update\StepProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class StepProviderTest extends TestCase
+final class StepProviderTest extends TestCase
 {
     private StepProvider $provider;
 
     protected function setUp(): void
     {
-        $this->provider = new StepProvider();
-
         /** @var MockObject|StepInterface $step1 */
         $step1 = $this->createMock(StepInterface::class);
         $step1->method('getOrder')
             ->willReturn(10);
         $step1->method('shouldExecuteInFinalStage')
             ->willReturn(false);
-        $this->provider->addStep($step1);
 
         /** @var MockObject|StepInterface $step2 */
         $step2 = $this->createMock(StepInterface::class);
@@ -29,7 +28,6 @@ class StepProviderTest extends TestCase
             ->willReturn(0);
         $step2->method('shouldExecuteInFinalStage')
             ->willReturn(false);
-        $this->provider->addStep($step2);
 
         /** @var MockObject|StepInterface $step3 */
         $step3 = $this->createMock(StepInterface::class);
@@ -37,7 +35,6 @@ class StepProviderTest extends TestCase
             ->willReturn(50);
         $step3->method('shouldExecuteInFinalStage')
             ->willReturn(true);
-        $this->provider->addStep($step3);
 
         /** @var MockObject|StepInterface $step4 */
         $step4 = $this->createMock(StepInterface::class);
@@ -45,7 +42,8 @@ class StepProviderTest extends TestCase
             ->willReturn(30);
         $step4->method('shouldExecuteInFinalStage')
             ->willReturn(true);
-        $this->provider->addStep($step4);
+
+        $this->provider = new StepProvider([$step1, $step2, $step3, $step4]);
     }
 
     public function testInitialStepsAreOrdered(): void

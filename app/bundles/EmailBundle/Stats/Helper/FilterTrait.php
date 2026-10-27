@@ -16,7 +16,7 @@ trait FilterTrait
      * @param int|null $companyId
      * @param string   $fromAlias
      */
-    protected function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't')
+    protected function addCompanyFilter(QueryBuilder $q, $companyId = null, $fromAlias = 't'): void
     {
         if (null !== $companyId && intval($companyId)) {
             $sb = $this->connection->createQueryBuilder();
@@ -40,7 +40,7 @@ trait FilterTrait
      * @param int|null $campaignId
      * @param string   $fromAlias
      */
-    protected function addCampaignFilter(QueryBuilder $q, $campaignId = null, $fromAlias = 't')
+    protected function addCampaignFilter(QueryBuilder $q, $campaignId = null, $fromAlias = 't'): void
     {
         if (null !== $campaignId && intval($campaignId)) {
             $q->innerJoin($fromAlias, '(SELECT DISTINCT event_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId)', 'clel', $fromAlias.'.source_id = clel.event_id AND '.$fromAlias.'.source = "campaign.event" AND '.$fromAlias.'.lead_id = clel.lead_id')
@@ -52,7 +52,7 @@ trait FilterTrait
      * @param int|null $campaignId
      * @param string   $fromAlias
      */
-    protected function addCampaignFilterForEmailSource(QueryBuilder $q, $campaignId = null, $fromAlias = 't')
+    protected function addCampaignFilterForEmailSource(QueryBuilder $q, $campaignId = null, $fromAlias = 't'): void
     {
         if (null !== $campaignId && intval($campaignId)) {
             $q->innerJoin($fromAlias, '(SELECT DISTINCT channel_id, lead_id FROM '.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log WHERE campaign_id = :campaignId AND channel = "email")', 'clel', $fromAlias.'.source_id = clel.channel_id AND '.$fromAlias.'.source = "email" AND '.$fromAlias.'.lead_id = clel.lead_id')
@@ -64,7 +64,7 @@ trait FilterTrait
      * @param int|null $segmentId
      * @param string   $fromAlias
      */
-    protected function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't')
+    protected function addSegmentFilter(QueryBuilder $q, $segmentId = null, $fromAlias = 't'): void
     {
         if (null !== $segmentId && intval($segmentId)) {
             $sb = $this->connection->createQueryBuilder();

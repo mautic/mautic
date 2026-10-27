@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CampaignLeadChangeEvent extends Event
+final class CampaignLeadChangeEvent extends Event
 {
     /**
      * @var ?Lead
@@ -23,7 +25,7 @@ class CampaignLeadChangeEvent extends Event
      * @param ?string     $action
      */
     public function __construct(
-        private Campaign $campaign,
+        private readonly Campaign $campaign,
         $leads,
         private $action,
     ) {

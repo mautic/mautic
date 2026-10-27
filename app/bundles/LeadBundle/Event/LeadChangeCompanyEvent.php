@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class LeadChangeCompanyEvent extends Event
+final class LeadChangeCompanyEvent extends Event
 {
     private ?Lead $lead = null;
 
@@ -20,8 +22,8 @@ class LeadChangeCompanyEvent extends Event
      */
     public function __construct(
         Lead|array $leads,
-        private Company $company,
-        private bool $added = true,
+        private readonly Company $company,
+        private readonly bool $added = true,
     ) {
         if (is_array($leads)) {
             $this->leads = $leads;

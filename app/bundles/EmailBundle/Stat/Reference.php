@@ -4,16 +4,16 @@ namespace Mautic\EmailBundle\Stat;
 
 use Mautic\EmailBundle\Entity\Stat;
 
-class Reference
+final class Reference
 {
-    private ?int $emailId;
+    private readonly ?int $emailId;
 
     /**
      * @var int
      */
     private $leadId = 0;
 
-    private ?string $statId;
+    private readonly ?string $statId;
 
     public function __construct(Stat $stat)
     {

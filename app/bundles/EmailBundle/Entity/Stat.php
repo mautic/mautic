@@ -115,7 +115,7 @@ class Stat
     /**
      * @var array<string,mixed[]>
      */
-    private $changes = [];
+    private array $changes = [];
 
     public function __construct()
     {
@@ -313,7 +313,7 @@ class Stat
      */
     public function isRead()
     {
-        return $this->getIsRead();
+        return $this->isRead;
     }
 
     /**
@@ -418,7 +418,7 @@ class Stat
      */
     public function isFailed()
     {
-        return $this->getIsFailed();
+        return $this->isFailed;
     }
 
     /**
@@ -512,10 +512,8 @@ class Stat
 
     /**
      * @param int $openCount
-     *
-     * @return Stat
      */
-    public function setOpenCount($openCount)
+    public function setOpenCount($openCount): static
     {
         $this->addChange('openCount', $this->openCount, $openCount);
         $this->openCount = $openCount;
@@ -528,7 +526,7 @@ class Stat
      */
     public function addOpenDetails($details): void
     {
-        if (self::MAX_OPEN_DETAILS > $this->getOpenCount()) {
+        if (self::MAX_OPEN_DETAILS > $this->openCount) {
             $this->openDetails[] = $details;
         }
 
@@ -537,10 +535,8 @@ class Stat
 
     /**
      * Up the sent count.
-     *
-     * @return Stat
      */
-    public function upOpenCount()
+    public function upOpenCount(): static
     {
         $count = (int) $this->openCount + 1;
         $this->addChange('openCount', $this->openCount, $count);
@@ -571,10 +567,7 @@ class Stat
         return $this->openDetails;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setOpenDetails(array $openDetails)
+    public function setOpenDetails(array $openDetails): static
     {
         $this->openDetails = $openDetails;
 
@@ -589,10 +582,7 @@ class Stat
         return $this->storedCopy;
     }
 
-    /**
-     * @return Stat
-     */
-    public function setStoredCopy(Copy $storedCopy)
+    public function setStoredCopy(Copy $storedCopy): static
     {
         $this->storedCopy = $storedCopy;
 
@@ -600,7 +590,7 @@ class Stat
     }
 
     /**
-     * @return ArrayCollection|EmailReply[]
+     * @return ArrayCollection<int, EmailReply>
      */
     public function getReplies()
     {
@@ -637,7 +627,7 @@ class Stat
     /**
      * @param \DateTime|\DateTimeImmutable|null $dateTime
      */
-    private function toDateTime($dateTime): ?\DateTime
+    private function toDateTime(?\DateTimeInterface $dateTime): ?\DateTime
     {
         return $dateTime instanceof \DateTimeImmutable ? \DateTime::createFromImmutable($dateTime) : $dateTime;
     }

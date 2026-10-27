@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -35,18 +37,6 @@ return [
                 'mautic.dashboard.menu.index' => [
                     'route'     => 'mautic_dashboard_index',
                     'iconClass' => 'ri-funds-fill',
-                ],
-            ],
-        ],
-    ],
-    'services' => [
-        'other' => [
-            'mautic.dashboard.widget' => [
-                'class'     => Mautic\DashboardBundle\Dashboard\Widget::class,
-                'arguments' => [
-                    'mautic.dashboard.model.dashboard',
-                    'mautic.helper.user',
-                    'request_stack',
                 ],
             ],
         ],

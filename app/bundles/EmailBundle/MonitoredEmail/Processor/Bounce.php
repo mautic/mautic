@@ -93,7 +93,7 @@ class Bounce implements ProcessorInterface
         return true;
     }
 
-    protected function updateStat(Stat $stat, BouncedEmail $bouncedEmail)
+    protected function updateStat(Stat $stat, BouncedEmail $bouncedEmail): void
     {
         $dtHelper    = new DateTimeHelper();
         $openDetails = $stat->getOpenDetails();

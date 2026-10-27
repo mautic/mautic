@@ -2,11 +2,13 @@
 
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Form\Type\AssetListType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Form\Type\PageListType;
 use MauticPlugin\MauticSocialBundle\Entity\Tweet;
 use Symfony\Component\Form\AbstractType;
@@ -21,10 +23,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<Tweet>
  */
-class TweetType extends AbstractType
+final class TweetType extends AbstractType
 {
     public function __construct(
-        protected EntityManager $em,
+        private readonly EntityManagerInterface $em,
     ) {
     }
 
@@ -36,16 +38,14 @@ class TweetType extends AbstractType
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.name',
                 'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'tooltip' => 'mautic.social.monitoring.twitter.tweet.name.tooltip',
                     'class'   => 'form-control',
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.name.required',
-                        ]
+                        message: 'mautic.core.name.required'
                     ),
                 ],
             ]
@@ -57,7 +57,7 @@ class TweetType extends AbstractType
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.description',
                 'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'tooltip' => 'mautic.social.monitoring.twitter.tweet.description.tooltip',
                     'class'   => 'form-control',
@@ -71,22 +71,20 @@ class TweetType extends AbstractType
             [
                 'label'      => 'mautic.social.monitoring.twitter.tweet.text',
                 'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'tooltip' => 'mautic.social.monitoring.twitter.tweet.text.tooltip',
                     'class'   => 'form-control tweet-message',
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\AssetBundle\Entity\Asset::class, 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, Asset::class, 'id');
         $builder->add(
             $builder->create(
                 'asset',
@@ -94,7 +92,7 @@ class TweetType extends AbstractType
                 [
                     'label'       => 'mautic.social.monitoring.twitter.assets',
                     'placeholder' => 'mautic.social.monitoring.list.choose',
-                    'label_attr'  => ['class' => 'control-label'],
+                    'label_attr'  => ['class' => 'form-label'],
                     'multiple'    => false,
                     'attr'        => [
                         'class'   => 'form-control tweet-insert-asset',
@@ -104,7 +102,7 @@ class TweetType extends AbstractType
             )->addModelTransformer($transformer)
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class, 'id');
+        $transformer = new IdToEntityModelTransformer($this->em, Page::class, 'id');
         $builder->add(
             $builder->create(
                 'page',
@@ -112,7 +110,7 @@ class TweetType extends AbstractType
                 [
                     'label'       => 'mautic.social.monitoring.twitter.pages',
                     'placeholder' => 'mautic.social.monitoring.list.choose',
-                    'label_attr'  => ['class' => 'control-label'],
+                    'label_attr'  => ['class' => 'form-label'],
                     'multiple'    => false,
                     'attr'        => [
                         'class'   => 'form-control tweet-insert-page',

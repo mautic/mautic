@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Exception;
 
-class PrivateAddressException extends \Exception
+final class PrivateAddressException extends \Exception
 {
     private const DEFAULT_MESSAGE = 'Access to private addresses is not allowed.';
 

@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SetContactAvatarFormSubscriber implements EventSubscriberInterface
+final readonly class SetContactAvatarFormSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private AvatarHelper $avatarHelper,
@@ -39,26 +39,23 @@ class SetContactAvatarFormSubscriber implements EventSubscriberInterface
 
         /** @var Field $field */
         foreach ($fields as $field) {
-            switch ($field->getType()) {
-                case 'file':
-                    $properties = $field->getProperties();
-                    if (empty($properties[FormFieldFileType::PROPERTY_PREFERED_PROFILE_IMAGE])) {
-                        break;
-                    }
-                    if (empty($results[$field->getAlias()])) {
-                        break;
-                    }
-                    try {
-                        $filePath = $this->uploader->getCompleteFilePath($field, $results[$field->getAlias()]);
-                        $this->avatarHelper->createAvatarFromFile($contact, $filePath);
-                        $contact->setPreferredProfileImage('custom');
-                        $this->leadModel->saveEntity($contact);
-
-                        return;
-                    } catch (\Exception) {
-                    }
-
+            if ('file' === $field->getType()) {
+                $properties = $field->getProperties();
+                if (empty($properties[FormFieldFileType::PROPERTY_PREFERED_PROFILE_IMAGE])) {
                     break;
+                }
+                if (empty($results[$field->getAlias()])) {
+                    break;
+                }
+                try {
+                    $filePath = $this->uploader->getCompleteFilePath($field, $results[$field->getAlias()]);
+                    $this->avatarHelper->createAvatarFromFile($contact, $filePath);
+                    $contact->setPreferredProfileImage('custom');
+                    $this->leadModel->saveEntity($contact);
+
+                    return;
+                } catch (\Exception) {
+                }
             }
         }
     }

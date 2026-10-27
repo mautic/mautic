@@ -5,7 +5,7 @@ namespace Mautic\NotificationBundle\Controller;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Response;
 
-class JsController extends CommonController
+final class JsController extends CommonController
 {
     /**
      * We can't user JsonResponse here, because

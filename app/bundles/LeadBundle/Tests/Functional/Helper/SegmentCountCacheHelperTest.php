@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\Functional\Helper;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
-use PHPUnit\Framework\Assert;
 
 final class SegmentCountCacheHelperTest extends MauticMysqlTestCase
 {
@@ -26,45 +25,45 @@ final class SegmentCountCacheHelperTest extends MauticMysqlTestCase
 
     public function testWorkflowForSegmentCount(): void
     {
-        Assert::assertSame(0, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
-        Assert::assertFalse($this->segmentCountCacheHelper->hasSegmentContactCount(self::SEGMENT_ID));
+        $this->assertSame(0, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
+        $this->assertFalse($this->segmentCountCacheHelper->hasSegmentContactCount(self::SEGMENT_ID));
 
         $this->segmentCountCacheHelper->setSegmentContactCount(self::SEGMENT_ID, 100);
-        Assert::assertSame(100, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
-        Assert::assertTrue($this->segmentCountCacheHelper->hasSegmentContactCount(self::SEGMENT_ID));
+        $this->assertSame(100, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
+        $this->assertTrue($this->segmentCountCacheHelper->hasSegmentContactCount(self::SEGMENT_ID));
 
         $this->segmentCountCacheHelper->incrementSegmentContactCount(self::SEGMENT_ID);
-        Assert::assertSame(101, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
+        $this->assertSame(101, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
 
         $this->segmentCountCacheHelper->decrementSegmentContactCount(self::SEGMENT_ID);
-        Assert::assertSame(100, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
+        $this->assertSame(100, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
 
         $this->segmentCountCacheHelper->deleteSegmentContactCount(self::SEGMENT_ID);
-        Assert::assertSame(0, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
-        Assert::assertFalse($this->segmentCountCacheHelper->hasSegmentContactCount(self::SEGMENT_ID));
+        $this->assertSame(0, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
+        $this->assertFalse($this->segmentCountCacheHelper->hasSegmentContactCount(self::SEGMENT_ID));
     }
 
     public function testDecrementCannotGoNegative(): void
     {
-        Assert::assertSame(0, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
+        $this->assertSame(0, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
 
         // Ensure we cannot decrement bellow zero.
         $this->segmentCountCacheHelper->decrementSegmentContactCount(self::SEGMENT_ID);
-        Assert::assertSame(0, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
+        $this->assertSame(0, $this->segmentCountCacheHelper->getSegmentContactCount(self::SEGMENT_ID));
     }
 
     public function testWorkflowForSegmentReount(): void
     {
-        Assert::assertFalse($this->segmentCountCacheHelper->hasSegmentIdForReCount(self::SEGMENT_ID));
+        $this->assertFalse($this->segmentCountCacheHelper->hasSegmentIdForReCount(self::SEGMENT_ID));
 
         $this->segmentCountCacheHelper->invalidateSegmentContactCount(self::SEGMENT_ID);
 
-        Assert::assertTrue($this->segmentCountCacheHelper->hasSegmentIdForReCount(self::SEGMENT_ID));
+        $this->assertTrue($this->segmentCountCacheHelper->hasSegmentIdForReCount(self::SEGMENT_ID));
 
         // Setting the count will delete the invalidation.
         $this->segmentCountCacheHelper->setSegmentContactCount(self::SEGMENT_ID, 100);
 
-        Assert::assertFalse($this->segmentCountCacheHelper->hasSegmentIdForReCount(self::SEGMENT_ID));
+        $this->assertFalse($this->segmentCountCacheHelper->hasSegmentIdForReCount(self::SEGMENT_ID));
 
         // Cleanup.
         $this->segmentCountCacheHelper->deleteSegmentContactCount(self::SEGMENT_ID);

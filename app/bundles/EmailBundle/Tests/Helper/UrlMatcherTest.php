@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Helper;
 
 use Mautic\EmailBundle\Helper\UrlMatcher;
 
-class UrlMatcherTest extends \PHPUnit\Framework\TestCase
+final class UrlMatcherTest extends \PHPUnit\Framework\TestCase
 {
     public function testUrlIsFound(): void
     {
@@ -70,6 +72,36 @@ class UrlMatcherTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->assertFalse(UrlMatcher::hasMatch($urls, 'https://yahoo.com'));
+    }
+
+    public function testEmptyUrlFilterIsIgnored(): void
+    {
+        $urls = [
+            'http://google.com',
+            'product/123',
+            '//google.com/hello',
+            '',
+        ];
+
+        $this->assertFalse(UrlMatcher::hasMatch($urls, 'https://yahoo.com'));
+    }
+
+    public function testPlainTextMatchesWithinUrl(): void
+    {
+        $urls = [
+            'product/123',
+        ];
+
+        $this->assertTrue(UrlMatcher::hasMatch($urls, 'https://example.com/product/1234'));
+    }
+
+    public function testLegacyWildcardPatternStillMatches(): void
+    {
+        $urls = [
+            '*product/123*',
+        ];
+
+        $this->assertTrue(UrlMatcher::hasMatch($urls, 'https://example.com/product/1234'));
     }
 
     public function testFTPSchemeMisMatch(): void

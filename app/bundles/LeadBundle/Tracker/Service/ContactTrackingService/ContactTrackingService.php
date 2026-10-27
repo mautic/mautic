@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * Used to ensure that contacts tracked under the old method are continued to be tracked under the new.
  */
-final class ContactTrackingService implements ContactTrackingServiceInterface
+final readonly class ContactTrackingService implements ContactTrackingServiceInterface
 {
     public function __construct(
         private CookieHelper $cookieHelper,
@@ -69,7 +69,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
     /**
      * @return string|null
      */
-    public function getTrackedIdentifier()
+    public function getTrackedIdentifier(): mixed
     {
         return $this->cookieHelper->getCookie('mautic_session_id');
     }

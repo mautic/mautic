@@ -15,7 +15,7 @@ use Doctrine\DBAL\Platforms\SQLServerPlatform;
 /**
  * A workaround for deprecated \Doctrine\DBAL\Platforms\AbstractPlatform::getName.
  */
-class DatabasePlatform
+final class DatabasePlatform
 {
     public static function getDatabasePlatform(AbstractPlatform $platform): string
     {

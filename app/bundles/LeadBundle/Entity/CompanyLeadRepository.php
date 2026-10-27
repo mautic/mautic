@@ -51,9 +51,6 @@ class CompanyLeadRepository extends CommonRepository
         parent::saveEntities($entities);
     }
 
-    /**
-     * Get companies by leadId.
-     */
     public function getCompaniesByLeadId($leadId, $companyId = null, ?bool $onlyPrimary = null): array
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
@@ -88,7 +85,7 @@ class CompanyLeadRepository extends CommonRepository
     {
         $ids = array_filter($ids);
 
-        if (!$ids) {
+        if ([] === $ids) {
             return [];
         }
 
@@ -173,7 +170,7 @@ class CompanyLeadRepository extends CommonRepository
 
         $result = $q->executeQuery()->fetchAllAssociative();
 
-        return !empty($result) ? $result[0] : [];
+        return $result[0] ?? [];
     }
 
     /**

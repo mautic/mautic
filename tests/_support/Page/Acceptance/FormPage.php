@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Page\Acceptance;
 
-class FormPage
+final class FormPage
 {
     public static string $URL                                   = '/s/forms/new';
 

@@ -231,11 +231,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public static function loadValidatorMetaData(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new NotBlank(['message' => 'mautic.core.name.required']));
+        $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
         $metadata->addPropertyConstraint('content', new NoNesting());
 
-        $metadata->addPropertyConstraint('type', new NotBlank(['message' => 'mautic.core.type.required']));
-        $metadata->addPropertyConstraint('type', new Choice(['choices' => (new TypeList())->getChoices()]));
+        $metadata->addPropertyConstraint('type', new NotBlank(message: 'mautic.core.type.required'));
+        $metadata->addPropertyConstraint('type', new Choice(choices: (new TypeList())->getChoices()));
 
         $metadata->addConstraint(new SlotNameType());
 
@@ -247,9 +247,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                         $dwc->getSlotName(),
                         [
                             new NotBlank(
-                                [
-                                    'message' => 'mautic.dynamicContent.slot_name.notblank',
-                                ]
+                                message: 'mautic.dynamicContent.slot_name.notblank'
                             ),
                         ]
                     );
@@ -261,12 +259,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                     $violations = $validator->validate(
                         $dwc->getFilters(),
                         [
-                            new Count(
-                                [
-                                    'minMessage' => 'mautic.dynamicContent.filter.options.empty',
-                                    'min'        => 1,
-                                ]
-                            ),
+                            new Count(min: 1, minMessage: 'mautic.dynamicContent.filter.options.empty'),
                         ]
                     );
                     foreach ($violations as $violation) {
@@ -307,10 +300,10 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         self::addProjectsInLoadApiMetadata($metadata, 'dwc');
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
 
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
@@ -336,10 +329,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->name;
     }
 
-    /**
-     * @return $this
-     */
-    public function setName(?string $name)
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -352,10 +342,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->description;
     }
 
-    /**
-     * @return $this
-     */
-    public function setDescription(?string $description)
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
@@ -379,10 +366,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this->category;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCategory(?Category $category)
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -400,10 +384,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param \DateTime $publishUp
-     *
-     * @return $this
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -421,10 +403,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param \DateTime $publishDown
-     *
-     * @return $this
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -442,10 +422,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param string $content
-     *
-     * @return $this
      */
-    public function setContent($content)
+    public function setContent($content): static
     {
         $this->isChanged('content', $content);
         $this->content = $content;
@@ -463,10 +441,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $includeVariants ? $this->getAccumulativeTranslationCount('getSentCount') : $this->sentCount;
     }
 
-    /**
-     * @return $this
-     */
-    public function setSentCount($sentCount)
+    public function setSentCount($sentCount): static
     {
         $this->sentCount = $sentCount;
 
@@ -491,10 +466,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param bool $isCampaignBased
-     *
-     * @return $this
      */
-    public function setIsCampaignBased($isCampaignBased)
+    public function setIsCampaignBased($isCampaignBased): static
     {
         $this->isChanged('isCampaignBased', $isCampaignBased);
         $this->isCampaignBased = $isCampaignBased;
@@ -512,10 +485,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
 
     /**
      * @param string $slotName
-     *
-     * @return $this
      */
-    public function setSlotName($slotName)
+    public function setSlotName($slotName): static
     {
         $this->isChanged('slotName', $slotName);
         $this->slotName = $slotName;
@@ -528,15 +499,12 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public function cleanSlotName(): void
     {
-        if ($this->getIsCampaignBased()) {
+        if ($this->isCampaignBased) {
             $this->setSlotName('');
         }
     }
 
-    /**
-     * @return DynamicContent
-     */
-    public function setUtmTags(array $utmTags)
+    public function setUtmTags(array $utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;

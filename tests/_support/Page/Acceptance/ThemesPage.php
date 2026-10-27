@@ -2,7 +2,7 @@
 
 namespace Page\Acceptance;
 
-class ThemesPage
+final class ThemesPage
 {
     public static $URL = '/s/themes';
 

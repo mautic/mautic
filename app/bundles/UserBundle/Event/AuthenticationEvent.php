@@ -26,6 +26,8 @@ class AuthenticationEvent extends Event
      */
     protected $isAuthenticated = false;
 
+    private bool $isSupportUser = false;
+
     /**
      * @var bool
      */
@@ -169,6 +171,22 @@ class AuthenticationEvent extends Event
     }
 
     /**
+     * Check if the user is a support user.
+     */
+    public function isSupportUser(): bool
+    {
+        return $this->isSupportUser;
+    }
+
+    /**
+     * Set if this user is a support user.
+     */
+    public function setIsSupportUser(bool $isSupportUser): void
+    {
+        $this->isSupportUser = $isSupportUser;
+    }
+
+    /**
      * Prevent any other authentication method from authorizing the user.
      * Mainly used to prevent a form login from trying to auth with the given password for a local user (think two-factor requirements).
      */
@@ -239,9 +257,6 @@ class AuthenticationEvent extends Event
         return $this->response;
     }
 
-    /**
-     * Get the request.
-     */
     public function getRequest(): Request
     {
         return $this->request;

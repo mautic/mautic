@@ -31,10 +31,7 @@ class UserProvider implements UserProviderInterface
     ) {
     }
 
-    /**
-     * @param string $username
-     */
-    public function loadUserByUsername($username): User
+    public function loadUserByUsername(string $username): User
     {
         return $this->loadUserByIdentifier($username);
     }
@@ -101,7 +98,6 @@ class UserProvider implements UserProviderInterface
             }
         }
 
-        // Validation for User objects returned by a plugin
         if (!$user->getRole()) {
             throw new AuthenticationException('mautic.integration.sso.error.no_role');
         }

@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class AbstractReportSubscriberTestCase extends MauticMysqlTestCase
 {
     protected $useCleanupRollback   = false;
+
     protected bool $authenticateApi = true;
 
     /**
@@ -49,7 +50,7 @@ abstract class AbstractReportSubscriberTestCase extends MauticMysqlTestCase
      */
     public function verifyReport(int $reportId, array $expected): void
     {
-        $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/$reportId");
+        $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$reportId}");
         $this->assertResponseIsSuccessful();
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
 
@@ -57,7 +58,7 @@ abstract class AbstractReportSubscriberTestCase extends MauticMysqlTestCase
         $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
 
         // remove row numbers
-        $resultReportTable = array_map(function ($subArray) {
+        $resultReportTable = array_map(function (array $subArray): array {
             array_shift($subArray);
 
             return $subArray;
@@ -141,7 +142,7 @@ abstract class AbstractReportSubscriberTestCase extends MauticMysqlTestCase
      */
     private function domTableToArray(Crawler $crawler): array
     {
-        $table = $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td) => trim($td->text())));
+        $table = $crawler->filter('tr')->each(fn ($tr) => $tr->filter('td')->each(fn ($td): string => trim($td->text())));
         array_shift($table);
         array_pop($table);
 

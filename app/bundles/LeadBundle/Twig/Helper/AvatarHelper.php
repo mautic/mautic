@@ -17,10 +17,10 @@ final class AvatarHelper
     private array $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
 
     public function __construct(
-        private AssetsHelper $assetsHelper,
-        private PathsHelper $pathsHelper,
-        private GravatarHelper $gravatarHelper,
-        private DefaultAvatarHelper $defaultAvatarHelper,
+        private readonly AssetsHelper $assetsHelper,
+        private readonly PathsHelper $pathsHelper,
+        private readonly GravatarHelper $gravatarHelper,
+        private readonly DefaultAvatarHelper $defaultAvatarHelper,
     ) {
     }
 
@@ -88,8 +88,6 @@ final class AvatarHelper
     }
 
     /**
-     * Get avatar path.
-     *
      * @param bool $absolute
      */
     public function getAvatarPath($absolute = false): string

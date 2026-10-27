@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment\DoNotContact;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
 
-class DoNotContactParts
+final class DoNotContactParts
 {
     private string $channel = 'email';
 

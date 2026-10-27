@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Exception;
 
-class FailedToSendToContactException extends \Exception
+final class FailedToSendToContactException extends \Exception
 {
 }

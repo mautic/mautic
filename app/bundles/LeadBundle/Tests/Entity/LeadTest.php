@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -8,10 +10,9 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
-class LeadTest extends TestCase
+final class LeadTest extends TestCase
 {
     use RequestTrait;
 
@@ -80,7 +81,7 @@ class LeadTest extends TestCase
         $lead->addDoNotContactEntry($dnc);
 
         $channelRules = Lead::generateChannelRules($lead->getFrequencyRules()->toArray(), $lead->getDoNotContact()->toArray());
-        $this->assertEquals(['channel2', 'channel3', 'channel5', 'channel6', 'channel1', 'channel4'], array_keys($channelRules));
+        $this->assertSame(['channel2', 'channel3', 'channel5', 'channel6', 'channel1', 'channel4'], array_keys($channelRules));
     }
 
     public function testAdjustPoints(): void
@@ -268,8 +269,8 @@ class LeadTest extends TestCase
         $lead->addUpdatedField('email', $email);
         $changes = $lead->getChanges();
 
-        $this->assertFalse(empty($changes['email']));
-        $this->assertFalse(empty($changes['fields']['email']));
+        $this->assertNotEmpty($changes['email']);
+        $this->assertNotEmpty($changes['fields']['email']);
 
         $this->assertEquals($email, $changes['email'][1]);
         $this->assertEquals($email, $changes['fields']['email'][1]);
@@ -311,9 +312,9 @@ class LeadTest extends TestCase
         $lead->addEventLog((new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2018-01-01')));
         $lead->addEventLog($lastSecond = (new LeadEventLog())->setAction('second')->setDateAdded(new \DateTime('2019-01-01')));
 
-        Assert::assertSame($lastFirst, $lead->getLastEventLogByAction('first'));
-        Assert::assertSame($lastSecond, $lead->getLastEventLogByAction('second'));
-        Assert::assertNull($lead->getLastEventLogByAction('third'));
+        $this->assertSame($lastFirst, $lead->getLastEventLogByAction('first'));
+        $this->assertSame($lastSecond, $lead->getLastEventLogByAction('second'));
+        $this->assertNotInstanceOf(LeadEventLog::class, $lead->getLastEventLogByAction('third'));
     }
 
     /**

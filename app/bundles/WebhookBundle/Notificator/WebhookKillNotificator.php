@@ -11,8 +11,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class WebhookKillNotificator
 {
     public function __construct(
-        private WebhookNotificationSender $sender,
-        private TranslatorInterface $translator,
+        private readonly WebhookNotificationSender $sender,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 

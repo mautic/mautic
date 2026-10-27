@@ -7,10 +7,9 @@ namespace Mautic\CampaignBundle\Tests\Functional\Controller;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 
-class CampaignEventStatsTest extends MauticMysqlTestCase
+final class CampaignEventStatsTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
@@ -55,14 +54,14 @@ class CampaignEventStatsTest extends MauticMysqlTestCase
             ],
         ];
 
-        Assert::assertSame($expectedEventsStatistics, $eventsStatistics);
+        $this->assertSame($expectedEventsStatistics, $eventsStatistics);
 
         $this->createCampaignLeadEventLog($lead, $campaignEvent2, $campaign, 1);
 
         $this->em->flush();
 
         $eventsStatistics         = $this->getEventsStatistics($campaign);
-        Assert::assertSame($expectedEventsStatistics, $eventsStatistics);
+        $this->assertSame($expectedEventsStatistics, $eventsStatistics);
 
         sleep(5);
 
@@ -81,7 +80,7 @@ class CampaignEventStatsTest extends MauticMysqlTestCase
             ],
         ];
 
-        Assert::assertSame($expectedEventsStatistics, $eventsStatistics);
+        $this->assertSame($expectedEventsStatistics, $eventsStatistics);
     }
 
     private function getTestCrawler(Campaign $campaign): Crawler

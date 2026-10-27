@@ -17,26 +17,36 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Stats\EmailDependencies;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Contracts\Service\Attribute\Required;
 use Twig\Environment;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
     use AjaxLookupControllerTrait;
+
+    private EmailModel $emailModel;
+
+    #[Required]
+    public function autowireEmailAjaxController(
+        EmailModel $emailModel,
+    ): void {
+        $this->emailModel = $emailModel;
+    }
 
     public function getAbTestFormAction(Request $request, FormFactoryInterface $formFactory, EmailModel $emailModel, Environment $twig): JsonResponse
     {
         return $this->sendJsonResponse($this->getAbTestForm(
             $request,
             $emailModel,
-            fn ($formType, $formOptions): \Symfony\Component\Form\FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
-            fn ($form): string                                                  => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
+            fn ($formType, $formOptions): FormInterface => $formFactory->create(AbTestPropertiesType::class, [], ['formType' => $formType, 'formTypeOptions' => $formOptions]),
+            fn (FormInterface $form): string => $this->renderView('@MauticEmail/AbTest/form.html.twig', ['form' => $this->setFormTheme($form, $twig, ['@MauticEmail/AbTest/form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig'])]),
             'email_abtest_settings',
             'emailform'
         ));
@@ -45,14 +55,11 @@ class AjaxController extends CommonAjaxController
     public function sendBatchAction(Request $request): JsonResponse
     {
         $dataArray = ['success' => 0];
-
-        /** @var EmailModel $model */
-        $model    = $this->getModel('email');
         $objectId = $request->request->get('id', 0);
         $pending  = $request->request->get('pending', 0);
         $limit    = $request->request->get('batchlimit', 100);
 
-        if ($objectId && $entity = $model->getEntity($objectId)) {
+        if ($objectId && $entity = $this->emailModel->getEntity($objectId)) {
             $dataArray['success'] = 1;
             $session              = $request->getSession();
             $progress             = $session->get('mautic.email.send.progress', [0, (int) $pending]);
@@ -61,7 +68,7 @@ class AjaxController extends CommonAjaxController
 
             if ($pending && !$inProgress && $entity->isPublished()) {
                 $session->set('mautic.email.send.active', true);
-                [$batchSentCount, $batchFailedCount, $batchFailedRecipients] = $model->sendEmailToLists($entity, null, $limit);
+                [$batchSentCount, $batchFailedCount, $batchFailedRecipients] = $this->emailModel->sendEmailToLists($entity, null, $limit);
 
                 $progress[0] += ($batchSentCount + $batchFailedCount);
                 $stats['sent'] += $batchSentCount;
@@ -91,10 +98,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getBuilderTokens($query)
     {
-        /** @var EmailModel $model */
-        $model = $this->getModel('email');
-
-        return $model->getBuilderComponents(null, ['tokens'], (string) $query);
+        return $this->emailModel->getBuilderComponents(null, ['tokens'], (string) $query);
     }
 
     public function generatePlaintTextAction(Request $request): JsonResponse
@@ -148,7 +152,7 @@ class AjaxController extends CommonAjaxController
                 if (!empty($folders)) {
                     $dataArray['folders'] = '';
                     foreach ($folders as $folder) {
-                        $dataArray['folders'] .= "<option value=\"$folder\">$folder</option>\n";
+                        $dataArray['folders'] .= "<option value=\"{$folder}\">{$folder}</option>\n";
                     }
                 }
                 $dataArray['success'] = 1;
@@ -161,7 +165,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    public function sendTestEmailAction(TransportInterface $transport, UserHelper $userHelper, CoreParametersHelper $parametersHelper): Response
+    public function sendTestEmailAction(TransportInterface $transport, UserHelper $userHelper, CoreParametersHelper $parametersHelper): JsonResponse
     {
         $user  = $userHelper->getUser();
         $email = (new MauticMessage())
@@ -185,9 +189,6 @@ class AjaxController extends CommonAjaxController
 
     public function getEmailCountStatsAction(Request $request): JsonResponse
     {
-        /** @var EmailModel $model */
-        $model = $this->getModel('email');
-
         $id  = $request->query->get('id');
         $ids = $request->query->all()['ids'] ?? [];
 
@@ -198,9 +199,9 @@ class AjaxController extends CommonAjaxController
 
         $data = [];
         foreach ($ids as $id) {
-            if ($email = $model->getEntity($id)) {
-                $pending = $model->getPendingLeads($email, null, true);
-                $queued  = $model->getQueuedCounts($email);
+            if ($email = $this->emailModel->getEntity($id)) {
+                $pending = $this->emailModel->getPendingLeads($email, null, true);
+                $queued  = $this->emailModel->getQueuedCounts($email);
 
                 $data[] = [
                     'id'          => $email->getId(),
@@ -246,17 +247,14 @@ class AjaxController extends CommonAjaxController
         if ($cacheItem->isHit()) {
             $deliveredCount = $cacheItem->get();
         } else {
-            /** @var EmailModel $model */
-            $model = $this->getModel('email');
-
-            $email = $model->getEntity($emailId);
+            $email = $this->emailModel->getEntity($emailId);
             if (null === $email) {
                 return $this->sendJsonResponse([
                     'success' => 0,
                     'message' => $this->translator->trans('mautic.api.call.notfound'),
                 ], 404);
             }
-            $deliveredCount = $model->getDeliveredCount($email);
+            $deliveredCount = $this->emailModel->getDeliveredCount($email);
             $cacheItem->set($deliveredCount);
             $cacheItem->expiresAfter($cacheTimeout * 60);
             $cacheProvider->save($cacheItem);

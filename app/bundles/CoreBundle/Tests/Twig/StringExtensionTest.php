@@ -8,10 +8,12 @@ use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 use Twig\Extra\String\StringExtension;
 use Twig\Loader\ArrayLoader;
+use Twig\TwigFilter;
 
 final class StringExtensionTest extends TestCase
 {
     private Environment $twig;
+
     private StringExtension $extension;
 
     protected function setUp(): void
@@ -32,34 +34,34 @@ final class StringExtensionTest extends TestCase
     {
         $result = $this->extension->createUnicodeString('Hello World');
 
-        self::assertSame('Hello World', $result->toString());
+        $this->assertSame('Hello World', $result->toString());
     }
 
     public function testUFilterInTwig(): void
     {
         $result = $this->twig->render('upper');
 
-        self::assertSame('HELLO WORLD', $result);
+        $this->assertSame('HELLO WORLD', $result);
     }
 
     public function testTruncateInTwig(): void
     {
         $result = $this->twig->render('truncate');
 
-        self::assertSame('This is...', $result);
+        $this->assertSame('This is...', $result);
     }
 
     public function testSlugFilter(): void
     {
         $result = $this->twig->render('slug');
 
-        self::assertSame('Hello-World', $result);
+        $this->assertSame('Hello-World', $result);
     }
 
     public function testGetFiltersContainsUFilter(): void
     {
-        $filterNames = array_map(static fn ($filter) => $filter->getName(), $this->extension->getFilters());
+        $filterNames = array_map(static fn (TwigFilter $filter): string => $filter->getName(), $this->extension->getFilters());
 
-        self::assertContains('u', $filterNames);
+        $this->assertContains('u', $filterNames);
     }
 }

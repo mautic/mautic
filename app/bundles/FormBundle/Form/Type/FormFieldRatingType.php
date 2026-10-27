@@ -18,8 +18,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class FormFieldRatingType extends AbstractType
 {
-    public function __construct(private TranslatorInterface $translator)
-    {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -29,7 +30,7 @@ final class FormFieldRatingType extends AbstractType
             IntegerType::class,
             [
                 'label'      => 'mautic.form.field.form.rating_star_count',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.form.field.help.rating_star_count',
@@ -46,7 +47,7 @@ final class FormFieldRatingType extends AbstractType
             ChoiceType::class,
             [
                 'label'      => 'mautic.form.field.form.rating_symbol',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'choices'    => [
                     $this->translator->trans('mautic.form.field.form.rating_symbol.star_filled_label')     => '★',
                     $this->translator->trans('mautic.form.field.form.rating_symbol.star_filled_alt_label') => '✪',
@@ -71,7 +72,7 @@ final class FormFieldRatingType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.rating_star_color',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control minicolors-input',
                     'tooltip'      => 'mautic.form.field.help.rating_star_color',
@@ -89,7 +90,7 @@ final class FormFieldRatingType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.rating_base_color',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'        => 'form-control minicolors-input',
                     'tooltip'      => 'mautic.form.field.help.rating_base_color',

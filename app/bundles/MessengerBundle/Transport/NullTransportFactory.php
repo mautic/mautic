@@ -11,7 +11,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 /**
  * Needed for the E2E tests.
  */
-class NullTransportFactory implements TransportFactoryInterface
+final class NullTransportFactory implements TransportFactoryInterface
 {
     /**
      * @param mixed[] $options

@@ -18,23 +18,31 @@ final class Version
         public ?string $type,
         public ?string $directoryName,
         public ?string $displayName,
+        public array $extra = [],
+        public array $authors = [],
+        public array $support = [],
+        public array $funding = [],
     ) {
     }
 
-    public static function fromArray(array $array): Version
+    public static function fromArray(array $array): self
     {
         return new self(
             $array['version'],
-            $array['license'],
-            new \DateTimeImmutable($array['time']),
-            $array['homepage'],
+            $array['license'] ?? [],
+            new \DateTimeImmutable($array['time'] ?? 'now'),
+            $array['homepage'] ?? '',
             $array['support']['issues'] ?? '',
             $array['support']['wiki'] ?? '',
             $array['require'] ?? [],
             $array['keywords'] ?? [],
             $array['type'] ?? null,
             $array['extra']['install-directory-name'] ?? null,
-            $array['extra']['display-name'] ?? null
+            $array['extra']['display-name'] ?? $array['extra']['display_name'] ?? null,
+            $array['extra'] ?? [],
+            $array['authors'] ?? [],
+            $array['support'] ?? [],
+            $array['funding'] ?? []
         );
     }
 

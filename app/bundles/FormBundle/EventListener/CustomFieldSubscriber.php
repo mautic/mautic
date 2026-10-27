@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class CustomFieldSubscriber implements EventSubscriberInterface
+final readonly class CustomFieldSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FieldRepository $fieldRepository,

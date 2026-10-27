@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class ScheduleDateRangeValidator extends ConstraintValidator
+final class ScheduleDateRangeValidator extends ConstraintValidator
 {
     public function validate(mixed $value, Constraint $constraint): void
     {

@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CategorySubscriber implements EventSubscriberInterface
+final readonly class CategorySubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private BundleHelper $bundleHelper,
@@ -93,7 +93,7 @@ class CategorySubscriber implements EventSubscriberInterface
             $message = $this->translator->trans(
                 'mautic.category.is_in_use.delete',
                 [
-                    '%entities%'     => implode(', ', array_map(fn ($entity): string => $this->translator->trans($entity['label']).' Id: '.$entity['id'], $usage)),
+                    '%entities%'     => implode(', ', array_map(fn (array $entity): string => $this->translator->trans($entity['label']).' Id: '.$entity['id'], $usage)),
                     '%categoryName%' => $event->getCategory()->getTitle(),
                 ],
                 'validators');

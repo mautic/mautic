@@ -40,3 +40,9 @@ ol ol ol {
 .ck-content p {
   display: block !important;
 }
+
+@media (max-width: 768px) {
+  .gjs-cell, .gjs-cell30, .gjs-cell70 {
+    height: auto !important;
+  }
+}

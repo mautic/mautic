@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class LeadMergeEvent extends Event
+final class LeadMergeEvent extends Event
 {
     public function __construct(
-        private Lead $victor,
-        private Lead $loser,
+        private readonly Lead $victor,
+        private readonly Lead $loser,
     ) {
     }
 

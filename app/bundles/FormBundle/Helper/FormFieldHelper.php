@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FormFieldHelper extends AbstractFormFieldHelper
 {
-    private ValidatorInterface $validator;
+    private readonly ValidatorInterface $validator;
 
     private array $types = [
         'captcha' => [
@@ -78,16 +78,13 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $this->translator = $translator;
 
         if (null === $validator) {
-            $validator = $validator = Validation::createValidator();
+            $validator = Validation::createValidator();
         }
         $this->validator = $validator;
 
         parent::__construct();
     }
 
-    /**
-     * Set the translation key prefix.
-     */
     public function setTranslationKeyPrefix(): void
     {
         $this->translationKeyPrefix = 'mautic.form.field.type.';
@@ -254,12 +251,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         }
     }
 
-    /**
-     * @param string $value
-     *
-     * @return string
-     */
-    public function sanitizeValue($value)
+    public function sanitizeValue(mixed $value): mixed
     {
         $valueType = gettype($value);
         $value     = str_replace(['"', '>', '<'], ['&quot;', '&gt;', '&lt;'], strip_tags(rawurldecode($value)));

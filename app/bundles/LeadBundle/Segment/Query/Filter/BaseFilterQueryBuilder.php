@@ -13,7 +13,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
 {
     public function __construct(
         private RandomParameterName $parameterNameGenerator,
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -50,10 +50,7 @@ class BaseFilterQueryBuilder implements FilterQueryBuilderInterface
         return $queryBuilder;
     }
 
-    /**
-     * @return BaseFilterQueryBuilder
-     */
-    public function setParameterNameGenerator(RandomParameterName $parameterNameGenerator)
+    public function setParameterNameGenerator(RandomParameterName $parameterNameGenerator): static
     {
         $this->parameterNameGenerator = $parameterNameGenerator;
 

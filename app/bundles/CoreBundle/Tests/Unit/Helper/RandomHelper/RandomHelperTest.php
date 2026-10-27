@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper\RandomHelper;
 
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelper;
 
-class RandomHelperTest extends \PHPUnit\Framework\TestCase
+final class RandomHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * Based on https://github.com/nette/utils/blob/master/tests/Utils/Random.generate().phpt.
@@ -36,10 +38,7 @@ class RandomHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @return RandomHelper
-     */
-    private function getRandomHelper()
+    private function getRandomHelper(): RandomHelper
     {
         return new RandomHelper();
     }

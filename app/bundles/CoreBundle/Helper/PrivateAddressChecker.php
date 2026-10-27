@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-class PrivateAddressChecker
+final class PrivateAddressChecker
 {
     private const PRIVATE_IP_RANGES = [
         '10.0.0.0/8',      // RFC1918
@@ -17,7 +17,9 @@ class PrivateAddressChecker
         '::1/128',         // Localhost IPv6
     ];
 
-    /** @var array<string> */
+    /**
+     * @var array<string>
+     */
     private array $allowedPrivateAddresses = [];
 
     /**
@@ -32,7 +34,7 @@ class PrivateAddressChecker
     /**
      * @param array<string> $allowedPrivateAddresses
      */
-    public function setAllowedPrivateAddresses(array $allowedPrivateAddresses): PrivateAddressChecker
+    public function setAllowedPrivateAddresses(array $allowedPrivateAddresses): self
     {
         $this->allowedPrivateAddresses = $allowedPrivateAddresses;
 
@@ -128,7 +130,7 @@ class PrivateAddressChecker
             }
 
             // If no allowed private addresses are set, all private URLs are forbidden
-            if (empty($this->allowedPrivateAddresses)) {
+            if ([] === $this->allowedPrivateAddresses) {
                 return false;
             }
 
@@ -164,7 +166,7 @@ class PrivateAddressChecker
 
             return false;
         } catch (\Exception $e) {
-            throw new \InvalidArgumentException('URL validation failed: '.$e->getMessage());
+            throw new \InvalidArgumentException('URL validation failed: '.$e->getMessage(), $e->getCode(), $e);
         }
     }
 

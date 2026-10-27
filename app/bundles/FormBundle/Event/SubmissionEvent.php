@@ -72,7 +72,7 @@ class SubmissionEvent extends CommonEvent
         Submission $submission,
         private $post,
         private $server,
-        private Request $request,
+        private readonly Request $request,
     ) {
         $this->entity  = $submission;
     }
@@ -116,10 +116,7 @@ class SubmissionEvent extends CommonEvent
         return $this->results;
     }
 
-    /**
-     * @return SubmissionEvent
-     */
-    public function setResults(array $results)
+    public function setResults(array $results): static
     {
         $this->results = $results;
 
@@ -131,10 +128,7 @@ class SubmissionEvent extends CommonEvent
         return $this->fields;
     }
 
-    /**
-     * @return SubmissionEvent
-     */
-    public function setFields(array $fields)
+    public function setFields(array $fields): static
     {
         $this->fields = $fields;
 
@@ -146,10 +140,7 @@ class SubmissionEvent extends CommonEvent
         return $this->tokens;
     }
 
-    /**
-     * @return SubmissionEvent
-     */
-    public function setTokens(array $tokens)
+    public function setTokens(array $tokens): static
     {
         $this->tokens = $tokens;
 
@@ -161,10 +152,7 @@ class SubmissionEvent extends CommonEvent
         return $this->contactFieldMatches;
     }
 
-    /**
-     * @return SubmissionEvent
-     */
-    public function setContactFieldMatches(array $contactFieldMatches)
+    public function setContactFieldMatches(array $contactFieldMatches): static
     {
         $this->contactFieldMatches = $contactFieldMatches;
 
@@ -185,11 +173,9 @@ class SubmissionEvent extends CommonEvent
     {
         if (null === $key) {
             return $this->feedback;
-        } elseif (isset($this->feedback[$key])) {
-            return $this->feedback[$key];
         }
 
-        return false;
+        return $this->feedback[$key] ?? false;
     }
 
     public function checkContext(string $context): bool
@@ -205,7 +191,7 @@ class SubmissionEvent extends CommonEvent
     public function setAction(?Action $action = null): void
     {
         $this->action = $action;
-        if (!is_null($action)) {
+        if (null !== $action) {
             $this->setContext($action->getType());
         }
     }
@@ -222,10 +208,8 @@ class SubmissionEvent extends CommonEvent
 
     /**
      * Set an post submit callback - include $callback['eventName' => '', 'anythingElse' ...].
-     *
-     * @param string $key
      */
-    public function setPostSubmitCallback($key, array $callback): void
+    public function setPostSubmitCallback(string $key, array $callback): void
     {
         if (!array_key_exists('eventName', $callback)) {
             throw new \InvalidArgumentException('eventName required');
@@ -257,10 +241,8 @@ class SubmissionEvent extends CommonEvent
 
     /**
      * @param mixed $callbackResponse
-     *
-     * @return SubmissionEvent
      */
-    public function setPostSubmitCallbackResponse($key, $callbackResponse)
+    public function setPostSubmitCallbackResponse($key, $callbackResponse): static
     {
         $this->callbackResponses[$key] = $callbackResponse;
 

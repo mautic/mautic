@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -100,8 +102,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int|null
      */
     public function getId()
@@ -110,13 +110,9 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Set bundle.
-     *
      * @param string $bundle
-     *
-     * @return Permission
      */
-    public function setBundle($bundle)
+    public function setBundle($bundle): static
     {
         $this->bundle = $bundle;
 
@@ -124,8 +120,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get bundle.
-     *
      * @return string|null
      */
     public function getBundle()
@@ -134,13 +128,9 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Set bitwise.
-     *
      * @param int $bitwise
-     *
-     * @return Permission
      */
-    public function setBitwise($bitwise)
+    public function setBitwise($bitwise): static
     {
         $this->bitwise = $bitwise;
 
@@ -148,8 +138,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get bitwise.
-     *
      * @return int|null
      */
     public function getBitwise()
@@ -157,12 +145,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
         return $this->bitwise;
     }
 
-    /**
-     * Set role.
-     *
-     * @return Permission
-     */
-    public function setRole(?Role $role = null)
+    public function setRole(?Role $role = null): static
     {
         $this->role = $role;
 
@@ -170,8 +153,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get role.
-     *
      * @return Role|null
      */
     public function getRole()
@@ -180,13 +161,9 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
-     *
-     * @return Permission
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->name = $name;
 
@@ -194,8 +171,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get name.
-     *
      * @return string|null
      */
     public function getName()
@@ -210,6 +185,6 @@ class Permission implements CacheInvalidateInterface, UuidInterface
 
     public function getPermissionUser(): mixed
     {
-        return $this->getRole()->getCreatedBy();
+        return $this->role->getCreatedBy();
     }
 }

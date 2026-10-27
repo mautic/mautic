@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Exception;
 
-class FileInvalidException extends \Exception
+final class FileInvalidException extends \Exception
 {
     private string $messageId = '';
 

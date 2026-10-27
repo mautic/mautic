@@ -55,15 +55,11 @@ final class ProjectEntityLookupLimitTest extends MauticMysqlTestCase
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
 
         $decoded = json_decode($response->getContent(), true);
-        Assert::assertIsArray($decoded, 'Response must be a JSON array.');
+        $this->assertIsArray($decoded, 'Response must be a JSON array.');
 
         $count = count($decoded);
 
         // ✅ Must return exactly 1000 items
-        Assert::assertSame(
-            1000,
-            $count,
-            "AJAX autocomplete search should return exactly 1000 results, got {$count}."
-        );
+        $this->assertSame(1000, $count, "AJAX autocomplete search should return exactly 1000 results, got {$count}.");
     }
 }

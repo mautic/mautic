@@ -12,10 +12,11 @@ use Mautic\CoreBundle\Event\EntityImportUndoEvent;
 use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class CustomFieldImportExportSubscriber implements EventSubscriberInterface
 {
@@ -24,9 +25,10 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
     public function __construct(
         private FieldModel $fieldModel,
         private EntityManagerInterface $entityManager,
+        private LeadFieldRepository $leadFieldRepository,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
-        private DenormalizerInterface $serializer,
+        private ImportEntityDenormalizer $serializer,
     ) {
     }
 
@@ -93,7 +95,7 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
         ];
 
         foreach ($event->getEntityData() as $element) {
-            $field = $this->entityManager->getRepository(LeadField::class)->findOneBy(['uuid' => $element['uuid']]);
+            $field = $this->leadFieldRepository->findOneBy(['uuid' => $element['uuid']]);
             $isNew = !$field;
 
             $field ??= new LeadField();
@@ -143,7 +145,7 @@ final class CustomFieldImportExportSubscriber implements EventSubscriberInterfac
             return;
         }
         foreach ($summary['ids'] as $id) {
-            $entity = $this->entityManager->getRepository(LeadField::class)->find($id);
+            $entity = $this->leadFieldRepository->find($id);
 
             if ($entity) {
                 $this->entityManager->remove($entity);

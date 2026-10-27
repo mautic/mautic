@@ -21,7 +21,7 @@ final class TrackableRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->model = self::getContainer()->get('mautic.page.model.trackable');
+        $this->model = self::getContainer()->get(TrackableModel::class);
     }
 
     public function testGetCount(): void

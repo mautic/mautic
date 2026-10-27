@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class EventType extends AbstractType
+final class EventType extends AbstractType
 {
     use PropertiesTrait;
 
@@ -34,7 +34,7 @@ class EventType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
@@ -81,7 +81,7 @@ class EventType extends AbstractType
                     'choices'           => array_flip($choices),
                     'expanded'          => true,
                     'multiple'          => false,
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'label'             => $label,
                     'placeholder'       => false,
                     'required'          => false,
@@ -137,7 +137,7 @@ class EventType extends AbstractType
                         'mautic.campaign.event.intervalunit.choice.y' => 'y',
                     ],
                     'multiple'          => false,
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'label'             => false,
                     'attr'              => [
                         'class' => 'form-control',
@@ -326,33 +326,38 @@ class EventType extends AbstractType
         }
 
         if (is_array($data[$name]) && array_key_exists('date', $data[$name])) {
-            return $this->parseTimeValue($data[$name]['date']);
-        } elseif (is_string($data[$name])) {
+            $timezone = !empty($data[$name]['timezone'])
+                ? new \DateTimeZone($data[$name]['timezone'])
+                : null;
+
+            return $this->parseTimeValue($data[$name]['date'], $timezone);
+        }
+        if (is_string($data[$name])) {
             return $this->parseTimeValue($data[$name]);
         }
 
         return null;
     }
 
-    private function parseTimeValue(string $value): \DateTime
+    private function parseTimeValue(string $value, ?\DateTimeZone $timezone = null): \DateTime
     {
         $trimmedValue = trim($value);
 
         if (preg_match('/^\d{1,2}$/', $trimmedValue)) {
-            $parsed = \DateTime::createFromFormat('!H', $trimmedValue);
+            $parsed = \DateTime::createFromFormat('!H', $trimmedValue, $timezone);
             if (false !== $parsed) {
                 return $parsed;
             }
         }
 
         if (preg_match('/^\d{1,2}:\d{2}$/', $trimmedValue)) {
-            $parsed = \DateTime::createFromFormat('!H:i', $trimmedValue);
+            $parsed = \DateTime::createFromFormat('!H:i', $trimmedValue, $timezone);
             if (false !== $parsed) {
                 return $parsed;
             }
         }
 
-        return new \DateTime($trimmedValue);
+        return new \DateTime($trimmedValue, $timezone);
     }
 
     public function getBlockPrefix(): string

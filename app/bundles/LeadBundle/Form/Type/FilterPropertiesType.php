@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @extends AbstractType<mixed>
  */
-class FilterPropertiesType extends AbstractType
+final class FilterPropertiesType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {

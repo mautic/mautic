@@ -25,21 +25,21 @@ use Mautic\LeadBundle\Exception\ImportFailedException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 
-class ContactObjectSubscriberTest extends TestCase
+final class ContactObjectSubscriberTest extends TestCase
 {
     /**
-     * @var ContactObjectHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&ContactObjectHelper
      */
     private \PHPUnit\Framework\MockObject\MockObject $contactObjectHelper;
 
     /**
-     * @var Router|\PHPUnit\Framework\MockObject\MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject&Router
      */
     private \PHPUnit\Framework\MockObject\MockObject $router;
 
     private ContactObjectSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -53,7 +53,7 @@ class ContactObjectSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS => ['collectInternalObjects', 0],
                 IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS  => ['updateContacts', 0],
@@ -102,7 +102,7 @@ class ContactObjectSubscriberTest extends TestCase
 
         $event = new InternalObjectUpdateEvent(new Contact(), [123], [$objectChangeDAO]);
 
-        $objectMapping = $this->createMock(UpdatedObjectMappingDAO::class);
+        $objectMapping = $this->createStub(UpdatedObjectMappingDAO::class);
         $this->contactObjectHelper->expects($this->once())
             ->method('update')
             ->with([123], [$objectChangeDAO])
@@ -129,7 +129,7 @@ class ContactObjectSubscriberTest extends TestCase
     {
         $event = new InternalObjectCreateEvent(new Contact(), [['somefield' => 'somevalue']]);
 
-        $objectMapping = $this->createMock(ObjectMapping::class);
+        $objectMapping = $this->createStub(ObjectMapping::class);
         $this->contactObjectHelper->expects($this->once())
             ->method('create')
             ->with([['somefield' => 'somevalue']])
@@ -337,13 +337,13 @@ class ContactObjectSubscriberTest extends TestCase
     {
         $event = new InternalObjectFindByIdEvent(new Contact());
         $event->setId(1);
-        $contactObj = $this->createMock(Lead::class);
+        $contactObj = $this->createStub(Lead::class);
         $this->contactObjectHelper->expects($this->once())
             ->method('findObjectById')
             ->with(1)
             ->willReturn($contactObj);
         $this->subscriber->findContactById($event);
-        self::assertSame($contactObj, $event->getEntity());
+        $this->assertSame($contactObj, $event->getEntity());
     }
 
     /**
@@ -355,7 +355,7 @@ class ContactObjectSubscriberTest extends TestCase
         $this->contactObjectHelper->expects($this->never())
             ->method('findObjectById');
         $this->subscriber->findContactById($event);
-        self::assertNull($event->getEntity());
+        $this->assertNull($event->getEntity());
     }
 
     /**
@@ -370,6 +370,6 @@ class ContactObjectSubscriberTest extends TestCase
             ->with(1)
             ->willReturn(null);
         $this->subscriber->findContactById($event);
-        self::assertNull($event->getEntity());
+        $this->assertNull($event->getEntity());
     }
 }

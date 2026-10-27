@@ -26,6 +26,8 @@
 		{% endif %}
 		{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
 			'searchValue': searchValue,
+			'searchScopes': searchScopes|default([]),
+			'searchScopeHint': searchScopeHint|default(null),
 			'action': currentRoute,
 			'page_actions': {
 				'templateButtons': {
@@ -48,6 +50,12 @@
 					'label': 'mautic.user.role.form.isadmin',
 					'tooltip': 'mautic.core.search.quickfilter.is_admin',
 					'icon': 'ri-admin-line'
+				},
+				{
+					'search': 'mautic.user.user.searchcommand.neverloggedin',
+					'label': 'mautic.user.user.searchcommand.neverloggedin.label',
+					'tooltip': 'mautic.user.user.searchcommand.neverloggedin.description',
+					'icon': 'ri-login-box-line'
 				},
 				{
 					'search': 'mautic.core.searchcommand.ispublished',

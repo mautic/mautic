@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 abstract class AbstractMigration implements MigrationInterface
 {
@@ -15,7 +15,7 @@ abstract class AbstractMigration implements MigrationInterface
     private array $queries = [];
 
     public function __construct(
-        protected EntityManager $entityManager,
+        protected EntityManagerInterface $entityManager,
         protected string $tablePrefix,
     ) {
     }

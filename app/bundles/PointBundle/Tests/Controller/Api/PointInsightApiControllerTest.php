@@ -1,20 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PointBundle\Entity\PointInsight;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PointInsightApiControllerTest extends MauticMysqlTestCase
+final class PointInsightApiControllerTest extends MauticMysqlTestCase
 {
     private const UPDATED_NAME = 'Updated Point Insight';
 
     public function testPointInsightCRUDActions(): void
     {
         /** @var Translator $translator */
-        $translator = static::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         $this->client->request('POST', '/api/points/insights/new', [
             'name'          => 'New Point Insight',

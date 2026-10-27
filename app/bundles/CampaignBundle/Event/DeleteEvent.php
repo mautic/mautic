@@ -9,8 +9,9 @@ final class DeleteEvent extends \Symfony\Contracts\EventDispatcher\Event
     /**
      * @param string[] $eventIds
      */
-    public function __construct(private array $eventIds)
-    {
+    public function __construct(
+        private readonly array $eventIds,
+    ) {
     }
 
     /**

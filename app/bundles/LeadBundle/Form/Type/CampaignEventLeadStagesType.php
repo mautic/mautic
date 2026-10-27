@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventLeadStagesType extends AbstractType
+final class CampaignEventLeadStagesType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -20,7 +20,7 @@ class CampaignEventLeadStagesType extends AbstractType
             StageListType::class,
             [
                 'label'       => 'mautic.lead.lead.field.stage',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'multiple'    => true,
                 'required'    => false,
             ]

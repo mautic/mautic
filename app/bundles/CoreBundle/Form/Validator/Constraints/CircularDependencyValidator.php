@@ -12,11 +12,11 @@ use Symfony\Component\Validator\ConstraintValidator;
  * Throws an exception if the field alias is equal some segment filter keyword.
  * It would cause odd behavior with segment filters otherwise.
  */
-class CircularDependencyValidator extends ConstraintValidator
+final class CircularDependencyValidator extends ConstraintValidator
 {
     public function __construct(
-        private ListModel $model,
-        private RequestStack $requestStack,
+        private readonly ListModel $model,
+        private readonly RequestStack $requestStack,
     ) {
     }
 
@@ -68,6 +68,6 @@ class CircularDependencyValidator extends ConstraintValidator
 
     private function flatten(array $array): array
     {
-        return array_unique(array_reduce($array, 'array_merge', []));
+        return array_unique(array_reduce($array, array_merge(...), []));
     }
 }

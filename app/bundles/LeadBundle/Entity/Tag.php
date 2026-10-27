@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -107,10 +109,7 @@ class Tag implements UuidInterface
         return $this->tag;
     }
 
-    /**
-     * @return Tag
-     */
-    public function setTag(string $tag)
+    public function setTag(string $tag): static
     {
         $this->tag = $this->validateTag($tag);
 
@@ -127,10 +126,8 @@ class Tag implements UuidInterface
 
     /**
      * @param string $description
-     *
-     * @return Tag
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 
@@ -139,6 +136,6 @@ class Tag implements UuidInterface
 
     private function validateTag(string $tag): string
     {
-        return InputHelper::string(trim((string) $tag));
+        return InputHelper::string(trim($tag));
     }
 }

@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Exception\InvalidContactFieldTokenException;
 /**
  * A value object representation of a contact field token.
  */
-class ContactFieldToken
+final class ContactFieldToken
 {
     private string $fieldAlias;
 
@@ -20,7 +20,7 @@ class ContactFieldToken
      * @throws InvalidContactFieldTokenException
      */
     public function __construct(
-        private string $fullToken,
+        private readonly string $fullToken,
     ) {
         $this->parse(trim($fullToken));
     }

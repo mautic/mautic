@@ -22,6 +22,21 @@
             "label": "Mautic (HTTPS)"
         }
     },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "workbench.editorAssociations": {
+                    "*.md": "vscode.markdown.preview.editor"
+                }
+            }
+        },
+        "codespaces": {
+            "openFiles": [
+                ".devcontainer/CODESPACES.md"
+            ]
+        }
+    },
     "postCreateCommand": ".devcontainer/setup-project.sh",
+    "postAttachCommand": ".devcontainer/post-attach.sh",
     "updateContentCommand": ".devcontainer/prebuild-project.sh"
 }

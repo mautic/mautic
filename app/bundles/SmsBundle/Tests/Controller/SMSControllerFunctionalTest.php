@@ -7,13 +7,14 @@ namespace Mautic\SmsBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\SmsBundle\Entity\Sms;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class SMSControllerFunctionalTest extends MauticMysqlTestCase
 {
     private const EDIT_SMS_PATH       = '/s/sms/edit/';
+
     private const DEFAULT_SMS_MESSAGE = 'sms body';
+
     private const SAVE_AND_CLOSE      = 'Save & Close';
 
     protected function setUp(): void
@@ -42,7 +43,8 @@ final class SMSControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedSms = $this->em->find(Sms::class, $sms->getId());
-        Assert::assertSame($project->getId(), $savedSms->getProjects()->first()->getId());
+        $this->assertInstanceOf(Sms::class, $savedSms);
+        $this->assertSame($project->getId(), $savedSms->getProjects()->first()->getId());
     }
 
     public function testListPageMMSIndicator(): void
@@ -83,8 +85,8 @@ final class SMSControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler  = $this->client->submit($form);
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk());
-        Assert::assertStringContainsString('Maximum 10 media could be attached with 1 MMS', $crawler->filter('#media_div .has-error')->text());
+        $this->assertTrue($response->isOk());
+        $this->assertStringContainsString('Maximum 10 media could be attached with 1 MMS', $crawler->filter('#media_div .has-error')->text());
     }
 
     public function testCloneSmsWithMediaSuccessfully(): void
@@ -106,12 +108,12 @@ final class SMSControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk());
+        $this->assertTrue($response->isOk());
         $savedSms = $this->em->getRepository(Sms::class)->findOneBy(['name' => $clonedName]);
-        Assert::assertInstanceOf(Sms::class, $savedSms);
-        Assert::assertSame($clonedMessage, $savedSms->getMessage());
-        Assert::assertSame($media, $savedSms->getMedia());
-        Assert::assertTrue($savedSms->getIsMms());
+        $this->assertInstanceOf(Sms::class, $savedSms);
+        $this->assertSame($clonedMessage, $savedSms->getMessage());
+        $this->assertSame($media, $savedSms->getMedia());
+        $this->assertTrue($savedSms->getIsMms());
     }
 
     public function testSaveSmsWithMediaFalse(): void
@@ -128,11 +130,11 @@ final class SMSControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
         $response = $this->client->getResponse();
-        Assert::assertTrue($response->isOk());
+        $this->assertTrue($response->isOk());
         $savedSms = $this->em->getRepository(Sms::class)->find($sms->getId());
-        Assert::assertInstanceOf(Sms::class, $savedSms);
-        Assert::assertSame([], $savedSms->getMedia());
-        Assert::assertFalse($savedSms->getIsMms());
+        $this->assertInstanceOf(Sms::class, $savedSms);
+        $this->assertSame([], $savedSms->getMedia());
+        $this->assertFalse($savedSms->getIsMms());
     }
 
     /**

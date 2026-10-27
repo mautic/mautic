@@ -15,23 +15,23 @@ class InputOptionsDAO
      */
     private $integration;
 
-    private bool $firstTimeSync;
+    private readonly bool $firstTimeSync;
 
-    private bool $disablePush;
+    private readonly bool $disablePush;
 
-    private bool $disablePull;
+    private readonly bool $disablePull;
 
-    private bool $disableActivityPush;
+    private readonly bool $disableActivityPush;
 
-    private ?ObjectIdsDAO $mauticObjectIds;
+    private readonly ?ObjectIdsDAO $mauticObjectIds;
 
-    private ?ObjectIdsDAO $integrationObjectIds;
+    private readonly ?ObjectIdsDAO $integrationObjectIds;
 
-    private ?\DateTimeInterface $startDateTime;
+    private readonly ?\DateTimeInterface $startDateTime;
 
-    private ?\DateTimeInterface $endDateTime;
+    private readonly ?\DateTimeInterface $endDateTime;
 
-    private array $options;
+    private readonly array $options;
 
     /**
      * Example $input:
@@ -132,7 +132,7 @@ class InputOptionsDAO
         try {
             return is_string($input[$optionName]) ? new \DateTimeImmutable($input[$optionName], new \DateTimeZone('UTC')) : null;
         } catch (\Throwable) {
-            throw new InvalidValueException("'$input[$optionName]' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
+            throw new InvalidValueException("'{$input[$optionName]}' is not valid. Use 'Y-m-d H:i:s' format like '2018-12-24 20:30:00' or something like '-10 minutes'");
         }
     }
 
@@ -147,7 +147,8 @@ class InputOptionsDAO
 
         if ($input[$optionName] instanceof ObjectIdsDAO) {
             return $input[$optionName];
-        } elseif (is_array($input[$optionName])) {
+        }
+        if (is_array($input[$optionName])) {
             return ObjectIdsDAO::createFromCliOptions($input[$optionName]);
         }
         throw new InvalidValueException("{$optionName} option has an unexpected type. Use an array or ObjectIdsDAO object.");
@@ -171,7 +172,7 @@ class InputOptionsDAO
             $input['mautic-object-id'][$key] = preg_replace(
                 '/^contact:/',
                 Contact::NAME.':',
-                "$mauticObjectId"
+                "{$mauticObjectId}"
             );
         }
 

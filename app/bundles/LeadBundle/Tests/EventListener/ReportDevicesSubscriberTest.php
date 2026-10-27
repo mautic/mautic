@@ -13,15 +13,16 @@ use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     public function testNotRelevantContextBuilder(): void
     {
-        $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock  = $this->createMock(CompanyReportData::class);
+        $fieldsBuilderMock      = $this->createStub(FieldsBuilder::class);
+        $companyReportDataMock  = $this->createStub(CompanyReportData::class);
         $reportBuilderEventMock = $this->createMock(ReportBuilderEvent::class);
 
         $reportBuilderEventMock->expects($this->once())
@@ -38,8 +39,8 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testNotRelevantContextGenerate(): void
     {
-        $fieldsBuilderMock        = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock    = $this->createMock(CompanyReportData::class);
+        $fieldsBuilderMock        = $this->createStub(FieldsBuilder::class);
+        $companyReportDataMock    = $this->createStub(CompanyReportData::class);
         $reportGeneratorEventMock = $this->createMock(ReportGeneratorEvent::class);
 
         $reportGeneratorEventMock->expects($this->once())
@@ -56,9 +57,9 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportBuilder(): void
     {
-        $translatorMock        = $this->createMock(TranslatorInterface::class);
-        $channelListHelperMock = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
-        $reportHelperMock      = new ReportHelper($this->createMock(EventDispatcher::class));
+        $translatorMock        = $this->createStub(TranslatorInterface::class);
+        $channelListHelperMock = new ChannelListHelper($this->createStub(EventDispatcher::class), $this->createStub(Translator::class));
+        $reportHelperMock      = new ReportHelper($this->createStub(EventDispatcher::class));
         $fieldsBuilderMock     = $this->createMock(FieldsBuilder::class);
         $companyReportDataMock = $this->createMock(CompanyReportData::class);
 
@@ -222,16 +223,13 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private function getReportDevicesSubscriber(): ReportDevicesSubscriber
     {
-        $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
-        $companyReportDataMock  = $this->createMock(CompanyReportData::class);
-
-        return new ReportDevicesSubscriber($fieldsBuilderMock, $companyReportDataMock);
+        return new ReportDevicesSubscriber($this->createStub(FieldsBuilder::class), $this->createStub(CompanyReportData::class));
     }
 
     /**
-     * @return ReportGeneratorEvent|\PHPUnit\Framework\MockObject\MockObject
+     * @return ReportGeneratorEvent&MockObject
      */
-    private function getReportGeneratorEventMock()
+    private function getReportGeneratorEventMock(): MockObject
     {
         $reportGeneratorEventMock = $this->createMock(ReportGeneratorEvent::class);
 
@@ -244,9 +242,9 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
+     * @return QueryBuilder&MockObject
      */
-    private function getQueryBuilderMock()
+    private function getQueryBuilderMock(): MockObject
     {
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\MessengerBundle\Tests\MessageHandler;
 
 use Doctrine\DBAL\Exception\RetryableException;
@@ -12,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
 
-class EmailHitNotificationHandlerTest extends TestCase
+final class EmailHitNotificationHandlerTest extends TestCase
 {
     public function testInvoke(): void
     {
@@ -49,7 +51,7 @@ class EmailHitNotificationHandlerTest extends TestCase
         $emailModelMock
             ->expects($this->exactly(1))
             ->method('hitEmail')
-            ->willThrowException($this->createMock(RetryableException::class));
+            ->willThrowException($this->createStub(RetryableException::class));
 
         /** @var MockObject&CoreParametersHelper $parametersHelper */
         $parametersHelper = $this->createMock(CoreParametersHelper::class);

@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Exception;
 
-class ImportRowFailedException extends \Exception
+final class ImportRowFailedException extends \Exception
 {
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Functional;
 
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\SmsBundle\Entity\Sms;
 use Symfony\Component\HttpFoundation\Request;
@@ -107,7 +108,7 @@ final class SmsControllerFunctionalTest extends MauticMysqlTestCase
 
         // Assert
         $this->em->refresh($childSms);
-        $this->assertNull($childSms->getTranslationParent());
+        $this->assertNotInstanceOf(TranslationEntityInterface::class, $childSms->getTranslationParent());
     }
 
     public function testTranslationsAreDisplayedOnViewPage(): void

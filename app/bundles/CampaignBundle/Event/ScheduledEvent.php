@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
-class ScheduledEvent extends CampaignScheduledEvent
+final class ScheduledEvent extends CampaignScheduledEvent
 {
     use ContextTrait;
 

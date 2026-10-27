@@ -8,11 +8,11 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class PreExecuteEvent extends Event
+final class PreExecuteEvent extends Event
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private int $purgeMode,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly int $purgeMode,
     ) {
     }
 

@@ -9,6 +9,7 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class FieldTest extends \PHPUnit\Framework\TestCase
 {
@@ -198,7 +199,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
     public function testShowForContactIfFormIsNull(): void
     {
         $field = new Field();
-        Assert::assertTrue($field->showForContact());
+        $this->assertTrue($field->showForContact());
     }
 
     public function testShowForContactIfInKioskMode(): void
@@ -206,7 +207,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field = new Field();
         $form  = new Form();
         $form->setInKioskMode(true);
-        Assert::assertTrue($field->showForContact(null, null, $form));
+        $this->assertTrue($field->showForContact(null, null, $form));
     }
 
     public function testShowForContactIfShowWhenValueExistsIsTrue(): void
@@ -215,7 +216,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $form  = new Form();
         $form->setInKioskMode(false);
         $field->setShowWhenValueExists(true);
-        Assert::assertTrue($field->showForContact(null, null, $form));
+        $this->assertTrue($field->showForContact(null, null, $form));
     }
 
     public function testShowForContactIfShowWhenValueExistsIsFalseAndSubmissionExists(): void
@@ -227,7 +228,7 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setShowWhenValueExists(false);
         $field->setIsAutoFill(false);
         $field->setAlias('field_a');
-        Assert::assertFalse($field->showForContact($submissions, null, $form));
+        $this->assertFalse($field->showForContact($submissions, null, $form));
     }
 
     public function testShowForContactIfShowWhenValueExistsIsFalseAndSubmissionDoesNotExist(): void
@@ -239,15 +240,15 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setShowWhenValueExists(false);
         $field->setIsAutoFill(false);
         $field->setAlias('unicorn');
-        Assert::assertTrue($field->showForContact($submissions, null, $form));
+        $this->assertTrue($field->showForContact($submissions, null, $form));
     }
 
     public function testShowForContactIfShowWhenValueExistsIsFalseAndMappedLeadFieldValueExists(): void
     {
         $field   = new Field();
         $form    = new Form();
-        $contact = new class extends Lead {
-            public function getFieldValue($field, $group = null)
+        $contact = new class() extends Lead {
+            public function getFieldValue($field, $group = null): string
             {
                 Assert::assertSame('field_a', $field);
 
@@ -259,15 +260,15 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setMappedField('field_a');
         $field->setMappedObject('contact');
         $field->setIsAutoFill(false);
-        Assert::assertFalse($field->showForContact(null, $contact, $form));
+        $this->assertFalse($field->showForContact(null, $contact, $form));
     }
 
     public function testShowForContactIfShowWhenValueExistsIsFalseAndMappedLeadFieldValueDoesNotExist(): void
     {
         $field   = new Field();
         $form    = new Form();
-        $contact = new class extends Lead {
-            public function getFieldValue($field, $group = null)
+        $contact = new class() extends Lead {
+            public function getFieldValue($field, $group = null): null
             {
                 Assert::assertSame('field_a', $field);
 
@@ -279,15 +280,15 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setMappedField('field_a');
         $field->setMappedObject('contact');
         $field->setIsAutoFill(false);
-        Assert::assertTrue($field->showForContact(null, $contact, $form));
+        $this->assertTrue($field->showForContact(null, $contact, $form));
     }
 
     public function testShowForContactIfShowWhenValueExistsIsFalseAndMappedNotLeadFieldValueExists(): void
     {
         $field   = new Field();
         $form    = new Form();
-        $contact = new class extends Lead {
-            public function getFieldValue($field, $group = null)
+        $contact = new class() extends Lead {
+            public function getFieldValue($field, $group = null): string
             {
                 Assert::assertSame('field_a', $field);
 
@@ -299,20 +300,20 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $field->setMappedField('field_a');
         $field->setMappedObject('unicorn_object');
         $field->setIsAutoFill(false);
-        Assert::assertTrue($field->showForContact(null, $contact, $form));
+        $this->assertTrue($field->showForContact(null, $contact, $form));
     }
 
     /**
      * @param array<string, int> $properties
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataProvider')]
+    #[DataProvider('dataProvider')]
     public function testHasChoices(string $type, array $properties, bool $result): void
     {
         $field = new Field();
         $field->setProperties($properties);
         $field->setType($type);
 
-        $this->assertEquals($result, $field->hasChoices());
+        $this->assertSame($result, $field->hasChoices());
     }
 
     /**
@@ -331,12 +332,12 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
     public function testFieldWidth(): void
     {
         $field = new Field();
-        $this->assertEquals('100%', $field->getFieldWidth(), 'Default field width should be 100%');
+        $this->assertSame('100%', $field->getFieldWidth(), 'Default field width should be 100%');
 
         $field->setFieldWidth('50%');
-        $this->assertEquals('50%', $field->getFieldWidth(), 'Field width should be updated to 50%');
+        $this->assertSame('50%', $field->getFieldWidth(), 'Field width should be updated to 50%');
 
         $field->setFieldWidth('');
-        $this->assertEquals('100%', $field->getFieldWidth(), 'Field width should default to 100% when set to empty string');
+        $this->assertSame('100%', $field->getFieldWidth(), 'Field width should default to 100% when set to empty string');
     }
 }

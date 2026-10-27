@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnInterface;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class GeneratedColumnSubscriberTest extends TestCase
@@ -27,7 +26,7 @@ final class GeneratedColumnSubscriberTest extends TestCase
     public function testOnGeneratedColumnsBuildWithMySql(): void
     {
         $generatedColumns = $this->buildGeneratedColumns(true);
-        Assert::assertCount(5, $generatedColumns);
+        $this->assertCount(5, $generatedColumns);
 
         $generatedColumns = iterator_to_array($generatedColumns);
         $this->assertAlterTableSql('ALTER TABLE '.MAUTIC_TABLE_PREFIX."campaign_leads ADD generated_date_added_hour DATETIME AS (DATE_FORMAT(date_added, \"%Y-%m-%d %H:00\")) STORED COMMENT '(DC2Type:generated)';
@@ -45,19 +44,20 @@ final class GeneratedColumnSubscriberTest extends TestCase
     public function testOnGeneratedColumnsBuildWithMariaDb(): void
     {
         $generatedColumns = $this->buildGeneratedColumns(false);
-        Assert::assertCount(0, $generatedColumns);
+        $this->assertCount(0, $generatedColumns);
     }
 
     private function assertAlterTableSql(string $expectedSql, GeneratedColumnInterface $generatedColumn): void
     {
-        Assert::assertSame($expectedSql, $generatedColumn->getAlterTableSql());
+        $this->assertSame($expectedSql, $generatedColumn->getAlterTableSql());
     }
 
     private function createVersionProvider(bool $isMySql): VersionProviderInterface
     {
         return new class($isMySql) implements VersionProviderInterface {
-            public function __construct(private bool $isMySql)
-            {
+            public function __construct(
+                private readonly bool $isMySql,
+            ) {
             }
 
             public function getVersion(): string
@@ -81,7 +81,7 @@ final class GeneratedColumnSubscriberTest extends TestCase
     {
         $generatedColumnsEvent = new GeneratedColumnsEvent();
         $generatedColumns      = $generatedColumnsEvent->getGeneratedColumns();
-        Assert::assertEmpty($generatedColumns);
+        $this->assertEmpty($generatedColumns);
 
         $columnSubscriber = new GeneratedColumnSubscriber($this->createVersionProvider($isMySql));
         $columnSubscriber->onGeneratedColumnsBuild($generatedColumnsEvent);

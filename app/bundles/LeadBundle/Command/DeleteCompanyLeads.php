@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: DeleteCompanyLeads::COMMAND_NAME,
     description: 'Delete Company referance from leads and update leads with new primary company.'
 )]
-final class DeleteCompanyLeads
+final readonly class DeleteCompanyLeads
 {
     public const COMMAND_NAME = 'mautic:company:delete_company_leads';
 
@@ -47,13 +47,13 @@ final class DeleteCompanyLeads
 
     private function processDeleteCompany(int $companyId, OutputInterface $output): void
     {
-        $output->writeln("<info>Updating with new primary company for company id $companyId which has been deleted.</info>");
+        $output->writeln("<info>Updating with new primary company for company id {$companyId} which has been deleted.</info>");
         $this->companyModel->changePrimaryCompanyToLatest($companyId);
 
-        $output->writeln("<info>Deleting all the company lead mapping for company id $companyId which has been deleted.</info>");
+        $output->writeln("<info>Deleting all the company lead mapping for company id {$companyId} which has been deleted.</info>");
         $this->companyLeadRepository->deleteCompanyLeads($companyId);
 
-        $output->writeln("<info>Deleting company for company id $companyId permanently.</info>");
+        $output->writeln("<info>Deleting company for company id {$companyId} permanently.</info>");
         $this->companyModel->deleteCompanyPermanently($companyId);
     }
 }

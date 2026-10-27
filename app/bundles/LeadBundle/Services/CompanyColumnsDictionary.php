@@ -16,9 +16,9 @@ final class CompanyColumnsDictionary
     private array $cachedChoices = [];
 
     public function __construct(
-        private FieldList $fieldList,
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly FieldList $fieldList,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 

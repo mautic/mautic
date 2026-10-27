@@ -14,9 +14,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadCategory;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
-use PHPUnit\Framework\Assert;
 
-class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
+final class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     private EmailRepository $emailRepository;
 
@@ -34,7 +33,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         $result = $this->emailRepository->getDoNotEmailList();
 
-        Assert::assertSame([], $result);
+        $this->assertSame([], $result);
     }
 
     public function testGetDoNotEmailListNotEmpty(): void
@@ -53,22 +52,22 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
 
         // no $leadIds
         $result = $this->emailRepository->getDoNotEmailList();
-        Assert::assertSame([$lead->getId() => $lead->getEmail()], $result);
+        $this->assertSame([$lead->getId() => $lead->getEmail()], $result);
 
         // matching $leadIds
         $result = $this->emailRepository->getDoNotEmailList([$lead->getId()]);
-        Assert::assertSame([$lead->getId() => $lead->getEmail()], $result);
+        $this->assertSame([$lead->getId() => $lead->getEmail()], $result);
 
         // mismatching $leadIds
         $result = $this->emailRepository->getDoNotEmailList([-1]);
-        Assert::assertSame([], $result);
+        $this->assertSame([], $result);
     }
 
     public function testCheckDoNotEmailNonExistent(): void
     {
         $result = $this->emailRepository->checkDoNotEmail('name@domain.tld');
 
-        Assert::assertFalse($result);
+        $this->assertFalse($result);
     }
 
     public function testCheckDoNotEmailExistent(): void
@@ -88,9 +87,9 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $result = $this->emailRepository->checkDoNotEmail('name@domain.tld');
-        Assert::assertNotFalse($result);
+        $this->assertNotFalse($result);
 
-        Assert::assertSame([
+        $this->assertSame([
             'id'           => (string) $doNotContact->getId(),
             'unsubscribed' => true,
             'bounced'      => false,
@@ -150,7 +149,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
             ->executeQuery()
             ->fetchAllAssociative();
 
-        $actualLeadIds  = array_map('intval', array_column($result, 'id'));
+        $actualLeadIds  = array_map(intval(...), array_column($result, 'id'));
         sort($actualLeadIds);
 
         $expectedLeadIds = [$leadFour->getId(), $leadFive->getId()];
@@ -197,10 +196,49 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         sort($actualLeadIds);
 
         $expectedLeadIds = [$leadOne->getId(), $leadFour->getId(), $leadFive->getId()];
-        $expectedLeadIds = array_map(fn (int $id) => (string) $id, $expectedLeadIds);
+        $expectedLeadIds = array_map(fn (int $id): string => (string) $id, $expectedLeadIds);
         sort($expectedLeadIds);
 
-        Assert::assertSame($expectedLeadIds, $actualLeadIds);
+        $this->assertSame($expectedLeadIds, $actualLeadIds);
+    }
+
+    public function testGetBatchMaxContactId(): void
+    {
+        // create some leads
+        $leadOne   = $this->createLead('one');
+        $leadTwo   = $this->createLead('two');
+        $leadThree = $this->createLead('three');
+        $leadFour  = $this->createLead('four');
+        $leadFive  = $this->createLead('five');
+        $leadSix   = $this->createLead('six');
+
+        // add some leads in lists for inclusion
+        $sourceListOne  = $this->createLeadList('Source One', $leadOne, $leadTwo, $leadThree);
+        $sourceListTwo  = $this->createLeadList('Source Two', $leadOne, $leadTwo, $leadFour, $leadFive, $leadSix);
+
+        // create an email with included/excluded lists
+        $email = new Email();
+        $email->setName('Email');
+        $email->setSubject('Subject');
+        $email->setEmailType('list');
+        $email->addList($sourceListOne);
+        $email->addList($sourceListTwo);
+        $this->em->persist($email);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $minId      = 0;
+        $batchSize  = 3;
+        $iterations = 0;
+
+        while ($minId !== ($maxId = $this->emailRepository->getBatchMaxContactId($email, $minId, $batchSize))) {
+            $minId = $maxId;
+            ++$iterations;
+        }
+
+        $this->assertSame(3, $iterations, 'No more than 3 iterations should be run.');
+        $this->assertSame((string) $leadSix->getId(), (string) $maxId, 'The ID of the last inserted lead should be returned.');
     }
 
     /**
@@ -217,11 +255,9 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param Lead ...$leads
-     *
      * @throws ORMException
      */
-    private function createLeadList(string $name, ...$leads): LeadList
+    private function createLeadList(string $name, Lead ...$leads): LeadList
     {
         $leadList = new LeadList();
         $leadList->setName($name);
@@ -256,10 +292,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         return $category;
     }
 
-    /**
-     * @param Category ...$categories
-     */
-    private function subscribeCategory(Lead $lead, bool $subscribed, ...$categories): void
+    private function subscribeCategory(Lead $lead, bool $subscribed, Category ...$categories): void
     {
         foreach ($categories as $category) {
             $leadCategory = new LeadCategory();

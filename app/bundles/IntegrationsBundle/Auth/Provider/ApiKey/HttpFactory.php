@@ -22,7 +22,7 @@ use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 /**
  * Factory for building HTTP clients using basic auth.
  */
-class HttpFactory implements AuthProviderInterface
+final class HttpFactory implements AuthProviderInterface
 {
     public const NAME = 'api_key';
 

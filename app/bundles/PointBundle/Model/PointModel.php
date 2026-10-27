@@ -2,7 +2,7 @@
 
 namespace Mautic\PointBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -26,6 +26,7 @@ use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -46,8 +47,8 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         protected RequestStack $requestStack,
         protected IpLookupHelper $ipLookupHelper,
         protected LeadModel $leadModel,
-        private ContactTracker $contactTracker,
-        EntityManager $em,
+        private readonly ContactTracker $contactTracker,
+        EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
@@ -55,17 +56,15 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
-        private PointGroupModel $pointGroupModel,
+        private readonly PointGroupModel $pointGroupModel,
+        private readonly PointRepository $pointRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return PointRepository
-     */
-    public function getRepository()
+    public function getRepository(): PointRepository
     {
-        return $this->em->getRepository(Point::class);
+        return $this->pointRepository;
     }
 
     public function getPermissionBase(): string
@@ -76,7 +75,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -168,10 +167,11 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
      * @param mixed $eventDetails     passthrough from function triggering action to the callback function
      * @param mixed $typeId           Something unique to the triggering event to prevent  unnecessary duplicate calls
      * @param bool  $allowUserRequest
+     * @param bool  $storeIpAddress   false for visitors Mautic doesn't track
      *
      * @throws \ReflectionException
      */
-    public function triggerAction($type, $eventDetails = null, $typeId = null, ?Lead $lead = null, $allowUserRequest = false): void
+    public function triggerAction($type, $eventDetails = null, $typeId = null, ?Lead $lead = null, $allowUserRequest = false, bool $storeIpAddress = true): void
     {
         // only trigger actions for not logged Mautic users
         if (!$this->security->isAnonymous() && !$allowUserRequest) {
@@ -190,13 +190,11 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         }
 
         // find all the actions for published points
-        /** @var PointRepository $repo */
-        $repo            = $this->getRepository();
-        $availablePoints = $repo->getPublishedByType($type);
+        $availablePoints = $this->pointRepository->getPublishedByType($type);
         if (empty($availablePoints)) {
             return;
         }
-        $ipAddress       = $this->ipLookupHelper->getIpAddress();
+        $ipAddress       = $storeIpAddress ? $this->ipLookupHelper->getIpAddress() : null;
 
         $hasLeadPointChanges = false;
         if (null === $lead) {
@@ -211,7 +209,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
         $availableActions = $this->getPointActions();
 
         // get a list of actions that has already been performed on this lead
-        $completedActions = $repo->getCompletedLeadActions($type, $lead->getId());
+        $completedActions = $this->pointRepository->getCompletedLeadActions($type, $lead->getId());
 
         $persist = [];
         /** @var Point $action */
@@ -238,7 +236,7 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
                 'eventDetails' => $eventDetails,
             ];
 
-            $callback = $settings['callback'] ?? [\Mautic\PointBundle\Helper\EventHelper::class, 'engagePointAction'];
+            $callback = $settings['callback'] ?? \Mautic\PointBundle\Helper\EventHelper::engagePointAction(...);
 
             if (is_callable($callback)) {
                 $object = null;
@@ -302,9 +300,9 @@ class PointModel extends CommonFormModel implements GlobalSearchInterface, Reset
             }
         }
 
-        if (!empty($persist)) {
-            $this->getRepository()->saveEntities($persist);
-            $this->getRepository()->detachEntities($persist);
+        if ([] !== $persist) {
+            $this->pointRepository->saveEntities($persist);
+            $this->pointRepository->detachEntities($persist);
         }
 
         if ($hasLeadPointChanges) {

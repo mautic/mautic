@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\EntityMetadata;
 use PHPUnit\Framework\TestCase;
 
-class EntityMetadataTest extends TestCase
+final class EntityMetadataTest extends TestCase
 {
     private BundleMetadata $metadata;
 
@@ -42,7 +44,7 @@ class EntityMetadataTest extends TestCase
             $entityMetadata->getOrmConfig()
         );
 
-        $this->assertEquals(
+        $this->assertSame(
             [
                 'namespace_prefix' => 'Mautic\\CoreBundle\\Entity',
                 'path'             => '@MauticCoreBundle/Entity',

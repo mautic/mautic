@@ -16,10 +16,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -35,7 +35,7 @@ class ConfigType extends AbstractType
             ChoiceType::class,
             [
                 'label'      => 'mautic.campaignconfig.campaign_time_wait_on_event_false',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'help'       => 'mautic.campaignconfig.campaign_time_wait_on_event_false_help',
                 'data'       => $options['data']['campaign_time_wait_on_event_false'],
                 'choices'    => [
@@ -91,7 +91,7 @@ class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.campaignconfig.campaign_email_stats_enabled',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'data'       => $options['data']['campaign_email_stats_enabled'] ?? true,
                 'required'   => false,
                 'attr'       => [
@@ -106,17 +106,14 @@ class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.config.peak_interaction_timer.best_default_hour_start',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.config.peak_interaction_timer.best_default_hour_start.tooltip',
                 ],
                 'data'        => $options['data']['peak_interaction_timer_best_default_hour_start'] ?? 9,
                 'constraints' => [
-                    new Range([
-                        'min' => 0,
-                        'max' => 23,
-                    ]),
+                    new Range(min: 0, max: 23),
                 ],
             ]
         );
@@ -126,17 +123,14 @@ class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.config.peak_interaction_timer.best_default_hour_end',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.config.peak_interaction_timer.best_default_hour_end.tooltip',
                 ],
                 'data'        => $options['data']['peak_interaction_timer_best_default_hour_end'] ?? 12,
                 'constraints' => [
-                    new Range([
-                        'min' => 0,
-                        'max' => 23,
-                    ]),
+                    new Range(min: 0, max: 23),
                     new Callback(
                         function ($hourEnd, ExecutionContextInterface $context): void {
                             $data      = $context->getRoot()->getData();
@@ -155,7 +149,7 @@ class ConfigType extends AbstractType
             ChoiceType::class,
             [
                 'label'      => 'mautic.config.peak_interaction_timer.best_default_days',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.config.peak_interaction_timer.best_default_days.tooltip',
@@ -180,7 +174,7 @@ class ConfigType extends AbstractType
             ChoiceType::class,
             [
                 'label'      => 'mautic.config.peak_interaction_timer.cache_timeout',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.config.peak_interaction_timer.cache_timeout.tooltip',
@@ -193,9 +187,7 @@ class ConfigType extends AbstractType
                 ],
                 'data'        => $options['data']['peak_interaction_timer_cache_timeout'] ?? 43800,
                 'constraints' => [
-                    new GreaterThanOrEqual([
-                        'value' => 0,
-                    ]),
+                    new GreaterThanOrEqual(value: 0),
                 ],
             ]
         );
@@ -205,7 +197,7 @@ class ConfigType extends AbstractType
             ChoiceType::class,
             [
                 'label'      => 'mautic.config.peak_interaction_timer.fetch_interactions_from',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.config.peak_interaction_timer.fetch_interactions_from.tooltip',
@@ -224,16 +216,14 @@ class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.config.peak_interaction_timer.fetch_limit',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.config.peak_interaction_timer.fetch_limit.tooltip',
                 ],
                 'data'        => $options['data']['peak_interaction_timer_fetch_limit'] ?? 50,
                 'constraints' => [
-                    new GreaterThanOrEqual([
-                        'value' => 10,
-                    ]),
+                    new GreaterThanOrEqual(value: 10),
                 ],
             ]
         );

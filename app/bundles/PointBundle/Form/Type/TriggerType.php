@@ -23,10 +23,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Trigger>
  */
-class TriggerType extends AbstractType
+final class TriggerType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security,
+        private readonly CorePermissions $security,
     ) {
     }
 
@@ -40,7 +40,7 @@ class TriggerType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -50,7 +50,7 @@ class TriggerType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control editor'],
                 'required'   => false,
             ]
@@ -71,7 +71,7 @@ class TriggerType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.point.trigger.form.points',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.point.trigger.form.points_descr',
@@ -87,7 +87,7 @@ class TriggerType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.point.trigger.form.color',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'       => 'form-control',
                     'data-toggle' => 'color',

@@ -11,7 +11,7 @@ trait TestEntityCreationTrait
     private function createContact(): Lead
     {
         $contact = new Lead();
-        $contact->setEmail(sprintf('testmail%s@nomail.com', rand(1, 10000)));
+        $contact->setEmail(sprintf('testmail%s@nomail.com', random_int(1, 10000)));
         $contact->setDateIdentified(new \DateTime());
         $this->em->persist($contact);
         $this->em->flush();
@@ -22,7 +22,7 @@ trait TestEntityCreationTrait
     private function createCompany(): Company
     {
         $company = new Company();
-        $company->setName('Company '.rand(0, 100000));
+        $company->setName('Company '.random_int(0, 100000));
         $this->em->persist($company);
         $this->em->flush();
 
@@ -48,7 +48,7 @@ trait TestEntityCreationTrait
 
     private function updateCompanyName(Company $company): void
     {
-        $company->setName($company->getName().rand(1, 100));
+        $company->setName($company->getName().random_int(1, 100));
         $this->em->persist($company);
         $this->em->flush();
     }

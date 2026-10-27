@@ -4,7 +4,7 @@ namespace Step\Acceptance;
 
 use Page\Acceptance\FormPage;
 
-class FormStep extends \AcceptanceTester
+final class FormStep extends \AcceptanceTester
 {
     public function addFormMetaData(): void
     {
@@ -27,11 +27,11 @@ class FormStep extends \AcceptanceTester
 
         $I->click(FormPage::$ADD_NEW_FIELD_BUTTON_TEXT);
         $I->click($fieldType);
-        $I->waitForText($modalHeader, 5);
-        $I->waitForElementVisible($labelSelector, 10);
+        $I->waitForText($modalHeader, self::TIMEOUT);
+        $I->waitForElementVisible($labelSelector, self::TIMEOUT);
         $I->fillField($labelSelector, $label);
-        $I->waitForElementClickable($saveButtonSelector, 10);
+        $I->waitForElementClickable($saveButtonSelector, self::TIMEOUT);
         $I->click($saveButtonSelector);
-        $I->waitForElementNotVisible($labelSelector, 10); // modal closed
+        $I->waitForElementNotVisible($labelSelector, self::TIMEOUT); // modal closed
     }
 }

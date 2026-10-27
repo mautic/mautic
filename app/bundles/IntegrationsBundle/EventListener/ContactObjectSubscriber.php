@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Exception\ImportFailedException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class ContactObjectSubscriber implements EventSubscriberInterface
+final readonly class ContactObjectSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private ContactObjectHelper $contactObjectHelper,

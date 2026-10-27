@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -70,7 +72,7 @@ class MessageQueue
 
     /**
      * @var \DateTimeInterface
-     **/
+     */
     private $datePublished;
 
     /**
@@ -88,7 +90,7 @@ class MessageQueue
      */
     private $dateSent;
 
-    private $options = [];
+    private array $options = [];
 
     /**
      * Used by listeners to note if the message had been processed in bulk.
@@ -104,10 +106,7 @@ class MessageQueue
      */
     private $failed = false;
 
-    /**
-     * @var bool
-     */
-    private $metadataUpdated = false;
+    private bool $metadataUpdated = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -200,10 +199,7 @@ class MessageQueue
         $this->attempts = $attempts;
     }
 
-    /**
-     * @return array
-     */
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -242,10 +238,8 @@ class MessageQueue
 
     /**
      * @param mixed $channelId
-     *
-     * @return MessageQueue
      */
-    public function setChannelId($channelId)
+    public function setChannelId($channelId): static
     {
         $this->channelId = $channelId;
 
@@ -260,10 +254,7 @@ class MessageQueue
         return $this->event;
     }
 
-    /**
-     * @return MessageQueue
-     */
-    public function setEvent(Event $event)
+    public function setEvent(Event $event): static
     {
         $this->event = $event;
 
@@ -429,10 +420,8 @@ class MessageQueue
 
     /**
      * @param bool $failed
-     *
-     * @return MessageQueue
      */
-    public function setFailed($failed = true)
+    public function setFailed($failed = true): static
     {
         $this->failed = $failed;
 
@@ -449,10 +438,8 @@ class MessageQueue
 
     /**
      * @param bool $processed
-     *
-     * @return MessageQueue
      */
-    public function setProcessed($processed = true)
+    public function setProcessed($processed = true): static
     {
         $this->processed = $processed;
 
@@ -473,10 +460,7 @@ class MessageQueue
         $this->options['metadata'] = $metadata;
     }
 
-    /**
-     * @return bool
-     */
-    public function wasMetadataUpdated()
+    public function wasMetadataUpdated(): bool
     {
         return $this->metadataUpdated;
     }

@@ -67,7 +67,7 @@ trait CreateTestEntitiesTrait
         $event->setTriggerInterval(1);
         $event->setTriggerMode('immediate');
 
-        if ($properties) {
+        if ([] !== $properties) {
             $event->setProperties($properties);
         }
 

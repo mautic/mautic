@@ -17,8 +17,8 @@ class DncReportService
     ];
 
     public function __construct(
-        private DoNotContact $doNotContactModel,
-        private DncFormatterHelper $dncFormatterHelper,
+        private readonly DoNotContact $doNotContactModel,
+        private readonly DncFormatterHelper $dncFormatterHelper,
     ) {
     }
 
@@ -83,14 +83,14 @@ class DncReportService
      */
     public function processDncStatusDisplay(array $data): array
     {
-        if (empty($data) || !array_key_exists('dnc_preferences', $data[0])) {
+        if ([] === $data || !array_key_exists('dnc_preferences', $data[0])) {
             return $data;
         }
 
         foreach ($data as &$row) {
             if (!empty($row['dnc_preferences'])) {
                 $dncEntries = explode(',', $row['dnc_preferences']);
-                $dncText    = array_map(function ($entry) {
+                $dncText    = array_map(function ($entry): string {
                     [$reason, $channel] = explode(':', $entry);
 
                     return $this->dncFormatterHelper->printReasonWithChannel((int) $reason, $channel);

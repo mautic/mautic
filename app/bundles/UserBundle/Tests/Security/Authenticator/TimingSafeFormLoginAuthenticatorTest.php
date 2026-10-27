@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 
-class TimingSafeFormLoginAuthenticatorTest extends TestCase
+final class TimingSafeFormLoginAuthenticatorTest extends TestCase
 {
     /**
      * @return array<mixed>
@@ -47,7 +47,7 @@ class TimingSafeFormLoginAuthenticatorTest extends TestCase
             ->method('getPasswordHasher');
 
         /** @var FormLoginAuthenticator|\PHPUnit\Framework\MockObject\MockObject $formLoginAuthenticator */
-        $formLoginAuthenticator = $this->createMock(FormLoginAuthenticator::class);
+        $formLoginAuthenticator = $this->createStub(FormLoginAuthenticator::class);
 
         $authenticator = new TimingSafeFormLoginAuthenticator(
             $formLoginAuthenticator,
@@ -97,7 +97,7 @@ class TimingSafeFormLoginAuthenticatorTest extends TestCase
             ->willReturn($passwordHasher);
 
         /** @var FormLoginAuthenticator|\PHPUnit\Framework\MockObject\MockObject $formLoginAuthenticator */
-        $formLoginAuthenticator = $this->createMock(FormLoginAuthenticator::class);
+        $formLoginAuthenticator = $this->createStub(FormLoginAuthenticator::class);
 
         $authenticator = new TimingSafeFormLoginAuthenticator(
             $formLoginAuthenticator,

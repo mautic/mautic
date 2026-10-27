@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -88,55 +90,10 @@ return [
         ],
     ],
 
-    'services' => [
-        'events' => [
-            'mautic.page.segment_tracking_subscriber' => [
-                'class'     => Mautic\PageBundle\EventListener\SegmentTrackingSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.lead.repository.lead_list',
-                ],
-            ],
-        ],
-        'fixtures' => [
-            'mautic.page.fixture.page_category' => [
-                'class'     => Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.category.model.category'],
-            ],
-            'mautic.page.fixture.page' => [
-                'class'     => Mautic\PageBundle\DataFixtures\ORM\LoadPageData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.page.model.page'],
-            ],
-            'mautic.page.fixture.page_hit' => [
-                'class'     => Mautic\PageBundle\DataFixtures\ORM\LoadPageHitData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.page.model.page'],
-            ],
-        ],
-        'other' => [
-            'mautic.page.helper.token' => [
-                'class'     => Mautic\PageBundle\Helper\TokenHelper::class,
-                'arguments' => 'mautic.page.model.page',
-            ],
-            'mautic.page.helper.tracking' => [
-                'class'     => Mautic\PageBundle\Helper\TrackingHelper::class,
-                'arguments' => [
-                    'mautic.tracker.contact',
-                    'mautic.cache.provider',
-                    'mautic.helper.core_parameters',
-                    'request_stack',
-                ],
-            ],
-        ],
-    ],
-
     'parameters' => [
         'cat_in_page_url'                       => false,
         'google_analytics'                      => null,
         'track_contact_by_ip'                   => false,
-        'track_by_fingerprint'                  => false,
         'google_analytics_id'                   => null,
         'google_analytics_trackingpage_enabled' => false,
         'google_analytics_landingpage_enabled'  => false,

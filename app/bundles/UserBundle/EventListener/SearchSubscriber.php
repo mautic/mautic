@@ -11,7 +11,7 @@ use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private UserModel $userModel,
@@ -41,7 +41,7 @@ class SearchSubscriber implements EventSubscriberInterface
             '@MauticUser/SubscribedEvents/Search/global_user.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.user.users', $results);
         }
     }
@@ -55,7 +55,7 @@ class SearchSubscriber implements EventSubscriberInterface
             '@MauticUser/SubscribedEvents/Search/global_role.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.user.roles', $results);
         }
     }

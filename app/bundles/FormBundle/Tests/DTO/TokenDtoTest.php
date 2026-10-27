@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(TokenDto::class)]
-class TokenDtoTest extends TestCase
+final class TokenDtoTest extends TestCase
 {
     public static function provideData(): \Generator
     {
@@ -49,6 +49,6 @@ class TokenDtoTest extends TestCase
     public function testToString(string $name, string|int $value, string $expected): void
     {
         $tokenDto = new TokenDto($name, $value);
-        self::assertEquals($expected, $tokenDto->toString());
+        $this->assertSame($expected, $tokenDto->toString());
     }
 }

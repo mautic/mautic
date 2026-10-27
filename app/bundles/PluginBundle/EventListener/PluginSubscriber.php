@@ -10,10 +10,11 @@ use Mautic\PluginBundle\Event\PluginUpdateEvent;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class PluginSubscriber implements EventSubscriberInterface
+final readonly class PluginSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private readonly PluginDatabase $pluginDatabase)
-    {
+    public function __construct(
+        private PluginDatabase $pluginDatabase,
+    ) {
     }
 
     public function onInstall(PluginInstallEvent $event): void

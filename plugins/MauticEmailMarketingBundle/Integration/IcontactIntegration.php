@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
 
-class IcontactIntegration extends EmailAbstractIntegration
+final class IcontactIntegration extends EmailAbstractIntegration
 {
     public function getName(): string
     {
@@ -86,7 +86,6 @@ class IcontactIntegration extends EmailAbstractIntegration
     /**
      * @param array  $parameters
      * @param string $method
-     * @param array  $settings
      *
      * @return mixed|string
      */
@@ -114,17 +113,13 @@ class IcontactIntegration extends EmailAbstractIntegration
             }
         }
 
-        if (empty($this->keys['accountId']) || empty($this->keys['clientFolderId'])) {
-            return false;
-        }
-
-        return true;
+        return !empty($this->keys['accountId']) && !empty($this->keys['clientFolderId']);
     }
 
     /**
      * @return mixed[]
      */
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         if (!$this->isAuthorized()) {
             return [];
@@ -154,7 +149,7 @@ class IcontactIntegration extends EmailAbstractIntegration
                 $leadFields[$f] = [
                     'label'    => $this->translator->trans('mautic.icontact.field.'.$f),
                     'type'     => 'string',
-                    'required' => 'email' == $f,
+                    'required' => 'email' === $f,
                 ];
             }
 
@@ -186,9 +181,11 @@ class IcontactIntegration extends EmailAbstractIntegration
 
         if (empty($mappedData)) {
             return false;
-        } elseif (empty($mappedData['email'])) {
+        }
+        if (empty($mappedData['email'])) {
             return false;
-        } elseif (!isset($config['list_settings'])) {
+        }
+        if (!isset($config['list_settings'])) {
             return false;
         }
 
@@ -206,7 +203,7 @@ class IcontactIntegration extends EmailAbstractIntegration
 
                 $listId = $config['list_settings']['list'];
 
-                if (!empty($customfields)) {
+                if ([] !== $customfields) {
                     $mappedData += $customfields;
                 }
 

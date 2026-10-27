@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\AbstractPreUpdateCheck;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class PreUpdateCheckHelper
 {
@@ -13,7 +14,19 @@ class PreUpdateCheckHelper
      */
     private array $checks = [];
 
-    public function addCheck(AbstractPreUpdateCheck $check): void
+    /**
+     * @param iterable<AbstractPreUpdateCheck> $checks
+     */
+    public function __construct(
+        #[AutowireIterator('mautic.update_check')]
+        iterable $checks = [],
+    ) {
+        foreach ($checks as $check) {
+            $this->addCheck($check);
+        }
+    }
+
+    private function addCheck(AbstractPreUpdateCheck $check): void
     {
         $this->checks[] = $check;
     }

@@ -71,7 +71,7 @@ final class ReportTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->reportModel->expects($this->exactly(2))
             ->method('getColumnList')
-            ->with($this->equalTo('assets')) // This is the confirmation that the source was selected properly.
+            ->with('assets') // This is the confirmation that the source was selected properly.
             ->willReturn($columnList);
 
         $this->reportModel->method('getGraphList')
@@ -79,7 +79,7 @@ final class ReportTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->formBuilder->method('addEventListener')
             ->willReturnCallback(
-                function (string $eventName, callable $listener) use ($report) {
+                function (string $eventName, callable $listener) use ($report): MockObject {
                     if (FormEvents::PRE_SET_DATA === $eventName) {
                         $form      = $this->createMock(FormInterface::class);
                         $formEvent = new FormEvent($form, $report);

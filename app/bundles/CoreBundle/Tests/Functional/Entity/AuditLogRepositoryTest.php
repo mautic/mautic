@@ -10,17 +10,18 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class AuditLogRepositoryTest extends MauticMysqlTestCase
 {
     /**
      * @param mixed[] $filters
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForGetAuditLogsForLeads')]
+    #[DataProvider('dataForGetAuditLogsForLeads')]
     public function testGetAuditLogsForSingleLead(array $filters, int $expectedCount): void
     {
         /** @var LeadModel $contactModel */
-        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get(LeadModel::class);
 
         $contact = new Lead();
         $contact->setEmail('john@doe.com');

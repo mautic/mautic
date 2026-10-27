@@ -15,11 +15,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class NotificationHelper
 {
     public function __construct(
-        private UserModel $userModel,
-        private NotificationModel $notificationModel,
-        private TranslatorInterface $translator,
-        private RouterInterface $router,
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly UserModel $userModel,
+        private readonly NotificationModel $notificationModel,
+        private readonly TranslatorInterface $translator,
+        private readonly RouterInterface $router,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -111,7 +111,7 @@ class NotificationHelper
         if ($sendToAuthor) {
             $this->userModel->emailUser($user, $subject, $content);
         } else {
-            $emailAddresses =  array_map('trim', explode(',', $this->coreParametersHelper->get('campaign_notification_email_addresses')));
+            $emailAddresses =  array_map(trim(...), explode(',', $this->coreParametersHelper->get('campaign_notification_email_addresses')));
             $this->userModel->sendMailToEmailAddresses($emailAddresses, $subject, $content);
         }
     }

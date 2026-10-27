@@ -6,10 +6,10 @@ namespace MauticPlugin\MauticCloudStorageBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class MauticCloudStorageExtension extends Extension
+final class MauticCloudStorageExtension extends Extension
 {
     /**
      * @param mixed[] $configs

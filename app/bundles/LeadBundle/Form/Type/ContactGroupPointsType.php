@@ -12,12 +12,12 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ContactGroupPointsType extends AbstractType
+final class ContactGroupPointsType extends AbstractType
 {
     private const SCORE_FIELD_PREFIX = 'score_group_';
 
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -42,7 +42,7 @@ class ContactGroupPointsType extends AbstractType
                         'class'       => 'form-control',
                         'placeholder' => $this->translator->trans('mautic.point.form.score_not_set'),
                     ],
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'required'   => false,
                 ]
             );
@@ -56,7 +56,7 @@ class ContactGroupPointsType extends AbstractType
                 'save_text'      => 'mautic.core.form.save',
                 'cancel_onclick' => 'javascript:void(0);',
                 'cancel_attr'    => [
-                    'data-dismiss' => 'modal',
+                    'data-bs-dismiss' => 'modal',
                 ],
             ]
         );

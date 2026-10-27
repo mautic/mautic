@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\ProjectBundle\Entity\Project;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterInterface;
 
-class PageControllerFunctionalTest extends MauticMysqlTestCase
+final class PageControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testPagePreview(): void
     {
@@ -36,7 +37,66 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/%s', $page->getAlias()));
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Test Html', $response->getContent());
+        $this->assertStringContainsString('Test Html', (string) $response->getContent());
+    }
+
+    public function testManualWinnerActionIsAvailableForPublishedStartedVariant(): void
+    {
+        [$parent, $variant] = $this->createManualWinnerPagePair(true, true);
+        $router             = self::getContainer()->get(RouterInterface::class);
+        $winnerUrl          = $router->generate('mautic_page_action', [
+            'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+        $viewUrl            = $router->generate('mautic_page_action', [
+            'objectAction' => 'view',
+            'objectId'     => $variant->getId(),
+        ]);
+
+        $this->client->request(Request::METHOD_GET, "/s/pages/view/{$parent->getId()}");
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
+
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_POST, $winnerUrl);
+        $this->assertResponseRedirects($viewUrl);
+
+        $this->em->clear();
+        $winner = $this->em->find(Page::class, $variant->getId());
+        $oldParent = $this->em->find(Page::class, $parent->getId());
+
+        $this->assertInstanceOf(Page::class, $winner);
+        $this->assertInstanceOf(Page::class, $oldParent);
+        $this->assertNotInstanceOf(VariantEntityInterface::class, $winner->getVariantParent());
+        $this->assertTrue($winner->isPublished(false));
+        $this->assertFalse($oldParent->isPublished(false));
+        $this->assertSame(100, $winner->getVariantSettings()['totalWeight']);
+    }
+
+    public function testManualWinnerActionIsUnavailableForUnpublishedVariant(): void
+    {
+        [$parent, $variant] = $this->createManualWinnerPagePair(false, true);
+        $winnerUrl          = self::getContainer()->get(RouterInterface::class)->generate('mautic_page_action', [
+            'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+
+        $this->client->request(Request::METHOD_GET, "/s/pages/view/{$parent->getId()}");
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testManualWinnerActionIsUnavailableBeforeAbTestStarts(): void
+    {
+        [$parent, $variant] = $this->createManualWinnerPagePair(true, false);
+        $winnerUrl          = self::getContainer()->get(RouterInterface::class)->generate('mautic_page_action', [
+            'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+
+        $this->client->request(Request::METHOD_GET, "/s/pages/view/{$parent->getId()}");
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
     }
 
     private function createSegment(): LeadList
@@ -49,6 +109,41 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $segment;
+    }
+
+    /**
+     * @return array{0: Page, 1: Page}
+     */
+    private function createManualWinnerPagePair(bool $variantPublished, bool $testStarted): array
+    {
+        $suffix = bin2hex(random_bytes(4));
+        $parent = new Page();
+        $parent->setTitle('Manual winner parent')
+            ->setAlias('manual-winner-parent-'.$suffix)
+            ->setTemplate('blank');
+        $parent->setCustomHtml('Manual winner parent html');
+        $parent
+            ->setIsPublished(true)
+            ->setVariantStartDate($testStarted ? new \DateTime('-1 hour') : null);
+        $this->em->persist($parent);
+
+        $variant = new Page();
+        $variant->setTitle('Manual winner variant')
+            ->setAlias('manual-winner-variant-'.$suffix)
+            ->setTemplate('blank');
+        $variant->setCustomHtml('Manual winner variant html');
+        $variant
+            ->setIsPublished($variantPublished)
+            ->setVariantParent($parent)
+            ->setVariantSettings([
+                'weight'         => 50,
+                'winnerCriteria' => 'page.bouncerate',
+            ]);
+        $parent->addVariantChild($variant);
+        $this->em->persist($variant);
+        $this->em->flush();
+
+        return [$parent, $variant];
     }
 
     /**
@@ -102,6 +197,7 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedPage = $this->em->find(Page::class, $page->getId());
+        $this->assertInstanceOf(Page::class, $savedPage);
         $this->assertSame($project->getId(), $savedPage->getProjects()->first()->getId());
     }
 
@@ -129,7 +225,7 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        Assert::assertEquals('New Page', $this->em->find(Page::class, $pageId)->getTitle());
+        $this->assertEquals('New Page', $this->em->find(Page::class, $pageId)->getTitle());
     }
 
     public function testOptimisticLock(): void
@@ -149,16 +245,14 @@ class PageControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $this->assertPageVersion($page->getId(), $version, 'The version should stay the same as there was an optimistic lock error.');
-        Assert::assertStringContainsString(
-            'The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.',
-            $crawler->text(), 'There should be an optimistic error as the form was not refreshed after the previous submission.',
-        );
+        $this->assertStringContainsString('The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.', $crawler->text(), 'There should be an optimistic error as the form was not refreshed after the previous submission.');
     }
 
     private function assertPageVersion(int $id, int $expectedVersion, string $message = ''): void
     {
         $this->em->clear();
         $page = $this->em->find(Page::class, $id);
-        Assert::assertSame($expectedVersion, $page->getVersion(), $message);
+        $this->assertInstanceOf(Page::class, $page);
+        $this->assertSame($expectedVersion, $page->getVersion(), $message);
     }
 }

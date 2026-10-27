@@ -2,7 +2,6 @@
 //== Bootstrap variable
 //
 //## import bootstrap variable.
-@import 'bootstrap/variables';
 @import '../../libraries/bootstrap/bootstrap-mautic-custom-variables';
 @import 'components/brand';
 @import 'mixins';
@@ -63,7 +62,6 @@ $content-bg:                                #f8f8f8;
 //## common footer variable.
 $footer-height:                             46px;
 $footer-bg:                                 transparent;
-$footer-zindex:                             $content-zindex;  // 1000
 
 
 $brand-facebook:        #3b5998;

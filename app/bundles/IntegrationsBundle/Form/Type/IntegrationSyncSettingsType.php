@@ -15,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class IntegrationSyncSettingsType extends AbstractType
+final class IntegrationSyncSettingsType extends AbstractType
 {
     /**
      * @throws IntegrationNotFoundException
@@ -38,7 +38,7 @@ class IntegrationSyncSettingsType extends AbstractType
                 'expanded'    => true,
                 'multiple'    => true,
                 'label'       => 'mautic.integration.sync_objects',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'placeholder' => [],
                 'required'    => false,
             ]
@@ -51,7 +51,7 @@ class IntegrationSyncSettingsType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'       => 'mautic.integration.sync.update_blanks',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'placeholder' => false,
                 'required'    => false,
                 'data'        => !empty($options['data']['updateBlanks'])

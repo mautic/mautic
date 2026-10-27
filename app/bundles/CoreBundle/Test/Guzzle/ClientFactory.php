@@ -9,7 +9,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 
-class ClientFactory
+final class ClientFactory
 {
     public static function stub(MockHandler $handler): ClientInterface
     {

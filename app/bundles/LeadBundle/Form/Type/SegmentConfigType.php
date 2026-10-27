@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -9,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class SegmentConfigType extends AbstractType
+final class SegmentConfigType extends AbstractType
 {
     /**
      * @param FormBuilderInterface<FormBuilderInterface> $builder
@@ -22,7 +24,7 @@ class SegmentConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.lead.list.form.config.segment_rebuild_time_warning',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.list.form.config.segment_rebuild_time_warning.tooltip',
@@ -36,7 +38,7 @@ class SegmentConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.lead.list.form.config.segment_build_time_warning',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.list.form.config.segment_build_time_warning.tooltip',

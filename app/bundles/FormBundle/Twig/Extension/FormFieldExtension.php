@@ -18,13 +18,13 @@ final class FormFieldExtension extends AbstractExtension
         ];
     }
 
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('formFieldParseBooleanList', [FormFieldHelper::class, 'parseBooleanList']),
             new TwigFunction('formFieldParseList', [FormFieldHelper::class, 'parseList']),
             new TwigFunction('formFieldParseListForChoices', [FormFieldHelper::class, 'parseListForChoices']),
-            new TwigFunction('formFieldCleanInputAttributes', [$this, 'cleanInputAttributes']),
+            new TwigFunction('formFieldCleanInputAttributes', $this->cleanInputAttributes(...)),
         ];
     }
 
@@ -38,7 +38,7 @@ final class FormFieldExtension extends AbstractExtension
         $value = htmlspecialchars($value, ENT_SUBSTITUTE, 'UTF-8', false);
         // Remove any attribute starting with "on" or javascript used in href, src, value, data, etc.
         preg_match('/(on[A-Za-z]*\s*=|javascript:)/i', $value, $result);
-        if (!empty($result)) {
+        if ([] !== $result) {
             return '';
         }
 

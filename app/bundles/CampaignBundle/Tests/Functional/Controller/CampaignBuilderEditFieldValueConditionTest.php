@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class CampaignBuilderEditFieldValueConditionTest extends MauticMysqlTestCase
@@ -98,7 +97,7 @@ final class CampaignBuilderEditFieldValueConditionTest extends MauticMysqlTestCa
         self::assertResponseIsSuccessful();
 
         // Additional verification: ensure response is valid JSON
-        Assert::assertJson($response->getContent());
+        $this->assertJson($response->getContent());
     }
 
     private function setupCampaignWithLeadList(): Campaign

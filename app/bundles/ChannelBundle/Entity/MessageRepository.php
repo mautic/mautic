@@ -9,7 +9,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Message>
  */
-class MessageRepository extends CommonRepository
+final class MessageRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
@@ -49,7 +49,7 @@ class MessageRepository extends CommonRepository
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in($alias.'.id', ':search'))
                     ->setParameter('search', $search);
             } else {

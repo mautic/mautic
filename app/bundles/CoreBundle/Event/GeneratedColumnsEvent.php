@@ -8,9 +8,9 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class GeneratedColumnsEvent extends Event
+final class GeneratedColumnsEvent extends Event
 {
-    private GeneratedColumns $generatedColumns;
+    private readonly GeneratedColumns $generatedColumns;
 
     public function __construct()
     {

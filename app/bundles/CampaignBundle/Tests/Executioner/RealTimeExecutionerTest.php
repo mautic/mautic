@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,6 +15,7 @@ use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
 use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -21,7 +24,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
-class RealTimeExecutionerTest extends TestCase
+final class RealTimeExecutionerTest extends TestCase
 {
     private MockObject&LeadModel $leadModel;
 
@@ -36,8 +39,6 @@ class RealTimeExecutionerTest extends TestCase
     private MockObject&EventScheduler $eventScheduler;
 
     private MockObject&ContactTracker $contactTracker;
-
-    private MockObject&LeadRepository $leadRepository;
 
     private DecisionHelper $decisionHelper;
 
@@ -59,14 +60,12 @@ class RealTimeExecutionerTest extends TestCase
 
         $this->contactTracker = $this->createMock(ContactTracker::class);
 
-        $this->leadRepository = $this->createMock(LeadRepository::class);
-
-        $this->decisionHelper    = new DecisionHelper($this->leadRepository);
+        $this->decisionHelper    = new DecisionHelper($this->createStub(LeadRepository::class));
         $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
 
         // Configure the redirection helper mock to return the event it receives
         $this->redirectionHelper->method('handleEventRedirection')
-            ->willReturnCallback(fn (Event $event) => $event);
+            ->willReturnCallback(fn (Event $event): Event => $event);
     }
 
     public function testContactNotFoundResultsInEmptyResponses(): void
@@ -79,8 +78,9 @@ class RealTimeExecutionerTest extends TestCase
             ->method('getContactPendingEvents');
 
         $responses = $this->getExecutioner()->execute('something');
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     public function testNoRelatedEventsResultInEmptyResponses(): void
@@ -102,8 +102,9 @@ class RealTimeExecutionerTest extends TestCase
             ->method('getEventConfig');
 
         $responses = $this->getExecutioner()->execute('something');
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     public function testChannelMisMatchResultsInEmptyResponses(): void
@@ -132,8 +133,9 @@ class RealTimeExecutionerTest extends TestCase
             ->method('getEventConfig');
 
         $responses = $this->getExecutioner()->execute('something', null, 'page');
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     public function testChannelFuzzyMatchResultsInNonEmptyResponses(): void
@@ -154,8 +156,8 @@ class RealTimeExecutionerTest extends TestCase
         $event->method('getEventType')
             ->willReturn(Event::TYPE_DECISION);
 
-        $action1 = $this->createMock(Event::class);
-        $action2 = $this->createMock(Event::class);
+        $action1 = $this->createStub(Event::class);
+        $action2 = $this->createStub(Event::class);
 
         $event->expects($this->once())
             ->method('getPositiveChildren')
@@ -210,8 +212,9 @@ class RealTimeExecutionerTest extends TestCase
             ->method('getEventConfig');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 1);
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     public function testEmptyPositiveactionsResultsInEmptyResponses(): void
@@ -244,8 +247,9 @@ class RealTimeExecutionerTest extends TestCase
             ->method('evaluateForContact');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 3);
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     public function testAssociatedEventsAreExecuted(): void
@@ -265,8 +269,8 @@ class RealTimeExecutionerTest extends TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $action1 = $this->createMock(Event::class);
-        $action2 = $this->createMock(Event::class);
+        $action1 = $this->createStub(Event::class);
+        $action2 = $this->createStub(Event::class);
 
         $event = $this->getEventMock(2, 3);
         $event->method('getEventType')
@@ -301,8 +305,9 @@ class RealTimeExecutionerTest extends TestCase
             ->method('executeEventsForContact');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 3);
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     public function testNonDecisionEventsAreIgnored(): void
@@ -331,8 +336,9 @@ class RealTimeExecutionerTest extends TestCase
             ->willReturn([$event]);
 
         $responses = $this->getExecutioner()->execute('something');
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     private function getEventMock(int $getChannelExpectsCount, int $getChannelIdExpectsCount): MockObject
@@ -348,10 +354,7 @@ class RealTimeExecutionerTest extends TestCase
         return $event;
     }
 
-    /**
-     * @return RealTimeExecutioner
-     */
-    private function getExecutioner()
+    private function getExecutioner(): RealTimeExecutioner
     {
         return new RealTimeExecutioner(
             new NullLogger(),

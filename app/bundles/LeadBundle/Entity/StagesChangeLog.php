@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -67,8 +69,6 @@ class StagesChangeLog
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -77,13 +77,9 @@ class StagesChangeLog
     }
 
     /**
-     * Set eventName.
-     *
      * @param string $eventName
-     *
-     * @return StagesChangeLog
      */
-    public function setEventName($eventName)
+    public function setEventName($eventName): static
     {
         $this->eventName = $eventName;
 
@@ -91,8 +87,6 @@ class StagesChangeLog
     }
 
     /**
-     * Get eventName.
-     *
      * @return string
      */
     public function getEventName()
@@ -101,13 +95,9 @@ class StagesChangeLog
     }
 
     /**
-     * Set actionName.
-     *
      * @param string $actionName
-     *
-     * @return StagesChangeLog
      */
-    public function setActionName($actionName)
+    public function setActionName($actionName): static
     {
         $this->actionName = $actionName;
 
@@ -115,8 +105,6 @@ class StagesChangeLog
     }
 
     /**
-     * Get actionName.
-     *
      * @return string
      */
     public function getActionName()
@@ -125,13 +113,9 @@ class StagesChangeLog
     }
 
     /**
-     * Set dateAdded.
-     *
      * @param \DateTime $dateAdded
-     *
-     * @return StagesChangeLog
      */
-    public function setDateAdded($dateAdded)
+    public function setDateAdded($dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -139,8 +123,6 @@ class StagesChangeLog
     }
 
     /**
-     * Get dateAdded.
-     *
      * @return \DateTimeInterface
      */
     public function getDateAdded()
@@ -148,12 +130,7 @@ class StagesChangeLog
         return $this->dateAdded;
     }
 
-    /**
-     * Set lead.
-     *
-     * @return StagesChangeLog
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -161,8 +138,6 @@ class StagesChangeLog
     }
 
     /**
-     * Get lead.
-     *
      * @return Lead
      */
     public function getLead()
@@ -170,12 +145,7 @@ class StagesChangeLog
         return $this->lead;
     }
 
-    /**
-     * Set stage.
-     *
-     * @return StagesChangeLog
-     */
-    public function setStage(Stage $stage)
+    public function setStage(Stage $stage): static
     {
         $this->stage = $stage;
 
@@ -183,8 +153,6 @@ class StagesChangeLog
     }
 
     /**
-     * Get stage.
-     *
      * @return Stage|null
      */
     public function getStage()

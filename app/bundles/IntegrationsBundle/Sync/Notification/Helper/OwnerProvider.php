@@ -8,7 +8,6 @@ use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
-use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -16,21 +15,19 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class OwnerProvider
 {
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
-        private ObjectProvider $objectProvider,
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly ObjectProvider $objectProvider,
     ) {
     }
 
     /**
      * @param int[] $objectIds
      *
-     * @return ObjectInterface
-     *
      * @throws ObjectNotSupportedException
      */
     public function getOwnersForObjectIds(string $objectName, array $objectIds): array
     {
-        if (empty($objectIds)) {
+        if ([] === $objectIds) {
             return [];
         }
 

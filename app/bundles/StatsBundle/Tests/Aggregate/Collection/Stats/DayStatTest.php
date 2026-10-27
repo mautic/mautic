@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection\Stats;
 
 use Mautic\StatsBundle\Aggregate\Collection\Stats\DayStat;
 use Mautic\StatsBundle\Aggregate\Collection\Stats\HourStat;
 use PHPUnit\Framework\TestCase;
 
-class DayStatTest extends TestCase
+final class DayStatTest extends TestCase
 {
     private string $day = '2019-11-07';
 
@@ -24,21 +26,20 @@ class DayStatTest extends TestCase
 
     public function testGetHour(): void
     {
-        $this->assertInstanceOf(HourStat::class, $this->hourStat);
-        $this->assertSame("$this->day $this->hour", $this->hourStat->getHour());
+        $this->assertSame("{$this->day} {$this->hour}", $this->hourStat->getHour());
         $this->assertSame(0, $this->hourStat->getCount());
 
         $this->hourStat = $this->dayStat->getHour($this->hour);
 
         $this->assertSame($this->hourStat, $this->dayStat->getHour($this->hour));
-        $this->assertSame("$this->day $this->hour", $this->hourStat->getHour());
+        $this->assertSame("{$this->day} {$this->hour}", $this->hourStat->getHour());
         $this->assertSame(0, $this->hourStat->getCount());
     }
 
     public function testGetStats(): void
     {
         $result = $this->dayStat->getStats();
-        $this->assertSame(["$this->day $this->hour" => $this->hourStat], $result);
+        $this->assertSame(["{$this->day} {$this->hour}" => $this->hourStat], $result);
     }
 
     public function testGetSum(): void

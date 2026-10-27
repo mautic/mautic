@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -21,14 +21,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Company>
  */
-class CompanyType extends AbstractType
+final class CompanyType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
     public function __construct(
-        private EntityManager $em,
-        protected RouterInterface $router,
-        protected TranslatorInterface $translator,
+        private EntityManagerInterface $em,
+        private RouterInterface $router,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -45,7 +45,7 @@ class CompanyType extends AbstractType
                 UserListType::class,
                 [
                     'label'      => 'mautic.lead.company.field.owner',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class' => 'form-control',
                     ],
@@ -62,7 +62,7 @@ class CompanyType extends AbstractType
             [
                 'label'      => 'mautic.company.score',
                 'attr'       => ['class' => 'form-control'],
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'scale'      => 0,
                 'required'   => false,
             ]

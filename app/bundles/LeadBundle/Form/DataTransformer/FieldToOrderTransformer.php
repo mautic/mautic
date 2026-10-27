@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\DataTransformer;
 
 use Mautic\LeadBundle\Entity\LeadField;
@@ -9,7 +11,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 /**
  * @implements DataTransformerInterface<LeadField|null, int|null>
  */
-class FieldToOrderTransformer implements DataTransformerInterface
+final readonly class FieldToOrderTransformer implements DataTransformerInterface
 {
     public function __construct(
         private LeadFieldRepository $leadFieldRepository,

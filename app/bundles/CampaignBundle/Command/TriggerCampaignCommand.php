@@ -18,10 +18,11 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
-use Mautic\LeadBundle\Model\ListModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
@@ -33,7 +34,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     name: 'mautic:campaigns:trigger',
     description: 'Trigger timed events for published campaigns.'
 )]
-class TriggerCampaignCommand extends ModeratedCommand
+final class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
 
@@ -61,16 +62,16 @@ class TriggerCampaignCommand extends ModeratedCommand
         private InactiveExecutioner $inactiveExecutioner,
         private LoggerInterface $logger,
         private FormatterHelper $formatterHelper,
-        private ListModel $listModel,
         private SegmentCountCacheHelper $segmentCountCacheHelper,
         PathsHelper $pathsHelper,
         private CoreParametersHelper $coreParametersHelper,
         private ProcessSignalService $processSignalService,
+        private readonly LeadListRepository $leadListRepository,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
@@ -213,23 +214,23 @@ class TriggerCampaignCommand extends ModeratedCommand
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads, $campaignLimit);
 
-        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
+        defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 
         $moderationKey = sprintf('%s-%s', $id, $threadId);
         if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
         try {
             // Specific campaign;
             if ($id) {
                 $statusCode = ExitCode::SUCCESS;
-                /** @var Campaign $campaign */
-                if ($campaign = $this->campaignRepository->getEntity($id)) {
+                $campaign = $this->campaignRepository->getEntity($id);
+                if ($campaign instanceof Campaign) {
                     $this->triggerCampaign($campaign);
                 } else {
                     $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
@@ -282,7 +283,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     /**
      * @return bool
      */
-    protected function dispatchTriggerEvent(Campaign $campaign)
+    private function dispatchTriggerEvent(Campaign $campaign)
     {
         if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_TRIGGER)) {
             /** @var CampaignTriggerEvent $event */
@@ -416,7 +417,7 @@ class TriggerCampaignCommand extends ModeratedCommand
             if ($updateSegmentCountInBackground) {
                 $this->segmentCountCacheHelper->invalidateSegmentContactCount($segmentId);
             } else {
-                $totalLeadCount = $this->listModel->getRepository()->getLeadCount($segmentId);
+                $totalLeadCount = $this->leadListRepository->getLeadCount($segmentId);
                 $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
             }
         }

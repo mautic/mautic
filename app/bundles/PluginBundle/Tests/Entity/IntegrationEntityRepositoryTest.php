@@ -8,32 +8,27 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
-use PHPUnit\Framework\Assert;
 
 /**
  * IntegrationRepository.
  */
-class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
+final class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 {
     public const INTEGRATION        = 'someIntegration';
+
     public const INTEGRATION_ENTITY = 'someIntegrationEntity';
+
     public const INTERNAL_ENTITY    = 'lead';
 
-    /**
-     * @var string
-     */
-    private $prefix;
+    private string $prefix;
 
-    /**
-     * @var IntegrationEntityRepository
-     */
-    private $integrationEntityRepository;
+    private IntegrationEntityRepository $integrationEntityRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->prefix                      = static::getContainer()->getParameter('mautic.db_table_prefix');
-        $this->integrationEntityRepository = $this->em->getRepository(IntegrationEntity::class);
+        $this->prefix                      = self::getContainer()->getParameter('mautic.db_table_prefix');
+        $this->integrationEntityRepository = self::getContainer()->get(IntegrationEntityRepository::class);
     }
 
     public function testThatGetIntegrationsEntityIdReturnsCorrectValues(): void
@@ -62,13 +57,12 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
             null,
             false,
             0,
-            0,
-            null
+            0
         );
 
-        Assert::assertCount(1, $results);
-        Assert::assertSame($integrationEntityId, (int) $results[0]['integration_entity_id']);
-        Assert::assertSame($internalEntityId, (int) $results[0]['internal_entity_id']);
+        $this->assertCount(1, $results);
+        $this->assertSame($integrationEntityId, (int) $results[0]['integration_entity_id']);
+        $this->assertSame($internalEntityId, (int) $results[0]['internal_entity_id']);
     }
 
     public function testFindLeadsToUpdate(): void
@@ -121,7 +115,7 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
 
     public function testGetIntegrationEntityByLeadWhenNoIntegrationNamePassed(): void
     {
-        $prefix = static::getContainer()->getParameter('mautic.db_table_prefix');
+        $prefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
         $this->connection->executeQuery('SET FOREIGN_KEY_CHECKS=0;');
         $this->connection->executeQuery("INSERT INTO {$prefix}plugin_integration_settings(plugin_id, name, is_published, api_keys) VALUES (:id, :name, :isPublished, '')", ['id' => 1, 'name' => self::INTEGRATION, 'isPublished' => 1]);

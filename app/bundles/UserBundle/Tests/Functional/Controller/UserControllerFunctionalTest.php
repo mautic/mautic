@@ -8,9 +8,14 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Tests\Traits\CreateEntityTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DomCrawler\Crawler;
 
-class UserControllerFunctionalTest extends MauticMysqlTestCase
+final class UserControllerFunctionalTest extends MauticMysqlTestCase
 {
+    use CreateEntityTrait;
+
     protected function setUp(): void
     {
         $this->configParams += [
@@ -23,6 +28,56 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/s/users/edit/1');
         $this->assertResponseIsSuccessful();
+    }
+
+    #[DataProvider('unmatchedActivityProvider')]
+    public function testEditPageWithUnmatchedActivity(string $object, string $action): void
+    {
+        // Non-empty profile values prevent unrelated users matching empty audit details.
+        foreach ($this->em->getRepository(User::class)->findAll() as $user) {
+            $user->setFirstName('Existing');
+            $user->setLastName('User');
+            $user->setPosition('Existing position');
+            $user->setSignature('Existing signature');
+        }
+        $role = new Role();
+        $role->setName('Activity test role');
+        $role->setDescription('Activity test role description');
+        $this->em->persist($role);
+
+        $actor = $this->userSetter($role);
+        $actor->setPosition('Activity test position');
+        $actor->setSignature('Activity test signature');
+        $this->em->persist($actor);
+        $this->em->flush();
+
+        $log = $this->auditLogSetter($actor->getId(), 'Historical actor', 'user', $object, 999999, $action, [
+            'email'    => ['', 'deleted@example.com'],
+            // Older records may lack a usable username as well as a current target.
+            'username' => ['', ''],
+            'name'     => ['', 'Deleted role'],
+        ]);
+        $this->em->persist($log);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/s/users/edit/'.$actor->getId());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $crawler->filter('form[name="user"]'));
+        $activity = $crawler->filter('.media-list-feed li.media');
+        $this->assertCount(1, $activity);
+        $this->assertCount(1, $activity->filter('a'));
+        $this->assertSame('Historical actor', $activity->filter('a')->text());
+        $this->assertSame('/s/users/edit/'.$actor->getId(), $activity->filter('a')->attr('href'));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function unmatchedActivityProvider(): iterable
+    {
+        yield 'user created' => ['user', 'create'];
+        yield 'user updated' => ['user', 'update'];
     }
 
     public function testRedirectNonExistingUser(): void
@@ -43,7 +98,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $response = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('has been updated!', $response->getContent());
+        $this->assertStringContainsString('has been updated!', (string) $response->getContent());
     }
 
     public function testEditActionFormSubmissionInvalid(): void
@@ -60,7 +115,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('The email entered is invalid.', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('The email entered is invalid.', (string) $this->client->getResponse()->getContent());
     }
 
     public function testIndexIncludesInviteForm(): void
@@ -69,6 +124,48 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertGreaterThan(0, $crawler->filter('#invite-user-form')->count());
+    }
+
+    #[DataProvider('neverLoggedInSearchProvider')]
+    public function testNeverLoggedInQuickFilterShowsUsersWithoutLastLogin(string $query): void
+    {
+        $admin = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $admin);
+        $adminRole = $admin->getRole();
+        $this->assertInstanceOf(Role::class, $adminRole);
+        $loggedInUser = $this->createUser($adminRole, 'alreadyloggedin@example.com');
+        $loggedInUser->setLastLogin(new \DateTime('2024-02-22 10:30:00'));
+        $neverLoggedInUser = $this->createUser($adminRole, 'neverloggedinfilter@example.com');
+        $this->em->flush();
+        $this->em->refresh($loggedInUser);
+        $this->assertInstanceOf(\DateTimeInterface::class, $loggedInUser->getLastLogin());
+
+        $crawler = $this->client->request('GET', '/s/users?'.$query);
+
+        $this->assertResponseIsSuccessful();
+        $usernames = $crawler->filter('#userTable tbody tr td:nth-child(4)')->each(
+            static fn (Crawler $cell): string => $cell->text()
+        );
+
+        $this->assertContains($neverLoggedInUser->getUsername(), $usernames);
+        $this->assertNotContains($loggedInUser->getUsername(), $usernames);
+
+        $crawler = $this->client->request('GET', '/s/users?search=');
+        $this->assertResponseIsSuccessful();
+        $usernames = $crawler->filter('#userTable tbody tr td:nth-child(4)')->each(
+            static fn (Crawler $cell): string => $cell->text()
+        );
+        $this->assertContains($neverLoggedInUser->getUsername(), $usernames);
+        $this->assertContains($loggedInUser->getUsername(), $usernames);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function neverLoggedInSearchProvider(): iterable
+    {
+        yield 'full page' => ['search=is%3Anever_logged_in'];
+        yield 'list fragment' => ['search=is%3Anever_logged_in&tmpl=list'];
     }
 
     public function testInviteActionShowsForm(): void
@@ -84,13 +181,13 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', '/s/users/invite');
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('name="user_invite"', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('name="user_invite"', (string) $this->client->getResponse()->getContent());
     }
 
     /**
      * @param array<string, string> $data
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataNewUserForPasswordField')]
+    #[DataProvider('dataNewUserForPasswordField')]
     public function testNewUserForPasswordField(array $data, string $message): void
     {
         $crawler = $this->client->request('GET', '/s/users/new');
@@ -106,7 +203,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($message, (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -149,7 +246,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<string, string> $data
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForEditUserForPasswordField')]
+    #[DataProvider('dataForEditUserForPasswordField')]
     public function testEditUserForPasswordField(array $data, string $message): void
     {
         $crawler = $this->client->request('GET', '/s/users/edit/1');
@@ -159,7 +256,7 @@ class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString($message, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($message, (string) $this->client->getResponse()->getContent());
     }
 
     /**

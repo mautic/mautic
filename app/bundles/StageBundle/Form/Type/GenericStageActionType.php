@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StageBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -9,14 +11,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class GenericStageActionType extends AbstractType
+final class GenericStageActionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $default = (empty($options['data']['weight'])) ? 0 : (int) $options['data']['weight'];
         $builder->add('weight', NumberType::class, [
             'label'      => 'mautic.stage.action.weight',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.stage.action.weight.help',

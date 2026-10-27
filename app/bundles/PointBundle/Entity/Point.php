@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PointBundle\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
@@ -110,7 +112,7 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @var Category|null
-     **/
+     */
     #[Groups(['point:read', 'point:write'])]
     private $category;
 
@@ -172,22 +174,13 @@ class Point extends FormEntity implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required'));
 
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank([
-            'message' => 'mautic.point.type.notblank',
-        ]));
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank(message: 'mautic.point.type.notblank'));
 
-        $metadata->addPropertyConstraint('delta', new Assert\NotBlank([
-            'message' => 'mautic.point.delta.notblank',
-        ]));
+        $metadata->addPropertyConstraint('delta', new Assert\NotBlank(message: 'mautic.point.delta.notblank'));
 
-        $metadata->addPropertyConstraint('delta', new Assert\Range([
-            'min' => IntHelper::MIN_INTEGER_VALUE,
-            'max' => IntHelper::MAX_INTEGER_VALUE,
-        ]));
+        $metadata->addPropertyConstraint('delta', new Assert\Range(min: IntHelper::MIN_INTEGER_VALUE, max: IntHelper::MAX_INTEGER_VALUE));
     }
 
     /**
@@ -229,10 +222,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param array $properties
-     *
-     * @return self
      */
-    public function setProperties($properties)
+    public function setProperties($properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -251,10 +242,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param string $type
-     *
-     * @return self
      */
-    public function setType($type)
+    public function setType($type): static
     {
         $this->isChanged('type', $type);
         $this->type = $type;
@@ -277,10 +266,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param string $description
-     *
-     * @return self
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -298,10 +285,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param string $name
-     *
-     * @return self
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -317,10 +302,7 @@ class Point extends FormEntity implements UuidInterface
         return $this->name;
     }
 
-    /**
-     * @return self
-     */
-    public function addLog(LeadPointLog $log)
+    public function addLog(LeadPointLog $log): static
     {
         $this->log[] = $log;
 
@@ -342,10 +324,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param \DateTime $publishUp
-     *
-     * @return Point
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -363,10 +343,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param \DateTime $publishDown
-     *
-     * @return Point
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -416,10 +394,8 @@ class Point extends FormEntity implements UuidInterface
 
     /**
      * @param bool $repeatable
-     *
-     * @return Point
      */
-    public function setRepeatable($repeatable)
+    public function setRepeatable($repeatable): static
     {
         $this->isChanged('repeatable', $repeatable);
         $this->repeatable = $repeatable;

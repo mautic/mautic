@@ -6,12 +6,12 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CategoryBundle\Model\CategoryModel;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 
-class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private CategoryModel $categoryModel,
+        private readonly CategoryRepository $categoryRepository,
     ) {
     }
 
@@ -26,11 +26,11 @@ class LoadPageCategoryData extends AbstractFixture implements OrderedFixtureInte
         $cat->setTitle($events);
         $cat->setAlias(strtolower($events));
 
-        $this->categoryModel->getRepository()->saveEntity($cat);
+        $this->categoryRepository->saveEntity($cat);
         $this->setReference('page-cat-1', $cat);
     }
 
-    public function getOrder()
+    public function getOrder(): int
     {
         return 6;
     }
