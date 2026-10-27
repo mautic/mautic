@@ -828,7 +828,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $segment = $this->createSegment($filters);
 
         $contactA = new Lead();
-        $contactA->setDateModified(new \DateTime('-1 hour'));
+        $contactA->setDateModified(new \DateTime('today 12:00:00'));
 
         $contactB = new Lead();
         $contactB->setDateModified((new \DateTime())->modify('+1 day'));
