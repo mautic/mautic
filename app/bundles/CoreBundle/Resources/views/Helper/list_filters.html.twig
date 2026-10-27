@@ -9,7 +9,7 @@
 
     {% set selected = (selectedValues is defined and optionValue in selectedValues) ? ' selected' : '' %}
 
-    {% if prefix is defined %}
+    {% if prefix is not empty %}
         {% set optionValue = prefix ~ ':' ~ optionValue %}
     {% endif %}
 

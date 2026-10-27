@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller;
 
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\PointBundle\Entity\LeadPointLog;
+use Mautic\PointBundle\Entity\LeadTriggerLog;
 use Mautic\PointBundle\Entity\Point;
+use Mautic\PointBundle\Entity\Trigger;
+use Mautic\PointBundle\Entity\TriggerEvent;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,20 +48,30 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
     public function testSubmissionTracksTheVisitorOnlyWhenTheRequestIsTrackable(array $server, bool $expectTracking): void
     {
         $formId = $this->createForm([
-            'label'        => 'Email',
-            'type'         => 'email',
-            'alias'        => 'email',
-            'mappedObject' => 'contact',
-            'mappedField'  => 'email',
+            [
+                'label'        => 'Email',
+                'type'         => 'email',
+                'alias'        => 'email',
+                'mappedObject' => 'contact',
+                'mappedField'  => 'email',
+            ],
+            [
+                'label'        => 'Company',
+                'type'         => 'text',
+                'alias'        => 'company',
+                'mappedObject' => 'company',
+                'mappedField'  => 'companyname',
+            ],
         ]);
         $this->createFormSubmitPointAction($formId);
+        $this->createPointTrigger();
 
         // The visitor is sent back to the referer after submitting, so it points at the form page itself
         $page    = "http://localhost/form/{$formId}";
         $referer = $page.'?email=visitor%40example.com&utm_source=newsletter#form';
 
         $this->logoutUser();
-        $this->submitForm($formId, ['mauticform[email]' => 'visitor@example.com'], $server + ['REMOTE_ADDR' => '203.0.113.9', 'HTTP_REFERER' => $referer]);
+        $this->submitForm($formId, ['mauticform[email]' => 'visitor@example.com', 'mauticform[company]' => 'Acme'], $server + ['REMOTE_ADDR' => '203.0.113.9', 'HTTP_REFERER' => $referer]);
 
         $cookieJar = $this->client->getCookieJar();
         $this->assertSame($expectTracking, $cookieJar->get('mautic_device_id') instanceof Cookie);
@@ -88,12 +105,27 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $pointLog = $this->em->getRepository(LeadPointLog::class)->findOneBy(['lead' => $contact]);
         $this->assertInstanceOf(LeadPointLog::class, $pointLog);
         $this->assertSame($expectTracking, null !== $pointLog->getIpAddress());
+
+        // The point trigger fired for the new contact keeps no IP either
+        $triggerLog = $this->em->getRepository(LeadTriggerLog::class)->findOneBy(['lead' => $contact]);
+        $this->assertInstanceOf(LeadTriggerLog::class, $triggerLog);
+        $this->assertSame($expectTracking, null !== $triggerLog->getIpAddress());
+
+        // Neither do the audit log entries for the contact and the company the submission created
+        $auditLogs = array_merge(
+            $this->em->getRepository(AuditLog::class)->findBy(['object' => 'lead', 'objectId' => $contact->getId()]),
+            $this->em->getRepository(AuditLog::class)->findBy(['object' => 'company'])
+        );
+        $this->assertCount(2, array_unique(array_map(static fn (AuditLog $log): string => $log->getObject(), $auditLogs)));
+        foreach ($auditLogs as $auditLog) {
+            $this->assertSame($expectTracking ? '203.0.113.9' : '', $auditLog->getIpAddress(), $auditLog->getObject().' '.$auditLog->getAction());
+        }
     }
 
     public function testAnonymousSubmissionWithPrivacySignalCreatesNoContact(): void
     {
         // Without a contact field there is nothing to save to a contact, so an untracked visitor gets none
-        $formId = $this->createForm(['label' => 'Comment', 'type' => 'text', 'alias' => 'comment']);
+        $formId = $this->createForm([['label' => 'Comment', 'type' => 'text', 'alias' => 'comment']]);
 
         $this->logoutUser();
         $this->submitForm($formId, ['mauticform[comment]' => 'Hello'], ['HTTP_DNT' => '1']);
@@ -106,6 +138,93 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->assertNotInstanceOf(IpAddress::class, $submission->getIpAddress());
         $this->assertNotInstanceOf(Lead::class, $submission->getLead());
         $this->assertSame([], $this->em->getRepository(Lead::class)->findAll());
+    }
+
+    public function testUntrackedVisitorCanSubmitFormWithFieldsHiddenByProgressiveProfiling(): void
+    {
+        // Only the first field is shown, so the second required field can't block the submission
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', [
+            'name'                      => 'Trackability form',
+            'formType'                  => 'standalone',
+            'isPublished'               => true,
+            'inKioskMode'               => 0,
+            'progressiveProfilingLimit' => 1,
+            'fields'                    => [
+                [
+                    'label'        => 'Email',
+                    'type'         => 'email',
+                    'alias'        => 'email',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
+                    'isRequired'   => true,
+                ],
+                [
+                    'label'        => 'First name',
+                    'type'         => 'text',
+                    'alias'        => 'firstname',
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'firstname',
+                    'isRequired'   => true,
+                ],
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
+        $formId = (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+
+        $this->logoutUser();
+        $crawler = $this->client->request(Request::METHOD_GET, "/form/{$formId}", [], [], ['HTTP_DNT' => '1']);
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(0, $crawler->filter('[name="mauticform[firstname]"]'));
+
+        $form = $crawler->filter('form[id=mauticform_trackabilityform]')->form();
+        $form->setValues(['mauticform[email]' => 'visitor@example.com']);
+        $this->client->submit($form, [], ['HTTP_DNT' => '1']);
+        $this->assertResponseIsSuccessful();
+
+        $this->em->clear();
+        $submission = $this->em->getRepository(Submission::class)->findOneBy(['form' => $formId]);
+        $this->assertInstanceOf(Submission::class, $submission);
+        $this->assertSame('visitor@example.com', $submission->getLead()?->getEmail());
+    }
+
+    public function testPointsChangedByFormAndCampaignActionsKeepNoIpForUntrackedVisitor(): void
+    {
+        // The form's "Adjust contact's points" action and a campaign "Change points" action both log points with an IP
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', [
+            'name'        => 'Trackability form',
+            'formType'    => 'campaign',
+            'isPublished' => true,
+            'fields'      => [[
+                'label'        => 'Email',
+                'type'         => 'email',
+                'alias'        => 'email',
+                'mappedObject' => 'contact',
+                'mappedField'  => 'email',
+            ]],
+            'actions'     => [[
+                'name'       => 'Adjust points',
+                'type'       => 'lead.pointschange',
+                'properties' => ['operator' => 'plus', 'points' => 3],
+            ]],
+        ]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
+        $formId = (int) json_decode((string) $this->client->getResponse()->getContent(), true)['form']['id'];
+        $this->createCampaignChangingPointsOnSubmit($formId);
+
+        $this->logoutUser();
+        $this->submitForm($formId, ['mauticform[email]' => 'visitor@example.com'], ['HTTP_DNT' => '1', 'REMOTE_ADDR' => '203.0.113.9']);
+
+        $this->em->clear();
+        $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'visitor@example.com']);
+        $this->assertInstanceOf(Lead::class, $contact);
+        $this->assertSame(7, $contact->getPoints());
+
+        $pointsChangeLogs = $this->em->getRepository(PointsChangeLog::class)->findBy(['lead' => $contact]);
+        $this->assertEqualsCanonicalizing(['campaign', 'form'], array_map(static fn (PointsChangeLog $log): string => $log->getType(), $pointsChangeLogs));
+        foreach ($pointsChangeLogs as $pointsChangeLog) {
+            $this->assertNotInstanceOf(IpAddress::class, $pointsChangeLog->getIpAddress(), $pointsChangeLog->getType());
+        }
+        $this->assertNotInstanceOf(IpAddress::class, $this->em->getRepository(IpAddress::class)->findOneBy(['ipAddress' => '203.0.113.9']));
     }
 
     /**
@@ -130,13 +249,13 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('trackingPermissionProvider')]
     public function testNoTrackingCookieIsSetUnlessTrackingIsPermitted(bool $inKioskMode, array $server, bool $trackingPermitted): void
     {
-        $formId = $this->createForm([
+        $formId = $this->createForm([[
             'label'        => 'Email',
             'type'         => 'email',
             'alias'        => 'email',
             'mappedObject' => 'contact',
             'mappedField'  => 'email',
-        ], $inKioskMode);
+        ]], $inKioskMode);
 
         $this->logoutUser();
         $this->client->getCookieJar()->clear();
@@ -161,17 +280,77 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
     }
 
+    private function createCampaignChangingPointsOnSubmit(int $formId): void
+    {
+        $form = $this->em->getReference(Form::class, $formId);
+
+        $campaign = new Campaign();
+        $campaign->setName('Change points on submit');
+        $campaign->setIsPublished(true);
+        $this->assertInstanceOf(Form::class, $form);
+        $campaign->addForm($form);
+
+        $decision = new Event();
+        $decision->setName('Submits the form');
+        $decision->setType('form.submit');
+        $decision->setEventType('decision');
+        $decision->setOrder(1);
+        $decision->setProperties(['forms' => [$formId]]);
+        $decision->setCampaign($campaign);
+
+        $action = new Event();
+        $action->setName('Add points');
+        $action->setType('lead.changepoints');
+        $action->setEventType('action');
+        $action->setOrder(2);
+        $action->setParent($decision);
+        $action->setDecisionPath('yes');
+        $action->setTriggerMode('immediate');
+        $action->setProperties(['points' => 4]);
+        $action->setCampaign($campaign);
+        $decision->addChild($action);
+
+        $campaign->addEvent(1, $decision);
+        $campaign->addEvent(2, $action);
+
+        $this->em->persist($campaign);
+        $this->em->persist($decision);
+        $this->em->persist($action);
+        $this->em->flush();
+        $this->em->clear();
+    }
+
+    private function createPointTrigger(): void
+    {
+        // A 0-point trigger fires for every new contact
+        $trigger = new Trigger();
+        $trigger->setName('Tag new contacts');
+        $trigger->setPoints(0);
+        $trigger->setIsPublished(true);
+
+        $event = new TriggerEvent();
+        $event->setName('Add a tag');
+        $event->setType('lead.changetags');
+        $event->setProperties(['add_tags' => ['new-contact'], 'remove_tags' => []]);
+        $event->setTrigger($trigger);
+        $trigger->addTriggerEvent('new', $event);
+
+        $this->em->persist($trigger);
+        $this->em->persist($event);
+        $this->em->flush();
+    }
+
     /**
-     * @param array<string, string> $field
+     * @param list<array<string, string>> $fields
      */
-    private function createForm(array $field, bool $inKioskMode = false): int
+    private function createForm(array $fields, bool $inKioskMode = false): int
     {
         $this->client->request(Request::METHOD_POST, '/api/forms/new', [
             'name'        => 'Trackability form',
             'formType'    => 'standalone',
             'isPublished' => true,
             'inKioskMode' => $inKioskMode,
-            'fields'      => [$field],
+            'fields'      => $fields,
         ]);
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED, (string) $this->client->getResponse()->getContent());
 

@@ -79,7 +79,7 @@ class LeadTriggerLog
     }
 
     /**
-     * @param IpAddress $ipAddress
+     * @param IpAddress|null $ipAddress
      */
     public function setIpAddress($ipAddress): void
     {
