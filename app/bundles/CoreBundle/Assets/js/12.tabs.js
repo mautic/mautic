@@ -323,6 +323,9 @@ Mautic.deleteTab = function(deleteBtn) {
      * Remember the last active tab for each tab list on the page.
      */
     Mautic.rememberActiveTabs = function() {
+        if (/\/new$/.test(globalThis.location.pathname)) {
+            return;
+        }
         mQuery('.nav-tabs').each(function(index) {
             // Using index would have nasty effects when tabs, with different tab count, are loaded asynchronously somewhere on the page.
             const $navTabs = mQuery(this);
