@@ -9,6 +9,16 @@
 {% set addons_append = addons_append|default([]) %}
 {% set control = control|default({}) %}
 {% set attributes = attributes|default({}) %}
+{% set control_describedby = [] %}
+{% if control.describedby is defined and control.describedby is not null %}
+    {% set control_describedby = control.describedby %}
+{% endif %}
+{% if control_describedby is not iterable %}
+    {% set control_describedby = [control_describedby] %}
+{% endif %}
+{% if help_id and help_id not in control_describedby %}
+    {% set control_describedby = control_describedby|merge([help_id]) %}
+{% endif %}
 {% set group_class = 'input-group' %}
 
 {% if size in ['sm', 'lg'] %}
@@ -49,7 +59,7 @@
             help_id: help_id,
             feedback_id: feedback_id,
             render_feedback: false,
-            describedby: help_id ? [help_id] : [],
+            describedby: control_describedby,
         }) %}
         {% include '@MauticCore/Components/' ~ control_type ~ '.html.twig' with control_context only %}
 
