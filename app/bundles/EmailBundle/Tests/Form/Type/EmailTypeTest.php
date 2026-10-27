@@ -52,7 +52,6 @@ final class EmailTypeTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->formBuilder->method('create')->willReturnSelf();
-        $this->formBuilder->method('add')->willReturnSelf();
         $this->formBuilder->method('addModelTransformer')->willReturnSelf();
         $corePermissions->method('hasPublishAccessForEntity')->willReturn(true);
         $translator->method('trans')->willReturn('translated');
@@ -61,24 +60,27 @@ final class EmailTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildForm(): void
     {
-        $options = ['data' => new Email()];
-        $names   = [];
+        $options          = ['data' => new Email()];
+        $names            = [];
+        $sendToDncOptions = [];
         $this->expectThemeHelper();
 
         $this->formBuilder->method('add')
-            ->with(
-                $this->callback(
-                    function (string|FormBuilderInterface $name) use (&$names): true {
-                        $names[] = $name;
-
-                        return true;
+            ->willReturnCallback(
+                function (string|FormBuilderInterface $name, ?string $type = null, array $fieldOptions = []) use (&$names, &$sendToDncOptions): FormBuilderInterface {
+                    $names[] = $name;
+                    if ('sendToDnc' === $name) {
+                        $sendToDncOptions = $fieldOptions;
                     }
-                )
+
+                    return $this->formBuilder;
+                }
             );
 
         $this->form->buildForm($this->formBuilder, $options);
 
         $this->assertContains('buttons', $names);
+        $this->assertSame('btn btn-danger', $sendToDncOptions['attr']['data-confirm-btn-class']);
     }
 
     private function expectThemeHelper(): void
