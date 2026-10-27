@@ -1,0 +1,144 @@
+name: Publish GrapesJS plugin package
+
+# Pushes each tag with compiled assets to the split repo. Release recommended-project after this succeeds.
+# The npm build runs in its own job, so third-party code never sees ACCESS_TOKEN.
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-grapesjs-package-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  SPLITSH_URL: https://github.com/splitsh/lite/releases/download/v1.0.1/lite_linux_amd64.tar.gz
+  SPLITSH_SHA256: 2539301ce5e21d0ca44b689d0dd2c1b20d9f9e996c1fe6c462afb8af4e7141cc
+
+jobs:
+  check:
+    name: Verify existing tag
+    if: github.repository == 'mautic/mautic'
+    runs-on: ubuntu-latest
+    outputs:
+      published: ${{ steps.existing.outputs.published }}
+      commit: ${{ steps.existing.outputs.commit }}
+
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+        # splitsh-lite needs full history.
+        fetch-depth: 0
+
+    - name: Install splitsh-lite
+      run: |
+        mkdir -p "$RUNNER_TEMP/splitsh"
+        curl -fsSL -o "$RUNNER_TEMP/splitsh.tar.gz" "$SPLITSH_URL"
+        echo "$SPLITSH_SHA256  $RUNNER_TEMP/splitsh.tar.gz" | sha256sum -c -
+        tar -xzf "$RUNNER_TEMP/splitsh.tar.gz" -C "$RUNNER_TEMP/splitsh"
+
+    # Public repo: read without credentials.
+    - name: Read the split repository over HTTPS
+      run: git config --global url.https://github.com/.insteadOf 'git@github.com:'
+
+    - name: Verify existing tag
+      id: existing
+      env:
+        SPLITSH: ${{ runner.temp }}/splitsh/splitsh-lite
+        TAG: ${{ github.ref_name }}
+      run: .github/scripts/publish-grapesjs-package.sh check-existing "$TAG"
+
+  build:
+    name: Build assets
+    needs: check
+    if: needs.check.outputs.published != 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      with:
+        node-version: '24'
+
+    - name: Build GrapesJS assets
+      working-directory: plugins/GrapesJsBuilderBundle
+      run: |
+        npm ci --prefer-offline --no-audit
+        npm run build
+
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: grapesjs-dist
+        path: plugins/GrapesJsBuilderBundle/Assets/library/js/dist
+        if-no-files-found: error
+        retention-days: 1
+
+  publish:
+    name: Publish tag
+    needs: [check, build]
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.publish.outputs.commit }}
+
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+        # splitsh-lite needs full history.
+        fetch-depth: 0
+
+    - name: Install splitsh-lite
+      run: |
+        mkdir -p "$RUNNER_TEMP/splitsh"
+        curl -fsSL -o "$RUNNER_TEMP/splitsh.tar.gz" "$SPLITSH_URL"
+        echo "$SPLITSH_SHA256  $RUNNER_TEMP/splitsh.tar.gz" | sha256sum -c -
+        tar -xzf "$RUNNER_TEMP/splitsh.tar.gz" -C "$RUNNER_TEMP/splitsh"
+
+    - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      with:
+        name: grapesjs-dist
+        path: plugins/GrapesJsBuilderBundle/Assets/library/js/dist
+
+    - uses: frankdejonge/use-github-token@ae451b947d7d5975ca9aaadf04655bbd75dfbd85 # 1.1.1
+      with:
+        authentication: 'username:${{ secrets.ACCESS_TOKEN }}'
+        user_name: 'Mautic CI'
+        user_email: 'ci@mautic.org'
+
+    - name: Publish tag with compiled assets
+      id: publish
+      env:
+        SPLITSH: ${{ runner.temp }}/splitsh/splitsh-lite
+        TAG: ${{ github.ref_name }}
+      run: .github/scripts/publish-grapesjs-package.sh publish "$TAG"
+
+  verify-packagist:
+    name: Verify Packagist package
+    needs: [check, publish]
+    # publish is skipped for an already published tag.
+    if: ${{ !cancelled() && needs.check.result == 'success' && (needs.check.outputs.published == 'true' || needs.publish.result == 'success') }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+
+    - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      with:
+        php-version: 8.2
+        tools: composer
+
+    - name: Wait for Packagist and install the package
+      env:
+        TAG: ${{ github.ref_name }}
+        COMMIT: ${{ needs.check.outputs.commit || needs.publish.outputs.commit }}
+      run: .github/scripts/publish-grapesjs-package.sh verify-packagist "$TAG" "$COMMIT"
