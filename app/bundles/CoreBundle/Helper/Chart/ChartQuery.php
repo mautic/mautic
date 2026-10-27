@@ -53,10 +53,17 @@ class ChartQuery extends AbstractChart
     {
         if ($filters && is_array($filters)) {
             foreach ($filters as $column => $value) {
+                // The filter array can originate from user input (e.g. the dashboard
+                // widget API). Column identifiers are concatenated straight into the SQL
+                // rather than bound as parameters, so they must be validated against a
+                // strict allow-list before use.
+                $this->assertSafeColumnName((string) $column);
+
                 $valId = $column.'_val';
 
                 // Special case: Lead list filter
                 if ('leadlist_id' === $column) {
+                    $this->assertSafeColumnName((string) $value['list_column_name']);
                     $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = '.$value['list_column_name']);
                     $query->andWhere('lll.leadlist_id = :'.$valId);
                     $query->setParameter($valId, $value['value']);
@@ -66,7 +73,11 @@ class ChartQuery extends AbstractChart
                         $query->setParameter($valId, $value['value']);
                     }
                 } elseif (isset($value['subquery'])) {
-                    $query->andWhere($value['subquery']);
+                    // A "subquery" is a raw, unparameterised SQL fragment. It must never
+                    // be accepted from a filter array that can be populated by a request.
+                    // Legitimate internal callers apply their server-built subqueries
+                    // directly on the QueryBuilder returned by prepareTimeDataQuery().
+                    throw new \InvalidArgumentException('Chart query filters may not contain a raw "subquery" fragment.');
                 } else {
                     $column = str_replace('t.', '', $column);
                     $valId  = str_replace('t.', '', $valId);
@@ -79,6 +90,19 @@ class ChartQuery extends AbstractChart
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Ensure an identifier that will be concatenated into raw SQL contains only an
+     * optional table alias plus a column name. This blocks SQL injection through the
+     * (potentially request-controlled) filter array keys and the leadlist_id
+     * "list_column_name" value, neither of which is parameterised.
+     */
+    private function assertSafeColumnName(string $identifier): void
+    {
+        if (!preg_match('/^(?:[A-Za-z_][A-Za-z0-9_]*\.)?[A-Za-z_][A-Za-z0-9_]*$/', $identifier)) {
+            throw new \InvalidArgumentException(sprintf('Invalid chart query column identifier: "%s".', $identifier));
         }
     }
 
