@@ -28,6 +28,7 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormSearchScopeProvider;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\PageBundle\Helper\AggregateAnalyticsHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -62,7 +63,7 @@ class FormController extends CommonFormController
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, FormSearchScopeProvider $formSearchScopeProvider, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, FormSearchScopeProvider $formSearchScopeProvider, AggregateAnalyticsHelper $aggregateAnalyticsHelper, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -108,6 +109,12 @@ class FormController extends CommonFormController
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
         $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
+        $aggregateAnalytics = $aggregateAnalyticsHelper->isEnabled();
+
+        // Sorting by the submission count would show the counts that aggregate analytics turned off
+        if (!$aggregateAnalytics && 'submission_count' === $orderBy) {
+            $orderBy = 'f.dateModified';
+        }
         $forms      = $this->formModel->getEntities(
             [
                 'start'      => $start,
@@ -154,6 +161,7 @@ class FormController extends CommonFormController
                     'permissions' => $permissions,
                     'security'    => $this->security,
                     'tmpl'        => $request->get('tmpl', 'index'),
+                    'aggregateAnalytics' => $aggregateAnalytics,
                 ],
                 'contentTemplate' => '@MauticForm/Form/list.html.twig',
                 'passthroughVars' => [
@@ -170,7 +178,7 @@ class FormController extends CommonFormController
      *
      * @param int $objectId
      */
-    public function viewAction(Request $request, $objectId): Response
+    public function viewAction(Request $request, AggregateAnalyticsHelper $aggregateAnalyticsHelper, $objectId): Response
     {
         $activeForm = $this->formModel->getEntity($objectId);
 
@@ -229,14 +237,15 @@ class FormController extends CommonFormController
         $dateRangeValues = $request->query->all()['daterange'] ?? $request->request->all()['daterange'] ?? [];
         $action          = $this->generateUrl('mautic_form_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
-        // Submission stats per time period
-        $timeStats = $this->submissionModel->getSubmissionsLineChartData(
+        // The submission counts are aggregate analytics, so they are not worked out when that is turned off
+        $aggregateAnalytics = $aggregateAnalyticsHelper->isEnabled();
+        $timeStats          = $aggregateAnalytics ? $this->submissionModel->getSubmissionsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
             null,
             ['form_id' => $objectId]
-        );
+        ) : [];
 
         // Only show actions and fields that still exist
         $customComponents  = $this->formModel->getCustomComponents();
@@ -259,13 +268,14 @@ class FormController extends CommonFormController
             $activeFormFields[] = $field;
         }
 
-        $submissionCounts = $this->submissionRepository->getSubmissionCounts($activeForm);
+        $submissionCounts = $aggregateAnalytics ? $this->submissionRepository->getSubmissionCounts($activeForm) : [];
 
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'activeForm'       => $activeForm,
-                    'submissionCounts' => $submissionCounts,
+                    'activeForm'         => $activeForm,
+                    'submissionCounts'   => $submissionCounts,
+                    'aggregateAnalytics' => $aggregateAnalytics,
                     'page'             => $page,
                     'logs'             => $logs,
                     'permissions'      => $permissions,
