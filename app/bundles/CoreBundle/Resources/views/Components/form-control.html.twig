@@ -41,8 +41,6 @@
     {% set describedby = describedby|merge([help_id]) %}
 {% endif %}
 
-{% set describedby_default = describedby|join(' ') %}
-
 {% if wrapperClass is defined and wrapperClass is not empty %}
 <div class="{{ wrapperClass }}">
 {% endif %}
