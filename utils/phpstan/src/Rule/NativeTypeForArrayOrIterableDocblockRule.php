@@ -76,6 +76,11 @@ final readonly class NativeTypeForArrayOrIterableDocblockRule implements Rule
                 continue;
             }
 
+            // a by-reference param often accepts broader runtime types than the docblock (e.g. a Traversable where an array is documented), so a native array/iterable type is unsafe
+            if ($param->byRef) {
+                continue;
+            }
+
             if (!$this->isMissingOrMixed($param->type)) {
                 continue;
             }

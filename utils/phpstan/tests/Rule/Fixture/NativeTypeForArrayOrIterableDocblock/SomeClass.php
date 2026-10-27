@@ -75,4 +75,11 @@ final class SomeClass
     public function skipNoDocblock($items): void
     {
     }
+
+    /**
+     * @param string[] $items
+     */
+    public function skipByRef(&$items): void
+    {
+    }
 }

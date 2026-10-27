@@ -160,15 +160,8 @@ final class DashboardModel extends FormModel
 
     /**
      * Fill widgets with their content.
-<<<<<<< HEAD
-     *
-     * @param array $widgets
-     */
-    public function populateWidgetsContent(&$widgets, array $filter = []): void
-=======
      */
     public function populateWidgetsContent(array &$widgets, array $filter = []): void
->>>>>>> 55a0b2d6b8 (Apply native array/iterable types from docblocks)
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
@@ -263,13 +256,12 @@ final class DashboardModel extends FormModel
     /**
      * @param Widget|array<string, mixed>      $entity
      * @param string|null $action
-     * @param array       $options
      *
      * @return FormInterface<mixed>
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Widget) {
             throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');

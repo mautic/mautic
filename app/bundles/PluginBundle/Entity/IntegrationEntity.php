@@ -229,20 +229,12 @@ class IntegrationEntity extends CommonEntity
         return $this;
     }
 
-<<<<<<< HEAD
     public function getInternal(): ?array
-=======
-    public function getInternal(): array
->>>>>>> 0ba9a2605b (Add rule requiring native array/iterable type for array/iterable docblocks)
     {
         return $this->internal;
     }
 
-<<<<<<< HEAD
     public function setInternal(?array $internal): static
-=======
-    public function setInternal(array $internal): static
->>>>>>> 0ba9a2605b (Add rule requiring native array/iterable type for array/iterable docblocks)
     {
         $this->internal = $internal;
 

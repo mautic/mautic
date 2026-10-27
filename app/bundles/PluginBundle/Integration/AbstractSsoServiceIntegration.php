@@ -124,11 +124,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     }
 
     /**
-<<<<<<< HEAD
      * @param Form|FormBuilder $builder
-=======
-     * @param Form|\Symfony\Component\Form\FormBuilder $builder
->>>>>>> 0ba9a2605b (Add rule requiring native array/iterable type for array/iterable docblocks)
      * @param string                                   $formArea
      */
     public function appendToForm($builder, array $data, $formArea): void

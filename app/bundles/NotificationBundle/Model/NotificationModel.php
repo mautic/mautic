@@ -93,12 +93,11 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
     /**
      * @param Notification|array<string, mixed>      $entity
      * @param string|null       $action
-     * @param array             $options
      *
      * @throws NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Notification) {
             throw new MethodNotAllowedHttpException(['Notification']);
