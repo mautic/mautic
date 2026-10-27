@@ -39,8 +39,18 @@ final readonly class PluginDatabase
             return;
         }
 
-        $schemaTool     = new SchemaTool($this->em);
-        $installQueries = $schemaTool->getCreateSchemaSql(array_values($metadata));
+        $schemaTool = new SchemaTool($this->em);
+        $schema     = $schemaTool->getSchemaFromMetadata(array_values($metadata));
+
+        // Schema listeners (e.g. Symfony Messenger) add their own tables, which may already exist
+        $pluginTables = $this->getPluginTableNames($metadata);
+        foreach ($schema->getTables() as $table) {
+            if (!in_array(strtolower($table->getName()), $pluginTables, true)) {
+                $schema->dropTable($table->getName());
+            }
+        }
+
+        $installQueries = $schema->toSql($this->connection->getDatabasePlatform());
 
         foreach ($installQueries as $q) {
             // Check if the query is a DDL statement
@@ -100,6 +110,28 @@ final readonly class PluginDatabase
 
             throw $e;
         }
+    }
+
+    /**
+     * @param array<class-string, ClassMetadata> $metadata
+     *
+     * @return string[]
+     */
+    private function getPluginTableNames(array $metadata): array
+    {
+        $tables = [];
+
+        foreach ($metadata as $classMetadata) {
+            $tables[] = strtolower($classMetadata->getTableName());
+
+            foreach ($classMetadata->getAssociationMappings() as $mapping) {
+                if (isset($mapping['joinTable']['name'])) {
+                    $tables[] = strtolower($mapping['joinTable']['name']);
+                }
+            }
+        }
+
+        return $tables;
     }
 
     private function isDDLStatement(string $query): bool|int
