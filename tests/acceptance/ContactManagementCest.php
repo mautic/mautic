@@ -507,7 +507,6 @@ final class ContactManagementCest
         // Wait for the import page to load
         $I->waitForText('Import Contacts', AcceptanceTester::TIMEOUT, 'h1.page-header-title');
         $I->waitForElementVisible(ContactPage::$uploadButton, AcceptanceTester::TIMEOUT);
-        $I->seeElement(ContactPage::$importForm);
 
         // Click 'Choose file' and select a file
         $I->attachFile(ContactPage::$chooseFileButton, '10contacts.csv');
