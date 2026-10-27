@@ -517,6 +517,61 @@ final class TrackableModelTest extends TestCase
         }
     }
 
+    #[DataProvider('doNotTrackUrlPrefixProvider')]
+    #[TestDox('Test that a do-not-track link is not corrupted when a tracked URL is a path prefix of its href')]
+    public function testDoNotTrackUrlIsNotCorruptedWhenTrackedUrlIsPrefixOfIt(string $trackedUrl, string $doNotTrackUrl): void
+    {
+        $model = $this->getModel();
+
+        $content = sprintf(
+            '<a href="%s">Homepage</a><a href="%s" data-mautic-disable-tracking="true">Contact</a>',
+            $trackedUrl,
+            $doNotTrackUrl,
+        );
+
+        [$processedContent, $trackables] = $model->parseContentForTrackables(
+            $content,
+            [],
+            'email',
+            1
+        );
+
+        // Only the root URL should be tracked; the do-not-track URL must be absent.
+        $this->assertCount(1, $trackables);
+        $this->assertSame($trackedUrl, reset($trackables)->getRedirect()->getUrl());
+
+        // The do-not-track link href must remain exactly as authored.
+        $this->assertStringContainsString(sprintf('href="%s"', $doNotTrackUrl), (string) $processedContent);
+    }
+
+    /**
+     * @return \Iterator<string, array{string, string}>
+     */
+    public static function doNotTrackUrlPrefixProvider(): \Iterator
+    {
+        yield 'same host casing' => ['https://example.com/', 'https://example.com/contact/'];
+        yield 'different host casing' => ['https://example.com/', 'https://EXAMPLE.com/contact/'];
+        yield 'regex metacharacters' => ['https://example.com/', 'https://example.com/contact/?ref=1'];
+    }
+
+    public function testTokenizedDoNotTrackUrlIsNotRewrittenAfterTokenExpansion(): void
+    {
+        $model = $this->getModel();
+
+        [$processedContent, $trackables] = $model->parseContentForTrackables(
+            '<a href="{pagelink=1}">Homepage</a><a href="{pagelink=1}contact/" data-mautic-disable-tracking="true">Contact</a>',
+            ['{pagelink=1}' => 'https://example.com/'],
+            'email',
+            1
+        );
+
+        $this->assertCount(1, $trackables);
+        $this->assertStringContainsString(
+            'href="https://example.com/contact/" data-mautic-disable-tracking="true"',
+            (string) $processedContent
+        );
+    }
+
     #[TestDox('Test that css images are not converted if there are no links')]
     public function testCssUrlsAreNotConvertedIfThereAreNoLinks(): void
     {
