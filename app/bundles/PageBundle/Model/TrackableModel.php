@@ -27,6 +27,13 @@ class TrackableModel extends AbstractCommonModel
     protected $doNotTrack = [];
 
     /**
+     * Literal URLs collected from disable-tracking attributes.
+     *
+     * @var array<string, string>
+     */
+    private array $literalDoNotTrackUrls = [];
+
+    /**
      * Tokens with values that could be used as URLs.
      *
      * @var array
@@ -242,6 +249,7 @@ class TrackableModel extends AbstractCommonModel
 
         // Set do not track list for validateUrlIsTrackable()
         $this->doNotTrack = $this->getDoNotTrackList($content);
+        $this->literalDoNotTrackUrls = [];
 
         // Set content tokens used by validateUrlIsTrackable()
         $this->contentTokens = $contentTokens;
@@ -300,6 +308,12 @@ class TrackableModel extends AbstractCommonModel
         // Simple search and replace to remove attributes, schema for tokens, and updating URL parameter order
         $firstPassSearch  = array_keys($this->contentReplacements['first_pass']);
         $firstPassReplace = $this->contentReplacements['first_pass'];
+
+        foreach ($this->literalDoNotTrackUrls as $url) {
+            $expandedUrl                    = str_ireplace($firstPassSearch, $firstPassReplace, $url);
+            $this->doNotTrack[$expandedUrl] = '^'.preg_quote($expandedUrl, '~').'$';
+        }
+
         $content          = str_ireplace($firstPassSearch, $firstPassReplace, $content);
 
         // Sort longer to shorter strings to ensure that URLs that share the same base are appropriately replaced
@@ -748,13 +762,13 @@ class TrackableModel extends AbstractCommonModel
             // Check for a do not track
             // @deprecated since 7.x — Will be removed in 8.0. Use data-mautic-disable-tracking.
             if ($link->hasAttribute('mautic:disable-tracking')) {
-                $this->doNotTrack[$url] = '^'.preg_quote($url, '~').'$';
+                $this->addDoNotTrackUrl($url);
                 continue;
             }
 
             // Check for a do not track in proper HTML format
             if ($link->hasAttribute('data-mautic-disable-tracking') && 'true' === $link->getAttribute('data-mautic-disable-tracking')) {
-                $this->doNotTrack[$url] = '^'.preg_quote($url, '~').'$';
+                $this->addDoNotTrackUrl($url);
                 continue;
             }
 
@@ -765,6 +779,12 @@ class TrackableModel extends AbstractCommonModel
         }
 
         return $trackableUrls;
+    }
+
+    private function addDoNotTrackUrl(string $url): void
+    {
+        $this->literalDoNotTrackUrls[$url] = $url;
+        $this->doNotTrack[$url]            = '^'.preg_quote($url, '~').'$';
     }
 
     /**

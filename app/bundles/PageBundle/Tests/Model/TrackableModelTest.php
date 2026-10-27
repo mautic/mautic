@@ -554,6 +554,24 @@ final class TrackableModelTest extends TestCase
         yield 'regex metacharacters' => ['https://example.com/', 'https://example.com/contact/?ref=1'];
     }
 
+    public function testTokenizedDoNotTrackUrlIsNotRewrittenAfterTokenExpansion(): void
+    {
+        $model = $this->getModel();
+
+        [$processedContent, $trackables] = $model->parseContentForTrackables(
+            '<a href="{pagelink=1}">Homepage</a><a href="{pagelink=1}contact/" data-mautic-disable-tracking="true">Contact</a>',
+            ['{pagelink=1}' => 'https://example.com/'],
+            'email',
+            1
+        );
+
+        $this->assertCount(1, $trackables);
+        $this->assertStringContainsString(
+            'href="https://example.com/contact/" data-mautic-disable-tracking="true"',
+            (string) $processedContent
+        );
+    }
+
     #[TestDox('Test that css images are not converted if there are no links')]
     public function testCssUrlsAreNotConvertedIfThereAreNoLinks(): void
     {
