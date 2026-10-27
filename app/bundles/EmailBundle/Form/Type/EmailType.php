@@ -194,7 +194,7 @@ final class EmailType extends AbstractType
                     'data-confirm-callback'  => 'dismissConfirmation',
                     'data-cancel-text'       => $this->translator->trans('mautic.email.send.dnc.confirmation.cancel.text'),
                     'data-cancel-callback'   => 'setSendToDncToNo',
-                    'data-confirm-btn-class' => 'btn btn-success',
+                    'data-confirm-btn-class' => 'btn btn-danger',
                     'tooltip'                => 'mautic.email.send.dnc.tooltip',
                     'readonly'               => !$this->corePermissions->isGranted('email:emails:sendtodnc'),
                 ],
