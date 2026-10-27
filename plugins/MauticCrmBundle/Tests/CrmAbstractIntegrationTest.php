@@ -124,6 +124,9 @@ final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             ->method('populateMauticLeadData')
             ->willReturn($data);
 
+        $integration->method('mergeConfigToFeatureSettings')
+            ->willReturn([]);
+
         $company = $integration->getMauticCompany($data);
         $this->assertInstanceOf(Company::class, $company);
 
