@@ -499,6 +499,7 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->companyLeadRepo->expects($this->once())
             ->method('saveEntities')
             ->willReturnCallback(function (array $companyLeads, bool $new) use ($winner, $company): void {
+                /** @var CompanyLead[] $companyLeads */
                 $this->assertCount(1, $companyLeads);
                 $this->assertSame($winner, $companyLeads[0]->getLead());
                 $this->assertSame($company, $companyLeads[0]->getCompany());
@@ -540,6 +541,7 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->companyLeadRepo->expects($this->once())
             ->method('saveEntities')
             ->willReturnCallback(function (array $companyLeads, bool $isNew): void {
+                /** @var CompanyLead[] $companyLeads */
                 $this->assertCount(1, $companyLeads);
                 // The winner already has a primary company so the loser's company is added as non-primary
                 $this->assertFalse((bool) $companyLeads[0]->getPrimary());

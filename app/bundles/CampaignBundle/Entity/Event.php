@@ -216,7 +216,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Used by API to house contact specific logs.
      *
-     * @var iterable<LeadEventLog>
+     * @var LeadEventLog[]
      */
     #[Groups(['event:read', 'event:write'])]
     private $contactLog = [];
