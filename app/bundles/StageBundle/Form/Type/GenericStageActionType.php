@@ -18,7 +18,7 @@ final class GenericStageActionType extends AbstractType
         $default = (empty($options['data']['weight'])) ? 0 : (int) $options['data']['weight'];
         $builder->add('weight', NumberType::class, [
             'label'      => 'mautic.stage.action.weight',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.stage.action.weight.help',

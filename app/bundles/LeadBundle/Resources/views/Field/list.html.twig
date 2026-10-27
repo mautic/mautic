@@ -44,6 +44,20 @@
                     'delete': permissions['lead:fields:full'],
                 },
             },
+            'quickFilters': [
+                {
+                    'search': 'mautic.lead.field.searchcommand.isindexed',
+                    'label': 'mautic.lead.field.searchcommand.isindexed.label',
+                    'tooltip': 'mautic.lead.field.searchcommand.isindexed.description',
+                    'icon': 'ri-search-eye-line'
+                },
+                {
+                    'search': 'mautic.lead.field.searchcommand.isunique',
+                    'label': 'mautic.lead.field.searchcommand.isunique.label',
+                    'tooltip': 'mautic.lead.field.searchcommand.isunique.description',
+                    'icon': 'ri-fingerprint-line'
+                }
+            ],
         }) }}
         <div class="page-list">
   {% endif %}

@@ -252,6 +252,11 @@ final class EmailApiController extends CommonApiController
             $parameters['sendToDnc'] = false;
         }
 
+        if (Request::METHOD_PATCH === $method && !array_key_exists('dynamicContent', $parameters)) {
+            // EmailType replaces a missing dynamicContent with the default one, so a partial update must send the current one.
+            $parameters['dynamicContent'] = $entity->getDynamicContent();
+        }
+
         return parent::processForm($request, $entity, $parameters, $method);
     }
 }
