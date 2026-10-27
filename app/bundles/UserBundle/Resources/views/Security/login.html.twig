@@ -18,7 +18,7 @@
 		{% if not app.request.xmlHttpRequest %}
 		<div class="mb-32 ps-16 pe-16 pt-16">
 			<h1 class="type-fluid-paragraph-01">{% trans %}mautic.user.auth.header{% endtrans %}</h1>
-			<span class="text-secondary type-helper-text-01">Need help? Contact your administrator.</span>
+			<span class="text-secondary type-helper-text-01">{{ 'mautic.user.auth.help'|trans }}</span>
 		</div>
 		{% endif %}
 		{% if oidcSettings is defined and oidcSettings.isEnabled and oidcSettings.isRequired %}
