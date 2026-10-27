@@ -95,11 +95,9 @@ final class MauticSocialMonitoringCommand extends Command
     }
 
     /**
-     * @param \MauticPlugin\MauticSocialBundle\Entity\Monitoring $listItem
-     *
      * @throws \Exception
      */
-    private function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int
+    private function processMonitorListItem(\MauticPlugin\MauticSocialBundle\Entity\Monitoring $listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int
     {
         // @todo set this up to use the command type per-monitor record.
         $networkType = $listItem->getNetworkType();

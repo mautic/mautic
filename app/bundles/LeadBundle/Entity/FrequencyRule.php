@@ -123,10 +123,7 @@ class FrequencyRule extends CommonEntity
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function setLead($lead): static
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 

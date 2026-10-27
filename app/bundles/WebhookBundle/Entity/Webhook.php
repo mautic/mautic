@@ -292,7 +292,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * @param Collection<int, Event> $events
      */
-    public function setEvents($events): static
+    public function setEvents(Collection $events): static
     {
         $this->isChanged('events', $events);
 
@@ -419,9 +419,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @param ArrayCollection<int,Log> $logs
+     * @param Collection<int, Log> $logs
      */
-    public function addLogs($logs): static
+    public function addLogs(Collection $logs): static
     {
         $this->logs = $logs;
 

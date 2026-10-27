@@ -754,14 +754,13 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Company $company
-     * @param array   $config
+     * @param array $config
      */
-    public function pushCompany($company, $config = []): array|false
+    public function pushCompany(Company $company, $config = []): array|false
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
-        if (empty($config['companyFields']) || !$company) {
+        if (empty($config['companyFields'])) {
             return [];
         }
         $object     = 'company';
@@ -1265,10 +1264,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return [$totalUpdated, $totalCreated, $totalErrors, $totalIgnored];
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function getSalesforceLeadId($lead): array
+    public function getSalesforceLeadId(Lead $lead): array
     {
         $config                = $this->mergeConfigToFeatureSettings([]);
 

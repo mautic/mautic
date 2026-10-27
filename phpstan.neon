@@ -170,6 +170,10 @@ parameters:
             path: utils/phpstan/src/Rule/EntityParamConcreteTypeRule.php
             identifier: phpstanApi.method
 
+        -
+            path: utils/phpstan/src/Rule/EntityCollectionParamMustUseInterfaceRule.php
+            identifier: phpstanApi.method
+
         # final classes mocked in tests make the Class&MockObject intersection unresolvable, the mock works via dg/bypass-finals
         -
             identifiers:
@@ -453,6 +457,8 @@ rules:
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
     - Utils\PHPStan\Rule\NoUselessReferenceParamRule
     - Utils\PHPStan\Rule\NoUselessReferenceForeachRule
+    - Utils\PHPStan\Rule\ExplicitNullableParamTypeRule
+    - Utils\PHPStan\Rule\EntityCollectionParamMustUseInterfaceRule
 
     - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
     - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
@@ -484,6 +490,15 @@ rules:
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
+    - Utils\PHPStan\ServiceTypeDetector
+    -
+        class: Utils\PHPStan\Rule\MoveObjectParamDocblockToNativeTypeRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Utils\PHPStan\Collector\ObjectParamDocblockCollector
+        tags:
+            - phpstan.collector
     -
         class: Utils\PHPStan\Rule\ParamTypeByVariableNameRule
         tags:

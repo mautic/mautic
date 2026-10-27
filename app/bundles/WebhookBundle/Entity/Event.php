@@ -104,9 +104,9 @@ class Event
     }
 
     /**
-     * @param ArrayCollection $queues
+     * @param Collection<int, WebhookQueue> $queues
      */
-    public function setQueues($queues): static
+    public function setQueues(Collection $queues): static
     {
         $this->queues = $queues;
 

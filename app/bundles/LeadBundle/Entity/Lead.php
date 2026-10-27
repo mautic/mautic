@@ -1766,9 +1766,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param ArrayCollection<int,GroupContactScore> $groupScores
+     * @param Collection<int, GroupContactScore> $groupScores
      */
-    public function setGroupScores($groupScores): void
+    public function setGroupScores(Collection $groupScores): void
     {
         $this->groupScores = $groupScores;
     }

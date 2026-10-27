@@ -160,9 +160,9 @@ class Redirect extends FormEntity
     }
 
     /**
-     * @param ArrayCollection $trackables
+     * @param Collection<int, Trackable> $trackables
      */
-    public function setTrackables($trackables): static
+    public function setTrackables(Collection $trackables): static
     {
         $this->trackables = $trackables;
 

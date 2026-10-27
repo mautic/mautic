@@ -2014,10 +2014,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array<mixed>         $options
+     * @param array<mixed> $options
      */
-    public function modifyForm($builder, $options): void
+    public function modifyForm(FormBuilderInterface $builder, $options): void
     {
         $this->dispatcher->dispatch(
             new PluginIntegrationFormBuildEvent($this, $builder, $options)
