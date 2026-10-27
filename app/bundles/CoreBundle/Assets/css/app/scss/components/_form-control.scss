@@ -1,11 +1,11 @@
-input:-webkit-autofill,
-input:-webkit-autofill:focus {
+.form-fluid input:-webkit-autofill,
+.form-fluid input:-webkit-autofill:focus {
     -webkit-box-shadow: 0 0 0 1000px var(--field) inset, inset 0 -1px 0 var(--border-strong);
     -webkit-text-fill-color: var(--text-primary);
     transition: background-color 5000s ease-in-out 0s, box-shadow var(--duration-productive) var(--easing-standard-productive);
 }
 
-input:-webkit-autofill:hover {
+.form-fluid input:-webkit-autofill:hover {
     -webkit-box-shadow: 0 0 0 1000px var(--field-hover) inset, inset 0 -1px 0 var(--border-strong);
     -webkit-text-fill-color: var(--text-primary);
     transition: background-color 5000s ease-in-out 0s, box-shadow var(--duration-productive) var(--easing-standard-productive);
@@ -31,7 +31,7 @@ input:-webkit-autofill:hover {
         content: '';
         display: block;
         width: 1px;
-        height: 1rem;
+        height: var(--spacing-05);
         background-color: var(--border-subtle);
         position: absolute;
     }
@@ -63,7 +63,7 @@ input:-webkit-autofill:hover {
 }
 
 .form-field-with-action > .form-control {
-    padding-right: 40px;
+    padding-right: var(--spacing-08);
 }
 
 .form-field-with-action > .form-control:has(~ .form-field-clear) {
@@ -71,7 +71,7 @@ input:-webkit-autofill:hover {
 }
 
 .form-field-with-number > .form-control {
-    padding-right: 96px;
+    padding-right: var(--spacing-12);
     appearance: textfield;
     -moz-appearance: textfield;
 }
@@ -85,7 +85,7 @@ input:-webkit-autofill:hover {
 .form-field-icon {
     position: absolute;
     top: 50%;
-    right: 12px;
+    right: var(--spacing-04);
     transform: translateY(-50%);
     color: var(--text-helper);
     pointer-events: none;
@@ -108,10 +108,10 @@ input:-webkit-autofill:hover {
 .form-field-toggle {
     position: absolute;
     top: 50%;
-    right: 8px;
+    right: var(--spacing-03);
     transform: translateY(-50%);
-    width: 32px;
-    height: 32px;
+    width: var(--spacing-07);
+    height: var(--spacing-07);
 }
 
 .form-field-clear {
@@ -129,12 +129,12 @@ input:-webkit-autofill:hover {
     transform: translateY(-50%);
     display: flex;
     align-items: stretch;
-    height: 40px;
+    height: var(--spacing-08);
 }
 
 .form-field-step {
-    width: 40px;
-    height: 40px;
+    width: var(--spacing-08);
+    height: var(--spacing-08);
     font-size: 16px;
     line-height: 16px;
 }
