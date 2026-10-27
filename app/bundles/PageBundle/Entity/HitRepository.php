@@ -288,12 +288,16 @@ class HitRepository extends CommonRepository
      */
     public function getBounces($pageIds, ?\DateTime $fromDate = null, $isVariantCheck = false): array
     {
+        $connection = $this->getEntityManager()->getConnection();
         $inOrEq = (!is_array($pageIds)) ? 'eq' : 'in';
 
         $hitsColumn = ($isVariantCheck) ? 'variant_hits' : 'unique_hits';
-        $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $pages      = $q->select("p.id, p.{$hitsColumn} as totalHits, p.title")
-            ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
+        $q          = $connection->createQueryBuilder();
+        $pages      = $q->select(
+            "p.id", 
+            "p.{$hitsColumn} as ".$connection->quoteIdentifier('totalHits'),
+            "p.title"
+        )->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
             ->where($q->expr()->{$inOrEq}('p.id', $pageIds))
             ->executeQuery()
             ->fetchAllAssociative();
@@ -310,7 +314,7 @@ class HitRepository extends CommonRepository
 
         // Get the total number of bounces - simplified query for if date_left is null, it'll more than likely be a bounce or
         // else we would have recorded the date_left on a subsequent page hit
-        $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q    = $connection->createQueryBuilder();
         $expr = $q->expr()->and(
             $q->expr()->{$inOrEq}('h.page_id', $pageIds),
             $q->expr()->eq('h.code', 200),
