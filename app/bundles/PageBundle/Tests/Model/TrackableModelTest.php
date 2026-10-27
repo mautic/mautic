@@ -535,15 +535,12 @@ HTML;
         );
 
         // Only the root URL should be tracked; the do-not-track URL must be absent.
-        Assert::assertCount(1, $trackables);
+        $this->assertCount(1, $trackables);
         $trackedUrl = reset($trackables)->getRedirect()->getUrl();
-        Assert::assertSame('https://example.com/', $trackedUrl);
+        $this->assertSame('https://example.com/', $trackedUrl);
 
         // The do-not-track link href must remain exactly as authored.
-        Assert::assertStringContainsString(
-            'href="https://example.com/contact/"',
-            $processedContent
-        );
+        $this->assertStringContainsString('href="https://example.com/contact/"', (string) $processedContent);
     }
 
     #[TestDox('Test that css images are not converted if there are no links')]
