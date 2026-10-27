@@ -43,7 +43,7 @@
 			link: {href: path('mautic_user_passwordreset'), label: 'mautic.user.user.passwordreset.link'},
 			attributes: {required: 'required'}
 		} only %}
-		<div class="pull-left mb-md ps-16">
+		<div class="mb-md ps-16">
 			{% include '@MauticCore/Components/checkbox.html.twig' with {
 				inline: true,
 				items: [{ id: 'remember_me', name: '_remember_me', value: 'on', label: 'mautic.user.auth.form.rememberme' }]
