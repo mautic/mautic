@@ -63,7 +63,7 @@ class FormController extends CommonFormController
         parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
-    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, FormSearchScopeProvider $formSearchScopeProvider, AggregateAnalyticsHelper $aggregateAnalyticsHelper, int $page = 1): Response
+    public function indexAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, FormSearchScopeProvider $formSearchScopeProvider, int $page = 1, ?AggregateAnalyticsHelper $aggregateAnalyticsHelper = null): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -109,7 +109,7 @@ class FormController extends CommonFormController
 
         $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
         $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
-        $aggregateAnalytics = $aggregateAnalyticsHelper->isEnabled();
+        $aggregateAnalytics = $aggregateAnalyticsHelper?->isEnabled() ?? true;
 
         // Sorting by the submission count would show the counts that aggregate analytics turned off
         if (!$aggregateAnalytics && 'submission_count' === $orderBy) {
@@ -178,7 +178,7 @@ class FormController extends CommonFormController
      *
      * @param int $objectId
      */
-    public function viewAction(Request $request, AggregateAnalyticsHelper $aggregateAnalyticsHelper, $objectId): Response
+    public function viewAction(Request $request, $objectId, ?AggregateAnalyticsHelper $aggregateAnalyticsHelper = null): Response
     {
         $activeForm = $this->formModel->getEntity($objectId);
 
@@ -238,7 +238,7 @@ class FormController extends CommonFormController
         $action          = $this->generateUrl('mautic_form_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         // The submission counts are aggregate analytics, so they are not worked out when that is turned off
-        $aggregateAnalytics = $aggregateAnalyticsHelper->isEnabled();
+        $aggregateAnalytics = $aggregateAnalyticsHelper?->isEnabled() ?? true;
         $timeStats          = $aggregateAnalytics ? $this->submissionModel->getSubmissionsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
