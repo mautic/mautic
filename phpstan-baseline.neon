@@ -5179,12 +5179,6 @@ parameters:
 			path: app/bundles/PluginBundle/Controller/AuthController.php
 
 		-
-			message: '#^Property Mautic\\PluginBundle\\Entity\\IntegrationEntity\:\:\$internal \(array\) does not accept Doctrine\\Common\\Collections\\ArrayCollection\<\*NEVER\*, \*NEVER\*\>\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/bundles/PluginBundle/Entity/IntegrationEntity.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Entity\\IntegrationEntityRepository\:\:findLeadsToCreate\(\) has parameter \$fromDate with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8297,12 +8291,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticSocialBundle/Exception/ExitMonitorException.php
-
-		-
-			message: '#^Parameter \#2 \$withFeatures of method Mautic\\PluginBundle\\Helper\\IntegrationHelper\:\:getIntegrationObjects\(\) expects array\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: plugins/MauticSocialBundle/Form/Type/SocialLoginType.php
 
 		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\FacebookIntegration\:\:getApiUrl\(\) has parameter \$endpoint with no type specified\.$#'

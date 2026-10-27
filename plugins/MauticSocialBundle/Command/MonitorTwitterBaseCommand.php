@@ -217,10 +217,8 @@ abstract class MonitorTwitterBaseCommand extends Command
 
     /**
      * Prints all the returned tweets.
-     *
-     * @param array $statuses
      */
-    protected function printTweets($statuses): void
+    protected function printTweets(array $statuses): void
     {
         if (!$this->input->getOption('show-posts') && $this->output->getVerbosity() < OutputInterface::VERBOSITY_VERY_VERBOSE) {
             return;
