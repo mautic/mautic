@@ -8,6 +8,8 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
@@ -25,13 +27,10 @@ use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
-
-use function Symfony\Component\Clock\now;
-
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -1668,6 +1667,98 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Email name maximum length is 190 characters', (string) $content);
     }
 
+    public function testEmailAuditLogs(): void
+    {
+        $segmentA = $this->createSegment('Segment A', 'segment-A');
+        $segmentB = $this->createSegment('Segment B', 'segment-B');
+        $this->em->flush();
+        $email = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segmentA, [
+            'totalWeight' => 100,
+            'winnerCriteria' => 'asset.downloads',
+        ]);
+        $this->em->flush();
+
+        // Edit the email and save it without making any changes.
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
+        $buttonCrawler  = $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->em->clear();
+
+        $auditLogs = $this->findEmailUpdateAuditLogs($email);
+        $this->assertCount(1, $auditLogs, 'There should be one audit log record.');
+
+        // enable AB test
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/email/abtest/generate/{$email->getId()}");
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('generate_ab_test[buttons][apply]')->form();
+        $form['generate_ab_test[winnerCriteria]']->setValue('email.openrate');
+        $form['generate_ab_test[sendWinnerDelay]']->setValue('12');
+        $form['generate_ab_test[totalWeight]']->setValue('10');
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->em->clear();
+
+        $auditLogs = $this->findEmailUpdateAuditLogs($email);
+        $this->assertCount(2, $auditLogs, 'There should be another audit log record.');
+        $auditLog = $auditLogs[0];
+        $this->assertInstanceOf(AuditLog::class, $auditLog);
+        $details = $auditLog->getDetails();
+        $this->assertCount(1, $details);
+        $this->assertArrayHasKey('variantSettings', $details);
+        $variantSettings = $details['variantSettings'];
+        $this->assertCount(2, $variantSettings);
+        $this->assertEqualsCanonicalizing([
+            'totalWeight' => 100,
+            'enableAbTest' => null,
+            'winnerCriteria' => 'asset.downloads',
+            'sendWinnerDelay' => 24,
+        ], $variantSettings[0]);
+        $this->assertEqualsCanonicalizing([
+            'totalWeight' => 10,
+            'enableAbTest' => 1,
+            'winnerCriteria' => 'email.openrate',
+            'sendWinnerDelay' => 12,
+        ], $variantSettings[1]);
+
+        // Edit the email and change segment and audit log should only have segment change logs
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
+        $buttonCrawler  = $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+
+        $listField = $form['emailform[lists]'];
+        $this->assertInstanceOf(ChoiceFormField::class, $listField);
+        $listField->setValue([$segmentA->getId(), $segmentB->getId()]);
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->em->clear();
+
+        $auditLogs = $this->findEmailUpdateAuditLogs($email);
+        $this->assertCount(3, $auditLogs, 'There should be another audit log record.');
+        $auditLog = $auditLogs[0];
+        $this->assertInstanceOf(AuditLog::class, $auditLog);
+        $details = $auditLog->getDetails();
+        $this->assertCount(1, $details);
+        $this->assertArrayHasKey('lists', $details);
+        $lists = $details['lists'];
+        $this->assertCount(2, $lists);
+        $this->assertEqualsCanonicalizing([$segmentA->getId()], $lists[0]);
+        $this->assertEqualsCanonicalizing([$segmentA->getId(), $segmentB->getId()], $lists[1]);
+
+        // Edit the email and save it without making any changes.
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
+        $buttonCrawler  = $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->em->clear();
+
+        $auditLogs = $this->findEmailUpdateAuditLogs($email);
+        $this->assertCount(3, $auditLogs, 'There should not be any new audit log record.');
+    }
+
     private function createSegment(string $name, string $alias): LeadList
     {
         $segment = new LeadList();
@@ -1791,5 +1882,18 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email = $this->em->find(Email::class, $id);
         $this->assertInstanceOf(Email::class, $email);
         $this->assertSame($expectedVersion, $email->getVersion(), $message);
+    }
+
+    private function findEmailUpdateAuditLogs(Email $email): array
+    {
+        $auditLogRepository = $this->em->getRepository(AuditLog::class);
+        $this->assertInstanceOf(AuditLogRepository::class, $auditLogRepository);
+
+        return $auditLogRepository->findBy([
+            'bundle'   => 'email',
+            'object'   => 'email',
+            'action'   => 'update',
+            'objectId' => $email->getId(),
+        ], ['id' => 'DESC']);
     }
 }
