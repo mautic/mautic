@@ -853,10 +853,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * @param Form|FormBuilder $builder
-     * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('keys' == $formArea) {
             $builder->add('version', ButtonGroupType::class, [
@@ -965,9 +964,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * @param Lead  $lead
-     * @param array $config
      */
-    public function pushLead($lead, $config = []): array|bool
+    public function pushLead($lead, array $config = []): array|bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -1082,11 +1080,10 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array                $keys
      * @param string               $object
      * @param array<string, mixed> $fields
      */
-    public function cleanSugarData(array $fields, $keys, $object): array
+    public function cleanSugarData(array $fields, array $keys, $object): array
     {
         $leadFields = [];
 
@@ -1469,11 +1466,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $response
-     *
      * @return array<int, int>
      */
-    private function processCompositeResponse($response): array
+    private function processCompositeResponse(?array $response): array
     {
         $created         = 0;
         $errored         = 0;

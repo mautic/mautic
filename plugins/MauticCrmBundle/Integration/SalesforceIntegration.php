@@ -493,10 +493,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param FormBuilder $builder
-     * @param array       $data
      * @param string      $formArea
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -657,9 +656,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param Lead  $lead
-     * @param array $config
      */
-    public function pushLead($lead, $config = []): array|false
+    public function pushLead($lead, array $config = []): array|false
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -753,10 +751,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * @param array $config
-     */
-    public function pushCompany(Company $company, $config = []): array|false
+    public function pushCompany(Company $company, array $config = []): array|false
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 

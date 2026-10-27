@@ -30,10 +30,9 @@ abstract class SocialIntegration extends AbstractIntegration
 
     /**
      * @param Form|FormBuilder $builder
-     * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('features' == $formArea) {
             $name     = strtolower($this->getName());

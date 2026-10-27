@@ -59,10 +59,9 @@ final class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * @param FormBuilder $builder
-     * @param array       $data
      * @param string      $formArea
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         $builder->add(
             'updateBlanks',
@@ -178,7 +177,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
      *
      * @return mixed[]
      */
-    public function populateLeadData($lead, $config = [], $object = 'Contacts'): array
+    public function populateLeadData($lead, array $config = [], $object = 'Contacts'): array
     {
         if ('company' === $object) {
             $object = 'accounts';
@@ -281,11 +280,10 @@ final class DynamicsIntegration extends CrmAbstractIntegration
 
     /**
      * @param Lead  $lead
-     * @param array $config
      *
      * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, array $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -850,10 +848,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
         return [$totalUpdated, $totalCreated, $totalErrors];
     }
 
-    /**
-     * @param array $ids
-     */
-    private function createIntegrationEntities($ids, string $object): void
+    private function createIntegrationEntities(array $ids, string $object): void
     {
         foreach ($ids as $oid => $leadId) {
             $this->logger->debug('CREATE INTEGRATION ENTITY: '.$oid);

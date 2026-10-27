@@ -217,7 +217,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
      *
      * @param array $leadData All the lead fields mapped
      */
-    public function formatLeadDataForCreateOrUpdate($leadData, $lead, $updateLink = false): array
+    public function formatLeadDataForCreateOrUpdate(array $leadData, $lead, $updateLink = false): array
     {
         $formattedLeadData = [];
 
@@ -258,7 +258,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
      * @param mixed[]              $data
      * @param string               $formArea
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('keys' === $formArea) {
             $builder->add(
@@ -511,9 +511,8 @@ final class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * @param Lead  $lead
-     * @param array $config
      */
-    public function pushLead($lead, $config = []): array|bool
+    public function pushLead($lead, array $config = []): array|bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
