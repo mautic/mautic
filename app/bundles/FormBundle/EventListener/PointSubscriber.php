@@ -46,6 +46,13 @@ final readonly class PointSubscriber implements EventSubscriberInterface
      */
     public function onFormSubmit(SubmissionEvent $event): void
     {
-        $this->pointModel->triggerAction('form.submit', $event->getSubmission());
+        if (null === $event->getLead()) {
+            return;
+        }
+
+        $submission = $event->getSubmission();
+
+        // No IP on the submission means the visitor isn't tracked, so keep it out of the points log too
+        $this->pointModel->triggerAction('form.submit', $submission, storeIpAddress: null !== $submission->getIpAddress());
     }
 }

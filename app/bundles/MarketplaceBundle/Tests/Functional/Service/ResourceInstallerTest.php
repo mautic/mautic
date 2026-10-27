@@ -8,6 +8,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\TransferException;
 use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Event\EntityImportUndoEvent;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
@@ -39,13 +40,13 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         parent::setUp();
 
         $this->tmpRoot   = sys_get_temp_dir().'/mautic_resource_installer_'.bin2hex(random_bytes(4));
-        $importDir = $this->tmpRoot.'/import';
+        $importDir       = $this->tmpRoot.'/import';
 
         (new Filesystem())->mkdir([$this->tmpRoot, $this->tmpRoot.'/var']);
 
         $this->marketplaceConnection  = $this->createMock(Connection::class);
         $this->httpClient             = $this->createMock(ClientInterface::class);
-        $pathsHelper            = $this->createMock(PathsHelper::class);
+        $pathsHelper                  = $this->createMock(PathsHelper::class);
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
 
         $pathsHelper->method('getImportCampaignsPath')->willReturn($importDir);
@@ -53,13 +54,16 @@ final class ResourceInstallerTest extends AbstractMauticTestCase
         $pathsHelper->method('getTemporaryPath')->willReturn($this->tmpRoot.'/tmp');
         $pathsHelper->method('getMediaPath')->willReturn($this->tmpRoot.'/media');
 
+        $coreParametersHelper = $this->createStub(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')->willReturn(['png']);
+
         $this->installer = new ResourceInstaller(
             $this->marketplaceConnection,
             $this->httpClient,
             $pathsHelper,
             $this->dispatcher,
             $this->createStub(LoggerInterface::class),
-            new ImportHelper($pathsHelper),
+            new ImportHelper($pathsHelper, $coreParametersHelper),
         );
     }
 
