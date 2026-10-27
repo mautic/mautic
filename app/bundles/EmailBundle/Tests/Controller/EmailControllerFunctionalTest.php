@@ -8,27 +8,51 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\ProjectBundle\Entity\Project;
-use PHPUnit\Framework\Assert;
+use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
     use ControllerTrait;
 
-    public function setUp(): void
+    private const SUBJECT_A      = 'Subject A';
+
+    private const SUBJECT_B      = 'Subject B';
+
+    private const SUBJECT_C      = 'Subject C';
+
+    private const SEGMENT_B      = 'Segment B';
+
+    private const CLICK_URL_LOW  = 'https://example.com/low';
+
+    private const CLICK_URL_MID  = 'https://example.com/mid';
+
+    private const CLICK_URL_HIGH = 'https://example.com/high';
+
+    protected function setUp(): void
     {
+        $this->configParams['legacy_builder_enabled'] = true;
         $this->configParams['disable_trackable_urls'] = false;
         $this->configParams['mailer_from_name']       = 'Mautic Admin';
         $this->configParams['mailer_from_email']      = 'admin@email.com';
@@ -55,9 +79,9 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('GET', '/s/emails');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful('Return code must be 200');
-        $this->assertStringContainsString('February 7, 2020', $clientResponse->getContent());
-        $this->assertStringContainsString('March 21, 2020', $clientResponse->getContent());
-        $this->assertStringContainsString('Test User', $clientResponse->getContent());
+        $this->assertStringContainsString('February 7, 2020', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('March 21, 2020', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('Test User', (string) $clientResponse->getContent());
 
         $urlAlias   = 'emails';
         $routeAlias = 'email';
@@ -74,503 +98,6 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testIndexActionWhenFiltering(): void
     {
         $this->client->request('GET', '/s/emails?search=has%3Aresults&tmpl=list');
-        $clientResponse = $this->client->getResponse();
-        $this->assertResponseIsSuccessful('Return code must be 200.');
-    }
-
-    /**
-     * Ensure there is no query for DNC reasons if there are no contacts who received the email
-     * because it loads the whole DNC table if no contact IDs are provided. It can lead to
-     * memory limit error if the DNC table is big.
-     *
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
-    public function testProfileEmailDetailPageForUnsentEmail(): void
-    {
-        $segment = $this->createSegment('Segment A', 'segment-a');
-        $email   = $this->createEmail('Email A', 'Email A Subject', 'list', 'blank', 'Test html', $segment);
-        $this->em->flush();
-
-        $this->client->enableProfiler();
-        $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
-
-        $profile = $this->client->getProfile();
-
-        /** @var DoctrineDataCollector $dbCollector */
-        $dbCollector = $profile->getCollector('db');
-        $queries     = $dbCollector->getQueries();
-        $prefix      = static::getContainer()->getParameter('mautic.db_table_prefix');
-
-        $dncQueries = array_filter(
-            $queries['default'],
-            fn (array $query) => "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE dnc.channel = :channel" === $query['sql']
-        );
-
-        Assert::assertCount(0, $dncQueries);
-    }
-
-    /**
-     * On the other hand there should be the query for DNC reasons if there are contacts who received the email.
-     *
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
-    public function testProfileEmailDetailPageForSentEmail(): void
-    {
-        $segment = $this->createSegment('Segment A', 'segment-a');
-        $email   = $this->createEmail('Email A', 'Email A Subject', 'list', 'blank', 'Test html', $segment);
-
-        $contact = new Lead();
-        $contact->setEmail('john@doe.email');
-        $emailStat = new Stat();
-        $emailStat->setEmail($email);
-        $emailStat->setLead($contact);
-        $emailStat->setEmailAddress($contact->getEmail());
-        $emailStat->setDateSent(new \DateTime());
-        $this->em->persist($contact);
-        $this->em->persist($emailStat);
-        $this->em->flush();
-
-        $this->client->enableProfiler();
-        $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
-
-        $profile = $this->client->getProfile();
-
-        /** @var DoctrineDataCollector $dbCollector */
-        $dbCollector = $profile->getCollector('db');
-        $queries     = $dbCollector->getQueries();
-        $prefix      = static::getContainer()->getParameter('mautic.db_table_prefix');
-
-        $dncQueries = array_filter(
-            $queries['default'],
-            fn (array $query) => "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE (dnc.channel = ?) AND (l.id IN ({$contact->getId()}))" === $query['sql']
-        );
-
-        Assert::assertCount(1, $dncQueries, 'DNC query not found. '.var_export(array_map(fn (array $query) => $query['sql'], $queries['default']), true));
-    }
-
-    public function testEmailDetailPageForDisabledSendButton(): void
-    {
-        $segment = $this->createSegment('Segment A', 'segment-a');
-        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'test html', $segment);
-        $email->setPublishUp(new \DateTime('now -1 hour'));
-        $this->em->persist($email);
-        $this->em->flush();
-
-        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
-        $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
-        $this->assertStringContainsString('Email is sending in the background', $html, $html);
-
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
-        $html    = $crawler->filter('.email-list > tbody > tr:nth-child(1) > td:nth-child(1)')->html();
-        $this->assertStringContainsString('Email is sending in the background', $html, $html);
-
-        $email->setPublishUp(new \DateTime('now +1 hour'));
-        $this->em->persist($email);
-        $this->em->flush();
-
-        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
-        $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
-        $this->assertStringNotContainsString('Email is sending in the background', $html, $html);
-
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
-        $html    = $crawler->filter('.email-list > tbody > tr:nth-child(1) > td:nth-child(1)')->html();
-        $this->assertStringNotContainsString('Email is sending in the background', $html, $html);
-
-        $email->setPublishUp(null);
-        $this->em->persist($email);
-        $this->em->flush();
-
-        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
-        $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
-        $this->assertStringNotContainsString('disabled', $html, $html);
-    }
-
-    /**
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
-    public function testSegmentEmailTranslationLookUp(): void
-    {
-        $segment = $this->createSegment('Segment A', 'segment-a');
-        $email   = $this->createEmail('Email A', 'Email A Subject', 'list', 'blank', 'Test html', $segment);
-        $this->em->flush();
-
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
-        $html    = $crawler->filterXPath("//select[@id='emailform_segmentTranslationParent']//optgroup")->html();
-        self::assertSame('<option value="'.$email->getId().'">'.$email->getName().'</option>', trim($html));
-    }
-
-    public function testSegmentEmailSend(): void
-    {
-        $segment = $this->createSegment('Segment A', 'segment-a');
-        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
-
-        foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
-            $contact = new Lead();
-            $contact->setEmail($emailAddress);
-
-            $member = new ListLead();
-            $member->setLead($contact);
-            $member->setList($segment);
-            $member->setDateAdded(new \DateTime());
-
-            $this->em->persist($member);
-            $this->em->persist($contact);
-        }
-        $this->em->flush();
-
-        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
-            'id'         => $email->getId(),
-            'pending'    => 2,
-            'batchLimit' => 10,
-        ]);
-
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
-        $this->assertQueuedEmailCount(2);
-
-        $email = $this->getMailerMessage();
-
-        // The order of the recipients is not guaranteed, so we need to check both possibilities.
-        Assert::assertSame('Subject A', $email->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
-        Assert::assertMatchesRegularExpression('#Ahoy _contact@(one|two).email_#', $email->getTextBody()); // Are the underscores expected?
-        Assert::assertCount(1, $email->getFrom());
-        Assert::assertSame($this->configParams['mailer_from_name'], $email->getFrom()[0]->getName());
-        Assert::assertSame($this->configParams['mailer_from_email'], $email->getFrom()[0]->getAddress());
-        Assert::assertCount(1, $email->getTo());
-        Assert::assertSame('', $email->getTo()[0]->getName());
-        Assert::assertMatchesRegularExpression('#contact@(one|two).email#', $email->getTo()[0]->getAddress());
-        Assert::assertCount(1, $email->getReplyTo());
-        Assert::assertSame('', $email->getReplyTo()[0]->getName());
-        Assert::assertSame($this->configParams['mailer_from_email'], $email->getReplyTo()[0]->getAddress());
-        Assert::assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
-    }
-
-    public function testSegmentEmailSendWithAdvancedOptions(): void
-    {
-        $segment = $this->createSegment('Segment A', 'segment-a');
-        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
-        $email->setPlainText('Dear {contactfield=email}');
-        $email->setFromAddress('custom@from.address');
-        $email->setFromName('Custom From Name');
-        $email->setReplyToAddress('custom@replyto.address');
-        $email->setBccAddress('custom@bcc.address');
-        $email->setHeaders(['x-global-custom-header' => 'value123 overridden']);
-        $email->setUtmTags(
-            [
-                'utmSource'   => 'utmSourceA',
-                'utmMedium'   => 'utmMediumA',
-                'utmCampaign' => 'utmCampaignA',
-                'utmContent'  => 'utmContentA',
-            ]
-        );
-
-        foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
-            $contact = new Lead();
-            $contact->setEmail($emailAddress);
-
-            $member = new ListLead();
-            $member->setLead($contact);
-            $member->setList($segment);
-            $member->setDateAdded(new \DateTime());
-
-            $this->em->persist($member);
-            $this->em->persist($contact);
-        }
-
-        $this->em->persist($segment);
-        $this->em->persist($email);
-        $this->em->flush();
-
-        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
-            'id'         => $email->getId(),
-            'pending'    => 2,
-            'batchLimit' => 10,
-        ]);
-
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
-        $this->assertQueuedEmailCount(2);
-
-        $email = $this->getMailerMessage();
-
-        // The order of the recipients is not guaranteed, so we need to check both possibilities.
-        Assert::assertSame('Subject A', $email->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+&utm_source=utmSourceA&utm_medium=utmMediumA&utm_campaign=utmCampaignA&utm_content=utmContentA">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $email->getHtmlBody());
-        Assert::assertMatchesRegularExpression('#Dear contact@(one|two).email#', $email->getTextBody());
-        Assert::assertCount(1, $email->getFrom());
-        Assert::assertSame('Custom From Name', $email->getFrom()[0]->getName());
-        Assert::assertSame('custom@from.address', $email->getFrom()[0]->getAddress());
-        Assert::assertCount(1, $email->getTo());
-        Assert::assertSame('', $email->getTo()[0]->getName());
-        Assert::assertMatchesRegularExpression('#contact@(one|two).email#', $email->getTo()[0]->getAddress());
-        Assert::assertCount(1, $email->getReplyTo());
-        Assert::assertSame('', $email->getReplyTo()[0]->getName());
-        Assert::assertSame('custom@replyto.address', $email->getReplyTo()[0]->getAddress());
-        Assert::assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
-    }
-
-    public function testSegmentEmailSendWithTokenInFromAddress(): void
-    {
-        $segment = $this->createSegment('Segment A', 'segment-a');
-        $email   = $this->createEmail('Email A', 'Subject A', 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
-        $email->setPlainText('Dear {contactfield=email}');
-        $email->setFromAddress('{contactfield=address2}');
-        $email->setFromName('{contactfield=address1}');
-        $email->setReplyToAddress('custom@replyto.address');
-
-        foreach (['contact@one.email', 'contact@two.email'] as $emailAddress) {
-            $contact = new Lead();
-            $contact->setEmail($emailAddress);
-            $contact->setAddress1('address1 name for '.$emailAddress);
-            $contact->setAddress2('address2+'.$emailAddress);
-
-            $member = new ListLead();
-            $member->setLead($contact);
-            $member->setList($segment);
-            $member->setDateAdded(new \DateTime());
-
-            $this->em->persist($member);
-            $this->em->persist($contact);
-        }
-
-        $this->em->persist($segment);
-        $this->em->persist($email);
-        $this->em->flush();
-
-        $this->setCsrfHeader();
-        $this->client->request(Request::METHOD_POST, '/s/ajax?action=email:sendBatch', [
-            'id'         => $email->getId(),
-            'pending'    => 2,
-            'batchLimit' => 10,
-        ]);
-
-        $this->assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-        $this->assertSame('{"success":1,"percent":100,"progress":[2,2],"stats":{"sent":2,"failed":0,"failedRecipients":[]}}', $this->client->getResponse()->getContent());
-        $this->assertQueuedEmailCount(2);
-
-        $messages   = self::getMailerMessages();
-        $messageOne = array_values(array_filter($messages, fn ($message) => 'contact@one.email' === $message->getTo()[0]->getAddress()))[0];
-        $messageTwo = array_values(array_filter($messages, fn ($message) => 'contact@two.email' === $message->getTo()[0]->getAddress()))[0];
-
-        Assert::assertSame('Subject A', $messageOne->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@one\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $messageOne->getHtmlBody());
-        Assert::assertSame('Dear contact@one.email', $messageOne->getTextBody());
-        Assert::assertCount(1, $messageOne->getFrom());
-        Assert::assertSame('address1 name for contact@one.email', $messageOne->getFrom()[0]->getName());
-        Assert::assertSame('address2+contact@one.email', $messageOne->getFrom()[0]->getAddress());
-        Assert::assertCount(1, $messageOne->getTo());
-        Assert::assertSame('', $messageOne->getTo()[0]->getName());
-        Assert::assertSame('contact@one.email', $messageOne->getTo()[0]->getAddress());
-        Assert::assertCount(1, $messageOne->getReplyTo());
-        Assert::assertSame('', $messageOne->getReplyTo()[0]->getName());
-        Assert::assertSame('custom@replyto.address', $messageOne->getReplyTo()[0]->getAddress());
-        Assert::assertSame('value123', $messageOne->getHeaders()->get('x-global-custom-header')->getBody());
-
-        Assert::assertSame('Subject A', $messageTwo->getSubject());
-        Assert::assertMatchesRegularExpression('#Ahoy <i>contact@two\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif" alt="" \/>#', $messageTwo->getHtmlBody());
-        Assert::assertSame('Dear contact@two.email', $messageTwo->getTextBody());
-        Assert::assertCount(1, $messageTwo->getFrom());
-        Assert::assertSame('address1 name for contact@two.email', $messageTwo->getFrom()[0]->getName());
-        Assert::assertSame('address2+contact@two.email', $messageTwo->getFrom()[0]->getAddress());
-        Assert::assertCount(1, $messageTwo->getTo());
-        Assert::assertSame('', $messageTwo->getTo()[0]->getName());
-        Assert::assertSame('contact@two.email', $messageTwo->getTo()[0]->getAddress());
-        Assert::assertCount(1, $messageTwo->getReplyTo());
-        Assert::assertSame('', $messageTwo->getReplyTo()[0]->getName());
-        Assert::assertSame('custom@replyto.address', $messageTwo->getReplyTo()[0]->getAddress());
-        Assert::assertSame('value123', $messageTwo->getHeaders()->get('x-global-custom-header')->getBody());
-    }
-
-    public function testCloneAction(): void
-    {
-        $segment = $this->createSegment('Segment B', 'segment-B');
-        $email   = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment);
-        $this->em->flush();
-
-        // request for email clone
-        $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/clone/{$email->getId()}");
-        $buttonCrawler  =  $crawler->selectButton('Save & Close');
-        $form           = $buttonCrawler->form();
-        $form['emailform[emailType]']->setValue('list');
-        $form['emailform[subject]']->setValue('Email B Subject clone');
-        $form['emailform[name]']->setValue('Email B clone');
-        $form['emailform[isPublished]']->setValue('1');
-
-        $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
-
-        $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
-        Assert::assertCount(2, $emails);
-
-        $firstEmail  = $emails[0];
-        $secondEmail = $emails[1];
-
-        Assert::assertSame($email->getId(), $firstEmail->getId());
-        Assert::assertNotSame($email->getId(), $secondEmail->getId());
-        Assert::assertEquals('list', $secondEmail->getEmailType());
-        Assert::assertEquals('Email B Subject', $firstEmail->getSubject());
-        Assert::assertEquals('Email B', $firstEmail->getName());
-        Assert::assertEquals('Email B Subject clone', $secondEmail->getSubject());
-        Assert::assertEquals('Email B clone', $secondEmail->getName());
-        Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
-    }
-
-    public function testAbTestAction(): void
-    {
-        $segment        = $this->createSegment('Segment B', 'segment-B');
-        $varientSetting = ['totalWeight' => 100, 'winnerCriteria' => 'email.openrate'];
-        $email          = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment, $varientSetting);
-        $this->em->flush();
-
-        // request for email clone
-        $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/abtest/{$email->getId()}");
-        $buttonCrawler  =  $crawler->selectButton('Save & Close');
-        $form           = $buttonCrawler->form();
-        $form['emailform[subject]']->setValue('Email B Subject var 2');
-        $form['emailform[name]']->setValue('Email B var 2');
-        $form['emailform[variantSettings][weight]']->setValue((string) $varientSetting['totalWeight']);
-        $form['emailform[variantSettings][winnerCriteria]']->setValue($varientSetting['winnerCriteria']);
-        $form['emailform[isPublished]']->setValue('1');
-
-        $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
-
-        $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
-        Assert::assertCount(2, $emails);
-
-        $firstEmail  = $emails[0];
-        $secondEmail = $emails[1];
-
-        Assert::assertSame($email->getId(), $firstEmail->getId());
-        Assert::assertNotSame($email->getId(), $secondEmail->getId());
-        Assert::assertEquals('list', $secondEmail->getEmailType());
-        Assert::assertEquals('Email B Subject', $firstEmail->getSubject());
-        Assert::assertEquals('Email B', $firstEmail->getName());
-        Assert::assertEquals('Email B Subject var 2', $secondEmail->getSubject());
-        Assert::assertEquals('Email B var 2', $secondEmail->getName());
-        Assert::assertEquals('blank', $secondEmail->getTemplate());
-        Assert::assertEquals('Test html', $secondEmail->getCustomHtml());
-        Assert::assertEquals($firstEmail->getId(), $secondEmail->getVariantParent()->getId());
-    }
-
-    #[DataProvider('dwcTokenTypeDataProvider')]
-    public function testSaveEmailWithHtmlTypeDWC(string $type): void
-    {
-        $dwc            = $this->createDynamicContent($type);
-        $subject        = sprintf('Email with DWC {dwc=%s}', $dwc->getSlotName());
-        $crawler        = $this->client->request(Request::METHOD_GET, '/s/emails/new');
-        $buttonCrawler  =  $crawler->selectButton('Save & Close');
-        $form           = $buttonCrawler->form();
-        $form['emailform[emailType]']->setValue('template');
-        $form['emailform[subject]']->setValue($subject);
-        $form['emailform[name]']->setValue('Email A');
-        $form['emailform[template]']->setValue('blank');
-        $form['emailform[customHtml]']->setValue('<html><body><p>some text</p></body></html>');
-        $form['emailform[isPublished]']->setValue('1');
-
-        $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
-        $errString = sprintf('The Dynamic Content slot &#039;%s&#039; is not of type &#039;text&#039;.', $dwc->getSlotName());
-        if (TypeList::TEXT === $type) {
-            $this->assertStringNotContainsString($errString, $this->client->getResponse()->getContent());
-        } else {
-            $this->assertStringContainsString($errString, $this->client->getResponse()->getContent());
-        }
-    }
-
-    /**
-     * @return iterable<string, string[]>
-     */
-    public static function dwcTokenTypeDataProvider(): iterable
-    {
-        yield 'text' => [TypeList::TEXT];
-        yield 'html' => [TypeList::HTML];
-    }
-
-    public function testEmailWithProject(): void
-    {
-        $email = $this->createEmail('Email', 'Subject', 'template', 'blank', 'html');
-
-        $project = new Project();
-        $project->setName('Test Project');
-        $this->em->persist($project);
-
-        $this->em->flush();
-        $this->em->clear();
-
-        $crawler = $this->client->request('GET', '/s/emails/edit/'.$email->getId());
-        $form    = $crawler->selectButton('Save')->form();
-        $form['emailform[projects]']->setValue((string) $project->getId());
-
-        $this->client->submit($form);
-
-        $this->assertResponseIsSuccessful();
-
-        $savedEmail = $this->em->find(Email::class, $email->getId());
-        Assert::assertSame($project->getId(), $savedEmail->getProjects()->first()->getId());
-    }
-
-    private function createSegment(string $name, string $alias): LeadList
-    {
-        $segment = new LeadList();
-        $segment->setName($name);
-        $segment->setAlias($alias);
-        $segment->setPublicName($name);
-        $this->em->persist($segment);
-
-        return $segment;
-    }
-
-    /**
-     * @param mixed[]|null $varientSetting
-     */
-    private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, ?LeadList $segment = null, ?array $varientSetting = []): Email
-    {
-        $email = new Email();
-        $email->setName($name);
-        $email->setSubject($subject);
-        $email->setEmailType($emailType);
-        $email->setTemplate($template);
-        $email->setCustomHtml($customHtml);
-        $email->setVariantSettings($varientSetting);
-        if (!empty($segment)) {
-            $email->addList($segment);
-        }
-        $this->em->persist($email);
-
-use Mautic\EmailBundle\Mailer\Message\MauticMessage;
-use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
-use Mautic\UserBundle\Entity\Permission;
-use Mautic\UserBundle\Entity\Role;
-use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Model\RoleModel;
-
-use function Symfony\Component\Clock\now;
-
-use Symfony\Component\DomCrawler\Crawler;
-    private const SUBJECT_A      = 'Subject A';
-
-    private const SUBJECT_B      = 'Subject B';
-
-    private const SUBJECT_C      = 'Subject C';
-
-    private const SEGMENT_B      = 'Segment B';
-
-    private const CLICK_URL_LOW  = 'https://example.com/low';
-
-    private const CLICK_URL_MID  = 'https://example.com/mid';
-
-    private const CLICK_URL_HIGH = 'https://example.com/high';
-
-    protected function setUp(): void
-        $this->configParams['legacy_builder_enabled'] = true;
-        $this->assertStringContainsString('February 7, 2020', (string) $clientResponse->getContent());
-        $this->assertStringContainsString('March 21, 2020', (string) $clientResponse->getContent());
-        $this->assertStringContainsString('Test User', (string) $clientResponse->getContent());
         $this->assertResponseIsSuccessful();
     }
 
@@ -594,6 +121,7 @@ use Symfony\Component\DomCrawler\Crawler;
             ]
         );
 
+        $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
 
         $response = json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR);
@@ -655,18 +183,118 @@ use Symfony\Component\DomCrawler\Crawler;
 
         $this->client->getResponse();
         $this->assertResponseIsSuccessful();
+    }
+
+    /**
+     * Ensure there is no query for DNC reasons if there are no contacts who received the email
+     * because it loads the whole DNC table if no contact IDs are provided. It can lead to
+     * memory limit error if the DNC table is big.
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function testProfileEmailDetailPageForUnsentEmail(): void
+    {
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Email A Subject', 'list', 'blank', 'Test html', $segment);
+        $this->em->flush();
+
+        $this->client->enableProfiler();
+        $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+
+        $profile = $this->client->getProfile();
+
+        /** @var DoctrineDataCollector $dbCollector */
+        $dbCollector = $profile->getCollector('db');
+        $queries     = $dbCollector->getQueries();
         $prefix      = self::getContainer()->getParameter('mautic.db_table_prefix');
+
+        $dncQueries = array_filter(
+            $queries['default'],
             fn (array $query): bool => "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE dnc.channel = :channel" === $query['sql']
+        );
+
         $this->assertCount(0, $dncQueries);
+    }
+
+    /**
+     * On the other hand there should be the query for DNC reasons if there are contacts who received the email.
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function testProfileEmailDetailPageForSentEmail(): void
+    {
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Email A Subject', 'list', 'blank', 'Test html', $segment);
+        $contact = new Lead();
+        $contact->setEmail('john@doe.email');
+        $emailStat = new Stat();
+        $emailStat->setEmail($email);
+        $emailStat->setLead($contact);
+        $emailStat->setEmailAddress($contact->getEmail());
+        $emailStat->setDateSent(new \DateTime());
         $this->em->persist($segment);
         $this->em->persist($email);
+        $this->em->persist($contact);
+        $this->em->persist($emailStat);
+        $this->em->flush();
+
+        $this->client->enableProfiler();
+        $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
+
+        $profile = $this->client->getProfile();
+
+        /** @var DoctrineDataCollector $dbCollector */
+        $dbCollector = $profile->getCollector('db');
+        $queries     = $dbCollector->getQueries();
         $prefix      = self::getContainer()->getParameter('mautic.db_table_prefix');
+
+        $dncQueries = array_filter(
+            $queries['default'],
             fn (array $query): bool => "SELECT l.id, dnc.reason FROM {$prefix}lead_donotcontact dnc LEFT JOIN {$prefix}leads l ON l.id = dnc.lead_id WHERE (dnc.channel = ?) AND (l.id IN (?))" === $query['sql']
+        );
+
         $this->assertCount(1, $dncQueries, 'DNC query not found. '.var_export(array_map(fn (array $query) => $query['sql'], $queries['default']), true));
+    }
+
+    public function testEmailDetailPageForDisabledSendButton(): void
+    {
+        $segment = $this->createSegment('Segment A', 'segment-a');
         $email   = $this->createEmail('Email A', self::SUBJECT_A, 'list', 'blank', 'test html', $segment);
+        $email->setPublishUp(new \DateTime('now -1 hour'));
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $html    = $crawler->filterXPath('//*[@id="toolbar"]')->html();
+        $this->assertStringContainsString('Email is sending in the background', $html, $html);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $html    = $crawler->filter('.email-list > tbody > tr:nth-child(1) > td:nth-child(1)')->html();
+        $this->assertStringContainsString('Email is sending in the background', $html, $html);
+
+        $email->setPublishUp(new \DateTime('now +1 hour'));
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $html    = $crawler->filterXPath('//*[@id="toolbar"]')->html();
+        $this->assertStringNotContainsString('Email is sending in the background', $html, $html);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails');
+        $html    = $crawler->filter('.email-list > tbody > tr:nth-child(1) > td:nth-child(1)')->html();
+        $this->assertStringNotContainsString('Email is sending in the background', $html, $html);
+
+        $email->setPublishUp(null);
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $html    = $crawler->filterXPath('//*[@id="toolbar"]')->html();
+        $this->assertStringNotContainsString('disabled', $html, $html);
+    }
+
     public function testEmailListOffersSendExampleWithoutOpeningTheDetail(): void
     {
         $email = $this->createEmail('Automation test email', self::SUBJECT_A, 'template', 'blank', 'test html');
@@ -726,11 +354,28 @@ use Symfony\Component\DomCrawler\Crawler;
         ], $this->getClickCountUrls($crawler));
     }
 
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function testSegmentEmailTranslationLookUp(): void
+    {
+        $segment = $this->createSegment('Segment A', 'segment-a');
+        $email   = $this->createEmail('Email A', 'Email A Subject', 'list', 'blank', 'Test html', $segment);
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $html    = $crawler->filterXPath("//select[@id='emailform_segmentTranslationParent']//optgroup")->html();
         $this->assertSame('<option value="'.$email->getId().'">'.$email->getName().' ('.$email->getId().')</option>', trim($html));
+    }
+
     public function testSegmentEmailVariationChildrenParents(): void
+    {
         $segment         = $this->createSegment('Segment A', 'segment-a');
         $emailGrandPah   = $this->createEmail('Email A', self::SUBJECT_A, 'list', 'blank', 'test html', $segment);
         $this->em->persist($emailGrandPah);
+        $this->em->flush();
+
         $emailParent = $this->createEmail('Email B', self::SUBJECT_B, 'list', 'blank', 'test html', $segment);
         $emailParent->setVariantParent($emailGrandPah);
         $this->em->persist($emailParent);
@@ -755,6 +400,7 @@ use Symfony\Component\DomCrawler\Crawler;
         foreach ($emailRows as $row) {
             $rowCrawler = new Crawler($row);
             $html       = $rowCrawler->html();
+
             if (str_contains($html, 'Email A')) {
                 $emailARow = $html;
             } elseif (str_contains($html, 'Email B')) {
@@ -763,9 +409,11 @@ use Symfony\Component\DomCrawler\Crawler;
                 $emailCRow = $html;
             }
         }
+
         $this->assertNotNull($emailARow, 'Could not find Email A row');
         $this->assertNotNull($emailBRow, 'Could not find Email B row');
         $this->assertNotNull($emailCRow, 'Could not find Email C row');
+
         // Email C (child) - should have A/B variant icon only
         $this->assertStringContainsString('ri-a-b fs-14', $emailCRow);
         $this->assertStringContainsString('Is A/B variant', $emailCRow);
@@ -796,6 +444,7 @@ use Symfony\Component\DomCrawler\Crawler;
         $this->assertInstanceOf(MauticMessage::class, $email);
 
         $quote = $singleOrDoubleQuotes ? '\'' : '"';
+        // The order of the recipients is not guaranteed, so we need to check both possibilities.
         $this->assertSame('Subject A', $email->getSubject());
         $this->assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email</i><a href='.$quote.'(?:\R|)https://localhost/r/[a-z0-9]+\?ct=[a-zA-Z0-9%]+(?:\R|)'.$quote.'>Mautic</a><img height="1" width="1" src="https://localhost/email/[a-z0-9]+\.gif\?ct=[^"]+" alt="" />#', $email->getHtmlBody());
         $this->assertMatchesRegularExpression('#Ahoy _contact@(one|two).email_#', $email->getTextBody()); // Are the underscores expected?
@@ -859,10 +508,38 @@ use Symfony\Component\DomCrawler\Crawler;
                 }
             }
         }
+    }
+
+    public function testSegmentEmailSendWithAdvancedOptions(): void
+    {
+        $segment = $this->createSegment('Segment A', 'segment-a');
         $email   = $this->createEmail('Email A', self::SUBJECT_A, 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
+        $email->setPlainText('Dear {contactfield=email}');
+        $email->setFromAddress('custom@from.address');
+        $email->setFromName('Custom From Name');
+        $email->setReplyToAddress('custom@replyto.address');
+        $email->setBccAddress('custom@bcc.address');
+        $email->setHeaders(['x-global-custom-header' => 'value123 overridden']);
+        $email->setUtmTags(
+            [
+                'utmSource'   => 'utmSourceA',
+                'utmMedium'   => 'utmMediumA',
+                'utmCampaign' => 'utmCampaignA',
+                'utmContent'  => 'utmContentA',
+            ]
+        );
+
         $this->addContactsToSegment($segment, ['contact@one.email', 'contact@two.email']);
+        $this->em->persist($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
         $this->sendBatchEmail($email);
+
+        $email = $this->getMailerMessage();
         $this->assertInstanceOf(MauticMessage::class, $email);
+
+        // The order of the recipients is not guaranteed, so we need to check both possibilities.
         $this->assertSame('Subject A', $email->getSubject());
         $this->assertMatchesRegularExpression('#Ahoy <i>contact@(one|two)\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+&utm_source=utmSourceA&utm_medium=utmMediumA&utm_campaign=utmCampaignA&utm_content=utmContentA">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $email->getHtmlBody());
         $this->assertMatchesRegularExpression('#Dear contact@(one|two).email#', $email->getTextBody());
@@ -876,7 +553,17 @@ use Symfony\Component\DomCrawler\Crawler;
         $this->assertSame('', $email->getReplyTo()[0]->getName());
         $this->assertSame('custom@replyto.address', $email->getReplyTo()[0]->getAddress());
         $this->assertSame('value123', $email->getHeaders()->get('x-global-custom-header')->getBody());
+    }
+
+    public function testSegmentEmailSendWithTokenInFromAddress(): void
+    {
+        $segment = $this->createSegment('Segment A', 'segment-a');
         $email   = $this->createEmail('Email A', self::SUBJECT_A, 'list', 'blank', 'Ahoy <i>{contactfield=email}</i><a href="https://mautic.org">Mautic</a>', $segment);
+        $email->setPlainText('Dear {contactfield=email}');
+        $email->setFromAddress('{contactfield=address2}');
+        $email->setFromName('{contactfield=address1}');
+        $email->setReplyToAddress('custom@replyto.address');
+
         $this->addContactsToSegment(
             $segment,
             ['contact@one.email', 'contact@two.email'],
@@ -885,10 +572,18 @@ use Symfony\Component\DomCrawler\Crawler;
                 $contact->setAddress2('address2+'.$emailAddress);
             }
         );
+
+        $this->em->persist($segment);
+        $this->em->persist($email);
+        $this->em->flush();
+
         $this->sendBatchEmail($email, 2, 10, true);
+
         /** @var MauticMessage[] $messages */
+        $messages   = self::getMailerMessages();
         $messageOne = array_values(array_filter($messages, fn (MauticMessage $message): bool => 'contact@one.email' === $message->getTo()[0]->getAddress()))[0];
         $messageTwo = array_values(array_filter($messages, fn (MauticMessage $message): bool => 'contact@two.email' === $message->getTo()[0]->getAddress()))[0];
+
         $this->assertSame('Subject A', $messageOne->getSubject());
         $this->assertMatchesRegularExpression('#Ahoy <i>contact@one\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $messageOne->getHtmlBody());
         $this->assertSame('Dear contact@one.email', $messageOne->getTextBody());
@@ -902,6 +597,7 @@ use Symfony\Component\DomCrawler\Crawler;
         $this->assertSame('', $messageOne->getReplyTo()[0]->getName());
         $this->assertSame('custom@replyto.address', $messageOne->getReplyTo()[0]->getAddress());
         $this->assertSame('value123', $messageOne->getHeaders()->get('x-global-custom-header')->getBody());
+
         $this->assertSame('Subject A', $messageTwo->getSubject());
         $this->assertMatchesRegularExpression('#Ahoy <i>contact@two\.email<\/i><a href="https:\/\/localhost\/r\/[a-z0-9]+\?ct=[a-zA-Z0-9%]+">Mautic<\/a><img height="1" width="1" src="https:\/\/localhost\/email\/[a-z0-9]+\.gif\?ct=[^"]+" alt="" \/>#', $messageTwo->getHtmlBody());
         $this->assertSame('Dear contact@two.email', $messageTwo->getTextBody());
@@ -915,9 +611,32 @@ use Symfony\Component\DomCrawler\Crawler;
         $this->assertSame('', $messageTwo->getReplyTo()[0]->getName());
         $this->assertSame('custom@replyto.address', $messageTwo->getReplyTo()[0]->getAddress());
         $this->assertSame('value123', $messageTwo->getHeaders()->get('x-global-custom-header')->getBody());
+    }
+
+    public function testCloneAction(): void
+    {
         $segment = $this->createSegment(self::SEGMENT_B, 'segment-B');
+        $email   = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment);
+        $this->em->flush();
+
+        // request for email clone
+        $crawler        = $this->client->request(Request::METHOD_GET, "/s/emails/clone/{$email->getId()}");
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form['emailform[emailType]']->setValue('list');
+        $form['emailform[subject]']->setValue('Email B Subject clone');
+        $form['emailform[name]']->setValue('Email B clone');
+        $form['emailform[isPublished]']->setValue('1');
+
+        $this->client->submit($form);
         self::assertResponseIsSuccessful();
+
+        $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
         $this->assertCount(2, $emails);
+
+        $firstEmail  = $emails[0];
+        $secondEmail = $emails[1];
+
         $this->assertSame($email->getId(), $firstEmail->getId());
         $this->assertNotSame($email->getId(), $secondEmail->getId());
         $this->assertEquals('list', $secondEmail->getEmailType());
@@ -1091,30 +810,96 @@ use Symfony\Component\DomCrawler\Crawler;
     {
         yield 'segment links are shown with view permission' => ['canViewSegments' => true];
         yield 'segment names are shown without view permission' => ['canViewSegments' => false];
+    }
+
+    public function testAbTestAction(): void
+    {
         $segment        = $this->createSegment(self::SEGMENT_B, 'segment-B');
         $varientSetting = ['totalWeight' => 100, 'winnerCriteria' => 'email.openrate'];
+        $email          = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segment, $varientSetting);
+        $this->em->flush();
+
         // Load the AB test form page and submit via the form's own apply button
         $crawler = $this->client->request(Request::METHOD_GET, "/s/email/abtest/generate/{$email->getId()}");
         $form    = $crawler->selectButton('generate_ab_test[buttons][apply]')->form();
         $form['generate_ab_test[winnerCriteria]']->setValue('email.openrate');
         $form['generate_ab_test[sendWinnerDelay]']->setValue('24');
         $form['generate_ab_test[totalWeight]']->setValue('10');
+        $this->client->submit($form);
         self::assertResponseIsSuccessful();
+
         // Verify the parent email was updated with AB test settings
         $this->em->clear();
         $updatedEmail = $this->em->getRepository(Email::class)->find($email->getId());
         $this->assertInstanceOf(Email::class, $updatedEmail);
+
         $settings = $updatedEmail->getVariantSettings();
         $this->assertEquals('email.openrate', $settings['winnerCriteria']);
         $this->assertEquals(24, $settings['sendWinnerDelay']);
         $this->assertEquals(10, $settings['totalWeight']);
         $this->assertEquals(1, $settings['enableAbTest']);
+    }
+
+    #[DataProvider('dwcTokenTypeDataProvider')]
+    public function testSaveEmailWithHtmlTypeDWC(string $type): void
+    {
+        $dwc            = $this->createDynamicContent($type);
+        $subject        = sprintf('Email with DWC {dwc=%s}', $dwc->getSlotName());
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/emails/new');
+        $buttonCrawler  =  $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form['emailform[emailType]']->setValue('template');
+        $form['emailform[subject]']->setValue($subject);
+        $form['emailform[name]']->setValue('Email A');
+        $form['emailform[template]']->setValue('blank');
+        $form['emailform[customHtml]']->setValue('<html><body><p>some text</p></body></html>');
+        $form['emailform[isPublished]']->setValue('1');
+
+        $this->client->submit($form);
         self::assertResponseIsSuccessful();
+        $errString = sprintf('The Dynamic Content slot &#039;%s&#039; is not of type &#039;text&#039;.', $dwc->getSlotName());
+        if (TypeList::TEXT === $type) {
             $this->assertStringNotContainsString($errString, (string) $this->client->getResponse()->getContent());
+        } else {
             $this->assertStringContainsString($errString, (string) $this->client->getResponse()->getContent());
+        }
+    }
+
+    /**
+     * @return iterable<string, string[]>
+     */
+    public static function dwcTokenTypeDataProvider(): iterable
+    {
+        yield 'text' => [TypeList::TEXT];
+        yield 'html' => [TypeList::HTML];
+    }
+
+    public function testEmailWithProject(): void
+    {
+        $email = $this->createEmail('Email', 'Subject', 'template', 'blank', 'html');
+
+        $project = new Project();
+        $project->setName('Test Project');
+        $this->em->persist($project);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler = $this->client->request('GET', '/s/emails/edit/'.$email->getId());
+        $form    = $crawler->selectButton('Save')->form();
+        $form['emailform[projects]']->setValue((string) $project->getId());
+
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+
+        $savedEmail = $this->em->find(Email::class, $email->getId());
         $this->assertInstanceOf(Email::class, $savedEmail);
         $this->assertSame($project->getId(), $savedEmail->getProjects()->first()->getId());
+    }
+
     public function testOptimisticLock(): void
+    {
         $version = 1;
         $email   = $this->createEmail('Email', 'Subject', 'template', 'blank', 'html');
         $this->em->flush();
@@ -1125,14 +910,19 @@ use Symfony\Component\DomCrawler\Crawler;
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $this->assertEmailVersion($email->getId(), ++$version, 'The version should be incremented after submitting the form.');
+
         $form    = $crawler->selectButton('Save')->form();
         $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
         $this->assertEmailVersion($email->getId(), $version, 'The version should stay the same as there was an optimistic lock error.');
         $this->assertStringContainsString('The record you are updating has been changed by someone else in the meantime. Please refresh the browser window and re-submit your changes.', $crawler->text(), 'There should be an optimistic error as the form was not refreshed after the previous submission.');
+    }
+
+    /**
      * @param array<mixed> $emails
      *
      * @throws \Doctrine\ORM\Exception\ORMException
+     */
     private function addContactsToSegment(LeadList $segment, array $emails, ?callable $contactCallback = null): void
     {
         foreach ($emails as $emailAddress) {
@@ -1174,6 +964,7 @@ use Symfony\Component\DomCrawler\Crawler;
     }
 
     public function testPublishPermissionOnNewEmailForAdminUser(): void
+    {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/emails/new');
         $this->assertResponseIsSuccessful();
         $isUnpublishedInput = $crawler->filter('input[name="emailform[isPublished]"][value="0"]:not([disabled="disabled"][checked])');
@@ -1198,6 +989,7 @@ use Symfony\Component\DomCrawler\Crawler;
         $this->assertInstanceOf(Email::class, $email);
         $this->assertTrue($email->getIsPublished());
     }
+
     /**
      * @param string[] $permissions
      */
@@ -1814,6 +1606,98 @@ use Symfony\Component\DomCrawler\Crawler;
         $this->assertStringContainsString('Email name maximum length is 190 characters', (string) $content);
     }
 
+    public function testEmailAuditLogs(): void
+    {
+        $segmentA = $this->createSegment('Segment A', 'segment-A');
+        $segmentB = $this->createSegment('Segment B', 'segment-B');
+        $this->em->flush();
+        $email = $this->createEmail('Email B', 'Email B Subject', 'list', 'blank', 'Test html', $segmentA, [
+            'totalWeight' => 100,
+            'winnerCriteria' => 'asset.downloads',
+        ]);
+        $this->em->flush();
+
+        // Edit the email and save it without making any changes.
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
+        $buttonCrawler  = $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->em->clear();
+
+        $auditLogs = $this->findEmailUpdateAuditLogs($email);
+        $this->assertCount(1, $auditLogs, 'There should be one audit log record.');
+
+        // enable AB test
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/email/abtest/generate/{$email->getId()}");
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('generate_ab_test[buttons][apply]')->form();
+        $form['generate_ab_test[winnerCriteria]']->setValue('email.openrate');
+        $form['generate_ab_test[sendWinnerDelay]']->setValue('12');
+        $form['generate_ab_test[totalWeight]']->setValue('10');
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->em->clear();
+
+        $auditLogs = $this->findEmailUpdateAuditLogs($email);
+        $this->assertCount(2, $auditLogs, 'There should be another audit log record.');
+        $auditLog = $auditLogs[0];
+        $this->assertInstanceOf(AuditLog::class, $auditLog);
+        $details = $auditLog->getDetails();
+        $this->assertCount(1, $details);
+        $this->assertArrayHasKey('variantSettings', $details);
+        $variantSettings = $details['variantSettings'];
+        $this->assertCount(2, $variantSettings);
+        $this->assertEqualsCanonicalizing([
+            'totalWeight' => 100,
+            'enableAbTest' => null,
+            'winnerCriteria' => 'asset.downloads',
+            'sendWinnerDelay' => 24,
+        ], $variantSettings[0]);
+        $this->assertEqualsCanonicalizing([
+            'totalWeight' => 10,
+            'enableAbTest' => 1,
+            'winnerCriteria' => 'email.openrate',
+            'sendWinnerDelay' => 12,
+        ], $variantSettings[1]);
+
+        // Edit the email and change segment and audit log should only have segment change logs
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
+        $buttonCrawler  = $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+
+        $listField = $form['emailform[lists]'];
+        $this->assertInstanceOf(ChoiceFormField::class, $listField);
+        $listField->setValue([$segmentA->getId(), $segmentB->getId()]);
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->em->clear();
+
+        $auditLogs = $this->findEmailUpdateAuditLogs($email);
+        $this->assertCount(3, $auditLogs, 'There should be another audit log record.');
+        $auditLog = $auditLogs[0];
+        $this->assertInstanceOf(AuditLog::class, $auditLog);
+        $details = $auditLog->getDetails();
+        $this->assertCount(1, $details);
+        $this->assertArrayHasKey('lists', $details);
+        $lists = $details['lists'];
+        $this->assertCount(2, $lists);
+        $this->assertEqualsCanonicalizing([$segmentA->getId()], $lists[0]);
+        $this->assertEqualsCanonicalizing([$segmentA->getId(), $segmentB->getId()], $lists[1]);
+
+        // Edit the email and save it without making any changes.
+        $crawler        = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
+        $buttonCrawler  = $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->em->clear();
+
+        $auditLogs = $this->findEmailUpdateAuditLogs($email);
+        $this->assertCount(3, $auditLogs, 'There should not be any new audit log record.');
+    }
+
     private function createSegment(string $name, string $alias): LeadList
     {
         $segment = new LeadList();
@@ -1894,5 +1778,18 @@ use Symfony\Component\DomCrawler\Crawler;
         $email = $this->em->find(Email::class, $id);
         $this->assertInstanceOf(Email::class, $email);
         $this->assertSame($expectedVersion, $email->getVersion(), $message);
+    }
+
+    private function findEmailUpdateAuditLogs(Email $email): array
+    {
+        $auditLogRepository = $this->em->getRepository(AuditLog::class);
+        $this->assertInstanceOf(AuditLogRepository::class, $auditLogRepository);
+
+        return $auditLogRepository->findBy([
+            'bundle'   => 'email',
+            'object'   => 'email',
+            'action'   => 'update',
+            'objectId' => $email->getId(),
+        ], ['id' => 'DESC']);
     }
 }
