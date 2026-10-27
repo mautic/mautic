@@ -7,7 +7,7 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Symfony\Component\Routing\RouterInterface;
 
-class DashboardSubscriber extends MainDashboardSubscriber
+final class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
      * Define the name of the bundle/category of the widget(s).
@@ -39,8 +39,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
     ];
 
     public function __construct(
-        protected AssetModel $assetModel,
-        protected RouterInterface $router,
+        private readonly AssetModel $assetModel,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -65,6 +65,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
+                        [],
                         $canViewOthers
                     ),
                 ]);
@@ -80,7 +81,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $event->setTemplateData([
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
-                    'chartData'   => $this->assetModel->getUniqueVsRepetitivePieChartData($params['dateFrom'], $params['dateTo'], $canViewOthers),
+                    'chartData'   => $this->assetModel->getUniqueVsRepetitivePieChartData($params['dateFrom'], $params['dateTo'], [], $canViewOthers),
                 ]);
             }
 
@@ -99,7 +100,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $assets = $this->assetModel->getPopularAssets($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
+                $assets = $this->assetModel->getPopularAssets($limit, $params['dateFrom'], $params['dateTo'], [], $canViewOthers);
                 $items  = [];
 
                 // Build table rows with links

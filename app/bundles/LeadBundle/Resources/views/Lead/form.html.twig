@@ -11,8 +11,9 @@
 {% block headerTitle %}
   {% if lead.id %}
     {{ 'mautic.lead.lead.header.edit'|trans({
-          '%name%': lead.primaryIdentifier|trans,
+        '%name%': lead.primaryIdentifier|trans,
     }) }}
+      {{ customContent('lead.name.after', _context) }}
   {% else %}
     {{ 'mautic.lead.lead.header.new'|trans }}
   {% endif %}

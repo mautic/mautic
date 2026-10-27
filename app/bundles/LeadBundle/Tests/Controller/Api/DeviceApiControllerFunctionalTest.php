@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DeviceApiControllerFunctionalTest extends MauticMysqlTestCase
+final class DeviceApiControllerFunctionalTest extends MauticMysqlTestCase
 {
     public function testPutEditWithInexistingIdSoItShouldCreate(): void
     {
@@ -24,8 +24,6 @@ class DeviceApiControllerFunctionalTest extends MauticMysqlTestCase
             'deviceOsPlatform'  => 'x64',
             'lead'              => $contact->getId(),
         ]);
-
-        $clientResponse = $this->client->getResponse();
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
     }

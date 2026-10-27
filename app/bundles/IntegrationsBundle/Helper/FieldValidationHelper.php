@@ -13,13 +13,13 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FieldValidationHelper
+final class FieldValidationHelper
 {
     private ?ConfigFormSyncInterface $integrationObject = null;
 
     public function __construct(
-        private FieldHelper $fieldHelper,
-        private TranslatorInterface $translator,
+        private readonly FieldHelper $fieldHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -58,12 +58,12 @@ class FieldValidationHelper
         }
     }
 
-    private function validateIntegrationRequiredFields(Form $fieldMappingsForm, array $missingFields): void
+    private function validateIntegrationRequiredFields(FormInterface $fieldMappingsForm, array $missingFields): void
     {
         $hasMissingFields  = false;
         $errorsOnGivenPage = false;
 
-        if (!empty($missingFields)) {
+        if ([] !== $missingFields) {
             $hasMissingFields = true;
         }
 
@@ -74,7 +74,7 @@ class FieldValidationHelper
 
             $errorsOnGivenPage = true;
 
-            /** @var Form $formField */
+            /** @var FormInterface $formField */
             $formField = $fieldMappingsForm[$field]['mappedField'];
             $formField->addError(
                 new FormError(
@@ -110,10 +110,10 @@ class FieldValidationHelper
     /**
      * @throws ObjectNotFoundException
      */
-    private function validateMauticRequiredFields(Form $fieldMappingsForm, string $object, array $objectFieldMappings): void
+    private function validateMauticRequiredFields(FormInterface $fieldMappingsForm, string $object, array $objectFieldMappings): void
     {
         $missingFields = $this->findMissingInternalRequiredFieldMappings($object, $objectFieldMappings);
-        if (empty($missingFields)) {
+        if ([] === $missingFields) {
             return;
         }
 

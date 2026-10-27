@@ -15,14 +15,16 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_EMAILS       = 'emails';
 
@@ -35,6 +37,8 @@ class ReportSubscriber implements EventSubscriberInterface
     public const EMAIL_VARIANT_PREFIX = 'vp';
 
     public const DNC_PREFIX           = 'dnc';
+
+    public const DNC_COUNT_PREFIX     = 'dnc_count';
 
     public const CLICK_PREFIX         = 'cut';
 
@@ -49,26 +53,33 @@ class ReportSubscriber implements EventSubscriberInterface
             'alias'   => 'unsubscribed',
             'label'   => 'mautic.email.report.unsubscribed',
             'type'    => 'string',
-            'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.self::DNC_PREFIX.'.id IS NOT NULL AND '.self::DNC_PREFIX.'.channel_id='.self::EMAILS_PREFIX.'.id AND dnc.reason='.DoNotContact::UNSUBSCRIBED.' , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+            'formula' => 'IFNULL('.self::DNC_COUNT_PREFIX.'.unsubscribed, 0)',
         ],
         'unsubscribed_ratio' => [
             'alias'   => 'unsubscribed_ratio',
             'label'   => 'mautic.email.report.unsubscribed_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.self::DNC_PREFIX.'.id IS NOT NULL AND '.self::DNC_PREFIX.'.channel_id='.self::EMAILS_PREFIX.'.id AND dnc.reason='.DoNotContact::UNSUBSCRIBED.' , 1, 0))/'.self::EMAILS_PREFIX.'.sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.unsubscribed/'.self::EMAILS_PREFIX.'.sent_count)*100, 1), \'0.0\')',
+            'suffix'  => '%',
+        ],
+        'unsubscribed_to_open_ratio' => [
+            'alias'   => 'unsubscribed_to_open_ratio',
+            'label'   => 'mautic.email.report.unsubscribed_to_open_ratio',
+            'type'    => 'string',
+            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.unsubscribed/'.self::EMAILS_PREFIX.'.read_count)*100, 1), \'0.0\')',
             'suffix'  => '%',
         ],
         'bounced' => [
             'alias'   => 'bounced',
             'label'   => 'mautic.email.report.bounced',
             'type'    => 'string',
-            'formula' => 'IFNULL((SELECT ROUND(SUM(IF('.self::DNC_PREFIX.'.id IS NOT NULL AND '.self::DNC_PREFIX.'.channel_id='.self::EMAILS_PREFIX.'.id AND dnc.reason='.DoNotContact::BOUNCED.' , 1, 0)), 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), 0)',
+            'formula' => 'IFNULL('.self::DNC_COUNT_PREFIX.'.bounced, 0)',
         ],
         'bounced_ratio' => [
             'alias'   => 'bounced_ratio',
             'label'   => 'mautic.email.report.bounced_ratio',
             'type'    => 'string',
-            'formula' => 'IFNULL((SELECT ROUND((SUM(IF('.self::DNC_PREFIX.'.id IS NOT NULL AND '.self::DNC_PREFIX.'.channel_id='.self::EMAILS_PREFIX.'.id AND dnc.reason='.DoNotContact::BOUNCED.' , 1, 0))/'.self::EMAILS_PREFIX.'.sent_count)*100, 1) FROM '.MAUTIC_TABLE_PREFIX.'lead_donotcontact dnc), \'0.0\')',
+            'formula' => 'IFNULL(ROUND(('.self::DNC_COUNT_PREFIX.'.bounced/'.self::EMAILS_PREFIX.'.sent_count)*100, 1), \'0.0\')',
             'suffix'  => '%',
         ],
     ];
@@ -161,6 +172,7 @@ class ReportSubscriber implements EventSubscriberInterface
         private EmailRepository $emailRepository,
         private GeneratedColumnsProviderInterface $generatedColumnsProvider,
         private FieldsBuilder $fieldsBuilder,
+        private DncReportService $dncReportService,
     ) {
     }
 
@@ -170,6 +182,7 @@ class ReportSubscriber implements EventSubscriberInterface
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
             ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0],
+            ReportEvents::REPORT_ON_DISPLAY        => ['onReportDisplay', 0],
         ];
     }
 
@@ -252,7 +265,8 @@ class ReportSubscriber implements EventSubscriberInterface
             $event->getCategoryColumns(),
             self::DNC_COLUMNS,
             self::EMAIL_VARIANT_COLUMNS,
-            self::CLICK_COLUMNS
+            self::CLICK_COLUMNS,
+            $this->dncReportService->getDncColumns()
         );
         $data = [
             'display_name' => 'mautic.email.emails',
@@ -374,7 +388,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 if ($useDncColumns) {
-                    $this->addDNCTableForEmails($qb);
+                    $this->addDncCountTableForEmails($qb);
                 }
 
                 if ($useClickThroughColumns) {
@@ -384,6 +398,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     )
                         ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph')
                         ->innerJoin('ph', MAUTIC_TABLE_PREFIX.'channel_url_trackables', 'cut', 'cut.redirect_id = ph.redirect_id AND cut.channel_id = ph.source_id')
+                        ->where('cut.channel = \'email\' AND ph.source = \'email\'')
                         ->groupBy('cut.channel_id');
                     $qb->leftJoin(self::EMAILS_PREFIX, sprintf('(%s)', $qbct->getSQL()), self::CLICK_THROUGH_PREFIX, 'e.id = ct.channel_id');
                 }
@@ -392,9 +407,13 @@ class ReportSubscriber implements EventSubscriberInterface
             case self::CONTEXT_EMAIL_STATS:
                 $qb->from(MAUTIC_TABLE_PREFIX.'email_stats', self::EMAIL_STATS_PREFIX);
 
+                // Unlike the other ratios, this per-email ratio is also available for individual stats.
+                $useUnsubscribedToOpenRatio = $event->usesColumn('unsubscribed_to_open_ratio');
+
                 if ($event->usesColumnWithPrefix(self::EMAILS_PREFIX)
                     || $event->usesColumnWithPrefix(ReportGeneratorEvent::CATEGORY_PREFIX)
                     || $useVariantColumns
+                    || $useUnsubscribedToOpenRatio
                 ) {
                     $qb->leftJoin(self::EMAIL_STATS_PREFIX, MAUTIC_TABLE_PREFIX.'emails', self::EMAILS_PREFIX, 'e.id = es.email_id');
                 }
@@ -405,6 +424,10 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 if ($useDncColumns) {
                     $this->addDNCTableForEmailStats($qb);
+                }
+
+                if ($useUnsubscribedToOpenRatio) {
+                    $this->addDncCountTableForEmails($qb);
                 }
 
                 if ($event->hasFilter('s.leadlist_id')) {
@@ -525,6 +548,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     break;
 
                 case 'mautic.email.graph.pie.ignored.read.failed':
+                    $queryBuilder->resetQueryPart('groupBy');
                     $counts = $this->statRepository->getIgnoredReadFailed($queryBuilder);
                     $chart  = new PieChart();
                     $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $counts['read']);
@@ -785,6 +809,18 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
+    public function onReportDisplay(ReportDataEvent $event): void
+    {
+        $data = $event->getData();
+
+        if ($event->checkContext([self::CONTEXT_EMAIL_STATS])) {
+            $data = $this->dncReportService->processDncStatusDisplay($data);
+        }
+
+        $event->setData($data);
+        unset($data);
+    }
+
     /**
      * @param array<string, int> $emailCounts
      *
@@ -829,6 +865,26 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * Add the per-email Do Not Contact counts to the query builder.
+     */
+    private function addDncCountTableForEmails(QueryBuilder $qb): void
+    {
+        // Group by the non-nullable emails.id instead of the nullable lead_donotcontact.channel_id,
+        // so MySQL ONLY_FULL_GROUP_BY detects that the counts depend on e.id.
+        $qbdnc = $this->db->createQueryBuilder();
+        $qbdnc->select(
+            'e2.id AS channel_id',
+            'SUM(IF(dnc2.reason = '.DoNotContact::UNSUBSCRIBED.', 1, 0)) AS unsubscribed',
+            'SUM(IF(dnc2.reason = '.DoNotContact::BOUNCED.', 1, 0)) AS bounced'
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc2')
+            ->innerJoin('dnc2', MAUTIC_TABLE_PREFIX.'emails', 'e2', 'e2.id = dnc2.channel_id')
+            ->where('dnc2.channel = \'email\'')
+            ->groupBy('e2.id');
+        $qb->leftJoin(self::EMAILS_PREFIX, sprintf('(%s)', $qbdnc->getSQL()), self::DNC_COUNT_PREFIX, 'e.id = dnc_count.channel_id');
+    }
+
     private function addTrackableTablesForEmailStats(QueryBuilder $qb): void
     {
         $trTable = MAUTIC_TABLE_PREFIX.'channel_url_trackables';
@@ -869,10 +925,10 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function isJoined($query, $table, $fromAlias, $alias): bool
+    private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
         $joins = $query->getQueryParts()['join'];
-        if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) {
+        if (empty($joins) || empty($joins[$fromAlias])) {
             return false;
         }
 

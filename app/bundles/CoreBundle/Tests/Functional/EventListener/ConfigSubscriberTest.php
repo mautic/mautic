@@ -1,0 +1,169 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mautic\CoreBundle\Tests\Functional\EventListener;
+
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelInterface;
+
+final class ConfigSubscriberTest extends MauticMysqlTestCase
+{
+    protected $useCleanupRollback = false;
+
+    protected function setUp(): void
+    {
+        $this->configParams['config_allowed_parameters'] = [
+            'kernel.root_dir',
+            'kernel.project_dir',
+        ];
+
+        $this->configParams['locale'] = 'en_US';
+
+        parent::setUp();
+
+        $configPath = $this->getConfigPath();
+        if (file_exists($configPath)) {
+            // backup original local.php
+            copy($configPath, $configPath.'.backup');
+        } else {
+            // write a temporary local.php
+            file_put_contents($configPath, '<?php $parameters = [];');
+        }
+    }
+
+    protected function beforeTearDown(): void
+    {
+        if (file_exists($this->getConfigPath().'.backup')) {
+            // restore original local.php
+            rename($this->getConfigPath().'.backup', $this->getConfigPath());
+        } else {
+            // local.php didn't exist to start with so delete
+            unlink($this->getConfigPath());
+        }
+    }
+
+    private function getConfigPath(): string
+    {
+        /** @var \AppKernel $kernel */
+        $kernel = self::getContainer()->get(KernelInterface::class);
+
+        return $kernel->getLocalConfigFile();
+    }
+
+    public function testFailConfigMediaPathWithDots(): void
+    {
+        $crawler = $this->setImagePathRequest('media/..');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('..');
+        $this->assertStringContainsString('The image path is invalid', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('...');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('./');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('../');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('./../');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+    }
+
+    public function testFailConfigMediaPathWithSystemDirectories(): void
+    {
+        $crawler = $this->setImagePathRequest('app/');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('app\\');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('app\\..');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('app/../');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('app\\../');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('app\\..\\');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('bin');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('bin/');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('themes');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+    }
+
+    public function testFoldersThatDontExist(): void
+    {
+        $crawler = $this->setImagePathRequest('media/this-folder-does-not-exist');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('media/this-folder-does-not-exist/');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('media/this-folder-does-not-exist/this-folder-does-not-exist');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('media/this-folder-does-not-exist/this-folder-does-not-exist/');
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+    }
+
+    public function testValidFolders(): void
+    {
+        $crawler = $this->setImagePathRequest('media/');
+        $this->assertStringNotContainsString('The image path is invalid.', $crawler->text());
+
+        $crawler = $this->setImagePathRequest('media/files/');
+        $this->assertStringNotContainsString('The image path is invalid.', $crawler->text());
+
+        $newFolder = $this->getContainer()->getParameter('mautic.image_path').'/../../media/newFolder';
+
+        $crawler = $this->setImagePathRequest('media/newFolder');
+
+        $this->assertStringContainsString('The image path is invalid.', $crawler->text());
+
+        if (!file_exists($newFolder)) {
+            mkdir($newFolder, 0777, true);
+        }
+
+        $crawler = $this->setImagePathRequest('media/newFolder');
+
+        $this->assertStringNotContainsString('The image path is invalid.', $crawler->text());
+
+        if (is_dir($newFolder)) {
+            rmdir($newFolder);
+        }
+    }
+
+    private function setImagePathRequest(string $value): Crawler
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/coreconfig');
+        self::assertResponseIsSuccessful();
+
+        // Find save & close button
+        $buttonCrawler = $crawler->selectButton('config[buttons][save]');
+        $form          = $buttonCrawler->form();
+        $form->setValues(
+            [
+                'config[coreconfig][site_url]'   => 'https://mautic-community.local', // required
+                'config[coreconfig][image_path]' => $value,
+            ]
+        );
+
+        $crawler = $this->client->submit($form);
+        self::assertResponseIsSuccessful();
+
+        return $crawler;
+    }
+}

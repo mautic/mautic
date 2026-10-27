@@ -1,45 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CategoryBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   collectionOperations={
- *     "get",
- *     "post"={"security"="'category:categories:create'"}
- *   },
- *   itemOperations={
- *     "get"={"security"="'category:categories:view'"},
- *     "put"={"security"="'category:categories:edit'"},
- *     "patch"={"security"="'category:categories:edit'"},
- *     "delete"={"security"="'category:categories:delete'"},
- *   },
- *   attributes={
- *     "normalization_context"={
- *       "groups"={
- *         "category:read"
- *        },
- *       "swagger_definition_name"="Read"
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "category:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(),
+        new Post(security: "is_granted('category:categories:create')"),
+        new Get(security: "is_granted('category:categories:view')"),
+        new Put(security: "is_granted('category:categories:edit')"),
+        new Patch(security: "is_granted('category:categories:edit')"),
+        new Delete(security: "is_granted('category:categories:delete')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['category:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['category:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Category extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -47,31 +45,39 @@ class Category extends FormEntity implements UuidInterface
     /**
      * @var int
      */
+    #[Groups(['category:read', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
+    #[NotBlank(message: 'mautic.core.title.required')]
     private $title;
 
     /**
      * @var string|null
      */
+    #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
     private $alias;
 
     /**
      * @var string|null
      */
+    #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
     private $color;
 
     /**
      * @var string
      */
+    #[Groups(['category:read', 'category:write', 'stage:read', 'asset:read', 'download:read', 'event:read', 'leadcategory:read', 'notification:read', 'dynamicContent:read', 'webhook:read', 'sms:read', 'page:read', 'campaign:read', 'email:read', 'point:read', 'trigger:read', 'message:read', 'focus:read', 'form:read', 'beeFreeRow:read', 'segment:read'])]
+    #[NotBlank(message: 'mautic.core.value.required')]
     private $bundle;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -96,27 +102,6 @@ class Category extends FormEntity implements UuidInterface
             ->build();
 
         static::addUuidField($builder);
-    }
-
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint(
-            'title',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.title.required',
-                ]
-            )
-        );
-
-        $metadata->addPropertyConstraint(
-            'bundle',
-            new NotBlank(
-                [
-                    'message' => 'mautic.core.value.required',
-                ]
-            )
-        );
     }
 
     /**
@@ -146,9 +131,7 @@ class Category extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -156,13 +139,9 @@ class Category extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set title.
-     *
      * @param string $title
-     *
-     * @return Category
      */
-    public function setTitle($title)
+    public function setTitle($title): static
     {
         $this->isChanged('title', $title);
         $this->title = $title;
@@ -171,9 +150,7 @@ class Category extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get title.
-     *
-     * @return string
+     * @return string|null
      */
     public function getTitle()
     {
@@ -181,13 +158,9 @@ class Category extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set alias.
-     *
      * @param string $alias
-     *
-     * @return Category
      */
-    public function setAlias($alias)
+    public function setAlias($alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -196,9 +169,7 @@ class Category extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get alias.
-     *
-     * @return string
+     * @return string|null
      */
     public function getAlias()
     {
@@ -206,13 +177,9 @@ class Category extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
-     *
-     * @return Category
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -221,9 +188,7 @@ class Category extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get description.
-     *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -240,9 +205,7 @@ class Category extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get color.
-     *
-     * @return string
+     * @return string|null
      */
     public function getColor()
     {
@@ -250,8 +213,6 @@ class Category extends FormEntity implements UuidInterface
     }
 
     /**
-     * Set bundle.
-     *
      * @param string $bundle
      */
     public function setBundle($bundle): void
@@ -261,9 +222,7 @@ class Category extends FormEntity implements UuidInterface
     }
 
     /**
-     * Get bundle.
-     *
-     * @return string
+     * @return string|null
      */
     public function getBundle()
     {

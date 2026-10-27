@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment;
 
-class OperatorOptions
+final class OperatorOptions
 {
     public const EQUAL_TO              = '=';
 
@@ -28,9 +30,23 @@ class OperatorOptions
 
     public const NOT_BETWEEN           = '!between';
 
+    /**
+     * @deprecated Use OperatorOptions::INCLUDING_ANY
+     */
     public const IN                    = 'in';
 
+    /**
+     * @deprecated Use OperatorOptions::EXCLUDING_ANY
+     */
     public const NOT_IN                = '!in';
+
+    public const INCLUDING_ANY         = 'in';
+
+    public const EXCLUDING_ANY         = '!in';
+
+    public const INCLUDING_ALL         = 'in_all';
+
+    public const EXCLUDING_ALL         = '!in_all';
 
     public const REGEXP                = 'regexp';
 
@@ -43,6 +59,10 @@ class OperatorOptions
     public const ENDS_WITH             = 'endsWith';
 
     public const CONTAINS              = 'contains';
+
+    public const IN_LAST               = 'inLast';
+
+    public const IN_NEXT               = 'inNext';
 
     /**
      * @var array<string,array<string,string|bool>>
@@ -110,15 +130,35 @@ class OperatorOptions
             'negate_expr' => 'between',
             'hide'        => true,
         ],
-        self::IN => [
+        self::IN_LAST => [
+            'label'       => 'mautic.lead.list.form.operator.inlast',
+            'expr'        => 'inLast',
+            'negate_expr' => 'inNext',
+        ],
+        self::IN_NEXT => [
+            'label'       => 'mautic.lead.list.form.operator.innext',
+            'expr'        => 'inNext',
+            'negate_expr' => 'inLast',
+        ],
+        self::INCLUDING_ANY => [
             'label'       => 'mautic.lead.list.form.operator.in',
             'expr'        => 'in',
             'negate_expr' => 'notIn',
         ],
-        self::NOT_IN => [
+        self::EXCLUDING_ANY => [
             'label'       => 'mautic.lead.list.form.operator.notin',
             'expr'        => 'notIn',
             'negate_expr' => 'in',
+        ],
+        self::INCLUDING_ALL => [
+            'label'       => 'mautic.lead.list.form.operator.in_all',
+            'expr'        => self::INCLUDING_ALL,
+            'negate_expr' => self::EXCLUDING_ALL,
+        ],
+        self::EXCLUDING_ALL => [
+            'label'       => 'mautic.lead.list.form.operator.notin_all',
+            'expr'        => self::EXCLUDING_ALL,
+            'negate_expr' => self::INCLUDING_ALL,
         ],
         self::REGEXP => [
             'label'       => 'mautic.lead.list.form.operator.regexp',
@@ -156,7 +196,7 @@ class OperatorOptions
     /**
      * @return array<string,array<string,string>>
      */
-    public static function getFilterExpressionFunctions()
+    public static function getFilterExpressionFunctions(): array
     {
         return self::$operatorOptions;
     }
@@ -164,7 +204,7 @@ class OperatorOptions
     /**
      * @return array<string,array<string,string>>
      */
-    public function getFilterExpressionFunctionsNonStatic()
+    public function getFilterExpressionFunctionsNonStatic(): array
     {
         return self::$operatorOptions;
     }

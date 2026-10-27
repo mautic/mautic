@@ -2,56 +2,48 @@
 
 namespace Mautic\CategoryBundle\Model;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Event\CategoryEvent;
 use Mautic\CategoryBundle\Event\CategoryTypeEntityEvent;
 use Mautic\CategoryBundle\Form\Type\CategoryType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Category>
  */
-class CategoryModel extends FormModel
+class CategoryModel extends FormModel implements AjaxLookupModelInterface
 {
     /**
      * @var array<string,mixed[]>
      */
     private array $categoriesByBundleCache = [];
 
-    public function __construct(
-        protected RequestStack $requestStack,
-        EntityManager $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    protected RequestStack $requestStack;
+
+    private CategoryRepository $categoryRepository;
+
+    #[Required]
+    public function autowireCategoryModel(
+        RequestStack $requestStack,
+        CategoryRepository $categoryRepository,
+    ): void {
+        $this->requestStack       = $requestStack;
+        $this->categoryRepository = $categoryRepository;
     }
 
+    // @phpstan-ignore-next-line method.childReturnType
     public function getRepository(): CategoryRepository
     {
-        $repository = $this->em->getRepository(Category::class);
-        \assert($repository instanceof CategoryRepository);
-
-        return $repository;
+        return $this->categoryRepository;
     }
 
     public function getNameGetter(): string
@@ -81,18 +73,17 @@ class CategoryModel extends FormModel
         $alias = $this->cleanAlias($alias, '', 0, '-');
 
         // make sure alias is not already taken
-        $repo      = $this->getRepository();
         $testAlias = $alias;
         $bundle    = $entity->getBundle();
-        $count     = $repo->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
+        $count     = $this->categoryRepository->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
         $aliasTag  = $count;
 
         while ($count) {
             $testAlias = $alias.$aliasTag;
-            $count     = $repo->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
+            $count     = $this->categoryRepository->checkUniqueCategoryAlias($bundle, $testAlias, $entity);
             ++$aliasTag;
         }
-        if ($testAlias != $alias) {
+        if ($testAlias !== $alias) {
             $alias = $testAlias;
         }
         $entity->setAlias($alias);
@@ -104,7 +95,7 @@ class CategoryModel extends FormModel
      * @param string|null $action
      * @param array       $options
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);
@@ -155,7 +146,7 @@ class CategoryModel extends FormModel
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new CategoryEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -163,29 +154,41 @@ class CategoryModel extends FormModel
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
-     * Get list of entities for autopopulate fields.
+     * @param string|array<int, string> $filter
+     * @param array<string, mixed>      $options
      *
-     * @param string $bundle
-     * @param string $filter
-     * @param int    $limit
-     *
-     * @return mixed[]
+     * @return array<mixed>
      */
-    public function getLookupResults($bundle, $filter = '', $limit = 10): array
+    public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array
     {
-        $key = $bundle.$filter.$limit;
+        $filterString = is_array($filter) ? implode('.', $filter) : $filter;
+        $key          = $type.$filterString.$limit;
 
-        if (!empty($this->categoriesByBundleCache[$key])) {
+        if (!isset($options['for_lookup']) && !empty($this->categoriesByBundleCache[$key])) {
             return $this->categoriesByBundleCache[$key];
         }
 
-        return $this->categoriesByBundleCache[$key] = $this->getRepository()->getCategoryList($bundle, $filter, $limit, 0);
+        $result = $this->categoryRepository->getCategoryList($type, $filter, $limit, $start);
+
+        if (!isset($options['for_lookup'])) {
+            return $this->categoriesByBundleCache[$key] = $result;
+        }
+
+        $data = [];
+        foreach ($result as $entity) {
+            $data[] = [
+                'label' => $entity['title'],
+                'value' => $entity['id'],
+            ];
+        }
+
+        return $data;
     }
 
     /**

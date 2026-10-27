@@ -2,8 +2,13 @@
   "name": "Creative",
   "author": "Dropsolid",
   "authorUrl": "https://dropsolid.io",
-  "builder": ["grapesjsbuilder"],
+  "builder": [
+    "grapesjsbuilder"
+  ],
   "features": [
     "email"
+  ],
+  "tags": [
+    "promotion"
   ]
 }

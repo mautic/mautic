@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
@@ -15,8 +17,10 @@ class PluginIntegrationKeyEvent extends AbstractPluginIntegrationEvent
 
     /**
      * Get the keys array.
+     *
+     * @return mixed[]|null
      */
-    public function getKeys()
+    public function getKeys(): ?array
     {
         return $this->keys;
     }

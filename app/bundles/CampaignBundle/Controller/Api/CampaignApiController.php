@@ -7,18 +7,25 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Helper\CampaignContactCountHelper;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Event\EntityExportEvent;
+use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +37,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * @extends CommonApiController<Campaign>
  */
-class CampaignApiController extends CommonApiController
+final class CampaignApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
@@ -54,10 +61,10 @@ class CampaignApiController extends CommonApiController
         CoreParametersHelper $coreParametersHelper,
         private ValidatorInterface $validator,
         private EventModel $eventModel,
+        private CampaignContactCountHelper $contactCountHelper,
+        CampaignModel $campaignModel,
+        private LeadModel $leadModel,
     ) {
-        $campaignModel = $modelFactory->getModel('campaign');
-        \assert($campaignModel instanceof CampaignModel);
-
         $this->model             = $campaignModel;
         $this->entityClass       = Campaign::class;
         $this->entityNameOne     = 'campaign';
@@ -70,10 +77,39 @@ class CampaignApiController extends CommonApiController
             'publishDetails',
             'leadListList',
             'formList',
-            'projectList',
         ];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
+    }
+
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
+    {
+        $response = parent::getEntitiesAction($request, $userHelper);
+
+        $withCounts = $request->query->has('withContactCounts')
+            && 'false' !== strtolower((string) $request->query->get('withContactCounts', 'true'));
+        if (!$withCounts) {
+            return $response;
+        }
+
+        $content = json_decode($response->getContent(), true);
+
+        if (!isset($content[$this->entityNameMulti]) || empty($content[$this->entityNameMulti])) {
+            return $response;
+        }
+
+        $campaignIds = array_keys($content[$this->entityNameMulti]);
+
+        $contactCounts = $this->contactCountHelper->getContactCounts($campaignIds);
+
+        foreach ($content[$this->entityNameMulti] as $id => &$campaign) {
+            $campaign['contactCount']          = $contactCounts[$id]['contactCount'] ?? 0;
+            $campaign['contactCountFetchedAt'] = $contactCounts[$id]['countFetchedAt'] ?? null;
+        }
+
+        $response->setContent(json_encode($content));
+
+        return $response;
     }
 
     /**
@@ -82,20 +118,18 @@ class CampaignApiController extends CommonApiController
      * @param int $id     Campaign ID
      * @param int $leadId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addLeadAction($id, $leadId)
+    public function addLeadAction($id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
-            $leadModel = $this->getModel('lead');
-            $lead      = $leadModel->getEntity($leadId);
+            $lead = $this->leadModel->getEntity($leadId);
 
             if (null == $lead) {
                 return $this->notFound();
-            } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
+            }
+            if (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
                 return $this->accessDenied();
             }
 
@@ -115,11 +149,9 @@ class CampaignApiController extends CommonApiController
      * @param int $id     Campaign ID
      * @param int $leadId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function removeLeadAction($id, $leadId)
+    public function removeLeadAction($id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
@@ -139,8 +171,10 @@ class CampaignApiController extends CommonApiController
     }
 
     /**
-     * @param Campaign &$entity
-     * @param string   $action
+     * @param Campaign             $entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
@@ -151,7 +185,8 @@ class CampaignApiController extends CommonApiController
                 $msg = $this->translator->trans('mautic.campaign.form.events.notempty', [], 'validators');
 
                 return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
-            } elseif (empty($parameters['lists']) && empty($parameters['forms'])) {
+            }
+            if (empty($parameters['lists']) && empty($parameters['forms'])) {
                 $msg = $this->translator->trans('mautic.campaign.form.sources.notempty', [], 'validators');
 
                 return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
@@ -180,7 +215,7 @@ class CampaignApiController extends CommonApiController
 
             foreach ($entity->getEvents() as $currentEvent) {
                 if (!in_array($currentEvent->getId(), $requestEventIds)) {
-                    $deletedEvents[] = $currentEvent->getId();
+                    $deletedEvents[] = ['id' => $currentEvent->getId()];
                 }
             }
 
@@ -226,17 +261,16 @@ class CampaignApiController extends CommonApiController
         /** @var array<ConstraintViolationListInterface<ConstraintViolationInterface>> $eventViolations */
         $eventViolations = array_filter(
             array_map(
-                fn (Event $event) => $this->validator->validate($event),
+                fn (Event $event): ConstraintViolationListInterface => $this->validator->validate($event),
                 $entity->getEvents()->toArray()
             ),
-            fn ($error) => $error->count() > 0
+            fn (ConstraintViolationListInterface $error): bool => $error->count() > 0
         );
 
         if (count($eventViolations) > 0) {
             $errors = [];
             foreach ($eventViolations as $violationList) {
                 foreach ($violationList as $violation) {
-                    \assert($violation instanceof ConstraintViolationInterface);
                     $errors[] = [
                         'code'    => $violation->getCode(),
                         'message' => $violation->getMessage(),
@@ -259,7 +293,7 @@ class CampaignApiController extends CommonApiController
             $this->model->setCanvasSettings($entity, $parameters['canvasSettings']);
         }
 
-        if (Request::METHOD_PUT === $method && !empty($deletedEvents)) {
+        if (Request::METHOD_PUT === $method && [] !== $deletedEvents) {
             $this->eventModel->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
     }
@@ -286,10 +320,8 @@ class CampaignApiController extends CommonApiController
 
     /**
      * Obtains a list of campaign contacts.
-     *
-     * @return Response
      */
-    public function getContactsAction(Request $request, $id)
+    public function getContactsAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -331,7 +363,7 @@ class CampaignApiController extends CommonApiController
         );
     }
 
-    public function cloneCampaignAction($campaignId)
+    public function cloneCampaignAction($campaignId): Response
     {
         if (empty($campaignId) || false == intval($campaignId)) {
             return $this->notFound();
@@ -361,6 +393,98 @@ class CampaignApiController extends CommonApiController
 
         $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK, $headers);
 
+        $this->setSerializationContext($view);
+
+        return $this->handleView($view);
+    }
+
+    /**
+     * Get a list of events.
+     */
+    public function exportCampaignAction(Request $request, int $campaignId): Response
+    {
+        // Check if the campaign exists
+        $campaign = $this->model->getEntity($campaignId);
+        if (!$campaign) {
+            return $this->notFound();
+        }
+
+        // Check if user has permission to export campaigns
+        if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {
+            return $this->accessDenied();
+        }
+
+        // Dispatch event to collect campaign data for export
+        $event = new EntityExportEvent(Campaign::ENTITY_NAME, $campaignId);
+        $this->dispatcher->dispatch($event);
+        $data = $event->getEntities();
+
+        // Prepare response
+        $view = $this->view([$data], Response::HTTP_OK);
+        $this->setSerializationContext($view);
+
+        return $this->handleView($view);
+    }
+
+    public function importCampaignAction(Request $request, UserHelper $userHelper, ImportHelper $importHelper): Response
+    {
+        // Check if user has permission to import campaigns
+        if (!$this->security->isGranted('campaign:imports:create')) {
+            return $this->accessDenied();
+        }
+
+        // Decode request JSON
+        $data = json_decode($request->getContent(), true);
+
+        if (!$data || !isset($data[0][Campaign::ENTITY_NAME])) {
+            $files = $request->files->all();
+
+            if (1 !== count($files)) {
+                return $this->handleView(
+                    $this->view(['error' => $this->translator->trans('mautic.campaign.api.import.incorrect_zip_file', [], 'messages')], Response::HTTP_BAD_REQUEST)
+                );
+            }
+
+            $uploadedFile = array_values($files)[0];
+
+            if (!$uploadedFile->isValid()) {
+                return $this->handleView(
+                    $this->view(['error' => $this->translator->trans('mautic.campaign.api.import.upload_failed', [], 'messages')], Response::HTTP_BAD_REQUEST)
+                );
+            }
+
+            if ('zip' !== strtolower($uploadedFile->getClientOriginalExtension())) {
+                return $this->handleView(
+                    $this->view(['error' => $this->translator->trans('mautic.campaign.api.import.incorrect_upload_file_format', [], 'messages')], Response::HTTP_BAD_REQUEST)
+                );
+            }
+
+            $zipPath = $uploadedFile->getPathname();
+
+            if (!file_exists($zipPath)) {
+                return $this->handleView(
+                    $this->view(['error' => $this->translator->trans('mautic.campaign.api.import.uploaded_file_no_exist', [], 'messages')], Response::HTTP_INTERNAL_SERVER_ERROR)
+                );
+            }
+
+            try {
+                $data = $importHelper->readZipFile($zipPath);
+            } catch (\RuntimeException $e) {
+                unlink($zipPath);
+
+                return $this->handleView(
+                    $this->view(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST)
+                );
+            }
+        }
+        $importHelper->recursiveRemoveEmailaddress($data);
+        $userId = $userHelper->getUser()->getId();
+
+        foreach ($data as $entity) {
+            $event  = new EntityImportEvent(Campaign::ENTITY_NAME, $entity, $userId);
+            $this->dispatcher->dispatch($event);
+        }
+        $view = $this->view([$this->translator->trans('mautic.campaign.campaign.import.finished', [], 'messages')], Response::HTTP_CREATED);
         $this->setSerializationContext($view);
 
         return $this->handleView($view);

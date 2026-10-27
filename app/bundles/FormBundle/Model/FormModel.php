@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -28,6 +29,7 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -35,6 +37,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -53,13 +56,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         protected ActionModel $formActionModel,
         protected FieldModel $formFieldModel,
         protected FormFieldHelper $fieldHelper,
-        private PrimaryCompanyHelper $primaryCompanyHelper,
+        private readonly PrimaryCompanyHelper $primaryCompanyHelper,
         protected LeadFieldModel $leadFieldModel,
-        private FormUploader $formUploader,
-        private ContactTracker $contactTracker,
-        private ColumnSchemaHelper $columnSchemaHelper,
-        private TableSchemaHelper $tableSchemaHelper,
-        private MappedObjectCollectorInterface $mappedObjectCollector,
+        private readonly FormUploader $formUploader,
+        private readonly ContactTracker $contactTracker,
+        private readonly ColumnSchemaHelper $columnSchemaHelper,
+        private readonly TableSchemaHelper $tableSchemaHelper,
+        private readonly MappedObjectCollectorInterface $mappedObjectCollector,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -68,16 +71,14 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly FormRepository $formRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
-    /**
-     * @return FormRepository
-     */
-    public function getRepository()
+    public function getRepository(): FormRepository
     {
-        return $this->em->getRepository(Form::class);
+        return $this->formRepository;
     }
 
     public function getPermissionBase(): string
@@ -90,7 +91,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         return 'getName';
     }
 
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -150,7 +151,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new FormEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -158,9 +159,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     public function setFields(Form $entity, $sessionFields): void
@@ -193,21 +194,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
                 $func = 'set'.ucfirst($f);
                 if (method_exists($field, $func)) {
-                    $field->$func($v);
+                    $field->{$func}($v);
                 }
             }
             $field->setForm($entity);
             $field->setSessionId($key);
-            if (!$field->getParent()) {
-                $field->setOrder($order);
-                ++$order;
-            } else {
-                if (isset($sessionFields[$field->getParent()]['order'])) {
-                    $field->setOrder($sessionFields[$field->getParent()]['order']);
-                } else {
-                    $field->setOrder($order);
-                }
-            }
+            $field->setOrder($order);
+            ++$order;
             $entity->addField($properties['id'], $field);
         }
 
@@ -226,11 +219,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $existingFields = $entity->getFields()->toArray();
         $deleteFields   = [];
         foreach ($sessionFields as $fieldId) {
-            if (!isset($existingFields[$fieldId])) {
+            if (!isset($existingFields[$fieldId ?? ''])) {
                 continue;
             }
-            $this->handleFilesDelete($existingFields[$fieldId]);
-            $entity->removeField($fieldId, $existingFields[$fieldId]);
+            $this->handleFilesDelete($existingFields[$fieldId ?? '']);
+            $entity->removeField($fieldId, $existingFields[$fieldId ?? '']);
             $deleteFields[] = $fieldId;
         }
 
@@ -283,7 +276,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
                 }
 
                 if (method_exists($action, $func)) {
-                    $action->$func($v);
+                    $action->{$func}($v);
                 }
             }
             $action->setForm($entity);
@@ -325,7 +318,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
     public function saveEntity($entity, $unlock = true): void
     {
-        $isNew = ($entity->getId()) ? false : true;
+        $isNew = !(bool) $entity->getId();
 
         if ($isNew && !$entity->getAlias()) {
             $alias = $this->cleanAlias($entity->getName(), '', 10);
@@ -353,6 +346,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getContent(Form $form, $withScript = true, $useCache = true): string
     {
+        if ($form->isSubmissionLimitReached()) {
+            $message = $form->getSubmissionLimitMessage() ?? $this->translator->trans('mautic.form.submission.limit_reached');
+
+            return sprintf('<div class="mautic-form-message">%s</div>', InputHelper::strict_html($message));
+        }
+
         $html = $this->getFormHtml($form, $useCache);
 
         if ($withScript) {
@@ -396,7 +395,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      */
     public function getLeadSubmissions(Form $form, $leadId, $limit = 200): array
     {
-        return $this->getRepository()->getFormResults(
+        return $this->formRepository->getFormResults(
             $form,
             [
                 'leadId' => $leadId,
@@ -420,9 +419,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $styleToRender = '@MauticForm/Builder/_style.html.twig';
         $formToRender  = '@MauticForm/Builder/form.html.twig';
 
-        if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig')) {
-            $styleToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig';
+        foreach (['_style', 'style'] as $styleFile) {
+            $stylePath = "@themes/{$theme}/html/MauticFormBundle/Builder/{$styleFile}.html.twig";
+            if ($this->twig->getLoader()->exists($stylePath)) {
+                $styleToRender = $stylePath;
+            }
         }
+
         if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig')) {
             $formToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig';
         }
@@ -433,19 +436,19 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         if ($entity->getRenderStyle()) {
             $styleTheme = $styleToRender;
-            $style      = $this->twig->render($this->themeHelper->checkForTwigTemplate($styleTheme));
+            $style      = $this->themeHelper->renderThemeTemplate($this->themeHelper->checkForTwigTemplate($styleTheme), []);
         }
 
         // Determine pages
         $fields = $entity->getFields()->toArray();
 
         // Ensure the correct order in case this is generated right after a form save with new fields
-        uasort($fields, fn ($a, $b): int => $a->getOrder() <=> $b->getOrder());
+        uasort($fields, fn (Field $a, Field $b): int => $this->compareFieldOrder($a, $b));
 
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         [$pages, $lastPage] = $this->getPages($fields);
-        $html               = $this->twig->render(
+        $html               = $this->themeHelper->renderThemeTemplate(
             $formToRender,
             [
                 'fieldSettings'          => $this->getCustomComponents()['fields'],
@@ -470,7 +473,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
             if ($persist) {
                 // bypass model function as events aren't needed for this
-                $this->getRepository()->saveEntity($entity);
+                $this->formRepository->saveEntity($entity);
             }
         }
 
@@ -529,7 +532,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         // create the field as its own column in the leads table
         $name         = 'form_results_'.$entity->getId().'_'.$entity->getAlias();
         $columns      = $this->generateFieldColumns($entity);
-        if ($isNew || (!$isNew && !$this->tableSchemaHelper->checkTableExists($name))) {
+        if ($isNew || !$this->tableSchemaHelper->checkTableExists($name)) {
             $this->tableSchemaHelper->addTable([
                 'name'    => $name,
                 'columns' => $columns,
@@ -551,9 +554,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
+    /**
+     * @param object $entity
+     */
     public function deleteEntity($entity): void
     {
-        /* @var Form $entity */
+        /** @var Form $entity */
         $this->deleteFormFiles($entity);
 
         if (!$entity->getId()) {
@@ -573,7 +579,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     {
         $entities     = parent::deleteEntities($ids);
         foreach ($entities as $id => $entity) {
-            /* @var Form $entity */
+            /** @var Form $entity */
             // delete the associated results table
             $this->tableSchemaHelper->deleteTable('form_results_'.$id.'_'.$entity->getAlias());
             $this->deleteFormFiles($entity);
@@ -660,23 +666,33 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $html       = $this->getContent($form, false);
         $formScript = $this->getFormScript($form);
 
-        // replace line breaks with literal symbol and escape quotations
-        $search        = ["\r\n", "\n", '"'];
-        $replace       = ['', '', '\"'];
-        $html          = str_replace($search, $replace, $html);
-        $oldFormScript = str_replace($search, $replace, $formScript);
+        // Remove line breaks for inline JavaScript string literals
+        $search  = ["\r\n", "\n"];
+        $replace = ['', ''];
+        $html    = str_replace($search, $replace, $html);
+
+        // generateJsScript uses createTextNode which can handle newlines,
+        // so pass the original formScript to preserve single-line // comments
         $newFormScript = $this->generateJsScript($formScript);
+
+        // The document.write fallback embeds formScript in a string literal,
+        // so newlines must be stripped there
+        $formScriptStripped = str_replace($search, $replace, $formScript);
+
+        // Use proper JSON encoding for JavaScript strings
+        $htmlEscaped       = json_encode($html, JSON_UNESCAPED_SLASHES);
+        $formScriptEscaped = json_encode($formScriptStripped, JSON_UNESCAPED_SLASHES);
 
         // Write html for all browser and fallback for IE
         $script = '
             var scr  = document.currentScript;
-            var html = "'.$html.'";
+            var html = '.$htmlEscaped.';
 
             if (scr !== undefined) {
                 scr.insertAdjacentHTML("afterend", html);
                 '.$newFormScript.'
             } else {
-                document.write("'.$oldFormScript.'"+html);
+                document.write('.$formScriptEscaped.'+html);
             }
         ';
 
@@ -694,7 +710,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             }
         }
 
-        $script = $this->twig->render(
+        $script = $this->themeHelper->renderThemeTemplate(
             $scriptToRender,
             [
                 'form'  => $form,
@@ -735,9 +751,13 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @param string $formHtml
      */
-    public function populateValuesWithLead(Form $form, &$formHtml): void
+    public function populateValuesWithLead(Form $form, &$formHtml, ?string $formName = null): void
     {
-        $formName          = $form->generateFormName();
+        if (!(bool) $this->coreParametersHelper->get('form_field_autofill', false)) {
+            return;
+        }
+
+        $formName ??= $form->generateFormName();
         $fields            = $form->getFields();
         $autoFillFields    = [];
         $objectsToAutoFill = ['contact', 'company'];
@@ -774,6 +794,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
             $value = $leadArray[$field->getMappedField()] ?? '';
             // just skip string empty field
             if ('' !== $value) {
+                $mappedFieldAlias = $field->getMappedField();
+                $mappedField      = $this->leadFieldModel->getEntityByAlias($mappedFieldAlias);
+                if ($mappedField && 'boolean' === $mappedField->getType()) {
+                    $properties = $mappedField->getProperties();
+                    $value      = CustomFieldValueHelper::normalize($value, 'boolean', $properties);
+                }
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
             }
         }
@@ -847,9 +873,8 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @param int   $limit
      * @param array $filters
-     * @param array $options
      */
-    public function getFormList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], $options = []): array
+    public function getFormList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.name, t.date_added, t.date_modified')
@@ -871,7 +896,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Load HTML consider Libxml < 2.7.8.
      */
-    private function loadHTML(&$dom, $html): void
+    private function loadHTML(\DOMDocument &$dom, string $html): void
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -885,20 +910,20 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @return string
      */
-    private function saveHTML($dom, $html)
+    private function saveHTML(\DOMDocument $dom, ?\DOMNode $html): string|false|null
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             return $dom->saveHTML($html);
-        } else {
-            // remove DOCTYPE, <html>, and <body> tags for old libxml
-            return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], ['', '', '', ''], $dom->saveHTML($html)));
         }
+
+        // remove DOCTYPE, <html>, and <body> tags for old libxml
+        return preg_replace('/^<!DOCTYPE.+?>/', '', str_replace(['<html>', '</html>', '<body>', '</body>'], ['', '', '', ''], $dom->saveHTML($html)));
     }
 
     /**
      * Extract script from html.
      */
-    private function extractScriptTag($html): array
+    private function extractScriptTag(string $html): array
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
@@ -916,7 +941,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Remove script from html.
      */
-    private function removeScriptTag($html): string
+    private function removeScriptTag(string $html): string
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
@@ -944,7 +969,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Generate dom manipulation javascript to include all script.
      */
-    private function generateJsScript($html): string
+    private function generateJsScript(string $html): string
     {
         libxml_use_internal_errors(true);
         $dom = new \DOMDocument();
@@ -955,18 +980,19 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         foreach ($items as $key => $script) {
             if ($script->hasAttribute('src')) {
                 $javascript .= "
-                var script$key = document.createElement('script');
-                script$key.src = '".$script->getAttribute('src')."';
-                document.getElementsByTagName('head')[0].appendChild(script$key);";
+                var script{$key} = document.createElement('script');
+                script{$key}.src = '".$script->getAttribute('src')."';
+                document.getElementsByTagName('head')[0].appendChild(script{$key});";
             } else {
                 $scriptContent = $script->nodeValue;
-                $scriptContent = str_replace(["\r\n", "\n", '"'], ['', '', '\"'], $scriptContent);
+                // Use json_encode to properly escape content for JavaScript string
+                $escapedContent = json_encode($scriptContent, JSON_UNESCAPED_SLASHES);
 
                 $javascript .= "
-                var inlineScript$key = document.createTextNode(\"$scriptContent\");
-                var script$key       = document.createElement('script');
-                script$key.appendChild(inlineScript$key);
-                document.getElementsByTagName('head')[0].appendChild(script$key);";
+                var inlineScript{$key} = document.createTextNode($escapedContent);
+                var script{$key}       = document.createElement('script');
+                script{$key}.appendChild(inlineScript{$key});
+                document.getElementsByTagName('head')[0].appendChild(script{$key});";
             }
         }
 
@@ -1077,12 +1103,23 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         if (!$this->canViewOthersEntity()) {
             $filter['force'][] = [
-                'column' => $this->getRepository()->getTableAlias().'.createdBy',
+                'column' => $this->formRepository->getTableAlias().'.createdBy',
                 'expr'   => 'eq',
                 'value'  => $this->userHelper->getUser()->getId(),
             ];
         }
 
-        return $this->getRepository()->getEntitiesForGlobalSearch($filter);
+        return $this->formRepository->getEntitiesForGlobalSearch($filter);
+    }
+
+    private function compareFieldOrder(Field $a, Field $b): int
+    {
+        $order = $a->getOrder() <=> $b->getOrder();
+
+        if (0 !== $order) {
+            return $order;
+        }
+
+        return ($a->getId() ?? 0) <=> ($b->getId() ?? 0);
     }
 }

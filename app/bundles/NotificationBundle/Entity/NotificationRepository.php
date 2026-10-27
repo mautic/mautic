@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Notification>
  */
-class NotificationRepository extends CommonRepository
+final class NotificationRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
@@ -77,8 +77,8 @@ class NotificationRepository extends CommonRepository
                     $unique     => $filter->string,
                 ];
                 $expr = $q->expr()->or(
-                    $q->expr()->eq('e.language', ":$unique"),
-                    $q->expr()->like('e.language', ":$langUnique")
+                    $q->expr()->eq('e.language', ":{$unique}"),
+                    $q->expr()->like('e.language', ":{$langUnique}")
                 );
                 $returnParameter = true;
                 break;
@@ -92,7 +92,7 @@ class NotificationRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [$expr, $parameters];
@@ -167,7 +167,7 @@ class NotificationRepository extends CommonRepository
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                     ->setParameter('search', $search);
             } else {
@@ -200,22 +200,19 @@ class NotificationRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $viewOther
-     * @param string $notificationType
+     * @param string|array<mixed> $search
+     * @param array<mixed>        $options
      *
-     * @return array
+     * @return array<int, array<string, int|string>>
      */
-    public function getMobileNotificationList($search = '', $limit = 10, $start = 0, $viewOther = false, $notificationType = null)
+    public function getMobileNotificationList(string|array $search = '', int $limit = 10, int $start = 0, bool $viewOther = false, array $options = []): array
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                     ->setParameter('search', $search);
             } else {
@@ -229,10 +226,18 @@ class NotificationRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if (!empty($notificationType)) {
+        if (!empty($options['notification_type'])) {
             $q->andWhere(
-                $q->expr()->eq('e.notificationType', $q->expr()->literal($notificationType))
+                $q->expr()->eq('e.notificationType', $q->expr()->literal($options['notification_type']))
             );
+        }
+
+        if (!empty($options['top_level']) && 'translation' === $options['top_level']) {
+            $q->andWhere($q->expr()->isNull('e.translationParent'));
+        }
+
+        if (!empty($options['ignore_ids'])) {
+            $q->andWhere($q->expr()->notIn('e.id', $options['ignore_ids']));
         }
 
         $q->andWhere('e.mobile = 1');

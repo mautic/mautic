@@ -103,7 +103,6 @@ class CacheStorageHelper
     {
         if (0 === $maxAge) {
             return false;
-        } elseif (null !== $maxAge) {
         }
 
         $cacheItem = $this->cacheAdaptor->getItem($name);
@@ -158,7 +157,7 @@ class CacheStorageHelper
     /**
      * Creates adapter.
      */
-    protected function setCacheAdaptor()
+    protected function setCacheAdaptor(): void
     {
         switch ($this->adaptor) {
             case self::ADAPTOR_DATABASE:

@@ -8,7 +8,7 @@ use Mautic\StatsBundle\Event\Options\FetchOptions;
 use Mautic\StatsBundle\StatEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class Collector
+final readonly class Collector
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
@@ -17,10 +17,8 @@ class Collector
 
     /**
      * @param string $statName
-     *
-     * @return StatCollection
      */
-    public function fetchStats($statName, \DateTime $fromDateTime, \DateTime $toDateTime, ?FetchOptions $fetchOptions = null)
+    public function fetchStats($statName, \DateTime $fromDateTime, \DateTime $toDateTime, ?FetchOptions $fetchOptions = null): StatCollection
     {
         if (null === $fetchOptions) {
             $fetchOptions = new FetchOptions();

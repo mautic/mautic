@@ -4,41 +4,51 @@ namespace Mautic\CampaignBundle\Model;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Event>
  */
 class EventModel extends FormModel
 {
-    /**
-     * @return \Mautic\CampaignBundle\Entity\EventRepository
-     */
-    public function getRepository()
-    {
-        return $this->em->getRepository(Event::class);
+    private LeadEventLogRepository $leadEventLogRepository;
+
+    private CampaignRepository $campaignRepository;
+
+    private EventRepository $eventRepository;
+
+    #[Required]
+    public function autowireEventModel(
+        EventRepository $eventRepository,
+        CampaignRepository $campaignRepository,
+        LeadEventLogRepository $leadEventLogRepository,
+    ): void {
+        $this->eventRepository = $eventRepository;
+        $this->campaignRepository = $campaignRepository;
+        $this->leadEventLogRepository = $leadEventLogRepository;
     }
 
-    /**
-     * @return \Mautic\CampaignBundle\Entity\CampaignRepository
-     */
-    public function getCampaignRepository()
+    public function getRepository(): EventRepository
     {
-        return $this->em->getRepository(Campaign::class);
+        return $this->eventRepository;
     }
 
-    /**
-     * @return LeadEventLogRepository
-     */
-    public function getLeadEventLogRepository()
+    public function getCampaignRepository(): CampaignRepository
     {
-        return $this->em->getRepository(LeadEventLog::class);
+        return $this->campaignRepository;
+    }
+
+    public function getLeadEventLogRepository(): LeadEventLogRepository
+    {
+        return $this->leadEventLogRepository;
     }
 
     public function getPermissionBase(): string
@@ -58,38 +68,40 @@ class EventModel extends FormModel
         return parent::getEntity($id);
     }
 
-    public function deleteEvents($currentEvents, $deletedEvents): void
+    /**
+     * Deletes campaign events and sets their redirect targets.
+     */
+    public function deleteEvents(array $currentEvents, array $deletedEvents): void
     {
         $deletedKeys = [];
-        foreach ($deletedEvents as $k => $deleteMe) {
-            if ($deleteMe instanceof Event) {
-                $deleteMe = $deleteMe->getId();
-            }
+        $deletedData = [];
 
-            if (str_starts_with($deleteMe, 'new')) {
+        foreach ($deletedEvents as $k => $deleteInfo) {
+            $eventId       = $deleteInfo['id'];
+            $redirectEvent = $deleteInfo['redirectEvent'] ?? null;
+
+            if (str_starts_with($eventId, 'new') || isset($currentEvents[$eventId])) {
                 unset($deletedEvents[$k]);
+                continue;
             }
 
-            if (isset($currentEvents[$deleteMe])) {
-                unset($deletedEvents[$k]);
-            }
-
-            if (isset($deletedEvents[$k])) {
-                $deletedKeys[] = $deleteMe;
-            }
+            $deletedKeys[] = $eventId;
+            $deletedData[] = [
+                'id'              => $eventId,
+                'redirectEvent'   => $redirectEvent instanceof Event ? $redirectEvent->getId() : $redirectEvent,
+            ];
         }
 
-        if (count($deletedEvents)) {
-            // wipe out any references to these events to prevent restraint violations
-            $this->getRepository()->nullEventRelationships($deletedKeys);
-            $this->getRepository()->setEventsAsDeleted($deletedEvents);
+        if ([] !== $deletedKeys) {
+            $this->eventRepository->nullEventRelationships($deletedKeys);
+            $this->eventRepository->setEventsAsDeletedWithRedirect($deletedData);
             $this->dispatcher->dispatch(new DeleteEvent($deletedKeys), CampaignEvents::ON_EVENT_DELETE);
         }
     }
 
     public function deleteEventsByCampaignId(int $campaignId): void
     {
-        $eventIds = $this->getRepository()->getCampaignEventIds($campaignId);
+        $eventIds = $this->eventRepository->getCampaignEventIds($campaignId);
         $this->deleteEventsByEventIds($eventIds);
     }
 
@@ -98,7 +110,8 @@ class EventModel extends FormModel
      */
     public function deleteEventsByEventIds(array $eventIds): void
     {
-        $this->getRepository()->deleteEvents($eventIds);
+        $deletedData = array_map(fn (string $id): array => ['id' => (int) $id, 'redirectEvent' => null], $eventIds);
+        $this->eventRepository->setEventsAsDeletedWithRedirect($deletedData);
         $this->dispatcher->dispatch(new DeleteEvent($eventIds), CampaignEvents::ON_AFTER_EVENTS_DELETE);
     }
 

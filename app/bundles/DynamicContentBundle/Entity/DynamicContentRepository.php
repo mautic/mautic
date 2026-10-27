@@ -5,12 +5,15 @@ namespace Mautic\DynamicContentBundle\Entity;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Serializer;
+use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<DynamicContent>
  */
-class DynamicContentRepository extends CommonRepository
+final class DynamicContentRepository extends CommonRepository
 {
+    use ProjectRepositoryTrait;
+
     /**
      * Get a list of entities.
      *
@@ -49,7 +52,6 @@ class DynamicContentRepository extends CommonRepository
 
         $command         = $filter->command;
         $unique          = $this->generateRandomParameterName();
-        $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.lang'):
@@ -60,10 +62,20 @@ class DynamicContentRepository extends CommonRepository
                     $unique     => $filter->string,
                 ];
                 $expr = $q->expr()->or(
-                    $q->expr()->eq('e.language', ":$unique"),
-                    $q->expr()->like('e.language', ":$langUnique")
+                    $q->expr()->eq('e.language', ":{$unique}"),
+                    $q->expr()->like('e.language', ":{$langUnique}")
                 );
                 break;
+            case $this->translator->trans('mautic.project.searchcommand.name'):
+            case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
+                return $this->handleProjectFilter(
+                    $this->_em->getConnection()->createQueryBuilder(),
+                    'dynamic_content_id',
+                    'dynamic_content_projects_xref',
+                    $this->getTableAlias(),
+                    $filter->string,
+                    $filter->not
+                );
         }
 
         if ($expr && $filter->not) {
@@ -72,9 +84,6 @@ class DynamicContentRepository extends CommonRepository
 
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
-        } elseif ($returnParameter) {
-            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
         }
 
         return [$expr, $parameters];
@@ -92,6 +101,7 @@ class DynamicContentRepository extends CommonRepository
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
+            'mautic.project.searchcommand.name',
         ];
 
         return array_merge($commands, parent::getSearchCommands());
@@ -146,7 +156,7 @@ class DynamicContentRepository extends CommonRepository
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
                   ->setParameter('search', $search);
             } else {
@@ -186,10 +196,7 @@ class DynamicContentRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    /**
-     * @return bool|object|null
-     */
-    public function getDynamicContentForSlotFromCampaign($slot)
+    public function getDynamicContentForSlotFromCampaign($slot): DynamicContent|false
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 

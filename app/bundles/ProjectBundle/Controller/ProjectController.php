@@ -9,24 +9,30 @@ use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ProjectBundle\Entity\Project;
+use Mautic\ProjectBundle\Form\Type\ProjectAddEntityType;
 use Mautic\ProjectBundle\Form\Type\ProjectEntityType;
+use Mautic\ProjectBundle\Helper\ProjectSearchScopeProvider;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use Mautic\ProjectBundle\Security\Permissions\ProjectPermissions;
+use Mautic\ProjectBundle\Service\ProjectEntityLoaderService;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 final class ProjectController extends AbstractFormController
 {
     public const ROUTE_INDEX     = 'mautic_project_index';
+
     private const ROUTE_ACTION   = 'mautic_project_action';
+
     private const LINK_ID_INDEX  = '#'.self::ROUTE_INDEX;
+
     private const TEMPLATE_INDEX = 'Mautic\ProjectBundle\Controller\ProjectController::indexAction';
+
     private const TEMPLATE_FORM  = '@MauticProject/Project/form.html.twig';
 
-    public function indexAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, int $page = 1): Response
+    public function indexAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader, ProjectSearchScopeProvider $projectSearchScopeProvider, int $page = 1): Response
     {
         $session = $request->getSession();
 
@@ -38,7 +44,7 @@ final class ProjectController extends AbstractFormController
         ], 'RETURN_ARRAY');
 
         if (!$permissions[ProjectPermissions::CAN_VIEW]) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->setListFilters();
@@ -71,6 +77,17 @@ final class ProjectController extends AbstractFormController
             ]
         );
 
+        // Calculate entity counts for each project
+        $entityTypes = $entityLoader->getEntityTypesWithViewPermissions();
+        foreach ($items as $project) {
+            $projectEntities = $entityLoader->getProjectEntities($project, $entityTypes);
+            $totalCount      = 0;
+            foreach ($projectEntities as $entityData) {
+                $totalCount += $entityData['count'];
+            }
+            $project->entitiesCount = $totalCount;
+        }
+
         $count = count($items);
 
         if ($count && $count < ($start + 1)) {
@@ -101,14 +118,15 @@ final class ProjectController extends AbstractFormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'items'         => $items,
-                'page'          => $page,
-                'limit'         => $limit,
-                'permissions'   => $permissions,
-                'security'      => $corePermissions,
-                'tmpl'          => $tmpl,
-                'currentUser'   => $this->user,
-                'searchValue'   => $search,
+                'items'           => $items,
+                'page'            => $page,
+                'limit'           => $limit,
+                'permissions'     => $permissions,
+                'security'        => $corePermissions,
+                'tmpl'            => $tmpl,
+                'currentUser'     => $this->user,
+                'searchValue'     => $search,
+                'searchScopes'    => $projectSearchScopeProvider->getScopes(),
             ],
             'contentTemplate' => '@MauticProject/Project/list.html.twig',
             'passthroughVars' => [
@@ -122,7 +140,7 @@ final class ProjectController extends AbstractFormController
     public function newAction(Request $request, ProjectModel $projectModel, FormFactoryInterface $formFactory, CorePermissions $corePermissions): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_CREATE)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $project   = new Project();
@@ -181,7 +199,7 @@ final class ProjectController extends AbstractFormController
     public function editAction(string|int $objectId, Request $request, ProjectModel $projectModel, FormFactoryInterface $formFactory, CorePermissions $corePermissions, bool $ignorePost = false): Response
     {
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $postActionVars = $this->getPostActionVars($request, $objectId);
@@ -238,7 +256,13 @@ final class ProjectController extends AbstractFormController
                         return $this->postActionRedirect($postActionVars);
                     }
 
-                    return $this->viewAction($project->getId(), $request, $projectModel, $corePermissions);
+                    // Redirect to view action after successful edit
+                    $viewUrl = $this->generateUrl(self::ROUTE_ACTION, [
+                        'objectAction' => 'view',
+                        'objectId'     => $project->getId(),
+                    ]);
+
+                    return $this->redirect($viewUrl);
                 }
             }
 
@@ -255,8 +279,6 @@ final class ProjectController extends AbstractFormController
                     'mauticContent' => 'project',
                 ],
             ]);
-        } catch (AccessDeniedException) {
-            return $this->accessDenied();
         } catch (EntityNotFoundException) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
@@ -299,7 +321,7 @@ final class ProjectController extends AbstractFormController
         ];
     }
 
-    public function viewAction(string|int $objectId, Request $request, ProjectModel $projectModel, CorePermissions $corePermissions): Response
+    public function viewAction(string|int $objectId, Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader): Response
     {
         /** @var ?Project $project */
         $project = $projectModel->getEntity($objectId);
@@ -327,13 +349,20 @@ final class ProjectController extends AbstractFormController
         }
 
         if (!$corePermissions->isGranted(ProjectPermissions::CAN_VIEW)) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
+
+        $entityTypes     = $entityLoader->getEntityTypesWithViewPermissions();
+        $editableTypes   = $entityLoader->getEntityTypesWithEditPermissions();
+        $projectEntities = $entityLoader->getProjectEntities($project, $entityTypes);
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl(self::ROUTE_ACTION, ['objectAction' => 'view', 'objectId' => $project->getId()]),
             'viewParameters' => [
-                'project' => $project,
+                'project'         => $project,
+                'projectEntities' => $projectEntities,
+                'entityTypes'     => $entityTypes,
+                'editableTypes'   => $editableTypes,
             ],
             'contentTemplate' => '@MauticProject/Project/details.html.twig',
             'passthroughVars' => [
@@ -370,7 +399,7 @@ final class ProjectController extends AbstractFormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$corePermissions->isGranted(ProjectPermissions::CAN_DELETE)) {
-                return $this->accessDenied();
+                $this->throwAccessDenied();
             }
 
             $projectModel->deleteEntity($project);
@@ -419,14 +448,14 @@ final class ProjectController extends AbstractFormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$corePermissions->isGranted(ProjectPermissions::CAN_DELETE)) {
-                    $flashes[] = $this->accessDenied(true);
+                    $flashes[] = $this->getAccessDeniedFlash();
                 } else {
                     $deleteIds[] = $objectId;
                 }
             }
 
             // Delete everything we are able to
-            if (!empty($deleteIds)) {
+            if ([] !== $deleteIds) {
                 try {
                     $entities = $projectModel->deleteEntities($deleteIds);
                 } catch (ForeignKeyConstraintViolationException) {
@@ -448,6 +477,260 @@ final class ProjectController extends AbstractFormController
                     ],
                 ];
             }
+        }
+
+        return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
+    }
+
+    public function selectEntityTypeAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader): Response
+    {
+        if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
+            $this->throwAccessDenied();
+        }
+
+        $projectId = $request->get('objectId');
+
+        /** @var ?Project $project */
+        $project = $projectModel->getEntity($projectId);
+        if (!$project instanceof Project) {
+            return $this->notFound();
+        }
+
+        // Get available entity types
+        $entityTypes = $entityLoader->getEntityTypesWithEditPermissions();
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'project'     => $project,
+                'entityTypes' => $entityTypes,
+            ],
+            'contentTemplate' => '@MauticProject/Project/select_entity_type_modal.html.twig',
+        ]);
+    }
+
+    public function addEntityAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, FormFactoryInterface $formFactory, ProjectEntityLoaderService $entityLoader): Response
+    {
+        if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
+            $this->throwAccessDenied();
+        }
+
+        $projectId  = $request->get('objectId');
+        $entityType = $request->get('entityType');
+
+        /** @var ?Project $project */
+        $project = $projectModel->getEntity($projectId);
+        if (!$project instanceof Project) {
+            return $this->notFound();
+        }
+
+        // Validate entity type
+        $entityTypes = $entityLoader->getEntityTypesWithEditPermissions();
+        if (!isset($entityTypes[$entityType])) {
+            $returnUrl = $this->generateUrl(self::ROUTE_ACTION, [
+                'objectAction' => 'view',
+                'objectId'     => $projectId,
+            ]);
+
+            return $this->postActionRedirect([
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => ['objectAction' => 'view', 'objectId' => $projectId],
+                'contentTemplate' => 'Mautic\ProjectBundle\Controller\ProjectController::viewAction',
+                'passthroughVars' => [
+                    'closeModal' => 1,
+                    'route'      => false,
+                ],
+                'flashes' => [
+                    [
+                        'type'    => 'error',
+                        'msg'     => 'mautic.project.error.invalid_entity_type',
+                        'msgVars' => ['%type%' => $entityType],
+                    ],
+                ],
+            ]);
+        }
+
+        // Generate the form action URL
+        $action = $this->generateUrl('mautic_project_action', [
+            'objectAction' => 'addEntity',
+            'objectId'     => $project->getId(),
+            'entityType'   => $entityType,
+        ]);
+
+        // Create the form
+        $form = $formFactory->create(ProjectAddEntityType::class, [], [
+            'action'     => $action,
+            'entityType' => $entityType,
+            'projectId'  => $project->getId(),
+        ]);
+
+        if ('POST' === $request->getMethod()) {
+            $flashes   = [];
+            $returnUrl = $this->generateUrl(self::ROUTE_ACTION, [
+                'objectAction' => 'view',
+                'objectId'     => $projectId,
+            ]);
+
+            $postActionVars = [
+                'returnUrl'       => $returnUrl,
+                'viewParameters'  => ['objectAction' => 'view', 'objectId' => $projectId],
+                'contentTemplate' => 'Mautic\ProjectBundle\Controller\ProjectController::viewAction',
+                'passthroughVars' => [
+                    'closeModal' => 1,
+                    'route'      => false,
+                ],
+            ];
+
+            $isCancelled = $this->isFormCancelled($form);
+            $isValid     = $this->isFormValid($form);
+
+            if ($isCancelled || !$isValid) {
+                return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
+            }
+
+            $data      = $form->getData();
+            $entityIds = $data['entityIds'] ?? [];
+
+            if (empty($entityIds)) {
+                return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
+            }
+
+            // Get entity types configuration
+            $entityTypes = $entityLoader->getEntityTypesWithEditPermissions();
+            if (!isset($entityTypes[$entityType])) {
+                $flashes[] = [
+                    'type' => 'error',
+                    'msg'  => 'mautic.core.error.badrequest',
+                ];
+
+                return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
+            }
+
+            $entityConfig = $entityTypes[$entityType];
+            $addedCount   = 0;
+
+            foreach ($entityIds as $entityId) {
+                $entity = $entityConfig->model->getEntity($entityId);
+                if (!$entity) {
+                    continue;
+                }
+
+                // Check if entity is not already in project
+                if ($entity->getProjects()->contains($project)) {
+                    continue;
+                }
+
+                $entity->addProject($project);
+                $this->doctrine->getManager()->persist($entity);
+                ++$addedCount;
+            }
+
+            if ($addedCount > 0) {
+                $this->doctrine->getManager()->flush();
+                $flashes[] = [
+                    'type'    => 'notice',
+                    'msg'     => 'mautic.project.notice.entities_added',
+                    'msgVars' => [
+                        '%count%'   => $addedCount,
+                        '%project%' => $project->getName(),
+                    ],
+                ];
+            } else {
+                $flashes[] = [
+                    'type' => 'notice',
+                    'msg'  => 'mautic.project.notice.no_entities_added',
+                ];
+            }
+
+            return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
+        }
+
+        return $this->delegateView([
+            'viewParameters' => [
+                'form'       => $form->createView(),
+                'project'    => $project,
+                'entityType' => $entityType,
+            ],
+            'contentTemplate' => '@MauticProject/Project/add_entity_modal.html.twig',
+        ]);
+    }
+
+    public function removeAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader): Response
+    {
+        if (!$corePermissions->isGranted(ProjectPermissions::CAN_EDIT)) {
+            $this->throwAccessDenied();
+        }
+
+        $projectId  = $request->get('objectId');
+        $entityType = $request->get('entityType');
+        $entityId   = $request->get('entityId');
+        $flashes    = [];
+
+        $returnUrl = $this->generateUrl(self::ROUTE_ACTION, [
+            'objectAction' => 'view',
+            'objectId'     => $projectId,
+        ]);
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['objectAction' => 'view', 'objectId' => $projectId],
+            'contentTemplate' => 'Mautic\ProjectBundle\Controller\ProjectController::viewAction',
+            'passthroughVars' => [
+                'activeLink'    => self::LINK_ID_INDEX,
+                'mauticContent' => 'project',
+            ],
+        ];
+
+        if ('POST' === $request->getMethod()) {
+            /** @var ?Project $project */
+            $project = $projectModel->getEntity($projectId);
+            if (!$project instanceof Project) {
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.project.error.notfound',
+                    'msgVars' => ['%id%' => $projectId],
+                ];
+
+                return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
+            }
+
+            // Get entity types configuration
+            $entityTypes = $entityLoader->getEntityTypesWithEditPermissions();
+            if (!isset($entityTypes[$entityType])) {
+                $flashes[] = [
+                    'type' => 'error',
+                    'msg'  => 'mautic.core.error.badrequest',
+                ];
+
+                return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
+            }
+
+            $entityConfig = $entityTypes[$entityType];
+            $entity       = $entityConfig->model->getEntity($entityId);
+
+            if (!$entity) {
+                $flashes[] = [
+                    'type' => 'error',
+                    'msg'  => 'mautic.core.error.notfound',
+                ];
+
+                return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
+            }
+
+            // Remove the project from the entity's projects collection
+            $entity->removeProject($project);
+            $this->doctrine->getManager()->persist($entity);
+            $this->doctrine->getManager()->flush();
+
+            $entityName = method_exists($entity, 'getName') ? $entity->getName() : (method_exists($entity, 'getTitle') ? $entity->getTitle() : $entity->getId());
+
+            $flashes[] = [
+                'type'    => 'notice',
+                'msg'     => 'mautic.project.notice.item_removed',
+                'msgVars' => [
+                    '%name%'    => $entityName,
+                    '%project%' => $project->getName(),
+                ],
+            ];
         }
 
         return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));

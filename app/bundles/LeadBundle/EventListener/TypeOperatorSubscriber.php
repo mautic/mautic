@@ -10,18 +10,20 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Form\Type\AlertType;
+use Mautic\CoreBundle\Form\Type\DateSpanType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
+use Mautic\LeadBundle\Form\Type\GlobalCategoryType;
 use Mautic\LeadBundle\Form\Validator\Constraints\DbRegex;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use Mautic\StageBundle\Model\StageModel;
+use Mautic\StageBundle\Entity\StageRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -35,19 +37,16 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
     private const EMAIL_ALIAS = 'email';
 
-    private TranslatorInterface $translator;
-
     public function __construct(
         private LeadModel $leadModel,
         private ListModel $listModel,
         private CampaignModel $campaignModel,
         private EmailModel $emailModel,
-        private StageModel $stageModel,
         private CategoryModel $categoryModel,
         private AssetModel $assetModel,
-        TranslatorInterface $translator,
+        private TranslatorInterface $translator,
+        private readonly StageRepository $stageRepository,
     ) {
-        $this->translator    = $translator;
     }
 
     public static function getSubscribedEvents(): array
@@ -59,7 +58,9 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 ['onSegmentFilterFormHandleTags', 1000],
                 ['onSegmentFilterFormHandleLookupId', 800],
                 ['onSegmentFilterFormHandleLookup', 600],
-                ['onSegmentFilterFormHandleSelect', 400],
+                ['onSegmentFilterFormHandleGlobalCategory', 400],
+                ['onSegmentFilterFormHandleSelect', 200],
+                ['onSegmentFilterFormHandleDateSpan', 100],
                 ['onSegmentFilterFormHandleDefault', 0],
             ],
         ];
@@ -72,9 +73,17 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             $event->setOperatorsForFieldType($typeName, $operatorOptions);
         }
 
+        $dateOperators = $this->typeOperators['date'];
+
+        if ('segment' === $event->getContext()) {
+            $dateOperators['include'][] = OperatorOptions::IN_LAST;
+            $dateOperators['include'][] = OperatorOptions::IN_NEXT;
+        }
+
         // Subscribe aliases
         $event->setOperatorsForFieldType('boolean', $this->typeOperators['bool']);
-        $event->setOperatorsForFieldType('datetime', $this->typeOperators['date']);
+        $event->setOperatorsForFieldType('datetime', $dateOperators);
+        $event->setOperatorsForFieldType('date', $dateOperators);
 
         foreach (['country', 'timezone', 'region', 'locale'] as $selectAlias) {
             $event->setOperatorsForFieldType($selectAlias, $this->typeOperators['select']);
@@ -132,7 +141,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 'multiple'                  => true,
                 'choice_translation_domain' => false,
                 'disabled'                  => $event->filterShouldBeDisabled(),
-                'constraints'               => $event->filterShouldBeDisabled() ? [] : [new NotBlank(['message' => 'mautic.core.value.required'])],
+                'constraints'               => $event->filterShouldBeDisabled() ? [] : [new NotBlank(message: 'mautic.core.value.required')],
                 'attr'                      => [
                     'class'                => 'form-control',
                     'data-placeholder'     => $this->translator->trans('mautic.lead.tags.select_or_create'),
@@ -183,7 +192,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 'attr'        => $displayAttr,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.core.value.required']
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -201,7 +210,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                 'disabled'    => $event->filterShouldBeDisabled(),
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.core.value.required']
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -238,11 +247,45 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
     }
 
+    public function onSegmentFilterFormHandleGlobalCategory(FormAdjustmentEvent $event): void
+    {
+        if (!$event->fieldTypeIsOneOf('globalcategory')) {
+            return;
+        }
+
+        $form = $event->getForm();
+
+        // This field will hold the label of the lookup item.
+        $form->add(
+            'filter',
+            GlobalCategoryType::class,
+            [
+                'label'       => false,
+                'multiple'    => true,
+                'required'    => $event->filterShouldBeRequired(),
+                'disabled'    => $event->filterShouldBeDisabled(),
+                'constraints' => $event->filterShouldBeRequired() ? [
+                    new NotBlank(
+                        message: $this->translator->trans('mautic.core.value.required')
+                    ),
+                ] : [],
+            ]
+        );
+
+        $event->stopPropagation();
+    }
+
     public function onSegmentFilterFormHandleSelect(FormAdjustmentEvent $event): void
     {
         $form       = $event->getForm();
         $data       = $form->getData();
-        $multiple   = $event->operatorIsOneOf(OperatorOptions::IN, OperatorOptions::NOT_IN) || $event->fieldTypeIsOneOf('multiselect');
+        $multiple   = $event->operatorIsOneOf(
+            OperatorOptions::INCLUDING_ANY,
+            OperatorOptions::EXCLUDING_ANY,
+            OperatorOptions::INCLUDING_ALL,
+            OperatorOptions::EXCLUDING_ALL,
+        )
+            || $event->fieldTypeIsOneOf('multiselect');
         $mustBeText = $event->operatorIsOneOf(OperatorOptions::REGEXP, OperatorOptions::NOT_REGEXP, OperatorOptions::STARTS_WITH, OperatorOptions::ENDS_WITH, OperatorOptions::CONTAINS, OperatorOptions::LIKE, OperatorOptions::NOT_LIKE);
         $isSelect   = $event->fieldTypeIsOneOf('select', 'multiselect', 'boolean', 'country', 'locale', 'region', 'timezone', 'leadlist', 'campaign', 'device_type', 'device_brand', 'device_os', 'stage', 'globalcategory', 'assets', 'lead_email_received');
 
@@ -269,11 +312,31 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
                     'multiple'                  => $multiple,
                     'choice_translation_domain' => false,
                     'disabled'                  => $event->filterShouldBeDisabled(),
-                    'constraints'               => $event->filterShouldBeDisabled() ? [] : [new NotBlank(['message' => 'mautic.core.value.required'])],
+                    'constraints'               => $event->filterShouldBeDisabled() ? [] : [new NotBlank(message: 'mautic.core.value.required')],
                 ]
             );
             $event->stopPropagation();
         }
+    }
+
+    public function onSegmentFilterFormHandleDateSpan(FormAdjustmentEvent $event): void
+    {
+        if (!$event->operatorIsOneOf(OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT)
+            || !$event->fieldTypeIsOneOf('date', 'datetime')) {
+            return;
+        }
+
+        $form = $event->getForm();
+        $form->add(
+            'filter',
+            DateSpanType::class,
+            [
+                'label' => false,
+                'data'  => $form->getData()['filter'] ?? [],
+            ]
+        );
+
+        $event->stopPropagation();
     }
 
     public function onSegmentFilterFormHandleDefault(FormAdjustmentEvent $event): void
@@ -360,7 +423,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
      */
     private function getStageChoices(): array
     {
-        return $this->makeChoices($this->stageModel->getRepository()->getSimpleList(), 'label', 'value');
+        return $this->makeChoices($this->stageRepository->getSimpleList(), 'label', 'value');
     }
 
     /**

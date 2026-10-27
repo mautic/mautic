@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
+use Mautic\CoreBundle\Model\MauticModelInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 trait AjaxLookupControllerTrait
 {
@@ -16,7 +19,9 @@ trait AjaxLookupControllerTrait
     {
         $dataArray = [];
         $modelName = InputHelper::clean($request->query->get('searchKey'));
-        $search    = $request->query->get(str_replace('.', '_', $modelName));
+        $searchKey = str_replace('.', '_', $modelName);
+        $options   = $request->query->all();
+        $search    = $options[$searchKey] ?? '';
         $limit     = (int) $request->query->get('limit', '0');
         $start     = (int) $request->query->get('start', '0');
 
@@ -34,7 +39,7 @@ trait AjaxLookupControllerTrait
             throw new BadRequestException("The model {$modelName} must implement the AjaxLookupModelInterface.");
         }
 
-        $results = $model->getLookupResults($modelName, $search, $limit, $start);
+        $results = $model->getLookupResults($modelName, $search, $limit, $start, $options);
 
         foreach ($results as $group => $result) {
             $option = [];
@@ -76,7 +81,7 @@ trait AjaxLookupControllerTrait
      *
      * @return AbstractCommonModel<object>
      */
-    abstract protected function getModel($modelNameKey);
+    abstract protected function getModel($modelNameKey): MauticModelInterface;
 
     /**
      * Get's the content of error page.

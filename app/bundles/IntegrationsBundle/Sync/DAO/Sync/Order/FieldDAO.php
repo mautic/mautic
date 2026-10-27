@@ -6,14 +6,14 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 
-class FieldDAO
+final class FieldDAO
 {
     /**
      * @param string $name
      */
     public function __construct(
         private $name,
-        private NormalizedValueDAO $value,
+        private readonly NormalizedValueDAO $value,
     ) {
     }
 

@@ -15,27 +15,21 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EntityLookupChoiceLoader implements ChoiceLoaderInterface
+final class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 {
-    /**
-     * @var array
-     */
-    protected $selected = [];
+    private array $selected = [];
 
-    /**
-     * @var array
-     */
-    protected $choices = [];
+    private array $choices = [];
 
     /**
      * @param ModelFactory<object>               $modelFactory
      * @param Options<array<mixed>>|array<mixed> $options
      */
     public function __construct(
-        protected ModelFactory $modelFactory,
-        protected TranslatorInterface $translator,
-        protected Connection $connection,
-        protected $options = [],
+        private readonly ModelFactory $modelFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly Connection $connection,
+        private $options = [],
     ) {
         if (is_array($options)) {
             $options = (new OptionsResolver())->setDefaults($options);
@@ -52,7 +46,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         $this->options = $options;
     }
 
-    public function loadChoiceList($value = null): ChoiceListInterface
+    public function loadChoiceList(?callable $value = null): ChoiceListInterface
     {
         return new ArrayChoiceList($this->getChoices(null, true));
     }
@@ -62,7 +56,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      *
      * Convert to other data types to strings - we're already working with IDs so just return $values
      */
-    public function loadChoicesForValues(array $values, $value = null): array
+    public function loadChoicesForValues(array $values, ?callable $value = null): array
     {
         return $values;
     }
@@ -70,7 +64,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * Convert to other data types to strings - we're already working with IDs so just return $choices.
      */
-    public function loadValuesForChoices(array $choices, $value = null): array
+    public function loadValuesForChoices(array $choices, ?callable $value = null): array
     {
         return $choices;
     }
@@ -80,20 +74,22 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      */
     public function onFormPostSetData(FormEvent $event): void
     {
-        $this->selected = (array) $event->getData();
+        $this->selected = $this->sanitizeIds($event->getData());
     }
 
     /**
      * @param array|null $data
-     * @param bool       $includeNew
      *
      * @return array
      */
-    protected function getChoices($data = null, $includeNew = false)
+    private function getChoices($data = null, bool $includeNew = false)
     {
         if (null === $data) {
             $data = $this->selected;
         }
+
+        // Ensure we only work with scalar numeric IDs to prevent array-to-string conversions
+        $data = $this->sanitizeIds($data);
 
         $modelName  = $this->options['model'];
         $modalRoute = $this->options['modal_route'];
@@ -102,13 +98,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         if (!isset($this->choices[$modelName]) || count(array_diff($data, array_keys($this->choices[$modelName]))) !== count($data)) {
             $this->choices[$modelName] = [];
 
-            if ($data) {
-                $data = array_map(
-                    fn ($v): int => (int) $v,
-                    (array) $data
-                );
-            }
-
             // Build choice list in case of different formats
             $choices = $this->fetchChoices($modelName, $data);
 
@@ -116,7 +105,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
                 $this->formatChoices($choices);
             }
 
-            if ($includeNew && !empty($data)) {
+            if ($includeNew && [] !== $data) {
                 // Fetch some extra choices
                 $extraChoices = $this->fetchChoices($modelName);
 
@@ -157,7 +146,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @return array
      */
-    protected function prepareChoices($choices)
+    private function prepareChoices($choices)
     {
         $prepped   = $choices;
         $isGrouped = false;
@@ -180,7 +169,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
             if (count($duplicates)) {
                 foreach ($duplicates as $value => $label) {
-                    $prepped[$value] = "$label ($value)";
+                    $prepped[$value] = "{$label} ({$value})";
                 }
             }
 
@@ -193,13 +182,13 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * @return array|mixed
      */
-    protected function fetchChoices($modelName, $data = [])
+    private function fetchChoices($modelName, array $data = [])
     {
         $labelColumn = $this->options['entity_label_column'];
         $idColumn    = $this->options['entity_id_column'];
 
         if (!$this->modelFactory->hasModel($modelName)) {
-            throw new \InvalidArgumentException("$modelName not found as a registered model service.");
+            throw new \InvalidArgumentException("{$modelName} not found as a registered model service.");
         }
         $model = $this->modelFactory->getModel($modelName);
         if (!$model instanceof AjaxLookupModelInterface) {
@@ -213,11 +202,12 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
         // Default to 100 records if no data is populated
         if (!isset($args['limit'])) {
-            $args['limit'] = empty($data) ? 100 : count($data);
+            $args['limit'] = [] === $data ? 100 : count($data);
         } elseif (0 !== $args['limit']) {
             $args['limit'] = max($args['limit'], count($data));
         }
 
+        $parameters = [];
         // Check if the method exists in the model
         $methodName = $this->options['model_lookup_method'] ?? null;
         if ($methodName && method_exists($model, $methodName)) {
@@ -228,15 +218,26 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             // rewrite query to use expression builder
             $alias     = $model->getRepository()->getTableAlias();
             $expr      = new ExpressionBuilder($this->connection);
-            $composite = $data ? CompositeExpression::and($expr->in($alias.'.id', $data)) : null;
-            $limit     = max(100, count($data));
-            $choices   = $model->getRepository()->getSimpleList($composite, [], $labelColumn, $idColumn, null, $limit);
+            $composite = null;
+
+            $limit = 100;
+            if ($data) {
+                $composite = CompositeExpression::and(
+                    $expr->in($alias.'.id', ':dataIds')
+                );
+                $parameters['dataIds'] = $data;
+                if (count($data) > $limit) {
+                    $limit = count($data);
+                }
+            }
+
+            $choices = $model->getRepository()->getSimpleList($composite, $parameters, $labelColumn, $idColumn, null, $limit);
         }
 
         return $choices;
     }
 
-    protected function formatChoices(array &$choices)
+    private function formatChoices(array &$choices): void
     {
         $firstKey = array_key_first($choices);
 
@@ -268,5 +269,44 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
             $choices = $validChoices;
         }
+    }
+
+    /**
+     * Normalize incoming selected values to an array of unique integer IDs.
+     * Accepts scalars, arrays, or an entity object exposing the configured identifier getter.
+     *
+     * @param int|numeric-string|iterable<int|numeric-string|object>|object|null $data
+     *
+     * @return int[]
+     */
+    private function sanitizeIds(int|string|array|object|null $data): array
+    {
+        if (null === $data) {
+            return [];
+        }
+
+        if (!is_iterable($data)) {
+            $data = [$data];
+        }
+
+        $idColumn = $this->options['entity_id_column'] ?? 'id';
+        $getter   = 'get'.ucfirst((string) $idColumn);
+
+        $ids = [];
+        foreach ($data as $value) {
+            $id = null;
+
+            if (is_object($value) && method_exists($value, $getter)) {
+                $id = $value->{$getter}();
+            } elseif (is_scalar($value)) {
+                $id = $value;
+            }
+
+            if (is_int($id) || (is_string($id) && ctype_digit($id))) {
+                $ids[] = (int) $id;
+            }
+        }
+
+        return array_values(array_unique($ids));
     }
 }

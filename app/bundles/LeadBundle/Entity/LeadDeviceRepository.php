@@ -108,7 +108,7 @@ class LeadDeviceRepository extends CommonRepository
         // get totals
         $device = $selectQuery->executeQuery()->fetchAllAssociative();
 
-        return (!empty($device)) ? $device[0] : [];
+        return $device[0] ?? [];
     }
 
     /**
@@ -153,7 +153,7 @@ class LeadDeviceRepository extends CommonRepository
         return $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es')
             ->where('lead_id = :leadId')
-            ->setParameter('leadId', (int) $lead->getId())
+            ->setParameter('leadId', $lead->getId())
             ->orderBy('date_added', 'desc')
             ->executeQuery()
             ->fetchAllAssociative();
@@ -169,5 +169,18 @@ class LeadDeviceRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId)
             ->executeStatement();
+    }
+
+    public function findExistingDevice(LeadDevice $device): ?LeadDevice
+    {
+        return $this->findOneBy(
+            [
+                'lead'         => $device->getLead(),
+                'device'       => $device->getDevice(),
+                'deviceBrand'  => $device->getDeviceBrand(),
+                'deviceModel'  => $device->getDeviceModel(),
+                'deviceOsName' => $device->getDeviceOsName(),
+            ]
+        );
     }
 }

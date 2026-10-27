@@ -12,7 +12,7 @@ use Symfony\Component\Form\DataTransformerInterface;
  *
  * @implements DataTransformerInterface<array<string>|null, string|null>
  */
-class BarStringTransformer implements DataTransformerInterface
+final class BarStringTransformer implements DataTransformerInterface
 {
     /**
      * @param array<string>|null $array
@@ -38,7 +38,7 @@ class BarStringTransformer implements DataTransformerInterface
         }
 
         return array_map(
-            fn (string $element): string => trim($element),
+            trim(...),
             explode('|', $string)
         );
     }

@@ -1,6 +1,5 @@
-// import ContentService from '../../../../../../../grapesjs-preset-mautic/src/content.service';
-import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
-import ContentService from 'grapesjs-preset-mautic/dist/content.service';
+import MjmlService from '../preset-mautic/mjml/mjml.service';
+import ContentService from '../preset-mautic/content.service';
 
 class CodeEditor {
   editor;
@@ -84,25 +83,40 @@ class CodeEditor {
    */
   updateCode() {
     const code = this.codeEditor.editor.getValue();
+    const isMjmlMode = ContentService.isMjmlMode(this.editor);
+    let updateSuccessful = false;
     // validate MJML code
-    if (ContentService.isMjmlMode(this.editor)) {
+    if (isMjmlMode) {
       MjmlService.mjmlToHtml(code);
     }
 
     try {
+      if (isMjmlMode) {
+        this.editor.trigger('mautic:code-editor-update:before', code);
+      }
+
       // delete canvas and set new content
       this.editor.DomComponents.getWrapper().set('content', '');
-      this.editor.setComponents(code.trim())
+      this.editor.setComponents(code.trim());
 
-      // Reinitialize the content after parsing MJML.
+      // Reinitialize the content only in MJML mode after parsing MJML.
       // This can be removed once the issue with self-closing tags is resolved in grapesjs-mjml.
       // See: https://github.com/GrapesJS/mjml/issues/149
-      const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
-      this.editor.setComponents(parsedContent);
+      if (isMjmlMode) {
+        const parsedContent = MjmlService.getEditorMjmlContent(this.editor);
+        this.editor.setComponents(parsedContent);
+      }
+
+      updateSuccessful = true;
+      this.editor.trigger('mautic:code-editor-update');
 
       this.editor.Modal.close();
     } catch (e) {
-      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')} \n${e.message}`);
+      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')}\n${e.message}`);
+    } finally {
+      if (isMjmlMode) {
+        this.editor.trigger('mautic:code-editor-update:complete', updateSuccessful);
+      }
     }
   }
 

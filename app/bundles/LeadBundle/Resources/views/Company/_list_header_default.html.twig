@@ -1,0 +1,11 @@
+{% set headerOrderBy = '' %}
+{% if column != 'leadcount' %}
+    {% set headerOrderBy = 'comp.' ~ column %}
+{% endif %}
+{% set colClass = column == 'companyname' ? 'col-company-name' : 'visible-md visible-lg col-company-' ~ column %}
+{{ include('@MauticCore/Helper/tableheader.html.twig', {
+    'sessionVar': 'company',
+    'orderBy': headerOrderBy,
+    'text': label,
+    'class': (class is defined ? colClass ~ ' '~class : colClass),
+}) }}

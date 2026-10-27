@@ -1,25 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(DateTimeHelper::class)]
-class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(DateTimeHelper::class)]
+final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('The guessTimezoneFromOffset returns correct values')]
+    #[TestDox('The guessTimezoneFromOffset returns correct values')]
     public function testGuessTimezoneFromOffset(): void
     {
         $helper   = new DateTimeHelper();
         $timezone = $helper->guessTimezoneFromOffset();
-        $this->assertEquals($timezone, 'Europe/London');
+        $this->assertSame('Europe/London', $timezone);
         $timezone = $helper->guessTimezoneFromOffset(3600);
-        $this->assertEquals($timezone, 'Europe/Paris');
+        $this->assertSame('Europe/Paris', $timezone);
         $timezone = $helper->guessTimezoneFromOffset(-2 * 3600);
-        $this->assertEquals($timezone, 'America/Goose_Bay'); // Is it really in timezone -2
+        $this->assertSame('America/Goose_Bay', $timezone); // Is it really in timezone -2
         $timezone = $helper->guessTimezoneFromOffset(-5 * 3600);
-        $this->assertEquals($timezone, 'America/New_York');
+        $this->assertSame('America/New_York', $timezone);
     }
 
     public function testBuildIntervalWithBadUnit(): void
@@ -66,7 +71,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $helper   = new DateTimeHelper('now', DateTimeHelper::FORMAT_DB, $timezone);
         $date     = new \DateTime();
         $date->setTimezone(new \DateTimeZone($timezone));
-        $this->assertEquals($date->format('P'), $helper->getLocalTimezoneOffset());
+        $this->assertSame($date->format('P'), $helper->getLocalTimezoneOffset());
     }
 
     public function testGetDiff(): void
@@ -114,13 +119,13 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $expectedDays     = (int) $expectedInterval->format('%R%a');
 
         // Assert that the interval days match the expected difference
-        $this->assertEquals($expectedDays, (int) $interval->format('%R%a'));
+        $this->assertSame($expectedDays, (int) $interval->format('%R%a'));
 
         // Assert that the interval hours are zero since times were reset
         $this->assertEquals(0, $interval->h);
 
         // Assert that the interval has the correct timezone
-        $this->assertEquals($nonDefaultTimezone->getName(), $dateTimeHelper->getDateTime()->getTimezone()->getName());
+        $this->assertSame($nonDefaultTimezone->getName(), $dateTimeHelper->getDateTime()->getTimezone()->getName());
     }
 
     public function testAddMethodModifiesOriginalDateTime(): void
@@ -138,7 +143,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $modifiedDateTime = $dateTimeHelper->getDateTime();
 
         // Assert that the date has been modified correctly
-        $this->assertEquals('2023-01-02 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame('2023-01-02 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
     public function testAddMethodReturnsClonedDateTime(): void
@@ -156,10 +161,10 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $originalDateTime = $dateTimeHelper->getDateTime();
 
         // Assert that the clone has been modified correctly
-        $this->assertEquals('2023-01-02 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame('2023-01-02 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
 
         // Assert that the original DateTime object remains unchanged
-        $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
     public function testSubMethodModifiesOriginalDateTime(): void
@@ -177,7 +182,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $modifiedDateTime = $dateTimeHelper->getDateTime();
 
         // Assert that the date has been modified correctly
-        $this->assertEquals('2023-01-01 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame('2023-01-01 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
     public function testSubMethodReturnsClonedDateTime(): void
@@ -195,10 +200,10 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $originalDateTime = $dateTimeHelper->getDateTime();
 
         // Assert that the clone has been modified correctly
-        $this->assertEquals('2023-01-01 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame('2023-01-01 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
 
         // Assert that the original DateTime object remains unchanged
-        $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
     public function testModifyMethodModifiesOriginalDateTime(): void
@@ -216,7 +221,7 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $modifiedDateTime = $dateTimeHelper->getDateTime();
 
         // Assert that the date has been modified correctly
-        $this->assertEquals('2023-01-03 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame('2023-01-03 12:00:00', $modifiedDateTime->format(DateTimeHelper::FORMAT_DB));
     }
 
     public function testModifyMethodReturnsClonedDateTime(): void
@@ -234,9 +239,117 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         $originalDateTime = $dateTimeHelper->getDateTime();
 
         // Assert that the clone has been modified correctly
-        $this->assertEquals('2023-01-03 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame('2023-01-03 12:00:00', $clonedDateTime->format(DateTimeHelper::FORMAT_DB));
 
         // Assert that the original DateTime object remains unchanged
-        $this->assertEquals($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
+        $this->assertSame($originalDate, $originalDateTime->format(DateTimeHelper::FORMAT_DB));
+    }
+
+    #[DataProvider('setTimeIfMissingDataProvider')]
+    public function testSetTimeIfMissing(string $input, string $defaultTime, string $timezone, string $expectedOutput, string $expectedTimezone): void
+    {
+        $result = DateTimeHelper::setTimeIfMissing($input, $defaultTime, $timezone);
+
+        $this->assertSame($expectedOutput, $result->format('Y-m-d H:i:s'));
+        $this->assertSame($expectedTimezone, $result->getTimezone()->getName());
+    }
+
+    /**
+     * @return \Generator<string, array{string, string, string, string, string}>
+     */
+    public static function setTimeIfMissingDataProvider(): \Generator
+    {
+        // [input, defaultTime, timezone, expectedOutput, expectedTimezone]
+
+        // Date only - should add default time
+        yield 'date only with default 00:00:00' => [
+            '2025-01-31', '00:00:00', 'UTC', '2025-01-31 00:00:00', 'UTC',
+        ];
+        yield 'date only with custom default time' => [
+            '2025-01-31', '23:59:59', 'UTC', '2025-01-31 23:59:59', 'UTC',
+        ];
+        yield 'date only with custom timezone' => [
+            '2025-01-31', '12:30:45', 'America/New_York', '2025-01-31 12:30:45', 'America/New_York',
+        ];
+
+        // Existing time with space separator - should preserve
+        yield 'datetime with space separator full' => [
+            '2025-01-31 14:30:45', '00:00:00', 'UTC', '2025-01-31 14:30:45', 'UTC',
+        ];
+        yield 'datetime with space separator HH:MM' => [
+            '2025-01-31 14:30', '00:00:00', 'UTC', '2025-01-31 14:30:00', 'UTC',
+        ];
+        yield 'datetime space separator ignores default' => [
+            '2025-01-31 09:15:30', '23:59:59', 'UTC', '2025-01-31 09:15:30', 'UTC',
+        ];
+        yield 'midnight time preserved' => [
+            '2025-01-31 00:00:00', '12:00:00', 'UTC', '2025-01-31 00:00:00', 'UTC',
+        ];
+        yield 'end of day time preserved' => [
+            '2025-01-31 23:59:59', '00:00:00', 'UTC', '2025-01-31 23:59:59', 'UTC',
+        ];
+
+        // Existing time with T separator (ISO 8601) - should preserve
+        yield 'ISO 8601 with T separator full' => [
+            '2025-01-31T14:30:45', '00:00:00', 'UTC', '2025-01-31 14:30:45', 'UTC',
+        ];
+        yield 'ISO 8601 with T separator HH:MM' => [
+            '2025-01-31T14:30', '00:00:00', 'UTC', '2025-01-31 14:30:00', 'UTC',
+        ];
+        yield 'ISO 8601 T separator ignores default' => [
+            '2025-01-31T09:15:30', '23:59:59', 'UTC', '2025-01-31 09:15:30', 'UTC',
+        ];
+        yield 'ISO 8601 with timezone offset' => [
+            '2025-01-31T14:30:45+02:00', '00:00:00', 'UTC', '2025-01-31 14:30:45', '+02:00',
+        ];
+
+        // Different date formats
+        yield 'December date' => [
+            '2025-12-31', '00:00:00', 'UTC', '2025-12-31 00:00:00', 'UTC',
+        ];
+        yield 'January date' => [
+            '2025-01-01', '00:00:00', 'UTC', '2025-01-01 00:00:00', 'UTC',
+        ];
+        yield 'Mid year date' => [
+            '2025-06-15', '00:00:00', 'UTC', '2025-06-15 00:00:00', 'UTC',
+        ];
+
+        // Different timezones
+        yield 'with Europe/London timezone' => [
+            '2025-01-31', '00:00:00', 'Europe/London', '2025-01-31 00:00:00', 'Europe/London',
+        ];
+        yield 'with America/New_York timezone' => [
+            '2025-01-31', '00:00:00', 'America/New_York', '2025-01-31 00:00:00', 'America/New_York',
+        ];
+    }
+
+    public function testSetDateTimeDoesNotMutateCallerDateTime(): void
+    {
+        $originalTimezone = date_default_timezone_get();
+        date_default_timezone_set('Europe/Berlin');
+
+        try {
+            $input = new \DateTime('2026-12-15 19:00:00', new \DateTimeZone('Europe/Berlin'));
+            $helper = new DateTimeHelper();
+            // System "local" timezone for DateTimeHelper comes from default_timezone (often UTC).
+            $helper->setDateTime($input, DateTimeHelper::FORMAT_DB, 'local');
+            $helper->toLocalString();
+
+            $this->assertSame('Europe/Berlin', $input->getTimezone()->getName());
+            $this->assertSame('2026-12-15 19:00:00', $input->format('Y-m-d H:i:s'));
+        } finally {
+            date_default_timezone_set($originalTimezone);
+        }
+    }
+
+    public function testToLocalStringDoesNotMutateInternalDateTimeTimezone(): void
+    {
+        $helper = new DateTimeHelper('2026-12-15 19:00:00', DateTimeHelper::FORMAT_DB, 'Europe/Berlin');
+        $before = $helper->getDateTime()->getTimezone()->getName();
+        $helper->toLocalString();
+        $after = $helper->getDateTime()->getTimezone()->getName();
+
+        $this->assertSame($before, $after);
+        $this->assertSame('Europe/Berlin', $after);
     }
 }

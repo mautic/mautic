@@ -16,11 +16,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class FieldPaginationController extends CommonController
+final class FieldPaginationController extends CommonController
 {
-    /**
-     * @return Response
-     */
     public function paginateAction(
         Request $request,
         FormFactoryInterface $formFactory,
@@ -28,10 +25,10 @@ class FieldPaginationController extends CommonController
         string $integration,
         string $object,
         int $page,
-    ) {
+    ): Response|JsonResponse {
         // Check ACL
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         // Find the integration
@@ -79,7 +76,7 @@ class FieldPaginationController extends CommonController
             ]
         )->getContent();
 
-        $prefix   = "integration_config[featureSettings][sync][fieldMappings][$object]";
+        $prefix   = "integration_config[featureSettings][sync][fieldMappings][{$object}]";
         $idPrefix = str_replace(['][', '[', ']'], '_', $prefix);
         if (str_ends_with($idPrefix, '_')) {
             $idPrefix = substr($idPrefix, 0, -1);

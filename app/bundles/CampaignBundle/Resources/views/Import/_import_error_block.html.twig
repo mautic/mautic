@@ -1,0 +1,28 @@
+<div class="justify-content-center">
+    <ul class="text-danger">
+        {# Show errors from importSummary.errors #}
+        {% for error in importSummary.errors|default([]) %}
+            <li>{{ error }}</li>
+        {% endfor %}
+
+        {# Show errors from analyzeSummary (grouped errors) #}
+        {% for group in analyzeSummary|default([]) %}
+            {% if group.errors is defined and group.errors.messages is defined %}
+                {% for message in group.errors.messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="justify-content-center gap-3 mt-md">
+    {{ include('@MauticCore/Helper/confirm.html.twig', {
+        'btnClass': 'btn btn-danger btn-nospin',
+        'message': 'mautic.campaign.campaign.import.cancelmessage'|trans,
+        'confirmText': 'mautic.campaign.campaign.import.cancelconfirm'|trans,
+        'confirmAction': path('mautic_campaign_import_action', {'objectAction' : 'cancel'}),
+        'iconClass': 'ri-delete-bin-line',
+        'btnText': 'mautic.campaign.campaign.import.cancel'|trans
+    }) }}
+</div>

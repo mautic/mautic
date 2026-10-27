@@ -19,4 +19,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\ProjectBundle\\Entity\\', '../Entity/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
+
+    $services->alias('mautic.project.model.project', Mautic\ProjectBundle\Model\ProjectModel::class);
 };

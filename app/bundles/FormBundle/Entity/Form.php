@@ -2,155 +2,201 @@
 
 namespace Mautic\FormBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\FormBundle\Validator\Constraint\IsPostActionRedirectUrl;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "form:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category", "fields", "actions"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "form:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('form:forms:viewown')"),
+        new Post(security: "is_granted('form:forms:create')"),
+        new Get(security: "is_granted('form:forms:viewown', object)"),
+        new Put(security: "is_granted('form:forms:editown', object)"),
+        new Patch(security: "is_granted('form:forms:editother', object)"),
+        new Delete(security: "is_granted('form:forms:deleteown', object)"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['form:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category', 'fields', 'actions'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['form:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Form extends FormEntity implements UuidInterface
 {
     use UuidTrait;
+
     use ProjectTrait;
+
+    public const ENTITY_NAME = 'forms';
+
+    public const TABLE_NAME  = 'forms';
 
     /**
      * @var int
      */
+    #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     private $id;
 
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private ?string $language = null;
 
     /**
      * @var string
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $formAttributes;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $description;
 
     /**
      * @var string
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $alias;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
-     **/
+     * @var Category|null
+     */
+    #[Groups(['form:read', 'form:write', 'campaign:read', 'email:read'])]
     private $category;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     private $cachedHtml;
 
     /**
      * @var string
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $postAction = 'message';
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $postActionProperty;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $publishDown;
 
     /**
      * @var ArrayCollection<int, Field>
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $fields;
 
     /**
      * @var ArrayCollection<string, Action>
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $actions;
 
     /**
      * @var string|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $template;
 
     /**
      * @var bool|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $inKioskMode = false;
 
     /**
      * @var bool|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $renderStyle = false;
 
     /**
      * @var Collection<int, Submission>
      */
+    #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     private Collection $submissions;
 
+    #[Groups(['form:read', 'download:read', 'campaign:read', 'email:read'])]
     public int $submission_count = 0;
 
     /**
      * @var string|null
+     *
+     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
      */
-    private $formType;
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    private $formType = 'standalone';
 
     /**
      * @var bool|null
      */
-    private $noIndex;
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    private $noIndex = true;
 
     /**
      * @var int|null
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
     private $progressiveProfilingLimit;
+
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    private ?int $submissionLimit = null;
+
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read', 'email:read'])]
+    private ?string $submissionLimitMessage = null;
+
+    private int $submissionCount = 0;
 
     /**
      * This var is used to cache the result once gained from the loop.
      *
      * @var bool
      */
+    #[Groups(['form:read', 'form:write', 'download:read', 'campaign:read'])]
     private $usesProgressiveProfiling;
 
     public function __clone()
@@ -206,7 +252,7 @@ class Form extends FormEntity implements UuidInterface
 
         $builder->createOneToMany('fields', 'Field')
             ->setIndexBy('id')
-            ->setOrderBy(['order' => 'ASC'])
+            ->setOrderBy(['order' => 'ASC', 'id' => 'ASC'])
             ->mappedBy('form')
             ->cascadeAll()
             ->fetchExtraLazy()
@@ -240,6 +286,15 @@ class Form extends FormEntity implements UuidInterface
             ->fetchExtraLazy()
             ->build();
 
+        $builder->addNullableField('submissionLimit', Types::INTEGER, 'submission_limit');
+        $builder->createField('submissionLimitMessage', Types::TEXT)
+            ->columnName('submission_limit_message')
+            ->nullable()
+            ->build();
+        $builder->createField('submissionCount', Types::INTEGER)
+            ->columnName('submission_count')
+            ->build();
+
         $builder->addNullableField('formType', 'string', 'form_type');
 
         $builder->createField('noIndex', 'boolean')
@@ -255,35 +310,17 @@ class Form extends FormEntity implements UuidInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank([
-            'message' => 'mautic.core.name.required',
-            'groups'  => ['form'],
-        ]));
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank(message: 'mautic.core.name.required', groups: ['form']));
 
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
-            'message' => 'mautic.form.form.postactionproperty_message.notblank',
-            'groups'  => ['messageRequired'],
-        ]));
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_message.notblank', groups: ['messageRequired']));
 
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank([
-            'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
-            'groups'  => ['urlRequired'],
-        ]));
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_redirect.notblank', groups: ['urlRequired']));
 
-        $metadata->addPropertyConstraint('postActionProperty', new Assert\Url([
-            'message' => 'mautic.form.form.postactionproperty_redirect.notblank',
-            'groups'  => ['urlRequiredPassTwo'],
-        ]));
+        $metadata->addPropertyConstraint('postActionProperty', new IsPostActionRedirectUrl(groups: ['urlRequired']));
 
-        $metadata->addPropertyConstraint('formType', new Assert\Choice([
-            'choices' => ['standalone', 'campaign'],
-        ]));
+        $metadata->addPropertyConstraint('postActionProperty', new Assert\NotBlank(message: 'mautic.form.form.postactionproperty_hideform.notblank', groups: ['hideformRequired']));
 
-        $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan([
-            'value'   => 0,
-            'message' => 'mautic.form.form.progressive_profiling_limit.error',
-            'groups'  => ['progressiveProfilingLimit'],
-        ]));
+        $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan(value: 0, message: 'mautic.form.form.progressive_profiling_limit.error', groups: ['progressiveProfilingLimit']));
     }
 
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form): array
@@ -297,6 +334,8 @@ class Form extends FormEntity implements UuidInterface
             $groups[] = 'messageRequired';
         } elseif ('redirect' == $postAction) {
             $groups[] = 'urlRequired';
+        } elseif ('hideform' == $postAction) {
+            $groups[] = 'hideformRequired';
         }
 
         if ('' != $data->getProgressiveProfilingLimit()) {
@@ -318,7 +357,7 @@ class Form extends FormEntity implements UuidInterface
                     'name',
                     'alias',
                     'category',
-                ]
+                ],
             )
             ->addProperties(
                 [
@@ -337,25 +376,25 @@ class Form extends FormEntity implements UuidInterface
                     'noIndex',
                     'formAttributes',
                     'language',
-                ]
+                ],
             )
             ->build();
 
         self::addProjectsInLoadApiMetadata($metadata, 'form');
     }
 
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         if ('actions' == $prop || 'fields' == $prop) {
             // changes are already computed so just add them
-            $this->changes[$prop][$val[0]] = $val[1];
+            $this->changes[$prop][$val[0] ?? ''] = $val[1];
         } else {
             parent::isChanged($prop, $val);
         }
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -364,10 +403,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $name
-     *
-     * @return Form
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -376,7 +413,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -385,10 +422,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $description
-     *
-     * @return Form
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -397,7 +432,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription($truncate = false, $length = 45)
     {
@@ -412,10 +447,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $cachedHtml
-     *
-     * @return Form
      */
-    public function setCachedHtml($cachedHtml)
+    public function setCachedHtml($cachedHtml): static
     {
         $this->cachedHtml = $cachedHtml;
 
@@ -423,7 +456,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getCachedHtml()
     {
@@ -440,10 +473,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $postAction
-     *
-     * @return Form
      */
-    public function setPostAction($postAction)
+    public function setPostAction($postAction): static
     {
         $this->isChanged('postAction', $postAction);
         $this->postAction = $postAction;
@@ -461,10 +492,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $postActionProperty
-     *
-     * @return Form
      */
-    public function setPostActionProperty($postActionProperty)
+    public function setPostActionProperty($postActionProperty): static
     {
         $this->isChanged('postActionProperty', $postActionProperty);
         $this->postActionProperty = $postActionProperty;
@@ -474,7 +503,7 @@ class Form extends FormEntity implements UuidInterface
 
     public function getPostActionProperty(): ?string
     {
-        if ('return' === $this->getPostAction()) {
+        if ('return' === $this->postAction) {
             return null;
         }
 
@@ -488,10 +517,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param \DateTime $publishUp
-     *
-     * @return Form
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -500,7 +527,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishUp()
     {
@@ -509,10 +536,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param \DateTime $publishDown
-     *
-     * @return Form
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -521,7 +546,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getPublishDown()
     {
@@ -530,10 +555,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param int|string $key
-     *
-     * @return Form
      */
-    public function addField($key, Field $field)
+    public function addField($key, Field $field): static
     {
         if ($changes = $field->getChanges()) {
             $this->isChanged('fields', [$key, $changes]);
@@ -565,7 +588,7 @@ class Form extends FormEntity implements UuidInterface
     public function getFieldAliases(): array
     {
         $aliases = [];
-        $fields  = $this->getFields();
+        $fields  = $this->fields;
 
         if ($fields) {
             foreach ($fields as $field) {
@@ -590,14 +613,13 @@ class Form extends FormEntity implements UuidInterface
                     'mappedObject' => $field->getMappedObject(),
                     'mappedField'  => $field->getMappedField(),
                 ],
-                $this->getFields()->getValues()
+                $this->fields->getValues(),
             ),
-            fn ($elem) => isset($elem['mappedObject']) && isset($elem['mappedField'])
+            fn (array $elem): bool => isset($elem['mappedObject']) && isset($elem['mappedField']),
         );
     }
 
     /**
-     * Set alias.
      * Loops trough the form fields and returns a simple array of mapped object keys if any.
      *
      * @return string[]
@@ -607,20 +629,18 @@ class Form extends FormEntity implements UuidInterface
         return array_values(
             array_filter(
                 array_unique(
-                    $this->getFields()->map(
-                        fn (Field $field) => $field->getMappedObject()
-                    )->toArray()
-                )
-            )
+                    $this->fields->map(
+                        fn (Field $field): ?string => $field->getMappedObject(),
+                    )->toArray(),
+                ),
+            ),
         );
     }
 
     /**
      * @param string $alias
-     *
-     * @return Form
      */
-    public function setAlias($alias)
+    public function setAlias($alias): static
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -629,17 +649,14 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAlias()
     {
         return $this->alias;
     }
 
-    /**
-     * @return Form
-     */
-    public function addSubmission(Submission $submissions)
+    public function addSubmission(Submission $submissions): static
     {
         $this->submissions[] = $submissions;
 
@@ -652,19 +669,17 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return Collection|Submission[]
+     * @return Collection<int, Submission>
      */
-    public function getSubmissions()
+    public function getSubmissions(): Collection
     {
         return $this->submissions;
     }
 
     /**
      * @param int|string $key
-     *
-     * @return Form
      */
-    public function addAction($key, Action $action)
+    public function addAction($key, Action $action): static
     {
         if ($changes = $action->getChanges()) {
             $this->isChanged('actions', [$key, $changes]);
@@ -696,7 +711,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -712,7 +727,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getTemplate()
     {
@@ -728,7 +743,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function getInKioskMode()
     {
@@ -752,28 +767,33 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
     public function isInKioskMode()
     {
-        return $this->getInKioskMode();
+        return $this->inKioskMode;
     }
 
     /**
-     * @return mixed
+     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
+     *
+     * @return string|null
      */
     public function getFormType()
     {
+        trigger_deprecation('mautic/mautic', '7.1', 'Form::getFormType() is deprecated and will be removed in 8.0.');
+
         return $this->formType;
     }
 
     /**
-     * @param mixed $formType
+     * @deprecated since Mautic 7.1, will be removed in 8.0. Form types are no longer used.
      *
-     * @return Form
+     * @param mixed $formType
      */
-    public function setFormType($formType)
+    public function setFormType($formType): static
     {
+        trigger_deprecation('mautic/mautic', '7.1', 'Form::setFormType() is deprecated and will be removed in 8.0.');
         $this->formType = $formType;
 
         return $this;
@@ -799,10 +819,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param string $formAttributes
-     *
-     * @return Form
      */
-    public function setFormAttributes($formAttributes)
+    public function setFormAttributes($formAttributes): static
     {
         $this->isChanged('formAttributes', $formAttributes);
         $this->formAttributes = $formAttributes;
@@ -811,7 +829,7 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getFormAttributes()
     {
@@ -831,17 +849,35 @@ class Form extends FormEntity implements UuidInterface
         return $this->language;
     }
 
+    /**
+     * @deprecated since Mautic 7.1, will be removed in 8.0. All forms can now be used in campaigns.
+     */
     public function isStandalone(): bool
     {
+        trigger_deprecation('mautic/mautic', '7.1', 'Form::isStandalone() is deprecated and will be removed in 8.0.');
+
         return 'campaign' != $this->formType;
     }
 
     /**
      * Generate a form name for HTML attributes.
+     *
+     * @param string[] $allowedCharacters
      */
-    public function generateFormName(): string
+    public function generateFormName(?string $name = null, array $allowedCharacters = []): string
     {
-        return $this->name ? strtolower(InputHelper::alphanum(InputHelper::transliterate($this->name))) : 'form-'.$this->id;
+        $name = strtolower(
+            InputHelper::alphanum(
+                InputHelper::transliterate(
+                    $name ?? $this->name
+                ),
+                false,
+                null,
+                $allowedCharacters
+            )
+        );
+
+        return (empty($name)) ? 'form-'.$this->id : $name;
     }
 
     /**
@@ -856,8 +892,8 @@ class Form extends FormEntity implements UuidInterface
         }
 
         // Progressive profiling must be turned off in the kiosk mode
-        if (false === $this->getInKioskMode()) {
-            if ('' != $this->getProgressiveProfilingLimit()) {
+        if (false === $this->inKioskMode) {
+            if ('' != $this->progressiveProfilingLimit) {
                 $this->usesProgressiveProfiling = true;
 
                 return $this->usesProgressiveProfiling;
@@ -880,10 +916,8 @@ class Form extends FormEntity implements UuidInterface
 
     /**
      * @param int $progressiveProfilingLimit
-     *
-     * @return Form
      */
-    public function setProgressiveProfilingLimit($progressiveProfilingLimit)
+    public function setProgressiveProfilingLimit($progressiveProfilingLimit): static
     {
         $this->isChanged('progressiveProfilingLimit', $progressiveProfilingLimit);
         $this->progressiveProfilingLimit = $progressiveProfilingLimit;
@@ -892,10 +926,53 @@ class Form extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getProgressiveProfilingLimit()
     {
         return $this->progressiveProfilingLimit;
+    }
+
+    public function setSubmissionLimit(?int $submissionLimit): self
+    {
+        $this->isChanged('submissionLimit', $submissionLimit);
+        $this->submissionLimit = $submissionLimit;
+
+        return $this;
+    }
+
+    public function getSubmissionLimit(): ?int
+    {
+        return $this->submissionLimit;
+    }
+
+    public function setSubmissionLimitMessage(?string $message): self
+    {
+        $this->isChanged('submissionLimitMessage', $message);
+        $this->submissionLimitMessage = $message;
+
+        return $this;
+    }
+
+    public function getSubmissionLimitMessage(): ?string
+    {
+        return $this->submissionLimitMessage;
+    }
+
+    public function getSubmissionCount(): int
+    {
+        return $this->submissionCount;
+    }
+
+    public function setSubmissionCount(int $count): self
+    {
+        $this->submissionCount = $count;
+
+        return $this;
+    }
+
+    public function isSubmissionLimitReached(): bool
+    {
+        return null !== $this->submissionLimit && $this->submissionLimit > 0 && $this->submissionCount >= $this->submissionLimit;
     }
 }

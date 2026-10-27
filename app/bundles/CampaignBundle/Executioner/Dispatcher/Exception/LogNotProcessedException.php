@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Executioner\Dispatcher\Exception;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 
-class LogNotProcessedException extends \Exception
+final class LogNotProcessedException extends \Exception
 {
     public function __construct(LeadEventLog $log)
     {
-        parent::__construct("LeadEventLog ID # {$log->getId()} must be passed to either pass() or fail()", 0, null);
+        parent::__construct("LeadEventLog ID # {$log->getId()} must be passed to either pass() or fail()");
     }
 }

@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigThemeType extends AbstractType
+final class ConfigThemeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -21,7 +21,7 @@ class ConfigThemeType extends AbstractType
             [
                 'label'      => 'mautic.core.config.form.brand_name',
                 'label_attr' => [
-                    'class' => 'control-label',
+                    'class' => 'form-label',
                 ],
                 'attr'  => [
                     'class'   => 'form-control',
@@ -38,7 +38,7 @@ class ConfigThemeType extends AbstractType
             [
                 'label'      => 'mautic.core.config.form.primary_brand_color',
                 'label_attr' => [
-                    'class' => 'control-label',
+                    'class' => 'form-label',
                 ],
                 'attr'  => [
                     'class'        => 'form-control minicolors-input',
@@ -69,7 +69,7 @@ class ConfigThemeType extends AbstractType
             HiddenType::class,
             [
                 'label'      => 'mautic.user.preferences.accent',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -96,7 +96,7 @@ class ConfigThemeType extends AbstractType
                 [
                     'label'      => 'mautic.core.config.form.theme.import.allowed.extensions',
                     'label_attr' => [
-                        'class' => 'control-label',
+                        'class' => 'form-label',
                     ],
                     'attr'       => [
                         'class' => 'form-control',

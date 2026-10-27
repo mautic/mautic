@@ -14,22 +14,21 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\UserBundle\Model\UserModel;
-use PHPUnit\Framework\Assert;
 
-class CompanyObjectHelperTest extends MauticMysqlTestCase
+final class CompanyObjectHelperTest extends MauticMysqlTestCase
 {
     public function testUpdateEmpty(): void
     {
         /** @var CompanyObjectHelper $companyObjectHelper */
-        $companyObjectHelper  = static::getContainer()->get('mautic.integrations.helper.company_object');
+        $companyObjectHelper  = self::getContainer()->get(CompanyObjectHelper::class);
         $updatedMappedObjects = $companyObjectHelper->update([], []);
-        Assert::assertSame([], $updatedMappedObjects);
+        $this->assertSame([], $updatedMappedObjects);
     }
 
     public function testUpdate(): void
     {
         /** @var UserModel $userModel */
-        $userModel = static::getContainer()->get('mautic.user.model.user');
+        $userModel = self::getContainer()->get(UserModel::class);
         $users     = $userModel->getRepository()->findAll();
         $user      = reset($users);
         $now       = new \DateTime();
@@ -43,7 +42,7 @@ class CompanyObjectHelperTest extends MauticMysqlTestCase
         $company2->setOwner($user);
 
         /** @var CompanyModel $companyModel */
-        $companyModel = static::getContainer()->get('mautic.lead.model.company');
+        $companyModel = self::getContainer()->get(CompanyModel::class);
         $companyModel->saveEntity($company1);
         $companyModel->saveEntity($company2);
 
@@ -51,7 +50,7 @@ class CompanyObjectHelperTest extends MauticMysqlTestCase
         $city  = 'Boston';
 
         /** @var CompanyObjectHelper $companyObjectHelper */
-        $companyObjectHelper = static::getContainer()->get('mautic.integrations.helper.company_object');
+        $companyObjectHelper = self::getContainer()->get(CompanyObjectHelper::class);
         $companyObjectHelper->update([
             $company1->getId(),
             $company2->getId(),
@@ -60,8 +59,8 @@ class CompanyObjectHelperTest extends MauticMysqlTestCase
             $company2->getId() => $this->buildObjectChangeDAO($company2, 'companycity', $city),
         ]);
 
-        Assert::assertSame($phone, $company1->getPhone());
-        Assert::assertSame($city, $company2->getCity());
+        $this->assertSame($phone, $company1->getPhone());
+        $this->assertSame($city, $company2->getCity());
     }
 
     private function buildObjectChangeDAO(Company $company, string $name, string $value): ObjectChangeDAO

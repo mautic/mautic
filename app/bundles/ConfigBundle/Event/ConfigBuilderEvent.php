@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Helper\BundleHelper;
@@ -26,16 +28,14 @@ class ConfigBuilderEvent extends Event
     protected array $encodedFields = [];
 
     public function __construct(
-        private BundleHelper $bundleHelper,
+        private readonly BundleHelper $bundleHelper,
     ) {
     }
 
     /**
      * Set new form to the forms array.
-     *
-     * @return $this
      */
-    public function addForm(array $form)
+    public function addForm(array $form): static
     {
         if (isset($form['formTheme'])) {
             $this->formThemes[] = $form['formTheme'];
@@ -64,20 +64,16 @@ class ConfigBuilderEvent extends Event
 
     /**
      * Returns the forms array.
-     *
-     * @return array
      */
-    public function getForms()
+    public function getForms(): array
     {
         return $this->forms;
     }
 
     /**
      * Returns the formThemes array.
-     *
-     * @return array
      */
-    public function getFormThemes()
+    public function getFormThemes(): array
     {
         return $this->formThemes;
     }
@@ -97,25 +93,19 @@ class ConfigBuilderEvent extends Event
 
         if (isset($allBundles[$bundle]) && $allBundles[$bundle]['config']['parameters']) {
             return $allBundles[$bundle]['config']['parameters'];
-        } else {
-            return [];
         }
+
+        return [];
     }
 
-    /**
-     * @return $this
-     */
-    public function addFileFields($fields)
+    public function addFileFields($fields): static
     {
         $this->encodedFields = array_merge($this->encodedFields, (array) $fields);
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFileFields()
+    public function getFileFields(): array
     {
         return $this->encodedFields;
     }

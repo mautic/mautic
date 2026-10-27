@@ -11,6 +11,7 @@ use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner as Executioner;
 use Mautic\CampaignBundle\Executioner\Exception\CampaignNotExecutableException;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
+use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
@@ -21,10 +22,7 @@ use Psr\Log\LoggerInterface;
 
 class RealTimeExecutioner
 {
-    /**
-     * @var Lead
-     */
-    private $contact;
+    private ?Lead $contact = null;
 
     /**
      * @var array
@@ -34,32 +32,30 @@ class RealTimeExecutioner
     private ?Responses $responses = null;
 
     public function __construct(
-        private LoggerInterface $logger,
-        private LeadModel $leadModel,
-        private EventRepository $eventRepository,
-        private EventExecutioner $executioner,
-        private Executioner $decisionExecutioner,
-        private EventCollector $collector,
-        private EventScheduler $scheduler,
-        private ContactTracker $contactTracker,
-        private DecisionHelper $decisionHelper,
+        private readonly LoggerInterface $logger,
+        private readonly LeadModel $leadModel,
+        private readonly EventRepository $eventRepository,
+        private readonly EventExecutioner $executioner,
+        private readonly Executioner $decisionExecutioner,
+        private readonly EventCollector $collector,
+        private readonly EventScheduler $scheduler,
+        private readonly ContactTracker $contactTracker,
+        private readonly DecisionHelper $decisionHelper,
+        private readonly EventRedirectionHelper $redirectionHelper,
     ) {
     }
 
     /**
-     * @param string      $type
      * @param mixed       $passthrough
      * @param string|null $channel
      * @param int|null    $channelId
-     *
-     * @return Responses
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute($type, $passthrough = null, $channel = null, $channelId = null)
+    public function execute(string $type, $passthrough = null, $channel = null, $channelId = null): ?Responses
     {
         $this->responses = new Responses();
         $now             = new \DateTime();
@@ -67,7 +63,7 @@ class RealTimeExecutioner
         $this->logger->debug('CAMPAIGN: Campaign triggered for event type '.$type.'('.$channel.' / '.$channelId.')');
 
         // Kept for BC support although not sure we need this
-        defined('MAUTIC_CAMPAIGN_NOT_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_NOT_SYSTEM_TRIGGERED', 1);
+        defined('MAUTIC_CAMPAIGN_NOT_SYSTEM_TRIGGERED') || define('MAUTIC_CAMPAIGN_NOT_SYSTEM_TRIGGERED', 1);
 
         try {
             $this->fetchCurrentContact();
@@ -87,6 +83,8 @@ class RealTimeExecutioner
 
         /** @var Event $event */
         foreach ($this->events as $event) {
+            $event = $this->redirectionHelper->handleEventRedirection($event, null, null);
+
             try {
                 $this->evaluateDecisionForContact($event, $passthrough, $channel, $channelId);
             } catch (DecisionNotApplicableException $exception) {
@@ -125,6 +123,8 @@ class RealTimeExecutioner
 
         /** @var Event $child */
         foreach ($children as $key => $child) {
+            $child = $this->redirectionHelper->handleEventRedirection($child, $children, $key);
+
             $executionDate = $this->scheduler->getExecutionDateTime($child, $now);
             $this->logger->debug(
                 'CAMPAIGN: Event ID# '.$child->getId().
@@ -178,7 +178,7 @@ class RealTimeExecutioner
     /**
      * @throws CampaignNotExecutableException
      */
-    private function fetchCampaignData($type): void
+    private function fetchCampaignData(string $type): void
     {
         if (!$this->events = $this->eventRepository->getContactPendingEvents($this->contact->getId(), $type)) {
             throw new CampaignNotExecutableException('Contact does not have any applicable '.$type.' associations.');

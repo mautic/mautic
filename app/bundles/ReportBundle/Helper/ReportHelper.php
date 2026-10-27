@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Helper;
 
 use Mautic\ReportBundle\Event\ColumnCollectEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class ReportHelper
+final readonly class ReportHelper
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
@@ -118,7 +120,7 @@ final class ReportHelper
         $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_COLUMN_COLLECT);
 
         return array_map(
-            function ($item) {
+            function (array $item): array {
                 if (isset($item['type'])) {
                     $item['type'] =  $this->getReportBuilderFieldType($item['type']);
                 }

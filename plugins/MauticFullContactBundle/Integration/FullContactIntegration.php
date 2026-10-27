@@ -10,7 +10,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class FullContactIntegration extends AbstractIntegration
+final class FullContactIntegration extends AbstractIntegration
 {
     public function getName(): string
     {
@@ -64,7 +64,7 @@ class FullContactIntegration extends AbstractIntegration
                 'stats',
                 TextareaType::class,
                 [
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'label'      => 'mautic.plugin.fullcontact.stats',
                     'required'   => false,
                     'attr'       => [
@@ -96,10 +96,7 @@ class FullContactIntegration extends AbstractIntegration
         return isset($featureSettings['auto_update']) && (bool) $featureSettings['auto_update'];
     }
 
-    /**
-     * @return string|array
-     */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         if ('custom' === $section) {
             return [

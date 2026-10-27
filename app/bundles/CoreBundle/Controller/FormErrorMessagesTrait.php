@@ -66,8 +66,8 @@ trait FormErrorMessagesTrait
         $codes = [];
 
         foreach ($form->getErrors(true) as $error) {
-            $code         = $error->getCause()->getCode();
-            $codes[$code] = $code;
+            $code               = $error->getCause()->getCode();
+            $codes[$code ?? ''] = $code;
         }
 
         return $codes;

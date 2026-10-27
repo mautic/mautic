@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\WebhookBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * @extends CommonRepository<WebhookQueue>
@@ -12,7 +16,7 @@ class WebhookQueueRepository extends CommonRepository
     /**
      * Deletes all the webhook queues by ID.
      *
-     * @param $idList array of webhookqueue IDs
+     * @param array $idList of webhookqueue IDs
      */
     public function deleteQueuesById(array $idList): void
     {
@@ -24,8 +28,30 @@ class WebhookQueueRepository extends CommonRepository
         $qb = $this->_em->getConnection()->createQueryBuilder();
         $qb->delete(MAUTIC_TABLE_PREFIX.'webhook_queue')
             ->where(
-                $qb->expr()->in('id', $idList)
+                $qb->expr()->in('id', ':ids')
             )
+            ->setParameter('ids', $idList, ArrayParameterType::INTEGER)
+            ->executeStatement();
+    }
+
+    /**
+     * @param array<int> $idList
+     */
+    public function incrementRetryCount(array $idList): void
+    {
+        if (!count($idList)) {
+            return;
+        }
+
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX.'webhook_queue')
+            ->where(
+                $qb->expr()->in('id', ':ids')
+            )
+            ->set('retries', 'retries + 1')
+            ->set('date_modified', ':date_modified')
+            ->setParameter('ids', $idList, ArrayParameterType::INTEGER)
+            ->setParameter('date_modified', (new \DateTimeImmutable())->format(DateTimeHelper::FORMAT_DB))
             ->executeStatement();
     }
 

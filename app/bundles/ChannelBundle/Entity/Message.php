@@ -1,7 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -11,30 +20,29 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata as ValidationClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "message:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"category", "channels"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "message:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('channel:messages:viewown')"),
+        new Post(security: "is_granted('channel:messages:create')"),
+        new Get(security: "is_granted('channel:messages:viewown', object)"),
+        new Put(security: "is_granted('channel:messages:editown', object)"),
+        new Patch(security: "is_granted('channel:messages:editother', object)"),
+        new Delete(security: "is_granted('channel:messages:deleteown', object)"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['message:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category', 'channels'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['message:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Message extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -43,36 +51,43 @@ class Message extends FormEntity implements UuidInterface
     /**
      * @var ?int
      */
+    #[Groups(['message:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['message:read', 'message:write', 'channel:read'])]
     private $name;
 
     /**
      * @var ?string
      */
+    #[Groups(['message:read', 'message:write'])]
     private $description;
 
     /**
      * @var ?\DateTimeInterface
      */
+    #[Groups(['message:read', 'message:write'])]
     private $publishUp;
 
     /**
      * @var ?\DateTimeInterface
      */
+    #[Groups(['message:read', 'message:write'])]
     private $publishDown;
 
     /**
      * @var ?Category
      */
+    #[Groups(['message:read', 'message:write'])]
     private $category;
 
     /**
      * @var ArrayCollection<int,Channel>
      */
+    #[Groups(['message:read', 'message:write'])]
     private $channels;
 
     public function __clone()
@@ -85,8 +100,8 @@ class Message extends FormEntity implements UuidInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('messages')
-                ->setCustomRepositoryClass(MessageRepository::class)
-                ->addIndex(['date_added'], 'date_message_added');
+            ->setCustomRepositoryClass(MessageRepository::class)
+            ->addIndex(['date_added'], 'date_message_added');
 
         $builder
             ->addIdColumns()
@@ -108,9 +123,7 @@ class Message extends FormEntity implements UuidInterface
 
     public static function loadValidatorMetadata(ValidationClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new NotBlank([
-            'message' => 'mautic.core.name.required',
-        ]));
+        $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
@@ -160,10 +173,8 @@ class Message extends FormEntity implements UuidInterface
 
     /**
      * @param ?string $name
-     *
-     * @return Message
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -181,10 +192,8 @@ class Message extends FormEntity implements UuidInterface
 
     /**
      * @param ?string $description
-     *
-     * @return Message
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -202,10 +211,8 @@ class Message extends FormEntity implements UuidInterface
 
     /**
      * @param ?\DateTime $publishUp
-     *
-     * @return Message
      */
-    public function setPublishUp($publishUp)
+    public function setPublishUp($publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -223,10 +230,8 @@ class Message extends FormEntity implements UuidInterface
 
     /**
      * @param ?\DateTime $publishDown
-     *
-     * @return Message
      */
-    public function setPublishDown($publishDown)
+    public function setPublishDown($publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -244,10 +249,8 @@ class Message extends FormEntity implements UuidInterface
 
     /**
      * @param ?Category $category
-     *
-     * @return Message
      */
-    public function setCategory($category)
+    public function setCategory($category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -265,10 +268,8 @@ class Message extends FormEntity implements UuidInterface
 
     /**
      * @param ArrayCollection<int,Channel> $channels
-     *
-     * @return Message
      */
-    public function setChannels($channels)
+    public function setChannels($channels): static
     {
         $this->isChanged('channels', $channels);
         $this->channels = $channels;

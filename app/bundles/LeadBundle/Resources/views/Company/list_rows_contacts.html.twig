@@ -9,11 +9,22 @@
     - limit
     - totalItems
 #}
-{% set baseUrl = path('mautic_company_contacts_list', {'objectId': company.id}) %}
+{% set baseUrl = path('mautic_company_contacts_list', {'objectId': company_id}) %}
 {% set customButtons = [] %}
 
-{% if permissions['lead:leads:editown'] or permissions['load:leads:editother'] %}
+{% if permissions['lead:leads:editown'] or permissions['lead:leads:editother'] %}
     {% set customButtons = [
+        {
+            'confirm': {
+                'message': 'mautic.company.contacts.confirm_batch_remove'|trans,
+                'confirmText': 'mautic.company.contacts.remove_selected'|trans,
+                'confirmAction': path('mautic_company_action', {'objectAction': 'batchRemoveContacts', 'objectId': company_id}),
+                'iconClass': 'ri-user-unfollow-line',
+                'btnText': 'mautic.company.contacts.remove_selected'|trans,
+                'precheck': 'batchActionPrecheck',
+                'confirmCallback': 'executeBatchAction',
+            },
+        },
         {
             'attr': {
                 'class': 'btn btn-ghost btn-sm btn-nospin',
@@ -63,6 +74,17 @@
                 'class': 'btn btn-ghost btn-sm btn-nospin',
                 'data-toggle': 'ajaxmodal',
                 'data-target': '#MauticSharedModal',
+                'href': path('mautic_contact_action', {'objectAction': 'batchFindReplace'}),
+                'data-header': 'mautic.core.find_replace'|trans,
+            },
+            'btnText': 'mautic.core.find_replace'|trans,
+            'iconClass': 'ri-find-replace-line',
+        },
+        {
+            'attr': {
+                'class': 'btn btn-ghost btn-sm btn-nospin',
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
                 'href': path('mautic_contact_action', {'objectAction': 'batchDnc'}),
                 'data-header': 'mautic.lead.batch.dnc'|trans,
             },
@@ -89,7 +111,7 @@
                         'tooltip': 'mautic.lead.list.checkall.help'|trans,
                     }) }}
                     {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'sessionVar': 'company.'~company_id~'.contacts',
                         'orderBy': 'l.lastname, l.firstname, l.company, l.email',
                         'text': 'mautic.core.name',
                         'class': 'col-lead-name',
@@ -97,7 +119,7 @@
                         'baseUrl': baseUrl,
                     }) }}
                     {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'sessionVar': 'company.'~company_id~'.contacts',
                         'orderBy': 'l.email',
                         'text': 'mautic.core.type.email',
                         'class': 'col-lead-email visible-md visible-lg',
@@ -105,7 +127,7 @@
                         'baseUrl': baseUrl,
                     }) }}
                     {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'sessionVar': 'company.'~company_id~'.contacts',
                         'orderBy': 'l.city, l.state',
                         'text': 'mautic.lead.lead.thead.location',
                         'class': 'col-lead-location visible-md visible-lg',
@@ -113,7 +135,7 @@
                         'baseUrl': baseUrl,
                     }) }}
                     {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'sessionVar': 'company.'~company_id~'.contacts',
                         'orderBy': 'l.stage_id',
                         'text': 'mautic.lead.stage.label',
                         'class': 'col-lead-stage',
@@ -121,7 +143,7 @@
                         'baseUrl': baseUrl,
                     }) }}
                     {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'sessionVar': 'company.'~company_id~'.contacts',
                         'orderBy': 'l.points',
                         'text': 'mautic.lead.points',
                         'class': 'visible-md visible-lg col-lead-points',
@@ -129,7 +151,7 @@
                         'baseUrl': baseUrl,
                     }) }}
                     {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'sessionVar': 'company.'~company_id~'.contacts',
                         'orderBy': 'l.last_active',
                         'text': 'mautic.lead.lastactive',
                         'class': 'col-lead-lastactive visible-md visible-lg',
@@ -138,7 +160,7 @@
                         'baseUrl': baseUrl,
                     }) }}
                     {{ include('@MauticCore/Helper/tableheader.html.twig', {
-                        'sessionVar': 'company.'~company.id~'.contacts',
+                        'sessionVar': 'company.'~company_id~'.contacts',
                         'orderBy': 'l.id',
                         'text': 'mautic.core.id',
                         'class': 'col-lead-id visible-md visible-lg',
@@ -192,8 +214,9 @@
                     </td>
                     <td>
                         <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">
-                            <div>{% if contact.isAnonymous %}{{ contact.primaryIdentifier|trans }}{% else %}{{ contact.primaryIdentifier|purify }}{% endif %}</div>
-                            <div class="small">{{ contact.secondaryIdentifier|purify }}</div>
+                            <div>{% if contact.isAnonymous %}{{ contact.primaryIdentifier|trans }}{% else %}{{ htmlEntityDecode(contact.primaryIdentifier)|purify }}{% endif %}</div>
+                            {{ customContent('lead.name.after', _context) }}
+                            <div class="small">{{ htmlEntityDecode(contact.secondaryIdentifier)|purify }}</div>
                         </a>
                     </td>
                     <td class="visible-md visible-lg">{{ fields.core.email.value|purify }}</td>
@@ -239,7 +262,7 @@
             'baseUrl': baseUrl,
             'target': '#contacts-table',
             'totalItems': totalItems,
-            'sessionVar': 'company.'~company.id~'.contacts',
+            'sessionVar': 'company.'~company_id~'.contacts',
     }) }}
 {% else %}
     {{ include('@MauticCore/Helper/noresults.html.twig') }}

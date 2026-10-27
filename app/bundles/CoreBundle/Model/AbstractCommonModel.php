@@ -8,27 +8,28 @@ use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @template T of object
  */
-abstract class AbstractCommonModel implements MauticModelInterface
+abstract class AbstractCommonModel implements MauticModelInterface, SearchCommandListInterface
 {
     public function __construct(
         protected EntityManagerInterface $em,
         protected CorePermissions $security,
         protected EventDispatcherInterface $dispatcher,
         protected UrlGeneratorInterface $router,
-        protected Translator $translator,
+        protected TranslatorInterface $translator,
         protected UserHelper $userHelper,
         protected LoggerInterface $logger,
         protected CoreParametersHelper $coreParametersHelper,
@@ -93,12 +94,11 @@ abstract class AbstractCommonModel implements MauticModelInterface
     public function getEntities(array $args = [])
     {
         // set the translator
-        $repo = $this->getRepository();
+        $repository = $this->getRepository();
 
-        $repo->setTranslator($this->translator);
-        $repo->setCurrentUser($this->userHelper->getUser());
+        $repository->setCurrentUser($this->userHelper->getUser());
 
-        return $repo->getEntities($args);
+        return $repository->getEntities($args);
     }
 
     /**
@@ -139,17 +139,20 @@ abstract class AbstractCommonModel implements MauticModelInterface
      */
     public function decodeArrayFromUrl($string, $urlDecode = true)
     {
-        return ClickthroughHelper::decodeArrayFromUrl($string, $urlDecode);
+        try {
+            return ClickthroughHelper::decodeArrayFromUrl($string, $urlDecode);
+        } catch (InvalidDecodedStringException) {
+            return [];
+        }
     }
 
     /**
-     * @param array $routeParams
      * @param bool  $absolute
      * @param array $clickthrough
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
+    public function buildUrl(string $route, array $routeParams = [], $absolute = true, $clickthrough = [])
     {
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate($route, $routeParams, $referenceType);
@@ -211,7 +214,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
         $entity = false;
         if (str_contains($idSlug, ':')) {
             $parts = explode(':', $idSlug);
-            if (2 == count($parts)) {
+            if (2 === count($parts)) {
                 $entity = $this->getEntity($parts[0]);
             }
         } else {
@@ -239,7 +242,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
     }
 
     /**
-     * @phpstan-param class-string<T> $class
+     * @param class-string<T> $class
      *
      * @return CommonRepository<T>
      */
@@ -271,8 +274,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
         $isGranted      = false;
         $permissionBase = $this->getPermissionBase();
-        if ($this->security->checkPermissionExists("$permissionBase:viewown")) {
-            $isGranted = $this->security->isGranted("$permissionBase:viewown");
+        if ($this->security->checkPermissionExists("{$permissionBase}:viewown")) {
+            $isGranted = $this->security->isGranted("{$permissionBase}:viewown");
         }
 
         return $isGranted;
@@ -286,8 +289,8 @@ abstract class AbstractCommonModel implements MauticModelInterface
 
         $isGranted      = false;
         $permissionBase = $this->getPermissionBase();
-        if ($this->security->checkPermissionExists("$permissionBase:viewother")) {
-            $isGranted = $this->security->isGranted(["$permissionBase:viewother"]);
+        if ($this->security->checkPermissionExists("{$permissionBase}:viewother")) {
+            $isGranted = $this->security->isGranted(["{$permissionBase}:viewother"]);
         }
 
         return $isGranted;

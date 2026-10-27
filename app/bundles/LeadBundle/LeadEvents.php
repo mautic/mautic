@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle;
 
 /**
@@ -217,6 +219,16 @@ final class LeadEvents
      * @var string
      */
     public const LIST_PRE_DELETE = 'mautic.lead_list_pre_delete';
+
+    /**
+     * The mautic.lead_list_delete event is dispatched before a lead_list is deleted.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListEvent instance.
+     *
+     * @var string
+     */
+    public const ON_LIST_DELETE = 'mautic.lead_list_delete';
 
     /**
      * The mautic.lead_list_post_delete event is dispatched after a lead_list is deleted.
@@ -487,6 +499,26 @@ final class LeadEvents
     public const TAG_POST_DELETE = 'mautic.lead_tag_post_delete';
 
     /**
+     * The mautic.lead_tag_pre_merge event is dispatched before two tags are merged.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagMergeEvent instance.
+     *
+     * @var string
+     */
+    public const TAG_PRE_MERGE = 'mautic.lead_tag_pre_merge';
+
+    /**
+     * The mautic.lead_tag_post_merge event is dispatched after two tags are merged.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TagMergeEvent instance.
+     *
+     * @var string
+     */
+    public const TAG_POST_MERGE = 'mautic.lead_tag_post_merge';
+
+    /**
      * The mautic.filter_choice_fields event is dispatched when the list filter dropdown is populated.
      *
      * The event listener receives a
@@ -590,6 +622,15 @@ final class LeadEvents
      * @var string
      */
     public const COMPANY_POST_DELETE = 'mautic.company_post_delete';
+
+    /**
+     * The mautic.company_soft_delete event is thrown after a company is marked as deleted.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\CompanyEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_SOFT_DELETE = 'mautic.company_soft_delete';
 
     /**
      * The mautic.company_pre_merge event is dispatched before two companies are merged.
@@ -787,6 +828,7 @@ final class LeadEvents
      * @var string
      */
     public const LEAD_FIELD_PRE_UPDATE_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_update_column_background_job';
+
     /**
      * The mautic.post_contact_export_scheduled event is dispatched when a contact export is scheduled.
      *

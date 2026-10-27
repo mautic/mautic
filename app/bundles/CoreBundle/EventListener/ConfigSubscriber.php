@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber implements EventSubscriberInterface
+final readonly class ConfigSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LanguageHelper $languageHelper,
@@ -29,6 +29,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $coreParams = $event->getParametersFromConfig('MauticCoreBundle');
         unset($coreParams['theme']);
         unset($coreParams['theme_import_allowed_extensions']);
+        unset($coreParams['gravatar_enabled']);
         $event->addForm([
             'bundle'     => 'CoreBundle',
             'formType'   => ConfigType::class,
@@ -44,6 +45,11 @@ class ConfigSubscriber implements EventSubscriberInterface
 
         // Preserve existing value
         $event->unsetIfEmpty('transifex_password');
+
+        // The coreconfig tab is not submitted when another configuration page is saved
+        if (!isset($values['coreconfig']['locale'])) {
+            return;
+        }
 
         // Check if the selected locale has been downloaded already, fetch it if not
         if (!array_key_exists($values['coreconfig']['locale'], $this->languageHelper->getSupportedLanguages())) {

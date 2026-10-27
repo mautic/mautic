@@ -4,7 +4,7 @@
 {% set classes = classes|merge([size_class]) %}
 
 {% if is_icon_only %}
-    {% set classes = classes|merge(['btn-icon', icon|default('ri-information-2-line'), 'ri-1x']) %}
+    {% set classes = classes|merge(['btn--icon-only', icon|default('ri-information-2-line'), 'ri-1x']) %}
 {% else %}
     {% set classes = classes|merge(['gap-5']) %}
 {% endif %}

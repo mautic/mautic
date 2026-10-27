@@ -10,14 +10,14 @@ use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 
-class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject&AbstractCacheProvider
      */
     private MockObject $adapter;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->adapter = $this->getMockBuilder(AbstractCacheProvider::class)
@@ -26,7 +26,7 @@ class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $this->adapter->method('clear')->willReturn(true);
         $this->adapter->method('commit')->willReturn(true);
-        $this->adapter->method('getCacheAdapter')->willReturn($this->createMock(AdapterInterface::class));
+        $this->adapter->method('getCacheAdapter')->willReturn($this->createStub(AdapterInterface::class));
     }
 
     public function testClear(): void

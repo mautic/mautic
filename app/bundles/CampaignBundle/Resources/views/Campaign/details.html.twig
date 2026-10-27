@@ -20,8 +20,21 @@
 {% block headerTitle %}{{ campaign.name }}{% endblock %}
 
 {% block actions %}
+    {% set buttons = [] %}
+
+    {% if securityHasEntityAccess(permissions['campaign:campaigns:viewown'], permissions['campaign:campaigns:viewother'], campaign.createdBy) and enableExportPermission is not empty%}
+        {% set buttons = buttons|merge([{
+            'attr': {
+                'href': path('mautic_campaign_action', {'objectAction': 'share', 'objectId': campaign.id}),
+            },
+            'btnText': 'mautic.core.export'|trans,
+            'iconClass': 'ri-export-line',
+        }]) %}
+    {% endif %}
+
   {{- include('@MauticCore/Helper/page_actions.html.twig', {
     'item': campaign,
+    'customButtons': buttons,
     'templateButtons': {
         'edit': securityHasEntityAccess(
             permissions['campaign:campaigns:editown'],
@@ -41,9 +54,9 @@
 
 {% block publishStatus %}
   {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': campaign}) }}
-  <div class="label__divider"></div>
-  
+
   {% if campaign.allowRestart is defined and campaign.allowRestart == 1 %}
+    <div class="label__divider"></div>
     {% include '@MauticCore/Helper/_tag.html.twig' with {
         tags: [{
             label: 'mautic.campaign.allow_restart'|trans,
@@ -71,6 +84,25 @@
                     <div class="panel shd-none mb-0">
                         <table class="table table-hover mb-0">
                             <tbody>
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle">
+                                    {{ 'mautic.campaignconfig.campaign_republish_behavior'|trans }}
+                                </td>
+                                <td>
+                                    {{ ('mautic.campaignconfig.campaign_republish_behavior.' ~ (campaign.republishBehavior ?: 'use_global'))|trans }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle">
+                                    {{ 'mautic.campaign.last.publish.date'|trans }}
+                                    <span data-toggle="tooltip"  title="{{ 'mautic.campaign.last.publish.date.tooltip'|trans }}">
+                                        <i class="ri-question-line"></i>
+                                    </span>
+                                </td>
+                                <td>
+                                    {{ lastPublishDate ? dateToFullConcat(lastPublishDate) : 'N/A' }}
+                                </td>
+                            </tr>
                             {{ include('@MauticCore/Helper/details.html.twig', {'entity': campaign}) }}
                             {% for sourceType, typeNames in sources %}
                               {% if typeNames is not empty %}
@@ -104,6 +136,23 @@
             <!--/ campaign detail collapseable toggler -->
 
             {{ customContent('left.section.top', _context) }}
+            {% if securityIsGranted('lead:leads:viewown') %}
+                <div class="pa-md">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
+                                {
+                                    'title': 'mautic.campaign.stat.contacts'|trans,
+                                    'value': contactCount,
+                                    'tooltip': 'mautic.campaign.stat.contacts.tooltip'|trans,
+                                    'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.campaign_membership'|trans) ~ ':' ~ campaign.id}),
+                                    'icon': 'ri-group-line'
+                                }
+                            ]}) }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
             {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
             {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
             <!-- some stats -->

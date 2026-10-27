@@ -23,7 +23,7 @@
   }) %}
 {% endif %}
 
-{% if field.type not in ['checkboxgrp', 'radiogrp', 'textarea'] %}
+{% if field.type not in ['checkboxgrp', 'radiogrp', 'rating', 'textarea'] %}
   {% set inputAttributes = inputAttributes|merge({
           'value': field.defaultValue|default(''),
   }) %}
@@ -64,6 +64,8 @@
           'class': inputAttributes.class|default([])|merge([defaultInputClass]),
   }) %}
 {% endif %}
+{% set widthClass = 'mauticform-' ~ (field.fieldWidth|default('100%')|u.replace('%', '').replaceMatches('/\\.\\d+/', '')) %}
+
 {% set containerAttributes = containerAttributes|merge({
 
         'id': 'mauticform' ~ formName|default('') ~ '_' ~ id,
@@ -71,8 +73,8 @@
           'mauticform-row',
           'mauticform-' ~ containerClass,
           'mauticform-field-' ~ order,
+          widthClass
         ]),
-        'style': 'width: ' ~ field.fieldWidth
 }) %}
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
@@ -185,7 +187,7 @@
 {# end: field_helper #}
 
 <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-  {% if field.showLabel %}<h3 {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify }}</h3>{% endif %}
+  {% if field.showLabel %}<h3 {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label|purify_allow_target_blank }}</h3>{% endif %}
   <div {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
     {{ field.properties.text|raw }}
   </div>

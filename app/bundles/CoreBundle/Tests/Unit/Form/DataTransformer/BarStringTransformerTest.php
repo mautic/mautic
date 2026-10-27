@@ -5,19 +5,16 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Form\DataTransformer;
 
 use Mautic\CoreBundle\Form\DataTransformer\BarStringTransformer;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class BarStringTransformerTest extends TestCase
 {
-    /**
-     * @param mixed $value
-     */
-    #[\PHPUnit\Framework\Attributes\DataProvider('transformProvider')]
-    public function testTransform($value, string $expected): void
+    #[DataProvider('transformProvider')]
+    public function testTransform(mixed $value, string $expected): void
     {
         $transformer = new BarStringTransformer();
-        Assert::assertSame($expected, $transformer->transform($value));
+        $this->assertSame($expected, $transformer->transform($value));
     }
 
     /**
@@ -36,14 +33,13 @@ final class BarStringTransformerTest extends TestCase
     }
 
     /**
-     * @param mixed    $value
      * @param string[] $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('reverseTransformProvider')]
-    public function testReverseTransform($value, array $expected): void
+    #[DataProvider('reverseTransformProvider')]
+    public function testReverseTransform(mixed $value, array $expected): void
     {
         $transformer = new BarStringTransformer();
-        Assert::assertSame($expected, $transformer->reverseTransform($value));
+        $this->assertSame($expected, $transformer->reverseTransform($value));
     }
 
     /**

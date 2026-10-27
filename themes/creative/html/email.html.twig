@@ -1,12 +1,24 @@
 <mjml>
   <mj-head>
     <mj-style inline="inline">
-      p, li {margin:0 !important; padding:0; line-height:1.4em;}
+      p, li {margin:0 !important; padding:0; line-height:140%;}
     </mj-style>
+    <mj-attributes>
+      <mj-all font-family="Ubuntu, Helvetica, Arial, sans-serif"></mj-all>
+      <mj-button border-radius="24px" padding="10px 25px"></mj-button>
+      <mj-section></mj-section>
+
+      <mj-class name="t-body" font-size="16px"></mj-class>
+      <mj-class name="t-btn" inner-padding="6px 18px" border-radius="20px"></mj-class>
+      <mj-class name="t-btn-primary" background-color="#1473E6" color="#ffffff" font-size="16px" font-weight="bold" border-radius="24px" padding="12px 24px"></mj-class>
+      <mj-class name="t-btn-secondary" background-color="transparent" border="3px solid #1473E6" color="#1473E6" font-weight="bold" inner-padding="6px 18px" border-radius="20px"></mj-class>
+      <mj-class name="t-section"></mj-class>
+      <mj-class name="t-surface-1" background-color="#ffffff"></mj-class>
+    </mj-attributes>
   </mj-head>
   <mj-body background-color="#F5F5F5">
     <!-- Header -->
-    <mj-section background-color="#ffffff" padding="20px 0">
+    <mj-section mj-class="t-surface-1" padding="20px 0">
       <mj-column>
         <mj-image src="{{ getOverridableUrl('images/placeholder-logo.png') }}" width="70px" />
       </mj-column>
@@ -20,27 +32,27 @@
         <mj-text color="#ffffff" align="center" padding-top="0px">
           <p>Discover the latest updates and enhancements to your Cloud Creative experience.</p>
         </mj-text>
-        <mj-button href="#" background-color="#1473E6" color="#ffffff" font-size="14px" font-weight="bold" border-radius="24px" padding="12px 24px">
+        <mj-button href="#" mj-class="t-btn-primary" font-size="14px">
           <p>Explore now</p>
         </mj-button>
       </mj-column>
     </mj-section>
 
     <!-- What's New Section -->
-    <mj-section background-color="#ffffff">
+    <mj-section mj-class="t-surface-1">
       <mj-column>
         <mj-spacer></mj-spacer>
         <mj-text font-size="24px" font-weight="bold" padding-bottom="10px">
           <p>What's new in Cloud Creative</p>
         </mj-text>
-        <mj-text font-size="16px">
+        <mj-text mj-class="t-body">
           <p>We're constantly improving our tools to help you create at your best. Check out these exciting updates:</p>
         </mj-text>
       </mj-column>
     </mj-section>
 
     <!-- New Features Cards -->
-    <mj-section background-color="#ffffff">
+    <mj-section mj-class="t-surface-1">
       <mj-column width="50%">
         <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/brush-line.png', null, null, true) }}" width="36px" padding-bottom="0px" align="left" alt="Designer Icon" />
         <mj-text font-weight="bold" font-size="18px">
@@ -49,7 +61,7 @@
         <mj-text>
           <p>New AI-powered selection tools and enhanced neural filters.</p>
         </mj-text>
-        <mj-button href="#" background-color="transparent" border="3px solid #1473E6" inner-padding="6px 18px" border-radius="20px" color="#1473E6" font-weight="bold" align="left">
+        <mj-button href="#" mj-class="t-btn-secondary" align="left">
           <p>Learn more</p>
         </mj-button>
         <mj-spacer></mj-spacer>
@@ -62,7 +74,7 @@
         <mj-text>
           <p>Improved 3D effects and new pattern creation tools.</p>
         </mj-text>
-        <mj-button href="#" background-color="transparent" border="3px solid #1473E6" inner-padding="6px 18px" border-radius="20px" color="#1473E6" font-weight="bold" align="left">
+        <mj-button href="#" mj-class="t-btn-secondary" align="left">
           <p>Learn more</p>
         </mj-button>
         <mj-spacer></mj-spacer>
@@ -76,7 +88,7 @@
         <mj-text font-size="24px" font-weight="bold" padding-bottom="10px" align="center">
           <p>Master new skills</p>
         </mj-text>
-        <mj-text font-size="16px" align="center">
+        <mj-text mj-class="t-body" align="center">
           <p>Enhance your creativity with our latest tutorials:</p>
         </mj-text>
       </mj-column>
@@ -88,7 +100,7 @@
         <mj-text font-weight="bold" align="center">
           <p>Create stunning visual effects in Cloud After Effects</p>
         </mj-text>
-        <mj-button href="#" background-color="transparent" border="3px solid #1473E6" inner-padding="6px 18px" border-radius="20px" color="#1473E6" font-weight="bold">
+        <mj-button href="#" mj-class="t-btn-secondary">
           <p>Watch tutorial</p>
         </mj-button>
         <mj-spacer></mj-spacer>
@@ -96,19 +108,19 @@
     </mj-section>
 
     <!-- Cloud Creative Plan Section -->
-    <mj-section background-color="#ffffff">
+    <mj-section mj-class="t-surface-1">
       <mj-column>
         <mj-spacer></mj-spacer>
         <mj-text font-size="24px" font-weight="bold" padding-bottom="10px" align="center">
           <p>Upgrade your Cloud Creative plan</p>
         </mj-text>
-        <mj-text font-size="16px" align="center">
+        <mj-text mj-class="t-body" align="center">
           <p>Get access to over 20+ creative desktop and mobile apps, including:</p>
         </mj-text>
       </mj-column>
     </mj-section>
 
-    <mj-section background-color="#ffffff">
+    <mj-section mj-class="t-surface-1">
       <mj-column width="33.33%">
         <mj-image src="{{ getAssetUrl('themes/'~template~'/assets/brush-line.png', null, null, true) }}" width="48px" alt="Cloud Designer" padding-bottom="10px" />
         <mj-text align="center">
@@ -129,9 +141,9 @@
       </mj-column>
     </mj-section>
 
-    <mj-section background-color="#ffffff">
+    <mj-section mj-class="t-surface-1">
       <mj-column>
-        <mj-button href="#" background-color="#1473E6" color="#ffffff" font-size="16px" font-weight="bold" border-radius="24px" padding="12px 24px">
+        <mj-button href="#" mj-class="t-btn-primary">
           <p>Upgrade now</p>
         </mj-button>
       </mj-column>
@@ -144,7 +156,7 @@
         <mj-text font-size="24px" font-weight="bold" padding-bottom="10px">
           <p>Community spotlight</p>
         </mj-text>
-        <mj-text font-size="16px">
+        <mj-text mj-class="t-body">
           <p>Check out this amazing work from our Cloud Creative community:</p>
         </mj-text>
       </mj-column>
@@ -176,7 +188,7 @@
 		</mj-image>
 		<mj-spacer>
 		</mj-spacer>
-		<mj-text font-family="Ubuntu, Helvetica, Arial, sans-serif" line-height="1.5" align="center" padding-top="0px" padding-bottom="0px" font-size="12px" color="white">
+		<mj-text line-height="1.5" align="center" padding-top="0px" padding-bottom="0px" font-size="12px" color="white">
 		  <p>{brand=name}
 			<br/>11111 Beautiful City, 1212 Nice Street
 			<br/>Brazil

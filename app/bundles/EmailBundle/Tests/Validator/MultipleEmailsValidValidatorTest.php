@@ -11,29 +11,29 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
+final class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
 {
     public function testNoEmailsProvided(): void
     {
         $emailValidatorMock = $this->createMock(EmailValidator::class);
-        $constraintMock     = $this->createMock(Constraint::class);
+        $constraintMock     = $this->createStub(Constraint::class);
 
         $emailValidatorMock->expects($this->never())
             ->method('validate');
 
         $multipleEmailsValidValidator = new MultipleEmailsValidValidator($emailValidatorMock);
 
-        $multipleEmailsValidValidator->validate(null, $constraintMock);
+        $multipleEmailsValidValidator->validate('', $constraintMock);
     }
 
     public function testValidEmails(): void
     {
         $emailValidatorMock = $this->createMock(EmailValidator::class);
-        $constraintMock     = $this->createMock(Constraint::class);
+        $constraintMock     = $this->createStub(Constraint::class);
         $matcher            = $this->exactly(2);
 
         $emailValidatorMock->expects($matcher)
-            ->method('validate')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('validate')->willReturnCallback(function (...$parameters) use ($matcher): void {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('john@don.com', $parameters[0]);
                 }
@@ -51,7 +51,7 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
     public function testNotValidEmails(): void
     {
         $emailValidatorMock                      = $this->createMock(EmailValidator::class);
-        $constraintMock                          = $this->createMock(Constraint::class);
+        $constraintMock                          = $this->createStub(Constraint::class);
         $executionContextInterfaceMock           = $this->createMock(ExecutionContextInterface::class);
         $constraintViolationBuilderInterfaceMock = $this->createMock(ConstraintViolationBuilderInterface::class);
 
@@ -73,5 +73,31 @@ class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
 
         $emails = 'xxx';
         $multipleEmailsValidValidator->validate($emails, $constraintMock);
+    }
+
+    public function testZeroValueIsValidated(): void
+    {
+        $emailValidatorMock                      = $this->createMock(EmailValidator::class);
+        $constraintMock                          = $this->createStub(Constraint::class);
+        $executionContextInterfaceMock           = $this->createMock(ExecutionContextInterface::class);
+        $constraintViolationBuilderInterfaceMock = $this->createMock(ConstraintViolationBuilderInterface::class);
+
+        $emailValidatorMock->expects($this->once())
+            ->method('validate')
+            ->with('0')
+            ->willThrowException(new InvalidEmailException('0'));
+
+        $executionContextInterfaceMock->expects($this->once())
+            ->method('buildViolation')
+            ->willReturn($constraintViolationBuilderInterfaceMock);
+
+        $constraintViolationBuilderInterfaceMock->expects($this->once())
+            ->method('addViolation')
+            ->with();
+
+        $multipleEmailsValidValidator = new MultipleEmailsValidValidator($emailValidatorMock);
+        $multipleEmailsValidValidator->initialize($executionContextInterfaceMock);
+
+        $multipleEmailsValidValidator->validate('0', $constraintMock);
     }
 }

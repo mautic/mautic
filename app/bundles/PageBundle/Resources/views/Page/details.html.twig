@@ -56,7 +56,6 @@
         'entity': activePage,
         'status': 'available'
     }) -}}
-    <div class="label__divider"></div>
 
     {% set blueTags = [] %}
     {% set grayTags = [] %}
@@ -74,20 +73,29 @@
     {% endif %}
 
     {% if activePage.isVariant and not activePage.isVariant(true) %}
-        {% set grayTags = grayTags|merge([{ type: 'read-only', color: 'warm-gray', label: 'mautic.email.icon_tooltip.abtest' }]) %}
+        {% set grayTags = grayTags|merge([{ type: 'read-only', color: 'blue', icon_only: true, label: 'mautic.email.icon_tooltip.abtest', icon: 'ri-a-b' }]) %}
     {% endif %}
 
     {% if activePage.isVariant(true) %}
-        {% set grayTags = grayTags|merge([{ color: 'warm-gray', label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}), icon: 'ri-organization-chart' }]) %}
+        {% set grayTags = grayTags|merge([{
+            color: 'warm-gray',
+            label: 'mautic.core.variant_of'|trans({'%parent%' : variants.parent.getName()}),
+            icon: 'ri-organization-chart',
+            attributes: {
+                'href': path('mautic_page_action', {'objectAction': 'view', 'objectId': variants.parent.id}),
+                'data-toggle': 'ajax'
+            }
+        }]) %}
     {% endif %}
 
     {% if activePage.isTranslation(true) %}
-        {% set grayTags = grayTags|merge([{ 
-            color: 'warm-gray', 
-            label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}), 
+        {% set grayTags = grayTags|merge([{
+            color: 'warm-gray',
+            label: 'mautic.core.translation_of'|trans({'%parent%' : translations.parent.getName()}),
             icon: 'ri-translate',
             attributes: {
-                'href': path('mautic_page_action', {'objectAction': 'view', 'objectId': translations.parent.id})
+                'href': path('mautic_page_action', {'objectAction': 'view', 'objectId': translations.parent.id}),
+                'data-toggle': 'ajax'
             }
         }]) %}
     {% endif %}
@@ -96,7 +104,11 @@
         {% set grayTags = grayTags|merge([{ label: activePage.language|language_name, icon: 'ri-translate-2', color: 'warm-gray', attributes: { 'data-toggle': 'tooltip', 'data-placement': 'top', 'title': 'mautic.core.language'|trans } }]) %}
     {% endif %}
 
-    {% include '@MauticCore/Helper/_tag.html.twig' with { tags: blueTags|merge(grayTags) } %}
+    {% set allTags = blueTags|merge(grayTags) %}
+    {% if allTags is not empty %}
+        <div class="label__divider"></div>
+        {% include '@MauticCore/Helper/_tag.html.twig' with { tags: allTags } %}
+    {% endif %}
 
 {% endblock %}
 
@@ -163,13 +175,13 @@
                       <div class="col-sm-12">
                           <div class="panel">
                               <div class="panel-body box-layout">
-                                  <div class="col-md-3 va-m">
+                                  <div class="col-md-3 align-middle">
                                       <h5 class="text-white dark-md fw-sb mb-xs">
                                           <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.page.pageviews'|trans }}
                                       </h5>
                                   </div>
-                                  <div class="col-md-9 va-m">
+                                  <div class="col-md-9 align-middle">
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>

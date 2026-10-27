@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-final class AnalyticsHelper
+final readonly class AnalyticsHelper
 {
     private string $code;
 
@@ -24,7 +24,7 @@ final class AnalyticsHelper
     public function addCode($content): string
     {
         // Add analytics
-        $analytics = $this->getCode();
+        $analytics = $this->code;
 
         // Check for html doc
         if (!str_contains($content, '<html')) {

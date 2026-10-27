@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class InternalObjectCreateEvent extends Event
+final class InternalObjectCreateEvent extends Event
 {
     /**
      * @var ObjectMapping[]
@@ -16,8 +16,8 @@ class InternalObjectCreateEvent extends Event
     private array $objectMappings = [];
 
     public function __construct(
-        private ObjectInterface $object,
-        private array $createObjects,
+        private readonly ObjectInterface $object,
+        private readonly array $createObjects,
     ) {
     }
 

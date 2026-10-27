@@ -10,7 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class CheckStepType extends AbstractType
+final class CheckStepType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -24,7 +24,7 @@ class CheckStepType extends AbstractType
                         'label' => 'mautic.install.next.step',
                         'type'  => 'submit',
                         'attr'  => [
-                            'class'   => 'btn btn-success pull-right btn-next',
+                            'class'   => 'btn btn-success float-end btn-next',
                             'icon'    => 'ri-arrow-right-circle-line',
                             'onclick' => 'MauticInstaller.showWaitMessage(event);',
                         ],

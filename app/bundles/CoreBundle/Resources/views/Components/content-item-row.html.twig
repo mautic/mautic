@@ -1,4 +1,3 @@
-{# Common blocks #}
 {% set common_header_content %}
     {% if eyebrow is defined %}
         <div class="content-item__eyebrow type-label-01 text-secondary mb-xs">{{ eyebrow|trans }}</div>
@@ -20,7 +19,7 @@
     {% endif %}
 {% endset %}
 
-<div class="row">
+<div class="row mb-64">
     <hr class="mt-32">
 
     {# === MEDIA TYPE === #}
@@ -29,7 +28,7 @@
             {{ common_header_content }}
             {{ common_footer_content }}
         </div>
-        <div class="col-sm-8 col-xs-12 mb-64">
+        <div class="col-sm-8 col-xs-12">
             {{ common_image_content }}
         </div>
 
@@ -41,7 +40,7 @@
         <div class="col-sm-8 col-xs-12">
             {{ common_footer_content }}
         </div>
-        <div class="col-xs-12 mb-64">
+        <div class="col-xs-12">
             {{ common_image_content }}
         </div>
 
@@ -50,7 +49,7 @@
         <div class="col-sm-4 col-xs-12 mb-xs">
             {{ common_header_content }}
         </div>
-        <div class="col-sm-8 col-xs-12 mb-64">
+        <div class="col-sm-8 col-xs-12">
             {{ common_footer_content }}
             {{ common_image_content }}
         </div>

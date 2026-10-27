@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Report;
 
 use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 
-class ObjectDAO
+final class ObjectDAO
 {
     /**
      * @var FieldDAO[]
@@ -36,10 +36,7 @@ class ObjectDAO
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function addField(FieldDAO $fieldDAO)
+    public function addField(FieldDAO $fieldDAO): static
     {
         $this->fields[$fieldDAO->getName()] = $fieldDAO;
 
@@ -63,13 +60,9 @@ class ObjectDAO
     }
 
     /**
-     * @param string $name
-     *
-     * @return FieldDAO|null
-     *
      * @throws FieldNotFoundException
      */
-    public function getField($name)
+    public function getField(string $name): FieldDAO
     {
         if (!isset($this->fields[$name])) {
             throw new FieldNotFoundException($name, $this->object);

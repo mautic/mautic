@@ -8,6 +8,8 @@ class ContactSegmentFilterCrate
 
     public const COMPANY_OBJECT   = 'company';
 
+    public const COMPANY_ALL_OBJECT = 'company_all';
+
     public const BEHAVIORS_OBJECT = 'behaviors';
 
     /**
@@ -40,7 +42,7 @@ class ContactSegmentFilterCrate
      */
     private $operator;
 
-    private array $sourceArray;
+    private readonly array $sourceArray;
 
     private $nullValue;
 
@@ -87,7 +89,7 @@ class ContactSegmentFilterCrate
 
     public function isCompanyType(): bool
     {
-        return self::COMPANY_OBJECT === $this->object;
+        return in_array($this->object, [self::COMPANY_OBJECT, self::COMPANY_ALL_OBJECT], true);
     }
 
     public function isBehaviorsType(): bool
@@ -101,14 +103,16 @@ class ContactSegmentFilterCrate
     public function getFilter()
     {
         $excludeTypecastOperators = [
-            OperatorOptions::IN,
-            OperatorOptions::NOT_IN,
+            OperatorOptions::INCLUDING_ANY,
+            OperatorOptions::EXCLUDING_ANY,
+            OperatorOptions::INCLUDING_ALL,
+            OperatorOptions::EXCLUDING_ALL,
             OperatorOptions::REGEXP,
             OperatorOptions::NOT_REGEXP,
         ];
 
-        if (!in_array($this->operator, $excludeTypecastOperators)) {
-            switch ($this->getType()) {
+        if (!in_array($this->operator, $excludeTypecastOperators, true)) {
+            switch ($this->type) {
                 case 'number':
                     return (float) $this->filter;
                 case 'boolean':
@@ -129,22 +133,22 @@ class ContactSegmentFilterCrate
 
     public function isBooleanType(): bool
     {
-        return 'boolean' === $this->getType();
+        return 'boolean' === $this->type;
     }
 
     public function isNumberType(): bool
     {
-        return 'number' === $this->getType();
+        return 'number' === $this->type;
     }
 
     public function isDateType(): bool
     {
-        return 'date' === $this->getType() || $this->hasTimeParts();
+        return 'date' === $this->type || $this->hasTimeParts();
     }
 
     public function hasTimeParts(): bool
     {
-        return 'datetime' === $this->getType();
+        return 'datetime' === $this->type;
     }
 
     /**
@@ -163,10 +167,7 @@ class ContactSegmentFilterCrate
         return $this->type;
     }
 
-    /**
-     * @return array
-     */
-    public function getArray()
+    public function getArray(): array
     {
         return $this->sourceArray;
     }
@@ -175,13 +176,13 @@ class ContactSegmentFilterCrate
     {
         $operator = $filter['operator'] ?? null;
 
-        if ('multiselect' === $this->getType() && in_array($operator, ['in', '!in'])) {
-            $neg            = !str_contains($operator, '!') ? '' : '!';
-            $this->operator = $neg.$this->getType();
+        if ('multiselect' === $this->type && in_array($operator, [OperatorOptions::INCLUDING_ANY, OperatorOptions::EXCLUDING_ANY, OperatorOptions::INCLUDING_ALL, OperatorOptions::EXCLUDING_ALL])) {
+            $neg            = !str_contains((string) $operator, '!') ? '' : '!';
+            $this->operator = $neg.$this->type;
 
             return;
         }
-        if ('page_id' === $this->getField() || 'email_id' === $this->getField() || 'redirect_id' === $this->getField() || 'notification' === $this->getField()) {
+        if ('page_id' === $this->field || 'email_id' === $this->field || 'redirect_id' === $this->field || 'notification' === $this->field) {
             $operator = ('=' === $operator) === $this->getFilter() ? 'notEmpty' : 'empty';
         }
 

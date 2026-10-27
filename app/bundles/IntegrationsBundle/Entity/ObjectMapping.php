@@ -15,7 +15,7 @@ class ObjectMapping
      */
     private $id;
 
-    private ?\DateTimeInterface $dateCreated;
+    private readonly ?\DateTimeInterface $dateCreated;
 
     /**
      * @var string
@@ -134,7 +134,7 @@ class ObjectMapping
     }
 
     /**
-     * @return int|null ?int
+     * @return int|null
      */
     public function getId()
     {
@@ -143,26 +143,21 @@ class ObjectMapping
 
     /**
      * @param int $id
-     *
-     * @return ObjectMapping
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateCreated()
+    public function getDateCreated(): ?\DateTimeInterface
     {
         return $this->dateCreated;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIntegration()
     {
@@ -171,10 +166,8 @@ class ObjectMapping
 
     /**
      * @param string $integration
-     *
-     * @return ObjectMapping
      */
-    public function setIntegration($integration)
+    public function setIntegration($integration): static
     {
         $this->integration = $integration;
 
@@ -182,7 +175,7 @@ class ObjectMapping
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getInternalObjectName()
     {
@@ -191,10 +184,8 @@ class ObjectMapping
 
     /**
      * @param string $internalObjectName
-     *
-     * @return ObjectMapping
      */
-    public function setInternalObjectName($internalObjectName)
+    public function setInternalObjectName($internalObjectName): static
     {
         $this->internalObjectName = $internalObjectName;
 
@@ -208,10 +199,8 @@ class ObjectMapping
 
     /**
      * @param int $internalObjectId
-     *
-     * @return ObjectMapping
      */
-    public function setInternalObjectId($internalObjectId)
+    public function setInternalObjectId($internalObjectId): static
     {
         $this->internalObjectId = (string) $internalObjectId;
 
@@ -219,7 +208,7 @@ class ObjectMapping
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIntegrationObjectName()
     {
@@ -228,10 +217,8 @@ class ObjectMapping
 
     /**
      * @param string $integrationObjectName
-     *
-     * @return ObjectMapping
      */
-    public function setIntegrationObjectName($integrationObjectName)
+    public function setIntegrationObjectName($integrationObjectName): static
     {
         $this->integrationObjectName = $integrationObjectName;
 
@@ -239,7 +226,7 @@ class ObjectMapping
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getIntegrationObjectId()
     {
@@ -248,30 +235,23 @@ class ObjectMapping
 
     /**
      * @param string $integrationObjectId
-     *
-     * @return ObjectMapping
      */
-    public function setIntegrationObjectId($integrationObjectId)
+    public function setIntegrationObjectId($integrationObjectId): static
     {
         $this->integrationObjectId = $integrationObjectId;
 
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getLastSyncDate()
+    public function getLastSyncDate(): ?\DateTimeInterface
     {
         return $this->lastSyncDate;
     }
 
     /**
      * @param \DateTimeInterface|null $lastSyncDate
-     *
-     * @return ObjectMapping
      */
-    public function setLastSyncDate($lastSyncDate)
+    public function setLastSyncDate($lastSyncDate): static
     {
         if (null === $lastSyncDate) {
             $lastSyncDate = new \DateTime();
@@ -292,20 +272,15 @@ class ObjectMapping
 
     /**
      * @param array $internalStorage
-     *
-     * @return ObjectMapping
      */
-    public function setInternalStorage($internalStorage)
+    public function setInternalStorage($internalStorage): static
     {
         $this->internalStorage = $internalStorage;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function appendToInternalStorage($key, $value)
+    public function appendToInternalStorage($key, $value): static
     {
         $this->internalStorage[$key] = $value;
 
@@ -322,10 +297,8 @@ class ObjectMapping
 
     /**
      * @param bool $isDeleted
-     *
-     * @return ObjectMapping
      */
-    public function setIsDeleted($isDeleted)
+    public function setIsDeleted($isDeleted): static
     {
         $this->isDeleted = $isDeleted;
 
@@ -342,10 +315,8 @@ class ObjectMapping
 
     /**
      * @param string|null $integrationReferenceId
-     *
-     * @return ObjectMapping
      */
-    public function setIntegrationReferenceId($integrationReferenceId)
+    public function setIntegrationReferenceId($integrationReferenceId): static
     {
         $this->integrationReferenceId = $integrationReferenceId;
 

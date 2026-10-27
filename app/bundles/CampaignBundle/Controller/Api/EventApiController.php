@@ -8,6 +8,7 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\FieldExclusionStrategy;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -22,15 +23,24 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<Event>
  */
-class EventApiController extends CommonApiController
+final class EventApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $campaignEventModel = $modelFactory->getModel('campaign.event');
-        \assert($campaignEventModel instanceof EventModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        EventModel $campaignEventModel,
+    ) {
         $this->model                    = $campaignEventModel;
         $this->entityClass              = Event::class;
         $this->entityNameOne            = 'event';
@@ -45,10 +55,7 @@ class EventApiController extends CommonApiController
     }
 
     /**
-     * @param Event  $entity
-     * @param string $action
-     *
-     * @return bool|mixed
+     * @param Event|FormEntity $entity
      */
     protected function checkEntityAccess($entity, $action = 'view')
     {

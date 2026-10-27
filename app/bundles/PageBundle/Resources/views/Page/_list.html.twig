@@ -36,6 +36,13 @@
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'page',
+                        'orderBy': 'p.template',
+                        'text': 'mautic.core.form.theme',
+                        'class': 'visible-md visible-lg col-page-template',
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'page',
                         'orderBy': 'p.hits',
                         'text': 'mautic.page.thead.hits',
                         'class': 'col-page-hits visible-md visible-lg',
@@ -162,6 +169,13 @@
                     </td>
                     <td class="visible-md visible-lg">
                         {{ include('@MauticCore/Modules/category--expanded.html.twig', {'category': item.category}) }}
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% if item.template %}
+                            {{ getThemeName(item.template) }}
+                        {% else %}
+                            <span class="text-muted">{{ 'mautic.core.form.default'|trans }}</span>
+                        {% endif %}
                     </td>
                     <td class="visible-md visible-lg">{{ item.hits }}</td>
                     <td class="visible-md visible-lg" title="{% if item.dateAdded %}{{ dateToFullConcat(item.dateAdded) }}{% endif %}">

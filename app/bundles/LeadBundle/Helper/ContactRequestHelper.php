@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
@@ -24,26 +23,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContactRequestHelper
 {
-    /**
-     * @var Lead|null
-     */
-    private $trackedContact;
+    private ?Lead $trackedContact = null;
 
     private array $queryFields = [];
 
     private array $publiclyUpdatableFieldValues = [];
 
     public function __construct(
-        private LeadModel $leadModel,
-        private ContactTracker $contactTracker,
-        private CoreParametersHelper $coreParametersHelper,
-        private IpLookupHelper $ipLookupHelper,
-        private RequestStack $requestStack,
-        private LoggerInterface $logger,
-        private EventDispatcherInterface $eventDispatcher,
-        private ContactMerger $contactMerger,
-        private StatRepository $statRepository,
-        private BotRatioHelper $botRatioHelper,
+        private readonly LeadModel $leadModel,
+        private readonly ContactTracker $contactTracker,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly RequestStack $requestStack,
+        private readonly LoggerInterface $logger,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ContactMerger $contactMerger,
+        private readonly StatRepository $statRepository,
+        private readonly BotRatioHelper $botRatioHelper,
     ) {
     }
 
@@ -123,10 +118,8 @@ class ContactRequestHelper
         } catch (ContactNotFoundException) {
         }
 
-        $this->setEmailFromClickthroughIdentification($clickthrough);
-
-        /* @var Lead $foundContact */
-        if (!empty($this->queryFields)) {
+        if ([] !== $this->queryFields) {
+            /** @var Lead $foundContact */
             [$foundContact, $this->publiclyUpdatableFieldValues] = $this->leadModel->checkForDuplicateContact(
                 $this->queryFields,
                 true,
@@ -140,7 +133,7 @@ class ContactRequestHelper
                 }
             }
 
-            if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {
+            if (null === $this->trackedContact || $foundContact->getId() !== $this->trackedContact->getId()) {
                 // A contact was found by a publicly updatable field
                 if (!$foundContact->isNew()) {
                     return $foundContact;
@@ -173,26 +166,6 @@ class ContactRequestHelper
         throw new ContactNotFoundException();
     }
 
-    private function setEmailFromClickthroughIdentification(array $clickthrough): void
-    {
-        if (!$this->coreParametersHelper->get('track_by_tracking_url') || !empty($queryFields['email'])) {
-            return;
-        }
-
-        if (empty($clickthrough['lead']) || !$foundContact = $this->leadModel->getEntity($clickthrough['lead'])) {
-            return;
-        }
-
-        // Identify contact from link if email field is set as publicly updateable
-        if ($email = $foundContact->getEmail()) {
-            // Add email to query for checkForDuplicateContact to pick up and merge
-            $this->queryFields['email'] = $email;
-            $this->logger->debug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
-
-            return;
-        }
-    }
-
     private function prepareContactFromRequest(): void
     {
         $ipAddress          = $this->ipLookupHelper->getIpAddress();
@@ -201,7 +174,7 @@ class ContactRequestHelper
             $this->trackedContact->addIpAddress($ipAddress);
         }
 
-        if (!empty($this->publiclyUpdatableFieldValues)) {
+        if ([] !== $this->publiclyUpdatableFieldValues) {
             $this->leadModel->setFieldValues(
                 $this->trackedContact,
                 $this->publiclyUpdatableFieldValues,

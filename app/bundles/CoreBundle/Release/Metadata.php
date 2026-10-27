@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Release;
 
-final class Metadata implements \JsonSerializable
+final readonly class Metadata implements \JsonSerializable
 {
     private string $version;
 

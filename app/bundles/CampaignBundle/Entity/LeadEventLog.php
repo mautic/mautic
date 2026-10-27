@@ -2,14 +2,20 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Entity\OptimisticLockInterface;
+use Mautic\CoreBundle\Entity\OptimisticLockTrait;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
-class LeadEventLog implements ChannelInterface
+class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 {
+    use OptimisticLockTrait;
+
     public const TABLE_NAME = 'campaign_lead_event_log';
 
     /**
@@ -39,7 +45,7 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * @var \DateTimeInterface|null
-     **/
+     */
     private $dateTriggered;
 
     /**
@@ -94,10 +100,12 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * Subscribers can fail log with custom reschedule interval.
-     *
-     * @var \DateInterval|null
      */
-    private $rescheduleInterval;
+    private ?\DateInterval $rescheduleInterval = null;
+
+    private ?\DateTime $dateQueued = null;
+
+    private bool $isExecuted = false;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -108,7 +116,7 @@ class LeadEventLog implements ChannelInterface
             ->addIndex(['is_scheduled', 'lead_id'], 'campaign_event_upcoming_search')
             ->addIndex(['campaign_id', 'is_scheduled', 'trigger_date'], 'campaign_event_schedule_counts')
             ->addIndex(['date_triggered'], 'campaign_date_triggered')
-            ->addIndex(['lead_id', 'campaign_id', 'rotation'], 'campaign_leads')
+            ->addIndex(['campaign_id', 'lead_id', 'rotation'], 'campaign_leads')
             ->addIndex(['channel', 'channel_id', 'lead_id'], 'campaign_log_channel')
             ->addIndex(['campaign_id', 'event_id', 'date_triggered'], 'campaign_actions')
             ->addIndex(['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], 'campaign_stats')
@@ -168,6 +176,13 @@ class LeadEventLog implements ChannelInterface
             ->fetchExtraLazy()
             ->cascadeAll()
             ->build();
+
+        $builder->createField('dateQueued', Types::DATETIME_MUTABLE)
+            ->columnName('date_queued')
+            ->nullable()
+            ->build();
+
+        self::addVersionField($builder);
     }
 
     /**
@@ -224,10 +239,7 @@ class LeadEventLog implements ChannelInterface
         return $this->dateTriggered;
     }
 
-    /**
-     * @return $this
-     */
-    public function setDateTriggered(?\DateTimeInterface $dateTriggered = null)
+    public function setDateTriggered(?\DateTimeInterface $dateTriggered = null): static
     {
         $this->dateTriggered = $dateTriggered;
         if (null !== $dateTriggered) {
@@ -245,10 +257,7 @@ class LeadEventLog implements ChannelInterface
         return $this->ipAddress;
     }
 
-    /**
-     * @return $this
-     */
-    public function setIpAddress(IpAddress $ipAddress)
+    public function setIpAddress(IpAddress $ipAddress): static
     {
         $this->ipAddress = $ipAddress;
 
@@ -263,10 +272,7 @@ class LeadEventLog implements ChannelInterface
         return $this->lead;
     }
 
-    /**
-     * @return $this
-     */
-    public function setLead(LeadEntity $lead)
+    public function setLead(LeadEntity $lead): static
     {
         $this->lead = $lead;
 
@@ -281,12 +287,7 @@ class LeadEventLog implements ChannelInterface
         return $this->event;
     }
 
-    /***
-     * @param $event
-     *
-     * @return $this
-     */
-    public function setEvent(Event $event)
+    public function setEvent(Event $event): static
     {
         $this->event = $event;
 
@@ -307,10 +308,8 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * @param bool $isScheduled
-     *
-     * @return $this
      */
-    public function setIsScheduled($isScheduled)
+    public function setIsScheduled($isScheduled): static
     {
         if (null === $this->previousScheduledState) {
             $this->previousScheduledState = $this->isScheduled;
@@ -339,15 +338,23 @@ class LeadEventLog implements ChannelInterface
         return $this->triggerDate;
     }
 
-    /**
-     * @return $this
-     */
-    public function setTriggerDate(?\DateTimeInterface $triggerDate = null)
+    public function setTriggerDate(?\DateTimeInterface $triggerDate = null, ?string $note = null): static
     {
         $this->triggerDate = $triggerDate;
         $this->setIsScheduled(true);
+        $this->logTriggerDateChange($triggerDate, $note);
 
         return $this;
+    }
+
+    private function logTriggerDateChange(?\DateTimeInterface $newTriggerDate, ?string $note): void
+    {
+        $this->metadata['triggerDateLog'] ??= [];
+        $this->metadata['triggerDateLog'][] = [
+            'date'      => (new \DateTime())->format(DateTimeHelper::FORMAT_DB),
+            'changedTo' => $newTriggerDate ? $newTriggerDate->format(DateTimeHelper::FORMAT_DB) : null,
+            'note'      => $note,
+        ];
     }
 
     /**
@@ -358,10 +365,7 @@ class LeadEventLog implements ChannelInterface
         return $this->campaign;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCampaign(Campaign $campaign)
+    public function setCampaign(Campaign $campaign): static
     {
         $this->campaign = $campaign;
 
@@ -378,10 +382,8 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * @param bool $systemTriggered
-     *
-     * @return $this
      */
-    public function setSystemTriggered($systemTriggered)
+    public function setSystemTriggered($systemTriggered): static
     {
         $this->systemTriggered = $systemTriggered;
 
@@ -389,7 +391,7 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function getNonActionPathTaken()
     {
@@ -398,10 +400,8 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * @param bool $nonActionPathTaken
-     *
-     * @return $this
      */
-    public function setNonActionPathTaken($nonActionPathTaken)
+    public function setNonActionPathTaken($nonActionPathTaken): static
     {
         $this->nonActionPathTaken = $nonActionPathTaken;
 
@@ -409,7 +409,7 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @return mixed[]|null
+     * @return mixed[]
      */
     public function getMetadata()
     {
@@ -431,10 +431,8 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * @param mixed[] $metadata
-     *
-     * @return $this
      */
-    public function setMetadata($metadata)
+    public function setMetadata($metadata): static
     {
         if (!is_array($metadata)) {
             // Assumed output for timeline
@@ -479,7 +477,7 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @return int|null
+     * @return int
      */
     public function getRotation()
     {
@@ -488,10 +486,8 @@ class LeadEventLog implements ChannelInterface
 
     /**
      * @param int $rotation
-     *
-     * @return LeadEventLog
      */
-    public function setRotation($rotation)
+    public function setRotation($rotation): static
     {
         $this->rotation = (int) $rotation;
 
@@ -506,10 +502,7 @@ class LeadEventLog implements ChannelInterface
         return $this->failedLog;
     }
 
-    /**
-     * @return $this
-     */
-    public function setFailedLog(?FailedLeadEventLog $log = null)
+    public function setFailedLog(?FailedLeadEventLog $log = null): static
     {
         $this->failedLog = $log;
 
@@ -518,7 +511,7 @@ class LeadEventLog implements ChannelInterface
 
     public function isFailed(): bool
     {
-        $log = $this->getFailedLog();
+        $log = $this->failedLog;
 
         return !empty($log);
     }
@@ -536,5 +529,27 @@ class LeadEventLog implements ChannelInterface
     public function getRescheduleInterval(): ?\DateInterval
     {
         return $this->rescheduleInterval;
+    }
+
+    public function getDateQueued(): ?\DateTime
+    {
+        return $this->dateQueued;
+    }
+
+    public function setDateQueued(?\DateTime $dateQueued): self
+    {
+        $this->dateQueued = $dateQueued;
+
+        return $this;
+    }
+
+    public function isExecuted(): bool
+    {
+        return $this->isExecuted;
+    }
+
+    public function setIsExecuted(bool $isExecuted): void
+    {
+        $this->isExecuted = $isExecuted;
     }
 }

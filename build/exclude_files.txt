@@ -1,6 +1,7 @@
 *.git*
 *.idea*
 .ddev/*
+.devcontainer/*
 .DS_Store
 .env.dist
 .github/*
@@ -8,7 +9,6 @@
 .php-cs-fixer.php
 .travis.yml
 codecov.yml
-Gruntfile.js
 README.md
 UPGRADE*.md
 app/console

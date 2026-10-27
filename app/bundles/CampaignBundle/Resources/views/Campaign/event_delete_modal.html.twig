@@ -1,0 +1,34 @@
+<div class="modal fade" id="campaignEventDeleteModal" tabindex="-1" role="dialog" aria-labelledby="campaignEventDeleteModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="campaignEventDeleteModalLabel">{{ 'mautic.campaign.event.delete'|trans }}</h4>
+            </div>
+            <div class="modal-body">
+                <form id="campaignEventDeleteForm">
+                    <div class="form-group">
+                        <label for="campaignEventDeleteRedirect" id="campaignEventDeleteRedirectLabel">{{ 'mautic.campaign.event.delete.redirect_description'|trans }}</label>
+                        <select class="form-control required" id="campaignEventDeleteRedirect">
+                            <option value="">{{ 'mautic.campaign.event.delete.do_not_redirect'|trans }}</option>
+                        </select>
+                    </div>
+                    <input type="hidden" id="campaignEventDeleteUrl" value="">
+                    <input type="hidden" id="campaignEventDeleteTarget" value="">
+                    <input type="hidden" id="campaignEventDeleteCampaignId" value="">
+
+                    <div id="campaignEventDeleteWarning" class="alert alert-warning mt-2" style="display: none; margin-top: 15px;">
+                        <span class="warning-message"></span><br/><br/>
+                        <button type="button" class="btn btn-danger btn-sm" id="campaignEventDeleteFinalConfirm">{{ 'mautic.core.form.confirm'|trans }}</button>
+                        <button type="button" class="btn btn-default btn-sm" id="campaignEventDeleteCancel">{{ 'mautic.core.form.cancel'|trans }}</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{{ 'mautic.core.form.cancel'|trans }}</button>
+                <button type="button" class="btn btn-danger" id="campaignEventDeleteConfirm">{{ 'mautic.campaign.event.delete.redirect_event'|trans }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+

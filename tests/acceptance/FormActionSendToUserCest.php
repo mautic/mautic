@@ -3,7 +3,7 @@
 use Page\Acceptance\FormPage;
 use Step\Acceptance\FormStep;
 
-class FormActionSendToUserCest
+final class FormActionSendToUserCest
 {
     public function _before(AcceptanceTester $I): void
     {
@@ -18,15 +18,12 @@ class FormActionSendToUserCest
         // Go to create new form
         $I->amOnPage(FormPage::$URL);
 
-        // Select standalone form
-        $form->selectAStandAloneType();
-
         // Fill basic form info
         $form->addFormMetaData();
 
         // Add First Name field
         $I->click('Fields');
-        $I->waitForText('Add a new field', 3);
+        $I->waitForText('Add a new field', AcceptanceTester::TIMEOUT);
 
         // Add First Name field
         $form->createFormField(FormPage::$FORM_FIELD_TEXT_SHORT_ANSWER_SELECTOR, 'Text: Short answer', 'First Name');
@@ -37,10 +34,10 @@ class FormActionSendToUserCest
         // Add "Send form results" action
         $I->click('Actions');
 
-        $I->waitForText('Add a new submit action', 3);
+        $I->waitForText('Add a new submit action', AcceptanceTester::TIMEOUT);
         $I->click('Add a new submit action');
         $I->click('//li[contains(text(), "Send form results")]');
-        $I->waitForText('Send form results', 2);
+        $I->waitForText('Send form results', AcceptanceTester::TIMEOUT);
 
         // Assert token insertion
         $message = $I->grabValueFrom('#formaction_properties_message');
@@ -56,6 +53,8 @@ class FormActionSendToUserCest
         $I->assertEquals(1, substr_count($message, '<strong>Email Address</strong>: {formfield=email_address}'));
 
         // Save the action
-        $I->executeJS("document.querySelector('button[name=\"formaction[buttons][save]\"]').click();");
+        $I->waitForElement(FormPage::$actionModalSaveButton, AcceptanceTester::TIMEOUT);
+        $I->executeJS('document.querySelector(\'button[name="formaction[buttons][save]"]\').click();');
+        $I->waitForElementNotVisible(FormPage::$actionModalSelector, AcceptanceTester::TIMEOUT);
     }
 }

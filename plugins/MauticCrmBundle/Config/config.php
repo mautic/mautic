@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'name'        => 'CRM',
     'description' => 'Enables integration with Mautic supported CRMs.',
@@ -19,16 +21,6 @@ return [
                 'controller'   => 'MauticPlugin\MauticCrmBundle\Controller\PublicController::companyDataAction',
                 'requirements' => [
                     'integration' => '.+',
-                ],
-            ],
-        ],
-    ],
-    'services' => [
-        'other' => [
-            'mautic_integration.service.transport' => [
-                'class'     => MauticPlugin\MauticCrmBundle\Services\Transport::class,
-                'arguments' => [
-                    'mautic.http.client',
                 ],
             ],
         ],

@@ -19,13 +19,19 @@ interface GeneratedColumnInterface
 
     public function getOriginalDateColumn(): ?string;
 
-    public function getTimeUnit(): string;
+    public function getTimeUnit(): ?string;
 
     public function getAlterTableSql(): string;
+
+    public function getAddColumnSql(): string;
+
+    public function getAddIndexSql(): string;
 
     public function getColumnDefinition(): string;
 
     public function getIndexColumns(): array;
 
     public function getIndexName(): string;
+
+    public function getFilterDateColumn(): ?string;
 }

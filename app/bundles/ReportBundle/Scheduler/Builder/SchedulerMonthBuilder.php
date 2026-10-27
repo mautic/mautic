@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Scheduler\Builder;
 
 use Mautic\ReportBundle\Scheduler\BuilderInterface;
@@ -10,7 +12,7 @@ use Recurr\Exception\InvalidArgument;
 use Recurr\Exception\InvalidRRule;
 use Recurr\Rule;
 
-class SchedulerMonthBuilder implements BuilderInterface
+final class SchedulerMonthBuilder implements BuilderInterface
 {
     /**
      * @throws InvalidSchedulerException

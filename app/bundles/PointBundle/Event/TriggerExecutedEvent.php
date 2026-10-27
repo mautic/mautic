@@ -11,31 +11,22 @@ class TriggerExecutedEvent extends Event
     private ?bool $result = null;
 
     public function __construct(
-        private TriggerEventEntity $triggerEvent,
-        private Lead $lead,
+        private readonly TriggerEventEntity $triggerEvent,
+        private readonly Lead $lead,
     ) {
     }
 
-    /**
-     * @return TriggerEventEntity
-     */
-    public function getTriggerEvent()
+    public function getTriggerEvent(): TriggerEventEntity
     {
         return $this->triggerEvent;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->lead;
     }
 
-    /**
-     * @return bool
-     */
-    public function getResult()
+    public function getResult(): ?bool
     {
         return $this->result;
     }

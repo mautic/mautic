@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Executioner\Result\Counter;
@@ -22,6 +24,13 @@ trait WriteCountTrait
             '<comment>'.$translator->trans(
                 'mautic.campaign.trigger.events_scheduled',
                 ['%count%' => $counter->getTotalScheduled()]
+            )
+            .'</comment>'
+        );
+        $output->writeln(
+            '<comment>'.$translator->trans(
+                'mautic.campaign.trigger.events_rescheduled',
+                ['%count%' => $counter->getRescheduled()]
             )
             .'</comment>'
         );

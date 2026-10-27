@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CampaignBundle\Form\Type\CampaignListType;
@@ -12,7 +14,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class DashboardBestHoursWidgetType extends AbstractType
+final class DashboardBestHoursWidgetType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -26,7 +28,7 @@ class DashboardBestHoursWidgetType extends AbstractType
             CompanyListType::class,
             [
                 'label'       => 'mautic.email.companyId.filter',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'empty_data'  => '',
                 'required'    => false,
@@ -40,7 +42,7 @@ class DashboardBestHoursWidgetType extends AbstractType
             CampaignListType::class,
             [
                 'label'       => 'mautic.email.campaignId.filter',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'empty_data'  => '',
                 'placeholder' => '',
@@ -54,7 +56,7 @@ class DashboardBestHoursWidgetType extends AbstractType
             LeadListType::class,
             [
                 'label'      => 'mautic.email.segmentId.filter',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'empty_data' => '',
                 'required'   => false,

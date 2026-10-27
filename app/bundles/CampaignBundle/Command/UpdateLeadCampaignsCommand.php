@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
@@ -23,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
     description: 'Rebuild campaigns based on contact segments.',
     aliases: ['mautic:campaigns:update']
 )]
-class UpdateLeadCampaignsCommand extends ModeratedCommand
+final class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
     private int $runLimit = 0;
 
@@ -32,18 +33,18 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
     private bool $quiet = false;
 
     public function __construct(
-        private CampaignRepository $campaignRepository,
-        private TranslatorInterface $translator,
-        private MembershipBuilder $membershipBuilder,
-        private LoggerInterface $logger,
-        private FormatterHelper $formatterHelper,
+        private readonly CampaignRepository $campaignRepository,
+        private readonly TranslatorInterface $translator,
+        private readonly MembershipBuilder $membershipBuilder,
+        private readonly LoggerInterface $logger,
+        private readonly FormatterHelper $formatterHelper,
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
     ) {
         parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption('--batch-limit', '-l', InputOption::VALUE_OPTIONAL, 'Set batch size of contacts to process per round. Defaults to 300.', 300)
@@ -58,15 +59,13 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
                 '--campaign-id',
                 '-i',
                 InputOption::VALUE_OPTIONAL,
-                'Build membership for a specific campaign.  Otherwise, all campaigns will be rebuilt.',
-                null
+                'Build membership for a specific campaign.  Otherwise, all campaigns will be rebuilt.'
             )
             ->addOption(
                 '--contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Build membership for a specific contact.',
-                null
+                'Build membership for a specific contact.'
             )
             ->addOption(
                 '--contact-ids',
@@ -78,15 +77,13 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
                 '--min-contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Build membership starting at a specific contact ID.',
-                null
+                'Build membership starting at a specific contact ID.'
             )
             ->addOption(
                 '--max-contact-id',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Build membership up to a specific contact ID.',
-                null
+                'Build membership up to a specific contact ID.'
             )
             ->addOption(
                 '--thread-id',
@@ -153,11 +150,11 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
 
-            return \Symfony\Component\Console\Command\Command::FAILURE;
+            return Command::FAILURE;
         }
 
         if (!$this->checkRunStatus($input, $output, $id)) {
-            return \Symfony\Component\Console\Command\Command::SUCCESS;
+            return Command::SUCCESS;
         }
 
         $this->contactLimiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads);
@@ -167,7 +164,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
             if (null === $campaign) {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
 
-                return \Symfony\Component\Console\Command\Command::FAILURE;
+                return Command::FAILURE;
             }
 
             $this->updateCampaign($campaign);
@@ -198,7 +195,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return \Symfony\Component\Console\Command\Command::SUCCESS;
+        return Command::SUCCESS;
     }
 
     /**

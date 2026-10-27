@@ -2,6 +2,6 @@
 
 use Codeception\Actor;
 
-class UnitTester extends Actor
+final class UnitTester extends Actor
 {
 }

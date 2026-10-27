@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
@@ -44,12 +45,12 @@ class TrackableRepository extends CommonRepository
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($alias)
-            ->innerJoin("$alias.redirect", 'r');
+            ->innerJoin("{$alias}.redirect", 'r');
 
         $q->where(
             $q->expr()->andX(
-                $q->expr()->eq("$alias.channel", ':channel'),
-                $q->expr()->eq("$alias.channelId", (int) $channelId),
+                $q->expr()->eq("{$alias}.channel", ':channel'),
+                $q->expr()->eq("{$alias}.channelId", (int) $channelId),
                 $q->expr()->eq('r.url', ':url')
             )
         )
@@ -70,12 +71,12 @@ class TrackableRepository extends CommonRepository
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($alias)
-            ->innerJoin("$alias.redirect", 'r');
+            ->innerJoin("{$alias}.redirect", 'r');
 
         $q->where(
             $q->expr()->andX(
-                $q->expr()->eq("$alias.channel", ':channel'),
-                $q->expr()->eq("$alias.channelId", (int) $channelId),
+                $q->expr()->eq("{$alias}.channel", ':channel'),
+                $q->expr()->eq("{$alias}.channelId", (int) $channelId),
                 $q->expr()->in('r.url', ':urls')
             )
         )
@@ -86,8 +87,6 @@ class TrackableRepository extends CommonRepository
     }
 
     /**
-     * Up the hit count.
-     *
      * @param int  $increaseBy
      * @param bool $unique
      */
@@ -137,8 +136,9 @@ class TrackableRepository extends CommonRepository
                 $channelIds = [(int) $channelIds];
             }
             $q->andWhere(
-                $q->expr()->in('cut.channel_id', $channelIds)
-            );
+                $q->expr()->in('cut.channel_id', ':channelIds')
+            )
+                ->setParameter('channelIds', $channelIds, ArrayParameterType::INTEGER);
         }
 
         if ($listId) {
@@ -150,8 +150,9 @@ class TrackableRepository extends CommonRepository
                         ->groupBy('cs.leadlist_id');
                 } elseif (is_array($listId)) {
                     $q->andWhere(
-                        $q->expr()->in('cs.leadlist_id', array_map('intval', $listId))
-                    );
+                        $q->expr()->in('cs.leadlist_id', ':listIds')
+                    )
+                        ->setParameter('listIds', array_map(intval(...), $listId), ArrayParameterType::INTEGER);
 
                     $q->addSelect('cs.leadlist_id')
                         ->groupBy('cs.leadlist_id');
@@ -164,8 +165,9 @@ class TrackableRepository extends CommonRepository
                 $subQ->select('distinct(list.lead_id)')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'list')
                     ->andWhere(
-                        $q->expr()->in('list.leadlist_id', array_map('intval', $listId))
-                    );
+                        $q->expr()->in('list.leadlist_id', ':listIds')
+                    )
+                    ->setParameter('listIds', array_map(intval(...), $listId), ArrayParameterType::INTEGER);
 
                 $q->innerJoin('ph', sprintf('(%s)', $subQ->getSQL()), 'cs', 'cs.lead_id = ph.lead_id');
             }

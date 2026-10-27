@@ -19,22 +19,17 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Response;
 
-class CampaignMapStatsControllerTest extends MauticMysqlTestCase
+final class CampaignMapStatsControllerTest extends MauticMysqlTestCase
 {
-    private MockObject $campaignModelMock;
-
     private CampaignMapStatsController $mapController;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        $this->campaignModelMock       = $this->createMock(CampaignModel::class);
-        $this->mapController           = new CampaignMapStatsController($this->campaignModelMock);
+        $this->mapController           = new CampaignMapStatsController($this->createStub(CampaignModel::class));
     }
 
     /**
@@ -258,7 +253,7 @@ class CampaignMapStatsControllerTest extends MauticMysqlTestCase
         // Add events to campaign
         $campaign->addEvent(0, $event);
 
-        if (!empty($leadsPayload)) {
+        if ([] !== $leadsPayload) {
             $this->emulateEmailCampaignStat($event, $email, $leadsPayload);
         }
 

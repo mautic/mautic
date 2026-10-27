@@ -16,13 +16,13 @@ final class SearchCommandList implements SearchCommandListInterface
     private array $searchCommands = [];
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 
     public function getList(): array
     {
-        if (!empty($this->searchCommands)) {
+        if ([] !== $this->searchCommands) {
             return $this->searchCommands;
         }
 

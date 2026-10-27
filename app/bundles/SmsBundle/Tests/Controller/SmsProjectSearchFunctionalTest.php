@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Controller;
 
-use Mautic\ProjectBundle\Tests\Functional\AbstratctProjectSearchTestCase;
+use Mautic\ProjectBundle\Tests\Functional\AbstractProjectSearchTestCase;
 use Mautic\SmsBundle\Entity\Sms;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-final class SmsProjectSearchFunctionalTest extends AbstratctProjectSearchTestCase
+final class SmsProjectSearchFunctionalTest extends AbstractProjectSearchTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('searchDataProvider')]
+    #[DataProvider('searchDataProvider')]
     public function testProjectSearch(string $searchTerm, array $expectedEntities, array $unexpectedEntities): void
     {
         $projectOne   = $this->createProject('Project One');

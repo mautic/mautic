@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
+use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -15,11 +18,12 @@ use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
-class AjaxControllerFunctionalTest extends MauticMysqlTestCase
+final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 {
     protected function beforeBeginTransaction(): void
     {
@@ -56,7 +60,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             $this->client->getResponse()->getContent()
         );
 
-        $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
+        $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
 
         // Let's remove the member now.
@@ -74,25 +78,67 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Ensure the contact 1 was removed as a member of campaign 1 member now.
         $this->assertSame([['lead_id' => (string) $contact->getId(), 'manually_added' => '0', 'manually_removed' => '1']], $this->getMembersForCampaign($campaign->getId()));
 
-        $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
-        $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
+        $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
+    }
+
+    public function testToggleLeadCampaignActionWithInadequatePermissions(): void
+    {
+        $campaign = $this->createCampaign();
+        $contact  = $this->createContact('blabla@contact.email');
+
+        $userRepository = $this->em->getRepository(User::class);
+        $this->assertInstanceOf(UserRepository::class, $userRepository);
+
+        $role = new Role();
+        $role->setName('No-campaign-edit-access');
+        $role->setIsAdmin(false);
+
+        $roleRepository = $this->em->getRepository(Role::class);
+        $this->assertInstanceOf(RoleRepository::class, $roleRepository);
+        $roleRepository->saveEntity($role);
+
+        $user = new User();
+        $user->setFirstName('No');
+        $user->setLastName('Campaign');
+        $user->setEmail('no-campaign-edit-user@test.com');
+        $user->setUsername('no-campaign-edit-user');
+        $user->setRole($role);
+
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+
+        $user->setPassword($hasher->hash('mautic'));
+        $userRepository->saveEntity($user);
+
+        $this->loginUser($user);
+
+        $payload = [
+            'action'         => 'lead:toggleLeadCampaign',
+            'leadId'         => $contact->getId(),
+            'campaignId'     => $campaign->getId(),
+            'campaignAction' => 'remove',
+        ];
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
+        $this->assertEquals(403, $this->client->getResponse()->getStatusCode(), 'The user without campaign edit own/others permissions should not access toggle lead campaign action.');
     }
 
     public function testSegmentDependencyTreeWithNotExistingSegment(): void
     {
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getSegmentDependencyTree&id=9999');
         $response = $this->client->getResponse();
-        Assert::assertSame(404, $response->getStatusCode());
-        Assert::assertSame('{"message":"Segment 9999 could not be found."}', $response->getContent());
+        self::assertResponseStatusCodeSame(404);
+        $this->assertSame('{"message":"Segment 9999 could not be found."}', $response->getContent());
     }
 
     public function testCompanyLookupWithNoCompanySelected(): void
     {
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=unicorn');
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
-        Assert::assertSame('[]', $response->getContent());
+        self::assertResponseIsSuccessful();
+        $this->assertSame('[]', $response->getContent());
     }
 
     public function testCompanyLookupWithCompanySelected(): void
@@ -104,16 +150,16 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=sa');
         $response = $this->client->getResponse();
-        Assert::assertSame(200, $response->getStatusCode());
-        Assert::assertSame('[{"text":"SaaS Company","value":"'.$company->getId().'"}]', $response->getContent());
+        self::assertResponseIsSuccessful();
+        $this->assertSame('[{"text":"SaaS Company","value":"'.$company->getId().'"}]', $response->getContent());
     }
 
     public function testCompanyLookupWithNoModelSet(): void
     {
         $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&lead.company=unicorn');
         $response = $this->client->getResponse();
-        Assert::assertSame(400, $response->getStatusCode());
-        Assert::assertStringContainsString('Bad Request - The searchKey parameter is required', $response->getContent());
+        self::assertResponseStatusCodeSame(400);
+        $this->assertStringContainsString('Bad Request - The searchKey parameter is required', (string) $response->getContent());
     }
 
     public function testCompanyLookupWithLimit(): void
@@ -133,21 +179,21 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $content  = json_decode($response->getContent(), true);
 
-        Assert::assertSame(200, $response->getStatusCode());
-        Assert::assertIsArray($content);
-        Assert::assertCount(1, $content, 'The result should contain only one element');
-        Assert::assertSame('Company 1', $content[0]['text']);
-        Assert::assertSame($company1->getId(), (int) $content[0]['value']);
+        self::assertResponseIsSuccessful();
+        $this->assertIsArray($content);
+        $this->assertCount(1, $content, 'The result should contain only one element');
+        $this->assertSame('Company 1', $content[0]['text']);
+        $this->assertSame($company1->getId(), (int) $content[0]['value']);
 
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:getLookupChoiceList&searchKey=lead.company&lead.company=Company&limit=1&start=1');
         $response = $this->client->getResponse();
         $content  = json_decode($response->getContent(), true);
 
-        Assert::assertSame(200, $response->getStatusCode());
-        Assert::assertIsArray($content);
-        Assert::assertCount(1, $content, 'The result should contain only one element');
-        Assert::assertSame('Company 2', $content[0]['text']);
-        Assert::assertSame($company2->getId(), (int) $content[0]['value']);
+        self::assertResponseIsSuccessful();
+        $this->assertIsArray($content);
+        $this->assertCount(1, $content, 'The result should contain only one element');
+        $this->assertSame('Company 2', $content[0]['text']);
+        $this->assertSame($company2->getId(), (int) $content[0]['value']);
     }
 
     public function testSegmentDependencyTree(): void
@@ -223,38 +269,35 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/ajax?action=lead:getSegmentDependencyTree&id={$segmentA->getId()}");
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk(), $response->getContent());
+        self::assertResponseIsSuccessful();
 
-        Assert::assertSame(
-            [
-                'levels' => [
-                    [
-                        'nodes' => [
-                            ['id' => "0-{$segmentA->getId()}", 'name' => $segmentA->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
-                        ],
-                    ],
-                    [
-                        'nodes' => [
-                            ['id' => "{$segmentA->getId()}-{$segmentB->getId()}", 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentB->getId()}"],
-                            ['id' => "{$segmentA->getId()}-{$segmentC->getId()}", 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentC->getId()}"],
-                            ['id' => "{$segmentA->getId()}-{$segmentD->getId()}", 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentD->getId()}"],
-                        ],
-                    ],
-                    [
-                        'nodes' => [
-                            ['id' => "{$segmentC->getId()}-{$segmentE->getId()}", 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentE->getId()}"],
-                        ],
+        $this->assertSame([
+            'levels' => [
+                [
+                    'nodes' => [
+                        ['id' => "0-{$segmentA->getId()}", 'name' => $segmentA->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
                     ],
                 ],
-                'edges' => [
-                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentB->getId()}"],
-                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentC->getId()}"],
-                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentD->getId()}"],
-                    ['source' => "{$segmentA->getId()}-{$segmentC->getId()}", 'target' => "{$segmentC->getId()}-{$segmentE->getId()}"],
+                [
+                    'nodes' => [
+                        ['id' => "{$segmentA->getId()}-{$segmentB->getId()}", 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentB->getId()}"],
+                        ['id' => "{$segmentA->getId()}-{$segmentC->getId()}", 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentC->getId()}"],
+                        ['id' => "{$segmentA->getId()}-{$segmentD->getId()}", 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentD->getId()}"],
+                    ],
+                ],
+                [
+                    'nodes' => [
+                        ['id' => "{$segmentC->getId()}-{$segmentE->getId()}", 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentE->getId()}"],
+                    ],
                 ],
             ],
-            json_decode($response->getContent(), true)
-        );
+            'edges' => [
+                ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentB->getId()}"],
+                ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentC->getId()}"],
+                ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentD->getId()}"],
+                ['source' => "{$segmentA->getId()}-{$segmentC->getId()}", 'target' => "{$segmentC->getId()}-{$segmentE->getId()}"],
+            ],
+        ], json_decode($response->getContent(), true));
     }
 
     public function testSegmentDependencyTreeWithLoop(): void
@@ -343,49 +386,65 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, "/s/ajax?action=lead:getSegmentDependencyTree&id={$segmentA->getId()}");
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk(), $response->getContent());
+        self::assertResponseIsSuccessful();
 
-        Assert::assertSame(
-            [
-                'levels' => [
-                    [
-                        'nodes' => [
-                            ['id' => "0-{$segmentA->getId()}", 'name' => $segmentA->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
-                        ],
-                    ],
-                    [
-                        'nodes' => [
-                            ['id' => "{$segmentA->getId()}-{$segmentB->getId()}", 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentB->getId()}"],
-                            ['id' => "{$segmentA->getId()}-{$segmentC->getId()}", 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentC->getId()}"],
-                            ['id' => "{$segmentA->getId()}-{$segmentD->getId()}", 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentD->getId()}"],
-                        ],
-                    ],
-                    [
-                        'nodes' => [
-                            ['id' => "{$segmentC->getId()}-{$segmentE->getId()}", 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentE->getId()}"],
-                        ],
-                    ],
-                    [
-                        'nodes' => [
-                            [
-                                'id'      => "{$segmentE->getId()}-{$segmentA->getId()}",
-                                'name'    => $segmentA->getName(),
-                                'link'    => "/s/segments/view/{$segmentA->getId()}",
-                                'message' => 'This segment already exists in the segment dependency tree',
-                            ],
-                        ],
+        $responseData = json_decode($response->getContent(), true);
+
+        $this->assertSame([
+            'levels' => [
+                [
+                    'nodes' => [
+                        ['id' => "0-{$segmentA->getId()}", 'name' => $segmentA->getName(), 'link' => "/s/segments/view/{$segmentA->getId()}"],
                     ],
                 ],
-                'edges' => [
-                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentB->getId()}"],
-                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentC->getId()}"],
-                    ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentD->getId()}"],
-                    ['source' => "{$segmentA->getId()}-{$segmentC->getId()}", 'target' => "{$segmentC->getId()}-{$segmentE->getId()}"],
-                    ['source' => "{$segmentC->getId()}-{$segmentE->getId()}", 'target' => "{$segmentE->getId()}-{$segmentA->getId()}"],
+                [
+                    'nodes' => [
+                        ['id' => "{$segmentA->getId()}-{$segmentB->getId()}", 'name' => $segmentB->getName(), 'link' => "/s/segments/view/{$segmentB->getId()}"],
+                        ['id' => "{$segmentA->getId()}-{$segmentC->getId()}", 'name' => $segmentC->getName(), 'link' => "/s/segments/view/{$segmentC->getId()}"],
+                        ['id' => "{$segmentA->getId()}-{$segmentD->getId()}", 'name' => $segmentD->getName(), 'link' => "/s/segments/view/{$segmentD->getId()}"],
+                    ],
+                ],
+                [
+                    'nodes' => [
+                        ['id' => "{$segmentC->getId()}-{$segmentE->getId()}", 'name' => $segmentE->getName(), 'link' => "/s/segments/view/{$segmentE->getId()}"],
+                    ],
+                ],
+                [
+                    'nodes' => [
+                        [
+                            'id'      => "{$segmentE->getId()}-{$segmentA->getId()}",
+                            'name'    => $segmentA->getName(),
+                            'link'    => "/s/segments/view/{$segmentA->getId()}",
+                            'message' => 'This segment already exists in the segment dependency tree',
+                        ],
+                    ],
                 ],
             ],
-            json_decode($response->getContent(), true)
-        );
+        ], [
+            'levels' => $responseData['levels'],
+        ]);
+
+        $expectedEdges = [
+            ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentB->getId()}"],
+            ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentC->getId()}"],
+            ['source' => "0-{$segmentA->getId()}", 'target' => "{$segmentA->getId()}-{$segmentD->getId()}"],
+            ['source' => "{$segmentA->getId()}-{$segmentC->getId()}", 'target' => "{$segmentC->getId()}-{$segmentE->getId()}"],
+            ['source' => "{$segmentC->getId()}-{$segmentE->getId()}", 'target' => "{$segmentE->getId()}-{$segmentA->getId()}"],
+        ];
+
+        $actualEdges = $responseData['edges'];
+        $this->assertCount(count($expectedEdges), $actualEdges, 'Should have the correct number of edges');
+
+        foreach ($expectedEdges as $expectedEdge) {
+            $edgeFound = false;
+            foreach ($actualEdges as $actualEdge) {
+                if ($actualEdge['source'] === $expectedEdge['source'] && $actualEdge['target'] === $expectedEdge['target']) {
+                    $edgeFound = true;
+                    break;
+                }
+            }
+            $this->assertTrue($edgeFound, "Expected edge {$expectedEdge['source']} -> {$expectedEdge['target']} not found");
+        }
     }
 
     public function testRemoveTagFromLeadAction(): void
@@ -414,12 +473,12 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $clientResponse = $this->client->getResponse();
 
-        $response = json_decode($clientResponse->getContent(), true);
-        $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+        $this->assertResponseIsSuccessful($clientResponse->getContent());
 
         // Assert the tag is removed from the lead
         $updatedLead = $this->em->getRepository(Lead::class)->find($lead->getId());
-        $this->assertFalse(in_array($tag, $updatedLead->getTags()->toArray()));
+        $this->assertInstanceOf(Lead::class, $updatedLead);
+        $this->assertNotContains($tag, $updatedLead->getTags()->toArray());
     }
 
     public function testContactListActionSuggestionsByAdminUser(): void
@@ -429,10 +488,10 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         /** @var User $adminUser */
         $adminUser = $userRepository->findOneBy(['username' => 'admin']);
-        self::assertInstanceOf(User::class, $adminUser);
+        $this->assertInstanceOf(User::class, $adminUser);
 
         $salesUser = $userRepository->findOneBy(['username' => 'sales']);
-        self::assertInstanceOf(User::class, $salesUser);
+        $this->assertInstanceOf(User::class, $salesUser);
 
         $leads = [];
 
@@ -445,7 +504,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             }
 
             $lead = new Lead();
-            $lead->setFirstname("User $i");
+            $lead->setFirstname("User {$i}");
             $lead->setOwner($owner);
             $leads[] = $lead;
         }
@@ -458,16 +517,149 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Check suggestions for admin user.
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:contactList&field=undefined&filter=user');
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
         $data       = json_decode($response->getContent(), true);
         $foundNames = array_column($data, 'value');
 
-        self::assertCount(4, $foundNames);
+        $this->assertCount(4, $foundNames);
+
+        // Results are ordered by last_active DESC; sort to verify all expected contacts are present.
+        sort($foundNames);
+        foreach ($foundNames as $key => $name) {
+            $this->assertSame('User '.($key + 1), $name);
+        }
+    }
+
+    public function testCompanyListActionSuggestionsByAdminUser(): void
+    {
+        $userRepository = $this->em->getRepository(User::class);
+        $this->assertInstanceOf(UserRepository::class, $userRepository);
+
+        $adminUser = $userRepository->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $adminUser);
+
+        $salesUser = $userRepository->findOneBy(['username' => 'sales']);
+        $this->assertInstanceOf(User::class, $salesUser);
+
+        $companies = [];
+
+        // Create 4 companies with two owned by admin and sales users respectively.
+        for ($i = 1; $i <= 4; ++$i) {
+            $owner = $adminUser;
+
+            if ($i > 2) {
+                $owner = $salesUser;
+            }
+
+            $company = new Company();
+            $company->setName("Company $i");
+            $company->setOwner($owner);
+            $companies[] = $company;
+        }
+
+        /** @var CompanyRepository $companyRepository */
+        $companyRepository = $this->em->getRepository(Company::class);
+        $companyRepository->saveEntities($companies);
+        $this->em->clear();
+
+        // Check suggestions for admin user.
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:companyList&field=undefined&filter=company');
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->isOk());
+
+        $data       = json_decode($response->getContent(), true);
+        $foundNames = array_column($data, 'value');
+
+        $this->assertCount(4, $foundNames);
 
         foreach ($foundNames as $key => $name) {
-            self::assertSame('User '.($key + 1), $name);
+            $this->assertSame('Company '.($key + 1), $name);
         }
+    }
+
+    public function testCompanyListActionSuggestionsByNonAdminUser(): void
+    {
+        /** @var UserRepository $userRepository */
+        $userRepository = $this->em->getRepository(User::class);
+
+        $adminUser = $userRepository->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $adminUser);
+
+        $companies = [];
+
+        // Create 4 companies with two owned by admin and sales users respectively.
+        for ($i = 1; $i <= 2; ++$i) {
+            $company = new Company();
+            $company->setName("Company $i");
+            $company->setOwner($adminUser);
+            $companies[] = $company;
+        }
+
+        /** @var CompanyRepository $companyRepository */
+        $companyRepository = $this->em->getRepository(Company::class);
+        $companyRepository->saveEntities($companies);
+        $this->em->clear();
+
+        $role = new Role();
+        $role->setName('Role');
+        $role->setIsAdmin(false);
+        $role->setRawPermissions(['lead:leads' => ['viewown']]);
+
+        /** @var RoleRepository $roleRepository */
+        $roleRepository = $this->em->getRepository(Role::class);
+        $roleRepository->saveEntity($role);
+
+        // Create a non admin user with view own contacts permission.
+        $user = new User();
+        $user->setFirstName('Non');
+        $user->setLastName('Admin');
+        $user->setEmail('non-admin-user@test.com');
+        $user->setUsername('non-admin-user');
+        $user->setRole($role);
+
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+
+        $passwordNonAdmin = 'Maut1cR0cks!';
+        $user->setPassword($hasher->hash($passwordNonAdmin));
+
+        $userRepository->saveEntity($user);
+
+        /** @var User $nonAdminUser */
+        $nonAdminUser = $userRepository->findOneBy(['email' => 'non-admin-user@test.com']);
+
+        $nonAdminCompanies = [];
+
+        // Create 2 companies with owned by non-admin user.
+        for ($i = 3; $i <= 4; ++$i) {
+            $company = new Company();
+            $company->setName("Company $i");
+            $company->setOwner($nonAdminUser);
+            $nonAdminCompanies[] = $company;
+        }
+
+        $companyRepository->saveEntities($nonAdminCompanies);
+        $this->em->clear();
+
+        $this->logoutUser();
+
+        // Check suggestions for a non admin user.
+        $this->client->loginUser($nonAdminUser, 'mautic');
+        $this->client->setServerParameter('PHP_AUTH_USER', 'non-admin-user');
+        // Set the new password, because new authenticator system checks for it.
+        $this->client->setServerParameter('PHP_AUTH_PW', $passwordNonAdmin);
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:companyList&field=undefined&filter=company');
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+
+        $data       = json_decode($response->getContent(), true);
+        $foundNames = array_column($data, 'value');
+
+        $this->assertCount(2, $foundNames);
+
+        $this->assertSame('Company 3', $foundNames[0]);
+        $this->assertSame('Company 4', $foundNames[1]);
     }
 
     public function testContactListActionSuggestionsByNonAdminUser(): void
@@ -476,14 +668,14 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $userRepository = $this->em->getRepository(User::class);
 
         $adminUser = $userRepository->findOneBy(['username' => 'admin']);
-        self::assertInstanceOf(User::class, $adminUser);
+        $this->assertInstanceOf(User::class, $adminUser);
 
         $leads = [];
 
         // Create 2 leads with owned by admin user.
         for ($i = 1; $i <= 2; ++$i) {
             $lead = new Lead();
-            $lead->setFirstname("User $i");
+            $lead->setFirstname("User {$i}");
             $lead->setOwner($adminUser);
             $leads[] = $lead;
         }
@@ -511,7 +703,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $user->setRole($role);
 
         /** @var PasswordHasherInterface $hasher */
-        $hasher = static::getContainer()->get('security.password_hasher_factory')->getPasswordHasher($user);
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
 
         $passwordNonAdmin = 'Maut1cR0cks!';
         $user->setPassword($hasher->hash($passwordNonAdmin));
@@ -525,7 +717,7 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         // Create 2 leads with owned by non-admin user.
         for ($i = 3; $i <= 4; ++$i) {
             $lead = new Lead();
-            $lead->setFirstname("User $i");
+            $lead->setFirstname("User {$i}");
             $lead->setOwner($nonAdminUser);
             $nonAdminLeads[] = $lead;
         }
@@ -542,20 +734,22 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->setServerParameter('PHP_AUTH_PW', $passwordNonAdmin);
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=lead:contactList&field=undefined&filter=user');
         $response = $this->client->getResponse();
-        self::assertTrue($response->isOk());
+        self::assertResponseIsSuccessful();
 
         $data       = json_decode($response->getContent(), true);
         $foundNames = array_column($data, 'value');
 
-        self::assertCount(2, $foundNames);
-        self::assertSame('User 3', $foundNames[0]);
-        self::assertSame('User 4', $foundNames[1]);
+        $this->assertCount(2, $foundNames);
+        // Results are ordered by last_active DESC; sort to verify all expected contacts are present.
+        sort($foundNames);
+        $this->assertSame('User 3', $foundNames[0]);
+        $this->assertSame('User 4', $foundNames[1]);
     }
 
     /**
      * @param string[] $expectedOptions
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('leadFieldOrderChoiceListProvider')]
+    #[DataProvider('leadFieldOrderChoiceListProvider')]
     public function testUpdateLeadFieldOrderChoiceListAction(string $object, string $group, array $expectedOptions): void
     {
         $payload = [
@@ -568,13 +762,12 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
 
         // Get the response HTML
-        $response    = $this->client->getResponse();
-        $htmlContent = $response->getContent();
+        $htmlContent = $this->client->getResponse()->getContent();
 
         // Assert the response is successful
-        $this->assertTrue($response->isOk(), "Response was not OK for object: $object, group: $group");
-        $this->assertStringNotContainsString('<form', $htmlContent, 'Response contains a form instead of just field order.');
-        $this->assertStringContainsString('<select', $htmlContent, 'Response contains select tag.');
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('<form', (string) $htmlContent, 'Response contains a form instead of just field order.');
+        $this->assertStringContainsString('<select', (string) $htmlContent, 'Response contains select tag.');
 
         // Parse the HTML content using DOMDocument
         $dom = new \DOMDocument();
@@ -590,11 +783,11 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
             }
         }
         // Assert that the actual options match the expected options
-        if (empty($expectedOptions)) {
+        if ([] === $expectedOptions) {
             $this->assertEmpty($actualOptions);
         }
         foreach ($expectedOptions as $expectedValue) {
-            $this->assertContains($expectedValue, $actualOptions, "Missing expected option '$expectedValue' for object: $object, group: $group");
+            $this->assertContains($expectedValue, $actualOptions, "Missing expected option '{$expectedValue}' for object: {$object}, group: {$group}");
         }
     }
 
@@ -605,6 +798,191 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         yield ['company', 'core', []];
     }
 
+    public function testTogglePreferredLeadChannelActionWithFlashMessage(): void
+    {
+        $contact = $this->createContact('test@example.com');
+
+        $payload = [
+            'action'         => 'lead:togglePreferredLeadChannel',
+            'leadId'         => $contact->getId(),
+            'channel'        => 'email',
+            'channelAction'  => 'remove',
+        ];
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
+        $this->assertResponseIsSuccessful();
+
+        $payload = [
+            'action'         => 'lead:togglePreferredLeadChannel',
+            'leadId'         => $contact->getId(),
+            'channel'        => 'email',
+            'channelAction'  => 'add',
+        ];
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
+        $this->assertResponseIsSuccessful();
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
+        $this->assertSame(1, $response['success']);
+        $this->assertArrayHasKey('flashes', $response, 'The response should contain flashes');
+        $this->assertNotEmpty($response['flashes'], 'The flashes should not be empty');
+
+        $this->assertStringContainsString('Contact is now contactable on the email channel', (string) $response['flashes'], 'Flash message about channel being contactable should be present');
+    }
+
+    public function testRemoveBounceStatusActionWithFlashMessage(): void
+    {
+        $contact = $this->createContact('bounce@example.com');
+
+        $dnc = new DoNotContact();
+        $dnc->setLead($contact);
+        $dnc->setChannel('email');
+        $dnc->setReason(DoNotContact::BOUNCED);
+        $dnc->setDateAdded(new \DateTime());
+
+        $this->em->persist($dnc);
+        $this->em->flush();
+
+        $payload = [
+            'action'  => 'lead:removeBounceStatus',
+            'id'      => $dnc->getId(),
+            'channel' => 'email',
+        ];
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_POST, '/s/ajax', $payload);
+        $this->assertResponseIsSuccessful();
+
+        $response = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertArrayHasKey('success', $response, 'The response does not contain the `success` param.');
+        $this->assertSame(1, $response['success']);
+        $this->assertArrayHasKey('flashes', $response, 'The response should contain flashes');
+        $this->assertNotEmpty($response['flashes'], 'The flashes should not be empty');
+
+        $this->assertStringContainsString('Contact is now contactable on the email channel', (string) $response['flashes'], 'Flash message about channel being contactable should be present');
+    }
+
+    public function testFieldListAction(): void
+    {
+        // Check if alias is null
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/ajax',
+            [
+                'action'     => 'lead:fieldList',
+                'field'      => '',
+                'filter'     => '',
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertSame('Alias cannot be empty', $response['error']);
+
+        // User search for filter
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/ajax',
+            [
+                'action'     => 'lead:fieldList',
+                'field'      => 'owner_id',
+                'filter'     => 'Admin',
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertSame('Admin User', $response[0]['value']);
+
+        // Check if filed type is not lookup
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/ajax',
+            [
+                'action'     => 'lead:fieldList',
+                'field'      => 'city',
+                'filter'     => '',
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertEmpty($response);
+
+        // Check if filed type is lookup
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/ajax',
+            [
+                'action'     => 'lead:fieldList',
+                'field'      => 'title',
+                'filter'     => '',
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey(0, $response);
+    }
+
+    public function testGetLookupChoiceListForGlobalCategory(): void
+    {
+        $category1 = $this->createGlobalCategory('GC11');
+        $category2 = $this->createGlobalCategory('GC12');
+
+        // Search global category with string filter
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/ajax',
+            [
+                'action'            => 'lead:getLookupChoiceList',
+                'for_lookup'        => 1,
+                'searchKey'         => 'category.category',
+                'category_category' => 'GC11',
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame($category1->getTitle(), $response[0]['text']);
+
+        // Search global category with array of ids
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/ajax',
+            [
+                'action'            => 'lead:getLookupChoiceList',
+                'for_lookup'        => 1,
+                'searchKey'         => 'category.category',
+                'category_category' => [$category1->getId(), $category2->getId()],
+            ]
+        );
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertCount(2, $response);
+    }
+
+    public function testLoadSegmentFilterFormForSubscribedCategory(): void
+    {
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/ajax',
+            [
+                'action'            => 'lead:loadSegmentFilterForm',
+                'fieldAlias'        => 'globalcategory',
+                'fieldObject'       => 'lead',
+                'operator'          => 'in',
+                'filterNum'         => 2,
+            ]
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('viewParameters', $response);
+        $this->assertStringContainsString('data-model="category.category"', (string) $response['viewParameters']['form']);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getMembersForCampaign(int $campaignId): array
     {
         return $this->connection->createQueryBuilder()
@@ -662,5 +1040,19 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $campaign;
+    }
+
+    private function createGlobalCategory(string $title): Category
+    {
+        $category = new Category();
+        $category->setIsPublished(true)
+            ->setTitle($title)
+            ->setAlias(strtolower($title))
+            ->setBundle('global');
+
+        $this->em->persist($category);
+        $this->em->flush();
+
+        return $category;
     }
 }

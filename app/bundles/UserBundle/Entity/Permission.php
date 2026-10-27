@@ -1,34 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "permission:read"
- *        },
- *       "swagger_definition_name"="Read",
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "permission:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('user:roles:viewown')"),
+        new Post(security: "is_granted('user:roles:create')"),
+        new Get(security: "is_granted('user:roles:viewown', object)"),
+        new Put(security: "is_granted('user:roles:editown', object)"),
+        new Patch(security: "is_granted('user:roles:editother', object)"),
+        new Delete(security: "is_granted('user:roles:deleteown', object)"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['permission:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['permission:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Permission implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
@@ -37,37 +44,32 @@ class Permission implements CacheInvalidateInterface, UuidInterface
 
     /**
      * @var int
-     *
-     * @Groups({"permission:read", "role:read"})
      */
+    #[Groups(['permission:read', 'role:read'])]
     protected $id;
 
     /**
      * @var string
-     *
-     * @Groups({"permission:read", "permission:write", "role:read"})
      */
+    #[Groups(['permission:read', 'permission:write', 'role:read'])]
     protected $bundle;
 
     /**
      * @var string
-     *
-     * @Groups({"permission:read", "permission:write", "role:read"})
      */
+    #[Groups(['permission:read', 'permission:write', 'role:read'])]
     protected $name;
 
     /**
      * @var Role
-     *
-     * @Groups({"permission:read", "permission:write", "role:read"})
      */
+    #[Groups(['permission:read', 'permission:write', 'role:read'])]
     protected $role;
 
     /**
      * @var int
-     *
-     * @Groups({"permission:read", "permission:write", "role:read"})
      */
+    #[Groups(['permission:read', 'permission:write', 'role:read'])]
     protected $bitwise;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -91,6 +93,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
         $builder->createManyToOne('role', 'Role')
             ->inversedBy('permissions')
             ->addJoinColumn('role_id', 'id', false, false, 'CASCADE')
+            ->isOwnershipParent()
             ->build();
 
         $builder->addField('bitwise', 'integer');
@@ -99,9 +102,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -109,13 +110,9 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Set bundle.
-     *
      * @param string $bundle
-     *
-     * @return Permission
      */
-    public function setBundle($bundle)
+    public function setBundle($bundle): static
     {
         $this->bundle = $bundle;
 
@@ -123,9 +120,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get bundle.
-     *
-     * @return string
+     * @return string|null
      */
     public function getBundle()
     {
@@ -133,13 +128,9 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Set bitwise.
-     *
      * @param int $bitwise
-     *
-     * @return Permission
      */
-    public function setBitwise($bitwise)
+    public function setBitwise($bitwise): static
     {
         $this->bitwise = $bitwise;
 
@@ -147,21 +138,14 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get bitwise.
-     *
-     * @return int
+     * @return int|null
      */
     public function getBitwise()
     {
         return $this->bitwise;
     }
 
-    /**
-     * Set role.
-     *
-     * @return Permission
-     */
-    public function setRole(?Role $role = null)
+    public function setRole(?Role $role = null): static
     {
         $this->role = $role;
 
@@ -169,9 +153,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get role.
-     *
-     * @return Role
+     * @return Role|null
      */
     public function getRole()
     {
@@ -179,13 +161,9 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
-     *
-     * @return Permission
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->name = $name;
 
@@ -193,9 +171,7 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get name.
-     *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -205,5 +181,10 @@ class Permission implements CacheInvalidateInterface, UuidInterface
     public function getCacheNamespacesToDelete(): array
     {
         return [self::CACHE_NAMESPACE];
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->role->getCreatedBy();
     }
 }

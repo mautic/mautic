@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Functional\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Company;
@@ -12,7 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
-use PHPUnit\Framework\Assert;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\Mailer;
 
@@ -29,8 +30,9 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     protected function beforeTearDown(): void
     {
         // Clear owners cache (to leave a clean environment for future tests):
-        $mailHelper = static::getContainer()->get('mautic.helper.mailer');
-        $this->setPrivateProperty($mailHelper, 'leadOwners', []);
+        /** @var MailHelper $mailHelper */
+        $mailHelper = self::getContainer()->get(MailHelper::class);
+        ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
     }
 
     public function testEmailSendWithCompanyTokens(): void
@@ -46,21 +48,49 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $this->sendEmailViaApi($emailId);
         $testEmail = function () use ($suffix): void {
             $message = $this->transport->sentMessage;
-            Assert::assertSame($message->getSubject(), 'Subject'.$suffix);
-            Assert::assertSame($message->getTo()[0]->getAddress(), 'JohnDoe'.$suffix.'@email.com');
-            Assert::assertSame($message->getTo()[0]->getName(), 'John'.$suffix);
+            $this->assertSame($message->getSubject(), 'Subject'.$suffix);
+            $this->assertSame($message->getTo()[0]->getAddress(), 'JohnDoe'.$suffix.'@email.com');
+            $this->assertSame($message->getTo()[0]->getName(), 'John'.$suffix);
             $messageBody = $message->getBody()->toString();
-            Assert::assertStringContainsString('JohnDoe'.$suffix.'@email.com', $messageBody);
-            Assert::assertStringContainsString('XYZ Co.'.$suffix, $messageBody);
-            Assert::assertStringContainsString('Second Street'.$suffix, $messageBody);
+            $this->assertStringContainsString('JohnDoe'.$suffix.'@email.com', $messageBody);
+            $this->assertStringContainsString('XYZ Co.'.$suffix, $messageBody);
+            $this->assertStringContainsString('Second Street'.$suffix, $messageBody);
         };
         $testEmail();
+    }
+
+    public function testSearchesForUnownedCompanies(): void
+    {
+        $unowned = $this->createCompany('Unowned company');
+        $owned   = $this->createCompany('Owned company');
+        $owner   = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $this->assertInstanceOf(User::class, $owner);
+        $owned->setOwner($owner);
+        $this->em->persist($owned);
+        $this->em->flush();
+        $this->em->refresh($owned);
+        $this->assertSame($owner, $owned->getOwner());
+
+        foreach (['', '&tmpl=list'] as $template) {
+            $this->client->request(Request::METHOD_GET, '/s/companies?search=is:unowned'.$template);
+
+            self::assertResponseIsSuccessful();
+            $content = (string) $this->client->getResponse()->getContent();
+            $this->assertStringContainsString($unowned->getName(), $content);
+            $this->assertStringNotContainsString($owned->getName(), $content);
+        }
+
+        $this->client->request(Request::METHOD_GET, '/s/companies?search=');
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($unowned->getName(), $content);
+        $this->assertStringContainsString($owned->getName(), $content);
     }
 
     private function createCompany(string $name, string $address1 = ''): Company
     {
         /** @var CompanyModel $model */
-        $model   = static::getContainer()->get('mautic.lead.model.company');
+        $model   = self::getContainer()->get(CompanyModel::class);
         $company = new Company();
         $company->setIsPublished(true)->setName($name)->setAddress1($address1);
         $model->saveEntity($company);
@@ -157,37 +187,24 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
 
     private function setUpMailer(): void
     {
-        $mailHelper = static::getContainer()->get('mautic.helper.mailer');
+        /** @var MailHelper $mailHelper */
+        $mailHelper = self::getContainer()->get(MailHelper::class);
         $transport  = new SmtpTransport();
         $mailer     = new Mailer($transport);
-        $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
-        $this->setPrivateProperty($mailHelper, 'transport', $transport);
+        ReflectionHelper::setValue($mailHelper, 'mailer', $mailer);
+        ReflectionHelper::setValue($mailHelper, 'transport', $transport);
         $this->transport = $transport;
-    }
-
-    /**
-     * @param mixed $value
-     */
-    private function setPrivateProperty(MailHelper $object, string $property, $value): void
-    {
-        $reflector = new \ReflectionProperty($object::class, $property);
-        $reflector->setAccessible(true);
-        $reflector->setValue($object, $value);
     }
 
     private function sendEmailViaApi(int $emailId): void
     {
         $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
-        Assert::assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
-        Assert::assertSame(
-            json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR),
-            [
-                'success'          => 1,
-                'sentCount'        => 1,
-                'failedRecipients' => 0,
-            ],
-            $clientResponse->getContent()
-        );
+        self::assertResponseIsSuccessful();
+        $this->assertSame(json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR), [
+            'success'          => 1,
+            'sentCount'        => 1,
+            'failedRecipients' => 0,
+        ], $clientResponse->getContent());
     }
 }

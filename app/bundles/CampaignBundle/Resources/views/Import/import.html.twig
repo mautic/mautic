@@ -1,0 +1,50 @@
+{#
+  Variables
+    - form
+#}
+
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}campaignImport{% endblock %}
+
+{% block headerTitle %}
+    {{ 'mautic.campaign.campaign.import.title'|trans }}
+{% endblock %}
+
+{% block actions %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+            'routeBase': 'campaign',
+            'templateButtons': {'close': true},
+            'routeVars': {
+                'close': {
+                    'object': app.request.get('object', 'campaigns'),
+                },
+            },
+    }) -}}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-sm-offset-3 col-sm-6">
+            <div class="ml-lg mr-lg mt-md pa-lg">               
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <div class="panel-title">{{ 'mautic.campaign.campaign.import.instructions'|trans({'%size%': 100}) }}</div>
+                    </div>
+
+                    <div class="panel-body">
+                        {{ form_start(form) }}
+                        <div class="input-group well mt-lg">
+                            {{ form_widget(form.campaignFile) }}
+                            <span class="input-group-btn">
+                                {{ form_widget(form.start) }}
+                            </span>
+                        </div>
+                        {{ form_end(form) }} 
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

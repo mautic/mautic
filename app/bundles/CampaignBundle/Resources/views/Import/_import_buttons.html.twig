@@ -1,0 +1,36 @@
+<div class="pa-sm">
+    {% include '@MauticCore/Helper/button.html.twig' with {
+        buttons: [
+            {
+                href: path('mautic_campaign_index'),
+                variant: 'primary',
+                icon: 'ri-list-check-2',
+                label: 'mautic.campaign.campaigns'
+            },
+            {
+                href: path('mautic_campaign_import_action', {'objectAction': 'new'}),
+                variant: 'secondary',
+                icon: 'ri-import-line',
+                label: 'mautic.campaign.campaign.reimport'
+            }
+        ]
+    } %}
+
+    {% set hasOnlyNew = true %}
+    {% for group in importSummary %}
+        {% if group.update is defined and group.update is not empty %}
+            {% set hasOnlyNew = false %}
+        {% endif %}
+    {% endfor %}
+
+    {% if hasOnlyNew %}
+        {{ include('@MauticCore/Helper/confirm.html.twig', {
+            'btnClass': 'btn btn-danger btn-nospin',
+            'message': 'mautic.campaign.campaign.import.undoconfirm'|trans,
+            'confirmText': 'mautic.campaign.campaign.import.undo'|trans,
+            'confirmAction': path('mautic_campaign_import_action', {'objectAction' : 'undo'}),
+            'iconClass': 'ri-delete-bin-line',
+            'btnText': 'mautic.campaign.campaign.import.undo'|trans
+        }) }}
+    {% endif %}
+</div>

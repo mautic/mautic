@@ -7,7 +7,7 @@ namespace Mautic\MarketplaceBundle\Collection;
 use Mautic\MarketplaceBundle\DTO\Maintainer;
 use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 
-class MaintainerCollection implements \Iterator, \Countable, \ArrayAccess
+final class MaintainerCollection implements \Iterator, \Countable, \ArrayAccess
 {
     /**
      * @var Maintainer[]
@@ -24,11 +24,11 @@ class MaintainerCollection implements \Iterator, \Countable, \ArrayAccess
         $this->records = array_values($records);
     }
 
-    public static function fromArray(array $array): MaintainerCollection
+    public static function fromArray(array $array): self
     {
         return new self(
             array_map(
-                fn (array $record) => Maintainer::fromArray($record),
+                Maintainer::fromArray(...),
                 $array
             )
         );
@@ -66,7 +66,7 @@ class MaintainerCollection implements \Iterator, \Countable, \ArrayAccess
 
     public function offsetSet($offset, $value): void
     {
-        if (is_null($offset)) {
+        if (null === $offset) {
             $this->records[] = $value;
         } else {
             $this->records[$offset] = $value;

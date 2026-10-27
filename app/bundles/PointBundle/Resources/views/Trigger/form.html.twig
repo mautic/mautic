@@ -52,8 +52,8 @@
                     <div class="tab-pane fade bdr-w-0" id="events-container">
                         <div id="triggerEvents">
                             <div class="mb-md">
-                                <div class="dropdown">
-                                    <button class="btn btn-ghost dropdown-toggle" type="button" data-toggle="dropdown">
+                                <div class="dropdown chosen-container">
+                                    <button class="btn chosen-single dropdown-toggle" type="button" data-toggle="dropdown">
                                         {{ 'mautic.point.trigger.event.add'|trans }}
                                         <span class="caret"></span>
                                     </button>
@@ -102,6 +102,7 @@
     <div class="col-md-3 height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
             {{ form_row(form.category) }}
+            {{ form_row(form.projects) }}
             {{ form_row(form.isPublished) }}
             {{ form_row(form.publishUp) }}
             {{ form_row(form.publishDown) }}

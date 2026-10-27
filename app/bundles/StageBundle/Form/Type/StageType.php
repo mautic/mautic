@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Form\Type\PublishDownDateType;
 use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -21,10 +22,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Stage>
  */
-class StageType extends AbstractType
+final class StageType extends AbstractType
 {
     public function __construct(
-        private CorePermissions $security,
+        private readonly CorePermissions $security,
     ) {
     }
 
@@ -35,20 +36,20 @@ class StageType extends AbstractType
 
         $builder->add('description', TextareaType::class, [
             'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => ['class' => 'form-control editor'],
             'required'   => false,
         ]);
         $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
             'label_attr' => [
-                'class' => 'control-label',
+                'class' => 'form-label',
             ], 'attr' => [
                 'class' => 'form-control',
             ], ]);
         $builder->add('weight', NumberType::class, [
             'label'      => 'mautic.stage.action.weight',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.stage.action.weight.help',
@@ -83,7 +84,8 @@ class StageType extends AbstractType
         $builder->add('publishUp', PublishUpDateType::class);
         $builder->add('publishDown', PublishDownDateType::class);
 
-        // add category
+        $builder->add('projects', ProjectType::class);
+
         $builder->add(
             'category',
             CategoryListType::class,

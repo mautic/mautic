@@ -1,8 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -11,74 +19,69 @@ use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "role:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"permissions"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "role:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('user:roles:viewown')"),
+        new Post(security: "is_granted('user:roles:create')"),
+        new Get(security: "is_granted('user:roles:viewown', object)"),
+        new Put(security: "is_granted('user:roles:editown', object)"),
+        new Patch(security: "is_granted('user:roles:editother', object)"),
+        new Delete(security: "is_granted('user:roles:deleteown', object)"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['role:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['permissions'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['role:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
+
     public const CACHE_NAMESPACE = 'Role';
+
     /**
      * @var int
-     *
-     * @Groups({"role:read"})
      */
+    #[Groups(['role:read'])]
     private $id;
 
     /**
      * @var string
-     *
-     * @Groups({"role:read", "role:write"})
      */
+    #[Groups(['role:read', 'role:write'])]
     private $name;
 
     /**
      * @var string|null
-     *
-     * @Groups({"role:read", "role:write"})
      */
+    #[Groups(['role:read', 'role:write'])]
     private $description;
 
     /**
      * @var bool
-     *
-     * @Groups({"role:read", "role:write"})
      */
+    #[Groups(['role:read', 'role:write'])]
     private $isAdmin = false;
 
     /**
      * @var ArrayCollection<int, Permission>
-     *
-     * @Groups({"role:read", "role:write"})
      */
+    #[Groups(['role:read', 'role:write'])]
     private $permissions;
 
     /**
      * @var array
-     *
-     * @Groups({"role:read", "role:write"})
      */
+    #[Groups(['role:read', 'role:write'])]
     private $rawPermissions;
 
     /**
@@ -128,7 +131,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank(
-            ['message' => 'mautic.core.name.required']
+            message: 'mautic.core.name.required'
         ));
     }
 
@@ -151,9 +154,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -161,13 +162,9 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
-     *
-     * @return Role
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -176,9 +173,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get name.
-     *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -187,10 +182,8 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
 
     /**
      * Add permissions.
-     *
-     * @return Role
      */
-    public function addPermission(Permission $permissions)
+    public function addPermission(Permission $permissions): static
     {
         $permissions->setRole($this);
 
@@ -208,9 +201,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get permissions.
-     *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ArrayCollection<int, Permission>
      */
     public function getPermissions()
     {
@@ -218,13 +209,9 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
-     *
-     * @return Role
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -233,9 +220,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get description.
-     *
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -243,13 +228,9 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Set isAdmin.
-     *
      * @param bool $isAdmin
-     *
-     * @return Role
      */
-    public function setIsAdmin($isAdmin)
+    public function setIsAdmin($isAdmin): static
     {
         $this->isChanged('isAdmin', $isAdmin);
         $this->isAdmin = $isAdmin;
@@ -258,8 +239,6 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get isAdmin.
-     *
      * @return bool
      */
     public function getIsAdmin()
@@ -274,7 +253,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
      */
     public function isAdmin()
     {
-        return $this->getIsAdmin();
+        return $this->isAdmin;
     }
 
     /**
@@ -287,9 +266,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get rawPermissions.
-     *
-     * @return array
+     * @return array|null
      */
     public function getRawPermissions()
     {
@@ -298,10 +275,8 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
 
     /**
      * Add users.
-     *
-     * @return Role
      */
-    public function addUser(User $users)
+    public function addUser(User $users): static
     {
         $this->users[] = $users;
 
@@ -317,9 +292,7 @@ class Role extends FormEntity implements CacheInvalidateInterface, UuidInterface
     }
 
     /**
-     * Get users.
-     *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return ArrayCollection<int, User>
      */
     public function getUsers()
     {

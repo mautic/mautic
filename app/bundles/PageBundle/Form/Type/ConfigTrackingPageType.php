@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PageBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -10,18 +12,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ConfigTrackingPageType extends AbstractType
+final class ConfigTrackingPageType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('track_by_tracking_url', YesNoButtonGroupType::class, [
-            'label' => 'mautic.page.config.form.track.by.tracking.url',
-            'data'  => isset($options['data']['track_by_tracking_url']) ? (bool) $options['data']['track_by_tracking_url'] : true,
-            'attr'  => [
-                'tooltip' => 'mautic.page.config.form.track.by.tracking.url.tooltip',
-            ],
-        ]);
-
         $builder->add(
             'anonymize_ip',
             YesNoButtonGroupType::class,
@@ -56,6 +50,18 @@ class ConfigTrackingPageType extends AbstractType
                 'data'  => isset($options['data']['do_not_track_404_anonymous']) && (bool) $options['data']['do_not_track_404_anonymous'],
                 'attr'  => [
                     'tooltip'      => 'mautic.page.config.form.do_not_track_404_anonymous.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'append_segment_id_tracking_url',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.page.config.form.append_segment_id_tracking_url',
+                'data'  => isset($options['data']['append_segment_id_tracking_url']) && (bool) $options['data']['append_segment_id_tracking_url'],
+                'attr'  => [
+                    'tooltip' => 'mautic.page.config.form.append_segment_id_tracking_url.tooltip',
                 ],
             ]
         );

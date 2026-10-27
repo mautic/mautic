@@ -14,10 +14,19 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilder;
 
 final class FieldTypeTest extends TestCase
 {
+    /**
+     * @var MockObject&ExecutionContextInterface
+     */
     private MockObject $executionContext;
 
+    /**
+     * @var MockObject&FormInterface
+     */
     private MockObject $formInterface;
 
+    /**
+     * @var MockObject&ConstraintViolationBuilder
+     */
     private MockObject $constraintViolationBuilder;
 
     protected function setUp(): void

@@ -24,30 +24,30 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LegacyEventDispatcherTest extends TestCase
+final class LegacyEventDispatcherTest extends TestCase
 {
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var MockObject|EventScheduler
+     * @var MockObject&EventScheduler
      */
     private MockObject $scheduler;
 
     /**
-     * @var MockObject|ContactTracker
+     * @var MockObject&ContactTracker
      */
     private MockObject $contactTracker;
 
     /**
-     * @var MockObject|AbstractEventAccessor
+     * @var MockObject&AbstractEventAccessor
      */
     private MockObject $config;
 
     /**
-     * @var MockObject|PendingEvent
+     * @var MockObject&PendingEvent
      */
     private MockObject $pendingEvent;
 
@@ -99,13 +99,13 @@ class LegacyEventDispatcherTest extends TestCase
         $matcher = $this->exactly(4);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event);
+                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
                     $this->assertSame('something', $eventName);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event);
+                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
                     $this->assertSame(CampaignEvents::ON_EVENT_EXECUTION, $eventName); // @phpstan-ignore-line classConstant.deprecated
                 }
                 if (3 === $matcher->numberOfInvocations()) {
@@ -148,9 +148,9 @@ class LegacyEventDispatcherTest extends TestCase
 
         // Legacy execution event should dispatch
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event);
+                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
                     $this->assertSame(CampaignEvents::ON_EVENT_EXECUTION, $eventName); // @phpstan-ignore-line classConstant.deprecated
                 }
                 if (2 === $matcher->numberOfInvocations()) {
@@ -195,14 +195,14 @@ class LegacyEventDispatcherTest extends TestCase
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event);
+                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
                     $this->assertSame('something', $eventName);
                     $event->setResult(['foo' => 'bar']);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event);
+                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
                     $this->assertSame(CampaignEvents::ON_EVENT_EXECUTION, $eventName); // @phpstan-ignore-line classConstant.deprecated
                 }
                 if (3 === $matcher->numberOfInvocations()) {
@@ -250,14 +250,14 @@ class LegacyEventDispatcherTest extends TestCase
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event);
+                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
                     $this->assertSame('something', $eventName);
                     $event->setResult(false);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event);
+                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
                     $this->assertSame(CampaignEvents::ON_EVENT_EXECUTION, $eventName); // @phpstan-ignore-line classConstant.deprecated
                 }
                 if (3 === $matcher->numberOfInvocations()) {
@@ -300,14 +300,14 @@ class LegacyEventDispatcherTest extends TestCase
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher) {
+            ->method('dispatch')->willReturnCallback(function (object $event, string $eventName) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event);
+                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
                     $this->assertSame('something', $eventName);
                     $event->setResult(['result' => false, 'foo' => 'bar']);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event);
+                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
                     $this->assertSame(CampaignEvents::ON_EVENT_EXECUTION, $eventName); // @phpstan-ignore-line classConstant.deprecated
                 }
                 if (3 === $matcher->numberOfInvocations()) {
@@ -351,9 +351,9 @@ class LegacyEventDispatcherTest extends TestCase
 
         // Legacy custom event should dispatch
         $this->dispatcher->expects($matcher)->method('dispatch')
-            ->willReturnCallback(function (object $event, string $eventName) use ($matcher) {
+            ->willReturnCallback(function (object $event, string $eventName) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event);
+                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
                     $this->assertSame('something', $eventName);
                     $event->setResult(['failed' => 1, 'reason' => 'because']);
                 }
@@ -390,9 +390,9 @@ class LegacyEventDispatcherTest extends TestCase
 
         // Should pass
         $this->dispatcher->expects($matcher)->method('dispatch')
-            ->willReturnCallback(function (object $event, string $eventName) use ($matcher) {
+            ->willReturnCallback(function (object $event, string $eventName) use ($matcher): object {
                 if (1 === $matcher->numberOfInvocations()) {
-                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event);
+                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
                     $this->assertSame('something', $eventName);
                     $event->setResult(true);
                 }
@@ -427,12 +427,23 @@ class LegacyEventDispatcherTest extends TestCase
             ->method('setSystemContact');
 
         $this->dispatcher->method('dispatch')
-            ->with($this->isInstanceOf(CampaignExecutionEvent::class), 'something')
-            ->willReturnCallback(fn (CampaignExecutionEvent $event) => $event->setResult(true));
+            ->with($this->isInstanceOf(CampaignExecutionEvent::class), 'something') // @phpstan-ignore classConstant.deprecatedClass
+            ->willReturnCallback(
+                // @phpstan-ignore return.deprecatedClass
+                function (object $event): CampaignExecutionEvent {
+                    $this->assertInstanceOf(CampaignExecutionEvent::class, $event); // @phpstan-ignore classConstant.deprecatedClass
+                    $event->setResult(true);
+
+                    return $event;
+                }
+            );
 
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, true, $this->pendingEvent);
     }
 
+    /**
+     * @phpstan-ignore return.deprecatedClass
+     */
     private function getLegacyEventDispatcher(): LegacyEventDispatcher
     {
         return new LegacyEventDispatcher(

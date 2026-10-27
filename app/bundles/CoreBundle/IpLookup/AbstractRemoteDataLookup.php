@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\RequestOptions;
 
 abstract class AbstractRemoteDataLookup extends AbstractLookup
 {
@@ -51,13 +52,13 @@ abstract class AbstractRemoteDataLookup extends AbstractLookup
         try {
             $response = ('post' == $this->method) ?
                 $this->client->post($url, [
-                    \GuzzleHttp\RequestOptions::BODY    => $this->getParameters(),
-                    \GuzzleHttp\RequestOptions::HEADERS => $this->getHeaders(),
-                    \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                    RequestOptions::BODY    => $this->getParameters(),
+                    RequestOptions::HEADERS => $this->getHeaders(),
+                    RequestOptions::TIMEOUT => 10,
                 ]) :
                 $this->client->get($url, [
-                    \GuzzleHttp\RequestOptions::HEADERS => $this->getHeaders(),
-                    \GuzzleHttp\RequestOptions::TIMEOUT => 10,
+                    RequestOptions::HEADERS => $this->getHeaders(),
+                    RequestOptions::TIMEOUT => 10,
                 ]);
 
             $this->parseResponse($response->getBody());

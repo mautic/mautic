@@ -9,8 +9,11 @@ use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
 class ProcessSignalService
 {
     public const SIGTERM  = 15;
+
     public const SIGINT   = 2;
+
     private const SIGNALS = [self::SIGTERM, self::SIGINT];
+
     private ?int $signal  = null;
 
     /**

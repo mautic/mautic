@@ -5,10 +5,13 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
@@ -16,7 +19,7 @@ use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber implements EventSubscriberInterface
 {
     public const CONTEXT_FORMS           = 'forms';
 
@@ -31,6 +34,8 @@ class ReportSubscriber implements EventSubscriberInterface
         private ReportHelper $reportHelper,
         private CoreParametersHelper $coreParametersHelper,
         private TranslatorInterface $translator,
+        private DncReportService $dncReportService,
+        private FormRepository $formRepository,
     ) {
     }
 
@@ -40,6 +45,7 @@ class ReportSubscriber implements EventSubscriberInterface
             ReportEvents::REPORT_ON_BUILD          => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE       => ['onReportGenerate', 0],
             ReportEvents::REPORT_ON_GRAPH_GENERATE => ['onReportGraphGenerate', 0],
+            ReportEvents::REPORT_ON_DISPLAY        => ['onReportDisplay', 0],
         ];
     }
 
@@ -98,7 +104,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
             $companyColumns = $this->companyReportData->getCompanyData();
 
-            $formSubmissionColumns = array_merge(
+            $commonColumnsAndFilters = array_merge(
                 $submissionColumns,
                 $columns,
                 $event->getCampaignByChannelColumns(),
@@ -106,10 +112,13 @@ class ReportSubscriber implements EventSubscriberInterface
                 $event->getIpColumn(),
                 $companyColumns
             );
+            $formSubmissionColumns = array_merge($commonColumnsAndFilters, $this->dncReportService->getDncColumns());
+            $formSubmissionFilters = array_merge($commonColumnsAndFilters, $this->dncReportService->getDncFilters());
 
             $data = [
                 'display_name' => 'mautic.form.report.submission.table',
                 'columns'      => $formSubmissionColumns,
+                'filters'      => $formSubmissionFilters,
             ];
             $event->addTable(self::CONTEXT_FORM_SUBMISSION, $data, self::CONTEXT_FORMS);
 
@@ -121,12 +130,11 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         if ($event->checkContext(self::CONTEXT_FORM_RESULT)) {
-            $formRepository = $this->formModel->getRepository();
             // select only the table for an existing report, if the setting is disabled
             if (false === $this->coreParametersHelper->get('form_results_data_sources')) {
                 $reportSource = empty($event->getContext()) ? ($event->getReportSource() ?? '') : $event->getContext();
 
-                $id   = $formRepository->getFormTableIdViaResults($reportSource);
+                $id   = $this->formRepository->getFormTableIdViaResults($reportSource);
                 $args = [
                     'filter' => [
                         'force' => [
@@ -140,7 +148,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 ];
             }
 
-            $forms = $formRepository->getEntities($args ?? []);
+            $forms = $this->formRepository->getEntities($args ?? []);
             foreach ($forms as $form) {
                 $formEntity         = $form[0];
 
@@ -158,7 +166,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     'columns'      => $formResultsColumns,
                 ];
 
-                $resultsTableName   = $formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
+                $resultsTableName   = $this->formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
                 $event->addTable(self::CONTEXT_FORM_RESULT.'.'.$resultsTableName, $data, self::CONTEXT_FORM_RESULT);
             }
         }
@@ -270,6 +278,17 @@ class ReportSubscriber implements EventSubscriberInterface
             }
             unset($queryBuilder);
         }
+    }
+
+    public function onReportDisplay(ReportDataEvent $event): void
+    {
+        $data = $event->getData();
+
+        if ($event->checkContext([self::CONTEXT_FORM_SUBMISSION])) {
+            $data = $this->dncReportService->processDncStatusDisplay($data);
+        }
+
+        $event->setData($data);
     }
 
     /**

@@ -7,27 +7,27 @@
 {% set color = contact.color|default('a0acb8') %}
 {% set img = leadGetAvatar(contact) %}
 <div class="shuffle shuffle-item grid col-sm-6 col-lg-4 contact-cards">
-    <div data-color="#{{ color }}" class="panel {% if highlight is defined %}highlight{% endif %} card ovf-h" style="border-top: 3px solid #{{ color }};">
+    <div data-color="#{{ color }}" class="panel {% if highlight is defined %}highlight{% endif %} card overflow-hidden" style="border-top: 3px solid #{{ color }};">
         <div class="box-layout">
-            <div class="col-xs-4 va-m">
+            <div class="col-xs-4 align-middle">
                 <div class="panel-body">
                   <span class="img-wrapper img-rounded">
                       <img class="img" src="{{ img }}" />
                   </span>
                 </div>
             </div>
-            <div class="col-xs-8 va-t">
+            <div class="col-xs-8 align-top">
                 <div class="panel-body">
                     {% if contact.id in noContactList|keys %}
                         <div class="pull-right label label-danger"><i class="ri-prohibited-line"></i></div>
                     {% endif %}
                     <h4 class="fw-sb mb-xs ellipsis">
                         <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">
-                            <span>{{ contact.primaryIdentifier }}</span>
+                            <span>{% if contact.isAnonymous %}{{ contact.primaryIdentifier|trans }}{% else %}{{ htmlEntityDecode(contact.primaryIdentifier)|purify }}{% endif %}</span>
                         </a>
                     </h4>
                     <div class="text-secondary mb-1 ellipsis">
-                        <i class="ri-fw ri-building-2-line mr-xs"></i>{{ fields.core.company.value|default('') }}
+                        <i class="ri-fw ri-building-2-line mr-xs"></i>{{ htmlEntityDecode(fields.core.company.value|default(''))|purify }}
                     </div>
                     <div class="text-secondary mb-1 ellipsis">
                         <i class="ri-fw ri-map-pin-2-line mr-xs"></i>
@@ -52,6 +52,7 @@
                         </div>
                     {% endif %}
                     {{ customContent('lead.grid', _context) }}
+                    {{ customContent('lead.name.after', _context) }}
                 </div>
             </div>
         </div>

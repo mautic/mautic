@@ -1,10 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Event;
 
+use Mautic\EmailBundle\MonitoredEmail\Message;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class ParseEmailEvent extends Event
+final class ParseEmailEvent extends Event
 {
     /**
      * @var mixed[]
@@ -28,37 +31,29 @@ class ParseEmailEvent extends Event
     /**
      * Get the array of messages.
      *
-     * @return \Mautic\EmailBundle\MonitoredEmail\Message[]
+     * @return Message[]
      */
-    public function getMessages()
+    public function getMessages(): array
     {
         return $this->messages;
     }
 
     /**
-     * @return $this
+     * @param Message[] $messages
      */
-    public function setMessages($messages)
+    public function setMessages(array $messages): static
     {
         $this->messages = $messages;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getKeys()
+    public function getKeys(): array
     {
         return $this->keys;
     }
 
-    /**
-     * @param array $keys
-     *
-     * @return $this
-     */
-    public function setKeys($keys)
+    public function setKeys(array $keys): static
     {
         $this->keys = $keys;
 
@@ -107,18 +102,12 @@ class ParseEmailEvent extends Event
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getCriteriaRequests()
+    public function getCriteriaRequests(): array
     {
         return $this->criteriaRequests;
     }
 
-    /**
-     * @return array
-     */
-    public function getMarkAsSeenInstructions()
+    public function getMarkAsSeenInstructions(): array
     {
         return $this->markAsSeen;
     }

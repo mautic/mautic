@@ -8,7 +8,7 @@ use Mautic\IntegrationsBundle\Integration\DefaultConfigFormTrait;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration;
 
-class ConfigSupport extends GrapesJsBuilderIntegration implements ConfigFormInterface
+final class ConfigSupport extends GrapesJsBuilderIntegration implements ConfigFormInterface
 {
     use DefaultConfigFormTrait;
 }

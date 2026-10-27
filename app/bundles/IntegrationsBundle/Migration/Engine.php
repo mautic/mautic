@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Migration;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\IntegrationsBundle\Exception\PathNotFoundException;
 
-class Engine
+final readonly class Engine
 {
     private string $migrationsPath;
 
@@ -31,7 +31,7 @@ class Engine
             return;
         }
 
-        if (!$migrationClasses) {
+        if ([] === $migrationClasses) {
             return;
         }
 
@@ -81,8 +81,6 @@ class Engine
     }
 
     /**
-     * Get migration file names.
-     *
      * @return string[]
      */
     private function getMigrationFileNames(): array

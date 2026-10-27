@@ -9,7 +9,7 @@ use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+final class CampaignSubscriber implements EventSubscriberInterface
 {
     use PushToIntegrationTrait;
 

@@ -17,7 +17,7 @@ $vars = [
     3 => 'password',
     4 => 'mauticVersion',
     5 => 'assetCategoryId',
-    6 => 'fileToUpload',
+    6 => 'remoteAssetUrl',
 ];
 
 foreach ($vars as $id => $var) {
@@ -29,6 +29,50 @@ foreach ($vars as $id => $var) {
     $$var = $_SERVER['argv'][$id];
 }
 
+// Validate the remote asset URL for security
+if (!filter_var($remoteAssetUrl, FILTER_VALIDATE_URL)) {
+    echo "Error: Invalid URL format for remote asset: {$remoteAssetUrl}\n";
+    exit(1);
+}
+
+// Parse the URL components
+$parsedUrl = parse_url($remoteAssetUrl);
+
+// Ensure the URL uses HTTPS for security
+if (!isset($parsedUrl['scheme']) || 'https' !== strtolower($parsedUrl['scheme'])) {
+    echo "Error: Remote asset URL must use HTTPS protocol\n";
+    exit(1);
+}
+
+// Verify the URL is from GitHub (required for Mautic release process)
+if (!isset($parsedUrl['host']) || !preg_match('/^github\.com$/i', $parsedUrl['host'])) {
+    echo "Error: Remote asset URL must be from github.com for security\n";
+    exit(1);
+}
+
+// Disallow userinfo (username:password@host) to avoid ambiguous/abusive URLs
+if (!empty($parsedUrl['user']) || !empty($parsedUrl['pass'])) {
+    echo "Error: Remote asset URL must not contain user information\n";
+    exit(1);
+}
+
+// Disallow query string or fragment to ensure a stable, direct asset URL
+if (!empty($parsedUrl['query']) || !empty($parsedUrl['fragment'])) {
+    echo "Error: Remote asset URL must not contain query parameters or fragment\n";
+    exit(1);
+}
+
+// Enforce the exact GitHub release asset path for the specified Mautic version
+if (empty($parsedUrl['path'])) {
+    echo "Error: Remote asset URL is missing a path component\n";
+    exit(1);
+}
+
+$expectedPath = '/mautic/mautic/releases/download/'.$mauticVersion.'/'.$mauticVersion.'.zip';
+if ($parsedUrl['path'] !== $expectedPath) {
+    echo "Error: Remote asset URL path must be \"{$expectedPath}\" for Mautic version {$mauticVersion}\n";
+    exit(1);
+}
 // Set up the authentication
 $settings = [
     'userName'   => $username,
@@ -40,41 +84,20 @@ $initAuth = new ApiAuth();
 $auth     = $initAuth->newAuth($settings, 'BasicAuth');
 $api      = new MauticApi();
 
-/** @var Mautic\Api\Files */
-$filesApi = $api->newApi('files', $auth, $instanceUrl);
-
 /** @var Mautic\Api\Assets */
 $assetApi = $api->newApi('assets', $auth, $instanceUrl);
 
 /**
- * Upload the file.
- */
-$filesApi->setFolder('assets');
-// File should be an absolute path!
-$fileRequest = [
-    'file' => $fileToUpload,
-];
-
-$response = $filesApi->create($fileRequest);
-
-if (isset($response['error'])) {
-    echo $response['error']['code'].': '.$response['error']['message']."\n";
-    exit(1);
-}
-
-if (!isset($response['file']) || !isset($response['file']['name'])) {
-    echo 'An unknown error occurred while uploading the release asset to our Mautic instance. '
-        ."Please try again or debug locally (we don't provide logs in CI for security reasons)\n";
-    exit(1);
-}
-
-/**
- * Create the actual asset based on the file we just uploaded.
+ * Create the asset with remote storage location.
+ * This references the GitHub release asset directly without uploading to local storage.
  */
 $data = [
     'title'           => "Mautic {$mauticVersion}",
-    'storageLocation' => 'local',
-    'file'            => $response['file']['name'],
+    'storageLocation' => 'remote',
+    // Mautic expects the remote URL in the "file" field for remote assets.
+    'file'            => $remoteAssetUrl,
+    // Keep remotePath for backward compatibility and clarity.
+    'remotePath'      => $remoteAssetUrl,
     'category'        => $assetCategoryId,
     'isPublished'     => true,
 ];

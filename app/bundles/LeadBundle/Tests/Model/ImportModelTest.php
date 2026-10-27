@@ -5,18 +5,29 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\ORM\Exception\ORMException;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
+use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ImportModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ImportModelTest extends StandardImportTestHelper
+final class ImportModelTest extends StandardImportTestHelper
 {
     public function testInitEventLog(): void
     {
@@ -33,11 +44,11 @@ class ImportModelTest extends StandardImportTestHelper
             ->setOriginalFile($fileName);
         $log = $model->initEventLog($entity, $line);
 
-        Assert::assertSame($userId, $log->getUserId());
-        Assert::assertSame($userName, $log->getUserName());
-        Assert::assertSame('lead', $log->getBundle());
-        Assert::assertSame('import', $log->getObject());
-        Assert::assertSame(['line' => $line, 'file' => $fileName], $log->getProperties());
+        $this->assertSame($userId, $log->getUserId());
+        $this->assertSame($userName, $log->getUserName());
+        $this->assertSame('lead', $log->getBundle());
+        $this->assertSame('import', $log->getObject());
+        $this->assertSame(['line' => $line, 'file' => $fileName], $log->getProperties());
     }
 
     public function testProcess(): void
@@ -48,7 +59,7 @@ class ImportModelTest extends StandardImportTestHelper
         $this->dispatcher->expects($this->exactly(4))
             ->method('dispatch')
             ->with(
-                $this->callback(function (ImportProcessEvent $event) {
+                $this->callback(function (ImportProcessEvent $event): true {
                     // Emulate a subscriber.
                     $event->setWasMerged(false);
 
@@ -61,23 +72,14 @@ class ImportModelTest extends StandardImportTestHelper
         $model->process($entity, new Progress());
         $entity->end();
 
-        Assert::assertEquals(100, $entity->getProgressPercentage());
-        Assert::assertSame(4, $entity->getInsertedCount());
-        Assert::assertSame(2, $entity->getIgnoredCount());
-        Assert::assertSame(Import::IMPORTED, $entity->getStatus());
+        $this->assertEquals(100, $entity->getProgressPercentage());
+        $this->assertSame(4, $entity->getInsertedCount());
+        $this->assertSame(2, $entity->getIgnoredCount());
+        $this->assertSame(Import::IMPORTED, $entity->getStatus());
     }
 
     public function testCheckParallelImportLimitWhenMore(): void
     {
-        $model  = $this->getMockBuilder(ImportModel::class)
-            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $model->expects($this->once())
-            ->method('getParallelImportLimit')
-            ->willReturn(4);
-
         $repository = $this->getMockBuilder(ImportRepository::class)
             ->onlyMethods(['countImportsWithStatuses'])
             ->disableOriginalConstructor()
@@ -87,19 +89,25 @@ class ImportModelTest extends StandardImportTestHelper
             ->method('countImportsWithStatuses')
             ->willReturn(5);
 
-        $model->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repository);
+        $model  = $this->getMockBuilder(ImportModel::class)
+            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
+        $model->expects($this->once())
+            ->method('getParallelImportLimit')
+            ->willReturn(4);
+
+        ReflectionHelper::setValue($model, 'importRepository', $repository);
         $result = $model->checkParallelImportLimit();
 
-        Assert::assertFalse($result);
+        $this->assertFalse($result);
     }
 
     public function testCheckParallelImportLimitWhenEqual(): void
     {
         $model  = $this->getMockBuilder(ImportModel::class)
-            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
+            ->onlyMethods(['getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -116,19 +124,17 @@ class ImportModelTest extends StandardImportTestHelper
             ->method('countImportsWithStatuses')
             ->willReturn(4);
 
-        $model->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repository);
+        ReflectionHelper::setValue($model, 'importRepository', $repository);
 
         $result = $model->checkParallelImportLimit();
 
-        Assert::assertFalse($result);
+        $this->assertFalse($result);
     }
 
     public function testCheckParallelImportLimitWhenLess(): void
     {
         $model  = $this->getMockBuilder(ImportModel::class)
-            ->onlyMethods(['getParallelImportLimit', 'getRepository'])
+            ->onlyMethods(['getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -145,13 +151,11 @@ class ImportModelTest extends StandardImportTestHelper
             ->method('countImportsWithStatuses')
             ->willReturn(5);
 
-        $model->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($repository);
+        ReflectionHelper::setValue($model, 'importRepository', $repository);
 
         $result = $model->checkParallelImportLimit();
 
-        Assert::assertTrue($result);
+        $this->assertTrue($result);
     }
 
     public function testBeginImportWhenParallelLimitHit(): void
@@ -182,10 +186,10 @@ class ImportModelTest extends StandardImportTestHelper
             // This is expected
         }
 
-        Assert::assertEquals(0, $entity->getProgressPercentage());
-        Assert::assertSame(0, $entity->getInsertedCount());
-        Assert::assertSame(0, $entity->getIgnoredCount());
-        Assert::assertSame(Import::DELAYED, $entity->getStatus());
+        $this->assertEquals(0, $entity->getProgressPercentage());
+        $this->assertSame(0, $entity->getInsertedCount());
+        $this->assertSame(0, $entity->getIgnoredCount());
+        $this->assertSame(Import::DELAYED, $entity->getStatus());
 
         $model->expects($this->never())->method('saveEntity');
     }
@@ -205,7 +209,7 @@ class ImportModelTest extends StandardImportTestHelper
 
         $model->expects($this->once())
             ->method('process')
-            ->will($this->throwException(new ORMException()));
+            ->willThrowException(new ORMException());
 
         $entity = $this->initImportEntity(['canProceed']);
 
@@ -219,10 +223,10 @@ class ImportModelTest extends StandardImportTestHelper
             // This is expected
         }
 
-        Assert::assertEquals(0, $entity->getProgressPercentage());
-        Assert::assertSame(0, $entity->getInsertedCount());
-        Assert::assertSame(0, $entity->getIgnoredCount());
-        Assert::assertSame(Import::DELAYED, $entity->getStatus());
+        $this->assertEquals(0, $entity->getProgressPercentage());
+        $this->assertSame(0, $entity->getInsertedCount());
+        $this->assertSame(0, $entity->getIgnoredCount());
+        $this->assertSame(Import::DELAYED, $entity->getStatus());
 
         $model->expects($this->never())->method('saveEntity');
     }
@@ -258,11 +262,7 @@ class ImportModelTest extends StandardImportTestHelper
         ];
 
         foreach ($testData as $test) {
-            Assert::assertSame(
-                $test['res'],
-                $model->isEmptyCsvRow($test['row']),
-                'Failed on row '.var_export($test['row'], true)
-            );
+            $this->assertSame($test['res'], $model->isEmptyCsvRow($test['row']), 'Failed on row '.var_export($test['row'], true));
         }
     }
 
@@ -285,11 +285,7 @@ class ImportModelTest extends StandardImportTestHelper
         ];
 
         foreach ($testData as $test) {
-            Assert::assertSame(
-                $test['res'],
-                $model->trimArrayValues($test['row']),
-                'Failed on row '.var_export($test['row'], true)
-            );
+            $this->assertSame($test['res'], $model->trimArrayValues($test['row']), 'Failed on row '.var_export($test['row'], true));
         }
     }
 
@@ -322,12 +318,8 @@ class ImportModelTest extends StandardImportTestHelper
 
         foreach ($testData as $test) {
             $res = $model->hasMoreValuesThanColumns($test['row'], $columns);
-            Assert::assertSame(
-                $test['res'],
-                $res,
-                'Failed on row '.var_export($test['row'], true)
-            );
-            Assert::assertSame($test['mod'], $test['row']);
+            $this->assertSame($test['res'], $res, 'Failed on row '.var_export($test['row'], true));
+            $this->assertSame($test['mod'], $test['row']);
         }
     }
 
@@ -352,22 +344,22 @@ class ImportModelTest extends StandardImportTestHelper
         $progress = new Progress();
         // Each batch should have the last line imported recorded as limit + 1
         $model->process($import, $progress, 100);
-        Assert::assertEquals(101, $import->getLastLineImported());
+        $this->assertEquals(101, $import->getLastLineImported());
         $model->process($import, $progress, 100);
-        Assert::assertEquals(201, $import->getLastLineImported());
+        $this->assertEquals(201, $import->getLastLineImported());
         $model->process($import, $progress, 100);
-        Assert::assertEquals(301, $import->getLastLineImported());
+        $this->assertEquals(301, $import->getLastLineImported());
         $model->process($import, $progress, 100);
-        Assert::assertEquals(401, $import->getLastLineImported());
+        $this->assertEquals(401, $import->getLastLineImported());
         $model->process($import, $progress, 100);
-        Assert::assertEquals(501, $import->getLastLineImported());
+        $this->assertEquals(501, $import->getLastLineImported());
         $model->process($import, $progress, 100);
 
         // 512 is an empty line in the CSV
-        Assert::assertEquals(512, $import->getLastLineImported());
+        $this->assertEquals(512, $import->getLastLineImported());
 
         // Excluding the header but including the empty row in 512, there are 511 rows
-        Assert::assertEquals(511, $import->getProcessedRows());
+        $this->assertSame(511, $import->getProcessedRows());
 
         $import->end();
     }
@@ -388,7 +380,7 @@ class ImportModelTest extends StandardImportTestHelper
         $importModel->process($import, new Progress());
         $import->end();
 
-        Assert::assertSame(Import::FAILED, $import->getStatus());
+        $this->assertSame(Import::FAILED, $import->getStatus());
     }
 
     public function testWhenWarningsAvailableInProcessEventLog(): void
@@ -399,7 +391,7 @@ class ImportModelTest extends StandardImportTestHelper
         $this->dispatcher->expects($this->exactly(4))
             ->method('dispatch')
             ->with(
-                $this->callback(function (ImportProcessEvent $event) {
+                $this->callback(function (ImportProcessEvent $event): true {
                     // Emulate a subscriber.
                     $event->setWasMerged(false);
                     $event->addWarning('test warning message');
@@ -413,7 +405,102 @@ class ImportModelTest extends StandardImportTestHelper
         $model->process($entity, new Progress());
         $entity->end();
 
-        Assert::assertEquals(100, $entity->getProgressPercentage());
-        Assert::assertSame(Import::IMPORTED, $entity->getStatus());
+        $this->assertEquals(100, $entity->getProgressPercentage());
+        $this->assertSame(Import::IMPORTED, $entity->getStatus());
+    }
+
+    public function testWhenImportUnpublishedInBetweenImportProcess(): void
+    {
+        $translator           = $this->getTranslatorMock();
+        $pathsHelper          = $this->getPathsHelperMock();
+        $this->entityManager  = $this->getEntityManagerMock();
+        $coreParametersHelper = $this->getCoreParametersHelperMock();
+
+        /** @var MockObject&UserHelper $userHelper */
+        $userHelper = $this->createStub(UserHelper::class);
+
+        /** @var MockObject&LeadEventLogRepository $logRepository */
+        $logRepository = $this->createStub(LeadEventLogRepository::class);
+
+        /** @var MockObject&ImportRepository $importRepository */
+        $importRepository = $this->createMock(ImportRepository::class);
+
+        $importRepository->expects($this->exactly(3))->method('getValue')
+            ->willReturnOnConsecutiveCalls(true, false, false);
+
+        $this->entityManager
+            ->method('isOpen')
+            ->willReturn(true);
+
+        /** @var MockObject&LeadModel $leadModel */
+        $leadModel = $this->getMockBuilder(LeadModel::class)
+            ->disableOriginalConstructor()
+            ->setConstructorArgs([16 => $this->entityManager])
+            ->getMock();
+
+        $leadModel
+            ->method('getEventLogRepository')
+            ->willReturn($logRepository);
+
+        /** @var MockObject&CompanyModel $companyModel */
+        $companyModel = $this->getMockBuilder(CompanyModel::class)
+            ->disableOriginalConstructor()
+            ->setConstructorArgs([3 => $this->entityManager])
+            ->getMock();
+
+        /** @var MockObject&NotificationModel $notificationModel */
+        $notificationModel = $this->getMockBuilder(NotificationModel::class)
+            ->disableOriginalConstructor()
+            ->setConstructorArgs([3 => $this->entityManager])
+            ->getMock();
+
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $this->dispatcher->expects($this->exactly(4))
+            ->method('dispatch')
+            ->with(
+                $this->callback(function (ImportProcessEvent $event): true {
+                    // Emulate a subscriber.
+                    $event->setWasMerged(false);
+
+                    return true;
+                }),
+                LeadEvents::IMPORT_ON_PROCESS,
+            );
+
+        $importModel = new ImportModel(
+            $pathsHelper,
+            $leadModel,
+            $notificationModel,
+            $coreParametersHelper,
+            $companyModel,
+            $this->entityManager,
+            $this->createStub(CorePermissions::class),
+            $this->dispatcher,
+            $this->createStub(UrlGeneratorInterface::class),
+            $translator,
+            $userHelper,
+            $this->createStub(LoggerInterface::class),
+            new ProcessSignalService(),
+            $importRepository,
+            $logRepository,
+        );
+
+        $this->setUpBeforeClass();
+
+        $entity = $this->initImportEntity();
+        $entity->setParserConfig([
+            'batchlimit' => 3,
+            'delimiter'  => ',',
+            'enclosure'  => '"',
+            'escape'     => '/',
+        ]);
+
+        $entity->start();
+        $importModel->process($entity, new Progress());
+        $entity->end();
+
+        $this->assertSame(4, $entity->getInsertedCount());
+        $this->assertSame(Import::STOPPED, $entity->getStatus());
     }
 }

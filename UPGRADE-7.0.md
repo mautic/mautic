@@ -8,6 +8,7 @@
 ## Removed features
 - The ability to update Mautic in the browser (via user interface) has been removed. To update Mautic, use the **command line** instead.
 - The API Limiter was removed temporarily. Shoud be added back before the M7-stable is released. https://github.com/mautic/mautic/pull/14876
+- The `track_by_tracking_url` configuration setting has been removed. Identification of contacts via the `ct` parameter in tracking URLs was already the default behavior.
 
 ## Removed code
 
@@ -62,3 +63,7 @@
 
 ### Javascript
 - Removed `Mautic.insertTextInEditor` function. Use `Mautic.insertHtmlInEditor` instead.
+
+# Notes
+
+- Migration file `app/migrations/Version20230522141144.php` has been removed. If you do not use the Mautic Citrix plugin or a fork of it, you can manually drop the `plugin_citrix_events` table from the database, as it is no longer used.

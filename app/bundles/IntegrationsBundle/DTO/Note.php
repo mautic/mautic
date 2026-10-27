@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\DTO;
 
-final class Note
+final readonly class Note
 {
     public const TYPE_WARNING = 'warning';
 

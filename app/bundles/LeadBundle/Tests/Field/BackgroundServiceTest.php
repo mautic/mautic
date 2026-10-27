@@ -19,7 +19,7 @@ use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
+final class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
 {
     private BackgroundService $backgroundService;
 
@@ -39,11 +39,6 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
     private MockObject $leadFieldSaver;
 
     /**
-     * @var MockObject&LeadFieldDeleter
-     */
-    private $leadFieldDeleter;
-
-    /**
      * @var MockObject&FieldColumnBackgroundJobDispatcher
      */
     private MockObject $fieldColumnBackgroundJobDispatcher;
@@ -53,12 +48,11 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $customFieldNotification;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->fieldModel                         = $this->createMock(FieldModel::class);
         $this->customFieldColumn                  = $this->createMock(CustomFieldColumn::class);
         $this->leadFieldSaver                     = $this->createMock(LeadFieldSaver::class);
-        $this->leadFieldDeleter                   = $this->createMock(LeadFieldDeleter::class);
         $this->fieldColumnBackgroundJobDispatcher = $this->createMock(FieldColumnBackgroundJobDispatcher::class);
         $this->customFieldNotification            = $this->createMock(CustomFieldNotification::class);
 
@@ -66,7 +60,7 @@ class BackgroundServiceTest extends \PHPUnit\Framework\TestCase
             $this->fieldModel,
             $this->customFieldColumn,
             $this->leadFieldSaver,
-            $this->leadFieldDeleter,
+            $this->createStub(LeadFieldDeleter::class),
             $this->fieldColumnBackgroundJobDispatcher,
             $this->customFieldNotification
         );

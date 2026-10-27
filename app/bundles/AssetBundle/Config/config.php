@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -54,61 +56,10 @@ return [
         ],
     ],
 
-    'services' => [
-        'permissions' => [
-            'mautic.asset.permissions' => [
-                'class'     => Mautic\AssetBundle\Security\Permissions\AssetPermissions::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-        ],
-        'others' => [
-            'mautic.asset.upload.error.handler' => [
-                'class'     => Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,
-            ],
-            // Override the DropzoneController
-            'oneup_uploader.controller.dropzone.class' => [
-                'class'     => Mautic\AssetBundle\Controller\UploadController::class,
-            ],
-        ],
-        'fixtures' => [
-            'mautic.asset.fixture.asset' => [
-                'class'     => Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class,
-                'tag'       => Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-            ],
-        ],
-    ],
-
     'parameters' => [
         'upload_dir'          => '%mautic.application_dir%/media/files',
         'max_size'            => '6',
         'allowed_extensions'  => ['csv', 'doc', 'docx', 'epub', 'gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'odt', 'odp', 'ods', 'pdf', 'png', 'ppt', 'pptx', 'tif', 'tiff', 'txt', 'xls', 'xlsx', 'wav'],
         'streamed_extensions' => ['gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'pdf', 'png', 'wav'],
-        'allowed_mimetypes'   => [
-            'csv'  => 'text/csv',
-            'doc'  => 'application/msword',
-            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'epub' => 'application/epub+zip',
-            'gif'  => 'image/gif',
-            'jpg'  => 'image/jpeg',
-            'jpeg' => 'image/jpeg',
-            'mpg'  => 'video/mpeg',
-            'mpeg' => 'video/mpeg',
-            'mp3'  => 'audio/mpeg',
-            'odt'  => 'application/vnd.oasis.opendocument.text',
-            'odp'  => 'application/vnd.oasis.opendocument.presentation',
-            'ods'  => 'application/vnd.oasis.opendocument.spreadsheet',
-            'pdf'  => 'application/pdf',
-            'png'  => 'image/png',
-            'ppt'  => 'application/vnd.ms-powerpoint',
-            'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            'tif'  => 'image/tiff',
-            'tiff' => 'image/tiff',
-            'txt'  => 'text/plain',
-            'xls'  => 'application/vnd.ms-excel',
-            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'wav'  => 'audio/wav',
-        ],
     ],
 ];

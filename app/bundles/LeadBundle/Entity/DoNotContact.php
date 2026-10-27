@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -123,17 +125,14 @@ class DoNotContact
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @return DoNotContact
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -148,10 +147,7 @@ class DoNotContact
         return $this->dateAdded;
     }
 
-    /**
-     * @return DoNotContact
-     */
-    public function setDateAdded(\DateTime $dateAdded)
+    public function setDateAdded(\DateTime $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
@@ -168,10 +164,8 @@ class DoNotContact
 
     /**
      * @param int $reason
-     *
-     * @return DoNotContact
      */
-    public function setReason($reason)
+    public function setReason($reason): static
     {
         $this->reason = $reason;
 
@@ -179,19 +173,14 @@ class DoNotContact
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getComments()
     {
         return $this->comments;
     }
 
-    /**
-     * @param string $comments
-     *
-     * @return DoNotContact
-     */
-    public function setComments($comments)
+    public function setComments(?string $comments): static
     {
         $this->comments = InputHelper::string((string) $comments);
 
@@ -208,10 +197,8 @@ class DoNotContact
 
     /**
      * @param string $channel
-     *
-     * @return DoNotContact
      */
-    public function setChannel($channel)
+    public function setChannel($channel): static
     {
         $this->channel = $channel;
 
@@ -228,10 +215,8 @@ class DoNotContact
 
     /**
      * @param mixed $channelId
-     *
-     * @return DoNotContact
      */
-    public function setChannelId($channelId)
+    public function setChannelId($channelId): static
     {
         $this->channelId = $channelId;
 

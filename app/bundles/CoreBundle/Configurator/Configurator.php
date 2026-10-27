@@ -201,13 +201,13 @@ class Configurator
                     $value = "'".addcslashes($value, '\\\'')."'";
                 } elseif (is_bool($value)) {
                     $value = ($value) ? 'true' : 'false';
-                } elseif (is_null($value)) {
+                } elseif (null === $value) {
                     $value = 'null';
                 } elseif (is_array($value)) {
                     $value = $this->renderArray($value);
                 }
 
-                $string .= "\t'$key' => $value,\n";
+                $string .= "\t'{$key}' => {$value},\n";
             }
         }
 

@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\TagModel;
 
-class BatchControllerTest extends MauticMysqlTestCase
+final class BatchControllerTest extends MauticMysqlTestCase
 {
     private TagRepository $tagRepository;
 
@@ -21,7 +25,7 @@ class BatchControllerTest extends MauticMysqlTestCase
      */
     private array $leads;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $tags = [
@@ -30,7 +34,9 @@ class BatchControllerTest extends MauticMysqlTestCase
             'tag3',
             'tag4',
         ];
-        $tagModel            = static::getContainer()->get('mautic.lead.model.tag');
+
+        /** @var TagModel $tagModel */
+        $tagModel            = self::getContainer()->get(TagModel::class);
         $this->tagRepository = $tagModel->getRepository();
         $this->tags          = $this->addTags($tags);
         $this->leads         = $this->addLeads();
@@ -39,9 +45,9 @@ class BatchControllerTest extends MauticMysqlTestCase
     public function testBatchViewAction(): void
     {
         $this->client->request('GET', '/s/tags/batch/view');
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $this->assertStringContainsString('Add tags', $this->client->getResponse()->getContent());
-        $this->assertStringContainsString('Remove tags', $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Add tags', (string) $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('Remove tags', (string) $this->client->getResponse()->getContent());
     }
 
     public function testAddTagBatchSetAction(): void
@@ -55,11 +61,13 @@ class BatchControllerTest extends MauticMysqlTestCase
         $form->setValues($values);
         $this->client->submit($form);
 
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $this->assertStringContainsString('3 contacts affected', $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('3 contacts affected', (string) $this->client->getResponse()->getContent());
 
-        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        /** @var LeadModel $leadModel */
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $lead1     = $leadModel->getEntity($this->leads[0]->getId());
+        $this->assertInstanceOf(Lead::class, $lead1);
         $this->assertContains($this->tags[0], $lead1->getTags()->toArray());
         $this->assertContains($this->tags[1], $lead1->getTags()->toArray());
         $this->assertNotContains($this->tags[2], $lead1->getTags()->toArray());
@@ -67,7 +75,8 @@ class BatchControllerTest extends MauticMysqlTestCase
 
     public function testAddAndRemoveBatchSetAction(): void
     {
-        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        /** @var LeadModel $leadModel */
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $this->leads[0]->addTag($this->tags[1]);
         $this->leads[0]->addTag($this->tags[2]);
         $leadModel->saveEntity($this->leads[0]);
@@ -80,9 +89,10 @@ class BatchControllerTest extends MauticMysqlTestCase
         $form->setValues($values);
         $this->client->submit($form);
 
-        $this->assertEquals(200, $this->client->getResponse()->getStatusCode());
-        $this->assertStringContainsString('1 contact affected', $this->client->getResponse()->getContent());
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('1 contact affected', (string) $this->client->getResponse()->getContent());
         $lead1 = $leadModel->getEntity($this->leads[0]->getId());
+        $this->assertInstanceOf(Lead::class, $lead1);
         $this->assertNotContains($this->tags[1], $lead1->getTags()->toArray());
         $this->assertContains($this->tags[2], $lead1->getTags()->toArray());
     }
@@ -108,7 +118,8 @@ class BatchControllerTest extends MauticMysqlTestCase
      */
     public function addLeads(): array
     {
-        $leadModel = static::getContainer()->get('mautic.lead.model.lead');
+        /** @var LeadModel $leadModel */
+        $leadModel = self::getContainer()->get(LeadModel::class);
         $lead      = $leadModel->getEntity();
 
         $lead->setEmail('example1@example.com');

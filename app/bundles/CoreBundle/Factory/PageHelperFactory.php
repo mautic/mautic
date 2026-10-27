@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Factory;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -7,7 +9,7 @@ use Mautic\CoreBundle\Helper\PageHelper;
 use Mautic\CoreBundle\Helper\PageHelperInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final class PageHelperFactory implements PageHelperFactoryInterface
+final readonly class PageHelperFactory implements PageHelperFactoryInterface
 {
     public function __construct(
         private RequestStack $requestStack,

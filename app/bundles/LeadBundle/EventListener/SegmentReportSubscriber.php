@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Report\FieldsBuilder;
@@ -8,7 +10,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SegmentReportSubscriber implements EventSubscriberInterface
+final readonly class SegmentReportSubscriber implements EventSubscriberInterface
 {
     public const SEGMENT_MEMBERSHIP = 'segment.membership';
 

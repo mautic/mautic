@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\EmailBundle\EventListener\EmailToUserSubscriber;
@@ -9,12 +11,12 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
 
-class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
+final class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var array
+     * @var array<string, mixed>
      */
-    private $config = [
+    private array $config = [
         'useremail' => [
             'email' => 33,
         ],
@@ -65,7 +67,7 @@ class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockSendEmailToUser->expects($this->once())
             ->method('sendEmailToUsers')
             ->with($this->config, $lead)
-            ->will($this->throwException(new EmailCouldNotBeSentException()));
+            ->willThrowException(new EmailCouldNotBeSentException());
 
         $triggerEvent = new TriggerEvent();
         $triggerEvent->setProperties($this->config);

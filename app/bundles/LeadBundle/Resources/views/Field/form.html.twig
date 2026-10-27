@@ -81,6 +81,122 @@
             </div>
             {% do form.properties.setRendered() %}
         </div>
+        {% set fieldGuidanceModalId = 'fieldGuidanceModal' %}
+        {% set fieldItems = [
+            {
+                'heading': 'mautic.lead.field.shouldbe.field.item1.heading',
+                'icon': 'ri-mail-line'
+            },
+            {
+                'heading': 'mautic.lead.field.shouldbe.field.item2.heading',
+                'copy': 'mautic.lead.field.shouldbe.field.item2.copy',
+                'icon': 'ri-user-line'
+            },
+            {
+                'heading': 'mautic.lead.field.shouldbe.field.item3.heading',
+                'icon': 'ri-upload-line'
+            },
+            {
+                'heading': 'mautic.lead.field.shouldbe.field.item4.heading',
+                'icon': 'ri-git-merge-line'
+            }
+        ] %}
+        {% set tagItems = [
+            {
+                'heading': 'mautic.lead.field.shouldbe.tag.item1.heading',
+                'copy': 'mautic.lead.field.shouldbe.tag.item1.copy',
+                'icon': 'ri-eye-line'
+            },
+            {
+                'heading': 'mautic.lead.field.shouldbe.tag.item2.heading',
+                'icon': 'ri-add-line'
+            },
+            {
+                'heading': 'mautic.lead.field.shouldbe.tag.item3.heading',
+                'icon': 'ri-group-line'
+            },
+            {
+                'heading': 'mautic.lead.field.shouldbe.tag.item4.heading',
+                'copy': 'mautic.lead.field.shouldbe.tag.item4.copy',
+                'icon': 'ri-checkbox-circle-line'
+            }
+        ] %}
+        {% set itemTypes = [
+            {'items': fieldItems, 'label': 'mautic.lead.field.shouldbe.field.heading', 'color': 'green'},
+            {'items': tagItems, 'label': 'mautic.lead.field.shouldbe.tag.heading', 'color': 'red'}
+        ] %}
+        {% set tilesHtml %}
+        <div class="mb-32">
+            <div class="grid grid-cols-4 gap-sm">
+            {% for type in itemTypes %}
+                {% for item in type.items %}
+                    {% set tileContent %}
+                    <div class="mb-sm">
+                    {% include '@MauticCore/Helper/_tag.html.twig' with {
+                        tags: [{
+                            label: '',
+                            icon: item.icon,
+                            icon_only: true,
+                            color: 'gray'
+                        }]
+                    } %}
+                    </div>
+                        <span class="type-heading-02 break-word">{{ item.heading|trans }}</span>
+                        {% if item.copy is defined %}
+                            <span class="type-label-01 mt-sm break-word">{{ item.copy|trans }}</span>
+                        {% endif %}
+                        <div class="mt-a pt-md">
+                        {% include '@MauticCore/Helper/_tag.html.twig' with {
+                            tags: [{
+                                label: type.label,
+                                color: type.color,
+                                size: 'sm'
+                            }]
+                        } %}
+                        </div>
+                    {% endset %}
+                    {% include '@MauticCore/Components/tile.html.twig' with {type: 'base', content: tileContent} only %}
+                {% endfor %}
+            {% endfor %}
+                </div>
+            </div>
+
+            {{ include('@MauticCore/Components/content-item-row.html.twig', {
+                type: 'default',
+                eyebrow: 'mautic.lead.field.shouldbe.faq',
+                heading: 'mautic.lead.field.shouldbe.faq.heading',
+                copy: 'mautic.lead.field.shouldbe.faq.copy',
+            }) }}
+
+        {% endset %}
+        {% set shouldBeFieldModalContent %}
+            {% include '@MauticCore/Components/content-block.html.twig' with {
+                heading: 'mautic.lead.field.shouldbe.heading',
+                subheading: 'mautic.lead.field.shouldbe.subheading',
+                childContainer: tilesHtml,
+
+            } only %}
+        {% endset %}
+        <div class="pa-md">
+        {% include '@MauticCore/Components/card.html.twig' with {
+            heading: 'mautic.lead.field.shouldbe.heading',
+            href: '',
+            attributes: {
+                'data-toggle': 'modal',
+                'data-target': '#' ~ fieldGuidanceModalId
+            },
+            type: 'link',
+            ctaType: 'modal'
+        } only %}
+        </div>
+        {% include '@MauticCore/Components/modal.html.twig' with {
+            id: fieldGuidanceModalId,
+            modalLabel: 'mautic.lead.field.shouldbe.label',
+            modalContent: shouldBeFieldModalContent,
+            type: 'expressive',
+            size: 'lg',
+            hasScrollingContent: true
+        } only %}
     </div>
     <div class="col-md-4 height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">

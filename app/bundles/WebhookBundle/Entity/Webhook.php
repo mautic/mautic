@@ -2,6 +2,13 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
@@ -12,47 +19,76 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\SkipModifiedInterface;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Webhook extends FormEntity
+#[ApiResource(
+    shortName: 'Webhooks',
+    operations: [
+        new GetCollection(uriTemplate: '/webhooks', security: "is_granted('webhook:webhooks:viewown')"),
+        new Post(uriTemplate: '/webhooks', security: "is_granted('webhook:webhooks:create')"),
+        new Get(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:viewown', object)"),
+        new Put(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:editown', object)"),
+        new Patch(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:editother', object)"),
+        new Delete(uriTemplate: '/webhooks/{id}', security: "is_granted('webhook:webhooks:deleteown', object)"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['webhook:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['category'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['webhook:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
+class Webhook extends FormEntity implements SkipModifiedInterface
 {
     public const LOGS_DISPLAY_LIMIT = 100;
 
     /**
      * @var ?int
      */
+    #[Groups(['webhook:read'])]
     private $id;
 
     /**
      * @var ?string
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $name;
 
     /**
      * @var string|null
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $description;
 
     /**
      * @var ?string
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $webhookUrl;
 
     /**
      * @var ?string
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $secret;
 
     /**
      * @var Category|null
-     **/
+     */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $category;
 
     /**
      * @var Collection<int, Event>
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $events;
 
     /**
@@ -60,23 +96,20 @@ class Webhook extends FormEntity
      */
     private $logs;
 
-    /**
-     * @var array
-     */
-    private $removedEvents = [];
+    private array $removedEvents = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $payload;
 
     /**
      * Holds a simplified array of events, just an array of event types.
      * It's used for API serializaiton.
-     *
-     * @var array
      */
-    private $triggers = [];
+    #[Groups(['webhook:read', 'webhook:write'])]
+    private array $triggers = [];
 
     /**
      * ASC or DESC order for fetching order of the events when queue mode is on.
@@ -84,7 +117,14 @@ class Webhook extends FormEntity
      *
      * @var string|null
      */
+    #[Groups(['webhook:read', 'webhook:write'])]
     private $eventsOrderbyDir;
+
+    private ?\DateTimeImmutable $markedUnhealthyAt      = null;
+
+    private ?\DateTimeImmutable $unHealthySince         = null;
+
+    private ?\DateTimeImmutable $lastNotificationSentAt = null;
 
     public function __construct()
     {
@@ -104,7 +144,7 @@ class Webhook extends FormEntity
 
         $builder->createOneToMany('events', 'Event')
             ->orphanRemoval()
-            ->setIndexBy('event_type')
+            ->setIndexBy('eventType')
             ->mappedBy('webhook')
             ->cascadePersist()
             ->cascadeMerge()
@@ -122,6 +162,9 @@ class Webhook extends FormEntity
         $builder->addNamedField('webhookUrl', Types::TEXT, 'webhook_url');
         $builder->addField('secret', Types::STRING);
         $builder->addNullableField('eventsOrderbyDir', Types::STRING, 'events_orderby_dir');
+        $builder->addNullableField('markedUnhealthyAt', Types::DATETIME_IMMUTABLE, 'marked_unhealthy_at');
+        $builder->addNullableField('unHealthySince', Types::DATETIME_IMMUTABLE, 'unhealthy_since');
+        $builder->addNullableField('lastNotificationSentAt', Types::DATETIME_IMMUTABLE, 'last_notification_sent_at');
     }
 
     /**
@@ -150,27 +193,21 @@ class Webhook extends FormEntity
         $metadata->addPropertyConstraint(
             'name',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.name.required',
-                ]
+                message: 'mautic.core.name.required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'webhookUrl',
             new Assert\Url(
-                [
-                    'message' => 'mautic.core.valid_url_required',
-                ]
+                message: 'mautic.core.valid_url_required'
             )
         );
 
         $metadata->addPropertyConstraint(
             'webhookUrl',
             new NotBlank(
-                [
-                    'message' => 'mautic.core.valid_url_required',
-                ]
+                message: 'mautic.core.valid_url_required'
             )
         );
 
@@ -187,7 +224,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -196,10 +233,8 @@ class Webhook extends FormEntity
 
     /**
      * @param string $name
-     *
-     * @return Webhook
      */
-    public function setName($name)
+    public function setName($name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -208,7 +243,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
@@ -217,10 +252,8 @@ class Webhook extends FormEntity
 
     /**
      * @param string $description
-     *
-     * @return Webhook
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -229,7 +262,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -238,10 +271,8 @@ class Webhook extends FormEntity
 
     /**
      * @param string $webhookUrl
-     *
-     * @return Webhook
      */
-    public function setWebhookUrl($webhookUrl)
+    public function setWebhookUrl($webhookUrl): static
     {
         $this->isChanged('webhookUrl', $webhookUrl);
         $this->webhookUrl = $webhookUrl;
@@ -250,7 +281,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getWebhookUrl()
     {
@@ -259,10 +290,8 @@ class Webhook extends FormEntity
 
     /**
      * @param ?string $secret
-     *
-     * @return Webhook
      */
-    public function setSecret($secret)
+    public function setSecret($secret): static
     {
         $this->isChanged('secret', $secret);
         $this->secret = $secret;
@@ -278,10 +307,7 @@ class Webhook extends FormEntity
         return $this->secret;
     }
 
-    /**
-     * @return Webhook
-     */
-    public function setCategory(?Category $category = null)
+    public function setCategory(?Category $category = null): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -290,7 +316,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return Category
+     * @return Category|null
      */
     public function getCategory()
     {
@@ -307,10 +333,8 @@ class Webhook extends FormEntity
 
     /**
      * @param Collection<int, Event> $events
-     *
-     * @return $this
      */
-    public function setEvents($events)
+    public function setEvents($events): static
     {
         $this->isChanged('events', $events);
 
@@ -378,10 +402,7 @@ class Webhook extends FormEntity
         return false;
     }
 
-    /**
-     * @return $this
-     */
-    public function addEvent(Event $event)
+    public function addEvent(Event $event): static
     {
         $this->isChanged('events', $event);
 
@@ -390,10 +411,7 @@ class Webhook extends FormEntity
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function removeEvent(Event $event)
+    public function removeEvent(Event $event): static
     {
         $this->isChanged('events', $event);
         $this->removedEvents[] = $event;
@@ -405,7 +423,7 @@ class Webhook extends FormEntity
     /**
      * @param string $eventsOrderbyDir
      */
-    public function setEventsOrderbyDir($eventsOrderbyDir)
+    public function setEventsOrderbyDir($eventsOrderbyDir): static
     {
         $this->isChanged('eventsOrderbyDir', $eventsOrderbyDir);
         $this->eventsOrderbyDir = $eventsOrderbyDir;
@@ -414,7 +432,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getEventsOrderbyDir()
     {
@@ -444,10 +462,8 @@ class Webhook extends FormEntity
 
     /**
      * @param ArrayCollection<int,Log> $logs
-     *
-     * @return $this
      */
-    public function addLogs($logs)
+    public function addLogs($logs): static
     {
         $this->logs = $logs;
 
@@ -459,20 +475,14 @@ class Webhook extends FormEntity
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function addLog(Log $log)
+    public function addLog(Log $log): static
     {
         $this->logs[] = $log;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function removeLog(Log $log)
+    public function removeLog(Log $log): static
     {
         $this->logs->removeElement($log);
 
@@ -487,10 +497,7 @@ class Webhook extends FormEntity
         return $this->payload;
     }
 
-    /**
-     * @return Webhook
-     */
-    public function setPayload($payload)
+    public function setPayload($payload): static
     {
         $this->payload = $payload;
 
@@ -507,20 +514,16 @@ class Webhook extends FormEntity
 
         $aWhileBack = (new \DateTime())->modify('-2 days');
 
-        if ($dateModified < $aWhileBack) {
-            return false;
-        }
-
-        return true;
+        return $dateModified >= $aWhileBack;
     }
 
     /**
      * @param string $prop
      */
-    protected function isChanged($prop, $val)
+    protected function isChanged($prop, $val): void
     {
         $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
+        $current = $this->{$getter}();
         if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
@@ -534,5 +537,57 @@ class Webhook extends FormEntity
         } else {
             parent::isChanged($prop, $val);
         }
+    }
+
+    public function getMarkedUnhealthyAt(): ?\DateTimeImmutable
+    {
+        return $this->markedUnhealthyAt;
+    }
+
+    public function setMarkedUnhealthyAt(?\DateTimeImmutable $markedUnhealthyAt): self
+    {
+        $this->isChanged('markedUnhealthyAt', $markedUnhealthyAt);
+        $this->markedUnhealthyAt = $markedUnhealthyAt;
+
+        return $this;
+    }
+
+    public function getUnHealthySince(): ?\DateTimeImmutable
+    {
+        return $this->unHealthySince;
+    }
+
+    public function setUnHealthySince(?\DateTimeImmutable $unHealthySince): self
+    {
+        $this->unHealthySince = $unHealthySince;
+
+        return $this;
+    }
+
+    public function getLastNotificationSentAt(): ?\DateTimeImmutable
+    {
+        return $this->lastNotificationSentAt;
+    }
+
+    public function setLastNotificationSentAt(?\DateTimeImmutable $lastNotificationSentAt): self
+    {
+        $this->lastNotificationSentAt = $lastNotificationSentAt;
+
+        return $this;
+    }
+
+    /**
+     * Do not update modified_by and date_modified fields if only DNC or manipulator was changed.
+     * Avoid unnecessary update queries.
+     */
+    public function shouldSkipSettingModifiedProperties(): bool
+    {
+        $changes = $this->changes;
+
+        unset($changes['markedUnhealthyAt']);
+        unset($changes['unHealthySince']);
+        unset($changes['lastNotificationSentAt']);
+
+        return 0 === count($changes);
     }
 }

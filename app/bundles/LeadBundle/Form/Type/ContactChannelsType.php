@@ -16,10 +16,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class ContactChannelsType extends AbstractType
+final class ContactChannelsType extends AbstractType
 {
     public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
@@ -35,8 +35,8 @@ class ContactChannelsType extends AbstractType
             [
                 'choices'           => $options['channels'],
                 'expanded'          => true,
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['onClick' => 'Mautic.togglePreferredChannel(this.value);'],
+                'label_attr'        => ['class' => 'form-label'],
+                'attr'              => ['onClick' => 'window.Mautic ? Mautic.togglePreferredChannel(this.value) : togglePreferredChannel(this.value);'],
                 'multiple'          => true,
                 'label'             => false,
                 'required'          => false,
@@ -52,7 +52,7 @@ class ContactChannelsType extends AbstractType
                     'expanded'          => false,
                     'multiple'          => false,
                     'label'             => 'mautic.lead.list.frequency.preferred.channel',
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'placeholder'       => false,
                     'required'          => false,
                     'attr'              => [
@@ -164,7 +164,7 @@ class ContactChannelsType extends AbstractType
                     'save_text'      => 'mautic.core.form.save',
                     'cancel_onclick' => 'javascript:void(0);',
                     'cancel_attr'    => [
-                        'data-dismiss' => 'modal',
+                        'data-bs-dismiss' => 'modal',
                     ],
                 ]
             );

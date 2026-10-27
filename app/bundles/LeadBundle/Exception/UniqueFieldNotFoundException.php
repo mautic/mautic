@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Exception;
 
-class UniqueFieldNotFoundException extends \Exception
+final class UniqueFieldNotFoundException extends \Exception
 {
 }

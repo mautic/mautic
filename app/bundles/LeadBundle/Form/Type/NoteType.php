@@ -17,9 +17,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<LeadNote>
  */
-class NoteType extends AbstractType
+final class NoteType extends AbstractType
 {
-    private DateTimeHelper $dateHelper;
+    private readonly DateTimeHelper $dateHelper;
 
     public function __construct()
     {
@@ -36,7 +36,7 @@ class NoteType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.lead.note.form.text',
-                'label_attr' => ['class' => 'control-label sr-only'],
+                'label_attr' => ['class' => 'form-label visually-hidden'],
                 'attr'       => ['class' => 'mousetrap form-control editor', 'rows' => 10, 'autofocus' => 'autofocus'],
             ]
         );
@@ -52,7 +52,7 @@ class NoteType extends AbstractType
                     'mautic.lead.note.type.call'    => 'call',
                     'mautic.lead.note.type.meeting' => 'meeting',
                 ],
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -65,7 +65,7 @@ class NoteType extends AbstractType
             DateTimeType::class,
             [
                 'label'      => 'mautic.core.date.added',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'widget'     => 'single_text',
                 'attr'       => [
                     'class'       => 'form-control',

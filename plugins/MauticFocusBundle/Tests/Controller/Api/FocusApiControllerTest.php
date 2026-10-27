@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticFocusBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -59,7 +58,7 @@ final class FocusApiControllerTest extends MauticMysqlTestCase
 
         $createdItem = json_decode($response->getContent(), true)['focus'];
 
-        Assert::assertNotEmpty($createdItem['id'], $response->getContent());
-        Assert::assertSame($this->testPayload['name'], $createdItem['name'], $response->getContent());
+        $this->assertNotEmpty($createdItem['id'], $response->getContent());
+        $this->assertSame($this->testPayload['name'], $createdItem['name'], $response->getContent());
     }
 }

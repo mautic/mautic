@@ -4,5 +4,6 @@
         <h6 class="text-secondary">{{ ('mautic.campaign.leadsource.'~sourceType~'.tooltip')|trans }}</h6>
     </div>
     {{ form_start(form) }}
+        <input type="hidden" name="submit" value="1">
     {{ form_end(form) }}
 </div>

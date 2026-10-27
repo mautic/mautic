@@ -1,15 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\InputHelper;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(InputHelper::class)]
-class InputHelperTest extends TestCase
+#[CoversClass(InputHelper::class)]
+final class InputHelperTest extends TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('The html returns correct values')]
+    #[TestDox('The html returns correct values')]
     public function testHtmlFilter(): void
     {
         $outlookXML = '<!--[if gte mso 9]><xml>
@@ -54,44 +58,44 @@ class InputHelperTest extends TestCase
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('The email returns value without double period')]
+    #[TestDox('The email returns value without double period')]
     public function testEmailFilterRemovesDoublePeriods(): void
     {
         $clean = InputHelper::email('john..doe@email.com');
 
-        $this->assertEquals('john..doe@email.com', $clean);
+        $this->assertSame('john..doe@email.com', $clean);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('The email returns value without surrounding white spaces')]
+    #[TestDox('The email returns value without surrounding white spaces')]
     public function testEmailFilterRemovesWhitespace(): void
     {
         $clean = InputHelper::email('    john.doe@email.com  ');
 
-        $this->assertEquals('john.doe@email.com', $clean);
+        $this->assertSame('john.doe@email.com', $clean);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('The array is cleaned')]
+    #[TestDox('The array is cleaned')]
     public function testCleanArrayWithEmptyValue(): void
     {
-        $this->assertEquals([], InputHelper::cleanArray(null));
+        $this->assertSame([], InputHelper::cleanArray(null));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('The string is converted to an array')]
+    #[TestDox('The string is converted to an array')]
     public function testCleanArrayWithStringValue(): void
     {
-        $this->assertEquals(['kuk'], InputHelper::cleanArray('kuk'));
+        $this->assertSame(['kuk'], InputHelper::cleanArray('kuk'));
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Javascript is encoded')]
+    #[TestDox('Javascript is encoded')]
     public function testCleanArrayWithJS(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             ['&#60;script&#62;console.log(&#34;log me&#34;);&#60;/script&#62;'],
             InputHelper::cleanArray(['<script>console.log("log me");</script>'])
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that filename handles some UTF8 chars')]
+    #[TestDox('Test that filename handles some UTF8 chars')]
     public function testFilename(): void
     {
         $this->assertSame(
@@ -100,7 +104,7 @@ class InputHelperTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test that filename handles some UTF8 chars')]
+    #[TestDox('Test that filename handles some UTF8 chars')]
     public function testFilenameWithChangingDir(): void
     {
         $this->assertSame(
@@ -109,7 +113,7 @@ class InputHelperTest extends TestCase
         );
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Test filename with extension')]
+    #[TestDox('Test filename with extension')]
     public function testFilenameWithExtension(): void
     {
         $this->assertSame(
@@ -123,72 +127,141 @@ class InputHelperTest extends TestCase
         $tests = [
             'custom test' => 'custom test',
             'čusťom test' => 'custom test',
-            null          => '',
+            ''            => '',
         ];
         foreach ($tests as $input=>$expected) {
             $this->assertEquals(InputHelper::transliterate($input), $expected);
         }
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('urlProvider')]
-    public function testUrlSanitization(string $inputUrl, string $outputUrl, bool $ignoreFragment = false): void
+    #[DataProvider('urlProvider')]
+    public function testUrlSanitization(string $inputUrl, string $outputUrl, string $message, bool $ignoreFragment = false): void
     {
         $cleanedUrl = InputHelper::url($inputUrl, false, null, null, [], $ignoreFragment);
 
-        Assert::assertEquals($cleanedUrl, $outputUrl);
+        $this->assertEquals($cleanedUrl, $outputUrl);
     }
 
+    /**
+     * @return iterable<array{0: string, 1: string, 2: string, 3?: bool}>
+     */
     public static function urlProvider(): iterable
     {
-        // valid URL is reconstructed as expected
-        yield ['https://www.mautic.org/somewhere/something?foo=bar#abc123', 'https://www.mautic.org/somewhere/something?foo=bar#abc123'];
+        yield [
+            'https://www.mautic.org/somewhere/something?foo=bar#abc123',
+            'https://www.mautic.org/somewhere/something?foo=bar#abc123',
+            'A valid URL is reconstructed as expected.',
+        ];
 
-        // non URL is simply cleaned
-        yield ['<img src="hello.png" />', '&#60;imgsrc=&#34;hello.png&#34;/&#62;'];
+        yield [
+            '<img src="hello.png" />',
+            '&#60;imgsrc=&#34;hello.png&#34;/&#62;',
+            'A non-URL is simply cleaned.',
+        ];
 
-        // disallowed protocol changed to default
-        yield ['foo://www.mautic.org', 'http://www.mautic.org'];
+        yield [
+            'foo://www.mautic.org',
+            'http://www.mautic.org',
+            'A disallowed protocol is changed to the default (http).',
+        ];
 
         // user and password are included
-        yield ['http://user:password@www.mautic.org', 'http://user:password@www.mautic.org'];
+        yield [
+            'http://user:password@www.mautic.org',
+            'http://user:password@www.mautic.org',
+            'User and password are included in the URL.',
+        ];
 
-        // user and password have tags stripped
         // PHP 7.3.26 changed behavior for this type of URL but in either case, the <img> tag is sanitized
         $sanitizedUrl = (\version_compare(PHP_VERSION, '7.3.26', '>=')) ?
             'http://&#60;img&#62;:&#60;img&#62;@www.mautic.org' :
             'http://:@www.mautic.org';
-        yield ['http://<img>:<img>@www.mautic.org', $sanitizedUrl];
+        yield [
+            'http://<img>:<img>@www.mautic.org',
+            $sanitizedUrl,
+            'User and password have tags stripped.',
+        ];
 
-        // host is cleaned (should have the whole url go through ::clean() because it's not recognized as a valid host
-        yield ['http://<img/src="doesnotexist.jpg">', 'http://&#60;img/src=&#34;doesnotexist.jpg&#34;&#62;'];
+        yield [
+            'http://<img/src="doesnotexist.jpg">',
+            'http://&#60;img/src=&#34;doesnotexist.jpg&#34;&#62;',
+            'Host is cleaned and tags are stripped.',
+        ];
 
-        // port is included
-        yield ['http://www.mautic.org:8080/path', 'http://www.mautic.org:8080/path'];
+        yield [
+            'http://www.mautic.org:8080/path',
+            'http://www.mautic.org:8080/path',
+            'Port is included in the URL.',
+        ];
 
-        // path has tags stripped
-        yield ['http://www.mautic.org/abc<img/src="doesnotexist.jpg">123', 'http://www.mautic.org/abc123'];
+        yield [
+            'http://www.mautic.org/abc<img/src="doesnotexist.jpg">123',
+            'http://www.mautic.org/abc123',
+            'Path has tags stripped.',
+        ];
 
-        // query keys are urlencoded
-        yield ['http://www.mautic.org?<foo>=bar', 'http://www.mautic.org?%3Cfoo%3E=bar'];
+        yield [
+            'http://www.mautic.org?<foo>=bar',
+            'http://www.mautic.org?%3Cfoo%3E=bar',
+            'Query keys are urlencoded.',
+        ];
 
-        // query is urlencoded appropriately
-        yield ['http://www.mautic.org?%3Cfoo%3E=<bar>', 'http://www.mautic.org?%3Cfoo%3E=%3Cbar%3E'];
+        yield [
+            'http://www.mautic.org?%3Cfoo%3E=<bar>',
+            'http://www.mautic.org?%3Cfoo%3E=%3Cbar%3E',
+            'Query values are urlencoded.',
+        ];
 
-        // fragment is included and cleaned
-        yield ['http://www.mautic.org#<img/src="doesnotexist.jpg">', 'http://www.mautic.org#'];
-        yield ['http://www.mautic.org#%3Cimg%2Fsrc%3D%22doesnotexist.jpg%22%3E', 'http://www.mautic.org#%3Cimg%2Fsrc%3D%22doesnotexist.jpg%22%3E'];
-        yield ['http://www.mautic.org#abc<img/src="doesnotexist.jpg">123', 'http://www.mautic.org#abc123'];
+        yield [
+            'http://www.mautic.org#<img/src="doesnotexist.jpg">',
+            'http://www.mautic.org#',
+            'Fragment is cleaned and tags are stripped.',
+        ];
 
-        // fragment is not included
-        yield ['http://www.mautic.org#abc123', 'http://www.mautic.org', true];
+        yield [
+            'http://www.mautic.org#%3Cimg%2Fsrc%3D%22doesnotexist.jpg%22%3E',
+            'http://www.mautic.org#%3Cimg%2Fsrc%3D%22doesnotexist.jpg%22%3E',
+            'Fragment is cleaned and tags are stripped.',
+        ];
+
+        yield [
+            'http://www.mautic.org#abc<img/src="doesnotexist.jpg">123',
+            'http://www.mautic.org#abc123',
+            'Fragment is cleaned and tags are stripped.',
+        ];
+
+        yield [
+            'http://www.mautic.org#abc123',
+            'http://www.mautic.org',
+            'Fragment is removed when ignoreFragment is true.',
+            true,
+        ];
+
+        yield [
+            'http://example.com/?q=this%20has%20spaces',
+            'http://example.com/?q=this%20has%20spaces',
+            '%20 Spaces are not encoded to +.',
+        ];
+
+        yield [
+            'http://example.com/?q=this+has+spaces',
+            'http://example.com/?q=this%20has%20spaces',
+            '+ spaces are encoded to %20',
+        ];
+
+        yield [
+            'http://example.com/?q=this+has+spaces&foo=~bar',
+            'http://example.com/?q=this%20has%20spaces&foo=~bar',
+            'The tilde character should not be encoded',
+        ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('filenameProvider')]
+    #[DataProvider('filenameProvider')]
     public function testFilenameSanitization(string $inputFilename, string $outputFilename): void
     {
         $cleanedUrl = InputHelper::transliterateFilename($inputFilename);
 
-        Assert::assertEquals($cleanedUrl, $outputFilename);
+        $this->assertSame($cleanedUrl, $outputFilename);
     }
 
     /**
@@ -227,63 +300,88 @@ class InputHelperTest extends TestCase
         ];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('minifyHTMLProvider')]
+    #[DataProvider('minifyHTMLProvider')]
     public function testMinifyHTML(string $html, string $expected): void
     {
-        $this->assertEquals($expected, InputHelper::minifyHTML($html));
+        $this->assertSame($expected, InputHelper::minifyHTML($html));
     }
 
     /**
-     * @return array<array<string>>
+     * @return \Iterator<(int|string), array<string>>
      */
-    public static function minifyHTMLProvider(): array
+    public static function minifyHTMLProvider(): \Iterator
     {
-        return [
-            // Test with a simple HTML string with no whitespace
-            ['<p>Hello World</p>', '<p>Hello World</p>'],
-            // Test with an HTML string with multiple spaces between tags
-            ['<p>    Hello World    </p>', '<p>Hello World</p>'],
-            // Test with an HTML string with multiple newlines between tags
-            ["<p>\n\nHello World\n\n</p>", '<p>Hello World</p>'],
-            // Test with an HTML string with inline CSS
-            ['<p style="color: red;">Hello World</p>', '<p style="color:red;">Hello World</p>'],
-            // Test with an empty HTML string
-            ['', ''],
-            // Test with an HTML string with multiple attributes
-            ['<p class="big" id="title">Hello World</p>', '<p class="big" id="title">Hello World</p>'],
-            // Test with an HTML string with multiple same tag
-            ['<p>Hello World</p><p>Hello World</p>', '<p>Hello World</p><p>Hello World</p>'],
-            // Test with an HTML string with multiple same tag but with different attributes
-            ['<p class="big">Hello World</p><p class="small">Hello World</p>', '<p class="big">Hello World</p><p class="small">Hello World</p>'],
-            [file_get_contents(__DIR__.'/resource/email/email-no-minify.html'), file_get_contents(__DIR__.'/resource/email/email-minify.html')],
-        ];
+        // Test with a simple HTML string with no whitespace
+        yield ['<p>Hello World</p>', '<p>Hello World</p>'];
+        // Test with an HTML string with multiple spaces between tags
+        yield ['<p>    Hello World    </p>', '<p>Hello World</p>'];
+        // Test with an HTML string with multiple newlines between tags
+        yield ["<p>\n\nHello World\n\n</p>", '<p>Hello World</p>'];
+        // Test with an HTML string with inline CSS
+        yield ['<p style="color: red;">Hello World</p>', '<p style="color:red;">Hello World</p>'];
+        // Test with an empty HTML string
+        yield ['', ''];
+        // Test with an HTML string with multiple attributes
+        yield ['<p class="big" id="title">Hello World</p>', '<p class="big" id="title">Hello World</p>'];
+        // Test with an HTML string with multiple same tag
+        yield ['<p>Hello World</p><p>Hello World</p>', '<p>Hello World</p><p>Hello World</p>'];
+        // Test with an HTML string with multiple same tag but with different attributes
+        yield ['<p class="big">Hello World</p><p class="small">Hello World</p>', '<p class="big">Hello World</p><p class="small">Hello World</p>'];
+        yield [file_get_contents(__DIR__.'/resource/email/email-no-minify.html'), file_get_contents(__DIR__.'/resource/email/email-minify.html')];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('underscoreProvider')]
+    #[DataProvider('underscoreProvider')]
     public function testUndersore(mixed $provided, mixed $expected): void
     {
         $this->assertSame($expected, InputHelper::_($provided));
     }
 
     /**
-     * @return mixed[]
+     * @return \Iterator<(int|string), mixed>
      */
-    public static function underscoreProvider(): array
+    public static function underscoreProvider(): \Iterator
     {
-        return [
-            ['hello', 'hello'],
-            [null, null],
-            [false, ''],
-            [true, '1'],
-            [0, '0'],
-            [10, '10'],
-            [[null], [null]],
-            [[0], ['0']],
-            [[false], ['']],
-            [[true], ['1']],
-            [[null, 'hello'], [null, 'hello']],
-            [[null, 3], [null, '3']],
-            [[[null]], [[null]]],
+        yield ['hello', 'hello'];
+        yield [null, null];
+        yield [false, ''];
+        yield [true, '1'];
+        yield [0, '0'];
+        yield [10, '10'];
+        yield [[null], [null]];
+        yield [[0], ['0']];
+        yield [[false], ['']];
+        yield [[true], ['1']];
+        yield [[null, 'hello'], [null, 'hello']];
+        yield [[null, 3], [null, '3']];
+        yield [[[null]], [[null]]];
+    }
+
+    #[TestDox('Test that clean filter converts special characters to HTML entities')]
+    public function testCleanConvertsSpecialCharacters(): void
+    {
+        $valueWithApostrophe = "administrator's";
+        $cleanResult         = InputHelper::clean($valueWithApostrophe);
+        $rawResult           = InputHelper::raw($valueWithApostrophe);
+
+        $this->assertNotSame($valueWithApostrophe, $cleanResult);
+        $this->assertStringContainsString('&#', (string) $cleanResult);
+
+        $this->assertEquals($valueWithApostrophe, $rawResult);
+    }
+
+    #[TestDox('Test that raw filter preserves special characters')]
+    public function testRawPreservesSpecialCharacters(): void
+    {
+        $testValues = [
+            "administrator's",
+            'manager&supervisor',
+            '"quoted value"',
+            '<tag>content</tag>',
         ];
+
+        foreach ($testValues as $originalValue) {
+            $rawResult = InputHelper::raw($originalValue);
+            $this->assertEquals($originalValue, $rawResult, "Raw filter should preserve: {$originalValue}");
+        }
     }
 }

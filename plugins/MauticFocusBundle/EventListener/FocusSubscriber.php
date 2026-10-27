@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
-class FocusSubscriber implements EventSubscriberInterface
+final readonly class FocusSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private RouterInterface $router,
@@ -49,8 +49,8 @@ class FocusSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /*
-     * Check and hijack the form's generate link if the ID has mf- in it
+    /**
+     * Check and hijack the form's generate link if the ID has mf- in it.
      */
     public function onKernelRequest(RequestEvent $event): void
     {
@@ -155,6 +155,8 @@ class FocusSubscriber implements EventSubscriberInterface
             foreach ($trackables as $token => $trackable) {
                 $tokens[$token] = $this->trackableModel->generateTrackableUrl($trackable, $clickthrough, false, $focus->getUtmTags());
             }
+
+            $tokens = array_merge($tokens, $event->getTokens());
 
             $content = str_replace(array_keys($tokens), array_values($tokens), $content);
 

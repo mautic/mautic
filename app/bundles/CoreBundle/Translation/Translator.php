@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Translation;
 
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
+use Symfony\Component\Translation\Exception\InvalidArgumentException as TranslatorInvalidArgumentException;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
@@ -16,7 +17,7 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
     /**
      * @var TranslatorInterface&WarmableInterface&TranslatorBagInterface&LocaleAwareInterface
      */
-    private TranslatorInterface $translator;
+    private readonly TranslatorInterface $translator;
 
     public function __construct(TranslatorInterface $translator)
     {
@@ -40,7 +41,11 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
      */
     public function trans(string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
-        return $this->translator->trans($id, $parameters, $domain, $locale);
+        try {
+            return $this->translator->trans($id, $parameters, $domain, $locale);
+        } catch (TranslatorInvalidArgumentException) {
+            return $this->translator->trans($id, $parameters, $domain, 'EN');
+        }
     }
 
     public function warmUp(string $cacheDir, ?string $buildDir = null): array
@@ -50,7 +55,7 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
         return [];
     }
 
-    public function getCatalogue($locale = null): MessageCatalogueInterface
+    public function getCatalogue(?string $locale = null): MessageCatalogueInterface
     {
         return $this->translator->getCatalogue($locale);
     }

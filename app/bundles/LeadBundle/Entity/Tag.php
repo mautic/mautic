@@ -1,7 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -9,26 +18,26 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Symfony\Component\Serializer\Attribute\Groups;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "leadfield:read"
- *        },
- *       "swagger_definition_name"="Read"
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "leadfield:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('tagManager:tagManager:view')"),
+        new Post(security: "is_granted('tagManager:tagManager:create')"),
+        new Get(security: "is_granted('tagManager:tagManager:view')"),
+        new Put(security: "is_granted('tagManager:tagManager:edit')"),
+        new Patch(security: "is_granted('tagManager:tagManager:edit')"),
+        new Delete(security: "is_granted('tagManager:tagManager:delete')"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['leadfield:read'],
+        'swagger_definition_name' => 'Read',
+    ],
+    denormalizationContext: [
+        'groups'                  => ['leadfield:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Tag implements UuidInterface
 {
     use UuidTrait;
@@ -36,19 +45,22 @@ class Tag implements UuidInterface
     /**
      * @var int
      */
+    #[Groups(['leadfield:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $tag;
 
     /**
      * @var string|null
      */
+    #[Groups(['leadfield:read', 'leadfield:write'])]
     private $description;
 
-    public ?int $deletedId;
+    public ?int $deletedId = null;
 
     public function __construct(?string $tag = null, bool $clean = true)
     {
@@ -82,7 +94,7 @@ class Tag implements UuidInterface
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
     public function getId()
     {
@@ -97,10 +109,7 @@ class Tag implements UuidInterface
         return $this->tag;
     }
 
-    /**
-     * @return Tag
-     */
-    public function setTag(string $tag)
+    public function setTag(string $tag): static
     {
         $this->tag = $this->validateTag($tag);
 
@@ -108,7 +117,7 @@ class Tag implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getDescription()
     {
@@ -117,10 +126,8 @@ class Tag implements UuidInterface
 
     /**
      * @param string $description
-     *
-     * @return Tag
      */
-    public function setDescription($description)
+    public function setDescription($description): static
     {
         $this->description = $description;
 
@@ -129,6 +136,6 @@ class Tag implements UuidInterface
 
     private function validateTag(string $tag): string
     {
-        return InputHelper::string(trim((string) $tag));
+        return InputHelper::string(trim($tag));
     }
 }

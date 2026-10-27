@@ -11,13 +11,9 @@
                     <input type="hidden" id="{{ channel.value }}-hidden"
                            name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
                            value="">
-                    <input type="checkbox" id="{{ channel.value }}"
-                           name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
-                           onclick="togglePreferredChannel(this.value);"
-                           value="{{ channel.value|e }}" {{ checked }}>
-                    <label for="{{ channel.value }}" id="is-contactable-{{ channel.value }}" data-channel="{{ channelName }}">
-                        {{ 'mautic.lead.contact.me.label'|trans({'%channel%': channelName}) }}
-                    </label>
+                    {% include '@MauticCore/Components/checkbox.html.twig' with {
+                        items: [{ id: channel.value, name: 'lead_contact_frequency_rules[lead_channels][subscribed_channels][' ~ key ~ ']', value: channel.value, checked: contactMe, label: 'mautic.lead.contact.me.label'|trans({'%channel%': channelName}), attributes: { onclick: 'togglePreferredChannel(this.value);' }, labelAttributes: { id: 'is-contactable-' ~ channel.value, 'data-channel': channelName } }]
+                    } only %}
                 </div>
             </td>
         </tr>
@@ -77,9 +73,9 @@
     <tr>
         <td>
             <div class="text-left">
-                <input type="checkbox" checked="">
-                <label class="control-label">
-                    {{ 'mautic.lead.contact.me.label'|trans }}</label>
+                {% include '@MauticCore/Components/checkbox.html.twig' with {
+                    items: [{ checked: true, label: channelfrequency['label-text']|default('mautic.lead.contact.me.label'|trans) }]
+                } only %}
             </div>
         </td>
     </tr>
@@ -87,17 +83,17 @@
         <td>
             <div id="frequency_email" class="text-left row">
                 <div class="col-xs-6">
-                    <label class="text-secondary label1">{{ 'mautic.lead.list.frequency.number'|trans }}</label>
+                    <label class="text-secondary label1">{{ channelfrequency['label-text1']|default('mautic.lead.list.frequency.number'|trans) }}</label>
                     <input type="text" class="frequency form-control">
-                    <label class="text-secondary fw-n frequency-label label2">{{ 'mautic.lead.list.frequency.times'|trans }}</label>
+                    <label class="text-secondary fw-n frequency-label label2">{{ channelfrequency['label-text2']|default('mautic.lead.list.frequency.times'|trans) }}</label>
                     <select class="form-control">
                         <option value="" selected="selected"></option>
                     </select>
                 </div>
                 <div class="col-xs-6">
-                    <label class="text-secondary label3">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
+                    <label class="text-secondary label3">{{ channelfrequency['label-text3']|default('mautic.lead.frequency.dates.label'|trans) }}</label>
                     <input type="date" class="form-control">
-                    <label class="frequency-label text-secondary fw-n label4">{{ 'mautic.lead.frequency.contact.end.date'|trans }}</label>
+                    <label class="frequency-label text-secondary fw-n label4">{{ channelfrequency['label-text4']|default('mautic.lead.frequency.contact.end.date'|trans) }}</label>
                     <input type="date" class="form-control">
                 </div>
             </div>

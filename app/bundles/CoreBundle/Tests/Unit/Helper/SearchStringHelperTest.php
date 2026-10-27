@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 
-class SearchStringHelperTest extends \PHPUnit\Framework\TestCase
+final class SearchStringHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testNegativeGroup(): void
     {
@@ -16,5 +16,15 @@ class SearchStringHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('email', $result->root[0]->command);
         $this->assertEquals('test@example.%', $result->root[0]->string);
         $this->assertEquals(1, $result->root[0]->not);
+    }
+
+    public function testCommandWithoutValueIsMarkedAsMissing(): void
+    {
+        $result = SearchStringHelper::parseSearchString('form:');
+
+        $this->assertSame('form', $result->root[0]->command);
+        $this->assertSame('', $result->root[0]->string);
+        $this->assertTrue($result->root[0]->missingValue);
+        $this->assertSame(SearchStringHelper::COMMAND_POSIT, $result->commands['form']);
     }
 }

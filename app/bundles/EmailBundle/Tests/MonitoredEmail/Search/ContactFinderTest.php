@@ -1,21 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Search;
 
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
+use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Monolog\Logger;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\TestDox;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(ContactFinder::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\EmailBundle\MonitoredEmail\Search\Result::class)]
-#[\PHPUnit\Framework\Attributes\CoversClass(\Mautic\EmailBundle\MonitoredEmail\Processor\Address::class)]
-class ContactFinderTest extends \PHPUnit\Framework\TestCase
+#[CoversClass(ContactFinder::class)]
+#[CoversClass(Result::class)]
+#[CoversClass(Address::class)]
+final class ContactFinderTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\TestDox('Contact should be found via contact email address')]
+    #[TestDox('Contact should be found via contact email address')]
     public function testContactFoundByDelegationForAddress(): void
     {
         $lead = new Lead();
@@ -30,7 +36,7 @@ class ContactFinderTest extends \PHPUnit\Framework\TestCase
             ->method('getContactsByEmail')
             ->willReturn([$lead]);
 
-        $logger = $this->createMock(Logger::class);
+        $logger = $this->createStub(Logger::class);
 
         $finder = new ContactFinder($statRepository, $leadRepository, $logger);
         $result = $finder->find($lead->getEmail(), 'contact@test.com');
@@ -38,7 +44,7 @@ class ContactFinderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result->getContacts(), [$lead]);
     }
 
-    #[\PHPUnit\Framework\Attributes\TestDox('Contact should be found via a hash in to email address')]
+    #[TestDox('Contact should be found via a hash in to email address')]
     public function testContactFoundByDelegationForHash(): void
     {
         $lead = new Lead();
@@ -51,8 +57,9 @@ class ContactFinderTest extends \PHPUnit\Framework\TestCase
         $statRepository->expects($this->once())
             ->method('findOneBy')
             ->willReturnCallback(
-                function ($hash) use ($stat) {
-                    $stat->setTrackingHash($hash);
+                function (array $criteria) use ($stat): Stat {
+                    $this->assertArrayHasKey('trackingHash', $criteria);
+                    $stat->setTrackingHash($criteria['trackingHash']);
 
                     $email = new Email();
                     $stat->setEmail($email);
@@ -65,7 +72,7 @@ class ContactFinderTest extends \PHPUnit\Framework\TestCase
         $leadRepository->expects($this->never())
             ->method('getContactsByEmail');
 
-        $logger = $this->createMock(Logger::class);
+        $logger = $this->createStub(Logger::class);
 
         $finder = new ContactFinder($statRepository, $leadRepository, $logger);
         $result = $finder->find($lead->getEmail(), 'test+unsubscribe_123abc@test.com');

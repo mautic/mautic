@@ -82,7 +82,7 @@
                             </tr>
                         </thead>
                         {% for folder, isWritable in folders %}
-                            <tr class="{% if isWritable %}success{% else %}danger{% endif %}">
+                            <tr class="{% if isWritable %}bg-success{% else %}bg-danger{% endif %}">
                                 <td>{{ folder }}</td>
                                 <td>
                                     {% if isWritable %}
@@ -111,7 +111,7 @@
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="dbinfo">
                 <div class="pt-md pr-md pl-md pb-md">
                     <h2 class="pb-md">{{ 'mautic.sysinfo.dbinfo.title'|trans }}</h2>
-                    <table class="table table-hover">
+                    <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>{{ 'mautic.sysinfo.dbinfo.property'|trans }}</th>

@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Crate;
 
 use Mautic\FormBundle\Entity\Field;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileFieldCrate
+final readonly class FileFieldCrate
 {
     public function __construct(
         private UploadedFile $uploadedFile,
@@ -13,18 +15,12 @@ class FileFieldCrate
     ) {
     }
 
-    /**
-     * @return UploadedFile
-     */
-    public function getUploadedFile()
+    public function getUploadedFile(): UploadedFile
     {
         return $this->uploadedFile;
     }
 
-    /**
-     * @return Field
-     */
-    public function getField()
+    public function getField(): Field
     {
         return $this->field;
     }

@@ -94,6 +94,10 @@ Mautic.ajaxifyForm = function (formName) {
     // Handle Enter key for jumping to the next input
     mQuery(form + ' input, ' + form + ' select').off('keydown.ajaxform');
     mQuery(form + ' input, ' + form + ' select').on('keydown.ajaxform', function (e) {
+        if (mQuery(e.target).hasClass('chosen-search-input')) {
+            return;
+        }
+
         if (e.keyCode == 13 && mQuery(e.target).is(':input')) {
             var inputs = mQuery(this).parents('form').eq(0).find(':input');
             if (inputs[inputs.index(this) + 1] != null) {
@@ -125,6 +129,16 @@ Mautic.ajaxifyForm = function (formName) {
     mQuery(form).on('submit.ajaxform', (function (e) {
         e.preventDefault();
         var form = mQuery(this);
+
+        // Sync CKEditor content (including source mode) before AJAX submission
+        if (typeof ckEditors !== 'undefined' && ckEditors.size > 0) {
+            form.find('textarea.editor').each(function() {
+                var editor = ckEditors.get(this);
+                if (editor && typeof editor.updateSourceElement === 'function') {
+                    editor.updateSourceElement();
+                }
+            });
+        }
 
         if (MauticVars.formSubmitInProgress) {
             return false;
@@ -196,7 +210,7 @@ Mautic.resetForm = function(form) {
  * @param form
  * @param callback
  */
-Mautic.postForm = function (form, callback) {
+Mautic.postForm = function (form, callback, extraData = {}) {
     form = mQuery(form);
 
     var modalParent = form.closest('.modal');
@@ -211,6 +225,7 @@ Mautic.postForm = function (form, callback) {
     var showLoading = (!inMain || form.attr('data-hide-loadingbar')) ? false : true;
 
     form.ajaxSubmit({
+        data: extraData,
         showLoadingBar: showLoading,
         success: function (data) {
             form.trigger('submit:success', [action, data, inMain]);
@@ -432,8 +447,9 @@ Mautic.updateEntitySelect = function (response) {
     if (response.id) {
         // New entity added through a popup so update the chosen
         var newOption = mQuery('<option />').val(response.id);
-        newOption.html(response.name);
         var el = '#' + response.updateSelect;
+        var optionName = response.optionLabel || response.name;
+        newOption.html(optionName);
 
         var sortOptions = function (options) {
             return options.sort(function (a, b) {
@@ -473,7 +489,7 @@ Mautic.updateEntitySelect = function (response) {
                     var firstOptions = mQuery(this).children();
                     for (var i = 0; i < firstOptions.length; i++) {
                         if (firstOptions[i].value === response.id.toString()) {
-                            firstOptions[i].text = response.name;
+                            firstOptions[i].text = optionName;
                             isUpdateOption = true;
                             break;
                         }
@@ -516,7 +532,7 @@ Mautic.updateEntitySelect = function (response) {
         }
 
         newOption.prop('selected', true);
-        mQueryParent(el).trigger("chosen:updated");
+        mQueryParent(el).val(response.id).trigger("chosen:updated").trigger("change");
     }
 
     if (window.opener) {
@@ -542,6 +558,10 @@ Mautic.toggleYesNo = function(element) {
         $textEl = $toggle.find('.toggle__text'),
         isYes = $yesInput.is(':checked');
 
+    if ($toggle.hasClass('toggle--disabled') || $toggle.hasClass('toggle--readonly')) {
+        return;
+    }
+
     $noInput.prop('checked', isYes);
     $yesInput.prop('checked', !isYes).trigger('change');
     $switchEl.toggleClass('toggle__switch--checked', !isYes);
@@ -556,9 +576,7 @@ Mautic.updatePublishingToggle = function(element) {
         $toggle = $label.closest('.toggle'),
         $form = $toggle.closest('form'),
         yesId = $label.data('yes-id'),
-        noId = $label.data('no-id'),
         $yesInput = mQuery('#' + yesId),
-        $noInput = mQuery('#' + noId),
         $textEl = $toggle.find('.toggle__text'),
         isYes = $yesInput.is(':checked'),
         yesText = $toggle.data('yes'),
@@ -571,6 +589,12 @@ Mautic.updatePublishingToggle = function(element) {
         $publishDown = $form.find('input[name$="[publishDown]"]'),
         hasPublishUp = $publishUp.length && $publishUp.val().trim() !== '',
         hasPublishDown = $publishDown.length && $publishDown.val().trim() !== '';
+
+    // Toggle schedule options notice for Segment Emails based on isPublished state
+    const $scheduleOptionsNotice = $form.find('#scheduleOptionsNotice');
+    if ($scheduleOptionsNotice.length) {
+        $scheduleOptionsNotice.toggle(isYes);
+    }
 
     // Inner function to toggle publish fields and datepicker buttons
     function togglePublishFields(enable) {
@@ -675,7 +699,7 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
             var valueFieldAttrs = {
                 'class': valueField.attr('class'),
                 'id': valueField.attr('id'),
-                'name': valueField.attr('name'),
+                'name': valueField.attr('name').replace(/\[\]$/, ''),
                 'autocomplete': valueField.attr('autocomplete'),
                 'value': valueField.val()
             };
@@ -691,7 +715,8 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
                     .attr('id', valueFieldAttrs['id'])
                     .attr('name', valueFieldAttrs['name'])
                     .attr('autocomplete', valueFieldAttrs['autocomplete'])
-                    .attr('value', valueFieldAttrs['value']);
+                    .attr('value', valueFieldAttrs['value'])
+                    .removeAttr('multiple');
 
                 var multiple = (fieldOperator === 'in' || fieldOperator === '!in');
                 if (multiple) {

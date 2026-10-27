@@ -30,7 +30,7 @@ Variables
         {% endblock %}
     </div>
 
-    {% if block('action_label') is not empty %}
+    {% if block('action_label')|trim is not empty %}
         <div class="d-flex panel-footer as-stretch gap-3 ai-center">
             {% block action_label %}{% endblock %}
         </div>

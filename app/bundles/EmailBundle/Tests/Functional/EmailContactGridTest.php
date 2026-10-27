@@ -18,7 +18,7 @@ use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EmailContactGridTest extends MauticMysqlTestCase
+final class EmailContactGridTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
     use UserEntityTrait;
@@ -30,7 +30,7 @@ class EmailContactGridTest extends MauticMysqlTestCase
      */
     public function testEmailContactsGridWithValidPermissions(): void
     {
-        list($email, $contactOne, $contactTwo) = $this->setupData();
+        [$email, $contactOne, $contactTwo] = $this->setupData();
 
         // create users
         $nonAdminUser = $this->createUserWithPermission([
@@ -57,8 +57,8 @@ class EmailContactGridTest extends MauticMysqlTestCase
 
         $content = $this->client->getResponse()->getContent();
 
-        $this->assertStringContainsString($contactOne->getName(), $content);
-        $this->assertStringContainsString($contactTwo->getName(), $content);
+        $this->assertStringContainsString($contactOne->getName(), (string) $content);
+        $this->assertStringContainsString($contactTwo->getName(), (string) $content);
     }
 
     /**
@@ -69,7 +69,7 @@ class EmailContactGridTest extends MauticMysqlTestCase
     public function testEmailContactsGridWithIncompletePermissions(): void
     {
         /** @var Email $email */
-        list($email, $contactOne, $contactTwo) = $this->setupData();
+        [$email, $contactOne, $contactTwo] = $this->setupData();
 
         // create users
         $nonAdminUser = $this->createUserWithPermission([
@@ -99,7 +99,7 @@ class EmailContactGridTest extends MauticMysqlTestCase
 
         $content = $this->client->getResponse()->getContent();
 
-        $this->assertStringContainsString('No Contacts Found', $content, $content);
+        $this->assertStringContainsString('No Contacts Found', (string) $content, $content);
     }
 
     /**

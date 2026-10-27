@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Symfony\Component\Intl\Locales;
 
-class FormFieldHelper extends AbstractFormFieldHelper
+final class FormFieldHelper extends AbstractFormFieldHelper
 {
     private static array $types = [
         'text' => [
@@ -92,18 +92,12 @@ class FormFieldHelper extends AbstractFormFieldHelper
         ],
     ];
 
-    /**
-     * Set the translation key prefix.
-     */
     public function setTranslationKeyPrefix(): void
     {
         $this->translationKeyPrefix = 'mautic.lead.field.type.';
     }
 
-    /**
-     * @return array
-     */
-    public function getTypes()
+    public function getTypes(): array
     {
         return self::$types;
     }
@@ -116,7 +110,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * @return array{0: bool, 1:string}
      */
-    public static function validateProperties($type, &$properties): array
+    public static function validateProperties($type, array &$properties): array
     {
         if (!array_key_exists($type, self::$types)) {
             // ensure the field type is supported
@@ -125,7 +119,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
 
         $fieldType = self::$types[$type]['properties'];
         foreach ($fieldType as $key => $property) {
-            $value = array_key_exists($key, $properties) ? $properties[$key] : null;
+            $value = $properties[$key] ?? null;
             if (!empty($property['required']) && empty($value)) {
                 return [false, $property['error_msg']];
             }
@@ -201,8 +195,6 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * Get locale choices.
-     *
      * @return array<string, string>
      */
     public static function getLocaleChoices(): array

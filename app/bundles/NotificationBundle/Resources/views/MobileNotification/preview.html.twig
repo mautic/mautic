@@ -2,22 +2,49 @@
   Variables
     - notification
 #}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">
-            {{ notification.heading }}
-            {% if notification.url %}
-            <span class="pull-right">
-                <a href="{{ notification.url }}" target="_blank"><span class="ri-external-link-line"></span></a>
-            </span>
+
+{% set notificationWrapper %}
+<div class="notification-preview">
+  <div class="notification-preview__body animation--grow">
+      <div class="notification-preview__container">
+        <div class="notification-preview__notification">
+          <span class="notification-preview__before"></span>
+          <header class="notification-preview__header">
+            <div class="notification-preview__heading tt-u">{{ configGetParameter('brand_name')|default('') }}</div>
+            <span class="notification-preview__timestamp">{{ 'mautic.core.now'|trans }}</span>
+          </header>
+          <div class="notification-preview__content">
+            <span class="notification-preview__title fw-sb">{{ notification.heading }}</span>
+            {% if notification.mobileSettings.ios_subtitle is defined %}
+            <span class="notification-preview__subtitle fw-sb">{{ notification.mobileSettings.ios_subtitle }}</span>
             {% endif %}
-        </h3>
+            <span class="notification-preview__message">{{ notification.message }}</span>
+            <span class="notification-preview__more">{{ 'mautic.notification.preview.more_notifications'|trans }}</span>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="panel-body">
-        <p>{{ notification.message }}</p>
-        {% if notification.url and notification.button %}
-            <br>
-            <p><a href="{{ notification.url }}" class="btn btn-primary">{{ notification.button }}</a></p>
-        {% endif %}
+    <div class="notification-preview__body">
+      <div class="notification-preview__container">
+        <div class="notification-preview__notification">
+          <span class="notification-preview__before" style="top: -294.15px;"></span>
+        </div>
+      </div>
+    </div>
+    <div class="notification-preview__body">
+      <div class="notification-preview__container">
+      <div class="notification-preview__notification">
+        <span class="notification-preview__before" style="top: -310.625px;"></span>
+      </div>
+        </div>
     </div>
 </div>
+{% endset %}
+
+{% if notification.url %}
+<a href="{{ notification.url }}" class="notification-wrapper" target="_blank">
+    {{ notificationWrapper }}
+</a>
+{% else %}
+    {{ notificationWrapper }}
+{% endif %}

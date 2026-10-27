@@ -2,30 +2,25 @@
 
 namespace Mautic\ApiBundle\Model;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
+use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
 use Mautic\ApiBundle\Event\ClientEvent;
 use Mautic\ApiBundle\Form\Type\ClientType;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<Client>
  */
-class ClientModel extends FormModel implements GlobalSearchInterface
+final class ClientModel extends FormModel implements GlobalSearchInterface
 {
     /**
      * @var string
@@ -36,18 +31,17 @@ class ClientModel extends FormModel implements GlobalSearchInterface
 
     private const DEFAULT_API_MODE = 'oauth2';
 
-    public function __construct(
-        private RequestStack $requestStack,
-        EntityManager $em,
-        CorePermissions $security,
-        EventDispatcherInterface $dispatcher,
-        UrlGeneratorInterface $router,
-        Translator $translator,
-        UserHelper $userHelper,
-        LoggerInterface $mauticLogger,
-        CoreParametersHelper $coreParametersHelper,
-    ) {
-        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
+    private RequestStack $requestStack;
+
+    private ClientRepository $clientRepository;
+
+    #[Required]
+    public function autowireClientModel(
+        RequestStack $requestStack,
+        ClientRepository $clientRepository,
+    ): void {
+        $this->requestStack     = $requestStack;
+        $this->clientRepository = $clientRepository;
     }
 
     private function getApiMode(): string
@@ -63,14 +57,14 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         return self::DEFAULT_API_MODE;
     }
 
-    public function setApiMode($apiMode): void
+    public function setApiMode(?string $apiMode): void
     {
         $this->apiMode = $apiMode;
     }
 
-    public function getRepository(): \Mautic\ApiBundle\Entity\oAuth2\ClientRepository
+    public function getRepository(): ClientRepository
     {
-        return $this->em->getRepository(Client::class);
+        return $this->clientRepository;
     }
 
     public function getPermissionBase(): string
@@ -81,7 +75,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
     /**
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(['Client']);
@@ -122,7 +116,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new ClientEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -134,12 +128,9 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         return null;
     }
 
-    /**
-     * @return array
-     */
-    public function getUserClients(User $user)
+    public function getUserClients(User $user): array
     {
-        return $this->getRepository()->getUserClients($user);
+        return $this->clientRepository->getUserClients($user);
     }
 
     /**
@@ -152,11 +143,7 @@ class ClientModel extends FormModel implements GlobalSearchInterface
         }
 
         // remove the user from the client
-        if ('oauth2' === $this->getApiMode()) {
-            $entity->removeUser($this->userHelper->getUser());
-            $this->saveEntity($entity);
-        } else {
-            $this->getRepository()->deleteAccessTokens($entity, $this->userHelper->getUser());
-        }
+        $entity->removeUser($this->userHelper->getUser());
+        $this->saveEntity($entity);
     }
 }

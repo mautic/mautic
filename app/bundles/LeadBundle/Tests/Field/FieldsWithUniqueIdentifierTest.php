@@ -1,24 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Field;
 
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FieldsWithUniqueIdentifierTest extends TestCase
+final class FieldsWithUniqueIdentifierTest extends TestCase
 {
     /**
-     * @var MockObject|FieldList
+     * @var MockObject&FieldList
      */
-    private $fieldList;
+    private MockObject $fieldList;
 
-    /**
-     * @var FieldsWithUniqueIdentifier
-     */
-    private $fieldsWithUniqueIdentifier;
+    private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
 
     protected function setUp(): void
     {
@@ -35,10 +33,10 @@ class FieldsWithUniqueIdentifierTest extends TestCase
             ->method('getFieldList')
             ->willReturn($fields);
 
-        Assert::assertSame($fields, $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['isPublished' => false]));
+        $this->assertSame($fields, $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['isPublished' => false]));
 
         // The cache should be used on subsequent requests and a second call to getFieldList not made
-        Assert::assertSame($fields, $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['isPublished' => false]));
+        $this->assertSame($fields, $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['isPublished' => false]));
     }
 
     public function testCacheIsNotUsed(): void
@@ -48,9 +46,9 @@ class FieldsWithUniqueIdentifierTest extends TestCase
             ->method('getFieldList')
             ->willReturn($fields);
 
-        Assert::assertSame($fields, $this->fieldsWithUniqueIdentifier->getLiveFields(['isPublished' => false]));
+        $this->assertSame($fields, $this->fieldsWithUniqueIdentifier->getLiveFields(['isPublished' => false]));
 
         // The cache should not be used on subsequent requests
-        Assert::assertSame($fields, $this->fieldsWithUniqueIdentifier->getLiveFields(['isPublished' => false]));
+        $this->assertSame($fields, $this->fieldsWithUniqueIdentifier->getLiveFields(['isPublished' => false]));
     }
 }

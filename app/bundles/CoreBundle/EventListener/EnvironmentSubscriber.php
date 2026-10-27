@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class EnvironmentSubscriber implements EventSubscriberInterface
+final readonly class EnvironmentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
@@ -35,7 +35,8 @@ class EnvironmentSubscriber implements EventSubscriberInterface
         }
 
         // Set date/time
-        date_default_timezone_set($request->getSession()->get('_timezone', $this->coreParametersHelper->get('default_timezone')));
+        date_default_timezone_set($request->getSession()->get('_timezone',
+            $this->coreParametersHelper->getDefaultTimezone()));
     }
 
     /**

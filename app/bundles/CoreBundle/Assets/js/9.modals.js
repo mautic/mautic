@@ -32,6 +32,7 @@ Mautic.ajaxifyModal = function (el, event) {
     let modalOpenCallback = element.attr('data-modal-open-callback') ? element.attr('data-modal-open-callback') : null;
     let modalCloseCallback = element.attr('data-modal-close-callback') ? element.attr('data-modal-close-callback') : null;
     let preventDismissal = element.attr('data-prevent-dismiss');
+    let formData = element.data('form-data') ? element.data('form-data') : {};
 
     if (preventDismissal) {
         // Reset
@@ -57,7 +58,7 @@ Mautic.ajaxifyModal = function (el, event) {
         };
     }
 
-    Mautic.loadAjaxModal(target, route, method, header, footer, preventDismissal, modalOpenCallbackReal, modalCloseCallbackReal);
+    Mautic.loadAjaxModal(target, route, method, header, footer, preventDismissal, modalOpenCallbackReal, modalCloseCallbackReal, formData);
 };
 
 /**
@@ -70,8 +71,9 @@ Mautic.ajaxifyModal = function (el, event) {
  * @param preventDismissal
  * @param modalOpenCallback
  * @param modalCloseCallback
+ * @param formData
  */
-Mautic.loadAjaxModal = function (target, route, method, header, footer, preventDismissal, modalOpenCallback, modalCloseCallback) {
+Mautic.loadAjaxModal = function (target, route, method, header, footer, preventDismissal, modalOpenCallback, modalCloseCallback, formData = {}) {
     let element = mQuery(target);
 
     if (element.find('.loading-placeholder').length) {
@@ -163,6 +165,7 @@ Mautic.loadAjaxModal = function (target, route, method, header, footer, preventD
         url: route,
         type: method,
         dataType: "json",
+        data: formData,
         success: function (response) {
             if (response) {
                 Mautic.processModalContent(response, target);
@@ -279,7 +282,7 @@ Mautic.processModalContent = function (response, target) {
 /**
  * Display confirmation modal
  */
-Mautic.showConfirmation = function (el) {
+Mautic.showConfirmation = function (el, customMessage) {
     var precheck = mQuery(el).data('precheck');
 
     if (precheck) {
@@ -294,7 +297,7 @@ Mautic.showConfirmation = function (el) {
         }
     }
 
-    var message = mQuery(el).data('message');
+    var message = customMessage ?? mQuery(el).data('message');
     var confirmText = mQuery(el).data('confirm-text');
     var confirmAction = mQuery(el).attr('href');
     var confirmCallback = mQuery(el).data('confirm-callback');
@@ -320,18 +323,18 @@ Mautic.showConfirmation = function (el) {
             }
         })
         .html(confirmText);
-    if (cancelText) {
-        var cancelButton = mQuery('<button type="button" />')
-            .addClass("btn btn-primary")
-            .click(function () {
-                if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
-                    window["Mautic"][cancelCallback].apply('window', [el]);
-                } else {
-                    Mautic.dismissConfirmation();
-                }
-            })
-            .html(cancelText);
-    }
+	    if (cancelText) {
+	        var cancelButton = mQuery('<button type="button" />')
+	            .addClass("btn btn-primary")
+	            .click(function () {
+	                if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
+	                    window["Mautic"][cancelCallback].apply('window', [el]);
+	                } else {
+	                    Mautic.dismissConfirmation();
+	                }
+	            })
+	            .text(cancelText);
+	    }
 
     if (typeof cancelButton != 'undefined') {
         confirmFooterDiv.append(cancelButton);
@@ -449,5 +452,4 @@ Mautic.showModal = function(target) {
 
     mQuery(target).modal('show');
 };
-
 

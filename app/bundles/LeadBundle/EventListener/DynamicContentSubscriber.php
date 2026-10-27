@@ -11,10 +11,11 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class DynamicContentSubscriber implements EventSubscriberInterface
+final readonly class DynamicContentSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private LeadListRepository $segmentRepository)
-    {
+    public function __construct(
+        private LeadListRepository $segmentRepository,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -45,14 +46,16 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
      */
     private function isContactSegmentRelationshipValid(Lead $contact, string $operator, ?array $segmentIds = null): bool
     {
-        $contactId = (int) $contact->getId();
+        $contactId = $contact->getId();
 
         return match ($operator) {
-            OperatorOptions::EMPTY     => $this->segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
-            OperatorOptions::NOT_EMPTY => $this->segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
-            OperatorOptions::IN        => $this->segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
-            OperatorOptions::NOT_IN    => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
-            default                    => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
+            OperatorOptions::EMPTY         => $this->segmentRepository->isNotContactInAnySegment($contactId), // Contact is not in any segment
+            OperatorOptions::NOT_EMPTY     => $this->segmentRepository->isContactInAnySegment($contactId), // Contact is in any segment
+            OperatorOptions::INCLUDING_ANY => $this->segmentRepository->isContactInSegments($contactId, $segmentIds), // Contact is in one of the segment provided in $segmentsIds
+            OperatorOptions::EXCLUDING_ANY => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in some segments provided in $segmentsIds
+            OperatorOptions::INCLUDING_ALL => $this->segmentRepository->isContactInAllSegments($contactId, $segmentIds), // Contact is in all segments provided in $segmentsIds
+            OperatorOptions::EXCLUDING_ALL => $this->segmentRepository->isNotContactInAllSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
+            default                        => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
         };
     }
 }

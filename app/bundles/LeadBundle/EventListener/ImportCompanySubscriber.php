@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ImportCompanySubscriber implements EventSubscriberInterface
+final readonly class ImportCompanySubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private FieldList $fieldList,
@@ -80,9 +80,10 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
                 $event->import->getMatchedFields(),
                 $event->rowData,
                 $event->import->getDefault('owner'),
-                (bool) $event->import->getDefault('skip_if_exists')
+                (bool) $event->import->getDefault('skip_if_exists'),
+                $event->import->getDefaults()['create_new'] ?? true
             );
-            $event->setWasMerged((bool) $merged);
+            $event->setWasMerged($merged);
             $event->stopPropagation();
         }
     }
@@ -96,7 +97,10 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
         $matchedFields = $event->getForm()->getData();
         $skipIfExists  = ArrayHelper::pickValue('skip_if_exists', $matchedFields, false);
         $event->setSkipIfExists((bool) $skipIfExists);
+        $createNew = ArrayHelper::pickValue('create_new', $matchedFields, true);
+        $event->setCreateNew((bool) $createNew);
         unset($matchedFields['skip_if_exists']);
+        unset($matchedFields['create_new']);
         $event->setOwnerId($this->handleValidateOwner($matchedFields));
 
         $matchedFields = array_map(
@@ -104,7 +108,7 @@ final class ImportCompanySubscriber implements EventSubscriberInterface
             array_filter($matchedFields)
         );
 
-        if (empty($matchedFields)) {
+        if ([] === $matchedFields) {
             $event->getForm()->addError(
                 new FormError(
                     $this->translator->trans('mautic.lead.import.matchfields', [], 'validators')

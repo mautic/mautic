@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Event\JobExtendTimeEvent;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\CoreBundle\ProcessSignal\Exception\SignalCaughtException;
@@ -12,7 +13,11 @@ use Mautic\LeadBundle\Entity\Lead;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -26,10 +31,12 @@ class ExportHelper
     public const EXPORT_TYPE_CSV   = 'csv';
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private CoreParametersHelper $coreParametersHelper,
-        private FilePathResolver $filePathResolver,
-        private ProcessSignalService $processSignalService,
+        private readonly TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly FilePathResolver $filePathResolver,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -96,7 +103,7 @@ class ExportHelper
             return $zipFilePath;
         }
 
-        throw new FilePathException("Could not create zip archive at $zipFilePath.");
+        throw new FilePathException("Could not create zip archive at {$zipFilePath}.");
     }
 
     private function exportAsExcel(\Iterator $data, string $filename): StreamedResponse
@@ -183,6 +190,7 @@ class ExportHelper
                 $headerSet = true;
             }
 
+            $this->eventDispatcher->dispatch(new JobExtendTimeEvent());
             CsvHelper::putCsv($handler, $row);
 
             // Check if signal caught here
@@ -199,8 +207,8 @@ class ExportHelper
         $contactExportDir = $this->coreParametersHelper->get('contact_export_dir');
         $this->filePathResolver->createDirectory($contactExportDir);
         $filePath     = $contactExportDir.'/'.$fileName;
-        $fileName     = (string) pathinfo($filePath, PATHINFO_FILENAME);
-        $extension    = (string) pathinfo($filePath, PATHINFO_EXTENSION);
+        $fileName     = pathinfo($filePath, PATHINFO_FILENAME);
+        $extension    = pathinfo($filePath, PATHINFO_EXTENSION);
         $originalName = $fileName;
         $i            = 1;
 
@@ -224,5 +232,67 @@ class ExportHelper
         $leadExport['stage'] = $stage ? $stage->getName() : null;
 
         return $leadExport;
+    }
+
+    public function downloadAsZip(string $filePath, string $fileName): BinaryFileResponse
+    {
+        return new BinaryFileResponse(
+            $filePath,
+            Response::HTTP_OK,
+            [
+                'Content-Type'        => 'application/zip',
+                'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
+                'Expires'             => 0,
+                'Cache-Control'       => 'must-revalidate',
+                'Pragma'              => 'public',
+            ]
+        );
+    }
+
+    /**
+     * @param array<string|int, string> $assetList
+     */
+    public function writeToZipFile(string $jsonOutput, array $assetList, string $path): string
+    {
+        if ('' === $path) {
+            $tempDir      = sys_get_temp_dir();
+            $jsonFilePath = sprintf('%s/entity_data.json', $tempDir);
+            $zipFilePath  = sprintf('%s/entity_data.zip', $tempDir);
+        } else {
+            $jsonFilePath = sprintf('%s/entity_data.json', $path);
+            $zipFilePath  = sprintf('%s/entity_data.zip', $path);
+        }
+
+        if (file_exists($jsonFilePath)) {
+            unlink($jsonFilePath);
+        }
+
+        if (file_exists($zipFilePath)) {
+            unlink($zipFilePath);
+        }
+
+        file_put_contents($jsonFilePath, $jsonOutput);
+
+        $zip = new \ZipArchive();
+        if (true === $zip->open($zipFilePath, \ZipArchive::CREATE)) {
+            $zip->addFile($jsonFilePath, 'entity_data.json');
+            foreach ($assetList as $assetPath) {
+                if (file_exists($assetPath)) {
+                    $zip->addFile($assetPath, 'assets/'.basename($assetPath));
+                } else {
+                    // Surface the gap instead of silently shipping an archive without the
+                    // file — a missing asset here means the export/share ZIP is incomplete.
+                    $this->logger?->warning('Export asset file not found; skipping it in the ZIP archive.', [
+                        'assetPath' => $assetPath,
+                        'zipFilePath' => $zipFilePath,
+                    ]);
+                }
+            }
+
+            $zip->close();
+            @unlink($jsonFilePath);
+        }
+
+        return $zipFilePath;
     }
 }

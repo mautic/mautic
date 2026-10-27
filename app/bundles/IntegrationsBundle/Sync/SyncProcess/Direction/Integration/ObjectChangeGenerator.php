@@ -20,7 +20,7 @@ use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 class ObjectChangeGenerator
 {
     public function __construct(
-        private ValueHelper $valueHelper,
+        private readonly ValueHelper $valueHelper,
     ) {
     }
 
@@ -100,7 +100,7 @@ class ObjectChangeGenerator
                     $integrationObject->getObject(),
                     $fieldMappingDAO->getIntegrationField()
                 ),
-                __CLASS__.':'.__FUNCTION__
+                self::class.':'.__FUNCTION__
             );
 
             return;

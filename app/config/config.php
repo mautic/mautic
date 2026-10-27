@@ -44,6 +44,33 @@ if (defined('MAUTIC_INSTALLER')) {
 }
 
 $container->loadFromExtension('framework', [
+    'assets' => [
+        'base_path' => './',
+    ],
+    'asset_mapper' => [
+        'paths' => [
+            '%mautic.application_dir%/app/bundles/CoreBundle/Assets'             => '',
+            '%kernel.project_dir%/vendor/twbs/bootstrap/dist/js' => 'vendor/bootstrap',
+        ],
+        'public_prefix'       => '/assets/build/',
+        'missing_import_mode' => 'strict',
+        'excluded_patterns'   => [
+            '*/assets/build/*',
+            '*/assets/build/**',
+            '*/app/bundles/CoreBundle/Assets/images/*',
+            '*/app/bundles/CoreBundle/Assets/images/**',
+            '*/app/bundles/CoreBundle/Assets/js/*',
+            '*/app/bundles/CoreBundle/Assets/js/**',
+            '*/app/bundles/CoreBundle/Assets/json/*',
+            '*/app/bundles/CoreBundle/Assets/json/**',
+            '*/app/bundles/CoreBundle/Assets/pictograms/*',
+            '*/app/bundles/CoreBundle/Assets/pictograms/**',
+            '*/app/bundles/CoreBundle/Assets/css/app/scss/_*.scss',
+            '*/app/bundles/CoreBundle/Assets/css/app/scss/**/_*.scss',
+            '*/app/bundles/CoreBundle/Assets/css/libraries/_*.scss',
+            '*/app/bundles/CoreBundle/Assets/css/libraries/**/_*.scss',
+        ],
+    ],
     'secret' => '%mautic.secret_key%',
     'router' => [
         'resource'            => '%mautic.application_dir%/app/config/routing.php',
@@ -52,7 +79,7 @@ $container->loadFromExtension('framework', [
     'form'            => null,
     'csrf_protection' => true,
     'validation'      => [
-        'enable_attributes' => false,
+        'enable_attributes' => true,
     ],
     'default_locale' => '%mautic.locale%',
     'translator'     => [
@@ -68,7 +95,9 @@ $container->loadFromExtension('framework', [
     'fragments'            => null,
     'http_method_override' => true,
     'mailer'               => [
-        'dsn' => '%env(urlencoded-dsn:MAUTIC_MAILER_DSN)%',
+        'transports' => [
+            'main' => '%env(urlencoded-dsn:MAUTIC_MAILER_DSN)%',
+        ],
     ],
     'messenger'            => [
         'failure_transport'  => 'failed',
@@ -100,6 +129,18 @@ $container->loadFromExtension('framework', [
     /*'validation'           => array(
         'static_method' => array('loadValidatorMetadata')
     )*/
+]);
+
+$container->loadFromExtension('symfonycasts_sass', [
+    'root_sass'    => [
+        '%mautic.application_dir%/app/bundles/CoreBundle/Assets/css/app.scss',
+    ],
+    'sass_options' => [
+        'load_path'  => [
+            '%kernel.project_dir%/vendor/twbs/bootstrap/scss',
+        ],
+        'source_map' => false,
+    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
@@ -143,6 +184,9 @@ if (!empty($localConfigParameterBag->get('db_host_ro'))) {
     ];
 }
 
+// Use the new Pdo\Mysql namespace for PHP 8.4+, fallback to legacy constant for older versions
+$unbufferedQueryConstant = class_exists('Pdo\Mysql') ? Pdo\Mysql::ATTR_USE_BUFFERED_QUERY : PDO::MYSQL_ATTR_USE_BUFFERED_QUERY;
+
 $container->loadFromExtension('doctrine', [
     'dbal' => [
         'default_connection' => 'default',
@@ -150,8 +194,8 @@ $container->loadFromExtension('doctrine', [
             'default'    => $connectionSettings,
             'unbuffered' => array_merge($connectionSettings, [
                 'options' => [
-                    PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
-                    PDO::ATTR_STRINGIFY_FETCHES        => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
+                    $unbufferedQueryConstant    => false,
+                    PDO::ATTR_STRINGIFY_FETCHES => true, // @see https://www.php.net/manual/en/migration81.incompatible.php#migration81.incompatible.pdo.mysql
                 ],
             ]),
         ],
@@ -257,11 +301,6 @@ $container->loadFromExtension('jms_serializer', [
     ],
 ]);
 
-// Twig Configuration
-$container->loadFromExtension('twig', [
-    'exception_controller' => null,
-]);
-
 $container->loadFromExtension('framework', [
     'cache' => [
         'pools' => [
@@ -364,5 +403,77 @@ $container->loadFromExtension('fm_elfinder', [
                 ],
             ],
         ],
+    ],
+]);
+
+// API Platform Configuration
+$container->loadFromExtension('api_platform', [
+    'title'             => 'Mautic API',
+    'description'       => 'API endpoints for Mautic',
+    'version'           => '1.0.0',
+    'show_webby'        => false,
+    'enable_swagger'    => true,
+    'enable_swagger_ui' => true,
+    'swagger'           => [
+        'versions' => [3],
+    ],
+    'enable_re_doc'     => true,
+    'enable_entrypoint' => true,
+    'enable_docs'       => true,
+    'enable_profiler'   => false,
+    'collection'        => [
+        'pagination'    => [
+            'enabled'        => true,
+        ],
+    ],
+    'patch_formats'     => [
+        'json'    => ['application/merge-patch+json'],
+        'jsonapi' => ['application/vnd.api+json'],
+    ],
+    'formats' => [
+        'jsonld'  => [
+            'mime_types' => [
+                'application/ld+json',
+            ],
+        ],
+        'json'    => [
+            'mime_types' => [
+                'application/json',
+            ],
+        ],
+        'jsonapi' => [
+            'mime_types' => [
+                'application/vnd.api+json',
+            ],
+        ],
+        'html' => [
+            'mime_types' => [
+                'text/html',
+            ],
+        ],
+    ],
+    'error_formats' => [
+        'jsonproblem' => [
+            'mime_types' => [
+                'application/problem+json',
+            ],
+        ],
+        'jsonapi' => [
+            'mime_types' => [
+                'application/vnd.api+json',
+            ],
+        ],
+        'jsonld' => [
+            'mime_types' => [
+                'application/ld+json',
+            ],
+        ],
+    ],
+    'exception_to_status' => [
+        'Symfony\Component\Serializer\Exception\ExceptionInterface'       => 400,
+        'ApiPlatform\Exception\InvalidArgumentException'                  => Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST,
+        'ApiPlatform\Validator\Exception\ValidationException'             => 400,
+        'Doctrine\ORM\OptimisticLockException'                            => 409,
+        'Symfony\Component\Security\Core\Exception\AccessDeniedException' => 403,
     ],
 ]);

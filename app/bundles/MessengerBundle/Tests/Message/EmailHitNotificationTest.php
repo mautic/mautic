@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\MessengerBundle\Tests\Message;
 
 use Mautic\MessengerBundle\Message\EmailHitNotification;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailHitNotificationTest extends TestCase
+final class EmailHitNotificationTest extends TestCase
 {
     public function testConstruct(): void
     {

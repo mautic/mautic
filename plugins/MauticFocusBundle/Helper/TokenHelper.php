@@ -9,7 +9,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class TokenHelper
 {
-    private string $regex = '{focus=(.*?)}';
+    public const REGEX = '/{focus=(.*?)}/i';
 
     public function __construct(
         protected FocusModel $model,
@@ -20,9 +20,7 @@ class TokenHelper
 
     public function findFocusTokens($content): array
     {
-        $regex = '/'.$this->regex.'/i';
-
-        preg_match_all($regex, $content, $matches);
+        preg_match_all(self::REGEX, $content, $matches);
 
         $tokens = [];
 

@@ -10,9 +10,12 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailRepositoryTest extends TestCase
+final class EmailRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -23,14 +26,26 @@ class EmailRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repo = $this->configureRepository(Email::class);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
+            'mautic.email.email.searchcommand.isexpired' => 'is:expired',
+            'mautic.email.email.searchcommand.ispending' => 'is:pending',
+            'mautic.core.searchcommand.name'              => 'name',
+            'mautic.email.email.searchcommand.subject'    => 'subject',
+            default                                       => $id,
+        });
+        $this->repo->autowireCommonRepository($translator);
+
+        $this->repo->autowireDispatcher($this->createStub(EventDispatcherInterface::class));
     }
 
     /**
      * @param int[] $variantIds
      * @param int[] $excludedListIds
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetEmailPendingQueryForCount')]
+    #[DataProvider('dataGetEmailPendingQueryForCount')]
     public function testGetEmailPendingQueryForCount(?array $variantIds, bool $countWithMaxMin, array $excludedListIds, string $expectedQuery): void
     {
         $this->mockExcludedListIds($excludedListIds);
@@ -54,7 +69,18 @@ class EmailRepositoryTest extends TestCase
         );
 
         $this->assertEquals($this->replaceQueryPrefix($expectedQuery), $query->getSql());
-        $this->assertEquals(['false' => false], $query->getParameters());
+
+        if ($variantIds) {
+            $variantIds[] = $emailId;
+        }
+        $params = [
+            'listIds'           => $listIds,
+            'variantIds'        => $variantIds,
+            'excludedListIds'   => $excludedListIds,
+        ];
+
+        $params = array_filter($params);
+        $this->assertEquals($params, $query->getParameters());
     }
 
     /**
@@ -62,15 +88,15 @@ class EmailRepositoryTest extends TestCase
      */
     public static function dataGetEmailPendingQueryForCount(): iterable
     {
-        yield [null, false, [], "SELECT count(*) as count FROM {prefix}leads l WHERE (l.id IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll WHERE (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM {prefix}lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM {prefix}email_stats stat WHERE (stat.lead_id IS NOT NULL) AND (stat.email_id = 5))) AND (l.id NOT IN (SELECT mq.lead_id FROM {prefix}message_queue mq WHERE (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id NOT IN (SELECT lc.lead_id FROM {prefix}lead_categories lc INNER JOIN {prefix}emails e ON e.category_id = lc.category_id WHERE (e.id = 5) AND (lc.manually_removed = 1))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
-        yield [[6], false, [16], "SELECT count(*) as count FROM {prefix}leads l WHERE (l.id IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll WHERE (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM {prefix}lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM {prefix}email_stats stat WHERE (stat.lead_id IS NOT NULL) AND (stat.email_id IN (6, 5)))) AND (l.id NOT IN (SELECT mq.lead_id FROM {prefix}message_queue mq WHERE (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id IN (6, 5)))) AND (l.id NOT IN (SELECT lc.lead_id FROM {prefix}lead_categories lc INNER JOIN {prefix}emails e ON e.category_id = lc.category_id WHERE (e.id = 5) AND (lc.manually_removed = 1))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
-        yield [null, true, [9, 7], "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM {prefix}leads l WHERE (l.id IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll WHERE (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM {prefix}lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM {prefix}email_stats stat WHERE (stat.lead_id IS NOT NULL) AND (stat.email_id = 5))) AND (l.id NOT IN (SELECT mq.lead_id FROM {prefix}message_queue mq WHERE (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id NOT IN (SELECT lc.lead_id FROM {prefix}lead_categories lc INNER JOIN {prefix}emails e ON e.category_id = lc.category_id WHERE (e.id = 5) AND (lc.manually_removed = 1))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
+        yield [null, false, [], "SELECT count(*) as count FROM {prefix}leads l WHERE (l.id NOT IN (SELECT dnc.lead_id FROM {prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.lead_id IS NOT NULL) AND (stat.email_id = 5))) AND (l.id NOT IN (SELECT mq.lead_id FROM {prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (:listIds)) AND (ll.manually_removed = 0))) AND (l.id NOT IN (SELECT lc.lead_id FROM {prefix}lead_categories lc INNER JOIN {prefix}emails e ON e.category_id = lc.category_id WHERE (e.id = 5) AND (lc.manually_removed = 1))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
+        yield [[6], false, [16], "SELECT count(*) as count FROM {prefix}leads l WHERE (l.id NOT IN (SELECT dnc.lead_id FROM {prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.lead_id IS NOT NULL) AND (stat.email_id IN (:variantIds)))) AND (l.id NOT IN (SELECT mq.lead_id FROM {prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id IN (:variantIds)))) AND (l.id IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (:listIds)) AND (ll.manually_removed = 0))) AND (l.id NOT IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll FORCE INDEX (`PRIMARY`) WHERE ll.leadlist_id IN (:excludedListIds))) AND (l.id NOT IN (SELECT lc.lead_id FROM {prefix}lead_categories lc INNER JOIN {prefix}emails e ON e.category_id = lc.category_id WHERE (e.id = 5) AND (lc.manually_removed = 1))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
+        yield [null, true, [9, 7], "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM {prefix}leads l WHERE (l.id NOT IN (SELECT dnc.lead_id FROM {prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.lead_id IS NOT NULL) AND (stat.email_id = 5))) AND (l.id NOT IN (SELECT mq.lead_id FROM {prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (:listIds)) AND (ll.manually_removed = 0))) AND (l.id NOT IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll FORCE INDEX (`PRIMARY`) WHERE ll.leadlist_id IN (:excludedListIds))) AND (l.id NOT IN (SELECT lc.lead_id FROM {prefix}lead_categories lc INNER JOIN {prefix}emails e ON e.category_id = lc.category_id WHERE (e.id = 5) AND (lc.manually_removed = 1))) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
     }
 
     /**
      * @param int[] $excludedListIds
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined')]
+    #[DataProvider('dataGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined')]
     public function testGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined(array $excludedListIds, string $expectedQuery): void
     {
         $this->mockExcludedListIds($excludedListIds);
@@ -96,10 +122,14 @@ class EmailRepositoryTest extends TestCase
         );
 
         $expectedParams = [
-            'false'        => false,
             'minContactId' => 10,
             'maxContactId' => 1000,
+            'listIds'      => $listIds,
         ];
+
+        if ([] !== $excludedListIds) {
+            $expectedParams['excludedListIds'] = $excludedListIds;
+        }
 
         $this->assertEquals($this->replaceQueryPrefix($expectedQuery), $query->getSql());
         $this->assertEquals($expectedParams, $query->getParameters());
@@ -110,8 +140,8 @@ class EmailRepositoryTest extends TestCase
      */
     public static function dataGetEmailPendingQueryForMaxMinIdCountWithMaxMinIdsDefined(): iterable
     {
-        yield [[], "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM {prefix}leads l WHERE (l.id IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll WHERE (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM {prefix}lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM {prefix}email_stats stat WHERE (stat.lead_id IS NOT NULL) AND (stat.email_id = 5))) AND (l.id NOT IN (SELECT mq.lead_id FROM {prefix}message_queue mq WHERE (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id NOT IN (SELECT lc.lead_id FROM {prefix}lead_categories lc INNER JOIN {prefix}emails e ON e.category_id = lc.category_id WHERE (e.id = 5) AND (lc.manually_removed = 1))) AND (l.id >= :minContactId) AND (l.id <= :maxContactId) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
-        yield [[96, 98, 103], "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM {prefix}leads l WHERE (l.id IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll WHERE (ll.leadlist_id IN (22, 33)) AND (ll.manually_removed = :false))) AND (l.id NOT IN (SELECT dnc.lead_id FROM {prefix}lead_donotcontact dnc WHERE dnc.channel = 'email')) AND (l.id NOT IN (SELECT stat.lead_id FROM {prefix}email_stats stat WHERE (stat.lead_id IS NOT NULL) AND (stat.email_id = 5))) AND (l.id NOT IN (SELECT mq.lead_id FROM {prefix}message_queue mq WHERE (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id NOT IN (SELECT lc.lead_id FROM {prefix}lead_categories lc INNER JOIN {prefix}emails e ON e.category_id = lc.category_id WHERE (e.id = 5) AND (lc.manually_removed = 1))) AND (l.id >= :minContactId) AND (l.id <= :maxContactId) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
+        yield [[], "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM {prefix}leads l WHERE (l.id NOT IN (SELECT dnc.lead_id FROM {prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.lead_id IS NOT NULL) AND (stat.email_id = 5))) AND (l.id NOT IN (SELECT mq.lead_id FROM {prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (:listIds)) AND (ll.manually_removed = 0))) AND (l.id NOT IN (SELECT lc.lead_id FROM {prefix}lead_categories lc INNER JOIN {prefix}emails e ON e.category_id = lc.category_id WHERE (e.id = 5) AND (lc.manually_removed = 1))) AND (l.id >= :minContactId) AND (l.id <= :maxContactId) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
+        yield [[96, 98, 103], "SELECT count(*) as count, MIN(l.id) as min_id, MAX(l.id) as max_id FROM {prefix}leads l WHERE (l.id NOT IN (SELECT dnc.lead_id FROM {prefix}lead_donotcontact dnc WHERE (dnc.lead_id = l.id) AND (dnc.channel = 'email'))) AND (NOT EXISTS (SELECT null FROM {prefix}email_stats stat WHERE (stat.lead_id = l.id) AND (stat.lead_id IS NOT NULL) AND (stat.email_id = 5))) AND (l.id NOT IN (SELECT mq.lead_id FROM {prefix}message_queue mq WHERE (mq.lead_id = l.id) AND (mq.status <> 'sent') AND (mq.channel = 'email') AND (mq.channel_id = 5))) AND (l.id IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll WHERE (ll.lead_id = l.id) AND (ll.leadlist_id IN (:listIds)) AND (ll.manually_removed = 0))) AND (l.id NOT IN (SELECT ll.lead_id FROM {prefix}lead_lists_leads ll FORCE INDEX (`PRIMARY`) WHERE ll.leadlist_id IN (:excludedListIds))) AND (l.id NOT IN (SELECT lc.lead_id FROM {prefix}lead_categories lc INNER JOIN {prefix}emails e ON e.category_id = lc.category_id WHERE (e.id = 5) AND (lc.manually_removed = 1))) AND (l.id >= :minContactId) AND (l.id <= :maxContactId) AND ((l.email IS NOT NULL) AND (l.email <> ''))"];
     }
 
     public function testGetUniqueCliks(): void
@@ -213,7 +243,7 @@ class EmailRepositoryTest extends TestCase
 
         $result = $this->repo->getSentReadNotReadCount($queryBuilder);
 
-        $this->assertEquals([
+        $this->assertSame([
             'sent_count' => 100,
             'read_count' => 60,
             'not_read'   => 40,
@@ -250,9 +280,9 @@ class EmailRepositoryTest extends TestCase
 
         $result = $this->repo->getSentReadNotReadCount($queryBuilder);
 
-        $this->assertEquals([
-            'sent_count' => 0,
+        $this->assertSame([
             'read_count' => 0,
+            'sent_count' => 0,
             'not_read'   => 0,
         ], $result);
     }
@@ -262,15 +292,73 @@ class EmailRepositoryTest extends TestCase
      */
     private function mockExcludedListIds(array $excludedListIds): void
     {
-        $resultMock = $this->createMock(Result::class);
-        $resultMock->method('fetchAllAssociative')
-            ->willReturn(array_map(fn (int $id) => [$id], $excludedListIds));
-        $this->connection->method('executeQuery')
-            ->willReturn($resultMock);
+        $this->result->method('fetchFirstColumn')
+            ->willReturn($excludedListIds);
     }
 
     private function replaceQueryPrefix(string $query): string
     {
         return str_replace('{prefix}', MAUTIC_TABLE_PREFIX, $query);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesExpirationFilters(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'is:expired', 'string' => '', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(EmailRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
+
+        $this->assertSame('(e.isPublished = :par1 AND e.publishDown IS NOT NULL AND e.publishDown <> \'\' AND e.publishDown < CURRENT_TIMESTAMP())', (string) $expr);
+        $this->assertSame(['par1' => true], $params);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesPendingFilters(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'is:pending', 'string' => '', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(EmailRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
+
+        $this->assertSame('(e.isPublished = :par1 AND e.publishUp IS NOT NULL AND e.publishUp <> \'\' AND e.publishUp > CURRENT_TIMESTAMP())', (string) $expr);
+        $this->assertSame(['par1' => true], $params);
+    }
+
+    public function testGetSearchCommandsContainsExpirationFilters(): void
+    {
+        $commands = $this->repo->getSearchCommands();
+        $this->assertContains('mautic.email.email.searchcommand.isexpired', $commands);
+        $this->assertContains('mautic.email.email.searchcommand.ispending', $commands);
+        $this->assertContains('mautic.core.searchcommand.name', $commands);
+        $this->assertContains('mautic.email.email.searchcommand.subject', $commands);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesNameFilter(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'name', 'string' => 'Newsletter', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(EmailRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
+
+        $this->assertStringContainsString('e.name', (string) $expr);
+        $this->assertCount(1, $params);
+    }
+
+    public function testAddSearchCommandWhereClauseHandlesSubjectFilter(): void
+    {
+        $qb     = $this->connection->createQueryBuilder();
+        $filter = (object) ['command' => 'subject', 'string' => 'Welcome', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(EmailRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($this->repo, $qb, $filter);
+
+        $this->assertStringContainsString('e.subject', (string) $expr);
+        $this->assertCount(1, $params);
     }
 }

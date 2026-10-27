@@ -5,20 +5,26 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Entity;
 
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class PageTest extends \PHPUnit\Framework\TestCase
+final class PageTest extends \PHPUnit\Framework\TestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('setIsPreferenceCenterDataProvider')]
-    public function testSetIsPreferenceCenter($value, $expected, array $changes): void
+    /**
+     * @param array<string, array<int, mixed>> $changes
+     */
+    #[DataProvider('setIsPreferenceCenterDataProvider')]
+    public function testSetIsPreferenceCenter(mixed $value, mixed $expected, array $changes): void
     {
         $page = new Page();
         $page->setIsPreferenceCenter($value);
 
-        Assert::assertSame($expected, $page->getIsPreferenceCenter());
-        Assert::assertSame($changes, $page->getChanges());
+        $this->assertSame($expected, $page->getIsPreferenceCenter());
+        $this->assertSame($changes, $page->getChanges());
     }
 
+    /**
+     * @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}>
+     */
     public static function setIsPreferenceCenterDataProvider(): iterable
     {
         yield [null, null, []];
@@ -29,16 +35,22 @@ class PageTest extends \PHPUnit\Framework\TestCase
         yield ['string', true, ['isPreferenceCenter' => [null, true]]];
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('setNoIndexDataProvider')]
-    public function testSetNoIndex($value, $expected, array $changes): void
+    /**
+     * @param array<string, array<int, mixed>> $changes
+     */
+    #[DataProvider('setNoIndexDataProvider')]
+    public function testSetNoIndex(mixed $value, mixed $expected, array $changes): void
     {
         $page = new Page();
         $page->setNoIndex($value);
 
-        Assert::assertSame($expected, $page->getNoIndex());
-        Assert::assertSame($changes, $page->getChanges());
+        $this->assertSame($expected, $page->getNoIndex());
+        $this->assertSame($changes, $page->getChanges());
     }
 
+    /**
+     * @return iterable<array{0: mixed, 1: mixed, 2: array<string, array{0: mixed, 1: mixed}>}>
+     */
     public static function setNoIndexDataProvider(): iterable
     {
         yield [null, null, []];
@@ -71,5 +83,22 @@ class PageTest extends \PHPUnit\Framework\TestCase
         $page->setFooterScript($script);
 
         $this->assertEquals($script, $page->getFooterScript());
+    }
+
+    #[DataProvider('setIsDuplicateDataProvider')]
+    public function testIsDuplicate(bool $isDuplicate): void
+    {
+        $page = new Page();
+        $page->setIsDuplicate($isDuplicate);
+        $this->assertIsBool($page->isDuplicate());
+    }
+
+    /**
+     * @return iterable<array{bool}>
+     */
+    public static function setIsDuplicateDataProvider(): iterable
+    {
+        yield [true];
+        yield [false];
     }
 }

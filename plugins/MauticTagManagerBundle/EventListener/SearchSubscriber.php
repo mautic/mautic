@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use MauticPlugin\MauticTagManagerBundle\Model\TagModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private TagModel $model,
@@ -35,7 +35,7 @@ class SearchSubscriber implements EventSubscriberInterface
             '@MauticTagManager/SubscribedEvents/Search/global.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.tagmanager.tag.header.index', $results);
         }
     }

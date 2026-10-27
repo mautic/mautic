@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private MessageModel $model,
@@ -34,7 +34,7 @@ class SearchSubscriber implements EventSubscriberInterface
             '@MauticChannel/SubscribedEvents/Search/global.html.twig'
         );
 
-        if (!empty($results)) {
+        if ([] !== $results) {
             $event->addResults('mautic.messages.header', $results);
         }
     }

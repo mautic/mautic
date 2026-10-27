@@ -8,6 +8,7 @@ use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
@@ -25,7 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * @extends CommonApiController<LeadList>
  */
-class ListApiController extends CommonApiController
+final class ListApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
@@ -34,11 +35,21 @@ class ListApiController extends CommonApiController
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $listModel = $modelFactory->getModel('lead.list');
-        \assert($listModel instanceof ListModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        private ListModel $listModel,
+        private LeadModel $leadModel,
+    ) {
         $this->model            = $listModel;
         $this->entityClass      = LeadList::class;
         $this->entityNameOne    = 'list';
@@ -49,7 +60,6 @@ class ListApiController extends CommonApiController
             'publishDetails',
             'ipAddress',
             'categoryList',
-            'projectList',
         ];
 
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
@@ -84,15 +94,45 @@ class ListApiController extends CommonApiController
     }
 
     /**
-     * Obtains a list of smart lists for the user.
-     *
-     * @return Response
+     * Obtains a list of entities.
      */
-    public function getListsAction()
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
     {
-        $listModel = $this->getModel('lead.list');
-        \assert($listModel instanceof ListModel);
-        $lists   = $listModel->getUserLists();
+        $withCounts = $request->query->has('withCounts');
+        $response   = parent::getEntitiesAction($request, $userHelper);
+
+        if ($withCounts && $response instanceof Response && 200 === $response->getStatusCode()) {
+            $content = json_decode($response->getContent(), true);
+
+            if (isset($content['lists']) && is_array($content['lists'])) {
+                $segmentIds = array_column($content['lists'], 'id');
+
+                if ([] !== $segmentIds) {
+                    /** @var ListModel $model */
+                    $model      = $this->model;
+                    $leadCounts = $model->getSegmentContactCount($segmentIds);
+
+                    foreach ($content['lists'] as &$segment) {
+                        $segment['contactCount'] = $leadCounts[$segment['id']] ?? 0;
+                    }
+
+                    $view = $this->view($content, Response::HTTP_OK);
+                    $this->setSerializationContext($view);
+
+                    return $this->handleView($view);
+                }
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Obtains a list of smart lists for the user.
+     */
+    public function getListsAction(): Response
+    {
+        $lists   = $this->listModel->getUserLists();
         $view    = $this->view($lists, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['leadListList']);
         $view->setContext($context);
@@ -106,11 +146,9 @@ class ListApiController extends CommonApiController
      * @param int $id     List ID
      * @param int $leadId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addLeadAction($id, $leadId)
+    public function addLeadAction($id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -129,9 +167,7 @@ class ListApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $leadModel = $this->getModel('lead');
-        \assert($leadModel instanceof LeadModel);
-        $leadModel->addToLists($leadId, $entity);
+        $this->leadModel->addToLists($leadId, $entity);
 
         $view = $this->view(['success' => 1], Response::HTTP_OK);
 
@@ -143,11 +179,9 @@ class ListApiController extends CommonApiController
      *
      * @param int $id segement ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addLeadsAction(Request $request, $id)
+    public function addLeadsAction(Request $request, $id): Response
     {
         $contactIds = $request->request->all()['ids'] ?? null;
         if (null === $contactIds) {
@@ -172,10 +206,7 @@ class ListApiController extends CommonApiController
             if ($contact instanceof Response) {
                 $responseDetail[$contactId] = ['success' => false];
             } else {
-                $leadModel = $this->getModel('lead');
-                \assert($leadModel instanceof LeadModel);
-                /* @var \Mautic\LeadBundle\Entity\Lead $contact */
-                $leadModel->addToLists($contact, $entity);
+                $this->leadModel->addToLists($contact, $entity);
                 $responseDetail[$contact->getId()] = ['success' => true];
             }
         }
@@ -191,11 +222,9 @@ class ListApiController extends CommonApiController
      * @param int $id     List ID
      * @param int $leadId Lead ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function removeLeadAction($id, $leadId)
+    public function removeLeadAction($id, $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -214,9 +243,7 @@ class ListApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $leadModel = $this->getModel('lead');
-        \assert($leadModel instanceof LeadModel);
-        $leadModel->removeFromLists($leadId, $entity);
+        $this->leadModel->removeFromLists($leadId, $entity);
 
         $view = $this->view(['success' => 1], Response::HTTP_OK);
 
@@ -235,7 +262,8 @@ class ListApiController extends CommonApiController
     {
         if ('create' == $action || 'edit' == $action || 'view' == $action) {
             return $this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN);
-        } elseif ('delete' == $action) {
+        }
+        if ('delete' == $action) {
             return $this->security->hasEntityAccess(
                 true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
             );

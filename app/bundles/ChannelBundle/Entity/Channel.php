@@ -1,7 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -9,28 +18,27 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
-/**
- * @ApiResource(
- *   attributes={
- *     "security"="false",
- *     "normalization_context"={
- *       "groups"={
- *         "channel:read"
- *        },
- *       "swagger_definition_name"="Read",
- *       "api_included"={"message"}
- *     },
- *     "denormalization_context"={
- *       "groups"={
- *         "channel:write"
- *       },
- *       "swagger_definition_name"="Write"
- *     }
- *   }
- * )
- */
+#[ApiResource(
+    operations: [
+        new GetCollection(security: "is_granted('channel:messages:viewown')"),
+        new Post(security: "is_granted('channel:messages:create')"),
+        new Get(security: "is_granted('channel:messages:viewown', object)"),
+        new Put(security: "is_granted('channel:messages:editown', object)"),
+        new Patch(security: "is_granted('channel:messages:editother', object)"),
+        new Delete(security: "is_granted('channel:messages:deleteown', object)"),
+    ],
+    normalizationContext: [
+        'groups'                  => ['channel:read'],
+        'swagger_definition_name' => 'Read',
+        'api_included'            => ['message'],
+    ],
+    denormalizationContext: [
+        'groups'                  => ['channel:write'],
+        'swagger_definition_name' => 'Write',
+    ]
+)]
 class Channel extends CommonEntity implements UuidInterface
 {
     use UuidTrait;
@@ -38,36 +46,43 @@ class Channel extends CommonEntity implements UuidInterface
     /**
      * @var int
      */
+    #[Groups(['channel:read'])]
     private $id;
 
     /**
      * @var string
      */
+    #[Groups(['channel:read', 'channel:write', 'message:read'])]
     private $channel;
 
     /**
      * @var int|null
      */
+    #[Groups(['channel:read', 'channel:write'])]
     private $channelId;
 
     /**
      * @var string
      */
+    #[Groups(['channel:read', 'message:read'])]
     private $channelName;
 
     /**
      * @var Message
      */
+    #[Groups(['channel:read', 'channel:write'])]
     private $message;
 
     /**
      * @var array
      */
+    #[Groups(['channel:read', 'channel:write'])]
     private $properties = [];
 
     /**
      * @var bool
      */
+    #[Groups(['channel:read', 'channel:write', 'message:read'])]
     private $isEnabled = false;
 
     public static function loadMetadata(ClassMetadata $metadata): void
@@ -91,6 +106,7 @@ class Channel extends CommonEntity implements UuidInterface
         $builder->createManyToOne('message', Message::class)
                 ->addJoinColumn('message_id', 'id', false, false, 'CASCADE')
                 ->inversedBy('channels')
+                ->isOwnershipParent()
                 ->build();
 
         static::addUuidField($builder);
@@ -121,7 +137,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -129,7 +145,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getChannel()
     {
@@ -138,10 +154,8 @@ class Channel extends CommonEntity implements UuidInterface
 
     /**
      * @param string $channel
-     *
-     * @return Channel
      */
-    public function setChannel($channel)
+    public function setChannel($channel): static
     {
         $this->channel = $channel;
 
@@ -149,7 +163,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getChannelId()
     {
@@ -158,10 +172,8 @@ class Channel extends CommonEntity implements UuidInterface
 
     /**
      * @param int $channelId
-     *
-     * @return Channel
      */
-    public function setChannelId($channelId)
+    public function setChannelId($channelId): static
     {
         if (empty($channelId)) {
             $channelId = null;
@@ -173,7 +185,7 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getChannelName()
     {
@@ -182,10 +194,8 @@ class Channel extends CommonEntity implements UuidInterface
 
     /**
      * @param string $channelName
-     *
-     * @return Channel
      */
-    public function setChannelName($channelName)
+    public function setChannelName($channelName): static
     {
         $this->channelName = $channelName;
 
@@ -193,17 +203,14 @@ class Channel extends CommonEntity implements UuidInterface
     }
 
     /**
-     * @return Message
+     * @return Message|null
      */
     public function getMessage()
     {
         return $this->message;
     }
 
-    /**
-     * @return Channel
-     */
-    public function setMessage(Message $message)
+    public function setMessage(Message $message): static
     {
         $this->message = $message;
 
@@ -218,10 +225,7 @@ class Channel extends CommonEntity implements UuidInterface
         return $this->properties;
     }
 
-    /**
-     * @return Channel
-     */
-    public function setProperties(array $properties)
+    public function setProperties(array $properties): static
     {
         $this->properties = $properties;
 
@@ -238,13 +242,16 @@ class Channel extends CommonEntity implements UuidInterface
 
     /**
      * @param bool $isEnabled
-     *
-     * @return Channel
      */
-    public function setIsEnabled($isEnabled)
+    public function setIsEnabled($isEnabled): static
     {
         $this->isEnabled = $isEnabled;
 
         return $this;
+    }
+
+    public function getPermissionUser(): mixed
+    {
+        return $this->message->getCreatedBy();
     }
 }

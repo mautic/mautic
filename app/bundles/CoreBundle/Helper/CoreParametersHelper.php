@@ -7,12 +7,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CoreParametersHelper
 {
-    private \Symfony\Component\HttpFoundation\ParameterBag $parameters;
+    private readonly \Symfony\Component\HttpFoundation\ParameterBag $parameters;
 
     private ?array $resolvedParameters = null;
 
     public function __construct(
-        private ContainerInterface $container,
+        private readonly ContainerInterface $container,
     ) {
         $loader = new ParameterLoader();
 
@@ -45,10 +45,7 @@ class CoreParametersHelper
         return $this->parameters->get($name, $default);
     }
 
-    /**
-     * @param string $name
-     */
-    public function has($name): bool
+    public function has(string $name): bool
     {
         return $this->parameters->has($this->stripMauticPrefix($name));
     }
@@ -70,5 +67,14 @@ class CoreParametersHelper
         foreach ($all as $key => $value) {
             $this->resolvedParameters[$key] = $this->get($key, $value);
         }
+    }
+
+    public function getDefaultTimezone(): string
+    {
+        if (!empty($this->get('default_timezone'))) {
+            return $this->get('default_timezone');
+        }
+
+        return 'UTC';
     }
 }

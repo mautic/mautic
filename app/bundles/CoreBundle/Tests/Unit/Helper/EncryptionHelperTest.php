@@ -11,27 +11,24 @@ use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\SymmetricCipherInte
 use Mautic\CoreBundle\Security\Exception\Cryptography\Symmetric\InvalidDecryptionException;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class EncryptionHelperTest extends \PHPUnit\Framework\TestCase
+final class EncryptionHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelperMock;
 
     /**
-     * @var MockObject|OpenSSLCipher
+     * @var MockObject&OpenSSLCipher
      */
     private MockObject $mainCipherMock;
 
     /**
-     * @var MockObject|SymmetricCipherInterface
+     * @var MockObject&SymmetricCipherInterface
      */
     private MockObject $secondaryCipherMock;
 
-    /**
-     * @var string
-     */
-    private $key = 'totallySecretKeyHere';
+    private string $key = 'totallySecretKeyHere';
 
     protected function setUp(): void
     {

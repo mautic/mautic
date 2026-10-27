@@ -9,7 +9,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 
-final class FormAdjustmentsProvider implements FormAdjustmentsProviderInterface
+final readonly class FormAdjustmentsProvider implements FormAdjustmentsProviderInterface
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,

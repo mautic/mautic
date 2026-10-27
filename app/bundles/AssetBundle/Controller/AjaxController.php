@@ -9,16 +9,25 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
-    public function categoryListAction(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    private AssetModel $assetModel;
+
+    #[Required]
+    public function autowireAssetAjaxController(
+        AssetModel $assetModel,
+    ): void {
+        $this->assetModel = $assetModel;
+    }
+
+    public function categoryListAction(Request $request): JsonResponse
     {
-        $assetModel = $this->getModel('asset');
-        \assert($assetModel instanceof AssetModel);
         $filter     = InputHelper::clean($request->query->get('filter'));
-        $results    = $assetModel->getLookupResults('category', $filter, 10);
+        $results    = $this->assetModel->getLookupResults('category', $filter, 10);
         $dataArray  = [];
         foreach ($results as $r) {
             $dataArray[] = [
@@ -33,13 +42,12 @@ class AjaxController extends CommonAjaxController
     /**
      * @throws \Exception
      */
-    public function fetchRemoteFilesAction(Request $request, IntegrationHelper $integrationHelper): \Symfony\Component\HttpFoundation\JsonResponse
+    public function fetchRemoteFilesAction(Request $request, IntegrationHelper $integrationHelper): JsonResponse
     {
         $provider   = InputHelper::string($request->request->get('provider'));
         $path       = InputHelper::string($request->request->get('path', ''));
-        $dispatcher = $this->dispatcher;
         $name       = AssetEvents::ASSET_ON_REMOTE_BROWSE;
-        if (!$dispatcher->hasListeners($name)) {
+        if (!$this->dispatcher->hasListeners($name)) {
             return $this->sendJsonResponse(['success' => 0]);
         }
 
@@ -47,7 +55,7 @@ class AjaxController extends CommonAjaxController
         $integration = $integrationHelper->getIntegrationObject($provider);
 
         $event = new RemoteAssetBrowseEvent($integration);
-        $dispatcher->dispatch($event, $name);
+        $this->dispatcher->dispatch($event, $name);
 
         if (!$adapter = $event->getAdapter()) {
             return $this->sendJsonResponse([

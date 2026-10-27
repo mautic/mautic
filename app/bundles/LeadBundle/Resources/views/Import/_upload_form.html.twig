@@ -3,32 +3,72 @@
     - form
 #}
 {% set uploadMaxFilesize = ini_get('upload_max_filesize')|replace({'M': ''}) %}
-<div class="row">
-    <div class="col-sm-offset-3 col-sm-6">
-        <div class="ml-lg mr-lg mt-md pa-lg">
-            <div class="panel panel-info mb-32">
-                <div class="panel-heading">
-                    <div class="panel-title">{{ 'mautic.lead.import.start.instructions'|trans({'%size%': uploadMaxFilesize}) }}</div>
-                </div>
-                <div class="panel-body">
-                    {{ form_start(form) }}
-                    <div class="input-group well mt-lg">
-                        {{ form_widget(form.file) }}
-                        <span class="input-group-btn">
-                            {{ form_widget(form.start) }}
-                        </span>
+<div class="row animation--slide-in-up">
+    <div class="col-lg-offset-3 col-sm-offset-1 col-md-offset-2 col-md-8 col-lg-6">
+        <div class="pt-40">
+            {% include '@MauticCore/Components/pictogram.html.twig' with {
+                pictogram: 'upload--02',
+                size: 64
+            } %}
+            <h2 class="mt-lg mb-xs">{{ 'mautic.lead.import.start.instructions.choose_file'|trans }}</h2>
+            <div class="text-secondary mb-lg">{{ 'mautic.lead.import.start.instructions.upload_size'|trans({'%size%': uploadMaxFilesize}) }}</div>
+            <div class="row">
+                <div class="panel">
+                    <div class="panel-body">
+                        {{ form_start(form) }}
+                        <div class="small text-secondary"> {{ 'mautic.lead.import.start.instructions.format'|trans }}: CSV</div>
+                        <div class="input-group well mt-xs">
+                            {{ form_widget(form.file, {'label': 'mautic.lead.import.csv.parser.config'}) }}
+                            <span class="input-group-btn">
+                                {{ form_widget(form.start) }}
+                            </span>
+                        </div>
+                        <div class="row">
+                            {% set sampleContent %}
+                                <div class="d-flex fd-row-md fd-column fw-wrap fw-nowrap-md gap-md">
+                                    {{ form_row(form.batchlimit) }}
+                                    {{ form_row(form.delimiter) }}
+                                    {{ form_row(form.enclosure) }}
+                                    {{ form_row(form.escape) }}
+                                </div>
+                                <div class="tile mt-lg">
+                                    <div class="row-no-gutters gap-sm fw-nowrap-md">
+                                        <div class="col-md-8 gap-xs">
+                                            <h5 class="fw-b"> {{'mautic.lead.import.start.instructions.sample'|trans }}</h5>
+                                            <span> {{ 'mautic.lead.import.start.instructions.sample.description'|trans }}</span>
+                                        </div>
+                                        <div class="col-md-4 ai-end jc-center">
+                                            {% include '@MauticCore/Helper/button.html.twig' with {
+                                                'buttons': [
+                                                    {
+                                                        'label': 'mautic.core.download',
+                                                        'icon': 'ri-download-line',
+                                                        'variant': 'tertiary',
+                                                        'size': 'sm',
+                                                        'href': '/app/bundles/LeadBundle/Assets/contacts_sample.csv',
+                                                        'attributes': {
+                                                            'download': ''
+                                                        }
+                                                    }
+                                                ]
+                                            } %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endset %}
+                            {% include '@MauticCore/Helper/accordion.html.twig' with {
+                                'items': [
+                                    {
+                                        'title': 'mautic.lead.import.csv_settings',
+                                        'content': sampleContent
+                                    }
+                                ]
+                            } %}
+                        </div>
+                        {{ form_end(form) }}
                     </div>
-
-                    <div class="d-flex fd-row-md fd-column fw-wrap fw-nowrap-md gap-md">
-                        {{ form_row(form.batchlimit) }}
-                        {{ form_row(form.delimiter) }}
-                        {{ form_row(form.enclosure) }}
-                        {{ form_row(form.escape) }}
-                    </div>
-                    {{ form_end(form) }}
                 </div>
             </div>
-
             {% if securityIsGranted('lead:lists:create') %}
                 {% include '@MauticCore/Components/card.html.twig' with {
                     'type': 'feature',

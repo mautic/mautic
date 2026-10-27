@@ -9,7 +9,7 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Message>
  */
-class MessageRepository extends CommonRepository
+final class MessageRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
@@ -19,7 +19,8 @@ class MessageRepository extends CommonRepository
     public function getEntities(array $args = [])
     {
         $qb = $this->createQueryBuilder($this->getTableAlias());
-        $qb->join(Channel::class, 'channel', 'WITH', 'channel.message = '.$this->getTableAlias().'.id');
+        // Because of this inner join pagination is not working properly. Removing this doesn't seem to break any feature.
+        // $qb->join(Channel::class, 'channel', 'WITH', 'channel.message = '.$this->getTableAlias().'.id');
         $qb->leftJoin(Category::class, 'cat', 'WITH', 'cat.id = '.$this->getTableAlias().'.category');
         $qb->groupBy($this->getTableAlias().'.id');
 
@@ -48,7 +49,7 @@ class MessageRepository extends CommonRepository
 
         if (!empty($search)) {
             if (is_array($search)) {
-                $search = array_map('intval', $search);
+                $search = array_map(intval(...), $search);
                 $q->andWhere($q->expr()->in($alias.'.id', ':search'))
                     ->setParameter('search', $search);
             } else {

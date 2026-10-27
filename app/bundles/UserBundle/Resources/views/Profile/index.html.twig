@@ -81,8 +81,10 @@
                             <div class="text-secondary small pb-20">{{ 'mautic.user.config.account.security.helper'|trans }}</div>
                             {{ permissions.editUsername ? form_row(userForm.username) : form_row(userForm.username_unbound) }}
                             {{ permissions.editEmail ? form_row(userForm.email) : form_row(userForm.email_unbound) }}
-                            {{ form_row(userForm.plainPassword.password) }}
-                            {{ form_row(userForm.plainPassword.confirm) }}
+                            {% if not isSamlUser %}
+                                {{ form_row(userForm.plainPassword.password) }}
+                                {{ form_row(userForm.plainPassword.confirm) }}
+                            {% endif %}
                             <h3 id="learning" class="pt-20 mb-xs">{{ 'mautic.user.config.title.experience_and_learning'|trans }}</h3>
                             <div class="text-secondary small pb-20">{{ 'mautic.user.config.title.experience_and_learning.description'|trans }}</div>
                             {% include '@MauticCore/Helper/button.html.twig' with {

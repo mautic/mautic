@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class KeysType extends AbstractType
+final class KeysType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -48,7 +48,7 @@ class KeysType extends AbstractType
                 $type,
                 [
                     'label'      => $label,
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'        => 'form-control',
                         'placeholder'  => (PasswordType::class === $type) ? '**************' : '',

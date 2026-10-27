@@ -1,0 +1,66 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mautic\PageBundle\Tests\Entity;
+
+use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Entity\PageRepository;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+final class PageRepositoryTest extends TestCase
+{
+    use RepositoryConfiguratorTrait;
+
+    private function getRepository(): PageRepository
+    {
+        $repository = $this->configureRepository(Page::class);
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
+
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
+            'mautic.page.searchcommand.isexpired' => 'is:expired',
+            'mautic.page.searchcommand.ispending' => 'is:pending',
+            default                               => $id,
+        });
+        $repository->autowireCommonRepository($translator);
+
+        return $repository;
+    }
+
+    #[DataProvider('dataExpirationFilters')]
+    public function testAddSearchCommandWhereClauseHandlesExpirationFilters(string $command, string $expected): void
+    {
+        $repository = $this->getRepository();
+        $qb         = $this->connection->createQueryBuilder();
+        $filter     = (object) ['command' => $command, 'string' => '', 'not' => false, 'strict' => false];
+
+        $method = new \ReflectionMethod(PageRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr, $params] = $method->invoke($repository, $qb, $filter);
+
+        $this->assertSame($expected, (string) $expr);
+        $this->assertSame(['par1' => true], $params);
+    }
+
+    /**
+     * @return iterable<array{0: string, 1: string}>
+     */
+    public static function dataExpirationFilters(): iterable
+    {
+        yield ['is:expired', "(p.isPublished = :par1 AND p.publishDown IS NOT NULL AND p.publishDown <> '' AND p.publishDown < CURRENT_TIMESTAMP())"];
+        yield ['is:pending', "(p.isPublished = :par1 AND p.publishUp IS NOT NULL AND p.publishUp <> '' AND p.publishUp > CURRENT_TIMESTAMP())"];
+    }
+
+    public function testGetSearchCommandsContainsExpirationFilters(): void
+    {
+        $repository = $this->getRepository();
+        $commands   = $repository->getSearchCommands();
+        $this->assertContains('mautic.page.searchcommand.isexpired', $commands);
+        $this->assertContains('mautic.page.searchcommand.ispending', $commands);
+    }
+}

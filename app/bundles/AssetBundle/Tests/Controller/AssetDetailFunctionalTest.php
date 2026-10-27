@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 
-class AssetDetailFunctionalTest extends MauticMysqlTestCase
+final class AssetDetailFunctionalTest extends MauticMysqlTestCase
 {
     public function testLeadViewPreventsXSS(): void
     {
@@ -22,12 +23,12 @@ class AssetDetailFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($asset);
 
         $crawler   = $this->client->request('GET', sprintf('/s/assets/view/%d', $asset->getId()));
-        $imageTag  = $crawler->filter('.tab-content.preview-detail img');
+        $imageTag  = $crawler->filter('.img-thumbnail');
 
         $onError  = $imageTag->attr('onerror');
         $altProp  = $imageTag->attr('alt');
 
-        Assert::assertNull($onError);
-        Assert::assertSame($title, $altProp);
+        $this->assertNull($onError);
+        $this->assertSame($title, $altProp);
     }
 }

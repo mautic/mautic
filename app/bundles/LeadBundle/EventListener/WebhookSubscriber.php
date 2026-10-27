@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
@@ -15,11 +16,12 @@ use Mautic\WebhookBundle\Model\WebhookModel;
 use Mautic\WebhookBundle\WebhookEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class WebhookSubscriber implements EventSubscriberInterface
+final readonly class WebhookSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private WebhookModel $webhookModel,
         private LeadModel $leadModel,
+        private LeadRepository $leadRepository,
     ) {
     }
 
@@ -35,7 +37,7 @@ class WebhookSubscriber implements EventSubscriberInterface
             LeadEvents::COMPANY_POST_SAVE            => ['onCompanySave', 0],
             LeadEvents::COMPANY_POST_DELETE          => ['onCompanyDelete', 0],
             LeadEvents::LEAD_LIST_CHANGE             => ['onSegmentChange', 0],
-            LeadEvents::LEAD_LIST_BATCH_CHANGE       => ['onSegmentChange', 0],
+            LeadEvents::LEAD_LIST_BATCH_CHANGE       => ['onSegmentBatchChange', 0],
         ];
     }
 
@@ -263,11 +265,24 @@ class WebhookSubscriber implements EventSubscriberInterface
 
     public function onSegmentChange(ListChangeEvent $changeEvent): void
     {
-        $contacts = $changeEvent->getLeads() ?? [$changeEvent->getLead()];
+        $this->doSegmentChange($changeEvent);
+    }
+
+    public function onSegmentBatchChange(ListChangeEvent $changeEvent): void
+    {
+        $this->doSegmentChange($changeEvent);
+    }
+
+    private function doSegmentChange(ListChangeEvent $changeEvent): void
+    {
+        $contacts               = $changeEvent->getLeads() ?? [$changeEvent->getLead()];
+        $detachContactReference = false;
         foreach ($contacts as $contact) {
             if (is_array($contact)) {
-                $contact = $this->leadModel->getEntity($contact['id']);
+                $contact                = $this->leadModel->getEntity($contact['id']);
+                $detachContactReference = true;
             }
+
             $this->webhookModel->queueWebhooksByType(
                 LeadEvents::LEAD_LIST_CHANGE,
                 [
@@ -276,6 +291,11 @@ class WebhookSubscriber implements EventSubscriberInterface
                     'action'   => $changeEvent->wasAdded() ? 'added' : 'removed',
                 ]
             );
+
+            if ($detachContactReference) {
+                $detachContactReference = false;
+                $this->leadRepository->detachEntity($contact);
+            }
         }
     }
 }

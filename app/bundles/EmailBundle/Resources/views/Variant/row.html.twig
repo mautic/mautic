@@ -1,0 +1,74 @@
+{# Resolve variant weight from properties or settings #}
+{% set id = variant.id %}
+{% if variants.properties is defined and variants.properties is not null and variants.properties[id] is defined %}
+    {% set weight = variants.properties[id].weight|default(0)|int %}
+{% else %}
+    {% set weight = variant.variantSettings.weight|default(0)|int %}
+{% endif %}
+
+{# Set variant status variables #}
+{% set isPublished = variant.isPublished() %}
+{% set isWinner = abTestResults.winners is defined and variant.id in abTestResults.winners and variants.parent.variantStartDate and isPublished %}
+{% set isCurrent = variant.id == activeEntity.id %}
+
+{# Render variant list item #}
+<div class="list-group-item variant-item d-flex ai-center {% if isCurrent %}bg-aut bg-dark-xs{% endif %}" style="padding: 4px 8px;">
+    {# Variant indicator #}
+    <div class="variant-indicator">
+        <i class="ri-arrow-right-line"></i>
+    </div>
+
+    {# Main content #}
+    <div class="variant-content fg-1" style="min-width: 0;">
+        {# Title and status #}
+        <div class="variant-title d-flex ai-center fs-14" style="min-width: 0; overflow: hidden;">
+            <a href="{{ path(actionRoute, {'objectAction': 'view', 'objectId': variant.id}) }}"
+               data-toggle="ajax"
+               title="{{ variant.subject }}"
+               class="variant-name {% if isCurrent %}fw-b{% endif %}"
+               style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                {{ attribute(variant, nameGetter) }}
+            </a>
+
+            {% if isWinner %}
+                <span class="badge bg-success text-white ml-2" title="{{ 'mautic.core.ab_test.winner'|trans }}">
+                    {{ 'mautic.core.ab_test.winner'|trans }}
+                </span>
+            {% endif %}
+
+            {% if variant is instanceof('\\Mautic\\CoreBundle\\Entity\\TranslationEntityInterface') and variant.isTranslation() %}
+                <span class="ml-2" data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
+                    <i class="ri-translate"></i>
+                </span>
+            {% endif %}
+        </div>
+    </div>
+
+    {# Action buttons #}
+    <div class="variant-actions d-flex" style="flex-shrink: 0;">
+        <a href="{{ path('mautic_email_preview', {'objectId': variant.id}) }}"
+           class="btn btn-ghost btn--icon-only btn-sm btn-nospin"
+           title="{{ 'mautic.core.preview'|trans }}"
+           target="_blank">
+            <i class="ri-external-link-line"></i>
+        </a>
+
+        <a href="{{ path(actionRoute, {'objectAction': 'edit', 'objectId': variant.id}) }}"
+           class="btn btn-ghost btn--icon-only btn-sm btn-nospin"
+           title="{{ 'mautic.core.form.edit'|trans }}"
+           data-toggle="ajax">
+            <i class="ri-pencil-line"></i>
+        </a>
+
+        <a href="{{ path(actionRoute, {'objectAction': 'delete', 'objectId': variant.id, 'parentId': variant.variantParent ? variant.variantParent.id : 0}) }}"
+           class="btn btn-ghost btn--icon-only btn-sm btn-nospin"
+           title="{{ 'mautic.core.form.delete'|trans }}"
+           data-toggle="confirmation"
+           data-message="{{ (variant.variantParent ? 'mautic.email.form.confirmdelete.variant' : 'mautic.email.form.confirmdelete')|trans({'%name%': attribute(variant, nameGetter) ~ ' (' ~ variant.id ~ ')'})|escape }}"
+           data-confirm-text="{{ 'mautic.core.form.delete'|trans|escape }}"
+           data-confirm-callback="executeAction"
+           data-cancel-text="{{ 'mautic.core.form.cancel'|trans|escape }}">
+            <i class="ri-close-line"></i>
+        </a>
+    </div>
+</div>

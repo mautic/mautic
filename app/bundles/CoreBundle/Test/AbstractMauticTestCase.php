@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Test;
 
 use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
@@ -18,8 +20,12 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
@@ -33,8 +39,12 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     protected array $clientOptions = [];
 
-    // Credentials for API authentication
-    protected array $clientServer  = [
+    /**
+     * Credentials for API authentication.
+     *
+     * @var array<string,string>
+     */
+    protected array $clientServer = [
         'PHP_AUTH_USER' => 'admin',
         'PHP_AUTH_PW'   => 'Maut1cR0cks!',
     ];
@@ -56,40 +66,46 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     /**
      * Overloading the method from MailerAssertionsTrait to get better typehint.
-     *
-     * @return MauticMessage[]
      */
-    public static function getMailerMessages(?string $transport = null): array
-    {
-        $messages = parent::getMailerMessages($transport);
-
-        return array_map(function (RawMessage $message): MauticMessage {
-            \assert($message instanceof MauticMessage);
-
-            return $message;
-        }, $messages);
-    }
-
-    /**
-     * Overloading the method from MailerAssertionsTrait to get better typehint.
-     */
-    public static function getMailerMessage(int $index = 0, ?string $transport = null): ?MauticMessage
+    public static function getMailerMessage(int $index = 0, ?string $transport = null): RawMessage|MauticMessage|null
     {
         return self::getMailerMessages($transport)[$index] ?? null;
     }
 
     /**
-     * @return MauticMessage[]
+     * @return RawMessage[]
      */
     public static function getMailerMessagesByToAddress(string $toAddress, ?string $transport = null): array
     {
-        return array_values(array_filter(self::getMailerMessages($transport), fn (MauticMessage $mauticMessage) => $mauticMessage->getTo()[0]->getAddress() === $toAddress));
+        return array_values(
+            array_filter(
+                self::getMailerMessages($transport),
+                function (RawMessage $message) use ($toAddress): bool {
+                    // Messages are actually Message objects (which extend RawMessage) and have getHeaders()
+                    if ($message instanceof Message) {
+                        return $toAddress === $message->getHeaders()->get('To')->getBodyAsString();
+                    }
+
+                    return false;
+                }
+            )
+        );
     }
 
     protected function setUp(): void
     {
         $this->setUpSymfony($this->configParams);
         $this->databaseTool = static::getContainer()->get(DatabaseToolCollection::class)->get();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        // The kernel boot registers an exception handler that is not removed on shutdown.
+        // PHPUnit 11.5 fails the test if a leaked handler remains on the stack.
+        // @see https://github.com/sebastianbergmann/phpunit/issues/5721
+        restore_exception_handler();
     }
 
     protected function setUpSymfony(array $defaultConfigOptions = []): void
@@ -102,10 +118,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->disableReboot();
         $this->client->followRedirects(true);
 
-        $this->em = static::getContainer()->get('doctrine')->getManager();
-        \assert($this->em instanceof EntityManagerInterface);
+        $this->em = static::getContainer()->get(ManagerRegistry::class)->getManager();
         $this->connection = $this->em->getConnection();
-        $this->router     = static::getContainer()->get('router');
+        $this->router     = static::getContainer()->get(RouterInterface::class);
         $scheme           = $this->router->getContext()->getScheme();
         $secure           = 0 === strcasecmp($scheme, 'https');
 
@@ -120,6 +135,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function logoutUser(): void
     {
         $this->client->request(Request::METHOD_GET, '/s/logout');
+        $this->client->getCookieJar()->clear();
     }
 
     /**
@@ -143,7 +159,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
 
-        $application = new Application(static::getContainer()->get('kernel'));
+        $application = new Application(static::getContainer()->get(KernelInterface::class));
         $application->setAutoExit(false);
         $application->run($input, $output);
     }
@@ -163,7 +179,19 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function getCsrfToken(string $intention): string
     {
-        return $this->client->getContainer()->get('security.csrf.token_manager')->refreshToken($intention)->getValue();
+        return $this->client->getContainer()->get(CsrfTokenManagerInterface::class)->refreshToken($intention)->getValue();
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function createAjaxHeaders(): array
+    {
+        return [
+            'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
+        ];
     }
 
     /**
@@ -171,12 +199,12 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected function testSymfonyCommand(string $name, array $params = [], ?Command $command = null): CommandTester
     {
-        $kernel      = static::getContainer()->get('kernel');
+        $kernel      = static::getContainer()->get(KernelInterface::class);
         $application = new Application($kernel);
 
         if ($command) {
             // Register the command
-            $application->add($command);
+            $application->addCommand($command);
         } else {
             $command = $application->find($name);
         }
@@ -184,7 +212,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $bypassLockingOption = 'bypass-locking';
 
         if ($command->getDefinition()->hasOption($bypassLockingOption)) {
-            $params["--$bypassLockingOption"] = true;
+            $params["--{$bypassLockingOption}"] = true;
         }
 
         $command       = $application->find($name);

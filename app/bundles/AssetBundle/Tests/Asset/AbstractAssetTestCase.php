@@ -7,6 +7,7 @@ namespace Mautic\AssetBundle\Tests\Asset;
 use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\AssetBundle\Entity\Asset;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
@@ -63,15 +64,26 @@ abstract class AbstractAssetTestCase extends MauticMysqlTestCase
     protected function createAsset(array $assetData): Asset
     {
         $asset = new Asset();
-        $asset->setTitle($assetData['title']);
-        $asset->setAlias($assetData['alias']);
+        $asset->setTitle($assetData['title'] ?? 'Test Asset');
+        $asset->setAlias($assetData['alias'] ?? uniqid('test-asset-'));
         $asset->setDateAdded($assetData['createdAt'] ?? new \DateTime());
         $asset->setDateModified($assetData['updatedAt'] ?? new \DateTime());
         $asset->setCreatedByUser($assetData['createdBy'] ?? 'User');
         $asset->setStorageLocation($assetData['storage'] ?? 'local');
-        $asset->setPath($assetData['path'] ?? '');
-        $asset->setExtension($assetData['extension'] ?? '');
-        $asset->setSize($this->csvPath ? filesize($this->csvPath) : 0);
+
+        if (($assetData['storage'] ?? 'local') === 'local') {
+            $asset->setPath($assetData['path'] ?? basename($this->csvPath));
+            $asset->setExtension($assetData['extension'] ?? pathinfo($this->csvPath, PATHINFO_EXTENSION));
+            $asset->setSize($this->csvPath ? filesize($this->csvPath) : 0);
+        } else {
+            $asset->setRemotePath($assetData['path'] ?? '');
+            $asset->setExtension($assetData['extension'] ?? '');
+            $asset->setSize(0);
+        }
+
+        if (isset($assetData['isPublished'])) {
+            $asset->setIsPublished($assetData['isPublished']);
+        }
 
         $this->em->persist($asset);
         $this->em->flush();
@@ -85,7 +97,7 @@ abstract class AbstractAssetTestCase extends MauticMysqlTestCase
      */
     protected function generateCsv(): void
     {
-        $uploadDir  = static::getContainer()->get('mautic.helper.core_parameters')->get('upload_dir') ?? sys_get_temp_dir();
+        $uploadDir  = static::getContainer()->get(CoreParametersHelper::class)->get('upload_dir') ?? sys_get_temp_dir();
         $tmpFile    = tempnam($uploadDir, 'mautic_asset_test_');
         $file       = fopen($tmpFile, 'w');
 

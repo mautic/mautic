@@ -9,6 +9,22 @@
 {% block content %}
   {% if isIndex %}
     <div id="page-list-wrapper" class="{% if items|length > 0 or searchValue is not empty %}panel {% endif %}panel-default">
+        {%- set pageButtons = [] %}
+        {% if permissions['campaign:campaigns:create'] %}
+            {% if permissions['campaign:imports:create'] %}
+                {% set pageButtons = pageButtons|merge([
+                    {
+                        'attr': {
+                            'href': path('mautic_campaign_import_action', {'objectAction': 'new'}),
+                            'data-toggle': '0',
+                        },
+                        'iconClass': 'ri-import-line',
+                        'btnText': 'mautic.campaign.campaign.import',
+                    }
+                ]) %}
+            {% endif %}
+        {% endif %}
+
         {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue': searchValue,
             'action': currentRoute,
@@ -26,6 +42,7 @@
                 },
                 'routeBase': 'campaign',
                 'langVar': 'campaign.campaigns',
+                'customButtons': pageButtons,
             },
             'bulk_actions': {
                 'routeBase': 'campaign',
@@ -57,8 +74,22 @@
                     'label': 'mautic.core.searchcommand.ismine.label',
                     'tooltip': 'mautic.core.searchcommand.ismine.description',
                     'icon': 'ri-user-line'
+                },
+                {
+                    'search': 'mautic.campaign.campaign.searchcommand.isexpired',
+                    'label': 'mautic.core.form.no_longer_available',
+                    'tooltip': 'mautic.campaign.campaign.searchcommand.isexpired.description',
+                    'icon': 'ri-time-line'
+                },
+                {
+                    'search': 'mautic.campaign.campaign.searchcommand.ispending',
+                    'label': 'mautic.core.form.not_yet_available',
+                    'tooltip': 'mautic.campaign.campaign.searchcommand.ispending.description',
+                    'icon': 'ri-timer-line'
                 }
-            ]
+            ],
+            'searchScopes': searchScopes|default([]),
+            'searchScopeHint': searchScopeHint|default(''),
         }) -}}
         <div class="page-list">
             {{- customContent('content.above', _context) -}}
@@ -137,6 +168,15 @@
                                 item.createdBy
                               ),
                           },
+                          'customButtons': enableExportPermission ? [{
+                              'attr': {
+                                  'class': 'btn btn-ghost btn-sm btn-nospin',
+                                  'href': path('mautic_campaign_action', {'objectAction': 'share', 'objectId': item.id}),
+                              },
+                              'iconClass': 'ri-export-line',
+                              'btnText': 'mautic.core.export'|trans,
+                              'priority': 200,
+                          }] : [],
                           'routeBase': 'campaign',
                       }) -}}
                     </td>

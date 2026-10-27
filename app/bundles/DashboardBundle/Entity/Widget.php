@@ -100,29 +100,18 @@ class Widget extends FormEntity
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('type', new NotBlank([
-            'message' => 'mautic.core.type.required',
-        ]));
+        $metadata->addPropertyConstraint('type', new NotBlank(message: 'mautic.core.type.required'));
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * Set name.
-     *
-     * @param string $name
-     *
-     * @return Widget
-     */
-    public function setName($name)
+    public function setName(string $name): static
     {
         $this->name = InputHelper::string($name);
         $this->isChanged('name', $this->name);
@@ -131,23 +120,14 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get name.
-     *
-     * @return string
+     * @return string|null
      */
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * Set type.
-     *
-     * @param string $type
-     *
-     * @return Widget
-     */
-    public function setType($type)
+    public function setType(string $type): static
     {
         $this->type = InputHelper::string($type);
         $this->isChanged('type', $this->type);
@@ -156,9 +136,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get type.
-     *
-     * @return string
+     * @return string|null
      */
     public function getType()
     {
@@ -166,13 +144,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set width.
-     *
      * @param int $width
-     *
-     * @return Widget
      */
-    public function setWidth($width)
+    public function setWidth($width): static
     {
         $this->width = (int) $width;
         $this->isChanged('width', $this->width);
@@ -181,9 +155,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get width.
-     *
-     * @return int
+     * @return int|null
      */
     public function getWidth()
     {
@@ -191,13 +163,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set height.
-     *
      * @param int $height
-     *
-     * @return Widget
      */
-    public function setHeight($height)
+    public function setHeight($height): static
     {
         $this->height = (int) $height;
         $this->isChanged('height', $this->height);
@@ -206,9 +174,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get cache timeout.
-     *
-     * @return int (minutes)
+     * @return int|null (minutes)
      */
     public function getCacheTimeout()
     {
@@ -216,13 +182,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set cache timeout.
-     *
      * @param int $cacheTimeout (minutes)
-     *
-     * @return Widget
      */
-    public function setCacheTimeout($cacheTimeout)
+    public function setCacheTimeout($cacheTimeout): static
     {
         $this->isChanged('cacheTimeout', $cacheTimeout);
         $this->cacheTimeout = $cacheTimeout;
@@ -231,9 +193,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get height.
-     *
-     * @return int
+     * @return int|null
      */
     public function getHeight()
     {
@@ -241,13 +201,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set ordering.
-     *
      * @param int $ordering
-     *
-     * @return Widget
      */
-    public function setOrdering($ordering)
+    public function setOrdering($ordering): static
     {
         $this->ordering = (int) $ordering;
         $this->isChanged('ordering', $this->ordering);
@@ -256,9 +212,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get ordering.
-     *
-     * @return int
+     * @return int|null
      */
     public function getOrdering()
     {
@@ -266,21 +220,14 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get params.
-     *
-     * @return array $params
+     * @return array
      */
     public function getParams()
     {
         return $this->params;
     }
 
-    /**
-     * Set params.
-     *
-     * @return Widget
-     */
-    public function setParams(array $params)
+    public function setParams(array $params): static
     {
         $this->isChanged('params', $params);
         $this->params = $params;
@@ -289,13 +236,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set template.
-     *
      * @param string $template
-     *
-     * @return Widget
      */
-    public function setTemplate($template)
+    public function setTemplate($template): static
     {
         $this->isChanged('template', $template);
         $this->template = $template;
@@ -304,9 +247,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get template.
-     *
-     * @return string
+     * @return string|null
      */
     public function getTemplate()
     {
@@ -314,21 +255,14 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get template data.
-     *
-     * @return array $templateData
+     * @return array
      */
     public function getTemplateData()
     {
         return $this->templateData;
     }
 
-    /**
-     * Set template data.
-     *
-     * @return Widget
-     */
-    public function setTemplateData(array $templateData)
+    public function setTemplateData(array $templateData): static
     {
         $this->isChanged('templateData', $templateData);
         $this->templateData = $templateData;
@@ -337,13 +271,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set errorMessage.
-     *
      * @param string $errorMessage
-     *
-     * @return Widget
      */
-    public function setErrorMessage($errorMessage)
+    public function setErrorMessage($errorMessage): static
     {
         $this->errorMessage = $errorMessage;
 
@@ -351,9 +281,7 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get errorMessage.
-     *
-     * @return string
+     * @return string|null
      */
     public function getErrorMessage()
     {
@@ -364,10 +292,8 @@ class Widget extends FormEntity
      * Set cached flag.
      *
      * @param bool $cached
-     *
-     * @return Widget
      */
-    public function setCached($cached)
+    public function setCached($cached): static
     {
         $this->cached = $cached;
 
@@ -385,13 +311,9 @@ class Widget extends FormEntity
     }
 
     /**
-     * Set loadTime.
-     *
      * @param string|float|int $loadTime
-     *
-     * @return Widget
      */
-    public function setLoadTime($loadTime)
+    public function setLoadTime($loadTime): static
     {
         $this->loadTime = $loadTime;
 
@@ -399,8 +321,6 @@ class Widget extends FormEntity
     }
 
     /**
-     * Get loadTime.
-     *
      * @return int
      */
     public function getLoadTime()
@@ -411,13 +331,13 @@ class Widget extends FormEntity
     public function toArray(): array
     {
         return [
-            'name'     => $this->getName(),
-            'width'    => $this->getWidth(),
-            'height'   => $this->getHeight(),
-            'ordering' => $this->getOrdering(),
-            'type'     => $this->getType(),
-            'params'   => $this->getParams(),
-            'template' => $this->getTemplate(),
+            'name'     => $this->name,
+            'width'    => $this->width,
+            'height'   => $this->height,
+            'ordering' => $this->ordering,
+            'type'     => $this->type,
+            'params'   => $this->params,
+            'template' => $this->template,
         ];
     }
 }

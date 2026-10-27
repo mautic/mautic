@@ -1,23 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Event;
 
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class QueueEmailEvent extends Event
+final class QueueEmailEvent extends Event
 {
     private bool $retry = false;
 
     public function __construct(
-        private MauticMessage $message,
+        private readonly MauticMessage $message,
     ) {
     }
 
-    /**
-     * @return MauticMessage
-     */
-    public function getMessage()
+    public function getMessage(): MauticMessage
     {
         return $this->message;
     }

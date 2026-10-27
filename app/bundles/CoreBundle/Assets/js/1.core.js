@@ -78,16 +78,12 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
 
     // Handle popover shown event
     mQuery('[data-toggle="popover"]').on('shown.bs.popover', function () {
-        // Initialize code blocks after popover is fully shown
-        Mautic.initializeCodeBlocks();
-
-        // Initialize other elements inside popover
         mQuery('.popover-content select').chosen({
             allow_single_deselect: true,
             disable_search_threshold: 10
         });
 
-        mQuery('.popover-content [data-toggle="tooltip"]').tooltip();
+        mQuery('.popover-content [data-toggle="tooltip"], .popover-content [data-bs-toggle="tooltip"]').tooltip();
     });
 });
 
@@ -96,7 +92,6 @@ mQuery( document ).ajaxStop(function(event) {
     // Seems to be stuck
     MauticVars.activeRequests = 0;
     Mautic.stopPageLoadingBar();
-    Mautic.initializeCodeBlocks();
 });
 
 mQuery( document ).ready(function() {
@@ -125,15 +120,6 @@ mQuery( document ).ready(function() {
         }
     }, mauticSessionLifetime * 1000 / 2);
 
-    // Copy code blocks when clicked
-    mQuery(document).on('click', 'code', function(e) {
-        e.preventDefault();
-        navigator.clipboard.writeText(mQuery(this).clone().children('.copy-icon').remove().end().text().trim()).then(() => {
-            mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line');
-            setTimeout(() => mQuery(this).find('.copy-icon').toggleClass('ri-clipboard-fill ri-check-line'), 2000);
-        });
-    });
-    Mautic.initializeCodeBlocks();
     Mautic.attachDismissHandlers();
 });
 
@@ -370,19 +356,6 @@ var Mautic = {
             modalWindow.modal();
         });
 
-    },
-
-    /**
-     * Copy code blocks when clicked
-     *
-     */
-    initializeCodeBlocks: function () {
-        mQuery('code').each(function() {
-            var $codeBlock = mQuery(this);
-            if (!$codeBlock.find('.copy-icon').length) {
-                $codeBlock.append('<i class="ri-clipboard-fill copy-icon"></i>');
-            }
-        });
     },
 
     /**
@@ -760,8 +733,8 @@ var Mautic = {
         //dismiss modal if activated
         Mautic.dismissConfirmation();
 
-        if (action.indexOf('batchExport') >= 0) {
-            delete Mautic.activeActions[action]
+        if (action.includes('batchExport')) {
+            delete Mautic.activeActions[action];
             Mautic.initiateFileDownload(action);
             return;
         }
@@ -1028,7 +1001,7 @@ var Mautic = {
     clearNotification: function (id) {
         if (id) {
             mQuery("#notification" + id).fadeTo("fast", 0.01).slideUp("fast", function () {
-                mQuery(this).find("*[data-toggle='tooltip']").tooltip('destroy');
+                mQuery(this).find("*[data-toggle='tooltip'], *[data-bs-toggle='tooltip']").tooltip('destroy');
                 mQuery(this).remove();
 
                 if (!mQuery('#notifications .notification').length) {

@@ -18,21 +18,23 @@ class FlashBag
 
     public const LEVEL_NOTICE    = 'notice';
 
+    public const LEVEL_SUCCESS   = 'success';
+
     public function __construct(
-        private TranslatorInterface $translator,
-        private RequestStack $requestStack,
-        private NotificationModel $notificationModel,
+        private readonly TranslatorInterface $translator,
+        private readonly RequestStack $requestStack,
+        private readonly NotificationModel $notificationModel,
     ) {
     }
 
     /**
-     * @param string     $message
-     * @param array|null $messageVars
-     * @param string     $level
-     * @param string     $domain
-     * @param bool       $addNotification
+     * @param string               $message
+     * @param array<string, mixed> $messageVars
+     * @param string               $level
+     * @param string               $domain
+     * @param bool                 $addNotification
      */
-    public function add($message, $messageVars = [], $level = self::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false): void
+    public function add($message, array $messageVars = [], $level = self::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false): void
     {
         if (false === $domain) {
             // message is already translated
@@ -54,6 +56,7 @@ class FlashBag
             $iconClass = match ($level) {
                 self::LEVEL_WARNING => 'text-warning ri-alert-line',
                 self::LEVEL_ERROR   => 'text-danger ri-error-warning-line',
+                self::LEVEL_SUCCESS => 'text-success ri-check-line',
                 default             => 'ri-information-2-line',
             };
 

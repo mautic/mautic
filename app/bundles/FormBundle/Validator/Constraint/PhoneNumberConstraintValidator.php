@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class PhoneNumberConstraintValidator extends ConstraintValidator
+final class PhoneNumberConstraintValidator extends ConstraintValidator
 {
     public function validate(mixed $value, Constraint $constraint): void
     {
@@ -17,7 +17,7 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_scalar($value) && !(is_object($value) && method_exists($value, '__toString'))) {
+        if (!is_scalar($value) && (!is_object($value) || !method_exists($value, '__toString'))) {
             throw new UnexpectedTypeException($value, 'string');
         }
 
@@ -42,12 +42,10 @@ class PhoneNumberConstraintValidator extends ConstraintValidator
     }
 
     /**
-     * Add a violation.
-     *
-     * @param mixed      $value      the value that should be validated
-     * @param Constraint $constraint the constraint for the validation
+     * @param string|PhoneNumber $value      the value that should be validated
+     * @param Constraint         $constraint the constraint for the validation
      */
-    private function addViolation($value, Constraint $constraint): void
+    private function addViolation(string|PhoneNumber $value, Constraint $constraint): void
     {
         $this->context->addViolation(
             $constraint->getMessage(),

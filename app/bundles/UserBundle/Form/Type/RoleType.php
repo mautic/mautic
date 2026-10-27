@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints\Valid;
 /**
  * @extends AbstractType<RoleType>
  */
-class RoleType extends AbstractType
+final class RoleType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -29,7 +29,7 @@ class RoleType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -39,7 +39,7 @@ class RoleType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control editor'],
                 'required'   => false,
             ]

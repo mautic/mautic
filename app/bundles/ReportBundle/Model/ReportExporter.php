@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Mautic\CoreBundle\Event\JobExtendTimeEvent;
 use Mautic\ReportBundle\Adapter\ReportDataAdapter;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
@@ -11,7 +12,7 @@ use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class ReportExporter
+final readonly class ReportExporter
 {
     public function __construct(
         private ScheduleModel $schedulerModel,
@@ -77,7 +78,7 @@ class ReportExporter
                 if ($this->reportExportOptions->getNumberOfProcessedResults() >= $totalResults) {
                     break;
                 }
-
+                $this->eventDispatcher->dispatch(new JobExtendTimeEvent());
                 $this->reportExportOptions->nextBatch();
             }
 

@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class TwitterHashtagType extends TwitterAbstractType
+final class TwitterHashtagType extends TwitterAbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('hashtag', TextType::class, [
             'label'      => 'mautic.social.monitoring.twitter.hashtag',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'tooltip'  => 'mautic.social.monitoring.twitter.hashtag.tooltip',
                 'class'    => 'form-control',
@@ -28,7 +30,7 @@ class TwitterHashtagType extends TwitterAbstractType
             'label'             => 'mautic.social.monitoring.twitter.namematching',
             'required'          => false,
             'placeholder'       => false,
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.social.monitoring.twitter.namematching.tooltip',

@@ -22,14 +22,18 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
@@ -54,6 +58,8 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         UserHelper $userHelper,
         LoggerInterface $mauticLogger,
         CoreParametersHelper $coreParametersHelper,
+        private readonly FocusRepository $focusRepository,
+        private readonly StatRepository $statRepository,
     ) {
         $this->dispatcher     = $dispatcher;
 
@@ -77,7 +83,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): \Symfony\Component\Form\FormInterface
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);
@@ -90,20 +96,14 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         return $formFactory->create(FocusType::class, $entity, $options);
     }
 
-    /**
-     * @return \MauticPlugin\MauticFocusBundle\Entity\FocusRepository
-     */
-    public function getRepository()
+    public function getRepository(): FocusRepository
     {
-        return $this->em->getRepository(Focus::class);
+        return $this->focusRepository;
     }
 
-    /**
-     * @return \MauticPlugin\MauticFocusBundle\Entity\StatRepository
-     */
-    public function getStatRepository()
+    public function getStatRepository(): StatRepository
     {
-        return $this->em->getRepository(Stat::class);
+        return $this->statRepository;
     }
 
     /**
@@ -119,72 +119,60 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Focus      $entity
-     * @param bool|false $unlock
+     * @param Focus $entity
+     * @param bool  $unlock
      */
     public function saveEntity($entity, $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
-
-        // Generate cache after save to have ID available
-        $content = $this->generateJavascript($entity);
-        $entity->setCache($content);
-
-        $this->getRepository()->saveEntity($entity);
+        $this->generateTrackableUrl($entity);
     }
 
     /**
-     * @return string|string[]
+     * @param bool $isPreview
      */
-    public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false): array|string
+    public function generateJavascript(Focus $focus, $isPreview = false): string
     {
-        // If cached is not an array, rebuild to support the new format
-        $cached = $focus->getCache() ? json_decode($focus->getCache(), true) : [];
-        if ($isPreview || $byPassCache || empty($cached) || !isset($cached['js'])) {
-            $focusArray = $focus->toArray();
+        $lead           = $this->contactTracker->getContact();
+        $focusArray     = $focus->toArray();
+        $url            = '';
 
-            $url = '';
-            if ('link' == $focusArray['type'] && !empty($focusArray['properties']['content']['link_url'])) {
-                $url = $focusArray['properties']['content']['link_url'];
-            }
-
-            $javascript = $this->twig->render(
-                '@MauticFocus/Builder/generate.js.twig',
-                [
-                    'focus'    => $focus,
-                    'preview'  => $isPreview,
-                    'clickUrl' => $url,
-                ]
-            );
-
-            $content = $this->getContent($focusArray, $isPreview, $url);
-            $cached  = [
-                'js'    => (new Minify\JS($javascript))->minify(),
-                'focus' => InputHelper::minifyHTML($content['focus']),
-                'form'  => InputHelper::minifyHTML($content['form']),
-            ];
-
-            if (!$byPassCache) {
-                $focus->setCache(json_encode($cached));
-                $this->saveEntity($focus);
-            }
+        if ($trackableUrl = $this->generateTrackableUrl($focus, $lead)) {
+            $url = '{focusClickUrl}';
         }
 
-        // Replace tokens to ensure clickthroughs, lead tokens etc are appropriate
-        $lead       = $this->contactTracker->getContact();
-        $tokenEvent = new TokenReplacementEvent($cached['focus'], $lead, ['focus_id' => $focus->getId()]);
+        $javascript = $this->twig->render(
+            '@MauticFocus/Builder/generate.js.twig',
+            [
+                'focus'    => $focus,
+                'preview'  => $isPreview,
+                'clickUrl' => $url,
+            ]
+        );
+
+        $content = $this->getContent($focusArray, $isPreview, $url);
+        $data    = [
+            'js'    => (new Minify\JS($javascript))->minify(),
+            'focus' => InputHelper::minifyHTML($content['focus']),
+            'form'  => InputHelper::minifyHTML($content['form']),
+        ];
+
+        // Replace tokens to ensure clickthroughs, lead tokens etc. are appropriate
+        $tokenEvent = new TokenReplacementEvent($data['focus'], $lead, ['focus_id' => $focus->getId()]);
+        if ($trackableUrl) {
+            $tokenEvent->addToken($url, $trackableUrl);
+        }
         $this->dispatcher->dispatch($tokenEvent, FocusEvents::TOKEN_REPLACEMENT);
         $focusContent = $tokenEvent->getContent();
-
-        $focusContent = str_replace('{focus_form}', $cached['form'], $focusContent, $formReplaced);
-        if (!$formReplaced && !empty($cached['form'])) {
+        $focusContent = str_replace('{focus_form}', $data['form'], $focusContent, $formReplaced);
+        if (!$formReplaced && !empty($data['form'])) {
             // Form token missing so just append the form
-            $focusContent .= $cached['form'];
+            $focusContent .= $data['form'];
         }
 
         $focusContent = $this->twig->getRuntime(EscaperRuntime::class)->escape($focusContent, 'js');
 
-        return str_replace('{focus_content}', $focusContent, $cached['js']);
+        return str_replace('{focus_content}', $focusContent, $data['js']);
     }
 
     /**
@@ -228,7 +216,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
             $displayManager = new DisplayManager($form, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         }
-        $formContent        = (!empty($form)) ? $this->twig->render(
+        $formContent        = ($form instanceof \Mautic\FormBundle\Entity\Form) ? $this->twig->render(
             '@MauticFocus/Builder/form.html.twig',
             [
                 'form'           => $form,
@@ -243,6 +231,11 @@ class FocusModel extends FormModel implements GlobalSearchInterface
                 'displayManager' => $displayManager,
             ]
         ) : '';
+
+        if ($form) {
+            $formName = $form->generateFormName("{$form->getName()}_focus", ['_']);
+            $this->formModel->populateValuesWithLead($form, $formContent, $formName);
+        }
 
         if ($isPreview) {
             $content = str_replace('{focus_form}', $formContent, $content, $formReplaced);
@@ -317,7 +310,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             ->setTypeId($typeId)
             ->setLead($lead);
 
-        $this->getStatRepository()->saveEntity($stat);
+        $this->statRepository->saveEntity($stat);
 
         return $stat;
     }
@@ -349,7 +342,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
+            if (!$event instanceof Event) {
                 $event = new FocusEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
@@ -357,9 +350,9 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return null;
         }
+
+        return null;
     }
 
     /**
@@ -410,16 +403,35 @@ class FocusModel extends FormModel implements GlobalSearchInterface
 
     public function getViewsCount(Focus $focus): int
     {
-        return $this->getStatRepository()->getViewsCount($focus->getId());
+        return $this->statRepository->getViewsCount($focus->getId());
     }
 
     public function getUniqueViewsCount(Focus $focus): int
     {
-        return $this->getStatRepository()->getUniqueViewsCount($focus->getId());
+        return $this->statRepository->getUniqueViewsCount($focus->getId());
     }
 
     public function getClickThroughCount(Focus $focus): int
     {
-        return $this->getStatRepository()->getClickThroughCount($focus->getId());
+        return $this->statRepository->getClickThroughCount($focus->getId());
+    }
+
+    private function generateTrackableUrl(Focus $focus, ?Lead $lead = null): ?string
+    {
+        $focusArray = $focus->toArray();
+
+        if ('link' != $focusArray['type'] || !($linkUrl = $focusArray['properties']['content']['link_url'])) {
+            return null;
+        }
+
+        return $this->trackableModel->generateTrackableUrl(
+            $this->trackableModel->getTrackableByUrl($linkUrl, 'focus', $focus->getId()),
+            [
+                'channel' => ['focus', $focus->getId()],
+                'lead'    => $lead ? $lead->getId() : null,
+            ],
+            false,
+            $focus->getUtmTags()
+        );
     }
 }

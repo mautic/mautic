@@ -18,7 +18,7 @@
 
 {% set template = '<div class="col-md-6">{content}</div>' %}
 {% set properties = form.properties|default([]) %}
-{% set validation = form.validation|default([]) %}
+{% set validation = form.validation is defined ? form.validation : null %}
 
 {% set showAttributes = (form.labelAttributes is defined or form.inputAttributes is defined or form.containerAttributes is defined or properties.labelAttributes is defined or form.alias is defined) %}
 {% set showBehavior = (form.showWhenValueExists is defined or properties.showWhenValueExists is defined) %}
@@ -156,23 +156,41 @@
                           {%- if form.isRequired is defined %}<div class="col-md-4">{{ form_row(form.isRequired) }}</div>{% endif %}
                           {%- if form.validationMessage is defined %}<div class="col-md-8">{{ form_row(form.validationMessage) }}</div>{% endif %}
                       </div>
-                  <div class="row">
-                      {% for name, property in validation %}
-                          {% if not form.validation[name].isRendered and 'labelAttributes' != name %}
-                            {% if 'hiddin' == form.validation[name].vars.block_prefixes[1] %}
-                                {{ form_row(form.validation[name]) }}
-                            {% else %}
-                                {% set col = 8 %}
-                                {% if 'chocie' == form.validation[name].vars.block_prefixes[1] %}
-                                    {% set col = 4 %}
-                                {% endif %}
-                                <div class="col-md-{{ col }}">
-                                    {{ form_row(form.validation[name]) }}
-                                </div>
-                            {% endif %}
+                      {% if validation %}
+                        <div class="row">
+                          {% if validation.minimum is defined %}
+                            <div class="col-md-4">{{ form_row(validation.minimum) }}</div>
                           {% endif %}
-                      {% endfor %}
-                  </div>
+                          {% if validation.min_message is defined %}
+                            <div class="col-md-8">{{ form_row(validation.min_message) }}</div>
+                          {% endif %}
+                        </div>
+                        <div class="row">
+                          {% if validation.maximum is defined %}
+                            <div class="col-md-4">{{ form_row(validation.maximum) }}</div>
+                          {% endif %}
+                          {% if validation.max_message is defined %}
+                            <div class="col-md-8">{{ form_row(validation.max_message) }}</div>
+                          {% endif %}
+                        </div>
+                        <div class="row">
+                            {% for name, property in validation %}
+                                {% if validation[name] is defined and not validation[name].isRendered and 'labelAttributes' != name %}
+                                  {% if 'hiddin' == validation[name].vars.block_prefixes[1] %}
+                                      {{ form_row(validation[name]) }}
+                                  {% else %}
+                                      {% set col = 8 %}
+                                      {% if 'chocie' == validation[name].vars.block_prefixes[1] %}
+                                          {% set col = 4 %}
+                                      {% endif %}
+                                      <div class="col-md-{{ col }}">
+                                          {{ form_row(validation[name]) }}
+                                      </div>
+                                  {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                      {% endif %}
               </div>
             {% endif %}
 

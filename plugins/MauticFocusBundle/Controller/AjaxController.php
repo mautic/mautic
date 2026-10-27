@@ -5,21 +5,20 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class AjaxController extends CommonAjaxController
+final class AjaxController extends CommonAjaxController
 {
-    /**
-     * This method produces HTTP request checking headers which are blocking availability for iframe inheritance for other pages.
-     */
-    public function checkIframeAvailabilityAction(Request $request, IframeAvailabilityChecker $availabilityChecker): JsonResponse
-    {
-        $url = $request->query->get('website');
+    private FocusModel $focusModel;
 
-        return $availabilityChecker->check($url, $request->getScheme());
+    #[Required]
+    public function autowireMauticFocusAjaxController(
+        FocusModel $focusModel,
+    ): void {
+        $this->focusModel = $focusModel;
     }
 
     public function generatePreviewAction(Request $request): JsonResponse
@@ -31,10 +30,8 @@ class AjaxController extends CommonAjaxController
             $focusArray = InputHelper::_($focus['focus']);
 
             if (!empty($focusArray['style']) && !empty($focusArray['type'])) {
-                /** @var FocusModel $model */
-                $model                    = $this->getModel('focus');
                 $focusArray['id']         = 'preview';
-                $responseContent['html']  = $model->getContent($focusArray, true);
+                $responseContent['html']  = $this->focusModel->getContent($focusArray, true);
                 $responseContent['style'] = $focusArray['style']; // Required by JS in response
             }
         }
@@ -61,18 +58,15 @@ class AjaxController extends CommonAjaxController
             $viewsCount       = $cacheItemValue['views'];
             $uniqueViewsCount = $cacheItemValue['uniqueViews'];
         } else {
-            /** @var FocusModel $model */
-            $model   = $this->getModel('focus');
-
-            $focus = $model->getEntity($focusId);
+            $focus = $this->focusModel->getEntity($focusId);
             if (null === $focus) {
                 return $this->sendJsonResponse([
                     'success' => 0,
                     'message' => $this->translator->trans('mautic.api.call.notfound'),
                 ], 404);
             }
-            $viewsCount       = $model->getViewsCount($focus);
-            $uniqueViewsCount = $model->getUniqueViewsCount($focus);
+            $viewsCount       = $this->focusModel->getViewsCount($focus);
+            $uniqueViewsCount = $this->focusModel->getUniqueViewsCount($focus);
             $cacheItem->set([
                 'views'       => $viewsCount,
                 'uniqueViews' => $uniqueViewsCount,
@@ -106,17 +100,14 @@ class AjaxController extends CommonAjaxController
         if ($cacheItem->isHit()) {
             $clickThroughCount = $cacheItem->get();
         } else {
-            /** @var FocusModel $model */
-            $model   = $this->getModel('focus');
-
-            $focus = $model->getEntity($focusId);
+            $focus = $this->focusModel->getEntity($focusId);
             if (null === $focus) {
                 return $this->sendJsonResponse([
                     'success' => 0,
                     'message' => $this->translator->trans('mautic.api.call.notfound'),
                 ], 404);
             }
-            $clickThroughCount = $model->getClickThroughCount($focus);
+            $clickThroughCount = $this->focusModel->getClickThroughCount($focus);
             $cacheItem->set($clickThroughCount);
             $cacheItem->tag("focus.{$focusId}");
             $cacheItem->expiresAfter($cacheTimeout * 60);

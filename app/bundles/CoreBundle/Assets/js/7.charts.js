@@ -346,6 +346,85 @@ Mautic.initDateRangePicker = function (fromId, toId) {
     }
 };
 
+Mautic.setDateRange = (option) => {
+  const today = new Date();
+  const dayInMilliseconds = 24 * 60 * 60 * 1000;
+  let fromDate;
+  let toDate;
+
+  switch (option) {
+    case 'today':
+      fromDate = today;
+      toDate = today;
+      break;
+    case 'yesterday':
+      fromDate = new Date(today.getTime() - dayInMilliseconds);
+      toDate = fromDate;
+      break;
+    default:
+      if (typeof option !== 'number') {
+        console.error('Invalid date range option.');
+
+        return;
+      }
+
+      fromDate = new Date(today.getTime() - (option * dayInMilliseconds));
+      toDate = today;
+  }
+
+  const dateFromInput = document.getElementById('daterange_date_from');
+  const dateToInput = document.getElementById('daterange_date_to');
+  const applyButton = document.getElementById('daterange_apply');
+
+  if (!dateFromInput || !dateToInput || !applyButton) {
+    console.error('Date range inputs are missing.');
+
+    return;
+  }
+
+  dateFromInput.value = Mautic.formatDate(fromDate);
+  dateToInput.value = Mautic.formatDate(toDate);
+  applyButton.click();
+};
+
+Mautic.formatDate = (date) => {
+  const monthNames = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
+  ];
+
+  return `${monthNames[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+};
+
+document.addEventListener('click', (event) => {
+  if (!(event.target instanceof Element)) {
+    return;
+  }
+
+  const dateRangeTrigger = event.target.closest('[data-date-range-option]');
+
+  if (!dateRangeTrigger) {
+    return;
+  }
+
+  event.preventDefault();
+
+  const option = dateRangeTrigger.dataset.dateRangeOption;
+  const dateRangeOption = /^\d+$/.test(option) ? Number(option) : option;
+
+  Mautic.setDateRange(dateRangeOption);
+});
+
 /**
  * Helper function to timeframe based graphs
  *

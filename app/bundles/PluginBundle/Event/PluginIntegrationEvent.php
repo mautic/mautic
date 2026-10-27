@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Event;
 
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 
-class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
+final class PluginIntegrationEvent extends AbstractPluginIntegrationEvent
 {
     public function __construct(UnifiedIntegrationInterface $integration)
     {

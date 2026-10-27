@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -69,7 +71,7 @@ class UserToken
     }
 
     /**
-     * @return User
+     * @return User|null
      */
     public function getUser()
     {
@@ -78,10 +80,8 @@ class UserToken
 
     /**
      * @param User $user
-     *
-     * @return UserToken
      */
-    public function setUser($user)
+    public function setUser($user): static
     {
         $this->user = $user;
 
@@ -89,7 +89,7 @@ class UserToken
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAuthorizator()
     {
@@ -98,10 +98,8 @@ class UserToken
 
     /**
      * @param string $authorizator
-     *
-     * @return UserToken
      */
-    public function setAuthorizator($authorizator)
+    public function setAuthorizator($authorizator): static
     {
         $this->authorizator = $authorizator;
 
@@ -109,7 +107,7 @@ class UserToken
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSecret()
     {
@@ -120,10 +118,8 @@ class UserToken
      * Use \Mautic\UserBundle\Entity\UserTokenRepositoryInterface::generateSecret to get valid secret.
      *
      * @param string $secret
-     *
-     * @return UserToken
      */
-    public function setSecret($secret)
+    public function setSecret($secret): static
     {
         $this->secret = $secret;
 
@@ -140,10 +136,8 @@ class UserToken
 
     /**
      * @param \DateTime|null $expiration
-     *
-     * @return UserToken
      */
-    public function setExpiration($expiration = null)
+    public function setExpiration($expiration = null): static
     {
         $this->expiration = $expiration;
 
@@ -160,10 +154,8 @@ class UserToken
 
     /**
      * @param bool $oneTimeOnly
-     *
-     * @return UserToken
      */
-    public function setOneTimeOnly($oneTimeOnly = true)
+    public function setOneTimeOnly($oneTimeOnly = true): static
     {
         $this->oneTimeOnly = $oneTimeOnly;
 

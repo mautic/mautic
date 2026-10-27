@@ -2,18 +2,17 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\AssetEvents;
-use Mautic\AssetBundle\Entity\Download;
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DetermineWinnerSubscriber implements EventSubscriberInterface
+final readonly class DetermineWinnerSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private EntityManagerInterface $em,
+        private DownloadRepository $downloadRepository,
         private TranslatorInterface $translator,
     ) {
     }
@@ -30,7 +29,6 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
      */
     public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event): void
     {
-        $repo       = $this->em->getRepository(Download::class);
         $parameters = $event->getParameters();
         $parent     = $parameters['parent'];
         $children   = $parameters['children'];
@@ -49,16 +47,15 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
         }
 
         $startDate = $parent->getVariantStartDate();
-        if (null != $startDate && !empty($ids)) {
-            $counts = ('page' == $type) ? $repo->getDownloadCountsByPage($ids, $startDate) : $repo->getDownloadCountsByEmail($ids, $startDate);
+        if (null != $startDate) {
+            $counts = ('page' === $type) ? $this->downloadRepository->getDownloadCountsByPage($ids, $startDate) : $this->downloadRepository->getDownloadCountsByEmail($ids, $startDate, $parent->getVariantEndDate());
 
-            $translator = $this->translator;
             if ($counts) {
                 $downloads  = $support  = $data  = [];
                 $hasResults = [];
 
-                $downloadsLabel = $translator->trans('mautic.asset.abtest.label.downloads');
-                $hitsLabel      = ('page' == $type) ? $translator->trans('mautic.asset.abtest.label.hits') : $translator->trans('mautic.asset.abtest.label.sentemils');
+                $downloadsLabel = $this->translator->trans('mautic.asset.abtest.label.downloads');
+                $hitsLabel      = ('page' === $type) ? $this->translator->trans('mautic.asset.abtest.label.hits') : $this->translator->trans('mautic.asset.abtest.label.sentemils');
                 foreach ($counts as $stats) {
                     $rate                    = ($stats['total']) ? round(($stats['count'] / $stats['total']) * 100, 2) : 0;
                     $downloads[$stats['id']] = $rate;
@@ -72,7 +69,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                 if (!in_array($parent->getId(), $hasResults)) {
                     $data[$downloadsLabel][] = 0;
                     $data[$hitsLabel][]      = 0;
-                    $support['labels'][]     = $parent->getId().':'.(('page' == $type) ? $parent->getTitle() : $parent->getName()).' (0%)';
+                    $support['labels'][]     = $parent->getId().':'.(('page' === $type) ? $parent->getTitle() : $parent->getName()).' (0%)';
                 }
 
                 foreach ($children as $c) {
@@ -80,7 +77,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                         if (!in_array($c->getId(), $hasResults)) {
                             $data[$downloadsLabel][] = 0;
                             $data[$hitsLabel][]      = 0;
-                            $support['labels'][]     = $c->getId().':'.(('page' == $type) ? $c->getTitle() : $c->getName()).' (0%)';
+                            $support['labels'][]     = $c->getId().':'.(('page' === $type) ? $c->getTitle() : $c->getName()).' (0%)';
                         }
                     }
                 }
