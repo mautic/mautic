@@ -314,16 +314,16 @@ class TrackableModel extends AbstractCommonModel
                 $searchPattern = str_replace('&amp;', '&', $searchPattern);
                 $searchPattern = str_replace('&', '(?:&|&amp;)', $searchPattern);
                 $content       = preg_replace_callback(
-                    '/<(.*?) href=(["\'])(?:\R|)(?:\s*)'.$searchPattern.'(.*?)(?:\s*)(?:\R|)\\2(.*?)>/i',
-                    function (array $m) use ($search, $replace): string {
+                    '/<(.*?) href=(["\'])(?:\R|)(?:\s*)('.$searchPattern.')(.*?)(?:\s*)(?:\R|)\\2(.*?)>/i',
+                    function (array $m) use ($replace): string {
                         // Decode HTML entities so raw href suffixes (&amp;) match normalized URLs
                         // in the do-not-track list (which are stored with plain &).
-                        $fullHref = html_entity_decode($search.$m[3], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                        $fullHref = html_entity_decode($m[3].$m[4], ENT_QUOTES | ENT_HTML5, 'UTF-8');
                         if ($this->isInDoNotTrack($fullHref)) {
                             return $m[0];
                         }
 
-                        return '<'.$m[1].' href='.$m[2].$replace.$m[3].$m[2].$m[4].'>';
+                        return '<'.$m[1].' href='.$m[2].$replace.$m[4].$m[2].$m[5].'>';
                     },
                     $content
                 );
@@ -748,13 +748,13 @@ class TrackableModel extends AbstractCommonModel
             // Check for a do not track
             // @deprecated since 7.x — Will be removed in 8.0. Use data-mautic-disable-tracking.
             if ($link->hasAttribute('mautic:disable-tracking')) {
-                $this->doNotTrack[$url] = $url;
+                $this->doNotTrack[$url] = '^'.preg_quote($url, '~').'$';
                 continue;
             }
 
             // Check for a do not track in proper HTML format
             if ($link->hasAttribute('data-mautic-disable-tracking') && 'true' === $link->getAttribute('data-mautic-disable-tracking')) {
-                $this->doNotTrack[$url] = $url;
+                $this->doNotTrack[$url] = '^'.preg_quote($url, '~').'$';
                 continue;
             }
 

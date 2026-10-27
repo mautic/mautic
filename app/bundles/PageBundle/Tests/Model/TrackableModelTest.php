@@ -517,15 +517,17 @@ final class TrackableModelTest extends TestCase
         }
     }
 
+    #[DataProvider('doNotTrackUrlPrefixProvider')]
     #[TestDox('Test that a do-not-track link is not corrupted when a tracked URL is a path prefix of its href')]
-    public function testDoNotTrackUrlIsNotCorruptedWhenTrackedUrlIsPrefixOfIt(): void
+    public function testDoNotTrackUrlIsNotCorruptedWhenTrackedUrlIsPrefixOfIt(string $trackedUrl, string $doNotTrackUrl): void
     {
         $model = $this->getModel();
 
-        $content = <<<HTML
-<a href="https://example.com/">Homepage</a>
-<a href="https://example.com/contact/" data-mautic-disable-tracking="true">Contact</a>
-HTML;
+        $content = sprintf(
+            '<a href="%s">Homepage</a><a href="%s" data-mautic-disable-tracking="true">Contact</a>',
+            $trackedUrl,
+            $doNotTrackUrl,
+        );
 
         [$processedContent, $trackables] = $model->parseContentForTrackables(
             $content,
@@ -536,11 +538,20 @@ HTML;
 
         // Only the root URL should be tracked; the do-not-track URL must be absent.
         $this->assertCount(1, $trackables);
-        $trackedUrl = reset($trackables)->getRedirect()->getUrl();
-        $this->assertSame('https://example.com/', $trackedUrl);
+        $this->assertSame($trackedUrl, reset($trackables)->getRedirect()->getUrl());
 
         // The do-not-track link href must remain exactly as authored.
-        $this->assertStringContainsString('href="https://example.com/contact/"', (string) $processedContent);
+        $this->assertStringContainsString(sprintf('href="%s"', $doNotTrackUrl), (string) $processedContent);
+    }
+
+    /**
+     * @return \Iterator<string, array{string, string}>
+     */
+    public static function doNotTrackUrlPrefixProvider(): \Iterator
+    {
+        yield 'same host casing' => ['https://example.com/', 'https://example.com/contact/'];
+        yield 'different host casing' => ['https://example.com/', 'https://EXAMPLE.com/contact/'];
+        yield 'regex metacharacters' => ['https://example.com/', 'https://example.com/contact/?ref=1'];
     }
 
     #[TestDox('Test that css images are not converted if there are no links')]
