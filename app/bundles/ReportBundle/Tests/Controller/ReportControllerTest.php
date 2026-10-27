@@ -22,6 +22,17 @@ final class ReportControllerTest extends MauticMysqlTestCase
     }
 
     /**
+     * Regression test for the is:mine report search command.
+     */
+    public function testIndexRouteSupportsIsMineSearch(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/reports?search=is%3Amine');
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    /**
      * Smoke test to ensure the '/s/reports/new' route loads.
      */
     public function testNewRouteSuccessfullyLoads(): void
