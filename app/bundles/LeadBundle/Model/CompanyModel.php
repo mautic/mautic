@@ -145,7 +145,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Company) {
             throw new MethodNotAllowedHttpException(['Company']);

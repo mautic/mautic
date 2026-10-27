@@ -92,7 +92,7 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
      * @param string|null $action
      * @param array       $options
      */
-    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Campaign) {
             throw new MethodNotAllowedHttpException(['Campaign']);

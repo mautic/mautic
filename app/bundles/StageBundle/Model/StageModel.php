@@ -67,7 +67,7 @@ class StageModel extends CommonFormModel implements GlobalSearchInterface
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Stage) {
             throw new MethodNotAllowedHttpException(['Stage']);

@@ -51,7 +51,7 @@ final class ActionModel extends CommonFormModel
      * @param Action|array<string, mixed> $entity
      * @param array  $options
      */
-    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Action) {
             throw new \InvalidArgumentException('Entity must be of class Action');

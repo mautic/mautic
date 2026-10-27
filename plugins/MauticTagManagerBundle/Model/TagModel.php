@@ -39,7 +39,7 @@ final class TagModel extends BaseTagModel implements GlobalSearchInterface
      * @param string|null $action
      * @param array       $options
      */
-    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);

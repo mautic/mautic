@@ -84,7 +84,7 @@ final class TriggerModel extends CommonFormModel implements GlobalSearchInterfac
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);

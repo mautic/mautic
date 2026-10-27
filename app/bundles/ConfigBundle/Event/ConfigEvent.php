@@ -31,7 +31,11 @@ class ConfigEvent extends CommonEvent
     /**
      * Data got from build form after update.
      */
+<<<<<<< HEAD
     private array $normData = [];
+=======
+    private ?array $normData = null;
+>>>>>>> 55a0b2d6b8 (Apply native array/iterable types from docblocks)
 
     /**
      * @param mixed[]|null $config

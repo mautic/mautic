@@ -120,7 +120,7 @@ final class DynamicContentModel extends FormModel implements AjaxLookupModelInte
      *
      * @throws \InvalidArgumentException
      */
-    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof DynamicContent) {
             throw new \InvalidArgumentException('Entity must be of class DynamicContent');

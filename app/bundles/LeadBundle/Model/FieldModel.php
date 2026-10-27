@@ -798,7 +798,7 @@ class FieldModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);

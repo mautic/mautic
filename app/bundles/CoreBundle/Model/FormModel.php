@@ -376,7 +376,7 @@ class FormModel extends AbstractCommonModel
      *
      * @throws NotFoundHttpException
      */
-    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         throw new NotFoundHttpException('Object does not support edits.');
     }
