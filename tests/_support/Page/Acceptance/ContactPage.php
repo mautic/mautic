@@ -50,7 +50,7 @@ final class ContactPage
 
     public static $uploadButton           = '#lead_import_start';
 
-    public static string $importForm = 'form[name="lead_import"]';
+    public static string $importForm = 'form[name=lead_import]';
 
     public static $firstName              = '#lead_field_import_firstname_chosen';
 
