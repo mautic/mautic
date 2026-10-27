@@ -114,6 +114,8 @@ final class DynamicContentType extends AbstractType
             array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()),
             array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())
         );
+
+        $this->fieldFilterTransformer->setContext('dwc');
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
