@@ -833,10 +833,10 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $contactA->setDateModified((clone $now)->modify($inLast ? '-1 hour' : '+1 hour'));
 
         $contactB = new Lead();
-        $contactB->setDateModified((clone $now)->modify($inLast ? '+2 days' : '+12 hours'));
+        $contactB->setDateModified((clone $now)->modify($inLast ? '+2 days' : '+1 day'));
 
         $contactC = new Lead();
-        $contactC->setDateModified((clone $now)->modify($inLast ? '-12 hours' : '-1 day'));
+        $contactC->setDateModified((clone $now)->modify('-1 day'));
 
         $contactD = new Lead();
         $contactD->setDateModified((clone $now)->modify('-2 days'));
