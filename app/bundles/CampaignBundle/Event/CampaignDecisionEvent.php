@@ -66,10 +66,10 @@ final class CampaignDecisionEvent extends Event
     public function getEventSettings($eventType = null, $type = null)
     {
         if ($type) {
-            return (empty($this->eventSettings[$eventType][$type])) ? false : $this->eventSettings[$eventType][$type];
+            return (!empty($this->eventSettings[$eventType][$type])) ? $this->eventSettings[$eventType][$type] : false;
         }
         if ($eventType) {
-            return (empty($this->eventSettings[$eventType])) ? false : $this->eventSettings[$eventType];
+            return (!empty($this->eventSettings[$eventType])) ? $this->eventSettings[$eventType] : false;
         }
 
         return $this->eventSettings;

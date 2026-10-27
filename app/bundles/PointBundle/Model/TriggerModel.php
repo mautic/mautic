@@ -244,7 +244,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 
         foreach ($sessionEvents as $properties) {
             $isNew = (!empty($properties['id']) && isset($existingActions[$properties['id']])) ? false : true;
-            $event = $isNew ? new TriggerEvent() : $existingActions[$properties['id']];
+            $event = !$isNew ? $existingActions[$properties['id']] : new TriggerEvent();
 
             foreach ($properties as $f => $v) {
                 if (in_array($f, ['id', 'order'])) {

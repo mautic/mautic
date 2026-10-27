@@ -134,7 +134,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         protected FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ) {
         $this->cache                  = $cacheStorageHelper->getCache($this->getName());
-        $this->request                = (defined('IN_MAUTIC_CONSOLE')) ? null : $requestStack->getCurrentRequest();
+        $this->request                = (!defined('IN_MAUTIC_CONSOLE')) ? $requestStack->getCurrentRequest() : null;
 
         $this->setClientFactory(fn (array $options): Client => new Client([
             'handler' => HandlerStack::create(new CurlHandler([
@@ -707,10 +707,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if ('GET' === $method && !empty($parameters)) {
             $parameters = array_merge($settings['query'], $parameters);
             $query      = http_build_query($parameters);
-            $url .= (str_contains($url, '?')) ? '&'.$query : '?'.$query;
+            $url .= (!str_contains($url, '?')) ? '?'.$query : '&'.$query;
         } elseif (!empty($settings['query'])) {
             $query = http_build_query($settings['query']);
-            $url .= (str_contains($url, '?')) ? '&'.$query : '?'.$query;
+            $url .= (!str_contains($url, '?')) ? '?'.$query : '&'.$query;
         }
 
         if (isset($postAppend)) {
@@ -912,9 +912,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                         ];
                         $parameters['grant_type'] = 'client_credentials';
                     } else {
-                        $defaultGrantType = (empty($settings['refresh_token'])) ? 'authorization_code'
-                            : 'refresh_token';
-                        $grantType = $settings['grant_type'] ?? $defaultGrantType;
+                        $defaultGrantType = (!empty($settings['refresh_token'])) ? 'refresh_token'
+                            : 'authorization_code';
+                        $grantType = (!isset($settings['grant_type'])) ? $defaultGrantType
+                            : $settings['grant_type'];
 
                         $useClientIdKey     = (empty($settings[$clientIdKey])) ? $clientIdKey : $settings[$clientIdKey];
                         $useClientSecretKey = (empty($settings[$clientSecretKey])) ? $clientSecretKey
@@ -1114,7 +1115,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         $settings['authorize_session'] = true;
 
-        $method = $settings['method'] ?? 'POST';
+        $method = (!isset($settings['method'])) ? 'POST' : $settings['method'];
         $data   = $this->makeRequest($this->getAccessTokenUrl(), $parameters, $method, $settings);
 
         return $this->extractAuthKeys($data);
@@ -1428,7 +1429,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
 
             // Check that the remaining fields have an updateKey set
-            foreach (array_keys($mappedFields) as $field) {
+            foreach ($mappedFields as $field => $mauticField) {
                 if (!isset($featureSettings[$updateKey][$field])) {
                     // Assume it's mapped to Mautic
                     $featureSettings[$updateKey][$field] = 1;

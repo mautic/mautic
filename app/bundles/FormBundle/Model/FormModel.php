@@ -171,7 +171,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $formName       = $entity->generateFormName();
         foreach ($sessionFields as $key => $properties) {
             $isNew = (!empty($properties['id']) && isset($existingFields[$properties['id']])) ? false : true;
-            $field = $isNew ? new Field() : $existingFields[$properties['id']];
+            $field = !$isNew ? $existingFields[$properties['id']] : new Field();
 
             if (!$isNew) {
                 if (empty($properties['alias'])) {
@@ -256,7 +256,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         foreach ($sessionActions as $properties) {
             $isNew  = (!empty($properties['id']) && isset($existingActions[$properties['id']])) ? false : true;
-            $action = $isNew ? new Action() : $existingActions[$properties['id']];
+            $action = !$isNew ? $existingActions[$properties['id']] : new Action();
 
             foreach ($properties as $f => $v) {
                 if (in_array($f, ['id', 'order'])) {
@@ -446,7 +446,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         uasort($fields, fn (Field $a, Field $b): int => $this->compareFieldOrder($a, $b));
 
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
-        $displayManager     = new DisplayManager($entity, empty($viewOnlyFields) ? [] : $viewOnlyFields);
+        $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         [$pages, $lastPage] = $this->getPages($fields);
         $html               = $this->themeHelper->renderThemeTemplate(
             $formToRender,

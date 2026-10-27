@@ -1542,7 +1542,7 @@ final class EmailController extends FormController
             } else {
                 $stats      = $session->get('mautic.email.send.stats');
                 $progress   = $session->get('mautic.email.send.progress');
-                $status     = (empty($stats['failed'])) ? 'success' : 'with_errors';
+                $status     = (!empty($stats['failed'])) ? 'with_errors' : 'success';
             }
 
             $batchlimit      = $this->coreParametersHelper->get('mailer_memory_msg_limit');

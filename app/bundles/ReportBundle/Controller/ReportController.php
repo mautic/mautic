@@ -601,7 +601,7 @@ final class ReportController extends FormController
 
         if (count($dynamicFilters) > 0 && count($entity->getFilters()) > 0) {
             foreach ($entity->getFilters() as $filter) {
-                foreach (array_keys($dynamicFilters) as $dfcol) {
+                foreach ($dynamicFilters as $dfcol => $dfval) {
                     if (1 === $filter['dynamic'] && $filter['column'] === $dfcol) {
                         $dynamicFilters[$dfcol]['expr'] = $filter['condition'];
                         break;

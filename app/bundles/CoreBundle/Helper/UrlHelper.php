@@ -129,7 +129,7 @@ final class UrlHelper
                 unset($urls[$key]);
 
                 // We know this is a URL due to the default so let's include it as a trackable
-                foreach (array_keys($matches[1]) as $tokenKey) {
+                foreach ($matches[1] as $tokenKey => $tokenContent) {
                     $urls[] = $matches[0][$tokenKey];
                 }
             }

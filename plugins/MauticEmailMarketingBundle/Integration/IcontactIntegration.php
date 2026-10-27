@@ -107,7 +107,7 @@ final class IcontactIntegration extends EmailAbstractIntegration
     public function isAuthorized(): bool
     {
         $keys = $this->getRequiredKeyFields();
-        foreach (array_keys($keys) as $k) {
+        foreach ($keys as $k => $l) {
             if (empty($this->keys[$k])) {
                 return false;
             }

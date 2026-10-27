@@ -172,8 +172,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function getUserCompanies()
     {
-        $user = ($this->security->isGranted('lead:leads:viewother')) ?
-            false : $this->userHelper->getUser();
+        $user = (!$this->security->isGranted('lead:leads:viewother')) ?
+            $this->userHelper->getUser() : false;
 
         return $this->companyRepository->getCompanies($user);
     }

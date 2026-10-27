@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Sequentially;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -48,7 +49,6 @@ use Symfony\Component\Validator\Constraints\Sequentially;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[Upload]
 class Asset extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -292,6 +292,11 @@ class Asset extends FormEntity implements UuidInterface
 
         static::addUuidField($builder);
         self::addProjectsField($builder, 'asset_projects_xref', 'asset_id');
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addConstraint(new Upload());
     }
 
     /**

@@ -272,7 +272,7 @@ class SendEmailToContact
     {
         // Update bad emails as bounces
         if (count($this->badEmails)) {
-            foreach (array_keys($this->badEmails) as $contactId) {
+            foreach ($this->badEmails as $contactId => $contactEmail) {
                 $this->dncModel->addDncForContact(
                     $contactId,
                     ['email' => $this->emailEntityId],

@@ -72,7 +72,7 @@ final class CampaignEventLeadAttachedType extends AbstractType
             ]
         );
 
-        $data = (empty($options['data']['triggerIntervalUnit'])) ? 'd' : $options['data']['triggerIntervalUnit'];
+        $data = (!empty($options['data']['triggerIntervalUnit'])) ? $options['data']['triggerIntervalUnit'] : 'd';
         $builder->add(
             'triggerIntervalUnit',
             ChoiceType::class,

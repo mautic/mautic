@@ -175,9 +175,8 @@ final class MauticDenyAccessListenerTest extends TestCase
         };
 
         $requestObject = new class($customObjectMock) {
-            public function __construct(
-                private readonly object $customObject,
-            ) {
+            public function __construct(private readonly object $customObject)
+            {
             }
 
             public function getCustomObject(): object
@@ -225,9 +224,8 @@ final class MauticDenyAccessListenerTest extends TestCase
         };
 
         $requestObject = new class($customFieldMock) {
-            public function __construct(
-                private readonly object $customField,
-            ) {
+            public function __construct(private readonly object $customField)
+            {
             }
 
             public function getCustomField(): object

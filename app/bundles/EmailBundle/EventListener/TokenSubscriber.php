@@ -105,7 +105,7 @@ class TokenSubscriber implements EventSubscriberInterface
                 [
                     'content' => $filterContent,
                     'email'   => $event->getPassthrough(),
-                    'idHash'  => empty($clickthrough['idHash']) ? null : $clickthrough['idHash'],
+                    'idHash'  => !empty($clickthrough['idHash']) ? $clickthrough['idHash'] : null,
                     'tokens'  => $tokens,
                     'lead'    => $lead,
                 ],

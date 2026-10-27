@@ -130,7 +130,7 @@ final class SchemaHelper
         }
 
         $this->platform = $this->db->getDatabasePlatform();
-        $backupPrefix   = (empty($this->dbParams['backup_prefix'])) ? 'bak_' : $this->dbParams['backup_prefix'];
+        $backupPrefix   = (!empty($this->dbParams['backup_prefix'])) ? $this->dbParams['backup_prefix'] : 'bak_';
 
         $metadatas = $this->em->getMetadataFactory()->getAllMetadata();
         if (empty($metadatas)) {

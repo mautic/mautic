@@ -104,7 +104,7 @@ final class ParameterLoader
         }
         $dotenv->populate($envVariables->all());
 
-        foreach (array_keys($envVariables->all()) as $key) {
+        foreach ($envVariables->all() as $key => $value) {
             self::$selfPopulatedEnvKeys[$key] = true;
         }
     }

@@ -65,7 +65,7 @@ final class EmailSendType extends AbstractType
                         'class'   => 'form-control email-type',
                         'tooltip' => 'mautic.email.send.emailtype.tooltip',
                     ],
-                    'data' => $options['data']['email_type'] ?? MailHelper::EMAIL_TYPE_MARKETING,
+                    'data' => (!isset($options['data']['email_type'])) ? MailHelper::EMAIL_TYPE_MARKETING : $options['data']['email_type'],
                 ]
             );
         }
@@ -137,7 +137,7 @@ final class EmailSendType extends AbstractType
                 ]
             );
             if (!empty($options['with_email_types'])) {
-                $data = (isset($options['data']['priority'])) ? (int) $options['data']['priority'] : 2;
+                $data = (!isset($options['data']['priority'])) ? 2 : (int) $options['data']['priority'];
                 $builder->add(
                     'priority',
                     ChoiceType::class,
@@ -157,7 +157,7 @@ final class EmailSendType extends AbstractType
                     ]
                 );
 
-                $data = (isset($options['data']['attempts'])) ? (int) $options['data']['attempts'] : 3;
+                $data = (!isset($options['data']['attempts'])) ? 3 : (int) $options['data']['attempts'];
                 $builder->add(
                     'attempts',
                     NumberType::class,

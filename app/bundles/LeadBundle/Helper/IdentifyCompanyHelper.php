@@ -77,7 +77,7 @@ final class IdentifyCompanyHelper
     private static function hasCompanyParameters(array $parameters, CompanyModel $companyModel): bool
     {
         $companyFields = $companyModel->fetchCompanyFields();
-        foreach (array_keys($parameters) as $alias) {
+        foreach ($parameters as $alias => $value) {
             foreach ($companyFields as $companyField) {
                 if ($companyField['alias'] === $alias) {
                     return true;

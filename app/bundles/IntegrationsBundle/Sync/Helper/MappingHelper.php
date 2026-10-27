@@ -61,7 +61,7 @@ class MappingHelper
         $uniqueIdentifierFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['object' => $internalObjectName]);
         $identifiers            = [];
 
-        foreach (array_keys($uniqueIdentifierFields) as $field) {
+        foreach ($uniqueIdentifierFields as $field => $fieldLabel) {
             try {
                 $integrationField = $mappingManualDAO->getIntegrationMappedField($integrationObjectDAO->getObject(), $internalObjectName, $field);
                 $integrationValue = $integrationObjectDAO->getField($integrationField);

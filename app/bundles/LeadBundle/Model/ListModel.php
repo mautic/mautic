@@ -344,7 +344,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getUserLists($alias = '')
     {
-        $user = $this->security->isGranted('lead:lists:viewother') ? null : $this->userHelper->getUser();
+        $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : null;
 
         return $this->leadListRepository->getLists($user, $alias);
     }
@@ -850,14 +850,14 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 continue;
             }
 
-            $listLead = ($skipFindOne) ?
-                $this->em->getReference(ListLead::class, [
-                    'lead' => $leadId,
-                    'list' => $listId,
-                ]) :
+            $listLead = (!$skipFindOne) ?
                 $this->listLeadRepository->findOneBy([
                     'lead' => $lead,
                     'list' => $this->leadChangeLists[$listId],
+                ]) :
+                $this->em->getReference(ListLead::class, [
+                    'lead' => $leadId,
+                    'list' => $listId,
                 ]);
 
             if (null == $listLead) {

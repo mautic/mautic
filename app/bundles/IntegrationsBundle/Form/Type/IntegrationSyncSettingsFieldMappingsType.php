@@ -41,7 +41,7 @@ final class IntegrationSyncSettingsFieldMappingsType extends AbstractType
 
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
 
-        foreach (array_keys($options['objects']) as $objectName) {
+        foreach ($options['objects'] as $objectName => $objectLabel) {
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($integrationObject, $objectName, $fieldFilterHelper): void {
                 $error = null;
 

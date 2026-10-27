@@ -67,38 +67,52 @@ abstract class SocialIntegration extends AbstractIntegration
             $socialProfileUrls = $this->integrationHelper->getSocialProfileUrlRegex();
 
             foreach ($available as $field => $details) {
-                $label = (empty($details['label'])) ? false : $details['label'];
+                $label = (!empty($details['label'])) ? $details['label'] : false;
                 $fn    = $this->matchFieldName($field);
                 switch ($details['type']) {
                     case 'string':
                     case 'boolean':
-                        $fields[$fn] = $label ?: $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}");
+                        $fields[$fn] = (!$label)
+                            ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
+                            : $label;
                         break;
                     case 'object':
                         if (isset($details['fields'])) {
                             foreach ($details['fields'] as $f) {
                                 $fn          = $this->matchFieldName($field, $f);
-                                $fields[$fn] = $label ?: $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}");
+                                $fields[$fn] = (!$label)
+                                    ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
+                                    : $label;
                             }
                         } else {
-                            $fields[$field] = $label ?: $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}");
+                            $fields[$field] = (!$label)
+                                ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
+                                : $label;
                         }
                         break;
                     case 'array_object':
                         if ('urls' == $field || 'url' == $field) {
-                            foreach (array_keys($socialProfileUrls) as $p) {
-                                $fields["{$p}ProfileHandle"] = $label ?: $this->translator->transConditional("mautic.integration.common.{$p}ProfileHandle", "mautic.integration.{$s}.{$p}ProfileHandle");
+                            foreach ($socialProfileUrls as $p => $d) {
+                                $fields["{$p}ProfileHandle"] = (!$label)
+                                    ? $this->translator->transConditional("mautic.integration.common.{$p}ProfileHandle", "mautic.integration.{$s}.{$p}ProfileHandle")
+                                    : $label;
                             }
                             foreach ($details['fields'] as $f) {
-                                $fields["{$p}Urls"] = $label ?: $this->translator->transConditional("mautic.integration.common.{$f}Urls", "mautic.integration.{$s}.{$f}Urls");
+                                $fields["{$p}Urls"] = (!$label)
+                                    ? $this->translator->transConditional("mautic.integration.common.{$f}Urls", "mautic.integration.{$s}.{$f}Urls")
+                                    : $label;
                             }
                         } elseif (isset($details['fields'])) {
                             foreach ($details['fields'] as $f) {
                                 $fn          = $this->matchFieldName($field, $f);
-                                $fields[$fn] = $label ?: $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}");
+                                $fields[$fn] = (!$label)
+                                    ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
+                                    : $label;
                             }
                         } else {
-                            $fields[$fn] = $label ?: $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}");
+                            $fields[$fn] = (!$label)
+                                ? $this->translator->transConditional("mautic.integration.common.{$fn}", "mautic.integration.{$s}.{$fn}")
+                                : $label;
                         }
                         break;
                 }

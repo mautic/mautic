@@ -55,7 +55,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[SlotNameType]
 /**
  * @use TranslationEntityTrait<DynamicContent>
  * @use VariantEntityTrait<DynamicContent>
@@ -77,11 +76,9 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $id;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
-    #[NotBlank(message: 'mautic.core.name.required')]
     private ?string $name = null;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
-    #[NotBlank(message: 'mautic.core.type.required')]
     private string $type = TypeList::HTML;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
@@ -106,7 +103,6 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      * @var string|null
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
-    #[NoNesting]
     private $content;
 
     /**
@@ -235,7 +231,13 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public static function loadValidatorMetaData(ClassMetadata $metadata): void
     {
+        $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
+        $metadata->addPropertyConstraint('content', new NoNesting());
+
+        $metadata->addPropertyConstraint('type', new NotBlank(message: 'mautic.core.type.required'));
         $metadata->addPropertyConstraint('type', new Choice(choices: (new TypeList())->getChoices()));
+
+        $metadata->addConstraint(new SlotNameType());
 
         $metadata->addConstraint(new Callback(
             function (self $dwc, ExecutionContextInterface $context): void {

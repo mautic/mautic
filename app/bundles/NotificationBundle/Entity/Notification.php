@@ -60,7 +60,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
      * @var string
      */
     #[Groups(['notification:read', 'notification:write'])]
-    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -79,14 +78,12 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
      * @var string
      */
     #[Groups(['notification:read', 'notification:write'])]
-    #[NotBlank(message: 'mautic.core.heading.required')]
     private $heading;
 
     /**
      * @var string
      */
     #[Groups(['notification:read', 'notification:write'])]
-    #[NotBlank(message: 'mautic.core.message.required')]
     private $message;
 
     /**
@@ -253,6 +250,27 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
+        $metadata->addPropertyConstraint(
+            'name',
+            new NotBlank(
+                message: 'mautic.core.name.required'
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'heading',
+            new NotBlank(
+                message: 'mautic.core.heading.required'
+            )
+        );
+
+        $metadata->addPropertyConstraint(
+            'message',
+            new NotBlank(
+                message: 'mautic.core.message.required'
+            )
+        );
+
         $metadata->addConstraint(new Callback(
             function (Notification $notification, ExecutionContextInterface $context): void {
                 $type = $notification->getNotificationType();

@@ -33,7 +33,7 @@ class StatRepository extends CommonRepository
 
         $result = $q->getQuery()->getResult();
 
-        return (empty($result)) ? null : $result[0];
+        return (!empty($result)) ? $result[0] : null;
     }
 
     public function getSentStats($smsId, $listId = null): array

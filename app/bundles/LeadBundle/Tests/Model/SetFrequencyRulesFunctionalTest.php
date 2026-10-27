@@ -67,7 +67,7 @@ final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
     private function createCategories(array $cats): array
     {
         $categories = [];
-        foreach (array_keys($cats) as $suffix) {
+        foreach ($cats as $suffix => $flag) {
             $categories[$suffix] = $this->createCategory($suffix, $suffix);
         }
 

@@ -567,8 +567,8 @@ final class PublicController extends CommonFormController
         $session = $request->getSession();
         $message = $session->get('mautic.emailbundle.message', []);
 
-        $msg     = (empty($message['message'])) ? '' : $message['message'];
-        $msgType = (empty($message['type'])) ? 'notice' : $message['type'];
+        $msg     = (!empty($message['message'])) ? $message['message'] : '';
+        $msgType = (!empty($message['type'])) ? $message['type'] : 'notice';
 
         $analytics = $analyticsHelper->getCode();
 
@@ -596,7 +596,7 @@ final class PublicController extends CommonFormController
         $objectId          = (empty($id)) ? (int) $request->get('id') : $id;
         $css               = InputHelper::string((string) $request->get('css'));
         $form              = $this->formModel->getEntity($objectId);
-        $customStylesheets = (empty($css)) ? [] : explode(',', $css);
+        $customStylesheets = (!empty($css)) ? explode(',', $css) : [];
         $template          = null;
 
         if (null === $form || !$form->isPublished()) {

@@ -52,7 +52,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[EntityEvent]
 /**
  * @use TranslationEntityTrait<Page>
  * @use VariantEntityTrait<Page>
@@ -79,7 +78,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      * @var string
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
-    #[NotBlank(message: 'mautic.core.title.required')]
     private $title;
 
     /**
@@ -322,6 +320,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
+        $metadata->addPropertyConstraint('title', new NotBlank(message: 'mautic.core.title.required'));
+
         $metadata->addConstraint(new Callback(
             function (Page $page, ExecutionContextInterface $context): void {
                 $type = $page->getRedirectType();
@@ -361,6 +361,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                 }
             },
         ));
+
+        $metadata->addConstraint(new EntityEvent());
     }
 
     /**

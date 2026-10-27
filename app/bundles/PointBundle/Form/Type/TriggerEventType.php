@@ -47,7 +47,7 @@ final class TriggerEventType extends AbstractType
         );
 
         if (!empty($options['settings']['formType'])) {
-            $properties = (empty($options['data']['properties'])) ? null : $options['data']['properties'];
+            $properties = (!empty($options['data']['properties'])) ? $options['data']['properties'] : null;
 
             $formTypeOptions = [
                 'label' => false,

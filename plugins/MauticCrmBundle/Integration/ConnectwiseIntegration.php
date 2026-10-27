@@ -279,7 +279,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                         'attr'       => [
                             'class' => 'form-control',
                         ],
-                        'data'     => $data['push_activities'] ?? true,
+                        'data'     => (!isset($data['push_activities'])) ? true : $data['push_activities'],
                         'required' => false,
                     ]
                 );

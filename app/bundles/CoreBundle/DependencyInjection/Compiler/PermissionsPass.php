@@ -13,7 +13,7 @@ final class PermissionsPass implements CompilerPassInterface
     {
         $corePermissions = $container->findDefinition('mautic.security');
 
-        foreach (array_keys($container->findTaggedServiceIds('mautic.permissions')) as $id) {
+        foreach ($container->findTaggedServiceIds('mautic.permissions') as $id => $tags) {
             $permissionObject = $container->findDefinition($id);
             $corePermissions->addMethodCall('setPermissionObject', [$permissionObject]);
         }

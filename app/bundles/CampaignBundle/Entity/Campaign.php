@@ -31,6 +31,7 @@ use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -51,7 +52,6 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[NoOrphanEvents]
 class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterface
 {
     use UuidTrait;
@@ -215,6 +215,11 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         self::addVersionField($builder);
         static::addUuidField($builder);
         self::addProjectsField($builder, 'campaign_projects_xref', 'campaign_id');
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addConstraint(new NoOrphanEvents());
     }
 
     /**

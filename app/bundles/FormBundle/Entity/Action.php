@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -63,7 +64,6 @@ class Action implements UuidInterface
      * @var string
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
-    #[Assert\NotBlank(message: 'mautic.core.name.required', groups: ['action'])]
     private $type;
 
     /**
@@ -141,6 +141,11 @@ class Action implements UuidInterface
                 ]
             )
             ->build();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank(message: 'mautic.core.name.required', groups: ['action']));
     }
 
     private function isChanged(string $prop, mixed $val): void

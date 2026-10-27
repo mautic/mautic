@@ -23,6 +23,7 @@ use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Mautic\ReportBundle\Scheduler\Validator as ReportAssert;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ApiResource(
     operations: [
@@ -42,7 +43,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
         'swagger_definition_name' => 'Write',
     ]
 )]
-#[ReportAssert\ScheduleIsValid]
 class Report extends FormEntity implements SchedulerInterface, UuidInterface
 {
     use UuidTrait;
@@ -57,7 +57,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var string
      */
     #[Groups(['report:read', 'report:write'])]
-    #[NotBlank(message: 'mautic.core.name.required')]
     private $name;
 
     /**
@@ -132,7 +131,6 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
      * @var string|null
      */
     #[Groups(['report:read', 'report:write'])]
-    #[EmailAssert\MultipleEmailsValid]
     private $toAddress;
 
     /**
@@ -217,6 +215,15 @@ class Report extends FormEntity implements SchedulerInterface, UuidInterface
         $builder->addNullableField('scheduleMonthFrequency', Types::STRING, 'schedule_month_frequency');
 
         static::addUuidField($builder);
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('name', new NotBlank(message: 'mautic.core.name.required'));
+
+        $metadata->addPropertyConstraint('toAddress', new EmailAssert\MultipleEmailsValid());
+
+        $metadata->addConstraint(new ReportAssert\ScheduleIsValid());
     }
 
     /**
