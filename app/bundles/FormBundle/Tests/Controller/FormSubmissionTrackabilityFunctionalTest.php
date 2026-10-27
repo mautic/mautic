@@ -93,8 +93,8 @@ final class FormSubmissionTrackabilityFunctionalTest extends MauticMysqlTestCase
         $this->assertSame($expectTracking, null !== $submission->getIpAddress());
         $this->assertSame($expectTracking, null !== $submission->getTrackingId());
 
-        // The query string of the page can carry identifiers, so only the page address is kept for an untracked visitor
-        $this->assertSame($expectTracking ? $referer : $page, $submission->getReferer());
+        // An untracked submitter's referer keeps the UTM tags for campaign attribution, and drops the email and the fragment
+        $this->assertSame($expectTracking ? $referer : $page.'?utm_source=newsletter', $submission->getReferer());
 
         // The submitted data is still saved to the contact
         $contact = $submission->getLead();

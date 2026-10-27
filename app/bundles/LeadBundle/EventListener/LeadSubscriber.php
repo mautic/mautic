@@ -708,10 +708,8 @@ final class LeadSubscriber implements EventSubscriberInterface
 
     /**
      * No IP for a form submitter Mautic doesn't track.
-     *
-     * @return string
      */
-    private function getVisitorIpAddress()
+    private function getVisitorIpAddress(): string
     {
         return $this->ipLookupHelper->isVisitorUntracked() ? '' : $this->ipLookupHelper->getIpAddressFromRequest();
     }
