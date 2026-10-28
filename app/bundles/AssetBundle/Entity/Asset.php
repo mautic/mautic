@@ -60,15 +60,6 @@ class Asset extends FormEntity implements UuidInterface
     public const TABLE_NAME = 'assets';
 
     /**
-     * Follow the global "Track asset downloads" setting.
-     */
-    public const TRACK_DOWNLOADS_GLOBAL = 'global';
-
-    public const TRACK_DOWNLOADS_ALWAYS = 'always';
-
-    public const TRACK_DOWNLOADS_NEVER = 'never';
-
-    /**
      * @var int|null
      */
     #[Groups(['asset:read', 'download:read', 'email:read'])]
@@ -228,8 +219,11 @@ class Asset extends FormEntity implements UuidInterface
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $disallow = true;
 
+    /**
+     * Whether a download is linked to the contact who downloads it. New assets start from the global setting.
+     */
     #[Groups(['asset:read', 'asset:write'])]
-    private string $trackDownloads = self::TRACK_DOWNLOADS_GLOBAL;
+    private bool $trackDownloads = true;
 
     public function __construct()
     {
@@ -304,10 +298,9 @@ class Asset extends FormEntity implements UuidInterface
             ->nullable()
             ->build();
 
-        $builder->createField('trackDownloads', Types::STRING)
+        $builder->createField('trackDownloads', Types::BOOLEAN)
             ->columnName('track_downloads')
-            ->length(10)
-            ->option('default', self::TRACK_DOWNLOADS_GLOBAL)
+            ->option('default', true)
             ->build();
 
         static::addUuidField($builder);
@@ -317,7 +310,6 @@ class Asset extends FormEntity implements UuidInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new Upload());
-        $metadata->addPropertyConstraint('trackDownloads', new Assert\Choice(choices: [self::TRACK_DOWNLOADS_GLOBAL, self::TRACK_DOWNLOADS_ALWAYS, self::TRACK_DOWNLOADS_NEVER]));
     }
 
     /**
@@ -1314,12 +1306,12 @@ class Asset extends FormEntity implements UuidInterface
         $this->disallow = $disallow;
     }
 
-    public function getTrackDownloads(): string
+    public function getTrackDownloads(): bool
     {
         return $this->trackDownloads;
     }
 
-    public function setTrackDownloads(string $trackDownloads): self
+    public function setTrackDownloads(bool $trackDownloads): self
     {
         $this->isChanged('trackDownloads', $trackDownloads);
         $this->trackDownloads = $trackDownloads;

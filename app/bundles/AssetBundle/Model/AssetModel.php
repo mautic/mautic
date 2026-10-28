@@ -126,7 +126,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $download->setUtmTerm($request->get('utm_term'));
 
         // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks) and downloads may be tracked
-        if (!$this->ipLookupHelper->isRequestTrackable() || !$this->isDownloadTracked($asset)) {
+        if (!$this->ipLookupHelper->isRequestTrackable() || !$asset->getTrackDownloads()) {
             // Still counted, but with nothing that links it to the visitor. Without an identifier it can't count as unique.
             // Bots, excluded IP addresses and prefetches aren't counted, privacy signals are.
             if (empty($systemEntry) && $this->ipLookupHelper->isRequestCountable()) {
@@ -292,19 +292,6 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * With download tracking off, a download is counted but never linked to a contact.
-     * The asset's own setting wins over the global one.
-     */
-    private function isDownloadTracked(Asset $asset): bool
-    {
-        return match ($asset->getTrackDownloads()) {
-            Asset::TRACK_DOWNLOADS_ALWAYS => true,
-            Asset::TRACK_DOWNLOADS_NEVER  => false,
-            default                       => (bool) $this->coreParametersHelper->get('track_asset_downloads', true),
-        };
-    }
-
-    /**
      * Increase the download count. Download counts are aggregate analytics, so they follow that setting.
      *
      * @param int        $increaseBy
@@ -361,6 +348,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
     {
         if (null === $id) {
             $entity = new Asset();
+            // A new asset starts from the global setting, and keeps its own value after that
+            $entity->setTrackDownloads((bool) $this->coreParametersHelper->get('track_asset_downloads', true));
         } else {
             $entity = parent::getEntity($id);
         }

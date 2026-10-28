@@ -6,6 +6,7 @@ namespace Mautic\AssetBundle\Tests\Controller;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
@@ -14,45 +15,53 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * An asset's own download tracking setting wins over the global one, but never over a privacy signal.
+ * Each asset decides whether its downloads are tracked. New assets start from the global setting,
+ * and a privacy signal always wins.
  */
 final class AssetDownloadTrackingOverrideFunctionalTest extends MauticMysqlTestCase
 {
-    private const GLOBAL_OFF = 'global tracking off';
-
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
     {
-        $this->configParams['track_asset_downloads'] = !str_contains((string) $this->dataName(), self::GLOBAL_OFF);
+        $this->configParams['track_asset_downloads'] = !str_contains($this->name(), 'GlobalOff');
         $this->configParams['aggregate_analytics']   = true;
 
         parent::setUp();
     }
 
-    /**
-     * @return iterable<string, array{string, bool}>
-     */
-    public static function trackingProvider(): iterable
+    public function testAssetToggledOffIsNotLinkedWhileGlobalIsOn(): void
     {
-        yield 'use global, global tracking on' => [Asset::TRACK_DOWNLOADS_GLOBAL, true];
-        yield 'use global, '.self::GLOBAL_OFF => [Asset::TRACK_DOWNLOADS_GLOBAL, false];
-        yield 'always, global tracking on' => [Asset::TRACK_DOWNLOADS_ALWAYS, true];
-        yield 'always, '.self::GLOBAL_OFF => [Asset::TRACK_DOWNLOADS_ALWAYS, true];
-        yield 'never, global tracking on' => [Asset::TRACK_DOWNLOADS_NEVER, false];
-        yield 'never, '.self::GLOBAL_OFF => [Asset::TRACK_DOWNLOADS_NEVER, false];
-    }
-
-    #[DataProvider('trackingProvider')]
-    public function testAssetSettingDecidesWhetherTheDownloadIsLinkedToTheContact(string $trackDownloads, bool $linked): void
-    {
-        $asset   = $this->createAsset($trackDownloads);
+        $asset   = $this->createAsset(false);
         $contact = $this->createContact();
 
         $this->download($asset, $contact, []);
 
-        $this->assertSame($linked ? [$contact->getId()] : [], $this->getDownloadContactIds($asset));
+        $this->assertSame([], $this->getDownloadContactIds($asset));
         $this->assertSame(1, $this->getDownloadCount($asset), 'the download is counted either way');
+    }
+
+    public function testAssetToggledOnIsLinkedWhileGlobalOff(): void
+    {
+        $asset   = $this->createAsset(true);
+        $contact = $this->createContact();
+
+        $this->download($asset, $contact, []);
+
+        $this->assertSame([$contact->getId()], $this->getDownloadContactIds($asset));
+        $this->assertSame(1, $this->getDownloadCount($asset));
+    }
+
+    public function testNewAssetStartsFromTheGlobalSetting(): void
+    {
+        $this->assertTrue($this->getNewAsset()->getTrackDownloads());
+        $this->assertSame('1', $this->getNewAssetFormValue());
+    }
+
+    public function testNewAssetStartsFromTheGlobalSettingWhileGlobalOff(): void
+    {
+        $this->assertFalse($this->getNewAsset()->getTrackDownloads());
+        $this->assertSame('0', $this->getNewAssetFormValue());
     }
 
     /**
@@ -68,9 +77,9 @@ final class AssetDownloadTrackingOverrideFunctionalTest extends MauticMysqlTestC
      * @param array<string, string> $server
      */
     #[DataProvider('privacySignalProvider')]
-    public function testAlwaysTrackDoesNotOverridePrivacySignals(array $server): void
+    public function testAssetToggledOnDoesNotOverridePrivacySignals(array $server): void
     {
-        $asset   = $this->createAsset(Asset::TRACK_DOWNLOADS_ALWAYS);
+        $asset   = $this->createAsset(true);
         $contact = $this->createContact();
 
         $this->download($asset, $contact, $server);
@@ -112,7 +121,23 @@ final class AssetDownloadTrackingOverrideFunctionalTest extends MauticMysqlTestC
         return (int) $this->em->find(Asset::class, $asset->getId())->getDownloadCount();
     }
 
-    private function createAsset(string $trackDownloads): Asset
+    private function getNewAsset(): Asset
+    {
+        $asset = self::getContainer()->get(AssetModel::class)->getEntity();
+        $this->assertInstanceOf(Asset::class, $asset);
+
+        return $asset;
+    }
+
+    private function getNewAssetFormValue(): string
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/assets/new');
+        $this->assertResponseIsSuccessful();
+
+        return (string) $crawler->filter('input[name="asset[trackDownloads]"]:checked')->attr('value');
+    }
+
+    private function createAsset(bool $trackDownloads): Asset
     {
         $asset = new Asset();
         $asset->setTitle('Override asset');

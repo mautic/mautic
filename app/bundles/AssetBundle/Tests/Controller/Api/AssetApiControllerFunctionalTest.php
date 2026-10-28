@@ -144,18 +144,15 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
             'file'            => 'tracking.txt',
             'storageLocation' => 'local',
             'title'           => 'tracking',
-            'trackDownloads'  => 'never',
+            'trackDownloads'  => 0,
         ]);
         $this->assertResponseStatusCodeSame(201, (string) $this->client->getResponse()->getContent());
         $asset = json_decode((string) $this->client->getResponse()->getContent(), true)['asset'];
-        $this->assertSame('never', $asset['trackDownloads']);
+        $this->assertFalse($asset['trackDownloads']);
 
-        $this->client->request('PATCH', sprintf('/api/assets/%d/edit', $asset['id']), ['trackDownloads' => 'always']);
+        $this->client->request('PATCH', sprintf('/api/assets/%d/edit', $asset['id']), ['trackDownloads' => 1]);
         $this->assertResponseIsSuccessful();
-        $this->assertSame('always', json_decode((string) $this->client->getResponse()->getContent(), true)['asset']['trackDownloads']);
-
-        $this->client->request('PATCH', sprintf('/api/assets/%d/edit', $asset['id']), ['trackDownloads' => 'sometimes']);
-        $this->assertResponseStatusCodeSame(400);
+        $this->assertTrue(json_decode((string) $this->client->getResponse()->getContent(), true)['asset']['trackDownloads']);
 
         unlink($assetsPath.'/tracking.txt');
     }
@@ -171,7 +168,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
             'title'           => 'default',
         ]);
         $this->assertResponseStatusCodeSame(201, (string) $this->client->getResponse()->getContent());
-        $this->assertSame('global', json_decode((string) $this->client->getResponse()->getContent(), true)['asset']['trackDownloads']);
+        $this->assertTrue(json_decode((string) $this->client->getResponse()->getContent(), true)['asset']['trackDownloads']);
 
         unlink($assetsPath.'/default.txt');
     }
