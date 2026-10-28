@@ -20,7 +20,7 @@ final class RegionType extends AbstractType
             [
                 'choices'           => FormFieldHelper::getRegionChoices(),
                 'choice_value'      => fn ($state) => $state,
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => ['class' => 'form-control'],
                 'multiple'          => false,
                 'expanded'          => false,

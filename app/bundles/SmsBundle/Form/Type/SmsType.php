@@ -46,7 +46,7 @@ final class SmsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.sms.form.internal.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -56,7 +56,7 @@ final class SmsType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.sms.form.internal.description',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
@@ -67,7 +67,7 @@ final class SmsType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.sms.form.message',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'                => 'form-control',
                     'data-token-activator' => '{',
@@ -126,7 +126,7 @@ final class SmsType extends AbstractType
                 LeadListType::class,
                 [
                     'label'      => 'mautic.email.form.list',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'        => 'form-control',
                     ],
@@ -157,7 +157,7 @@ final class SmsType extends AbstractType
             LocaleType::class,
             [
                 'label'      => 'mautic.core.language',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -178,7 +178,7 @@ final class SmsType extends AbstractType
             SmsListType::class, // A new form type to be created
             [
                 'label'      => 'mautic.core.form.translation_parent',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.form.translation_parent.help',

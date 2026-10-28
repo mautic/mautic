@@ -85,12 +85,10 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% set feedbackClass = hasErrors is not empty ? ' has-error' : '' %}
 <div class="row">
     <div class="form-group col-xs-12{{ feedbackClass }}">
-        <div class="checkbox">
-            <label>
-                {{ form_widget(form) }}
-                {{ form.vars.label|trans }}
-            </label>
-        </div>
+        {% include '@MauticCore/Components/checkbox.html.twig' with {
+            required: form.vars.required,
+            items: [{ id: form.vars.id, name: form.vars.full_name, value: form.vars.value, checked: form.vars.checked, disabled: form.vars.disabled, label: form.vars.label is null ? form.vars.name|humanize : form.vars.label, label_html: form.vars.label_html, translation_domain: form.vars.translation_domain, label_translation_parameters: form.vars.label_translation_parameters, attributes: form.vars.attr }]
+        } only %}
         {{ form_errors(form) }}
     </div>
 </div>
@@ -131,14 +129,12 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
         {{ form_label(form, label) }}
         <div class="choice-wrapper">
             {% if expanded and multiple %}
+            {% set checkboxItems = [] %}
             {% for child in form.children %}
-                <div class="checkbox">
-                    <label>
-                        {{ form_widget(child, {'attr': attr}) }}
-                        {{ child.vars.label|trans }}
-                    </label>
-                </div>
+                {% do child.setRendered() %}
+                {% set checkboxItems = checkboxItems|merge([{ id: child.vars.id, name: child.vars.full_name, value: child.vars.value, checked: child.vars.checked, disabled: child.vars.disabled, label: child.vars.label, label_html: child.vars.label_html, translation_domain: child.vars.translation_domain, label_translation_parameters: child.vars.label_translation_parameters, attributes: attr|merge(child.vars.attr) }]) %}
             {% endfor %}
+            {% include '@MauticCore/Components/checkbox.html.twig' with { items: checkboxItems } only %}
             {% else %}
             {{ form_widget(form) }}
             {% endif %}
