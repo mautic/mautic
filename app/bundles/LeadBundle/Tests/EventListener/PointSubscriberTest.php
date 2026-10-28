@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\EventListener\PointSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -189,4 +190,15 @@ final class PointSubscriberTest extends TestCase
         $this->leadModel->expects($this->once())->method('removeFromLists');
         $this->subscriber->onLeadSegmentsChange($this->triggerExecutedEvent);
     }
+<<<<<<< HEAD
+=======
+
+    public function testThatTheObserverForTriggerOnLeadSegmentsChangeEventIsFired(): void
+    {
+        $this->assertContains(
+            [PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE, 'onLeadSegmentsChange', 0],
+            ReflectionHelper::getAttributeListeners(PointSubscriber::class)
+        );
+    }
+>>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
 }

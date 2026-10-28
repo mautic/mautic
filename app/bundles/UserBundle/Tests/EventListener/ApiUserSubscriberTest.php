@@ -7,6 +7,7 @@ namespace Mautic\UserBundle\Tests\EventListener;
 use FOS\OAuthServerBundle\Model\AccessToken;
 use FOS\OAuthServerBundle\Security\Authenticator\Passport\Badge\AccessTokenBadge;
 use FOS\OAuthServerBundle\Security\Authenticator\Token\OAuthToken;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\EventListener\ApiUserSubscriber;
 use Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions;
@@ -24,6 +25,20 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 #[AllowMockObjectsWithoutExpectations]
 final class ApiUserSubscriberTest extends TestCase
 {
+<<<<<<< HEAD
+=======
+    public function testSubscribedEvents(): void
+    {
+        $expected = [
+            [CheckPassportEvent::class, 'onCheckPassport', 2048],
+            [AuthenticationTokenCreatedEvent::class, 'onTokenCreated', 0],
+        ];
+        sort($expected);
+
+        $this->assertSame($expected, ReflectionHelper::getAttributeListeners(ApiUserSubscriber::class));
+    }
+
+>>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testIfAuthenticationHasNoUserInvolved(): void
     {
         $passport = $this->createMock(Passport::class);

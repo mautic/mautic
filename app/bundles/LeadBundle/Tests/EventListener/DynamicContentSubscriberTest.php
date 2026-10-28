@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -31,6 +32,19 @@ final class DynamicContentSubscriberTest extends TestCase
         parent::setUp();
     }
 
+<<<<<<< HEAD
+=======
+    public function testGetSubscribedEvents(): void
+    {
+        $expected = [
+            [ContactFiltersEvaluateEvent::class, 'onContactFilterEvaluate', 0],
+        ];
+        sort($expected);
+
+        $this->assertSame($expected, ReflectionHelper::getAttributeListeners(DynamicContentSubscriber::class));
+    }
+
+>>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testOnContactFilterEvaluateUnknownOperator(): void
     {
         $contactId = 1;

@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
@@ -114,4 +115,15 @@ final class FormSubscriberTest extends TestCase
         $this->leadModel->expects($this->once())->method('removeFromLists');
         $this->subscriber->onLeadSegmentsChange($this->submissionEvent);
     }
+<<<<<<< HEAD
+=======
+
+    public function testThatTheObserverForTriggerOnLeadSegmentsChangeEventIsFired(): void
+    {
+        $this->assertContains(
+            [LeadEvents::LEAD_ON_SEGMENTS_CHANGE, 'onLeadSegmentsChange', 0],
+            ReflectionHelper::getAttributeListeners(FormSubscriber::class)
+        );
+    }
+>>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
 }

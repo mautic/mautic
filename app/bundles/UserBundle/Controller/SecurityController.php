@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,16 +25,17 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class SecurityController extends CommonController
+final class SecurityController extends CommonController implements EventSubscriberInterface
 {
     private AuthorizationCheckerInterface $authorizationChecker;
+
     #[Required]
     public function autowireSecurityController(
         AuthorizationCheckerInterface $authorizationChecker,
     ): void {
         $this->authorizationChecker = $authorizationChecker;
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::REQUEST)]
+
     public function onRequest(RequestEvent $event): void
     {
         $controller = $event->getRequest()->attributes->get('_controller');
@@ -51,6 +53,7 @@ final class SecurityController extends CommonController
             $event->setResponse(new RedirectResponse($redirectUrl));
         }
     }
+
     /**
      * Generates login form and processes login.
      */
@@ -99,6 +102,7 @@ final class SecurityController extends CommonController
             ],
         ]);
     }
+
     /**
      * The plugin should be handling this in it's listener.
      */
@@ -110,6 +114,7 @@ final class SecurityController extends CommonController
     {
         return new RedirectResponse($this->generateUrl('login'));
     }
+
     /**
      * The plugin should be handling this in it's listener.
      */
@@ -123,6 +128,7 @@ final class SecurityController extends CommonController
 
         return new RedirectResponse($this->generateUrl('login'));
     }
+
     #[Route(
         path: '/saml/login_retry',
         name: 'mautic_saml_login_retry',
@@ -148,5 +154,15 @@ final class SecurityController extends CommonController
                 'sessionExpired' => true,
             ],
         ]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::REQUEST => 'onRequest',
+        ];
     }
 }

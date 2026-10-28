@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
@@ -245,7 +246,7 @@ final class LeadSubscriberTest extends TestCase
         );
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber($subscriber);
+        ReflectionHelper::registerAttributeListeners($dispatcher, $subscriber);
 
         $dispatcher->dispatch($leadEvent);
 

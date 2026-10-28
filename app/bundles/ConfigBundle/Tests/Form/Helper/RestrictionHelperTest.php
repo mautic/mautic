@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EventListener\ProcessBounceSubscriber;
 use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
@@ -252,8 +253,8 @@ final class RestrictionHelperTest extends TypeTestCase
 
         // Register monitored email listeners
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new ProcessBounceSubscriber($this->createStub(Bounce::class)));
-        $dispatcher->addSubscriber(new ProcessUnsubscribeSubscriber($this->createStub(Unsubscribe::class), $this->createStub(FeedbackLoop::class), $this->createStub(CoreParametersHelper::class)));
+        ReflectionHelper::registerAttributeListeners($dispatcher, new ProcessBounceSubscriber($this->createStub(Bounce::class)));
+        ReflectionHelper::registerAttributeListeners($dispatcher, new ProcessUnsubscribeSubscriber($this->createStub(Unsubscribe::class), $this->createStub(FeedbackLoop::class), $this->createStub(CoreParametersHelper::class)));
 
         // This is what we're really testing here
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);

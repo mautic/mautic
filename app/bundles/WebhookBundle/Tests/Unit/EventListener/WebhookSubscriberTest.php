@@ -6,6 +6,7 @@ namespace Mautic\WebhookBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\EventListener\WebhookSubscriber;
@@ -27,6 +28,21 @@ final class WebhookSubscriberTest extends TestCase
         $this->webhookKillNotificator = $this->createMock(WebhookKillNotificator::class);
     }
 
+<<<<<<< HEAD
+=======
+    public function testGetSubscribedEvents(): void
+    {
+        $expected = [
+            [WebhookPostSaveEvent::class, 'onWebhookSave', 0],
+            [WebhookPostDeleteEvent::class, 'onWebhookDelete', 0],
+            [WebhookKillEvent::class, 'onWebhookKill', 0],
+        ];
+        sort($expected);
+
+        $this->assertSame($expected, ReflectionHelper::getAttributeListeners(WebhookSubscriber::class));
+    }
+
+>>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testOnWebhookKill(): void
     {
         $webhookMock = new Webhook();

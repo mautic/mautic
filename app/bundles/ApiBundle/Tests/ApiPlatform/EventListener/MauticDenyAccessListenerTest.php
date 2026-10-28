@@ -12,6 +12,7 @@ use Mautic\ApiBundle\ApiPlatform\EventListener\MauticDenyAccessListener;
 use Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -44,7 +45,7 @@ final class MauticDenyAccessListenerTest extends TestCase
         $this->configureRequest($this->createFormEntityMock());
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new class() {
+        ReflectionHelper::registerAttributeListeners($dispatcher, new class() {
             #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
                 event: ApiPlatformPermissionContextEvent::class,
                 priority: 0

@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\EventListener\ConfigSubscriber;
 use Mautic\LeadBundle\Form\Type\ConfigCompanyType;
 use Mautic\LeadBundle\Form\Type\ConfigType;
@@ -44,6 +45,20 @@ final class ConfigSubscriberTest extends TestCase
             });
     }
 
+<<<<<<< HEAD
+=======
+    public function testSubscribedEvents(): void
+    {
+        $listeners = ReflectionHelper::getAttributeListeners(ConfigSubscriber::class);
+
+        $events = array_column($listeners, 0);
+        $this->assertContains(ConfigBuilderEvent::class, $events);
+
+        $handlers = array_filter($listeners, static fn (array $listener): bool => ConfigBuilderEvent::class === $listener[0]);
+        $this->assertCount(2, $handlers);
+    }
+
+>>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testLeadAndSegmentFormsUseExpectedThemes(): void
     {
         $invocations = [];

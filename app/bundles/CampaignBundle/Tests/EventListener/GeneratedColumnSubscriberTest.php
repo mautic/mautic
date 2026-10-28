@@ -9,10 +9,24 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnInterface;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 
 final class GeneratedColumnSubscriberTest extends TestCase
 {
+<<<<<<< HEAD
+=======
+    public function testGetSubscribedEvents(): void
+    {
+        $expected = [
+            [GeneratedColumnsEvent::class, 'onGeneratedColumnsBuild', 0],
+        ];
+        sort($expected);
+
+        $this->assertSame($expected, ReflectionHelper::getAttributeListeners(GeneratedColumnSubscriber::class));
+    }
+
+>>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testOnGeneratedColumnsBuildWithMySql(): void
     {
         $generatedColumns = $this->buildGeneratedColumns(true);

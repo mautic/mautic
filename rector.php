@@ -52,8 +52,15 @@ return RectorConfig::configure()
     ->withSkip([
         '*/Fixture/*',
 
-        // handle in standalone PR
-        \Rector\Symfony\CodeQuality\Rector\Class_\EventSubscriberToAttributeRector::class,
+        // form event subscribers register on the Form dispatcher via addEventSubscriber(), which needs EventSubscriberInterface;
+        // SecurityController listens on kernel.request but a controller cannot expose a public non-action method
+        Rector\Symfony\CodeQuality\Rector\Class_\EventSubscriberToAttributeRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Form/EventListener',
+            __DIR__.'/app/bundles/UserBundle/Controller/SecurityController.php',
+        ],
+
+        // widening the public return types to \DateTime|bool|null is out of scope for this bump
+        __DIR__.'/app/bundles/CoreBundle/Helper/DateTimeHelper.php',
 
         // prefer implicit compare on object|null
         Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector::class,

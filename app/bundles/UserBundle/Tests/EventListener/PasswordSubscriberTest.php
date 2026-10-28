@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\UserBundle\Event\AuthenticationEvent;
 use Mautic\UserBundle\EventListener\PasswordSubscriber;
 use Mautic\UserBundle\Exception\WeakPasswordException;
@@ -36,6 +37,16 @@ final class PasswordSubscriberTest extends TestCase
             ->willReturn($this->createStub(PluginToken::class));
     }
 
+<<<<<<< HEAD
+=======
+    public function testThatItIsSubscribedToEvents(): void
+    {
+        $listeners = ReflectionHelper::getAttributeListeners(PasswordSubscriber::class);
+        $this->assertCount(1, $listeners);
+        $this->assertContains(CheckPassportEvent::class, array_column($listeners, 0));
+    }
+
+>>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testThatItThrowsExceptionIfPasswordIsWeak(): void
     {
         $this->expectException(WeakPasswordException::class);
