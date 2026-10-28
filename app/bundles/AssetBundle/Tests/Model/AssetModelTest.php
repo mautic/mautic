@@ -28,7 +28,6 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactory;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
-use Mautic\PageBundle\Helper\AggregateAnalyticsHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -84,8 +83,10 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParametersHelper->method('get')
-            ->with('max_size')
-            ->willReturn('2MB');
+            ->willReturnMap([
+                ['max_size', null, '2MB'],
+                ['aggregate_analytics', true, true],
+            ]);
         $cacheProvider               = new CacheProvider($this->coreParametersHelper, $this->createStub(ContainerInterface::class));
         $this->leadModel             = $this->createStub(LeadModel::class);
         $this->categoryModel         = $this->createStub(CategoryModel::class);
@@ -125,7 +126,6 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             $this->assetRepository,
             $this->createStub(DownloadRepository::class),
             $this->createStub(CategoryRepository::class),
-            new AggregateAnalyticsHelper($this->createConfiguredStub(CoreParametersHelper::class, ['get' => true])),
         );
     }
 
@@ -328,7 +328,6 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
                 $this->createStub(AssetRepository::class),
                 $this->createStub(DownloadRepository::class),
                 $this->createStub(CategoryRepository::class),
-                new AggregateAnalyticsHelper($this->createStub(CoreParametersHelper::class)),
             ])
             ->onlyMethods(['getEntity'])
             ->getMock();

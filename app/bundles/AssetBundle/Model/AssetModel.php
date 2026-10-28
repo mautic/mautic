@@ -75,7 +75,6 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         private readonly AssetRepository $assetRepository,
         private readonly DownloadRepository $downloadRepository,
         private readonly CategoryRepository $categoryRepository,
-        private readonly AggregateAnalyticsHelper $aggregateAnalyticsHelper,
     ) {
         $this->maxAssetSize           = $coreParametersHelper->get('max_size');
 
@@ -299,7 +298,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      */
     public function upDownloadCount($asset, $increaseBy = 1, $unique = false): void
     {
-        if (!$this->aggregateAnalyticsHelper->isEnabled()) {
+        if (!(new AggregateAnalyticsHelper($this->coreParametersHelper))->isEnabled()) {
             return;
         }
 
