@@ -128,7 +128,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks) and downloads may be tracked
         if (!$this->ipLookupHelper->isRequestTrackable() || !$this->isDownloadTracked($asset)) {
             // Still counted, but with nothing that links it to the visitor. Without an identifier it can't count as unique.
-            if (empty($systemEntry)) {
+            // Bots, excluded IP addresses and prefetches aren't counted, privacy signals are.
+            if (empty($systemEntry) && $this->ipLookupHelper->isRequestCountable()) {
                 $this->upDownloadCount($asset, 1, false);
             }
 

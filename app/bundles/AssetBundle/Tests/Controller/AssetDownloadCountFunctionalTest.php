@@ -22,6 +22,7 @@ final class AssetDownloadCountFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['aggregate_analytics'] = !str_contains($this->name(), 'AggregateAnalyticsOff');
+        $this->configParams['do_not_track_ips']    = ['203.0.113.9'];
 
         parent::setUp();
     }
@@ -63,6 +64,33 @@ final class AssetDownloadCountFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(0, $this->em->getRepository(Download::class)->findBy(['asset' => $asset->getId()]));
         $this->assertNotInstanceOf(Cookie::class, $this->client->getCookieJar()->get('mautic_device_id'));
         $this->assertNotInstanceOf(Cookie::class, $this->client->getCookieJar()->get('mtc_id'));
+    }
+
+    /**
+     * @return iterable<string, array{array<string, string>}>
+     */
+    public static function notCountedRequestProvider(): iterable
+    {
+        // Own address, so the bot check isn't skipped for an address another test already looked up
+        yield 'bot' => [['REMOTE_ADDR' => '203.0.113.20', 'HTTP_USER_AGENT' => 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)']];
+        yield 'prefetch' => [['HTTP_SEC_PURPOSE' => 'prefetch']];
+        yield 'excluded IP address' => [['REMOTE_ADDR' => '203.0.113.9', 'HTTP_DNT' => '1']];
+    }
+
+    /**
+     * Privacy signals don't stop a count, but traffic Mautic never counted still isn't counted.
+     *
+     * @param array<string, string> $server
+     */
+    #[DataProvider('notCountedRequestProvider')]
+    public function testDownloadFromBotsPrefetchesAndExcludedAddressesIsNotCounted(array $server): void
+    {
+        $asset = $this->createAsset();
+
+        $this->download($asset, $server);
+
+        $this->assertCounts($asset, 0, 0);
+        $this->assertCount(0, $this->em->getRepository(Download::class)->findBy(['asset' => $asset->getId()]));
     }
 
     public function testDownloadsAreNotCountedWhileAggregateAnalyticsOff(): void
