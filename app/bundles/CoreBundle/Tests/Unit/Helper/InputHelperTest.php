@@ -73,8 +73,8 @@ final class InputHelperTest extends TestCase
 
         $cleaned = InputHelper::html($html);
 
-        $this->assertStringContainsString($url, $cleaned);
-        $this->assertStringNotContainsString(rawurldecode($url), $cleaned);
+        $this->assertStringContainsString($url, (string) $cleaned);
+        $this->assertStringNotContainsString(rawurldecode($url), (string) $cleaned);
     }
 
     /**
