@@ -295,6 +295,7 @@ final class EmailType extends AbstractType
                 'label'      => 'mautic.email.form.body',
                 'label_attr' => ['class' => 'control-label'],
                 'required'   => false,
+                'error_bubbling' => true,
                 'attr'       => [
                     'tooltip'              => 'mautic.email.form.body.help',
                     'class'                => 'form-control editor-builder-tokens builder-html editor-email',
