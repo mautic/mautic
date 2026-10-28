@@ -3,7 +3,8 @@ const box = document.getElementById('login-background');
 const cv = box.querySelector('canvas');
 const gl = cv.getContext('webgl2', { antialias: false, depth: false });
 if (!gl) return;
-const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mq = matchMedia('(prefers-reduced-motion: reduce)');
+let RM = mq.matches;
 
 const VS = `#version 300 es
 void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(p*2.-1.,0,1);}`;
@@ -11,6 +12,7 @@ void main(){vec2 p=vec2((gl_VertexID<<1)&2,gl_VertexID&2);gl_Position=vec4(p*2.-
 const CELL = `#version 300 es
 precision highp float;
 uniform vec2 R,O,D,M;uniform float T,P,I,K,Q,Y;uniform vec3 C[10];uniform sampler2D S;
+float sq(float x){return x*x;}
 out vec4 o;
 float h(float n){return fract(sin(n)*43758.5453);}
 float vn(vec3 p){
@@ -29,13 +31,13 @@ void main(){
   for(int i=0;i<10;i++){
     vec3 k=C[i];if(k.x<0.)continue;
     float t=max(k.z,0.),r=distance(uv,(k.xy-R*.5-c*.5)/R.y);
-    float v=exp(-pow((r-.3*t)/.1,2.))*exp(-t)*exp(-10.*r);
+    float v=exp(-sq((r-.3*t)/.1))*exp(-t)*exp(-10.*r);
     if(v>.02)f=max(f,v);
   }
   if(I<1.){
     float fr=(1.-pow(1.-I,2.4))*(length(vec2(R.x/R.y,1))*.5+.2),r=distance(uv,vec2(-c*.5/R.y));
     f=mix(-1.,f,1.-smoothstep(fr-.06,fr+.04,r));
-    float v=exp(-pow((r-fr)/.07,2.))*(1.-I)*1.4;
+    float v=exp(-sq((r-fr)/.07))*(1.-I)*1.4;
     if(v>.02)f=max(f,v);
   }
   f=max(f,0.);
@@ -132,12 +134,12 @@ const resize = () => {
 
 let lost = false, queued = false, settle = 2;
 const schedule = () => { if (!queued && !lost) { queued = true; requestAnimationFrame(frame); } };
-cv.addEventListener('webglcontextlost', e => { e.preventDefault(); lost = true; });
+cv.addEventListener('webglcontextlost', () => { lost = true; });
 
 const frame = now => {
   queued = false;
   if (lost) return;
-  if (!RM || settle-- > 0) schedule();
+  if (!RM || --settle > 0) schedule();
   const dt = last ? Math.min(Math.max((now - last) / 1000, 0), 0.05) : 0;
   last = now;
   clk += dt;
@@ -189,6 +191,8 @@ addEventListener('pointerdown', e => {
   ci = (ci + 1) % 10;
 }, { passive: true });
 document.documentElement.addEventListener('pointerleave', () => { inside = false; });
+
+mq.addEventListener('change', e => { RM = e.matches; if (RM) { it = 1; inside = false; settle = 2; } schedule(); });
 
 resize();
 new ResizeObserver(resize).observe(box);
