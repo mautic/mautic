@@ -398,6 +398,7 @@ final class ContactManagementCest
         $I->fillField(ContactPage::$addToTheFollowingSegmentInput, 'Segment Test 3');
         $I->pressKey(ContactPage::$addToTheFollowingSegmentInput, WebDriverKeys::ENTER);
         $I->click(ContactPage::$changeSegmentModalSaveButton);
+        $I->waitForElementNotVisible('#MauticSharedModal', AcceptanceTester::TIMEOUT);
 
         // Clear all selection
         $I->click(ContactPage::$clearAllContactsSelection);
@@ -440,6 +441,7 @@ final class ContactManagementCest
         $I->fillField(ContactPage::$removeFromTheFollowingSegmentInput, 'Segment Test 3');
         $I->pressKey(ContactPage::$removeFromTheFollowingSegmentInput, WebDriverKeys::ENTER);
         $I->click(ContactPage::$changeSegmentModalSaveButton);
+        $I->waitForElementNotVisible('#MauticSharedModal', AcceptanceTester::TIMEOUT);
 
         // Clear all selection
         $I->click(ContactPage::$clearAllContactsSelection);
