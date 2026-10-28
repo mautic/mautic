@@ -38,7 +38,7 @@ $link-color:            var(--link-primary);
 //** Link hover color set via `darken()` function.
 $link-hover-color:      var(--link-primary-hover);
 //** Link hover decoration.
-$link-hover-decoration: none;
+$link-hover-decoration: underline;
 
 
 //== Typography
