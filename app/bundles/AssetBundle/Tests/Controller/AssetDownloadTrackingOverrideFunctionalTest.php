@@ -7,6 +7,7 @@ namespace Mautic\AssetBundle\Tests\Controller;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class AssetDownloadTrackingOverrideFunctionalTest extends MauticMysqlTestCase
 {
+    private const VISITOR_IP = '203.0.113.31';
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -35,10 +38,11 @@ final class AssetDownloadTrackingOverrideFunctionalTest extends MauticMysqlTestC
         $asset   = $this->createAsset(false);
         $contact = $this->createContact();
 
-        $this->download($asset, $contact, []);
+        $this->download($asset, $contact, ['REMOTE_ADDR' => self::VISITOR_IP]);
 
         $this->assertSame([], $this->getDownloadContactIds($asset));
         $this->assertSame(1, $this->getDownloadCount($asset), 'the download is counted either way');
+        $this->assertNotInstanceOf(IpAddress::class, $this->em->getRepository(IpAddress::class)->findOneBy(['ipAddress' => self::VISITOR_IP]), 'the visitor\'s IP address is not stored');
     }
 
     public function testAssetToggledOnIsLinkedWhileGlobalOff(): void
