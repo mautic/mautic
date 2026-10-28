@@ -91,7 +91,7 @@ final class AssetDownloadTrackingSettingFunctionalTest extends MauticMysqlTestCa
     {
         $this->em->clear();
         $asset = $this->em->find(Asset::class, $asset->getId());
-        $this->assertInstanceOf(\Mautic\AssetBundle\Entity\Asset::class, $asset);
+        $this->assertInstanceOf(Asset::class, $asset);
 
         $this->assertSame($total, (int) $asset->getDownloadCount(), 'download count');
         $this->assertSame($unique, (int) $asset->getUniqueDownloadCount(), 'unique download count');
