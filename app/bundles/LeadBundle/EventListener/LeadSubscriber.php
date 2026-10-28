@@ -35,21 +35,17 @@ use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber
 {
     use ChannelTrait;
-
     /**
      * @var string[]
      */
     private array $preventLoop = [];
-
     private ?int $lastContactId = null;
-
     /**
      * @param ModelFactory<object> $modelFactory
      * @param bool                 $isTest       whether or not we're running in a test environment
@@ -78,27 +74,13 @@ final class LeadSubscriber implements EventSubscriberInterface
     ) {
         $this->setModelFactory($modelFactory);
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadPostSaveEvent::class       => ['onLeadPostSave', 0],
-            LeadPreDeleteEvent::class      => ['onLeadPreDelete', 0],
-            LeadPostDeleteEvent::class     => ['onLeadDelete', 0],
-            LeadPreMergeEvent::class       => ['preLeadMerge', 0],
-            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
-            FieldPostSaveEvent::class      => ['onFieldPostSave', 0],
-            FieldPostDeleteEvent::class    => ['onFieldDelete', 0],
-            NotePostSaveEvent::class       => ['onNotePostSave', 0],
-            NotePostDeleteEvent::class     => ['onNoteDelete', 0],
-            Events\LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadChangeCompanyEvent::class  => ['onLeadCompanyChange', 0],
-        ];
-    }
-
     /**
      * Add a lead entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadPostSaveEvent::class,
+        priority: 0
+    )]
     public function onLeadPostSave(LeadEvent $event): void
     {
         $lead = $event->getLead();
@@ -172,10 +154,13 @@ final class LeadSubscriber implements EventSubscriberInterface
 
         $this->leadEventDispatcher->dispatchEvents($event, $details);
     }
-
     /**
      * Add a lead delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadPostDeleteEvent::class,
+        priority: 0
+    )]
     public function onLeadDelete(LeadEvent $event): void
     {
         $lead = $event->getLead();
@@ -189,10 +174,13 @@ final class LeadSubscriber implements EventSubscriberInterface
         ];
         $this->auditLogModel->writeToLog($log);
     }
-
     /**
      * Find lead linked segment ids to update post delete.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadPreDeleteEvent::class,
+        priority: 0
+    )]
     public function onLeadPreDelete(LeadEvent $event): void
     {
         if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
@@ -205,10 +193,13 @@ final class LeadSubscriber implements EventSubscriberInterface
             $this->segmentCountCacheHelper->decrementSegmentContactCount($segmentId);
         }
     }
-
     /**
      * Add a field entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FieldPostSaveEvent::class,
+        priority: 0
+    )]
     public function onFieldPostSave(Events\LeadFieldEvent $event): void
     {
         $field = $event->getField();
@@ -224,10 +215,13 @@ final class LeadSubscriber implements EventSubscriberInterface
             $this->auditLogModel->writeToLog($log);
         }
     }
-
     /**
      * Add a field delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FieldPostDeleteEvent::class,
+        priority: 0
+    )]
     public function onFieldDelete(Events\LeadFieldEvent $event): void
     {
         $field = $event->getField();
@@ -241,10 +235,13 @@ final class LeadSubscriber implements EventSubscriberInterface
         ];
         $this->auditLogModel->writeToLog($log);
     }
-
     /**
      * Add a note entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: NotePostSaveEvent::class,
+        priority: 0
+    )]
     public function onNotePostSave(Events\LeadNoteEvent $event): void
     {
         $note = $event->getNote();
@@ -260,10 +257,13 @@ final class LeadSubscriber implements EventSubscriberInterface
             $this->auditLogModel->writeToLog($log);
         }
     }
-
     /**
      * Add a note delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: NotePostDeleteEvent::class,
+        priority: 0
+    )]
     public function onNoteDelete(Events\LeadNoteEvent $event): void
     {
         $note = $event->getNote();
@@ -277,7 +277,10 @@ final class LeadSubscriber implements EventSubscriberInterface
         ];
         $this->auditLogModel->writeToLog($log);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadPreMergeEvent::class,
+        priority: 0
+    )]
     public function preLeadMerge(Events\LeadMergeEvent $event): void
     {
         $this->leadEventLogRepository->updateLead(
@@ -285,7 +288,10 @@ final class LeadSubscriber implements EventSubscriberInterface
             $event->getVictor()->getId()
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadPostMergeEvent::class,
+        priority: 0
+    )]
     public function onLeadMerge(Events\LeadMergeEvent $event): void
     {
         $this->pointsChangeLogRepository->updateLead(
@@ -318,10 +324,13 @@ final class LeadSubscriber implements EventSubscriberInterface
         ];
         $this->auditLogModel->writeToLog($log);
     }
-
     /**
      * Compile events for the lead timeline.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: Events\LeadTimelineEvent::class,
+        priority: 0
+    )]
     public function onTimelineGenerate(Events\LeadTimelineEvent $event): void
     {
         $eventTypes = [
@@ -387,7 +396,6 @@ final class LeadSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     private function addTimelineIpAddressEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $lead = $event->getLead();
@@ -424,7 +432,6 @@ final class LeadSubscriber implements EventSubscriberInterface
         }
         // Purposively not including this in engagements graph as it's info only
     }
-
     private function addTimelineDateCreatedEntry(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         // Do nothing if the lead is not set
@@ -452,10 +459,13 @@ final class LeadSubscriber implements EventSubscriberInterface
         }
         // Purposively not including this in engagements graph as it's info only
     }
-
     /**
      * @throws Exception
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadChangeCompanyEvent::class,
+        priority: 0
+    )]
     public function onLeadCompanyChange(LeadChangeCompanyEvent $event): void
     {
         $leadId                 = $event->getLead()->getId();
@@ -465,7 +475,6 @@ final class LeadSubscriber implements EventSubscriberInterface
             $this->companyLeadRepository->removeContactSecondaryCompanies($leadId);
         }
     }
-
     private function addTimelineDateIdentifiedEntry(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         // Do nothing if the lead is not set
@@ -495,7 +504,6 @@ final class LeadSubscriber implements EventSubscriberInterface
             // Purposively not including this in engagements graph as it's info only
         }
     }
-
     private function addTimelineUtmEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $utmTags = $this->utmTagRepository->getUtmTagsByLead($event->getLead(), $event->getQueryOptions());
@@ -550,7 +558,6 @@ final class LeadSubscriber implements EventSubscriberInterface
         }
         // Purposively not including this in engagements graph as the engagement is counted by the page hit
     }
-
     private function addTimelineDoNotContactEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $rows = $this->doNotContactRepository->getTimelineStats($event->getLeadId(), $event->getQueryOptions());
@@ -613,7 +620,6 @@ final class LeadSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     private function addTimelineImportedEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $imports = $this->leadEventLogRepository->getEvents(
@@ -667,7 +673,6 @@ final class LeadSubscriber implements EventSubscriberInterface
         }
         // Purposively not including this
     }
-
     private function addTimelineApiCreatedEntries(Events\LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $apiSingleEvents = $this->leadEventLogRepository->getEvents(

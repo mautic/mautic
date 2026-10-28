@@ -9,10 +9,9 @@ use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class CampaignSendSubscriber implements EventSubscriberInterface
+final readonly class CampaignSendSubscriber
 {
     public function __construct(
         private SmsModel $smsModel,
@@ -20,15 +19,10 @@ final readonly class CampaignSendSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION => ['onCampaignTriggerBatchAction', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CampaignBuilderEvent::class,
+        priority: 0
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
@@ -47,7 +41,10 @@ final readonly class CampaignSendSubscriber implements EventSubscriberInterface
             );
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION,
+        priority: 0
+    )]
     public function onCampaignTriggerBatchAction(PendingEvent $event): void
     {
         $smsId = (int) $event->getEvent()->getProperties()['sms'];
@@ -68,14 +65,12 @@ final readonly class CampaignSendSubscriber implements EventSubscriberInterface
         $event->setChannel('sms', $sms->getId());
         $this->sendSmsInBatches($sms, $event);
     }
-
     private function sendSmsInBatches(Sms $sms, PendingEvent $event): void
     {
         $contacts = $event->getContacts()->toArray();
         $result   = $this->smsModel->sendSMS($sms, $contacts, ['channel' => ['campaign.event', $event->getEvent()->getId()]]);
         $this->processResponse($event, $result);
     }
-
     /**
      * @param array<int, mixed> $result
      */

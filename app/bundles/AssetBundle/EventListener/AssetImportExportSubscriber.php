@@ -16,12 +16,10 @@ use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class AssetImportExportSubscriber implements EventSubscriberInterface
+final readonly class AssetImportExportSubscriber
 {
     use ImportExportTrait;
-
     public function __construct(
         private AssetModel $assetModel,
         private EntityManagerInterface $entityManager,
@@ -31,17 +29,10 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onAssetExport', 0],
-            EntityImportEvent::class        => ['onAssetImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityExportEvent::class,
+        priority: 0
+    )]
     public function onAssetExport(EntityExportEvent $event): void
     {
         if (Asset::ENTITY_NAME !== $event->getEntityName()) {
@@ -85,7 +76,10 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
         ];
         $this->auditLogModel->writeToLog($log);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportEvent::class,
+        priority: 0
+    )]
     public function onAssetImport(EntityImportEvent $event): void
     {
         if (Asset::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -128,7 +122,10 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
             }
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportUndoEvent::class,
+        priority: 0
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Asset::ENTITY_NAME !== $event->getEntityName()) {
@@ -151,7 +148,10 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
 
         $this->entityManager->flush();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+        priority: 0
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(
@@ -162,7 +162,6 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
             $this->entityManager
         );
     }
-
     /**
      * @param array<string, mixed> $details
      */

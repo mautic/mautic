@@ -7,11 +7,10 @@ use FOS\OAuthServerBundle\Event\OAuthEvent;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Entity\UserRepository;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class PreAuthorizationEventListener implements EventSubscriberInterface
+final readonly class PreAuthorizationEventListener
 {
     public function __construct(
         private EntityManagerInterface $em,
@@ -20,21 +19,10 @@ final readonly class PreAuthorizationEventListener implements EventSubscriberInt
         private TranslatorInterface $translator,
     ) {
     }
-
-    /**
-     * @return array<string, string>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            OAuthEvent::PRE_AUTHORIZATION_PROCESS  => 'onPreAuthorizationProcess',
-            OAuthEvent::POST_AUTHORIZATION_PROCESS => 'onPostAuthorizationProcess',
-        ];
-    }
-
     /**
      * @throws AccessDeniedException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: OAuthEvent::PRE_AUTHORIZATION_PROCESS)]
     public function onPreAuthorizationProcess(OAuthEvent $event): void
     {
         if ($user = $this->getUser($event)) {
@@ -51,7 +39,7 @@ final readonly class PreAuthorizationEventListener implements EventSubscriberInt
             }
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: OAuthEvent::POST_AUTHORIZATION_PROCESS)]
     public function onPostAuthorizationProcess(OAuthEvent $event): void
     {
         $client = $event->getClient();
@@ -64,7 +52,6 @@ final readonly class PreAuthorizationEventListener implements EventSubscriberInt
             }
         }
     }
-
     /**
      * @return mixed
      */

@@ -7,22 +7,17 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class AssetExportListEventSubscriber implements EventSubscriberInterface
+final readonly class AssetExportListEventSubscriber
 {
     public function __construct(
         private PathsHelper $pathsHelper,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            AssetExportListEvent::class        => ['onExportList', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: AssetExportListEvent::class,
+        priority: 0
+    )]
     public function onExportList(AssetExportListEvent $event): void
     {
         $data = $event->getEntityData();

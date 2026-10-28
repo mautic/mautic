@@ -7,10 +7,9 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\FocusEventTypes;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-final readonly class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber
 {
     public function __construct(
         private Translator $translator,
@@ -18,17 +17,13 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         private StatRepository $statRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadTimelineEvent::class      => ['onTimelineGenerate', 0],
-        ];
-    }
-
     /**
      * Compile events for the lead timeline.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadTimelineEvent::class,
+        priority: 0
+    )]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $eventViewTypeName = $this->translator->trans('mautic.focus.event.view');

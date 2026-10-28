@@ -10,10 +10,9 @@ use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupRepository;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class SegmentFilterSubscriber implements EventSubscriberInterface
+final readonly class SegmentFilterSubscriber
 {
     public function __construct(
         private GroupRepository $groupRepository,
@@ -21,19 +20,10 @@ final readonly class SegmentFilterSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadListFiltersChoicesEvent::class   => [
-                ['onGenerateSegmentFiltersAddPointGroups', -10],
-            ],
-            SegmentDictionaryGenerationEvent::class   => [
-                ['onSegmentDictionaryGenerate', 0],
-            ],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadListFiltersChoicesEvent::class,
+        priority: -10
+    )]
     public function onGenerateSegmentFiltersAddPointGroups(LeadListFiltersChoicesEvent $event): void
     {
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
@@ -58,7 +48,10 @@ final readonly class SegmentFilterSubscriber implements EventSubscriberInterface
             $event->addChoice('groups', $alias, $fieldOptions);
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: SegmentDictionaryGenerationEvent::class,
+        priority: 0
+    )]
     public function onSegmentDictionaryGenerate(SegmentDictionaryGenerationEvent $event): void
     {
         $groups = $this->groupRepository->getEntities();

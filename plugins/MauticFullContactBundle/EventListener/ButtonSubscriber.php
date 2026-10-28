@@ -8,11 +8,10 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ButtonSubscriber implements EventSubscriberInterface
+final readonly class ButtonSubscriber
 {
     public function __construct(
         private IntegrationHelper $helper,
@@ -20,14 +19,10 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
         private RouterInterface $router,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomButtonEvent::class => ['injectViewButtons', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CustomButtonEvent::class,
+        priority: 0
+    )]
     public function injectViewButtons(CustomButtonEvent $event): void
     {
         // get api_key from plugin settings

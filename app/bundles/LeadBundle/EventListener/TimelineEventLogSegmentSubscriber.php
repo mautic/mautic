@@ -12,12 +12,10 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\ListBatchChangeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
+final class TimelineEventLogSegmentSubscriber
 {
     use TimelineEventLogTrait;
-
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
         private readonly UserHelper $userHelper,
@@ -27,16 +25,7 @@ final class TimelineEventLogSegmentSubscriber implements EventSubscriberInterfac
         $this->eventLogRepository = $eventLogRepository;
         $this->translator         = $translator;
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ListChangeEvent::class       => 'onChange',
-            ListBatchChangeEvent::class => 'onBatchChange',
-            LeadTimelineEvent::class   => 'onTimelineGenerate',
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListChangeEvent::class)]
     public function onChange(ListChangeEvent $event): void
     {
         if (!$contact = $event->getLead()) {
@@ -50,7 +39,7 @@ final class TimelineEventLogSegmentSubscriber implements EventSubscriberInterfac
             $event->getDate()
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
@@ -62,7 +51,7 @@ final class TimelineEventLogSegmentSubscriber implements EventSubscriberInterfac
             'segment'
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListBatchChangeEvent::class)]
     public function onBatchChange(ListChangeEvent $event): void
     {
         if (!$contacts = $event->getLeads()) {
@@ -76,7 +65,6 @@ final class TimelineEventLogSegmentSubscriber implements EventSubscriberInterfac
             $event->getDate()
         );
     }
-
     /**
      * @param Lead[] $contacts
      */

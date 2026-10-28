@@ -11,27 +11,19 @@ use Mautic\LeadBundle\Event\LeadPreDeleteEvent;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber
 {
     private const string FEATURE_PUSH_LEAD = 'push_lead';
-
     public function __construct(
         private IntegrationEntityRepository $integrationEntityRepository,
         private IntegrationRepository $integrationRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadPreDeleteEvent::class    => ['onLeadDelete', 0],
-            LeadPostSaveEvent::class     => ['onLeadSave', 0],
-            CompanyPreDeleteEvent::class => ['onCompanyDelete', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadPreDeleteEvent::class,
+        priority: 0
+    )]
     public function onLeadDelete(LeadEvent $event): bool
     {
         $lead = $event->getLead();
@@ -39,7 +31,10 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
 
         return false;
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CompanyPreDeleteEvent::class,
+        priority: 0
+    )]
     public function onCompanyDelete(CompanyEvent $event): bool
     {
         /** @var Company $company */
@@ -48,10 +43,13 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
 
         return false;
     }
-
     /*
-    * Change lead event
-    */
+     * Change lead event
+     */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadPostSaveEvent::class,
+        priority: 0
+    )]
     public function onLeadSave(LeadEvent $event): void
     {
         $lead = $event->getLead();
@@ -59,7 +57,6 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
             $this->integrationEntityRepository->updateErrorLeads('lead-error', $lead->getId());
         }
     }
-
     private function isAnyIntegrationEnabled(): bool
     {
         $integrations = $this->integrationRepository->getIntegrations();

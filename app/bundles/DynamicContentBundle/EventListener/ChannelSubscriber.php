@@ -6,17 +6,13 @@ namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ReportBundle\Model\ReportModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class ChannelSubscriber implements EventSubscriberInterface
+final class ChannelSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ChannelEvent::class => ['onAddChannel', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ChannelEvent::class,
+        priority: 0
+    )]
     public function onAddChannel(ChannelEvent $event): void
     {
         $event->addChannel(

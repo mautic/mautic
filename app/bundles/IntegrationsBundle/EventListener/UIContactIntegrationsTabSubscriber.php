@@ -8,22 +8,17 @@ use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class UIContactIntegrationsTabSubscriber implements EventSubscriberInterface
+final readonly class UIContactIntegrationsTabSubscriber
 {
     public function __construct(
         private ObjectMappingRepository $objectMappingRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomTemplateEvent::class => ['onTemplateRender', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CustomTemplateEvent::class,
+        priority: 0
+    )]
     public function onTemplateRender(CustomTemplateEvent $event): void
     {
         if ('@MauticLead/Lead/lead.html.twig' === $event->getTemplate()) {

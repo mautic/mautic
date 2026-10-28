@@ -21,16 +21,12 @@ use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignEventSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventSubscriber
 {
     public const int LOOPS_TO_FAIL = 100;
-
     private const int MINIMUM_CONTACTS_FOR_DISABLE = 100;
-
     private const float DISABLE_CAMPAIGN_THRESHOLD   = 0.35;
-
     public function __construct(
         private EventRepository $eventRepository,
         private CampaignModel $campaignModel,
@@ -39,26 +35,14 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
         private DateHelper $dateHelper,
     ) {
     }
-
-    /**
-     * Get the subscribed events for this listener.
-     *
-     * @return array<string,mixed>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignPreSaveEvent::class              => ['onCampaignPreSave', 0],
-            FailedEvent::class                       => ['onEventFailed', 0],
-            ExecutedEvent::class                     => ['onEventExecuted', 0],
-            EventPreview::class                      => ['onEventPreviewRequest', 0],
-        ];
-    }
-
     /**
      * Reset all campaign event failed_count's
      * to 0 when the campaign is published.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CampaignPreSaveEvent::class,
+        priority: 0
+    )]
     public function onCampaignPreSave(CampaignPreSaveEvent $event): void
     {
         $campaign = $event->getCampaign();
@@ -85,7 +69,6 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     /**
      * Process the FailedEvent event. Notifies users and checks
      * failed thresholds to notify CS and/or disable the campaign.
@@ -95,6 +78,10 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
      * @throws OptimisticLockException
      * @throws TransactionRequiredException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FailedEvent::class,
+        priority: 0
+    )]
     public function onEventFailed(FailedEvent $event): void
     {
         $log                  = $event->getLog();
@@ -138,13 +125,16 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     /**
      * Check the fail log if the lead is recorded there. If yes it decrease the failed count. It prevents counting
      * the same failure twice.
      *
      * @throws NonUniqueResultException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ExecutedEvent::class,
+        priority: 0
+    )]
     public function onEventExecuted(ExecutedEvent $event): void
     {
         $log                  = $event->getLog();
@@ -163,7 +153,10 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
         // Decrease if last failed and over the LOOPS_TO_FAIL
         $this->eventRepository->decreaseFailedCount($executedEvent);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EventPreview::class,
+        priority: 0
+    )]
     public function onEventPreviewRequest(EventPreview $eventPreview): void
     {
         $logStats = $this->leadEventLogRepository->getEventLogStats($eventPreview->event->getId());

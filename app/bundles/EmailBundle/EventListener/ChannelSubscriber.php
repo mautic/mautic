@@ -9,17 +9,13 @@ use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\EmailBundle\Form\Type\EmailListType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Model\ReportModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class ChannelSubscriber implements EventSubscriberInterface
+final class ChannelSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ChannelEvent::class => ['onAddChannel', 100],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ChannelEvent::class,
+        priority: 100
+    )]
     public function onAddChannel(ChannelEvent $event): void
     {
         $event->addChannel(

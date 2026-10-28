@@ -5,28 +5,21 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class SegmentLogReportSubscriber implements EventSubscriberInterface
+final readonly class SegmentLogReportSubscriber
 {
     public const string SEGMENT_LOG = 'segment.log';
-
     public function __construct(
         private FieldsBuilder $fieldsBuilder,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportBuilderEvent::class,
+        priority: 0
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::SEGMENT_LOG])) {
@@ -63,10 +56,13 @@ final readonly class SegmentLogReportSubscriber implements EventSubscriberInterf
 
         unset($columns, $filters, $segmentColumns, $data);
     }
-
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportGeneratorEvent::class,
+        priority: 0
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::SEGMENT_LOG])) {
@@ -104,7 +100,6 @@ final readonly class SegmentLogReportSubscriber implements EventSubscriberInterf
 
         $event->setQueryBuilder($qb);
     }
-
     private function generateLeftJoinCondition(string $alias, string $action): string
     {
         return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.`action` =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';

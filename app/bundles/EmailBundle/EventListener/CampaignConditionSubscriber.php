@@ -10,24 +10,18 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-final readonly class CampaignConditionSubscriber implements EventSubscriberInterface
+final readonly class CampaignConditionSubscriber
 {
     public function __construct(
         private EmailValidator $validator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            EmailEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CampaignBuilderEvent::class,
+        priority: 0
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addCondition(
@@ -39,7 +33,10 @@ final readonly class CampaignConditionSubscriber implements EventSubscriberInter
             ]
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        priority: 0
+    )]
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
         /** @var Lead $lead */

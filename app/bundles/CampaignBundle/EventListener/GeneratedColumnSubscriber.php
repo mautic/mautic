@@ -7,22 +7,17 @@ namespace Mautic\CampaignBundle\EventListener;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class GeneratedColumnSubscriber implements EventSubscriberInterface
+final readonly class GeneratedColumnSubscriber
 {
     public function __construct(
         private VersionProviderInterface $versionProvider,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            GeneratedColumnsEvent::class => ['onGeneratedColumnsBuild', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: GeneratedColumnsEvent::class,
+        priority: 0
+    )]
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
         if (!$this->versionProvider->isMySql()) {
@@ -35,7 +30,6 @@ final readonly class GeneratedColumnSubscriber implements EventSubscriberInterfa
         $event->addGeneratedColumn($this->buildGeneratedColumn('month', 'CHAR(7)', '%Y-%m', 'm'));
         $event->addGeneratedColumn($this->buildGeneratedColumn('year', 'YEAR', '%Y', 'Y'));
     }
-
     private function buildGeneratedColumn(string $name, string $type, string $format, string $unit, bool $filterDateColumn = false): GeneratedColumn
     {
         $columnName      = 'generated_date_added_'.$name;

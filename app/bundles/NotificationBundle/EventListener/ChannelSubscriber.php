@@ -8,22 +8,17 @@ use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Form\Type\NotificationListType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\ReportBundle\Model\ReportModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class ChannelSubscriber implements EventSubscriberInterface
+final readonly class ChannelSubscriber
 {
     public function __construct(
         private IntegrationHelper $integrationHelper,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ChannelEvent::class => ['onAddChannel', 70],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ChannelEvent::class,
+        priority: 70
+    )]
     public function onAddChannel(ChannelEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');

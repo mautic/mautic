@@ -22,31 +22,20 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber
 {
     public const string CONTEXT_EMAILS       = 'emails';
-
     public const string CONTEXT_EMAIL_STATS  = 'email.stats';
-
     public const string EMAILS_PREFIX        = 'e';
-
     public const string EMAIL_STATS_PREFIX   = 'es';
-
     public const string EMAIL_VARIANT_PREFIX = 'vp';
-
     public const string DNC_PREFIX           = 'dnc';
-
     public const string CLICK_PREFIX         = 'cut';
-
     public const string TRACKABLE_PREFIX     = 'tr';
-
     public const string REDIRECT_PREFIX      = 'pr';
-
     public const string CLICK_THROUGH_PREFIX = 'ct';
-
     public const array DNC_COLUMNS = [
         'unsubscribed' => [
             'alias'   => 'unsubscribed',
@@ -82,7 +71,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             'suffix'  => '%',
         ],
     ];
-
     public const array EMAIL_STATS_COLUMNS = [
         self::EMAIL_STATS_PREFIX.'.email_address' => [
             'label' => 'mautic.email.report.stat.email_address',
@@ -123,7 +111,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             'type'  => 'int',
         ],
     ];
-
     public const array EMAIL_VARIANT_COLUMNS = [
         self::EMAIL_VARIANT_PREFIX.'.id' => [
             'label' => 'mautic.email.report.variant_parent_id',
@@ -134,7 +121,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             'type'  => 'string',
         ],
     ];
-
     public const array CLICK_COLUMNS = [
         'hits' => [
             'alias'   => 'hits',
@@ -163,7 +149,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             'suffix'  => '%',
         ],
     ];
-
     public function __construct(
         private Connection $db,
         private CompanyReportData $companyReportData,
@@ -174,20 +159,13 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         private DncReportService $dncReportService,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-            ReportGraphEvent::class     => ['onReportGraphGenerate', 0],
-            ReportDataEvent::class      => ['onReportDisplay', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportBuilderEvent::class,
+        priority: 0
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_EMAILS, self::CONTEXT_EMAIL_STATS])) {
@@ -345,10 +323,13 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             $event->addGraph($context, 'table', 'mautic.email.table.most.emails.clicks');
         }
     }
-
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportGeneratorEvent::class,
+        priority: 0
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
@@ -480,10 +461,13 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
         $event->setQueryBuilder($qb);
     }
-
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportGraphEvent::class,
+        priority: 0
+    )]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         $graphs = $event->getRequestedGraphs();
@@ -803,7 +787,10 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             unset($queryBuilder);
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportDataEvent::class,
+        priority: 0
+    )]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();
@@ -815,7 +802,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         $event->setData($data);
         unset($data);
     }
-
     /**
      * @param array<string, int> $emailCounts
      *
@@ -836,14 +822,12 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
         return $result;
     }
-
     private function joinEmailsTableIfMissing(TrackingQueryBuilder $queryBuilder, ReportGraphEvent $event): void
     {
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS) && !$this->isJoined($queryBuilder, MAUTIC_TABLE_PREFIX.'emails', self::EMAIL_STATS_PREFIX, self::EMAILS_PREFIX)) {
             $queryBuilder->leftJoin(self::EMAIL_STATS_PREFIX, MAUTIC_TABLE_PREFIX.'emails', self::EMAILS_PREFIX, 'e.id = es.email_id');
         }
     }
-
     /**
      * Add the Do Not Contact table to the query builder.
      */
@@ -860,7 +844,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             );
         }
     }
-
     private function addTrackableTablesForEmailStats(TrackingQueryBuilder $qb): void
     {
         $trTable = MAUTIC_TABLE_PREFIX.'channel_url_trackables';
@@ -883,7 +866,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             );
         }
     }
-
     /**
      * Add the Do Not Contact table to the query builder.
      */
@@ -900,7 +882,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             );
         }
     }
-
     /**
      * Only Mautic's builder records its parts, and this subscriber reads a query back to
      * see whether a table is already joined. Connections hand out the tracking builder,
@@ -915,7 +896,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
         return $queryBuilder;
     }
-
     private function isJoined(TrackingQueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
         $joins = $query->getQueryParts()['join'];

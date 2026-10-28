@@ -11,11 +11,10 @@ use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber
 {
     public function __construct(
         private EventCollector $eventCollector,
@@ -26,33 +25,30 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         private LeadRepository $campaignLeadRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
-        ];
-    }
-
     /**
      * Compile events for the lead timeline.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadTimelineEvent::class,
+        priority: 0
+    )]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addTimelineEvents($event, 'campaign.event', $this->translator->trans('mautic.campaign.triggered'));
         $this->addTimelineEvents($event, 'campaign.event.scheduled', $this->translator->trans('mautic.campaign.scheduled'));
     }
-
     /**
      * Update records after lead merge.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadPostMergeEvent::class,
+        priority: 0
+    )]
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->leadEventLogRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
         $this->campaignLeadRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
-
     private function addTimelineEvents(LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $event->addEventType($eventTypeKey, $eventTypeName);
@@ -156,7 +152,6 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     /**
      * Check if the given campaign event is a condition or decision event.
      */
@@ -169,7 +164,6 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
 
         return $entities[0] ?? null;
     }
-
     /**
      * Get details for the campaign event.
      *

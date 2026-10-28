@@ -13,12 +13,11 @@ use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ImportCompanySubscriber implements EventSubscriberInterface
+final readonly class ImportCompanySubscriber
 {
     public function __construct(
         private FieldList $fieldList,
@@ -27,20 +26,10 @@ final readonly class ImportCompanySubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ImportInitEvent::class => ['onImportInit'],
-            ImportMappingEvent::class => ['onFieldMapping'],
-            ImportProcessEvent::class => ['onImportProcess'],
-            ImportValidateEvent::class => ['onValidateImport'],
-        ];
-    }
-
     /**
      * @throws AccessDeniedException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportInitEvent::class)]
     public function onImportInit(ImportInitEvent $event): void
     {
         if ($event->importIsForRouteObject('companies')) {
@@ -55,7 +44,7 @@ final readonly class ImportCompanySubscriber implements EventSubscriberInterface
             $event->stopPropagation();
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportMappingEvent::class)]
     public function onFieldMapping(ImportMappingEvent $event): void
     {
         if ($event->importIsForRouteObject('companies')) {
@@ -72,7 +61,7 @@ final readonly class ImportCompanySubscriber implements EventSubscriberInterface
             ];
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportProcessEvent::class)]
     public function onImportProcess(ImportProcessEvent $event): void
     {
         if ($event->importIsForObject('company')) {
@@ -87,7 +76,7 @@ final readonly class ImportCompanySubscriber implements EventSubscriberInterface
             $event->stopPropagation();
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportValidateEvent::class)]
     public function onValidateImport(ImportValidateEvent $event): void
     {
         if (false === $event->importIsForRouteObject('companies')) {
@@ -120,7 +109,6 @@ final readonly class ImportCompanySubscriber implements EventSubscriberInterface
 
         $event->setMatchedFields($matchedFields);
     }
-
     /**
      * @param mixed[] $matchedFields
      */
@@ -131,7 +119,6 @@ final readonly class ImportCompanySubscriber implements EventSubscriberInterface
 
         return $owner?->getId();
     }
-
     /**
      * Validate required fields.
      *

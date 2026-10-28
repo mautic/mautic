@@ -6,27 +6,22 @@ use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class DetermineWinnerSubscriber implements EventSubscriberInterface
+final readonly class DetermineWinnerSubscriber
 {
     public function __construct(
         private SubmissionRepository $submissionRepository,
         private TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER => ['onDetermineSubmissionWinner', 0],
-        ];
-    }
-
     /**
      * Determines the winner of A/B test based on number of form submissions.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER,
+        priority: 0
+    )]
     public function onDetermineSubmissionWinner(DetermineWinnerEvent $event): void
     {
         $parameters = $event->getParameters();

@@ -14,39 +14,27 @@ use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-final readonly class CompanyObjectSubscriber implements EventSubscriberInterface
+final readonly class CompanyObjectSubscriber
 {
     public function __construct(
         private CompanyObjectHelper $companyObjectHelper,
         private RouterInterface $router,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            InternalObjectEvent::class         => ['collectInternalObjects', 0],
-            InternalObjectUpdateEvent::class   => ['updateCompanies', 0],
-            InternalObjectCreateEvent::class   => ['createCompanies', 0],
-            InternalObjectFindEvent::class     => [
-                ['findCompaniesByIds', 0],
-                ['findCompaniesByDateRange', 0],
-                ['findCompaniesByFieldValues', 0],
-            ],
-            InternalObjectOwnerEvent::class    => ['findOwnerIdsForCompanies', 0],
-            InternalObjectRouteEvent::class    => ['buildCompanyRoute', 0],
-            InternalObjectFindByIdEvent::class => ['findCompanyById', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectEvent::class,
+        priority: 0
+    )]
     public function collectInternalObjects(InternalObjectEvent $event): void
     {
         $event->addObject(new Company());
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectUpdateEvent::class,
+        priority: 0
+    )]
     public function updateCompanies(InternalObjectUpdateEvent $event): void
     {
         if (Company::NAME !== $event->getObject()->getName()) {
@@ -61,7 +49,10 @@ final readonly class CompanyObjectSubscriber implements EventSubscriberInterface
         );
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectCreateEvent::class,
+        priority: 0
+    )]
     public function createCompanies(InternalObjectCreateEvent $event): void
     {
         if (Company::NAME !== $event->getObject()->getName()) {
@@ -71,7 +62,10 @@ final readonly class CompanyObjectSubscriber implements EventSubscriberInterface
         $event->setObjectMappings($this->companyObjectHelper->create($event->getCreateObjects()));
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectFindEvent::class,
+        priority: 0
+    )]
     public function findCompaniesByIds(InternalObjectFindEvent $event): void
     {
         if (Company::NAME !== $event->getObject()->getName() || empty($event->getIds())) {
@@ -81,7 +75,10 @@ final readonly class CompanyObjectSubscriber implements EventSubscriberInterface
         $event->setFoundObjects($this->companyObjectHelper->findObjectsByIds($event->getIds()));
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectFindEvent::class,
+        priority: 0
+    )]
     public function findCompaniesByDateRange(InternalObjectFindEvent $event): void
     {
         if (Company::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof DateRange) {
@@ -98,7 +95,10 @@ final readonly class CompanyObjectSubscriber implements EventSubscriberInterface
         );
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectFindEvent::class,
+        priority: 0
+    )]
     public function findCompaniesByFieldValues(InternalObjectFindEvent $event): void
     {
         if (Company::NAME !== $event->getObject()->getName() || empty($event->getFieldValues())) {
@@ -112,7 +112,10 @@ final readonly class CompanyObjectSubscriber implements EventSubscriberInterface
         );
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectOwnerEvent::class,
+        priority: 0
+    )]
     public function findOwnerIdsForCompanies(InternalObjectOwnerEvent $event): void
     {
         if (Company::NAME !== $event->getObject()->getName()) {
@@ -126,7 +129,10 @@ final readonly class CompanyObjectSubscriber implements EventSubscriberInterface
         );
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectRouteEvent::class,
+        priority: 0
+    )]
     public function buildCompanyRoute(InternalObjectRouteEvent $event): void
     {
         if (Company::NAME !== $event->getObject()->getName()) {
@@ -144,7 +150,10 @@ final readonly class CompanyObjectSubscriber implements EventSubscriberInterface
         );
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectFindByIdEvent::class,
+        priority: 0
+    )]
     public function findCompanyById(InternalObjectFindByIdEvent $event): void
     {
         if (null === $event->getId() || Company::NAME !== $event->getObject()->getName()) {

@@ -4,22 +4,19 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final class CookieHelper implements EventSubscriberInterface
+final class CookieHelper
 {
     private ?Request $request = null;
-
     /**
      * @var array<string, Cookie>
      */
     private array $cookies = [];
-
     public function __construct(
         private readonly ?string $path,
         private readonly ?string $domain,
@@ -28,7 +25,6 @@ final class CookieHelper implements EventSubscriberInterface
         private readonly RequestStack $requestStack,
     ) {
     }
-
     public function getCookie(string $key, mixed $default = null): mixed
     {
         if (null === $this->getRequest()) {
@@ -37,7 +33,6 @@ final class CookieHelper implements EventSubscriberInterface
 
         return $this->getRequest()->cookies->get($key, $default);
     }
-
     /**
      * @param int|string|float|bool|object|null $value
      */
@@ -61,7 +56,6 @@ final class CookieHelper implements EventSubscriberInterface
 
         $this->cookies[$name] = $cookie;
     }
-
     /**
      * Deletes a cookie by expiring it.
      */
@@ -69,21 +63,13 @@ final class CookieHelper implements EventSubscriberInterface
     {
         $this->setCookie($name, '', -86400, $path, $domain, $secure, $httponly, $sameSite);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::RESPONSE)]
     public function onResponse(ResponseEvent $event): void
     {
         foreach ($this->cookies as $cookie) {
             $event->getResponse()->headers->setCookie($cookie);
         }
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::RESPONSE => 'onResponse',
-        ];
-    }
-
     private function getRequest(): ?Request
     {
         if (null !== $this->request) {

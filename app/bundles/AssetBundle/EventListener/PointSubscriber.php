@@ -9,23 +9,17 @@ use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
 use Mautic\AssetBundle\Helper\PointActionHelper;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber
 {
     public function __construct(
         private PointModel $pointModel,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PointBuilderEvent::class => ['onPointBuild', 0],
-            AssetLoadEvent::class       => ['onAssetDownload', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PointBuilderEvent::class,
+        priority: 0
+    )]
     public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
@@ -38,10 +32,13 @@ final readonly class PointSubscriber implements EventSubscriberInterface
 
         $event->addAction('asset.download', $action);
     }
-
     /**
      * Trigger point actions for asset download.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: AssetLoadEvent::class,
+        priority: 0
+    )]
     public function onAssetDownload(AssetLoadEvent $event): void
     {
         $asset = $event->getRecord()->getAsset();

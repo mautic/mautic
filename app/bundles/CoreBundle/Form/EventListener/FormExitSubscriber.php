@@ -2,24 +2,18 @@
 
 namespace Mautic\CoreBundle\Form\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-final readonly class FormExitSubscriber implements EventSubscriberInterface
+final readonly class FormExitSubscriber
 {
     public function __construct(
         private string $model,
         private array $options = [],
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [FormEvents::PRE_SET_DATA => 'preSetData'];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::PRE_SET_DATA)]
     public function preSetData(FormEvent $event): void
     {
         $id = !empty($this->options['data']) ? $this->options['data']->getId() : 0;

@@ -8,13 +8,11 @@ use Mautic\CoreBundle\Event\CustomAssetsEvent;
 use Mautic\InstallBundle\Install\InstallService;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final readonly class AssetsSubscriber implements EventSubscriberInterface
+final readonly class AssetsSubscriber
 {
     private const string ASSET_DIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
-
     public function __construct(
         private Config $config,
         private InstallService $installer,
@@ -23,14 +21,10 @@ final readonly class AssetsSubscriber implements EventSubscriberInterface
         private LoggerInterface $logger,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomAssetsEvent::class => ['injectAssets', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CustomAssetsEvent::class,
+        priority: 0
+    )]
     public function injectAssets(CustomAssetsEvent $assetsEvent): void
     {
         if (!$this->installer->checkIfInstalled() || !$this->isMauticAdministrationPage()) {
@@ -55,7 +49,6 @@ final readonly class AssetsSubscriber implements EventSubscriberInterface
             $assetsEvent->addStylesheet(self::ASSET_DIR.'/'.$css);
         }
     }
-
     /**
      * Parcel content-hashes output filenames (e.g. builder.abc123.css), so resolve the
      * logical name to the actual file via the manifest.json emitted by the build.
@@ -87,7 +80,6 @@ final readonly class AssetsSubscriber implements EventSubscriberInterface
 
         return $fileName;
     }
-
     /**
      * Returns true for routes that starts with /s/.
      */

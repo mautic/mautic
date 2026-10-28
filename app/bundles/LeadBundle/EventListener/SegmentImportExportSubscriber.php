@@ -20,12 +20,10 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class SegmentImportExportSubscriber implements EventSubscriberInterface
+final readonly class SegmentImportExportSubscriber
 {
     use ImportExportTrait;
-
     public function __construct(
         private ListModel $leadListModel,
         private EntityManagerInterface $entityManager,
@@ -38,17 +36,10 @@ final readonly class SegmentImportExportSubscriber implements EventSubscriberInt
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onSegmentExport', 0],
-            EntityImportEvent::class        => ['onSegmentImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityExportEvent::class,
+        priority: 0
+    )]
     public function onSegmentExport(EntityExportEvent $event): void
     {
         if (LeadList::ENTITY_NAME !== $event->getEntityName()) {
@@ -98,7 +89,10 @@ final readonly class SegmentImportExportSubscriber implements EventSubscriberInt
         $event->addEntity(LeadList::ENTITY_NAME, $segmentData);
         $this->logAction('export', $leadListId, $segmentData);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportEvent::class,
+        priority: 0
+    )]
     public function onSegmentImport(EntityImportEvent $event): void
     {
         if (LeadList::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -140,7 +134,10 @@ final readonly class SegmentImportExportSubscriber implements EventSubscriberInt
             }
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportUndoEvent::class,
+        priority: 0
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (LeadList::ENTITY_NAME !== $event->getEntityName()) {
@@ -163,7 +160,10 @@ final readonly class SegmentImportExportSubscriber implements EventSubscriberInt
 
         $this->entityManager->flush();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+        priority: 0
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         if (LeadList::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
@@ -195,7 +195,6 @@ final readonly class SegmentImportExportSubscriber implements EventSubscriberInt
             $this->entityManager
         );
     }
-
     /**
      * @param array<string, mixed> $details
      */

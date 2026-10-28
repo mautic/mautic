@@ -12,9 +12,8 @@ use Mautic\CampaignBundle\Form\Validator\Constraints\InfiniteLoopValidator;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityValidateEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterface
+final readonly class CampaignActionChangeMembershipSubscriber
 {
     public function __construct(
         private MembershipManager $membershipManager,
@@ -22,19 +21,13 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
         private InfiniteLoopValidator $infiniteLoopValidator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class                          => ['addAction', 0],
-            CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP => ['changeMembership', 0],
-            EntityValidateEvent::class                           => ['validateInfiniteLoop', 0],
-        ];
-    }
-
     /**
      * Add change membership action.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CampaignBuilderEvent::class,
+        priority: 0
+    )]
     public function addAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
@@ -50,7 +43,10 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
             ]
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP,
+        priority: 0
+    )]
     public function changeMembership(PendingEvent $event): void
     {
         $properties          = $event->getEvent()->getProperties();
@@ -85,7 +81,10 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
 
         $event->passAll();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityValidateEvent::class,
+        priority: 0
+    )]
     public function validateInfiniteLoop(EntityValidateEvent $event): void
     {
         $campaignEvent = $event->getEntity();
@@ -106,7 +105,6 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
             $campaignEvent->getTriggerIntervalUnit()
         );
     }
-
     private function getCampaigns(array $campaigns, Campaign $executingCampaign): array
     {
         // Check for the keyword "this"

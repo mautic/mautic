@@ -23,12 +23,10 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class EmailImportExportSubscriber implements EventSubscriberInterface
+final readonly class EmailImportExportSubscriber
 {
     use ImportExportTrait;
-
     public function __construct(
         private EmailModel $emailModel,
         private EntityManagerInterface $entityManager,
@@ -42,17 +40,10 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
         private EmailMediaImageHelper $mediaImageHelper,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onEmailExport', 0],
-            EntityImportEvent::class        => ['onEmailImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityExportEvent::class,
+        priority: 0
+    )]
     public function onEmailExport(EntityExportEvent $event): void
     {
         if (Email::ENTITY_NAME !== $event->getEntityName()) {
@@ -133,7 +124,10 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
             ]);
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportEvent::class,
+        priority: 0
+    )]
     public function onEmailImport(EntityImportEvent $event): void
     {
         if (Email::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -194,7 +188,10 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
             }
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportUndoEvent::class,
+        priority: 0
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Email::ENTITY_NAME !== $event->getEntityName()) {
@@ -217,7 +214,10 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
 
         $this->entityManager->flush();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+        priority: 0
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(
@@ -228,7 +228,6 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
             $this->entityManager
         );
     }
-
     /**
      * @param array<string, mixed> $details
      */

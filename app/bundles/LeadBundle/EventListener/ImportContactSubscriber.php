@@ -15,12 +15,11 @@ use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ImportContactSubscriber implements EventSubscriberInterface
+final readonly class ImportContactSubscriber
 {
     public function __construct(
         private FieldList $fieldList,
@@ -29,20 +28,10 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ImportInitEvent::class => 'onImportInit',
-            ImportMappingEvent::class => 'onFieldMapping',
-            ImportProcessEvent::class => 'onImportProcess',
-            ImportValidateEvent::class => 'onValidateImport',
-        ];
-    }
-
     /**
      * @throws AccessDeniedException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportInitEvent::class)]
     public function onImportInit(ImportInitEvent $event): void
     {
         if ($event->importIsForRouteObject('contacts')) {
@@ -57,7 +46,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
             $event->stopPropagation();
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportMappingEvent::class)]
     public function onFieldMapping(ImportMappingEvent $event): void
     {
         if ($event->importIsForRouteObject('contacts')) {
@@ -85,7 +74,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
             ];
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportProcessEvent::class)]
     public function onImportProcess(ImportProcessEvent $event): void
     {
         if ($event->importIsForObject('lead')) {
@@ -105,7 +94,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
             $event->stopPropagation();
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportValidateEvent::class)]
     public function onValidateImport(ImportValidateEvent $event): void
     {
         if (false === $event->importIsForRouteObject('contacts')) {
@@ -143,7 +132,6 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
 
         $event->setMatchedFields($matchedFields);
     }
-
     /**
      * @param mixed[] $matchedFields
      */
@@ -154,7 +142,6 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
 
         return $owner ? $owner->getId() : null;
     }
-
     /**
      * @param mixed[] $matchedFields
      */
@@ -162,7 +149,6 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
     {
         return ArrayHelper::pickValue('list', $matchedFields);
     }
-
     /**
      * @param mixed[] $matchedFields
      *
@@ -177,7 +163,6 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
 
         return array_map(fn (Tag $tag) => $tag->getTag(), $tags);
     }
-
     /**
      * Validate required fields.
      *

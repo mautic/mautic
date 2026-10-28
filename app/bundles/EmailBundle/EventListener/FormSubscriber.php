@@ -11,29 +11,21 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber
 {
     public function __construct(
         private EmailModel $emailModel,
         private ContactTracker $contactTracker,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormBuilderEvent::class             => ['onFormBuilder', 0],
-            FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
-                ['onFormSubmitActionSendEmail', 0],
-            ],
-        ];
-    }
-
     /**
      * Add a send email actions to available form submit actions.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormBuilderEvent::class,
+        priority: 0
+    )]
     public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('email.send.user', [
@@ -57,10 +49,13 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             'template'        => '@MauticEmail/Action/email.html.twig',
         ]);
     }
-
     /**
      * @throws ORMException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+        priority: 0
+    )]
     public function onFormSubmitActionSendEmail(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('email.send.user') && false === $event->checkContext('email.send.lead')) {
@@ -87,7 +82,6 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             ]);
         }
     }
-
     /**
      * @param array<string, mixed> $feedback
      */

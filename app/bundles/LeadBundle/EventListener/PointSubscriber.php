@@ -12,10 +12,9 @@ use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Mautic\PointBundle\PointEvents;
 use Mautic\StageBundle\Model\StageModel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber
 {
     public function __construct(
         private LeadModel $leadModel,
@@ -24,16 +23,10 @@ final readonly class PointSubscriber implements EventSubscriberInterface
         private LoggerInterface $logger,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            TriggerBuilderEvent::class                   => ['onTriggerBuild', 0],
-            PointEvents::TRIGGER_ON_EVENT_EXECUTE        => ['onTriggerExecute', 0],
-            PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE => ['onLeadSegmentsChange', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: TriggerBuilderEvent::class,
+        priority: 0
+    )]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $event->addEvent(
@@ -75,7 +68,10 @@ final readonly class PointSubscriber implements EventSubscriberInterface
             ]
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PointEvents::TRIGGER_ON_EVENT_EXECUTE,
+        priority: 0
+    )]
     public function onTriggerExecute(TriggerExecutedEvent $event): void
     {
         if ('lead.changetags' === $event->getTriggerEvent()->getType()) {
@@ -84,7 +80,6 @@ final readonly class PointSubscriber implements EventSubscriberInterface
             $this->handleChangeStage($event);
         }
     }
-
     private function handleChangeTags(TriggerExecutedEvent $event): void
     {
         $properties = $event->getTriggerEvent()->getProperties();
@@ -95,7 +90,6 @@ final readonly class PointSubscriber implements EventSubscriberInterface
             $event->setSucceded();
         }
     }
-
     private function handleChangeStage(TriggerExecutedEvent $event): void
     {
         $properties = $event->getTriggerEvent()->getProperties();
@@ -127,7 +121,6 @@ final readonly class PointSubscriber implements EventSubscriberInterface
             $this->logger->info("LeadBundle: Stage not updated for lead {$event->getLead()->getId()} by trigger because: {$exception->getMessage()}");
         }
     }
-
     private function handleRemoveStage(Lead $lead): void
     {
         $stage = $lead->getStage();
@@ -140,7 +133,10 @@ final readonly class PointSubscriber implements EventSubscriberInterface
             );
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE,
+        priority: 0
+    )]
     public function onLeadSegmentsChange(TriggerExecutedEvent $event): void
     {
         $lead = $event->getLead();

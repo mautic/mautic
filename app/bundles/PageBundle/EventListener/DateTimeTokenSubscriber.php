@@ -7,10 +7,9 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class DateTimeTokenSubscriber implements EventSubscriberInterface
+final readonly class DateTimeTokenSubscriber
 {
     public function __construct(
         private TranslatorInterface $translator,
@@ -19,20 +18,18 @@ final readonly class DateTimeTokenSubscriber implements EventSubscriberInterface
         private ContactTracker $contactTracker,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PageBuilderEvent::class                     => ['onPageBuild', 0],
-            PageDisplayEvent::class                   => ['onPageDisplay', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PageBuilderEvent::class,
+        priority: 0
+    )]
     public function onPageBuild(PageBuilderEvent $event): void
     {
         $event->addToken('{today}', $this->translator->trans('mautic.core.token.group.other').': '.$this->translator->trans('mautic.email.token.today'));
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PageDisplayEvent::class,
+        priority: 0
+    )]
     public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content   = $event->getContent();

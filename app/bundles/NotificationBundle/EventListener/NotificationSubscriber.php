@@ -12,9 +12,8 @@ use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class NotificationSubscriber implements EventSubscriberInterface
+final readonly class NotificationSubscriber
 {
     public function __construct(
         private AuditLogModel $auditLogModel,
@@ -23,19 +22,13 @@ final readonly class NotificationSubscriber implements EventSubscriberInterface
         private AssetTokenHelper $assetTokenHelper,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            NotificationEvents::NOTIFICATION_POST_SAVE   => ['onPostSave', 0],
-            NotificationEvents::NOTIFICATION_POST_DELETE => ['onDelete', 0],
-            NotificationEvents::TOKEN_REPLACEMENT        => ['onTokenReplacement', 0],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: NotificationEvents::NOTIFICATION_POST_SAVE,
+        priority: 0
+    )]
     public function onPostSave(NotificationEvent $event): void
     {
         $entity = $event->getNotification();
@@ -50,10 +43,13 @@ final readonly class NotificationSubscriber implements EventSubscriberInterface
             $this->auditLogModel->writeToLog($log);
         }
     }
-
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: NotificationEvents::NOTIFICATION_POST_DELETE,
+        priority: 0
+    )]
     public function onDelete(NotificationEvent $event): void
     {
         $entity = $event->getNotification();
@@ -66,7 +62,10 @@ final readonly class NotificationSubscriber implements EventSubscriberInterface
         ];
         $this->auditLogModel->writeToLog($log);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: NotificationEvents::TOKEN_REPLACEMENT,
+        priority: 0
+    )]
     public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */

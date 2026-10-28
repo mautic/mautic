@@ -9,27 +9,20 @@ use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class GeneratedColumnSubscriber implements EventSubscriberInterface
+final readonly class GeneratedColumnSubscriber
 {
     use SegmentFilterIconTrait;
-
     public function __construct(
         private ListModel $segmentModel,
         private TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            GeneratedColumnsEvent::class                 => ['onGeneratedColumnsBuild', 0],
-            LeadListFiltersChoicesEvent::class => ['onGenerateSegmentFilters', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: GeneratedColumnsEvent::class,
+        priority: 0
+    )]
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
         $emailDomain = new GeneratedColumn(
@@ -41,7 +34,10 @@ final readonly class GeneratedColumnSubscriber implements EventSubscriberInterfa
 
         $event->addGeneratedColumn($emailDomain);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadListFiltersChoicesEvent::class,
+        priority: 0
+    )]
     public function onGenerateSegmentFilters(LeadListFiltersChoicesEvent $event): void
     {
         $event->addChoice('lead', 'generated_email_domain', [

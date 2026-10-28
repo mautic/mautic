@@ -6,10 +6,9 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\UserBundle\Form\Type\ConfigType;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-final class ConfigSubscriber implements EventSubscriberInterface
+final class ConfigSubscriber
 {
     /**
      * @var string[]
@@ -19,15 +18,10 @@ final class ConfigSubscriber implements EventSubscriberInterface
         'saml_idp_own_certificate',
         'saml_idp_own_private_key',
     ];
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ConfigBuilderEvent::class => ['onConfigGenerate', 0],
-            ConfigPreSaveEvent::class    => ['onConfigSave', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ConfigBuilderEvent::class,
+        priority: 0
+    )]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addFileFields($this->fileFields)
@@ -41,7 +35,10 @@ final class ConfigSubscriber implements EventSubscriberInterface
                 ]
             );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ConfigPreSaveEvent::class,
+        priority: 0
+    )]
     public function onConfigSave(ConfigEvent $event): void
     {
         // Preserve existing value
@@ -91,7 +88,6 @@ final class ConfigSubscriber implements EventSubscriberInterface
 
         $event->setConfig($data, 'userconfig');
     }
-
     private function validateXml(string $content): bool
     {
         $valid = true;

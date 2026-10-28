@@ -12,12 +12,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
+final class TimelineEventLogCampaignSubscriber
 {
     use TimelineEventLogTrait;
-
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
         private readonly UserHelper $userHelper,
@@ -26,16 +24,7 @@ final class TimelineEventLogCampaignSubscriber implements EventSubscriberInterfa
         $this->eventLogRepository = $eventLogRepository;
         $this->translator         = $translator;
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignSingleLeadChangeEvent::class => 'onChange',
-            CampaignBatchLeadChangeEvent::class  => 'onBatchChange',
-            LeadTimelineEvent::class             => 'onTimelineGenerate',
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignSingleLeadChangeEvent::class)]
     public function onChange(CampaignLeadChangeEvent $event): void
     {
         if (!$contact = $event->getLead()) {
@@ -48,7 +37,7 @@ final class TimelineEventLogCampaignSubscriber implements EventSubscriberInterfa
             $event->getAction()
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBatchLeadChangeEvent::class)]
     public function onBatchChange(CampaignLeadChangeEvent $event): void
     {
         if (!$contacts = $event->getLeads()) {
@@ -61,7 +50,7 @@ final class TimelineEventLogCampaignSubscriber implements EventSubscriberInterfa
             $event->getAction()
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
@@ -73,7 +62,6 @@ final class TimelineEventLogCampaignSubscriber implements EventSubscriberInterfa
             'campaign'
         );
     }
-
     /**
      * @param Lead[] $contacts
      */

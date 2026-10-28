@@ -8,23 +8,18 @@ use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\SmsBundle\Model\SmsModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber
 {
     public function __construct(
         private SmsModel $model,
         private GlobalSearch $globalSearch,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MauticEvents\GlobalSearchEvent::class => ['onGlobalSearch', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: MauticEvents\GlobalSearchEvent::class,
+        priority: 0
+    )]
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());

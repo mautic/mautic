@@ -9,24 +9,17 @@ use Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber
 {
     public function __construct(
         private RealTimeExecutioner $realTimeExecutioner,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            AssetLoadEvent::class                     => ['onAssetDownload', 0],
-            AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CampaignBuilderEvent::class,
+        priority: 0
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $trigger = [
@@ -40,10 +33,13 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
         $event->addDecision('asset.download', $trigger);
     }
-
     /**
      * Trigger point actions for asset download.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: AssetLoadEvent::class,
+        priority: 0
+    )]
     public function onAssetDownload(AssetLoadEvent $event): void
     {
         $asset = $event->getRecord()->getAsset();
@@ -52,7 +48,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             $this->realTimeExecutioner->execute('asset.download', $asset, 'asset', $asset->getId());
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+        priority: 0
+    )]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();

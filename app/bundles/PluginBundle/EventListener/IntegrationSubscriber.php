@@ -7,27 +7,21 @@ use Mautic\PluginBundle\Event\PluginIntegrationResponseEvent;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This class can provide useful debugging information for API requests and responses.
  * The information is displayed when a command is executed from the console and the -vv flag is passed to it.
  */
-final readonly class IntegrationSubscriber implements EventSubscriberInterface
+final readonly class IntegrationSubscriber
 {
     public function __construct(
         private LoggerInterface $logger,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PluginIntegrationRequestEvent::class => ['onRequest', 0],
-            PluginIntegrationResponseEvent::class => ['onResponse', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PluginIntegrationRequestEvent::class,
+        priority: 0
+    )]
     public function onRequest(PluginIntegrationRequestEvent $event): void
     {
         $name     = strtoupper($event->getIntegrationName());
@@ -60,7 +54,10 @@ final readonly class IntegrationSubscriber implements EventSubscriberInterface
             }
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PluginIntegrationResponseEvent::class,
+        priority: 0
+    )]
     public function onResponse(PluginIntegrationResponseEvent $event): void
     {
         $response = $event->getResponse();

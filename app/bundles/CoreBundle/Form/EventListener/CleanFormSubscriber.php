@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Form\EventListener;
 
 use Mautic\CoreBundle\Helper\InputHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**
  * Clean data before persisting to DB.
  */
-final readonly class CleanFormSubscriber implements EventSubscriberInterface
+final readonly class CleanFormSubscriber
 {
     /**
      * @param string|mixed[] $masks
@@ -21,14 +20,7 @@ final readonly class CleanFormSubscriber implements EventSubscriberInterface
         private string|array $masks = 'clean',
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormEvents::PRE_SUBMIT => 'preSubmitData',
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::PRE_SUBMIT)]
     public function preSubmitData(FormEvent $event): void
     {
         $data = $event->getData();

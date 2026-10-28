@@ -16,12 +16,10 @@ use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CustomFieldImportExportSubscriber implements EventSubscriberInterface
+final readonly class CustomFieldImportExportSubscriber
 {
     use ImportExportTrait;
-
     public function __construct(
         private FieldModel $fieldModel,
         private EntityManagerInterface $entityManager,
@@ -31,17 +29,10 @@ final readonly class CustomFieldImportExportSubscriber implements EventSubscribe
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onLeadFieldExport', 0],
-            EntityImportEvent::class        => ['onLeadFieldImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityExportEvent::class,
+        priority: 0
+    )]
     public function onLeadFieldExport(EntityExportEvent $event): void
     {
         if (LeadField::ENTITY_NAME !== $event->getEntityName()) {
@@ -82,7 +73,10 @@ final readonly class CustomFieldImportExportSubscriber implements EventSubscribe
         $event->addEntity(LeadField::ENTITY_NAME, $leadFieldData);
         $this->logAction('export', $leadField->getId(), $leadFieldData);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportEvent::class,
+        priority: 0
+    )]
     public function onLeadFieldImport(EntityImportEvent $event): void
     {
         if (LeadField::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -132,7 +126,10 @@ final readonly class CustomFieldImportExportSubscriber implements EventSubscribe
             }
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportUndoEvent::class,
+        priority: 0
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (LeadField::ENTITY_NAME !== $event->getEntityName()) {
@@ -155,7 +152,10 @@ final readonly class CustomFieldImportExportSubscriber implements EventSubscribe
 
         $this->entityManager->flush();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+        priority: 0
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(
@@ -166,7 +166,6 @@ final readonly class CustomFieldImportExportSubscriber implements EventSubscribe
             $this->entityManager
         );
     }
-
     /**
      * @param array<string, mixed> $details
      */

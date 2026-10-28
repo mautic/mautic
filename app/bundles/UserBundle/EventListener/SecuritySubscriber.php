@@ -7,23 +7,18 @@ namespace Mautic\UserBundle\EventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\UserBundle\Event\LoginEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class SecuritySubscriber implements EventSubscriberInterface
+final readonly class SecuritySubscriber
 {
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LoginEvent::class => ['onSecurityInteractiveLogin', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LoginEvent::class,
+        priority: 0
+    )]
     public function onSecurityInteractiveLogin(LoginEvent $event): void
     {
         $userId   = (int) $event->getUser()->getId();

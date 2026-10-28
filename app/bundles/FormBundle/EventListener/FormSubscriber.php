@@ -16,16 +16,14 @@ use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber
 {
     private MailHelper $mailer;
-
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel,
@@ -36,23 +34,13 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     ) {
         $this->mailer = $mailer->getMailer();
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],
-            FormEvents::FORM_POST_DELETE         => ['onFormDelete', 0],
-            Events\FormBuilderEvent::class       => ['onFormBuilder', 0],
-            FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
-                ['onFormSubmitActionSendEmail', 0],
-                ['onFormSubmitActionRepost', 0],
-            ],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormEvents::FORM_POST_SAVE,
+        priority: 0
+    )]
     public function onFormPostSave(Events\FormEvent $event): void
     {
         $form = $event->getForm();
@@ -71,10 +59,13 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             $this->languageHelper->extractLanguagePackage($form->getLanguage());
         }
     }
-
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormEvents::FORM_POST_DELETE,
+        priority: 0
+    )]
     public function onFormDelete(Events\FormEvent $event): void
     {
         $form = $event->getForm();
@@ -88,10 +79,13 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         ];
         $this->auditLogModel->writeToLog($log);
     }
-
     /**
      * Add a simple email form.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: Events\FormBuilderEvent::class,
+        priority: 0
+    )]
     public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addSubmitAction('form.email', [
@@ -121,7 +115,10 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+        priority: 0
+    )]
     public function onFormSubmitActionSendEmail(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.email')) {
@@ -187,7 +184,10 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             $this->mailer->send(true);
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+        priority: 0
+    )]
     public function onFormSubmitActionRepost(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.repost')) {
@@ -305,7 +305,6 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     /**
      * @return bool|mixed
      */
@@ -360,7 +359,6 @@ final readonly class FormSubscriber implements EventSubscriberInterface
 
         return $redirect;
     }
-
     private function postToHtml(array $post): string
     {
         $output = '<table>';
@@ -376,7 +374,6 @@ final readonly class FormSubscriber implements EventSubscriberInterface
 
         return $output.'</table>';
     }
-
     /**
      * @return array<string, null>
      */
@@ -384,7 +381,6 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     {
         return (!empty($emailString)) ? array_fill_keys(array_map(trim(...), explode(',', $emailString)), null) : [];
     }
-
     /**
      * @param array<mixed>               $config
      * @param array<mixed>               $tokens

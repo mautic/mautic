@@ -11,26 +11,18 @@ use Mautic\ReportBundle\Event\AbstractReportEvent;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber
 {
     public const string CONTEXT_AUDIT_LOG = 'audit.log';
-
     public function __construct(
         private CorePermissions $security,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-            ReportDataEvent::class      => ['onReportDisplay', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportBuilderEvent::class,
+        priority: 0
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$this->allowAuditLogReportBuild($event)) {
@@ -130,7 +122,10 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             ]
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportGeneratorEvent::class,
+        priority: 0
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$this->allowAuditLogReportBuild($event)) {
@@ -156,7 +151,10 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
         $event->setQueryBuilder($queryBuilder);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportDataEvent::class,
+        priority: 0
+    )]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         if (!$this->security->isAdmin() || !$event->checkContext([self::CONTEXT_AUDIT_LOG])) {
@@ -175,7 +173,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
         $event->setData($data);
     }
-
     private function allowAuditLogReportBuild(AbstractReportEvent $event): bool
     {
         // Allow to create audit_log report only for admin user and cli

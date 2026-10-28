@@ -18,10 +18,9 @@ use Mautic\LeadBundle\Event\ListPreUnpublishEvent;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class SegmentSubscriber implements EventSubscriberInterface
+final readonly class SegmentSubscriber
 {
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
@@ -33,28 +32,13 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ListPostSaveEvent::class     => ['onSegmentPostSave', 0],
-            ListDeleteEvent::class     => ['onSegmentDelete', 0],
-            ListPostDeleteEvent::class   => [
-                ['onSegmentPostDelete', 0],
-                ['clearSegmentCountCache', 0],
-            ],
-            ListPreDeleteEvent::class   => [
-                ['onSegmentPreDelete', 0],
-            ],
-            ListPreUnpublishEvent::class => [
-                ['onSegmentPreUnpublish', 0],
-            ],
-        ];
-    }
-
     /**
      * Add a segment entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ListPostSaveEvent::class,
+        priority: 0
+    )]
     public function onSegmentPostSave(SegmentEvent $event): void
     {
         $segment = $event->getList();
@@ -70,10 +54,13 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
             $this->auditLogModel->writeToLog($log);
         }
     }
-
     /**
      * @throws RecordCanNotUnpublishException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ListPreUnpublishEvent::class,
+        priority: 0
+    )]
     public function onSegmentPreUnpublish(SegmentEvent $event): void
     {
         $leadList = $event->getList();
@@ -94,10 +81,13 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
             throw new RecordCanNotUnpublishException($this->segmentUsedInCampaignsValidator->getErrorMessage());
         }
     }
-
     /**
      * @throws DeleteEntityDependencyException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ListPreDeleteEvent::class,
+        priority: 0
+    )]
     public function onSegmentPreDelete(SegmentEvent $event): void
     {
         $leadList = $event->getList();
@@ -119,7 +109,10 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
             $event->addDependencyError($this->segmentUsedInCampaignsValidator->getErrorMessage());
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ListDeleteEvent::class,
+        priority: 0
+    )]
     public function onSegmentDelete(SegmentEvent $event): void
     {
         if ($this->coreParametersHelper->get('delete_segment_in_background', false)) {
@@ -131,10 +124,13 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
         $this->listModel->removeLeadsByListId($list->getId());
         $this->listModel->hardDeleteEntity($list);
     }
-
     /**
      * Add a segment delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ListPostDeleteEvent::class,
+        priority: 0
+    )]
     public function onSegmentPostDelete(SegmentEvent $event): void
     {
         $segment = $event->getList();
@@ -148,13 +144,15 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
         ];
         $this->auditLogModel->writeToLog($log);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ListPostDeleteEvent::class,
+        priority: 0
+    )]
     public function clearSegmentCountCache(SegmentEvent $event): void
     {
         $segment = $event->getList();
         $this->segmentCountCacheHelper->deleteSegmentContactCount($segment->deletedId);
     }
-
     private function validateSegmentsUsedInCampaigns(SegmentEvent $event, string $action): bool
     {
         return $this->segmentUsedInCampaignsValidator->validate($event->getList(), $action);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +14,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-final readonly class RequestSubscriber implements EventSubscriberInterface
+final readonly class RequestSubscriber
 {
     public function __construct(
         private CsrfTokenManagerInterface $tokenManager,
@@ -23,14 +22,10 @@ final readonly class RequestSubscriber implements EventSubscriberInterface
         private Environment $twig,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::REQUEST => ['validateCsrfTokenForAjaxPost', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: KernelEvents::REQUEST,
+        priority: 0
+    )]
     public function validateCsrfTokenForAjaxPost(RequestEvent $event): void
     {
         $request = $event->getRequest();
@@ -44,17 +39,14 @@ final readonly class RequestSubscriber implements EventSubscriberInterface
             $event->stopPropagation();
         }
     }
-
     private function isAjaxPost(Request $request): bool
     {
         return $request->isXmlHttpRequest() && Request::METHOD_POST === $request->getMethod();
     }
-
     private function isSecurePath(Request $request): bool
     {
         return 1 === preg_match('/^\/s\//', $request->getPathinfo());
     }
-
     private function isCsrfTokenFromRequestHeaderValid(Request $request): bool
     {
         $csrfRequestToken = $request->headers->get('X-CSRF-Token');

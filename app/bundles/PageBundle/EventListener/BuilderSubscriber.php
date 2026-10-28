@@ -17,49 +17,31 @@ use Mautic\PageBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-final class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber
 {
     private const string pageTokenRegex         = '{pagelink=(.*?)}';
-
     private const string dwcTokenRegex          = '{dwc=(.*?)}';
-
     private const string langBarRegex           = '{langbar}';
-
     private const string shareButtonsRegex      = '{sharebuttons}';
-
     private const string titleRegex             = '{pagetitle}';
-
     private const string descriptionRegex       = '{pagemetadescription}';
-
     public const string brandName                = '{brand=name}';
-
     public const string segmentListRegex         = '{segmentlist}';
-
     public const string categoryListRegex        = '{categorylist}';
-
     public const string channelfrequency         = '{channelfrequency}';
-
     public const string preferredchannel         = '{preferredchannel}';
-
     public const string saveprefsRegex           = '{saveprefsbutton}';
-
     public const string successmessage           = '{successmessage}';
-
     public const string identifierToken          = '{leadidentifier}';
-
     public const string saveButtonContainerClass = 'prefs-saveprefs';
-
     public const string firstSlotAttribute       = ' data-prefs-center-first="1"';
-
     /**
      * @var array<string,string>
      */
     private array $renderedContentCache = [];
-
     public function __construct(
         private readonly TokenHelper $tokenHelper,
         private readonly IntegrationHelper $integrationHelper,
@@ -71,18 +53,10 @@ final class BuilderSubscriber implements EventSubscriberInterface
         private readonly CoreParametersHelper $coreParametersHelper,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            Events\PageDisplayEvent::class   => ['onPageDisplay', 0],
-            Events\PageBuilderEvent::class     => ['onPageBuild', 0],
-            EmailOnBuildEvent::class      => ['onEmailBuild', 0],
-            EmailSendEvent::class         => ['onEmailGenerate', 0],
-            EmailDisplayEvent::class      => ['onEmailGenerate', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailOnBuildEvent::class,
+        priority: 0
+    )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         if ($event->tokensRequested([self::pageTokenRegex])) {
@@ -100,7 +74,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
             }
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailSendEvent::class,
+        priority: 0
+    )]
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailDisplayEvent::class,
+        priority: 0
+    )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $content      = $event->getContent();
@@ -110,10 +91,13 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         $event->addTokens($tokens);
     }
-
     /**
      * Add forms to available page tokens.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: Events\PageBuilderEvent::class,
+        priority: 0
+    )]
     public function onPageBuild(Events\PageBuilderEvent $event): void
     {
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
@@ -184,7 +168,10 @@ final class BuilderSubscriber implements EventSubscriberInterface
             );
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: Events\PageDisplayEvent::class,
+        priority: 0
+    )]
     public function onPageDisplay(Events\PageDisplayEvent $event): void
     {
         if (empty($content = $event->getContent())) {
@@ -215,7 +202,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         $event->setContent($content);
     }
-
     private function replaceCommonTokens(string $content, Page $page): string
     {
         return str_ireplace([
@@ -232,7 +218,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
             str_contains($content, self::descriptionRegex) ? $page->getMetaDescription() : '',
         ], $content);
     }
-
     /**
      * @param array<string,mixed> $params
      */
@@ -244,7 +229,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         return $this->wrapPreferenceCenterInFormTag($content, $params);
     }
-
     /**
      * @param array<string,mixed> $params
      */
@@ -266,7 +250,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
             str_contains($content, self::successmessage) ? $this->renderSuccessMessage($params) : '',
         ], $content);
     }
-
     /**
      * @param array<string, mixed>|array<string, array<int, mixed[]>> $templateParams
      */
@@ -289,7 +272,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         return $this->renderedContentCache[$templateName] = $content;
     }
-
     private function renderSocialShareButtons(): string
     {
         return $this->renderTemplate(
@@ -299,7 +281,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
             implode('', $this->integrationHelper->getShareButtons())
         );
     }
-
     /**
      * @param array<string, mixed> $params
      */
@@ -312,7 +293,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
             self::firstSlotAttribute
         );
     }
-
     /**
      * @param array<string, mixed> $params
      */
@@ -325,7 +305,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
             self::firstSlotAttribute
         );
     }
-
     /**
      * @param array<string, mixed> $params
      */
@@ -337,7 +316,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
             '<div class="pref-preferredchannel">{templateContent}</div>'
         );
     }
-
     /**
      * @param array<string, mixed> $params
      */
@@ -350,7 +328,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
             self::firstSlotAttribute
         );
     }
-
     /**
      * @param array<string, mixed> $params
      */
@@ -364,7 +341,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
             self::firstSlotAttribute
         );
     }
-
     /**
      * @param array<string,mixed> $params
      */
@@ -375,7 +351,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $params
         );
     }
-
     private function renderLanguageBar(Page $page): string
     {
         return $this->renderTemplate(
@@ -383,7 +358,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
             ['pages' => $this->getRelatedPagesForLanguageBar($page)]
         );
     }
-
     /**
      * @return array<int,mixed[]>
      */
@@ -427,7 +401,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         return $related;
     }
-
     /**
      * @return array{lang: string, url: string}
      */
@@ -446,7 +419,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
             'url'  => $this->pageModel->generateUrl($page, false).'?ntrd=1',
         ];
     }
-
     private function createDOMXPathForContent(string $content): \DOMXPath
     {
         $domDocument = new \DOMDocument('1.0', 'utf-8');
@@ -454,7 +426,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         return new \DOMXPath($domDocument);
     }
-
     /**
      * @param array<string, mixed> $params
      */
@@ -478,7 +449,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         return str_replace(['<startform></startform>', '<endform></endform>'], [$params['startform'], '</form>'], $xpath->document->saveHTML());
     }
-
     private function getFirstNodeThatContainsAPreferenceCenterToken(\DOMXPath $xpath): ?\DOMNode
     {
         $nodeList = $xpath->query('//*[@data-prefs-center-first="1"]');
@@ -489,7 +459,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         return null;
     }
-
     private function getFirstParentNodeThatContainsAllFormInputs(\DOMNode $node): \DOMNode
     {
         $content = implode('', array_map($node->ownerDocument->saveHTML(...), iterator_to_array($node->childNodes)));

@@ -17,9 +17,8 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber
 {
     public function __construct(
         private FormModel $formModel,
@@ -29,20 +28,13 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         private SubmissionRepository $submissionRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            SubmissionEvent::class                    => ['onFormSubmit', 0],
-            FormEvents::ON_CAMPAIGN_TRIGGER_DECISION  => ['onCampaignTriggerDecision', 0],
-            FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
-        ];
-    }
-
     /**
      * Add the option to the list.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CampaignBuilderEvent::class,
+        priority: 0
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $trigger = [
@@ -62,16 +54,22 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         ];
         $event->addCondition('form.field_value', $trigger);
     }
-
     /**
      * Trigger campaign event for when a form is submitted.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: SubmissionEvent::class,
+        priority: 0
+    )]
     public function onFormSubmit(SubmissionEvent $event): void
     {
         $form = $event->getSubmission()->getForm();
         $this->realTimeExecutioner->execute('form.submit', $form, 'form', $form->getId());
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+        priority: 0
+    )]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();
@@ -95,7 +93,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
         $event->setAsApplicable();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        priority: 0
+    )]
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
         /** @var Lead|null $lead */

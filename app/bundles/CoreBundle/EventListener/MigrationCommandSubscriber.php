@@ -13,10 +13,9 @@ use Mautic\CoreBundle\Doctrine\Schema\ColumnIntrospector;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-final readonly class MigrationCommandSubscriber implements EventSubscriberInterface
+final readonly class MigrationCommandSubscriber
 {
     public function __construct(
         private VersionProviderInterface $versionProvider,
@@ -24,14 +23,7 @@ final readonly class MigrationCommandSubscriber implements EventSubscriberInterf
         private Connection $connection,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ConsoleEvents::TERMINATE => ['addGeneratedColumns'],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ConsoleEvents::TERMINATE)]
     public function addGeneratedColumns(ConsoleTerminateEvent $event): void
     {
         $command = $event->getCommand();
@@ -74,7 +66,6 @@ final readonly class MigrationCommandSubscriber implements EventSubscriberInterf
             $this->executeAlterQuery($query, $tableName, 'adding indices', $output);
         }
     }
-
     private function executeAlterQuery(string $query, string $tableName, string $comment, OutputInterface $output): void
     {
         $stopwatch = new Stopwatch();
@@ -90,7 +81,6 @@ final readonly class MigrationCommandSubscriber implements EventSubscriberInterf
         $output->writeln("<info>++</info> Execution finished ({$duration})");
         $output->writeln('');
     }
-
     private function generatedColumnExistsInSchema(GeneratedColumn $generatedColumn): bool
     {
         $tableColumns = ColumnIntrospector::listColumns($this->connection->createSchemaManager(), $generatedColumn->getTableName());

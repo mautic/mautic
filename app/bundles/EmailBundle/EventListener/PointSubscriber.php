@@ -15,9 +15,8 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber
 {
     public function __construct(
         private PointModel $pointModel,
@@ -25,17 +24,10 @@ final readonly class PointSubscriber implements EventSubscriberInterface
         private PointEventHelper $pointEventHelper,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PointBuilderEvent::class   => ['onPointBuild', 0],
-            TriggerBuilderEvent::class => ['onTriggerBuild', 0],
-            EmailOpenEvent::class         => ['onEmailOpen', 0],
-            EmailSendEvent::class         => ['onEmailSend', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PointBuilderEvent::class,
+        priority: 0
+    )]
     public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
@@ -56,7 +48,10 @@ final readonly class PointSubscriber implements EventSubscriberInterface
 
         $event->addAction('email.send', $action);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: TriggerBuilderEvent::class,
+        priority: 0
+    )]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $sendEvent = [
@@ -81,18 +76,24 @@ final readonly class PointSubscriber implements EventSubscriberInterface
 
         $event->addEvent('email.send_to_user', $sendToOwnerEvent);
     }
-
     /**
      * Trigger point actions for email open.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailOpenEvent::class,
+        priority: 0
+    )]
     public function onEmailOpen(EmailOpenEvent $event): void
     {
         $this->pointModel->triggerAction('email.open', $event->getEmail());
     }
-
     /**
      * Trigger point actions for email send.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailSendEvent::class,
+        priority: 0
+    )]
     public function onEmailSend(EmailSendEvent $event): void
     {
         $leadArray = $event->getLead();
