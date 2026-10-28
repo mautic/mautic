@@ -124,8 +124,9 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $download->setUtmSource($request->get('utm_source'));
         $download->setUtmTerm($request->get('utm_term'));
 
-        // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks) and downloads may be tracked
-        if (!$this->ipLookupHelper->isRequestTrackable() || !$this->isDownloadTrackingEnabled()) {
+        // Downloads may be tracked and the request is trackable (includes IP, bot, privacy signal, and prefetch checks).
+        // The setting goes first, since the trackability check looks up and stores the visitor's IP address.
+        if (!$this->isDownloadTrackingEnabled() || !$this->ipLookupHelper->isRequestTrackable()) {
             // Still counted, but with nothing that links it to the visitor. Without an identifier it can't count as unique.
             // Bots, excluded IP addresses and prefetches aren't counted, privacy signals are.
             if (empty($systemEntry) && $this->ipLookupHelper->isRequestCountable()) {
