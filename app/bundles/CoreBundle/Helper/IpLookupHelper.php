@@ -322,7 +322,7 @@ class IpLookupHelper
     {
         $purpose = $request->headers->get('Purpose') ?? $request->headers->get('Sec-Purpose');
 
-        return $purpose && in_array(strtolower($purpose), ['prefetch', 'prerender'], true);
+        return $purpose && [] !== array_intersect(array_map(trim(...), explode(';', strtolower($purpose))), ['prefetch', 'prerender']);
     }
 
     private function isBot(Request $request): bool
