@@ -8,8 +8,9 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class DashboardSubscriber
+class DashboardSubscriber implements EventSubscriberInterface
 {
     /**
      * Define the name of the bundle/category of the widget(s).
@@ -17,39 +18,45 @@ class DashboardSubscriber
      * @var string
      */
     protected $bundle = 'others';
+
     /**
      * Define the widget(s).
      *
      * @var array
      */
     protected $types = [];
+
     /**
      * Define permissions to see those widgets.
      *
      * @var array
      */
     protected $permissions = [];
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            WidgetTypeListEvent::class                           => ['onWidgetListGenerate', 0],
+            WidgetFormEvent::class                               => ['onWidgetFormGenerate', 0],
+            PreLoadWidgetDetailEvent::class                      => ['onWidgetDetailPreLoad', 0],
+            GenerateWidgetDetailEvent::class                     => ['onWidgetDetailGenerate', 0],
+        ];
+    }
+
     /**
      * Generates widget preview without data.
      *
      * @throws InvalidArgumentException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
-        event: PreLoadWidgetDetailEvent::class,
-        priority: 0
-    )]
     public function onWidgetDetailPreLoad(WidgetDetailEvent $event): void
     {
         $event->setTemplate('@MauticCore/Helper/chart.html.twig');
         $event->stopPropagation();
     }
+
     /**
      * Adds widget new widget types to the list of available widget types.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
-        event: WidgetTypeListEvent::class,
-        priority: 0
-    )]
     public function onWidgetListGenerate(WidgetTypeListEvent $event): void
     {
         if ($this->permissions && !$event->hasPermissions($this->permissions)) {
@@ -62,13 +69,10 @@ class DashboardSubscriber
             $event->addType($type, $this->bundle);
         }
     }
+
     /**
      * Set a widget edit form when needed.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
-        event: WidgetFormEvent::class,
-        priority: 0
-    )]
     public function onWidgetFormGenerate(WidgetFormEvent $event): void
     {
         if (isset($this->types[$event->getType()])) {
@@ -76,16 +80,14 @@ class DashboardSubscriber
             $event->stopPropagation();
         }
     }
+
     /**
      * Set a widget detail when needed.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
-        event: GenerateWidgetDetailEvent::class,
-        priority: 0
-    )]
     public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
     }
+
     /**
      * Set a widget detail when needed.
      */
