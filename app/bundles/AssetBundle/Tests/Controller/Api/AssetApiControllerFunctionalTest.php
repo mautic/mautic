@@ -135,6 +135,47 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         unlink($assetsPath.'/file.txt');
     }
 
+    public function testDownloadTrackingCanBeSetThroughTheApi(): void
+    {
+        $assetsPath = $this->client->getKernel()->getContainer()->getParameter('mautic.upload_dir');
+        file_put_contents($assetsPath.'/tracking.txt', 'test');
+
+        $this->client->request('POST', 'api/assets/new', [
+            'file'            => 'tracking.txt',
+            'storageLocation' => 'local',
+            'title'           => 'tracking',
+            'trackDownloads'  => 'never',
+        ]);
+        $this->assertResponseStatusCodeSame(201, (string) $this->client->getResponse()->getContent());
+        $asset = json_decode((string) $this->client->getResponse()->getContent(), true)['asset'];
+        $this->assertSame('never', $asset['trackDownloads']);
+
+        $this->client->request('PATCH', sprintf('/api/assets/%d/edit', $asset['id']), ['trackDownloads' => 'always']);
+        $this->assertResponseIsSuccessful();
+        $this->assertSame('always', json_decode((string) $this->client->getResponse()->getContent(), true)['asset']['trackDownloads']);
+
+        $this->client->request('PATCH', sprintf('/api/assets/%d/edit', $asset['id']), ['trackDownloads' => 'sometimes']);
+        $this->assertResponseStatusCodeSame(400);
+
+        unlink($assetsPath.'/tracking.txt');
+    }
+
+    public function testNewAssetFollowsTheGlobalDownloadTrackingSetting(): void
+    {
+        $assetsPath = $this->client->getKernel()->getContainer()->getParameter('mautic.upload_dir');
+        file_put_contents($assetsPath.'/default.txt', 'test');
+
+        $this->client->request('POST', 'api/assets/new', [
+            'file'            => 'default.txt',
+            'storageLocation' => 'local',
+            'title'           => 'default',
+        ]);
+        $this->assertResponseStatusCodeSame(201, (string) $this->client->getResponse()->getContent());
+        $this->assertSame('global', json_decode((string) $this->client->getResponse()->getContent(), true)['asset']['trackDownloads']);
+
+        unlink($assetsPath.'/default.txt');
+    }
+
     /**
      * @return iterable<string, array{string}>
      */

@@ -126,7 +126,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         $download->setUtmTerm($request->get('utm_term'));
 
         // Check if request is trackable (includes IP, bot, privacy signal, and prefetch checks) and downloads may be tracked
-        if (!$this->ipLookupHelper->isRequestTrackable() || !$this->isDownloadTrackingEnabled()) {
+        if (!$this->ipLookupHelper->isRequestTrackable() || !$this->isDownloadTracked($asset)) {
             // Still counted, but with nothing that links it to the visitor. Without an identifier it can't count as unique.
             if (empty($systemEntry)) {
                 $this->upDownloadCount($asset, 1, false);
@@ -292,10 +292,15 @@ class AssetModel extends FormModel implements GlobalSearchInterface
 
     /**
      * With download tracking off, a download is counted but never linked to a contact.
+     * The asset's own setting wins over the global one.
      */
-    private function isDownloadTrackingEnabled(): bool
+    private function isDownloadTracked(Asset $asset): bool
     {
-        return (bool) $this->coreParametersHelper->get('track_asset_downloads', true);
+        return match ($asset->getTrackDownloads()) {
+            Asset::TRACK_DOWNLOADS_ALWAYS => true,
+            Asset::TRACK_DOWNLOADS_NEVER  => false,
+            default                       => (bool) $this->coreParametersHelper->get('track_asset_downloads', true),
+        };
     }
 
     /**

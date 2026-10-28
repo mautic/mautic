@@ -57,6 +57,17 @@ class Asset extends FormEntity implements UuidInterface
 
     public const ENTITY_NAME = 'asset';
 
+    public const TABLE_NAME = 'assets';
+
+    /**
+     * Follow the global "Track asset downloads" setting.
+     */
+    public const TRACK_DOWNLOADS_GLOBAL = 'global';
+
+    public const TRACK_DOWNLOADS_ALWAYS = 'always';
+
+    public const TRACK_DOWNLOADS_NEVER = 'never';
+
     /**
      * @var int|null
      */
@@ -217,6 +228,9 @@ class Asset extends FormEntity implements UuidInterface
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private $disallow = true;
 
+    #[Groups(['asset:read', 'asset:write'])]
+    private string $trackDownloads = self::TRACK_DOWNLOADS_GLOBAL;
+
     public function __construct()
     {
         $this->initializeProjects();
@@ -226,7 +240,7 @@ class Asset extends FormEntity implements UuidInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('assets')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(AssetRepository::class)
             ->addIndex(['alias'], 'asset_alias_search');
 
@@ -290,6 +304,12 @@ class Asset extends FormEntity implements UuidInterface
             ->nullable()
             ->build();
 
+        $builder->createField('trackDownloads', Types::STRING)
+            ->columnName('track_downloads')
+            ->length(10)
+            ->option('default', self::TRACK_DOWNLOADS_GLOBAL)
+            ->build();
+
         static::addUuidField($builder);
         self::addProjectsField($builder, 'asset_projects_xref', 'asset_id');
     }
@@ -297,6 +317,7 @@ class Asset extends FormEntity implements UuidInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addConstraint(new Upload());
+        $metadata->addPropertyConstraint('trackDownloads', new Assert\Choice(choices: [self::TRACK_DOWNLOADS_GLOBAL, self::TRACK_DOWNLOADS_ALWAYS, self::TRACK_DOWNLOADS_NEVER]));
     }
 
     /**
@@ -328,6 +349,7 @@ class Asset extends FormEntity implements UuidInterface
                     'downloadUrl',
                     'storageLocation',
                     'disallow',
+                    'trackDownloads',
                 ]
             )
             ->build();
@@ -1290,6 +1312,19 @@ class Asset extends FormEntity implements UuidInterface
     public function setDisallow($disallow): void
     {
         $this->disallow = $disallow;
+    }
+
+    public function getTrackDownloads(): string
+    {
+        return $this->trackDownloads;
+    }
+
+    public function setTrackDownloads(string $trackDownloads): self
+    {
+        $this->isChanged('trackDownloads', $trackDownloads);
+        $this->trackDownloads = $trackDownloads;
+
+        return $this;
     }
 
     /**

@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -136,6 +137,22 @@ final class AssetType extends AbstractType
                     message: 'mautic.core.value.required'
                 ),
             ],
+        ]);
+
+        $builder->add('trackDownloads', ChoiceType::class, [
+            'label'      => 'mautic.asset.asset.form.track_downloads',
+            'label_attr' => ['class' => 'form-label'],
+            'attr'       => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.asset.asset.form.track_downloads.tooltip',
+            ],
+            'choices' => [
+                'mautic.asset.asset.form.track_downloads.global' => Asset::TRACK_DOWNLOADS_GLOBAL,
+                'mautic.asset.asset.form.track_downloads.always' => Asset::TRACK_DOWNLOADS_ALWAYS,
+                'mautic.asset.asset.form.track_downloads.never'  => Asset::TRACK_DOWNLOADS_NEVER,
+            ],
+            'required'    => true,
+            'placeholder' => false,
         ]);
 
         $builder->add('isPublished', YesNoButtonGroupType::class, [
