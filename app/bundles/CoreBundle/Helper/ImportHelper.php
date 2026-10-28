@@ -62,14 +62,18 @@ class ImportHelper
         // Zip Bomb protection constants
         $maxFiles     = 1000;  // Maximum number of files
         $maxSize      = 100 * 1024 * 1024;  // 100MB total uncompressed size
-        $maxRatio     = 100;   // Maximum compression ratio (1:100)
+        $maxRatio     = 10;    // Maximum compression ratio (1:10)
+        $maxJsonRatio = 100;   // Maximum compression ratio for entity_data.json (1:100)
         $readLength   = 1024;  // Read buffer size
 
         // The ratio check only makes sense for sizable entries: legitimate text payloads such as
-        // the exported entity_data.json compress around 1:20, so a tight ratio rejects real exports.
-        // A zip bomb compresses far beyond 1:100 and still trips the absolute $maxSize and
-        // per-file streaming caps below, so we skip the ratio check under this threshold.
+        // the exported entity_data.json compress far better than 1:10, so enforcing the ratio on
+        // small files yields false positives. A real zip bomb still trips the absolute $maxSize
+        // and per-file streaming caps below, so we skip the ratio check under this threshold.
         $minRatioCheckSize = 1024 * 1024; // 1MB
+
+        // A large entity_data.json compresses around 1:20, so only that file gets the relaxed ratio
+        $maxRatioFor = static fn (string $filename): int => 'entity_data.json' === $filename ? $maxJsonRatio : $maxRatio;
 
         if (true !== $zip->open($filePath)) {
             throw new \RuntimeException(sprintf('Unable to open ZIP file: %s', $filePath));
@@ -119,7 +123,7 @@ class ImportHelper
             // Check compression ratio for potential zip bomb
             if (isset($stat['size'], $stat['comp_size']) && $stat['comp_size'] > 0 && $stat['size'] > $minRatioCheckSize) {
                 $ratio = $stat['size'] / $stat['comp_size'];
-                if ($ratio > $maxRatio) {
+                if ($ratio > $maxRatioFor($normalizedFilename)) {
                     $zip->close();
                     throw new \RuntimeException('Suspicious compression ratio detected in ZIP file.');
                 }
@@ -181,7 +185,7 @@ class ImportHelper
                     // Check compression ratio during extraction
                     if (isset($stat['comp_size']) && $stat['comp_size'] > 0 && $currentSize > $minRatioCheckSize) {
                         $ratio = $currentSize / $stat['comp_size'];
-                        if ($ratio > $maxRatio) {
+                        if ($ratio > $maxRatioFor($normalizedFilename)) {
                             fclose($fileHandle);
                             fclose($fp);
                             $zip->close();
