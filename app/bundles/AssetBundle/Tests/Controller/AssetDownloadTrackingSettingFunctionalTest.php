@@ -7,6 +7,7 @@ namespace Mautic\AssetBundle\Tests\Controller;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Model\AssetModel;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
@@ -20,6 +21,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 final class AssetDownloadTrackingSettingFunctionalTest extends MauticMysqlTestCase
 {
+    private const VISITOR_IP = '203.0.113.30';
+
     protected $useCleanupRollback = false;
 
     protected function setUp(): void
@@ -46,11 +49,12 @@ final class AssetDownloadTrackingSettingFunctionalTest extends MauticMysqlTestCa
         $asset   = $this->createAsset();
         $contact = $this->createContact();
 
-        $this->download($asset, ['ct' => ClickthroughHelper::encodeArrayForUrl(['lead' => $contact->getId()])]);
+        $this->download($asset, ['ct' => ClickthroughHelper::encodeArrayForUrl(['lead' => $contact->getId()])], ['REMOTE_ADDR' => self::VISITOR_IP]);
 
         $this->assertCounts($asset, 1, 0);
         $this->assertSame([], $this->getDownloadContactIds($asset));
         $this->assertNoTrackingCookieSet();
+        $this->assertNotInstanceOf(IpAddress::class, $this->em->getRepository(IpAddress::class)->findOneBy(['ipAddress' => self::VISITOR_IP]), 'the visitor\'s IP address is not stored');
     }
 
     public function testDownloadFromTrackedVisitorIsRecordedOnTheirContact(): void
@@ -79,11 +83,12 @@ final class AssetDownloadTrackingSettingFunctionalTest extends MauticMysqlTestCa
 
     /**
      * @param array<string, string> $query
+     * @param array<string, string> $server
      */
-    private function download(Asset $asset, array $query = []): void
+    private function download(Asset $asset, array $query = [], array $server = []): void
     {
         $this->client->followRedirects(false);
-        $this->client->request(Request::METHOD_GET, '/asset/'.$asset->getSlug(), $query);
+        $this->client->request(Request::METHOD_GET, '/asset/'.$asset->getSlug(), $query, [], $server);
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND, 'the visitor gets the file either way');
         $this->assertSame($asset->getRemotePath(), $this->client->getResponse()->headers->get('Location'));
     }
