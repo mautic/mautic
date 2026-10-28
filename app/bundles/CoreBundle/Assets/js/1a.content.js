@@ -342,7 +342,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
     });
 
     //initialize tooltips
-    var pageTooltips = mQuery(container + " *[data-toggle='tooltip']");
+    var pageTooltips = mQuery(container + " *[data-toggle='tooltip'], " + container + " *[data-bs-toggle='tooltip']");
     pageTooltips.tooltip({html: true, container: 'body'});
 
     // Enable tooltips on checkbox & radio input's to
@@ -476,7 +476,7 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.startIconSpinOnEvent(event);
     });
 
-    mQuery(container + ' input[class=list-checkbox]').on('change', function () {
+    mQuery(container + ' input.list-checkbox').on('change', function () {
         var disabled = Mautic.batchActionPrecheck(container) ? false : true;
         var color    = (disabled) ? 'btn-ghost' : 'btn-info';
         var button   = container + ' th.col-actions .btn.dropdown-toggle';
@@ -813,7 +813,7 @@ Mautic.makeLinksAlive = function(jQueryObject) {
 Mautic.onPageUnload = function (container, response) {
     //unload tooltips so they don't double show
     if (typeof container != 'undefined') {
-        mQuery(container + " *[data-toggle='tooltip']").tooltip('destroy');
+        mQuery(container + " *[data-toggle='tooltip'], " + container + " *[data-bs-toggle='tooltip']").tooltip('destroy');
 
         //unload lingering modals from body so that there will not be multiple modals generated from new ajaxed content
         if (typeof MauticVars.modalsReset == 'undefined') {
@@ -2521,7 +2521,7 @@ Mautic.initFilterCommands = function () {
     const selectFields = document.querySelectorAll('.popover-content select');
 
     selectFields.forEach(function (selectElement) {
-        const options = Array.from(selectElement.options).map(option => option.value);
+        const options = Array.from(selectElement.options).map(option => option.value).filter(Boolean);
         Mautic.filterCommands.push(...options);
     });
 };
@@ -2554,6 +2554,7 @@ Mautic.toggleFilter = function (element) {
  * Applies the selected filters when the "Apply filters" button is clicked.
  */
 Mautic.applyFilters = function () {
+    Mautic.initFilterCommands();
     const searchInput = document.getElementById('list-search');
     let currentSearchValue = searchInput.value || '';
     currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
@@ -2566,7 +2567,7 @@ Mautic.applyFilters = function () {
     const selectFields = document.querySelectorAll('.popover-content select');
     const selectedFilterValues = [];
     selectFields.forEach(function (selectElement) {
-        const selectedOptions = Array.from(selectElement.selectedOptions).map(option => option.value);
+        const selectedOptions = Array.from(selectElement.selectedOptions).map(option => option.value).filter(Boolean);
         selectedFilterValues.push(...selectedOptions);
     });
 
@@ -2596,6 +2597,7 @@ Mautic.applyFilters = function () {
  * Resets the filters when the "Reset filters" button is clicked.
  */
 Mautic.resetFilters = function () {
+    Mautic.initFilterCommands();
     const searchInput = document.getElementById('list-search');
     let currentSearchValue = searchInput.value || '';
     currentSearchValue = Mautic.removeFilterCommands(currentSearchValue);
@@ -2732,7 +2734,7 @@ Mautic.initializePopoverFilters = function (popoverElement) {
 
     selectFields.forEach(function (selectElement) {
         Array.from(selectElement.options).forEach(function (option) {
-            const isSelected = selectedPopoverFilters.includes(option.value);
+            const isSelected = selectedPopoverFilters.includes(option.value) || activeFilterCommands.includes(option.value);
             option.selected = isSelected;
         });
 
@@ -2758,6 +2760,7 @@ Mautic.handlePopoverInsertion = function () {
         const popoverElement = document.getElementById(popoverId);
         if (!popoverElement) return;
 
+        Mautic.initFilterCommands();
         Mautic.initializePopoverFilters(popoverElement);
 
         // Initialize Chosen after popover content is inserted

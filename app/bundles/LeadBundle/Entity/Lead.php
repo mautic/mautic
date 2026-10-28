@@ -899,7 +899,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Creates a points change entry.
      */
-    public function addPointsChangeLogEntry(string $type, string $name, string $action, int $pointChanges, IpAddress $ip, ?Group $group = null): void
+    public function addPointsChangeLogEntry(string $type, string $name, string $action, int $pointChanges, ?IpAddress $ip, ?Group $group = null): void
     {
         if (0 === $pointChanges) {
             // No need to record no change

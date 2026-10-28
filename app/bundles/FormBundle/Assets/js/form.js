@@ -249,7 +249,7 @@ Mautic.formFieldOnLoad = function (container, response) {
         });
 
         //initialize tooltips
-        mQuery(fieldContainer).find("*[data-toggle='tooltip']").tooltip({html: true});
+        mQuery(fieldContainer).find("*[data-toggle='tooltip'], *[data-bs-toggle='tooltip']").tooltip({html: true});
 
         //initialize ajax'd modals
         mQuery(fieldContainer).find("[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
@@ -320,7 +320,7 @@ Mautic.formActionOnLoad = function (container, response) {
             return Mautic.ajaxifyLink(this, event);
         });
         //initialize tooltips
-        mQuery(actionId + " *[data-toggle='tooltip']").tooltip({html: true});
+        mQuery(actionId + " *[data-toggle='tooltip'], " + actionId + " *[data-bs-toggle='tooltip']").tooltip({html: true});
 
         //initialize ajax'd modals
         mQuery(actionId + " [data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
