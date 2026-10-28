@@ -52,6 +52,7 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\Form\Type\PageType;
+use Mautic\PageBundle\Helper\AggregateAnalyticsHelper;
 use Mautic\PageBundle\PageEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -531,19 +532,10 @@ class PageModel extends FormModel implements GlobalSearchInterface
         // Check for any clickthrough info
         $clickthrough = $this->generateClickThrough($hit);
         if (!empty($clickthrough)) {
-            if (!empty($clickthrough['channel'])) {
-                if (1 === count($clickthrough['channel'])) {
-                    $channelId = reset($clickthrough['channel']);
-                    $channel   = key($clickthrough['channel']);
-                } else {
-                    $channel   = $clickthrough['channel'][0];
-                    $channelId = (int) $clickthrough['channel'][1];
-                }
+            [$channel, $channelId] = $this->getClickthroughChannel($clickthrough);
+            if (null !== $channel) {
                 $hit->setSource($this->limitString($channel));
                 $hit->setSourceId($channelId);
-            } elseif (!empty($clickthrough['source'])) {
-                $hit->setSource($this->limitString($clickthrough['source'][0]));
-                $hit->setSourceId($clickthrough['source'][1]);
             }
 
             if (!empty($clickthrough['email'])) {
@@ -732,6 +724,55 @@ class PageModel extends FormModel implements GlobalSearchInterface
                 }
             }
         }
+    }
+
+    /**
+     * Counts a click on a tracked link from a visitor Mautic doesn't track, with nothing that links it to them.
+     * Without an identifier it can't count as unique. Bots, excluded addresses and prefetches aren't counted.
+     *
+     * @param array<string, mixed> $clickthrough only the channel the link was sent in is read
+     */
+    public function countUntrackedClick(Redirect $redirect, array $clickthrough = []): void
+    {
+        // Don't skew results with user clicks
+        if (!$this->security->isAnonymous() || !$this->ipLookupHelper->isRequestCountable()) {
+            return;
+        }
+
+        if (!(new AggregateAnalyticsHelper($this->coreParametersHelper))->isEnabled()) {
+            return;
+        }
+
+        $this->redirectRepository->upHitCount($redirect->getId());
+
+        [$channel, $channelId] = $this->getClickthroughChannel($clickthrough);
+        if (null !== $channel && null !== $channelId) {
+            $this->trackableRepository->upHitCount($redirect->getId(), $channel, $channelId);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $clickthrough
+     *
+     * @return array{0: ?string, 1: mixed}
+     */
+    private function getClickthroughChannel(array $clickthrough): array
+    {
+        if (!empty($clickthrough['channel'])) {
+            if (1 === count($clickthrough['channel'])) {
+                $channelId = reset($clickthrough['channel']);
+
+                return [(string) key($clickthrough['channel']), $channelId];
+            }
+
+            return [$clickthrough['channel'][0], (int) $clickthrough['channel'][1]];
+        }
+
+        if (!empty($clickthrough['source'])) {
+            return [$clickthrough['source'][0], $clickthrough['source'][1]];
+        }
+
+        return [null, null];
     }
 
     public function getHitQuery(Request $request, Redirect|Page|null $page = null): array

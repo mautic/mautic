@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CookieHelper;
@@ -63,8 +62,6 @@ final class PublicControllerTest extends TestCase
 
     private MockObject&IpLookupHelper $ipLookupHelper;
 
-    private MockObject&IpAddress $ipAddress;
-
     private MockObject&PageModel $pageModel;
 
     private MockObject&ContactRequestHelper $contactRequestHelper;
@@ -80,7 +77,6 @@ final class PublicControllerTest extends TestCase
         $this->redirectModel        = $this->createMock(RedirectModel::class);
         $this->redirect             = $this->createMock(Redirect::class);
         $this->ipLookupHelper       = $this->createMock(IpLookupHelper::class);
-        $this->ipAddress            = $this->createMock(IpAddress::class);
         $this->pageModel            = $this->createMock(PageModel::class);
         $this->contactRequestHelper = $this->createMock(ContactRequestHelper::class);
         $this->router               = $this->createMock(RouterInterface::class);
@@ -262,11 +258,7 @@ final class PublicControllerTest extends TestCase
             ->willReturn($redirectUrl);
 
         $this->ipLookupHelper->expects($this->once())
-            ->method('getIpAddress')
-            ->willReturn($this->ipAddress);
-
-        $this->ipAddress->expects($this->once())
-            ->method('isTrackable')
+            ->method('isRequestTrackable')
             ->willReturn(true);
 
         $getContactFromRequestCallback = function ($queryFields) use ($clickTrough): null {
@@ -341,11 +333,7 @@ final class PublicControllerTest extends TestCase
             ->willReturn($redirectUrl);
 
         $this->ipLookupHelper->expects($this->once())
-            ->method('getIpAddress')
-            ->willReturn($this->ipAddress);
-
-        $this->ipAddress->expects($this->once())
-            ->method('isTrackable')
+            ->method('isRequestTrackable')
             ->willReturn(true);
 
         $getContactFromRequestCallback = function ($queryFields) use ($clickThrough): null {

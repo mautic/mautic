@@ -484,13 +484,14 @@ final class PublicController extends AbstractFormController
             $url = UrlHelper::appendQueryToUrl($url, http_build_query($query));
         }
 
-        // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
-        // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
-        $ipAddress = $ipLookupHelper->getIpAddress();
+        // A request isn't trackable when it came from a configured "do not track" IP or user agent, which keeps
+        // simulated clicks from 3rd party services such as URL shorteners out, or carries a privacy signal.
+        // The visitor is only looked up when trackable, since the lookup stores their IP address.
+        $isRequestTrackable = $ipLookupHelper->isRequestTrackable();
 
         $isHitTrackable = false;
         if (null !== $ct && '' !== $ct) {
-            if ($ipAddress->isTrackable()) {
+            if ($isRequestTrackable) {
                 // Search replace lead fields in the URL
                 try {
                     $lead           = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
@@ -529,6 +530,11 @@ final class PublicController extends AbstractFormController
             }
         }
 
+        // Still counted, with nothing that links it to the visitor
+        if (!$isRequestTrackable) {
+            $pageModel->countUntrackedClick($redirect, $this->decodeClickthrough($ct));
+        }
+
         $url = UrlHelper::sanitizeAbsoluteUrl($url);
 
         if (!UrlHelper::isValidUrl($url)) {
@@ -539,6 +545,22 @@ final class PublicController extends AbstractFormController
         $response->headers->setCookie(new Cookie('Blocked-Tracking', (string) !$isHitTrackable, strtotime('now + 15 seconds')));
 
         return $response;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function decodeClickthrough(mixed $ct): array
+    {
+        if (!is_string($ct) || '' === $ct) {
+            return [];
+        }
+
+        try {
+            return ClickthroughHelper::decodeArrayFromUrl($ct);
+        } catch (InvalidDecodedStringException) {
+            return [];
+        }
     }
 
     /**
