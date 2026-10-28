@@ -16,7 +16,7 @@
 
 {% block mainContent %}
 		{% if not app.request.xmlHttpRequest %}
-		<div class="mb-32 ps-16 pe-16 pt-16">
+		<div class="mb-24 pl-16 pr-16 pt-16">
 			<h1 class="type-fluid-paragraph-01">{% trans %}mautic.user.auth.header{% endtrans %}</h1>
 			<span class="text-secondary type-helper-text-01">{{ 'mautic.user.auth.help'|trans }}</span>
 		</div>
@@ -43,7 +43,7 @@
 			link: {href: path('mautic_user_passwordreset'), label: 'mautic.user.user.passwordreset.link'},
 			attributes: {required: 'required'}
 		} only %}
-		<div class="mb-md ps-16">
+		<div class="mb-md pl-16">
 			{% include '@MauticCore/Components/checkbox.html.twig' with {
 				inline: true,
 				items: [{ id: 'remember_me', name: '_remember_me', value: 'on', label: 'mautic.user.auth.form.rememberme' }]
@@ -51,7 +51,7 @@
 		</div>
 
 		<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate')|escape }}"/>
-		<div class="mt-24 row-no-gutters justify-content-end">
+		<div class="mt-24 pl-16 pr-16 row-no-gutters justify-content-end">
 			<div class="col-xs-6">
 				{% include '@MauticCore/Helper/button.html.twig' with {
 					buttons: [{
