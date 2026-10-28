@@ -52,14 +52,8 @@ final class Version20261028145757 extends PreUpAssertionMigration
 
     private function isDownloadTrackingOffGlobally(): bool
     {
-        $configFile = ParameterLoader::getLocalConfigFile(__DIR__.'/../');
-        if (!file_exists($configFile)) {
-            return false;
-        }
+        $localParameters = (new ParameterLoader())->getLocalParameterBag();
 
-        require $configFile;
-
-        return isset($parameters) && is_array($parameters)
-            && array_key_exists('track_asset_downloads', $parameters) && !$parameters['track_asset_downloads'];
+        return $localParameters->has('track_asset_downloads') && !$localParameters->get('track_asset_downloads');
     }
 }
