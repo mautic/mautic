@@ -1615,7 +1615,8 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email = $this->em->getRepository(Email::class)->findOneBy(['name' => $name]);
 
         $this->assertNotInstanceOf(Email::class, $email);
-        $this->assertStringContainsString('The email contains an invalid URL: ://example.com', $crawler->text());
+        $this->assertStringContainsString('The HTML content of the email contains an invalid URL: ://example.com', $crawler->text());
+        $this->assertCount(0, $crawler->filter('a[href="#advanced-container"] span.text-danger'));
     }
 
     /**
