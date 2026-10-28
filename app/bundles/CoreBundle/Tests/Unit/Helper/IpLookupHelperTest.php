@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -181,6 +182,73 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
 
         // Returns true since there's no request to check and the IP (127.0.0.1) is trackable
         $this->assertTrue($result);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, string>, string, bool}>
+     */
+    public static function countableRequestProvider(): iterable
+    {
+        yield 'normal request' => [[], 'GET', true];
+        yield 'Do Not Track' => [['DNT' => '1'], 'GET', true];
+        yield 'Global Privacy Control' => [['Sec-GPC' => '1'], 'GET', true];
+        yield 'prefetch' => [['Purpose' => 'prefetch'], 'GET', false];
+        yield 'prerender' => [['Sec-Purpose' => 'prerender'], 'GET', false];
+        yield 'HEAD request' => [[], 'HEAD', false];
+    }
+
+    /**
+     * @param array<string, string> $headers
+     */
+    #[DataProvider('countableRequestProvider')]
+    public function testIsRequestCountable(array $headers, string $method, bool $countable): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52', 'REQUEST_METHOD' => $method]);
+        $request->headers->add($headers);
+
+        $this->assertSame($countable, $this->getIpHelper($request)->isRequestCountable());
+    }
+
+    public function testIsRequestCountableIsFalseForBots(): void
+    {
+        $this->deviceDetector->method('isBot')->willReturn(true);
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('DNT', '1');
+
+        $this->assertFalse($this->getIpHelper($request)->isRequestCountable());
+    }
+
+    public function testIsRequestCountableIsFalseForExcludedIpAddresses(): void
+    {
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')
+            ->willReturnCallback(static fn (string $name): ?array => 'do_not_track_ips' === $name ? ['73.77.245.0/24'] : null);
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('Sec-GPC', '1');
+
+        $this->assertFalse($this->getIpHelper($request, $coreParametersHelper)->isRequestCountable());
+    }
+
+    public function testIsRequestCountableDoesNotStoreTheIpAddress(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('Sec-GPC', '1');
+        $requestStack = new RequestStack([$request]);
+
+        $repository = $this->createMock(IpAddressRepository::class);
+        $repository->expects($this->never())->method('saveEntity');
+        $repository->expects($this->never())->method('__call');
+        $this->deviceDetectorFactory->method('create')->willReturn($this->deviceDetector);
+
+        $helper = new IpLookupHelper($requestStack, $repository, $this->createStub(CoreParametersHelper::class), $this->deviceDetectorFactory);
+        $helper->reset();
+
+        $this->assertTrue($helper->isRequestCountable());
+    }
+
+    public function testIsRequestCountableWithoutRequest(): void
+    {
+        $this->assertFalse($this->getIpHelper()->isRequestCountable());
     }
 
     private function getIpHelper(?Request $request = null, ?CoreParametersHelper $mockCoreParametersHelper = null): IpLookupHelper
