@@ -21,7 +21,7 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
     /**
      * @param FormBuilder|Form $builder
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('features' == $formArea || 'integration' == $formArea) {
             if ($this->isAuthorized()) {

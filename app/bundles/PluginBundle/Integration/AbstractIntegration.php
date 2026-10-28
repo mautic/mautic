@@ -1254,11 +1254,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get request token for oauth1a authorization request.
      *
-     * @param array $settings
-     *
      * @return mixed|string
      */
-    public function getRequestToken($settings = [])
+    public function getRequestToken(array $settings = [])
     {
         // Child classes can easily pass in custom settings this way
         $settings = array_merge(
@@ -1490,7 +1488,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return mixed[]
      */
-    public function populateLeadData($lead, $config = []): array
+    public function populateLeadData($lead, array $config = []): array
     {
         if (!isset($config['leadFields'])) {
             $config = $this->mergeConfigToFeatureSettings($config);
@@ -1606,10 +1604,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Takes profile data from an integration and maps it to Mautic's lead fields.
      *
-     * @param array       $config
      * @param string|null $object
      */
-    public function populateMauticLeadData($data, $config = [], $object = null): array
+    public function populateMauticLeadData($data, array $config = [], $object = null): array
     {
         // Glean supported fields from what was returned by the integration
         $gleanedData = $data;
@@ -2002,21 +1999,20 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Allows appending extra data to the config.
      *
      * @param FormBuilder|Form $builder
-     * @param array            $data
      * @param string           $formArea Section of form being built keys|features|integration
      *                                   keys can be used to store login/request related settings; keys are encrypted
      *                                   features can be used for configuring share buttons, etc
      *                                   integration is called when adding an integration to events like point triggers,
      *                                   campaigns actions, forms actions, etc
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
     }
 
     /**
      * @param array<mixed> $options
      */
-    public function modifyForm(FormBuilderInterface $builder, $options): void
+    public function modifyForm(FormBuilderInterface $builder, array $options): void
     {
         $this->dispatcher->dispatch(
             new PluginIntegrationFormBuildEvent($this, $builder, $options)

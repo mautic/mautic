@@ -169,10 +169,7 @@ final class IcontactIntegration extends EmailAbstractIntegration
         return $leadFields;
     }
 
-    /**
-     * @param array $config
-     */
-    public function pushLead(Lead $lead, $config = []): bool
+    public function pushLead(Lead $lead, array $config = []): bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 

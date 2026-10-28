@@ -49,11 +49,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param Lead|array $lead
-     * @param array      $config
      *
      * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, array $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
