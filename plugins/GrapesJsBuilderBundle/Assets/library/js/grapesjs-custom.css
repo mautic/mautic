@@ -366,6 +366,10 @@ html {
 /* CKEditor styles */
 .cke-modal .ck-editor .ck-content {
   min-height: 400px;
+}
+
+.cke-modal .ck-editor .ck-content,
+.cke-modal .ck-editor .ck-source-editing-area textarea {
   background: var(--background);
   color: var(--text-primary);
 }
