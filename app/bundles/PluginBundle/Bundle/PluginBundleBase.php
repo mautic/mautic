@@ -4,6 +4,7 @@ namespace Mautic\PluginBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PluginBundle\Entity\Plugin;
@@ -38,9 +39,19 @@ abstract class PluginBundleBase extends Bundle
             return;
         }
 
-        $db             = $factory->getDatabase();
-        $schemaTool     = new SchemaTool($factory->getEntityManager());
-        $installQueries = $schemaTool->getCreateSchemaSql($metadata);
+        $db         = $factory->getDatabase();
+        $schemaTool = new SchemaTool($factory->getEntityManager());
+        $schema     = $schemaTool->getSchemaFromMetadata($metadata);
+
+        // Schema listeners (e.g. Symfony Messenger) add their own tables, which may already exist
+        $pluginTables = self::getPluginTableNames($metadata);
+        foreach ($schema->getTables() as $table) {
+            if (!in_array(strtolower($table->getName()), $pluginTables, true)) {
+                $schema->dropTable($table->getName());
+            }
+        }
+
+        $installQueries = $schema->toSql($db->getDatabasePlatform());
 
         foreach ($installQueries as $q) {
             // Check if the query is a DDL statement
@@ -62,6 +73,28 @@ abstract class PluginBundleBase extends Bundle
                 }
             }
         }
+    }
+
+    /**
+     * @param ClassMetadata[] $metadata
+     *
+     * @return string[]
+     */
+    private static function getPluginTableNames(array $metadata): array
+    {
+        $tables = [];
+
+        foreach ($metadata as $classMetadata) {
+            $tables[] = strtolower($classMetadata->getTableName());
+
+            foreach ($classMetadata->getAssociationMappings() as $mapping) {
+                if (isset($mapping['joinTable']['name'])) {
+                    $tables[] = strtolower($mapping['joinTable']['name']);
+                }
+            }
+        }
+
+        return $tables;
     }
 
     private static function isDDLStatement(string $query): bool|int
