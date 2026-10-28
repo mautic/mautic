@@ -306,16 +306,19 @@ class IpLookupHelper
             return false;
         }
 
-        $ip = $this->getIpAddressFromRequest();
-        if (!$this->ipIsValid($ip)) {
-            $ip = '127.0.0.1';
+        // Also the visitor's own address, which a private range replaces with 127.0.0.1 in getIpAddressFromRequest()
+        $addresses  = array_unique(array_filter([$request->getClientIp(), $this->getIpAddressFromRequest()]));
+        $doNotTrack = array_merge((array) $this->doNotTrackIps, (array) $this->doNotTrackInternalIps);
+        foreach ($addresses as $address) {
+            // Checked on an unsaved entity, so nothing about the visitor is stored
+            $ipAddress = new IpAddress($address);
+            $ipAddress->setDoNotTrackList($doNotTrack);
+            if (!$ipAddress->isTrackable()) {
+                return false;
+            }
         }
 
-        // Checked on an unsaved entity, so nothing about the visitor is stored
-        $ipAddress = new IpAddress($ip);
-        $ipAddress->setDoNotTrackList(array_merge((array) $this->doNotTrackIps, (array) $this->doNotTrackInternalIps));
-
-        return $ipAddress->isTrackable() && !$this->isBot($request);
+        return !$this->isBot($request);
     }
 
     private function isPrefetch(Request $request): bool

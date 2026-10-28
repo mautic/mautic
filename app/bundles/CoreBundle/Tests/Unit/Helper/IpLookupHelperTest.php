@@ -239,6 +239,18 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->getIpHelper($request, $coreParametersHelper)->isRequestCountable());
     }
 
+    public function testIsRequestCountableIsFalseForAnExcludedPrivateAddress(): void
+    {
+        // Private ranges aren't tracked by default, so the address would otherwise be checked as 127.0.0.1
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')
+            ->willReturnCallback(static fn (string $name): ?array => 'do_not_track_ips' === $name ? ['10.0.0.5'] : null);
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '10.0.0.5']);
+        $request->headers->set('DNT', '1');
+
+        $this->assertFalse($this->getIpHelper($request, $coreParametersHelper)->isRequestCountable());
+    }
+
     public function testIsRequestCountableDoesNotStoreTheIpAddress(): void
     {
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
