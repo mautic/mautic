@@ -330,8 +330,13 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('0', $this->getConfigPageForm('leadconfig')['config[leadconfig][contact_export_notify_admins]']->getValue());
     }
 
-    public function testFormTrackSubmittersConfigDefaultsToEnabledAndCanBeDisabled(): void
+    public function testFormTrackSubmittersConfigCanBeEnabledAndDisabled(): void
     {
+        // New installs start with No and upgrades with Yes, so set Yes first instead of relying on either
+        $this->submitConfigPage('formconfig', [
+            'config[formconfig][form_track_submitters]' => '1',
+        ]);
+        $this->assertTrue((bool) $this->getConfigParameters()['form_track_submitters']);
         $this->assertSame('1', $this->getConfigPageForm('formconfig')['config[formconfig][form_track_submitters]']->getValue());
         $this->assertStringContainsString('Track submitters on form submission', (string) $this->client->getResponse()->getContent());
 
