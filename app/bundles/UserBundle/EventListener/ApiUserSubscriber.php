@@ -93,7 +93,10 @@ final readonly class ApiUserSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $authenticatedToken->setUser($accessTokenBadge->getAccessToken()->getUser());
+        $user = $accessTokenBadge->getAccessToken()->getUser();
+        if (null !== $user) {
+            $authenticatedToken->setUser($user);
+        }
     }
 
     /**
@@ -102,7 +105,9 @@ final readonly class ApiUserSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CheckPassportEvent::class              => ['onCheckPassport', 2048],
+            // Priority must be higher than UserProviderListener (2048) which is registered
+            // per-firewall when a provider is configured. We need to set our userLoader first.
+            CheckPassportEvent::class              => ['onCheckPassport', 2560],
             AuthenticationTokenCreatedEvent::class => 'onTokenCreated',
         ];
     }
