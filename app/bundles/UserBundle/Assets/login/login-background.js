@@ -34,7 +34,7 @@ void main(){
   }
   if(I<1.){
     float fr=(1.-pow(1.-I,2.4))*(length(vec2(R.x/R.y,1))*.5+.2),r=distance(uv,vec2(-c*.5/R.y));
-    f=mix(-1.,f,smoothstep(fr+.04,fr-.06,r));
+    f=mix(-1.,f,1.-smoothstep(fr-.06,fr+.04,r));
     float v=exp(-pow((r-fr)/.07,2.))*(1.-I)*1.4;
     if(v>.02)f=max(f,v);
   }
@@ -127,14 +127,17 @@ const resize = () => {
     gl.bindFramebuffer(gl.FRAMEBUFFER, f);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, T2, t, 0);
   }
+  if (RM) { settle = 2; schedule(); }
 };
 
-let lost = false;
+let lost = false, queued = false, settle = 2;
+const schedule = () => { if (!queued && !lost) { queued = true; requestAnimationFrame(frame); } };
 cv.addEventListener('webglcontextlost', e => { e.preventDefault(); lost = true; });
 
 const frame = now => {
+  queued = false;
   if (lost) return;
-  requestAnimationFrame(frame);
+  if (!RM || settle-- > 0) schedule();
   const dt = last ? Math.min(Math.max((now - last) / 1000, 0), 0.05) : 0;
   last = now;
   clk += dt;
@@ -174,6 +177,7 @@ const loc = e => {
   return [x, y, x >= 0 && y >= 0 && x <= b.width && y <= b.height];
 };
 addEventListener('pointermove', e => {
+  if (RM) return;
   const [x, y, i] = loc(e);
   if (i) { if (!inside) { mx = x * r; my = (vh - y) * r; } px = x; py = y; }
   inside = i;
@@ -188,5 +192,5 @@ document.documentElement.addEventListener('pointerleave', () => { inside = false
 
 resize();
 new ResizeObserver(resize).observe(box);
-requestAnimationFrame(frame);
+schedule();
 })();
