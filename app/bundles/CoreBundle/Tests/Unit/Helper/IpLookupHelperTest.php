@@ -132,6 +132,14 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($result);
     }
 
+    public function testIsRequestTrackableWithCombinedSecPurposeHeader(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('Sec-Purpose', 'prefetch;prerender');
+
+        $this->assertFalse($this->getIpHelper($request)->isRequestTrackable());
+    }
+
     #[TestDox('Check that GPC requests are not trackable')]
     public function testIsRequestTrackableWithGpcHeader(): void
     {
@@ -194,6 +202,8 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         yield 'Global Privacy Control' => [['Sec-GPC' => '1'], 'GET', true];
         yield 'prefetch' => [['Purpose' => 'prefetch'], 'GET', false];
         yield 'prerender' => [['Sec-Purpose' => 'prerender'], 'GET', false];
+        yield 'combined prefetch and prerender' => [['Sec-Purpose' => 'prefetch;prerender'], 'GET', false];
+        yield 'prefetch with a parameter' => [['Sec-Purpose' => 'prefetch; anonymous-client-ip'], 'GET', false];
         yield 'HEAD request' => [[], 'HEAD', false];
     }
 
