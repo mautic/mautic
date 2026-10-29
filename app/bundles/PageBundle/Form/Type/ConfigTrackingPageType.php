@@ -89,6 +89,17 @@ final class ConfigTrackingPageType extends AbstractType
         );
 
         $builder->add(
+            'track_link_clicks',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.page.config.form.track_link_clicks',
+                'attr'  => [
+                    'tooltip' => 'mautic.page.config.form.track_link_clicks.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
             'facebook_pixel_id',
             TextType::class,
             [

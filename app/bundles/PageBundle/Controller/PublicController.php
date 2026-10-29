@@ -487,8 +487,9 @@ final class PublicController extends AbstractFormController
 
         // A request isn't trackable when it came from a configured "do not track" IP or user agent, which keeps
         // simulated clicks from 3rd party services such as URL shorteners out, or carries a privacy signal.
-        // The visitor is only looked up when trackable, since the lookup stores their IP address.
-        $isRequestTrackable = $ipLookupHelper->isRequestTrackable();
+        // With link click tracking off, every click is handled as untracked.
+        // The setting goes first and the visitor is only looked up when trackable, since the lookup stores their IP address.
+        $isRequestTrackable = $this->coreParametersHelper->get('track_link_clicks', true) && $ipLookupHelper->isRequestTrackable();
 
         $isHitTrackable = false;
         if (null !== $ct && '' !== $ct) {
