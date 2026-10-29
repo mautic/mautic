@@ -22,7 +22,7 @@ return RectorConfig::configure()
         phpunitNarrowAsserts: true,
     )
     ->withPhpSets(php84: true)
-    ->withImportNames(importShortClasses: false)
+    // ->withImportNames(importShortClasses: false)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
         // to be used next on loadMetadata()
