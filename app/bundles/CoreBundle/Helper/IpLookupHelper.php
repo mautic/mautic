@@ -12,19 +12,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class IpLookupHelper
 {
     /**
-     * Server keys that can carry the visitor's address, most specific first.
-     */
-    private const IP_HOLDERS = [
-        'HTTP_CLIENT_IP',
-        'HTTP_X_FORWARDED_FOR',
-        'HTTP_X_FORWARDED',
-        'HTTP_X_CLUSTER_CLIENT_IP',
-        'HTTP_FORWARDED_FOR',
-        'HTTP_FORWARDED',
-        'REMOTE_ADDR',
-    ];
-
-    /**
      * @var array
      */
     protected $doNotTrackIps;
@@ -80,7 +67,17 @@ class IpLookupHelper
         $request = $this->getRequest();
 
         if (null !== $request) {
-            foreach (self::IP_HOLDERS as $key) {
+            $ipHolders = [
+                'HTTP_CLIENT_IP',
+                'HTTP_X_FORWARDED_FOR',
+                'HTTP_X_FORWARDED',
+                'HTTP_X_CLUSTER_CLIENT_IP',
+                'HTTP_FORWARDED_FOR',
+                'HTTP_FORWARDED',
+                'REMOTE_ADDR',
+            ];
+
+            foreach ($ipHolders as $key) {
                 if ($request->server->get($key)) {
                     $ip = trim($request->server->get($key));
 
@@ -317,25 +314,12 @@ class IpLookupHelper
     }
 
     /**
-     * The address that identifies the visitor, found like getIpAddressFromRequest() does, but without
-     * replacing a private address with 127.0.0.1, so an excluded private address is still recognised.
+     * The address that identifies the visitor. Forwarded headers only count from a trusted proxy, so a visitor
+     * can't send one to get past the exclusion list. A private address isn't replaced with 127.0.0.1 here.
      */
     private function getVisitorAddress(Request $request): string
     {
-        foreach (self::IP_HOLDERS as $key) {
-            $value = trim((string) $request->server->get($key));
-            if ('' === $value) {
-                continue;
-            }
-
-            // X-Forwarded-For: client, proxy1, proxy2
-            $address = trim(explode(',', $value)[0]);
-            if (false !== filter_var($address, FILTER_VALIDATE_IP)) {
-                return $address;
-            }
-        }
-
-        return '127.0.0.1';
+        return $request->getClientIp() ?? '127.0.0.1';
     }
 
     private function isPrefetch(Request $request): bool
