@@ -35,7 +35,6 @@ final readonly class CampaignSubscriber
      */
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -62,7 +61,6 @@ final readonly class CampaignSubscriber
      */
     #[AsEventListener(
         event: SubmissionEvent::class,
-        priority: 0
     )]
     public function onFormSubmit(SubmissionEvent $event): void
     {
@@ -72,7 +70,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: FormEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-        priority: 0
     )]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
@@ -100,7 +97,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
-        priority: 0
     )]
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {

@@ -21,7 +21,6 @@ final readonly class ControllerSubscriber
 
     #[AsEventListener(
         event: KernelEvents::CONTROLLER,
-        priority: 0
     )]
     public function onKernelController(ControllerEvent $event): void
     {

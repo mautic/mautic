@@ -30,7 +30,6 @@ final class PageSubscriber
      */
     #[AsEventListener(
         event: PageBuilderEvent::class,
-        priority: 0
     )]
     public function onPageBuild(PageBuilderEvent $event): void
     {
@@ -50,7 +49,6 @@ final class PageSubscriber
 
     #[AsEventListener(
         event: PageDisplayEvent::class,
-        priority: 0
     )]
     public function onPageDisplay(PageDisplayEvent $event): void
     {

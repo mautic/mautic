@@ -38,7 +38,6 @@ final readonly class FormImportExportSubscriber
 
     #[AsEventListener(
         event: EntityExportEvent::class,
-        priority: 0
     )]
     public function onFormExport(EntityExportEvent $event): void
     {
@@ -104,7 +103,6 @@ final readonly class FormImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportEvent::class,
-        priority: 0
     )]
     public function onFormImport(EntityImportEvent $event): void
     {
@@ -148,7 +146,6 @@ final readonly class FormImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportUndoEvent::class,
-        priority: 0
     )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
@@ -175,7 +172,6 @@ final readonly class FormImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
-        priority: 0
     )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {

@@ -22,7 +22,6 @@ final readonly class DetermineWinnerSubscriber
      */
     #[AsEventListener(
         event: AssetEvents::ON_DETERMINE_DOWNLOAD_RATE_WINNER,
-        priority: 0
     )]
     public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event): void
     {

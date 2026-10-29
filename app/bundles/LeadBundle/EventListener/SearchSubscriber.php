@@ -41,7 +41,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: GlobalSearchEvent::class,
-        priority: 0
     )]
     public function onGlobalSearchForContacts(GlobalSearchEvent $event): void
     {
@@ -89,7 +88,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: GlobalSearchEvent::class,
-        priority: 0
     )]
     public function onGlobalSearchForSegments(GlobalSearchEvent $event): void
     {
@@ -106,7 +104,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: GlobalSearchEvent::class,
-        priority: 0
     )]
     public function onGlobalSearchForCompanies(GlobalSearchEvent $event): void
     {
@@ -142,7 +139,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: CommandListEvent::class,
-        priority: 0
     )]
     public function onBuildCommandList(CommandListEvent $event): void
     {
@@ -159,7 +155,6 @@ final readonly class SearchSubscriber
      */
     #[AsEventListener(
         event: LeadBuildSearchEvent::class,
-        priority: 0
     )]
     public function onBuildSearchCommands(LeadBuildSearchEvent $event): void
     {

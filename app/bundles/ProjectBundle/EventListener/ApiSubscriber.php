@@ -26,7 +26,6 @@ final class ApiSubscriber
 {
     #[AsEventListener(
         event: ApiInitializeEvent::class,
-        priority: 0
     )]
     public function onApiInitializeEvent(ApiInitializeEvent $event): void
     {

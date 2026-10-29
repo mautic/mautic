@@ -19,7 +19,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: WebhookEvents::ON_CAMPAIGN_BATCH_ACTION,
-        priority: 0
     )]
     public function onCampaignTriggerAction(PendingEvent $event): void
     {
@@ -44,7 +43,6 @@ final readonly class CampaignSubscriber
      */
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {

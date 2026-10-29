@@ -32,7 +32,6 @@ abstract class CommonStatsSubscriber
 
     #[AsEventListener(
         event: StatsEvent::class,
-        priority: 0
     )]
     public function onStatsFetch(StatsEvent $event): void
     {

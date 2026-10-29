@@ -93,7 +93,6 @@ final class CampaignSubscriber
      */
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -267,7 +266,6 @@ final class CampaignSubscriber
 
     #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
-        priority: 0
     )]
     public function onCampaignTriggerActionChangePoints(PendingEvent $event): void
     {
@@ -345,7 +343,6 @@ final class CampaignSubscriber
 
     #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
-        priority: 0
     )]
     public function onCampaignTriggerActionUpdateLead(PendingEvent $event): void
     {
@@ -542,7 +539,6 @@ final class CampaignSubscriber
 
     #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
-        priority: 0
     )]
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {

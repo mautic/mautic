@@ -23,7 +23,6 @@ final readonly class StageSubscriber
      */
     #[AsEventListener(
         event: StageEvents::STAGE_POST_SAVE,
-        priority: 0
     )]
     public function onStagePostSave(Events\StageEvent $event): void
     {
@@ -46,7 +45,6 @@ final readonly class StageSubscriber
      */
     #[AsEventListener(
         event: StageEvents::STAGE_POST_DELETE,
-        priority: 0
     )]
     public function onStageDelete(Events\StageEvent $event): void
     {

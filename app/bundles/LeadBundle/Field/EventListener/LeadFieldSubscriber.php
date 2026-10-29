@@ -25,7 +25,6 @@ final readonly class LeadFieldSubscriber
      */
     #[AsEventListener(
         event: FieldPreDeleteEvent::class,
-        priority: 0
     )]
     public function onFieldPreDelete(LeadFieldEvent $event): void
     {

@@ -22,7 +22,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -44,7 +43,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: SocialEvents::ON_CAMPAIGN_BATCH_ACTION,
-        priority: 0
     )]
     public function onCampaignAction(PendingEvent $event): void
     {

@@ -15,10 +15,7 @@ use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
-<<<<<<< HEAD
-=======
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
->>>>>>> 3024571ab4 (Import AsEventListener attribute and restore blank lines between methods)
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;

@@ -88,7 +88,6 @@ final readonly class ApiSubscriber
 
     #[AsEventListener(
         event: KernelEvents::RESPONSE,
-        priority: 0
     )]
     public function onKernelResponse(ResponseEvent $event): void
     {

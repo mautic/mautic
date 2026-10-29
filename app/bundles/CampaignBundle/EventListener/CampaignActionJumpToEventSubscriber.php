@@ -38,7 +38,6 @@ final readonly class CampaignActionJumpToEventSubscriber
      */
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -69,7 +68,6 @@ final readonly class CampaignActionJumpToEventSubscriber
      */
     #[AsEventListener(
         event: CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
-        priority: 0
     )]
     public function onJumpToEvent(PendingEvent $campaignEvent): void
     {

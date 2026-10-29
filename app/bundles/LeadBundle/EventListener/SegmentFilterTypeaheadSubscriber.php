@@ -39,7 +39,6 @@ final readonly class SegmentFilterTypeaheadSubscriber
 
     #[AsEventListener(
         event: ListTypeaheadEvent::class,
-        priority: 0
     )]
     public function onSegmentFilterAliasUser(ListTypeaheadEvent $event): void
     {
@@ -64,7 +63,6 @@ final readonly class SegmentFilterTypeaheadSubscriber
 
     #[AsEventListener(
         event: ListTypeaheadEvent::class,
-        priority: 0
     )]
     public function onSegmentFilterFieldEmpty(ListTypeaheadEvent $event): void
     {
@@ -79,7 +77,6 @@ final readonly class SegmentFilterTypeaheadSubscriber
 
     #[AsEventListener(
         event: ListTypeaheadEvent::class,
-        priority: 0
     )]
     public function onSegmentFilterCanProvideTypeahead(ListTypeaheadEvent $event): void
     {
@@ -98,7 +95,6 @@ final readonly class SegmentFilterTypeaheadSubscriber
 
     #[AsEventListener(
         event: ListTypeaheadEvent::class,
-        priority: 0
     )]
     public function onSegmentFilterEntityByAlias(ListTypeaheadEvent $event): void
     {

@@ -34,7 +34,6 @@ final readonly class GroupImportExportSubscriber
 
     #[AsEventListener(
         event: EntityExportEvent::class,
-        priority: 0
     )]
     public function onPointGroupExport(EntityExportEvent $event): void
     {
@@ -62,7 +61,6 @@ final readonly class GroupImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportEvent::class,
-        priority: 0
     )]
     public function onPointGroupImport(EntityImportEvent $event): void
     {
@@ -107,7 +105,6 @@ final readonly class GroupImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportUndoEvent::class,
-        priority: 0
     )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
@@ -134,7 +131,6 @@ final readonly class GroupImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
-        priority: 0
     )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {

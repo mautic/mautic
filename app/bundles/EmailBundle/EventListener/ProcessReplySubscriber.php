@@ -24,7 +24,6 @@ final readonly class ProcessReplySubscriber
 
     #[AsEventListener(
         event: MonitoredEmailEvent::class,
-        priority: 0
     )]
     public function onEmailConfig(MonitoredEmailEvent $event): void
     {
@@ -33,7 +32,6 @@ final readonly class ProcessReplySubscriber
 
     #[AsEventListener(
         event: PreFetchEmailEvent::class,
-        priority: 0
     )]
     public function onEmailPreFetch(PreFetchEmailEvent $event): void
     {

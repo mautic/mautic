@@ -46,7 +46,6 @@ final readonly class CampaignEventSubscriber
      */
     #[AsEventListener(
         event: CampaignPreSaveEvent::class,
-        priority: 0
     )]
     public function onCampaignPreSave(CampaignPreSaveEvent $event): void
     {
@@ -86,7 +85,6 @@ final readonly class CampaignEventSubscriber
      */
     #[AsEventListener(
         event: FailedEvent::class,
-        priority: 0
     )]
     public function onEventFailed(FailedEvent $event): void
     {
@@ -140,7 +138,6 @@ final readonly class CampaignEventSubscriber
      */
     #[AsEventListener(
         event: ExecutedEvent::class,
-        priority: 0
     )]
     public function onEventExecuted(ExecutedEvent $event): void
     {
@@ -163,7 +160,6 @@ final readonly class CampaignEventSubscriber
 
     #[AsEventListener(
         event: EventPreview::class,
-        priority: 0
     )]
     public function onEventPreviewRequest(EventPreview $eventPreview): void
     {

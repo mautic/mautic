@@ -21,7 +21,6 @@ final readonly class MessageQueueSubscriber
      */
     #[AsEventListener(
         event: MessageQueueBatchProcessEvent::class,
-        priority: 0
     )]
     public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event): void
     {

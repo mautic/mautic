@@ -45,7 +45,6 @@ final class BuilderSubscriber
 
     #[AsEventListener(
         event: EmailOnBuildEvent::class,
-        priority: 0
     )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
@@ -143,11 +142,9 @@ final class BuilderSubscriber
 
     #[AsEventListener(
         event: EmailSendEvent::class,
-        priority: 0
     )]
     #[AsEventListener(
         event: EmailDisplayEvent::class,
-        priority: 0
     )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {

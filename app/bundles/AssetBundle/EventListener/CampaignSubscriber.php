@@ -20,7 +20,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -41,7 +40,6 @@ final readonly class CampaignSubscriber
      */
     #[AsEventListener(
         event: AssetLoadEvent::class,
-        priority: 0
     )]
     public function onAssetDownload(AssetLoadEvent $event): void
     {
@@ -54,7 +52,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-        priority: 0
     )]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {

@@ -23,7 +23,6 @@ final readonly class SendSmsSubscriber
 
     #[AsEventListener(
         event: DncEvent::class,
-        priority: 0
     )]
     public function dncFilter(DncEvent $event): void
     {
@@ -38,7 +37,6 @@ final readonly class SendSmsSubscriber
 
     #[AsEventListener(
         event: QueueEvent::class,
-        priority: 0
     )]
     public function queueFilter(QueueEvent $event): void
     {
@@ -64,7 +62,6 @@ final readonly class SendSmsSubscriber
 
     #[AsEventListener(
         event: FilterEvent::class,
-        priority: 0
     )]
     public function genericFilter(FilterEvent $event): void
     {

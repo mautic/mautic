@@ -41,7 +41,6 @@ final readonly class SegmentImportExportSubscriber
 
     #[AsEventListener(
         event: EntityExportEvent::class,
-        priority: 0
     )]
     public function onSegmentExport(EntityExportEvent $event): void
     {
@@ -95,7 +94,6 @@ final readonly class SegmentImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportEvent::class,
-        priority: 0
     )]
     public function onSegmentImport(EntityImportEvent $event): void
     {
@@ -141,7 +139,6 @@ final readonly class SegmentImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportUndoEvent::class,
-        priority: 0
     )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
@@ -168,7 +165,6 @@ final readonly class SegmentImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
-        priority: 0
     )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {

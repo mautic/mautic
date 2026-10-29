@@ -15,7 +15,6 @@ final class ConfigSubscriber
 {
     #[AsEventListener(
         event: ConfigBuilderEvent::class,
-        priority: 0
     )]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
@@ -51,7 +50,6 @@ final class ConfigSubscriber
 
     #[AsEventListener(
         event: ConfigBuilderEvent::class,
-        priority: 0
     )]
     public function onConfigCompanyGenerate(ConfigBuilderEvent $event): void
     {

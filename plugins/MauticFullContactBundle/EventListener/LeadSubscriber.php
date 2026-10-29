@@ -18,7 +18,6 @@ final readonly class LeadSubscriber
 
     #[AsEventListener(
         event: LeadPostSaveEvent::class,
-        priority: 0
     )]
     public function leadPostSave(LeadEvent $event): void
     {
@@ -27,7 +26,6 @@ final readonly class LeadSubscriber
 
     #[AsEventListener(
         event: CompanyPostSaveEvent::class,
-        priority: 0
     )]
     public function companyPostSave(CompanyEvent $event): void
     {

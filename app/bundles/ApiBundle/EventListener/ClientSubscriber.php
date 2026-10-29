@@ -24,7 +24,6 @@ final readonly class ClientSubscriber
      */
     #[AsEventListener(
         event: ClientPostSaveEvent::class,
-        priority: 0
     )]
     public function onClientPostSave(Events\ClientEvent $event): void
     {
@@ -49,7 +48,6 @@ final readonly class ClientSubscriber
      */
     #[AsEventListener(
         event: ClientPostDeleteEvent::class,
-        priority: 0
     )]
     public function onClientDelete(Events\ClientEvent $event): void
     {

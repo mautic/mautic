@@ -20,7 +20,6 @@ final readonly class StatSubscriber
 
     #[AsEventListener(
         event: PageHitEvent::class,
-        priority: 0
     )]
     public function onPageHit(PageHitEvent $event): void
     {
@@ -42,7 +41,6 @@ final readonly class StatSubscriber
      */
     #[AsEventListener(
         event: SubmissionEvent::class,
-        priority: 0
     )]
     public function onFormSubmit(SubmissionEvent $event): void
     {

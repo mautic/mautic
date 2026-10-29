@@ -83,7 +83,6 @@ final class LeadSubscriber
      */
     #[AsEventListener(
         event: LeadPostSaveEvent::class,
-        priority: 0
     )]
     public function onLeadPostSave(LeadEvent $event): void
     {
@@ -164,7 +163,6 @@ final class LeadSubscriber
      */
     #[AsEventListener(
         event: LeadPostDeleteEvent::class,
-        priority: 0
     )]
     public function onLeadDelete(LeadEvent $event): void
     {
@@ -185,7 +183,6 @@ final class LeadSubscriber
      */
     #[AsEventListener(
         event: LeadPreDeleteEvent::class,
-        priority: 0
     )]
     public function onLeadPreDelete(LeadEvent $event): void
     {
@@ -205,7 +202,6 @@ final class LeadSubscriber
      */
     #[AsEventListener(
         event: FieldPostSaveEvent::class,
-        priority: 0
     )]
     public function onFieldPostSave(Events\LeadFieldEvent $event): void
     {
@@ -228,7 +224,6 @@ final class LeadSubscriber
      */
     #[AsEventListener(
         event: FieldPostDeleteEvent::class,
-        priority: 0
     )]
     public function onFieldDelete(Events\LeadFieldEvent $event): void
     {
@@ -249,7 +244,6 @@ final class LeadSubscriber
      */
     #[AsEventListener(
         event: NotePostSaveEvent::class,
-        priority: 0
     )]
     public function onNotePostSave(Events\LeadNoteEvent $event): void
     {
@@ -272,7 +266,6 @@ final class LeadSubscriber
      */
     #[AsEventListener(
         event: NotePostDeleteEvent::class,
-        priority: 0
     )]
     public function onNoteDelete(Events\LeadNoteEvent $event): void
     {
@@ -290,7 +283,6 @@ final class LeadSubscriber
 
     #[AsEventListener(
         event: LeadPreMergeEvent::class,
-        priority: 0
     )]
     public function preLeadMerge(Events\LeadMergeEvent $event): void
     {
@@ -302,7 +294,6 @@ final class LeadSubscriber
 
     #[AsEventListener(
         event: LeadPostMergeEvent::class,
-        priority: 0
     )]
     public function onLeadMerge(Events\LeadMergeEvent $event): void
     {
@@ -342,7 +333,6 @@ final class LeadSubscriber
      */
     #[AsEventListener(
         event: Events\LeadTimelineEvent::class,
-        priority: 0
     )]
     public function onTimelineGenerate(Events\LeadTimelineEvent $event): void
     {
@@ -480,7 +470,6 @@ final class LeadSubscriber
      */
     #[AsEventListener(
         event: LeadChangeCompanyEvent::class,
-        priority: 0
     )]
     public function onLeadCompanyChange(LeadChangeCompanyEvent $event): void
     {

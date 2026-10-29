@@ -17,7 +17,6 @@ final readonly class SegmentStatsSubscriber
 
     #[AsEventListener(
         event: GetStatDataEvent::class,
-        priority: 0
     )]
     public function getStatsLeadEvents(GetStatDataEvent $event): void
     {

@@ -24,7 +24,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
-        priority: 0
     )]
     public function onGlobalSearchUser(MauticEvents\GlobalSearchEvent $event): void
     {
@@ -42,7 +41,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
-        priority: 0
     )]
     public function onGlobalSearchRoles(MauticEvents\GlobalSearchEvent $event): void
     {
@@ -60,7 +58,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: MauticEvents\CommandListEvent::class,
-        priority: 0
     )]
     public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {

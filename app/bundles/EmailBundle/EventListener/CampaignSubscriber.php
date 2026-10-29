@@ -48,7 +48,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -132,7 +131,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: EventPreview::class,
-        priority: 0
     )]
     public function onEventPreviewRequest(EventPreview $eventPreview): void
     {
@@ -159,7 +157,6 @@ final readonly class CampaignSubscriber
      */
     #[AsEventListener(
         event: EmailOpenEvent::class,
-        priority: 0
     )]
     public function onEmailOpen(EmailOpenEvent $event): void
     {
@@ -180,7 +177,6 @@ final readonly class CampaignSubscriber
      */
     #[AsEventListener(
         event: EmailReplyEvent::class,
-        priority: 0
     )]
     public function onEmailReply(EmailReplyEvent $event): void
     {
@@ -192,7 +188,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-        priority: 0
     )]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
@@ -253,7 +248,6 @@ final readonly class CampaignSubscriber
      */
     #[AsEventListener(
         event: EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
-        priority: 0
     )]
     public function onCampaignTriggerActionSendEmailToContact(PendingEvent $event): void
     {

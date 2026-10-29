@@ -34,7 +34,6 @@ final readonly class PageSubscriber
      */
     #[AsEventListener(
         event: PageEvents::PAGE_POST_SAVE,
-        priority: 0
     )]
     public function onPagePostSave(PageEvent $event): void
     {
@@ -60,7 +59,6 @@ final readonly class PageSubscriber
      */
     #[AsEventListener(
         event: PageEvents::PAGE_POST_DELETE,
-        priority: 0
     )]
     public function onPageDelete(PageEvent $event): void
     {

@@ -17,7 +17,6 @@ final readonly class PointInsightSubscriber
 
     #[AsEventListener(
         event: GroupScoreChangeEvent::class,
-        priority: 0
     )]
     public function onGroupScoreChange(GroupScoreChangeEvent $event): void
     {

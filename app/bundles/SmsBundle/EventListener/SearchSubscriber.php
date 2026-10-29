@@ -20,7 +20,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
-        priority: 0
     )]
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event): void
     {

@@ -16,7 +16,6 @@ final readonly class TrackingSubscriber
 
     #[AsEventListener(
         event: ContactIdentificationEvent::class,
-        priority: 0
     )]
     public function onIdentifyContact(ContactIdentificationEvent $event): void
     {

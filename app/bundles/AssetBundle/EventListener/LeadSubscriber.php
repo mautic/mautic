@@ -28,7 +28,6 @@ final readonly class LeadSubscriber
      */
     #[AsEventListener(
         event: LeadTimelineEvent::class,
-        priority: 0
     )]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
@@ -83,7 +82,6 @@ final readonly class LeadSubscriber
 
     #[AsEventListener(
         event: LeadChangeEvent::class,
-        priority: 0
     )]
     public function onLeadChange(LeadChangeEvent $event): void
     {
@@ -96,7 +94,6 @@ final readonly class LeadSubscriber
 
     #[AsEventListener(
         event: LeadPostMergeEvent::class,
-        priority: 0
     )]
     public function onLeadMerge(LeadMergeEvent $event): void
     {

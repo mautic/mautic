@@ -28,7 +28,6 @@ final readonly class CampaignActionChangeMembershipSubscriber
      */
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function addAction(CampaignBuilderEvent $event): void
     {
@@ -48,7 +47,6 @@ final readonly class CampaignActionChangeMembershipSubscriber
 
     #[AsEventListener(
         event: CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP,
-        priority: 0
     )]
     public function changeMembership(PendingEvent $event): void
     {
@@ -87,7 +85,6 @@ final readonly class CampaignActionChangeMembershipSubscriber
 
     #[AsEventListener(
         event: EntityValidateEvent::class,
-        priority: 0
     )]
     public function validateInfiniteLoop(EntityValidateEvent $event): void
     {

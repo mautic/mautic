@@ -18,11 +18,9 @@ final readonly class SegmentSubscriber
 
     #[AsEventListener(
         event: ListChangeEvent::class,
-        priority: 0
     )]
     #[AsEventListener(
         event: ListBatchChangeEvent::class,
-        priority: 0
     )]
     public function onListChange(ListChangeEvent $event): void
     {

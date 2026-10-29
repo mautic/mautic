@@ -35,7 +35,6 @@ final readonly class PageImportExportSubscriber
 
     #[AsEventListener(
         event: EntityExportEvent::class,
-        priority: 0
     )]
     public function onPageExport(EntityExportEvent $event): void
     {
@@ -81,7 +80,6 @@ final readonly class PageImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportEvent::class,
-        priority: 0
     )]
     public function onPageImport(EntityImportEvent $event): void
     {
@@ -126,7 +124,6 @@ final readonly class PageImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportUndoEvent::class,
-        priority: 0
     )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
@@ -153,7 +150,6 @@ final readonly class PageImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
-        priority: 0
     )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {

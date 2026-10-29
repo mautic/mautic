@@ -29,7 +29,6 @@ final readonly class NotificationSubscriber
      */
     #[AsEventListener(
         event: NotificationEvents::NOTIFICATION_POST_SAVE,
-        priority: 0
     )]
     public function onPostSave(NotificationEvent $event): void
     {
@@ -51,7 +50,6 @@ final readonly class NotificationSubscriber
      */
     #[AsEventListener(
         event: NotificationEvents::NOTIFICATION_POST_DELETE,
-        priority: 0
     )]
     public function onDelete(NotificationEvent $event): void
     {
@@ -68,7 +66,6 @@ final readonly class NotificationSubscriber
 
     #[AsEventListener(
         event: NotificationEvents::TOKEN_REPLACEMENT,
-        priority: 0
     )]
     public function onTokenReplacement(TokenReplacementEvent $event): void
     {

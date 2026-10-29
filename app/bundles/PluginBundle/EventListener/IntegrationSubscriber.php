@@ -23,7 +23,6 @@ final readonly class IntegrationSubscriber
 
     #[AsEventListener(
         event: PluginIntegrationRequestEvent::class,
-        priority: 0
     )]
     public function onRequest(PluginIntegrationRequestEvent $event): void
     {
@@ -60,7 +59,6 @@ final readonly class IntegrationSubscriber
 
     #[AsEventListener(
         event: PluginIntegrationResponseEvent::class,
-        priority: 0
     )]
     public function onResponse(PluginIntegrationResponseEvent $event): void
     {

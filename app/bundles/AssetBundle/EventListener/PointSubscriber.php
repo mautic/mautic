@@ -20,7 +20,6 @@ final readonly class PointSubscriber
 
     #[AsEventListener(
         event: PointBuilderEvent::class,
-        priority: 0
     )]
     public function onPointBuild(PointBuilderEvent $event): void
     {
@@ -40,7 +39,6 @@ final readonly class PointSubscriber
      */
     #[AsEventListener(
         event: AssetLoadEvent::class,
-        priority: 0
     )]
     public function onAssetDownload(AssetLoadEvent $event): void
     {

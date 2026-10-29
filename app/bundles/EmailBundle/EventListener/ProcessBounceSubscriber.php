@@ -19,7 +19,6 @@ final readonly class ProcessBounceSubscriber
 
     #[AsEventListener(
         event: MonitoredEmailEvent::class,
-        priority: 0
     )]
     public function onEmailConfig(MonitoredEmailEvent $event): void
     {
@@ -28,7 +27,6 @@ final readonly class ProcessBounceSubscriber
 
     #[AsEventListener(
         event: ParseEmailEvent::class,
-        priority: 0
     )]
     public function onEmailParse(ParseEmailEvent $event): void
     {

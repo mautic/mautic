@@ -39,7 +39,6 @@ final readonly class SegmentSubscriber
      */
     #[AsEventListener(
         event: ListPostSaveEvent::class,
-        priority: 0
     )]
     public function onSegmentPostSave(SegmentEvent $event): void
     {
@@ -62,7 +61,6 @@ final readonly class SegmentSubscriber
      */
     #[AsEventListener(
         event: ListPreUnpublishEvent::class,
-        priority: 0
     )]
     public function onSegmentPreUnpublish(SegmentEvent $event): void
     {
@@ -90,7 +88,6 @@ final readonly class SegmentSubscriber
      */
     #[AsEventListener(
         event: ListPreDeleteEvent::class,
-        priority: 0
     )]
     public function onSegmentPreDelete(SegmentEvent $event): void
     {
@@ -116,7 +113,6 @@ final readonly class SegmentSubscriber
 
     #[AsEventListener(
         event: ListDeleteEvent::class,
-        priority: 0
     )]
     public function onSegmentDelete(SegmentEvent $event): void
     {
@@ -135,7 +131,6 @@ final readonly class SegmentSubscriber
      */
     #[AsEventListener(
         event: ListPostDeleteEvent::class,
-        priority: 0
     )]
     public function onSegmentPostDelete(SegmentEvent $event): void
     {
@@ -153,7 +148,6 @@ final readonly class SegmentSubscriber
 
     #[AsEventListener(
         event: ListPostDeleteEvent::class,
-        priority: 0
     )]
     public function clearSegmentCountCache(SegmentEvent $event): void
     {

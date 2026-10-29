@@ -20,7 +20,6 @@ final readonly class PublishToggleSubscriber
 
     #[AsEventListener(
         event: CustomTemplateEvent::class,
-        priority: 0
     )]
     public function onTemplateRender(CustomTemplateEvent $event): void
     {

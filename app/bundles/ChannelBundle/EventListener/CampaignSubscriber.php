@@ -47,7 +47,6 @@ final class CampaignSubscriber
 
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -82,15 +81,10 @@ final class CampaignSubscriber
     /**
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
-<<<<<<< HEAD
-     * @throws \ReflectionException
-=======
      * @throws ReflectionException
->>>>>>> 3024571ab4 (Import AsEventListener attribute and restore blank lines between methods)
      */
     #[AsEventListener(
         event: ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
-        priority: 0
     )]
     public function onCampaignTriggerAction(PendingEvent $pendingEvent): void
     {
@@ -151,11 +145,7 @@ final class CampaignSubscriber
      *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
-<<<<<<< HEAD
      * @throws \ReflectionException
-=======
-     * @throws ReflectionException
->>>>>>> 3024571ab4 (Import AsEventListener attribute and restore blank lines between methods)
      * @param Collection<int, LeadEventLog> $logs
      */
     private function sendChannelMessage(Collection $logs, int|string $channel, array $messageChannel)

@@ -25,7 +25,6 @@ final class ReportSubscriber
      */
     #[AsEventListener(
         event: ReportBuilderEvent::class,
-        priority: 0
     )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
@@ -298,7 +297,6 @@ final class ReportSubscriber
      */
     #[AsEventListener(
         event: ReportGeneratorEvent::class,
-        priority: 0
     )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {

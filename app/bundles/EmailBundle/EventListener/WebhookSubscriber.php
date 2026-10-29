@@ -23,7 +23,6 @@ final readonly class WebhookSubscriber
      */
     #[AsEventListener(
         event: WebhookBuilderEvent::class,
-        priority: 0
     )]
     public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
@@ -44,7 +43,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: EmailSendEvent::class,
-        priority: 0
     )]
     public function onEmailSend(EmailSendEvent $event): void
     {
@@ -73,7 +71,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: EmailOpenEvent::class,
-        priority: 0
     )]
     public function onEmailOpen(EmailOpenEvent $event): void
     {
@@ -92,7 +89,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: WebhookQueueEvent::class,
-        priority: 0
     )]
     public function onWebhookQueueOnAdd(WebhookQueueEvent $event): void
     {

@@ -24,7 +24,6 @@ final readonly class ImportSubscriber
      */
     #[AsEventListener(
         event: ImportPostSaveEvent::class,
-        priority: 0
     )]
     public function onImportPostSave(ImportEvent $event): void
     {
@@ -47,7 +46,6 @@ final readonly class ImportSubscriber
      */
     #[AsEventListener(
         event: ImportPostDeleteEvent::class,
-        priority: 0
     )]
     public function onImportDelete(ImportEvent $event): void
     {

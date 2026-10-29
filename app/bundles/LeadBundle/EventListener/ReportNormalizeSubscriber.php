@@ -16,7 +16,6 @@ final readonly class ReportNormalizeSubscriber
 
     #[AsEventListener(
         event: ReportDataEvent::class,
-        priority: 0
     )]
     public function onReportDisplay(ReportDataEvent $event): void
     {

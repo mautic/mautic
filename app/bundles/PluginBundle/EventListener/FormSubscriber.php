@@ -14,7 +14,6 @@ final class FormSubscriber
 
     #[AsEventListener(
         event: FormBuilderEvent::class,
-        priority: 0
     )]
     public function onFormBuild(FormBuilderEvent $event): void
     {
@@ -31,7 +30,6 @@ final class FormSubscriber
 
     #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-        priority: 0
     )]
     public function onFormSubmitActionTriggered(SubmissionEvent $event): void
     {

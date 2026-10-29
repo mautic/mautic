@@ -36,7 +36,6 @@ final class EmailSubscriber
      */
     #[AsEventListener(
         event: EmailPreSaveEvent::class,
-        priority: 0
     )]
     public function onEmailPreSave(Events\EmailEvent $event): void
     {
@@ -58,7 +57,6 @@ final class EmailSubscriber
      */
     #[AsEventListener(
         event: EmailPostSaveEvent::class,
-        priority: 0
     )]
     public function onEmailPostSave(Events\EmailEvent $event): void
     {
@@ -74,7 +72,6 @@ final class EmailSubscriber
      */
     #[AsEventListener(
         event: EmailPostDeleteEvent::class,
-        priority: 0
     )]
     public function onEmailDelete(Events\EmailEvent $event): void
     {

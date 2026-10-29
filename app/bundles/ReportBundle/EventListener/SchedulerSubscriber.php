@@ -17,7 +17,6 @@ final readonly class SchedulerSubscriber
 
     #[AsEventListener(
         event: ReportScheduleSendEvent::class,
-        priority: 0
     )]
     public function onScheduleSend(ReportScheduleSendEvent $event): void
     {

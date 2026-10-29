@@ -14,7 +14,6 @@ final class SegmentOperatorQuerySubscriber
 {
     #[AsEventListener(
         event: SegmentOperatorQueryBuilderEvent::class,
-        priority: 0
     )]
     public function onEmptyOperator(SegmentOperatorQueryBuilderEvent $event): void
     {
@@ -38,7 +37,6 @@ final class SegmentOperatorQuerySubscriber
 
     #[AsEventListener(
         event: SegmentOperatorQueryBuilderEvent::class,
-        priority: 0
     )]
     public function onNotEmptyOperator(SegmentOperatorQueryBuilderEvent $event): void
     {
@@ -62,7 +60,6 @@ final class SegmentOperatorQuerySubscriber
 
     #[AsEventListener(
         event: SegmentOperatorQueryBuilderEvent::class,
-        priority: 0
     )]
     public function onNegativeOperators(SegmentOperatorQueryBuilderEvent $event): void
     {
@@ -111,7 +108,6 @@ final class SegmentOperatorQuerySubscriber
 
     #[AsEventListener(
         event: SegmentOperatorQueryBuilderEvent::class,
-        priority: 0
     )]
     public function onMultiselectOperators(SegmentOperatorQueryBuilderEvent $event): void
     {
@@ -172,7 +168,6 @@ final class SegmentOperatorQuerySubscriber
 
     #[AsEventListener(
         event: SegmentOperatorQueryBuilderEvent::class,
-        priority: 0
     )]
     public function onDefaultOperators(SegmentOperatorQueryBuilderEvent $event): void
     {

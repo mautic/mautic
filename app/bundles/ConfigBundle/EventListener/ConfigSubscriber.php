@@ -24,7 +24,6 @@ final readonly class ConfigSubscriber
 
     #[AsEventListener(
         event: ConfigPostSaveEvent::class,
-        priority: 0
     )]
     public function onConfigPostSave(ConfigEvent $event): void
     {

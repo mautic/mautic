@@ -24,7 +24,6 @@ final readonly class ProcessUnsubscribeSubscriber
 
     #[AsEventListener(
         event: MonitoredEmailEvent::class,
-        priority: 0
     )]
     public function onEmailConfig(MonitoredEmailEvent $event): void
     {
@@ -33,7 +32,6 @@ final readonly class ProcessUnsubscribeSubscriber
 
     #[AsEventListener(
         event: ParseEmailEvent::class,
-        priority: 0
     )]
     public function onEmailParse(ParseEmailEvent $event): void
     {
@@ -53,7 +51,6 @@ final readonly class ProcessUnsubscribeSubscriber
      */
     #[AsEventListener(
         event: EmailSendEvent::class,
-        priority: 0
     )]
     public function onEmailSend(EmailSendEvent $event): void
     {

@@ -25,7 +25,6 @@ final class ReplySubscriber
 
     #[AsEventListener(
         event: ReplyEvent::class,
-        priority: 0
     )]
     public function onReply(ReplyEvent $event): void
     {

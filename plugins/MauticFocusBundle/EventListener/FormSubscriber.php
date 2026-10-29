@@ -24,7 +24,6 @@ final readonly class FormSubscriber
      */
     #[AsEventListener(
         event: FormEvents::FORM_POST_DELETE,
-        priority: 0
     )]
     public function onFormDelete(Events\FormEvent $event): void
     {

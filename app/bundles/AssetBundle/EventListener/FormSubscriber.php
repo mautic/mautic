@@ -38,7 +38,6 @@ final readonly class FormSubscriber
      */
     #[AsEventListener(
         event: FormBuilderEvent::class,
-        priority: 0
     )]
     public function onFormBuilder(FormBuilderEvent $event): void
     {
@@ -55,7 +54,6 @@ final readonly class FormSubscriber
 
     #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-        priority: 0
     )]
     public function onFormSubmitActionAssetDownload(SubmissionEvent $event): void
     {
@@ -90,7 +88,6 @@ final readonly class FormSubscriber
 
     #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-        priority: 0
     )]
     public function onFormSubmitActionDownloadFile(SubmissionEvent $event): void
     {

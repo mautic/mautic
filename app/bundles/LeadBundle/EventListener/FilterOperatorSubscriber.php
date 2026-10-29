@@ -69,7 +69,6 @@ final class FilterOperatorSubscriber
 
     #[AsEventListener(
         event: LeadListFiltersOperatorsEvent::class,
-        priority: 0
     )]
     public function onListOperatorsGenerate(LeadListFiltersOperatorsEvent $event): void
     {
@@ -80,7 +79,6 @@ final class FilterOperatorSubscriber
 
     #[AsEventListener(
         event: LeadListFiltersChoicesEvent::class,
-        priority: 0
     )]
     public function onGenerateSegmentFiltersAddCustomFields(LeadListFiltersChoicesEvent $event): void
     {
@@ -120,7 +118,6 @@ final class FilterOperatorSubscriber
 
     #[AsEventListener(
         event: LeadListFiltersChoicesEvent::class,
-        priority: 0
     )]
     public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
     {
@@ -361,7 +358,6 @@ final class FilterOperatorSubscriber
 
     #[AsEventListener(
         event: LeadListFiltersChoicesEvent::class,
-        priority: 0
     )]
     public function onGenerateSegmentFiltersAddBehaviors(LeadListFiltersChoicesEvent $event): void
     {

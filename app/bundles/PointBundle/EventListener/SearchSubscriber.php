@@ -26,7 +26,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
-        priority: 0
     )]
     public function onGlobalSearchPointActions(MauticEvents\GlobalSearchEvent $event): void
     {
@@ -44,7 +43,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
-        priority: 0
     )]
     public function onGlobalSearchPointGroup(MauticEvents\GlobalSearchEvent $event): void
     {
@@ -62,7 +60,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
-        priority: 0
     )]
     public function onGlobalSearchPointTriggers(MauticEvents\GlobalSearchEvent $event): void
     {
@@ -80,7 +77,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: MauticEvents\CommandListEvent::class,
-        priority: 0
     )]
     public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {

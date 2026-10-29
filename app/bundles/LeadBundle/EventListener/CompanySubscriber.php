@@ -32,7 +32,6 @@ final readonly class CompanySubscriber
      */
     #[AsEventListener(
         event: CompanyPostSaveEvent::class,
-        priority: 0
     )]
     public function onCompanyPostSave(Events\CompanyEvent $event): void
     {
@@ -55,7 +54,6 @@ final readonly class CompanySubscriber
      */
     #[AsEventListener(
         event: CompanyPostDeleteEvent::class,
-        priority: 0
     )]
     public function onCompanyDelete(Events\CompanyEvent $event): void
     {
@@ -74,7 +72,6 @@ final readonly class CompanySubscriber
 
     #[AsEventListener(
         event: CompanySoftDeleteEvent::class,
-        priority: 0
     )]
     public function onCompanySoftDelete(Events\CompanyEvent $event): void
     {
@@ -100,7 +97,6 @@ final readonly class CompanySubscriber
 
     #[AsEventListener(
         event: CompanyPreSaveEvent::class,
-        priority: 0
     )]
     public function onCompanyPreSave(Events\CompanyEvent $event): void
     {

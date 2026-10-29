@@ -26,7 +26,6 @@ final readonly class AssetsSubscriber
 
     #[AsEventListener(
         event: CustomAssetsEvent::class,
-        priority: 0
     )]
     public function injectAssets(CustomAssetsEvent $assetsEvent): void
     {

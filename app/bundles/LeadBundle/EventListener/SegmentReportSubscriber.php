@@ -23,7 +23,6 @@ final readonly class SegmentReportSubscriber
      */
     #[AsEventListener(
         event: ReportBuilderEvent::class,
-        priority: 0
     )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
@@ -61,7 +60,6 @@ final readonly class SegmentReportSubscriber
      */
     #[AsEventListener(
         event: ReportGeneratorEvent::class,
-        priority: 0
     )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {

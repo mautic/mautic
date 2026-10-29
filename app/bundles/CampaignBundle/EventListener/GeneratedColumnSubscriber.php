@@ -18,7 +18,6 @@ final readonly class GeneratedColumnSubscriber
 
     #[AsEventListener(
         event: GeneratedColumnsEvent::class,
-        priority: 0
     )]
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {

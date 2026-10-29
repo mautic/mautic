@@ -42,7 +42,6 @@ final readonly class FocusSubscriber
      */
     #[AsEventListener(
         event: KernelEvents::REQUEST,
-        priority: 0
     )]
     public function onKernelRequest(RequestEvent $event): void
     {
@@ -70,7 +69,6 @@ final readonly class FocusSubscriber
      */
     #[AsEventListener(
         event: FocusEvents::POST_SAVE,
-        priority: 0
     )]
     public function onFocusPostSave(FocusEvent $event): void
     {
@@ -93,7 +91,6 @@ final readonly class FocusSubscriber
      */
     #[AsEventListener(
         event: FocusEvents::POST_DELETE,
-        priority: 0
     )]
     public function onFocusDelete(FocusEvent $event): void
     {
@@ -128,7 +125,6 @@ final readonly class FocusSubscriber
 
     #[AsEventListener(
         event: FocusTokenReplacementEvent::class,
-        priority: 0
     )]
     public function onTokenReplacement(FocusTokenReplacementEvent $event): void
     {

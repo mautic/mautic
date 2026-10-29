@@ -21,7 +21,6 @@ final readonly class PointSubscriber
 
     #[AsEventListener(
         event: PointBuilderEvent::class,
-        priority: 0
     )]
     public function onPointBuild(PointBuilderEvent $event): void
     {
@@ -52,7 +51,6 @@ final readonly class PointSubscriber
      */
     #[AsEventListener(
         event: Events\PageHitEvent::class,
-        priority: 0
     )]
     public function onPageHit(Events\PageHitEvent $event): void
     {

@@ -19,7 +19,6 @@ final readonly class DateTimeTokenSubscriber
 
     #[AsEventListener(
         event: EmailOnBuildEvent::class,
-        priority: 0
     )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
@@ -28,7 +27,6 @@ final readonly class DateTimeTokenSubscriber
 
     #[AsEventListener(
         event: EmailDisplayEvent::class,
-        priority: 0
     )]
     public function onEmailDisplay(EmailSendEvent $event): void
     {
@@ -37,7 +35,6 @@ final readonly class DateTimeTokenSubscriber
 
     #[AsEventListener(
         event: EmailSendEvent::class,
-        priority: 0
     )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {

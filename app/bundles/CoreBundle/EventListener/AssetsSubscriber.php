@@ -21,7 +21,6 @@ final readonly class AssetsSubscriber
 
     #[AsEventListener(
         event: KernelEvents::REQUEST,
-        priority: 0
     )]
     public function fetchCustomAssets(RequestEvent $event): void
     {

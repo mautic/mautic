@@ -24,7 +24,6 @@ final readonly class GeneratedColumnSubscriber
 
     #[AsEventListener(
         event: GeneratedColumnsEvent::class,
-        priority: 0
     )]
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
@@ -40,7 +39,6 @@ final readonly class GeneratedColumnSubscriber
 
     #[AsEventListener(
         event: LeadListFiltersChoicesEvent::class,
-        priority: 0
     )]
     public function onGenerateSegmentFilters(LeadListFiltersChoicesEvent $event): void
     {

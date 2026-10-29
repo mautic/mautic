@@ -19,7 +19,6 @@ final readonly class SecuritySubscriber
 
     #[AsEventListener(
         event: LoginEvent::class,
-        priority: 0
     )]
     public function onSecurityInteractiveLogin(LoginEvent $event): void
     {

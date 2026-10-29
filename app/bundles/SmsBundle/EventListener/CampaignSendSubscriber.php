@@ -23,7 +23,6 @@ final readonly class CampaignSendSubscriber
 
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -46,7 +45,6 @@ final readonly class CampaignSendSubscriber
 
     #[AsEventListener(
         event: SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION,
-        priority: 0
     )]
     public function onCampaignTriggerBatchAction(PendingEvent $event): void
     {

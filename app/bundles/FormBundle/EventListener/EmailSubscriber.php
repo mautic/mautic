@@ -12,7 +12,6 @@ final class EmailSubscriber
 {
     #[AsEventListener(
         event: EmailOnBuildEvent::class,
-        priority: 0
     )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {

@@ -22,7 +22,6 @@ final readonly class SetContactAvatarFormSubscriber
 
     #[AsEventListener(
         event: SubmissionEvent::class,
-        priority: 0
     )]
     public function onFormSubmit(SubmissionEvent $submissionEvent): void
     {

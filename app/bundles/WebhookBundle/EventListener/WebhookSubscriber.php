@@ -25,7 +25,6 @@ final readonly class WebhookSubscriber
      */
     #[AsEventListener(
         event: WebhookPostSaveEvent::class,
-        priority: 0
     )]
     public function onWebhookSave(WebhookEvent $event): void
     {
@@ -49,7 +48,6 @@ final readonly class WebhookSubscriber
      */
     #[AsEventListener(
         event: WebhookPostDeleteEvent::class,
-        priority: 0
     )]
     public function onWebhookDelete(WebhookEvent $event): void
     {
@@ -70,7 +68,6 @@ final readonly class WebhookSubscriber
      */
     #[AsEventListener(
         event: WebhookKillEvent::class,
-        priority: 0
     )]
     public function onWebhookKill(WebhookEvent $event): void
     {

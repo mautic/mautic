@@ -28,7 +28,6 @@ final readonly class UploadSubscriber
      */
     #[AsEventListener(
         event: UploadEvents::POST_UPLOAD,
-        priority: 0
     )]
     public function onPostUpload(PostUploadEvent $event): void
     {
@@ -55,7 +54,6 @@ final readonly class UploadSubscriber
      */
     #[AsEventListener(
         event: UploadEvents::VALIDATION,
-        priority: 0
     )]
     public function onUploadValidation(ValidationEvent $event): void
     {

@@ -28,7 +28,6 @@ final readonly class ReportSubscriber
      */
     #[AsEventListener(
         event: ReportBuilderEvent::class,
-        priority: 0
     )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
@@ -163,7 +162,6 @@ final readonly class ReportSubscriber
      */
     #[AsEventListener(
         event: ReportGeneratorEvent::class,
-        priority: 0
     )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
@@ -197,7 +195,6 @@ final readonly class ReportSubscriber
      */
     #[AsEventListener(
         event: ReportGraphEvent::class,
-        priority: 0
     )]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
@@ -236,7 +233,6 @@ final readonly class ReportSubscriber
 
     #[AsEventListener(
         event: ReportDataEvent::class,
-        priority: 0
     )]
     public function onReportDisplay(ReportDataEvent $event): void
     {

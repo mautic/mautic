@@ -49,7 +49,6 @@ final class TypeOperatorSubscriber
 
     #[AsEventListener(
         event: TypeOperatorsEvent::class,
-        priority: 0
     )]
     public function onTypeOperatorsCollect(TypeOperatorsEvent $event): void
     {
@@ -81,7 +80,6 @@ final class TypeOperatorSubscriber
 
     #[AsEventListener(
         event: ListFieldChoicesEvent::class,
-        priority: 0
     )]
     public function onTypeListCollect(ListFieldChoicesEvent $event): void
     {
@@ -354,7 +352,6 @@ final class TypeOperatorSubscriber
 
     #[AsEventListener(
         event: FormAdjustmentEvent::class,
-        priority: 0
     )]
     public function onSegmentFilterFormHandleDefault(FormAdjustmentEvent $event): void
     {

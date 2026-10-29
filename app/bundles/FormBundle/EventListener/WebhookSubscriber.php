@@ -22,7 +22,6 @@ final readonly class WebhookSubscriber
      */
     #[AsEventListener(
         event: WebhookBuilderEvent::class,
-        priority: 0
     )]
     public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
@@ -38,7 +37,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: SubmissionEvent::class,
-        priority: 0
     )]
     public function onFormSubmit(SubmissionEvent $event): void
     {

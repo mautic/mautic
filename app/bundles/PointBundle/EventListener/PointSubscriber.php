@@ -23,7 +23,6 @@ final readonly class PointSubscriber
      */
     #[AsEventListener(
         event: PointEvents::POINT_POST_SAVE,
-        priority: 0
     )]
     public function onPointPostSave(Events\PointEvent $event): void
     {
@@ -46,7 +45,6 @@ final readonly class PointSubscriber
      */
     #[AsEventListener(
         event: PointEvents::POINT_POST_DELETE,
-        priority: 0
     )]
     public function onPointDelete(Events\PointEvent $event): void
     {
@@ -67,7 +65,6 @@ final readonly class PointSubscriber
      */
     #[AsEventListener(
         event: PointEvents::TRIGGER_POST_SAVE,
-        priority: 0
     )]
     public function onTriggerPostSave(Events\TriggerEvent $event): void
     {
@@ -90,7 +87,6 @@ final readonly class PointSubscriber
      */
     #[AsEventListener(
         event: PointEvents::TRIGGER_POST_DELETE,
-        priority: 0
     )]
     public function onTriggerDelete(Events\TriggerEvent $event): void
     {

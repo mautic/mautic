@@ -20,7 +20,6 @@ final readonly class ButtonSubscriber
 
     #[AsEventListener(
         event: CustomButtonEvent::class,
-        priority: 0
     )]
     public function injectViewButtons(CustomButtonEvent $event): void
     {

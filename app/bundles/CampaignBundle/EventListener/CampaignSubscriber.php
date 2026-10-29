@@ -22,7 +22,6 @@ final readonly class CampaignSubscriber
      */
     #[AsEventListener(
         event: Events\CampaignPostSaveEvent::class,
-        priority: 0
     )]
     public function onCampaignPostSave(Events\CampaignPostSaveEvent $event): void
     {
@@ -54,7 +53,6 @@ final readonly class CampaignSubscriber
      */
     #[AsEventListener(
         event: Events\CampaignPostDeleteEvent::class,
-        priority: 0
     )]
     public function onCampaignDelete(Events\CampaignPostDeleteEvent $event): void
     {

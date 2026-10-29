@@ -46,7 +46,6 @@ final readonly class EmailSubscriber
 
     #[AsEventListener(
         event: EmailPreSaveEvent::class,
-        priority: 0
     )]
     public function cloneParentEmailDataForVariant(EmailEvent $event): void
     {
@@ -61,7 +60,6 @@ final readonly class EmailSubscriber
      */
     #[AsEventListener(
         event: EmailPostSaveEvent::class,
-        priority: 0
     )]
     public function onEmailPostSave(EmailEvent $event): void
     {
@@ -112,7 +110,6 @@ final readonly class EmailSubscriber
      */
     #[AsEventListener(
         event: EmailPostDeleteEvent::class,
-        priority: 0
     )]
     public function onEmailDelete(EmailEvent $event): void
     {
@@ -133,7 +130,6 @@ final readonly class EmailSubscriber
      */
     #[AsEventListener(
         event: EmailEvents::EMAIL_FAILED,
-        priority: 0
     )]
     public function onEmailFailed(Events\QueueEmailEvent $event): void
     {
@@ -157,7 +153,6 @@ final readonly class EmailSubscriber
      */
     #[AsEventListener(
         event: EmailEvents::EMAIL_RESEND,
-        priority: 0
     )]
     public function onEmailResend(Events\QueueEmailEvent $event): void
     {

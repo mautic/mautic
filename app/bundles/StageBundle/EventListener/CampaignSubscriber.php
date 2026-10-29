@@ -25,7 +25,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -41,7 +40,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: StageEvents::ON_CAMPAIGN_BATCH_ACTION,
-        priority: 0
     )]
     public function onCampaignTriggerStageChange(PendingEvent $event): void
     {

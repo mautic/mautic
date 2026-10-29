@@ -12,7 +12,6 @@ final class ConfigThemeSubscriber
 {
     #[AsEventListener(
         event: ConfigBuilderEvent::class,
-        priority: 0
     )]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {

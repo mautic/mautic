@@ -18,7 +18,6 @@ final readonly class FormFieldSubscriber
 
     #[AsEventListener(
         event: FormEvents::FIELD_POST_DELETE,
-        priority: 0
     )]
     public function onFieldPostDelete(FormFieldEvent $event): void
     {

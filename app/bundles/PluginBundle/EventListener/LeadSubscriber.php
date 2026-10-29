@@ -25,7 +25,6 @@ final readonly class LeadSubscriber
 
     #[AsEventListener(
         event: LeadPreDeleteEvent::class,
-        priority: 0
     )]
     public function onLeadDelete(LeadEvent $event): bool
     {
@@ -37,7 +36,6 @@ final readonly class LeadSubscriber
 
     #[AsEventListener(
         event: CompanyPreDeleteEvent::class,
-        priority: 0
     )]
     public function onCompanyDelete(CompanyEvent $event): bool
     {
@@ -53,7 +51,6 @@ final readonly class LeadSubscriber
      */
     #[AsEventListener(
         event: LeadPostSaveEvent::class,
-        priority: 0
     )]
     public function onLeadSave(LeadEvent $event): void
     {

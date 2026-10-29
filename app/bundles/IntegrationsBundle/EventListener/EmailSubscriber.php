@@ -30,7 +30,6 @@ final readonly class EmailSubscriber
 
     #[AsEventListener(
         event: EmailOnBuildEvent::class,
-        priority: 0
     )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
@@ -62,11 +61,9 @@ final readonly class EmailSubscriber
 
     #[AsEventListener(
         event: EmailSendEvent::class,
-        priority: 0
     )]
     #[AsEventListener(
         event: EmailDisplayEvent::class,
-        priority: 0
     )]
     public function decodeTokens(EmailSendEvent $event): void
     {

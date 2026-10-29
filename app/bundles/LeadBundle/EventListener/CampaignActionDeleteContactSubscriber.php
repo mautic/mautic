@@ -19,7 +19,6 @@ final readonly class CampaignActionDeleteContactSubscriber
 
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function configureAction(CampaignBuilderEvent $event): void
     {
@@ -42,7 +41,6 @@ final readonly class CampaignActionDeleteContactSubscriber
 
     #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_ACTION_DELETE_CONTACT,
-        priority: 0
     )]
     public function deleteContacts(PendingEvent $event): void
     {

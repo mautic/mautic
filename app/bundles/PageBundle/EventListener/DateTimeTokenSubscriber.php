@@ -23,7 +23,6 @@ final readonly class DateTimeTokenSubscriber
 
     #[AsEventListener(
         event: PageBuilderEvent::class,
-        priority: 0
     )]
     public function onPageBuild(PageBuilderEvent $event): void
     {
@@ -32,7 +31,6 @@ final readonly class DateTimeTokenSubscriber
 
     #[AsEventListener(
         event: PageDisplayEvent::class,
-        priority: 0
     )]
     public function onPageDisplay(PageDisplayEvent $event): void
     {

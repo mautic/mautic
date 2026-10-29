@@ -21,7 +21,6 @@ final readonly class DetermineWinnerSubscriber
      */
     #[AsEventListener(
         event: PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER,
-        priority: 0
     )]
     public function onDetermineBounceRateWinner(DetermineWinnerEvent $event): void
     {
@@ -111,7 +110,6 @@ final readonly class DetermineWinnerSubscriber
      */
     #[AsEventListener(
         event: PageEvents::ON_DETERMINE_DWELL_TIME_WINNER,
-        priority: 0
     )]
     public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event): void
     {

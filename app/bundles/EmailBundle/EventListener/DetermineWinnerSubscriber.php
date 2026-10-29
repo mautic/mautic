@@ -24,7 +24,6 @@ final readonly class DetermineWinnerSubscriber
      */
     #[AsEventListener(
         event: EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER,
-        priority: 0
     )]
     public function onDetermineOpenRateWinner(DetermineWinnerEvent $event): void
     {
@@ -119,7 +118,6 @@ final readonly class DetermineWinnerSubscriber
      */
     #[AsEventListener(
         event: EmailEvents::ON_DETERMINE_CLICKTHROUGH_RATE_WINNER,
-        priority: 0
     )]
     public function onDetermineClickthroughRateWinner(DetermineWinnerEvent $event): void
     {

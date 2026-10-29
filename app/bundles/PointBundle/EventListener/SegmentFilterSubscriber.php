@@ -53,7 +53,6 @@ final readonly class SegmentFilterSubscriber
 
     #[AsEventListener(
         event: SegmentDictionaryGenerationEvent::class,
-        priority: 0
     )]
     public function onSegmentDictionaryGenerate(SegmentDictionaryGenerationEvent $event): void
     {

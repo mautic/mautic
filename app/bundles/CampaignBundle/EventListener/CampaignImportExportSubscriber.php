@@ -50,7 +50,6 @@ final readonly class CampaignImportExportSubscriber
 
     #[AsEventListener(
         event: EntityExportEvent::class,
-        priority: 0
     )]
     public function onCampaignExport(EntityExportEvent $event): void
     {
@@ -81,7 +80,6 @@ final readonly class CampaignImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportEvent::class,
-        priority: 0
     )]
     public function onCampaignImport(EntityImportEvent $event): void
     {
@@ -225,7 +223,6 @@ final readonly class CampaignImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
-        priority: 0
     )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
@@ -786,7 +783,6 @@ final readonly class CampaignImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportUndoEvent::class,
-        priority: 0
     )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {

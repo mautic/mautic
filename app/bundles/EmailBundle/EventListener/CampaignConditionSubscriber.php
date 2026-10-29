@@ -22,7 +22,6 @@ final readonly class CampaignConditionSubscriber
 
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -38,7 +37,6 @@ final readonly class CampaignConditionSubscriber
 
     #[AsEventListener(
         event: EmailEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
-        priority: 0
     )]
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {

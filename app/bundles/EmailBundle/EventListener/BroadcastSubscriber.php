@@ -23,7 +23,6 @@ final readonly class BroadcastSubscriber
 
     #[AsEventListener(
         event: ChannelBroadcastEvent::class,
-        priority: 0
     )]
     public function onBroadcast(ChannelBroadcastEvent $event): void
     {

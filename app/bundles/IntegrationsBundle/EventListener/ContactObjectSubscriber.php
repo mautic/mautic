@@ -29,7 +29,6 @@ final readonly class ContactObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectEvent::class,
-        priority: 0
     )]
     public function collectInternalObjects(InternalObjectEvent $event): void
     {
@@ -38,7 +37,6 @@ final readonly class ContactObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectUpdateEvent::class,
-        priority: 0
     )]
     public function updateContacts(InternalObjectUpdateEvent $event): void
     {
@@ -57,7 +55,6 @@ final readonly class ContactObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectCreateEvent::class,
-        priority: 0
     )]
     public function createContacts(InternalObjectCreateEvent $event): void
     {
@@ -71,7 +68,6 @@ final readonly class ContactObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectFindEvent::class,
-        priority: 0
     )]
     public function findContactsByIds(InternalObjectFindEvent $event): void
     {
@@ -85,7 +81,6 @@ final readonly class ContactObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectFindEvent::class,
-        priority: 0
     )]
     public function findContactsByDateRange(InternalObjectFindEvent $event): void
     {
@@ -106,7 +101,6 @@ final readonly class ContactObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectFindEvent::class,
-        priority: 0
     )]
     public function findContactsByFieldValues(InternalObjectFindEvent $event): void
     {
@@ -124,7 +118,6 @@ final readonly class ContactObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectOwnerEvent::class,
-        priority: 0
     )]
     public function findOwnerIdsForContacts(InternalObjectOwnerEvent $event): void
     {
@@ -142,7 +135,6 @@ final readonly class ContactObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectRouteEvent::class,
-        priority: 0
     )]
     public function buildContactRoute(InternalObjectRouteEvent $event): void
     {
@@ -167,7 +159,6 @@ final readonly class ContactObjectSubscriber
      */
     #[AsEventListener(
         event: InternalObjectFindByIdEvent::class,
-        priority: 0
     )]
     public function findContactById(InternalObjectFindByIdEvent $event): void
     {

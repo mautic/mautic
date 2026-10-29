@@ -17,7 +17,6 @@ final readonly class MaintenanceSubscriber
 
     #[AsEventListener(
         event: MaintenanceEvent::class,
-        priority: 0
     )]
     public function onDataCleanup(MaintenanceEvent $event): void
     {

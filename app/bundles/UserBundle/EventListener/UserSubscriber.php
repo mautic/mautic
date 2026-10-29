@@ -25,7 +25,6 @@ final readonly class UserSubscriber
      */
     #[AsEventListener(
         event: PostSaveUserEvent::class,
-        priority: 0
     )]
     public function onUserPostSave(PostSaveUserEvent $event): void
     {
@@ -49,7 +48,6 @@ final readonly class UserSubscriber
      */
     #[AsEventListener(
         event: PostDeleteUserEvent::class,
-        priority: 0
     )]
     public function onUserDelete(PostDeleteUserEvent $event): void
     {
@@ -70,7 +68,6 @@ final readonly class UserSubscriber
      */
     #[AsEventListener(
         event: PostSaveRoleEvent::class,
-        priority: 0
     )]
     public function onRolePostSave(PostSaveRoleEvent $event): void
     {
@@ -93,7 +90,6 @@ final readonly class UserSubscriber
      */
     #[AsEventListener(
         event: PostDeleteRoleEvent::class,
-        priority: 0
     )]
     public function onRoleDelete(PostDeleteRoleEvent $event): void
     {

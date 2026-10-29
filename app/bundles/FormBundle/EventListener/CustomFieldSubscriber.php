@@ -24,7 +24,6 @@ final readonly class CustomFieldSubscriber
      */
     #[AsEventListener(
         event: FieldPostSaveEvent::class,
-        priority: 0
     )]
     public function regenerateFormCache(LeadFieldEvent $event): void
     {

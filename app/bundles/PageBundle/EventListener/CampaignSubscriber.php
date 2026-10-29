@@ -33,7 +33,6 @@ final readonly class CampaignSubscriber
      */
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -86,7 +85,6 @@ final readonly class CampaignSubscriber
      */
     #[AsEventListener(
         event: PageHitEvent::class,
-        priority: 0
     )]
     public function onPageHit(PageHitEvent $event): void
     {
@@ -156,7 +154,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-        priority: 0
     )]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
@@ -228,7 +225,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: PageEvents::ON_CAMPAIGN_BATCH_ACTION,
-        priority: 0
     )]
     public function onCampaignTriggerAction(PendingEvent $event): void
     {

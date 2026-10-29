@@ -41,7 +41,6 @@ final readonly class CoreSubscriber
      */
     #[AsEventListener(
         event: SecurityEvents::INTERACTIVE_LOGIN,
-        priority: 0
     )]
     public function onSecurityInteractiveLogin(InteractiveLoginEvent $event): void
     {
@@ -110,7 +109,6 @@ final readonly class CoreSubscriber
 
     #[AsEventListener(
         event: RouteEvent::class,
-        priority: 0
     )]
     public function onBuildRoute(RouteEvent $event): void
     {

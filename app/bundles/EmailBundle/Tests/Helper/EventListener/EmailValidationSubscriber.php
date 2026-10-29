@@ -10,7 +10,6 @@ final class EmailValidationSubscriber
 {
     #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
         event: EmailValidationEvent::class,
-        priority: 0
     )]
     public function onEmailValidation(EmailValidationEvent $event): void
     {

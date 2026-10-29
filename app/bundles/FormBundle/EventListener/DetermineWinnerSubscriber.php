@@ -22,7 +22,6 @@ final readonly class DetermineWinnerSubscriber
      */
     #[AsEventListener(
         event: FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER,
-        priority: 0
     )]
     public function onDetermineSubmissionWinner(DetermineWinnerEvent $event): void
     {

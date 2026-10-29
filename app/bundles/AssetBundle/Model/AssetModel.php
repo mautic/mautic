@@ -107,11 +107,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
      * @param array<string, mixed> $systemEntry
      *
      * @throws ORMException
-<<<<<<< HEAD
-     * @throws \Exception
-=======
      * @throws Exception
->>>>>>> 3024571ab4 (Import AsEventListener attribute and restore blank lines between methods)
      */
     public function trackDownload(Asset $asset, ?Request $request = null, int $code = 200, array $systemEntry = []): void
     {

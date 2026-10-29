@@ -45,7 +45,6 @@ final readonly class EmailImportExportSubscriber
 
     #[AsEventListener(
         event: EntityExportEvent::class,
-        priority: 0
     )]
     public function onEmailExport(EntityExportEvent $event): void
     {
@@ -130,7 +129,6 @@ final readonly class EmailImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportEvent::class,
-        priority: 0
     )]
     public function onEmailImport(EntityImportEvent $event): void
     {
@@ -195,7 +193,6 @@ final readonly class EmailImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportUndoEvent::class,
-        priority: 0
     )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
@@ -222,7 +219,6 @@ final readonly class EmailImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
-        priority: 0
     )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {

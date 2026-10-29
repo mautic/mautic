@@ -19,7 +19,6 @@ final readonly class EditorFontsSubscriber
 
     #[AsEventListener(
         event: CustomAssetsEvent::class,
-        priority: 0
     )]
     public function addGlobalAssets(CustomAssetsEvent $customAssetsEvent): void
     {

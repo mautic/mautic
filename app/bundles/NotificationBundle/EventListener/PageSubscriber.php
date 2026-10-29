@@ -17,7 +17,6 @@ final readonly class PageSubscriber
 
     #[AsEventListener(
         event: PageDisplayEvent::class,
-        priority: 0
     )]
     public function onPageDisplay(): void
     {

@@ -34,7 +34,6 @@ final readonly class WebhookSubscriber
      */
     #[AsEventListener(
         event: WebhookBuilderEvent::class,
-        priority: 0
     )]
     public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
@@ -122,7 +121,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: LeadPostSaveEvent::class,
-        priority: 0
     )]
     public function onLeadNewUpdate(LeadEvent $event): void
     {
@@ -157,7 +155,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: PointsChangeEvent::class,
-        priority: 0
     )]
     public function onLeadPointChange(PointsChangeEvent $event): void
     {
@@ -183,7 +180,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: LeadPostDeleteEvent::class,
-        priority: 0
     )]
     public function onLeadDelete(LeadEvent $event): void
     {
@@ -206,7 +202,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: ChannelSubscriptionChange::class,
-        priority: 0
     )]
     public function onChannelSubscriptionChange(ChannelSubscriptionChange $event): void
     {
@@ -231,7 +226,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: LeadChangeCompanyEvent::class,
-        priority: 0
     )]
     public function onLeadCompanyChange(LeadChangeCompanyEvent $event): void
     {
@@ -255,7 +249,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: CompanyPostSaveEvent::class,
-        priority: 0
     )]
     public function onCompanySave(CompanyEvent $event): void
     {
@@ -269,7 +262,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: CompanyPostDeleteEvent::class,
-        priority: 0
     )]
     public function onCompanyDelete(CompanyEvent $event): void
     {
@@ -285,7 +277,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: ListChangeEvent::class,
-        priority: 0
     )]
     public function onSegmentChange(ListChangeEvent $changeEvent): void
     {
@@ -294,7 +285,6 @@ final readonly class WebhookSubscriber
 
     #[AsEventListener(
         event: ListBatchChangeEvent::class,
-        priority: 0
     )]
     public function onSegmentBatchChange(ListChangeEvent $changeEvent): void
     {

@@ -24,7 +24,6 @@ final class EmailSubscriber
 
     #[AsEventListener(
         event: EmailOnBuildEvent::class,
-        priority: 0
     )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
@@ -33,7 +32,6 @@ final class EmailSubscriber
 
     #[AsEventListener(
         event: EmailDisplayEvent::class,
-        priority: 0
     )]
     public function onEmailDisplay(EmailSendEvent $event): void
     {
@@ -42,7 +40,6 @@ final class EmailSubscriber
 
     #[AsEventListener(
         event: EmailSendEvent::class,
-        priority: 0
     )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
@@ -63,7 +60,6 @@ final class EmailSubscriber
 
     #[AsEventListener(
         event: OnEmailAddressTokenReplacementEvent::class,
-        priority: 0
     )]
     public function onEmailAddressReplacement(TokenReplacementEvent $event): void
     {

@@ -23,7 +23,6 @@ final readonly class AssetSubscriber
      */
     #[AsEventListener(
         event: AssetPostSaveEvent::class,
-        priority: 0
     )]
     public function onAssetPostSave(AssetPostSaveEvent $event): void
     {
@@ -46,7 +45,6 @@ final readonly class AssetSubscriber
      */
     #[AsEventListener(
         event: AssetPostDeleteEvent::class,
-        priority: 0
     )]
     public function onAssetDelete(AssetPostDeleteEvent $event): void
     {

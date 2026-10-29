@@ -23,7 +23,6 @@ final readonly class PageSubscriber
      */
     #[AsEventListener(
         event: Events\PageHitEvent::class,
-        priority: 0
     )]
     public function onPageHit(Events\PageHitEvent $event): void
     {

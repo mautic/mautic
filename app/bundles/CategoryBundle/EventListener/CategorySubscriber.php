@@ -29,7 +29,6 @@ final readonly class CategorySubscriber
      */
     #[AsEventListener(
         event: CategoryTypesEvent::class,
-        priority: 0
     )]
     public function onCategoryBundleListBuild(CategoryTypesEvent $event): void
     {
@@ -49,7 +48,6 @@ final readonly class CategorySubscriber
      */
     #[AsEventListener(
         event: CategoryEvents::CATEGORY_POST_SAVE,
-        priority: 0
     )]
     public function onCategoryPostSave(CategoryEvent $event): void
     {
@@ -72,7 +70,6 @@ final readonly class CategorySubscriber
      */
     #[AsEventListener(
         event: CategoryEvents::CATEGORY_POST_DELETE,
-        priority: 0
     )]
     public function onCategoryDelete(CategoryEvent $event): void
     {
@@ -90,7 +87,6 @@ final readonly class CategorySubscriber
 
     #[AsEventListener(
         event: CategoryEvents::CATEGORY_PRE_DELETE,
-        priority: 0
     )]
     public function onCategoryPreDelete(CategoryEvent $event): void
     {
@@ -109,7 +105,6 @@ final readonly class CategorySubscriber
 
     #[AsEventListener(
         event: CategoryTypeEntityEvent::class,
-        priority: 0
     )]
     public function onCategoryTypeEntity(CategoryTypeEntityEvent $event): void
     {

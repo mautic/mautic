@@ -18,7 +18,6 @@ final readonly class EmailDefaultsSubscriber
 
     #[AsEventListener(
         event: EmailPreSaveEvent::class,
-        priority: 0
     )]
     public function onEmailPreSave(EmailEvent $event): void
     {

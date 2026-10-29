@@ -20,7 +20,6 @@ final readonly class CampaignInjectCustomContentSubscriber
 
     #[AsEventListener(
         event: CustomContentEvent::class,
-        priority: 0
     )]
     public function injectViewCustomContent(CustomContentEvent $customContentEvent): void
     {

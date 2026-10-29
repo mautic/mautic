@@ -29,7 +29,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -79,7 +78,6 @@ final readonly class CampaignSubscriber
      */
     #[AsEventListener(
         event: DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION,
-        priority: 0
     )]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
@@ -110,7 +108,6 @@ final readonly class CampaignSubscriber
 
     #[AsEventListener(
         event: DynamicContentEvents::ON_CAMPAIGN_BATCH_ACTION,
-        priority: 0
     )]
     public function onCampaignTriggerAction(PendingEvent $event): void
     {

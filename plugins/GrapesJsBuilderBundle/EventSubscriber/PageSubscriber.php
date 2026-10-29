@@ -20,7 +20,6 @@ final readonly class PageSubscriber
 
     #[AsEventListener(
         event: PageEvents::PAGE_POST_SAVE,
-        priority: 0
     )]
     public function onPagePostSave(PageEvent $event): void
     {

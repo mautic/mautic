@@ -18,7 +18,6 @@ final readonly class ConfigSubscriber
 
     #[AsEventListener(
         event: ConfigBuilderEvent::class,
-        priority: 0
     )]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
@@ -37,7 +36,6 @@ final readonly class ConfigSubscriber
 
     #[AsEventListener(
         event: ConfigPreSaveEvent::class,
-        priority: 0
     )]
     public function onConfigSave(ConfigEvent $event): void
     {

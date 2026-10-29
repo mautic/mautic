@@ -30,7 +30,6 @@ final readonly class PointSubscriber
 
     #[AsEventListener(
         event: TriggerBuilderEvent::class,
-        priority: 0
     )]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
@@ -76,7 +75,6 @@ final readonly class PointSubscriber
 
     #[AsEventListener(
         event: PointEvents::TRIGGER_ON_EVENT_EXECUTE,
-        priority: 0
     )]
     public function onTriggerExecute(TriggerExecutedEvent $event): void
     {
@@ -145,7 +143,6 @@ final readonly class PointSubscriber
 
     #[AsEventListener(
         event: PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE,
-        priority: 0
     )]
     public function onLeadSegmentsChange(TriggerExecutedEvent $event): void
     {

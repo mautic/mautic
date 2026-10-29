@@ -14,7 +14,6 @@ final class CampaignSubscriber
 
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -31,7 +30,6 @@ final class CampaignSubscriber
 
     #[AsEventListener(
         event: PluginEvents::ON_CAMPAIGN_BATCH_ACTION,
-        priority: 0
     )]
     public function onCampaignTriggerAction(PendingEvent $event): void
     {

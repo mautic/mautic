@@ -20,7 +20,6 @@ final readonly class PageSubscriber
 
     #[AsEventListener(
         event: UrlTokenReplaceEvent::class,
-        priority: 0
     )]
     public function onUrlTokenReplace(UrlTokenReplaceEvent $event): void
     {

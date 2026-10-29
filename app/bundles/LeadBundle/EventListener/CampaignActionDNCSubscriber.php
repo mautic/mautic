@@ -22,7 +22,6 @@ final readonly class CampaignActionDNCSubscriber
 
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function configureAction(CampaignBuilderEvent $event): void
     {
@@ -49,7 +48,6 @@ final readonly class CampaignActionDNCSubscriber
 
     #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_ACTION_ADD_DONOTCONTACT,
-        priority: 0
     )]
     public function addDoNotContact(PendingEvent $event): void
     {
@@ -78,7 +76,6 @@ final readonly class CampaignActionDNCSubscriber
 
     #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_ACTION_REMOVE_DONOTCONTACT,
-        priority: 0
     )]
     public function removeDoNotContact(PendingEvent $event): void
     {

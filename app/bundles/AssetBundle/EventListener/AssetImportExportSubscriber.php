@@ -35,7 +35,6 @@ final readonly class AssetImportExportSubscriber
 
     #[AsEventListener(
         event: EntityExportEvent::class,
-        priority: 0
     )]
     public function onAssetExport(EntityExportEvent $event): void
     {
@@ -83,7 +82,6 @@ final readonly class AssetImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportEvent::class,
-        priority: 0
     )]
     public function onAssetImport(EntityImportEvent $event): void
     {
@@ -130,7 +128,6 @@ final readonly class AssetImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportUndoEvent::class,
-        priority: 0
     )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
@@ -157,7 +154,6 @@ final readonly class AssetImportExportSubscriber
 
     #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
-        priority: 0
     )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {

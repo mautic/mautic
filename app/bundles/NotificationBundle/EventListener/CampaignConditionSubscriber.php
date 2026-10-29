@@ -12,7 +12,6 @@ final class CampaignConditionSubscriber
 {
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -28,7 +27,6 @@ final class CampaignConditionSubscriber
 
     #[AsEventListener(
         event: NotificationEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
-        priority: 0
     )]
     public function onCampaignTriggerHasActiveCondition(ConditionEvent $event): void
     {

@@ -23,7 +23,6 @@ final class TimelineEventLogSubscriber
 
     #[AsEventListener(
         event: LeadTimelineEvent::class,
-        priority: 0
     )]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {

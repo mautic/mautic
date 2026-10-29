@@ -28,7 +28,6 @@ final readonly class PointSubscriber
 
     #[AsEventListener(
         event: PointBuilderEvent::class,
-        priority: 0
     )]
     public function onPointBuild(PointBuilderEvent $event): void
     {
@@ -53,7 +52,6 @@ final readonly class PointSubscriber
 
     #[AsEventListener(
         event: TriggerBuilderEvent::class,
-        priority: 0
     )]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
@@ -85,7 +83,6 @@ final readonly class PointSubscriber
      */
     #[AsEventListener(
         event: EmailOpenEvent::class,
-        priority: 0
     )]
     public function onEmailOpen(EmailOpenEvent $event): void
     {
@@ -97,7 +94,6 @@ final readonly class PointSubscriber
      */
     #[AsEventListener(
         event: EmailSendEvent::class,
-        priority: 0
     )]
     public function onEmailSend(EmailSendEvent $event): void
     {

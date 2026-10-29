@@ -18,7 +18,6 @@ final readonly class PluginSubscriber
 
     #[AsEventListener(
         event: PluginInstallEvent::class,
-        priority: 0
     )]
     public function onInstall(PluginInstallEvent $event): void
     {
@@ -36,7 +35,6 @@ final readonly class PluginSubscriber
 
     #[AsEventListener(
         event: PluginUpdateEvent::class,
-        priority: 0
     )]
     public function onUpdate(PluginUpdateEvent $event): void
     {

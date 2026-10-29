@@ -15,7 +15,6 @@ final readonly class GraphAggregateStatsSubscriber
 
     #[AsEventListener(
         event: AggregateStatRequestEvent::class,
-        priority: 0
     )]
     public function onStatRequest(AggregateStatRequestEvent $event): void
     {

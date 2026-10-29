@@ -26,7 +26,6 @@ final readonly class RequestSubscriber
 
     #[AsEventListener(
         event: KernelEvents::REQUEST,
-        priority: 0
     )]
     public function validateCsrfTokenForAjaxPost(RequestEvent $event): void
     {

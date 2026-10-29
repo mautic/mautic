@@ -20,7 +20,6 @@ final readonly class SearchSubscriber
 
     #[AsEventListener(
         event: GlobalSearchEvent::class,
-        priority: 0
     )]
     public function onGlobalSearch(GlobalSearchEvent $event): void
     {

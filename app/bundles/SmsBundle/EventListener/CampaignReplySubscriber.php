@@ -28,7 +28,6 @@ final readonly class CampaignReplySubscriber
 
     #[AsEventListener(
         event: CampaignBuilderEvent::class,
-        priority: 0
     )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -49,7 +48,6 @@ final readonly class CampaignReplySubscriber
 
     #[AsEventListener(
         event: SmsEvents::ON_CAMPAIGN_REPLY,
-        priority: 0
     )]
     public function onCampaignReply(DecisionEvent $decisionEvent): void
     {
@@ -82,7 +80,6 @@ final readonly class CampaignReplySubscriber
      */
     #[AsEventListener(
         event: ReplyEvent::class,
-        priority: 0
     )]
     public function onReply(ReplyEvent $event): void
     {

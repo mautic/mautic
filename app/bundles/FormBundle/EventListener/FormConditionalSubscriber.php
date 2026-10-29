@@ -23,7 +23,6 @@ final readonly class FormConditionalSubscriber
      */
     #[AsEventListener(
         event: FormEvents::FORM_POST_SAVE,
-        priority: 0
     )]
     public function onFormPostSave(FormEvent $event): void
     {

@@ -16,7 +16,6 @@ final readonly class ReportSchedulerSubscriber
 
     #[AsEventListener(
         event: ReportEvents::REPORT_POST_SAVE,
-        priority: 0
     )]
     public function onReportSave(ReportEvent $event): void
     {

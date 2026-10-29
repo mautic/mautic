@@ -13,7 +13,6 @@ final class EmailDetailsRightColumnSubscriber
 {
     #[AsEventListener(
         event: CustomContentEvent::class,
-        priority: 0
     )]
     public function injectContent(CustomContentEvent $event): void
     {

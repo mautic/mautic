@@ -24,7 +24,6 @@ final readonly class CampaignEventDeleteSubscriber
 
     #[AsEventListener(
         event: DeleteCampaign::class,
-        priority: 0
     )]
     public function onCampaignDelete(DeleteCampaign $event): void
     {
@@ -41,7 +40,6 @@ final readonly class CampaignEventDeleteSubscriber
 
     #[AsEventListener(
         event: DeleteEvent::class,
-        priority: 0
     )]
     public function onEventDelete(DeleteEvent $event): void
     {

@@ -25,7 +25,6 @@ final readonly class EmailExportListEventSubscriber
 
     #[AsEventListener(
         event: AssetExportListEvent::class,
-        priority: 0
     )]
     public function onExportList(AssetExportListEvent $event): void
     {

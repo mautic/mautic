@@ -53,7 +53,6 @@ final readonly class FormSubscriber
      */
     #[AsEventListener(
         event: FormBuilderEvent::class,
-        priority: 0
     )]
     public function onFormBuilder(FormBuilderEvent $event): void
     {
@@ -123,7 +122,6 @@ final readonly class FormSubscriber
 
     #[AsEventListener(
         event: ObjectCollectEvent::class,
-        priority: 0
     )]
     public function onObjectCollect(ObjectCollectEvent $event): void
     {
@@ -133,7 +131,6 @@ final readonly class FormSubscriber
 
     #[AsEventListener(
         event: FieldCollectEvent::class,
-        priority: 0
     )]
     public function onFieldCollect(FieldCollectEvent $event): void
     {
@@ -161,7 +158,6 @@ final readonly class FormSubscriber
 
     #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
-        priority: 0
     )]
     public function onFormSubmitActionChangePoints(SubmissionEvent $event): void
     {
@@ -337,7 +333,6 @@ final readonly class FormSubscriber
 
     #[AsEventListener(
         event: LeadEvents::LEAD_ON_SEGMENTS_CHANGE,
-        priority: 0
     )]
     public function onLeadSegmentsChange(SubmissionEvent $event): void
     {

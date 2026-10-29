@@ -19,7 +19,6 @@ final readonly class EmailToUserSubscriber
 
     #[AsEventListener(
         event: EmailEvents::ON_SENT_EMAIL_TO_USER,
-        priority: 0
     )]
     public function onEmailToUser(TriggerExecutedEvent $event): void
     {

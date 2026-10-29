@@ -34,7 +34,6 @@ final readonly class SmsSubscriber
      */
     #[AsEventListener(
         event: SmsPostSaveEvent::class,
-        priority: 0
     )]
     public function onPostSave(SmsEvent $event): void
     {
@@ -56,7 +55,6 @@ final readonly class SmsSubscriber
      */
     #[AsEventListener(
         event: SmsPostDeleteEvent::class,
-        priority: 0
     )]
     public function onDelete(SmsEvent $event): void
     {
@@ -73,7 +71,6 @@ final readonly class SmsSubscriber
 
     #[AsEventListener(
         event: SmsEvents::TOKEN_REPLACEMENT,
-        priority: 0
     )]
     public function onTokenReplacement(TokenReplacementEvent $event): void
     {

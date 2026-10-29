@@ -21,7 +21,6 @@ final readonly class MessageSubscriber
      */
     #[AsEventListener(
         event: ChannelEvents::MESSAGE_POST_SAVE,
-        priority: 0
     )]
     public function onPostSave(MessageEvent $event): void
     {
@@ -43,7 +42,6 @@ final readonly class MessageSubscriber
      */
     #[AsEventListener(
         event: ChannelEvents::MESSAGE_POST_DELETE,
-        priority: 0
     )]
     public function onDelete(MessageEvent $event): void
     {

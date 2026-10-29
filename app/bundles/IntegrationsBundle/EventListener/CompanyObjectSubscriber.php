@@ -27,7 +27,6 @@ final readonly class CompanyObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectEvent::class,
-        priority: 0
     )]
     public function collectInternalObjects(InternalObjectEvent $event): void
     {
@@ -36,7 +35,6 @@ final readonly class CompanyObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectUpdateEvent::class,
-        priority: 0
     )]
     public function updateCompanies(InternalObjectUpdateEvent $event): void
     {
@@ -55,7 +53,6 @@ final readonly class CompanyObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectCreateEvent::class,
-        priority: 0
     )]
     public function createCompanies(InternalObjectCreateEvent $event): void
     {
@@ -69,7 +66,6 @@ final readonly class CompanyObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectFindEvent::class,
-        priority: 0
     )]
     public function findCompaniesByIds(InternalObjectFindEvent $event): void
     {
@@ -83,7 +79,6 @@ final readonly class CompanyObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectFindEvent::class,
-        priority: 0
     )]
     public function findCompaniesByDateRange(InternalObjectFindEvent $event): void
     {
@@ -104,7 +99,6 @@ final readonly class CompanyObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectFindEvent::class,
-        priority: 0
     )]
     public function findCompaniesByFieldValues(InternalObjectFindEvent $event): void
     {
@@ -122,7 +116,6 @@ final readonly class CompanyObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectOwnerEvent::class,
-        priority: 0
     )]
     public function findOwnerIdsForCompanies(InternalObjectOwnerEvent $event): void
     {
@@ -140,7 +133,6 @@ final readonly class CompanyObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectRouteEvent::class,
-        priority: 0
     )]
     public function buildCompanyRoute(InternalObjectRouteEvent $event): void
     {
@@ -162,7 +154,6 @@ final readonly class CompanyObjectSubscriber
 
     #[AsEventListener(
         event: InternalObjectFindByIdEvent::class,
-        priority: 0
     )]
     public function findCompanyById(InternalObjectFindByIdEvent $event): void
     {

@@ -53,7 +53,6 @@ final readonly class DynamicContentSubscriber
      */
     #[AsEventListener(
         event: DynamicContentEvents::POST_SAVE,
-        priority: 0
     )]
     public function onPostSave(Events\DynamicContentEvent $event): void
     {
@@ -75,7 +74,6 @@ final readonly class DynamicContentSubscriber
      */
     #[AsEventListener(
         event: DynamicContentEvents::POST_DELETE,
-        priority: 0
     )]
     public function onDelete(Events\DynamicContentEvent $event): void
     {
@@ -92,7 +90,6 @@ final readonly class DynamicContentSubscriber
 
     #[AsEventListener(
         event: MauticEvents\TokenReplacementEvent::class,
-        priority: 0
     )]
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {

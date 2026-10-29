@@ -31,7 +31,6 @@ final class OwnerSubscriber
 
     #[AsEventListener(
         event: EmailOnBuildEvent::class,
-        priority: 0
     )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
@@ -40,7 +39,6 @@ final class OwnerSubscriber
 
     #[AsEventListener(
         event: EmailDisplayEvent::class,
-        priority: 0
     )]
     public function onEmailDisplay(EmailSendEvent $event): void
     {
@@ -49,7 +47,6 @@ final class OwnerSubscriber
 
     #[AsEventListener(
         event: EmailSendEvent::class,
-        priority: 0
     )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
@@ -58,7 +55,6 @@ final class OwnerSubscriber
 
     #[AsEventListener(
         event: TokensBuildEvent::class,
-        priority: 0
     )]
     public function onSmsTokensBuild(TokensBuildEvent $event): void
     {
@@ -68,7 +64,6 @@ final class OwnerSubscriber
 
     #[AsEventListener(
         event: SmsEvents::TOKEN_REPLACEMENT,
-        priority: 0
     )]
     public function onSmsTokenReplacement(TokenReplacementEvent $event): void
     {
@@ -84,7 +79,6 @@ final class OwnerSubscriber
 
     #[AsEventListener(
         event: UrlTokenReplaceEvent::class,
-        priority: 0
     )]
     public function onUrlTokenReplace(UrlTokenReplaceEvent $event): void
     {

@@ -14,7 +14,6 @@ final class RemoteAssetBrowseSubscriber
      */
     #[AsEventListener(
         event: Events\RemoteAssetBrowseEvent::class,
-        priority: 0
     )]
     public function onAssetRemoteBrowse(Events\RemoteAssetBrowseEvent $event): void
     {

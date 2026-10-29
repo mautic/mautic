@@ -12,7 +12,6 @@ final class ChannelSubscriber
 {
     #[AsEventListener(
         event: ChannelEvent::class,
-        priority: 0
     )]
     public function onAddChannel(ChannelEvent $event): void
     {

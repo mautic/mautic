@@ -26,7 +26,6 @@ final readonly class FormValidationSubscriber
      */
     #[AsEventListener(
         event: Events\FormBuilderEvent::class,
-        priority: 0
     )]
     public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
@@ -67,7 +66,6 @@ final readonly class FormValidationSubscriber
      */
     #[AsEventListener(
         event: FormEvents::ON_FORM_VALIDATE,
-        priority: 0
     )]
     public function onFormValidate(Events\ValidationEvent $event): void
     {

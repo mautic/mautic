@@ -22,7 +22,6 @@ final readonly class LeadListSubscriber
 
     #[AsEventListener(
         event: LeadListFiltersChoicesEvent::class,
-        priority: 0
     )]
     public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event): void
     {
@@ -80,7 +79,6 @@ final readonly class LeadListSubscriber
      */
     #[AsEventListener(
         event: ListPreProcessListEvent::class,
-        priority: 0
     )]
     public function onLeadListProcessList(ListPreProcessListEvent $event): void
     {

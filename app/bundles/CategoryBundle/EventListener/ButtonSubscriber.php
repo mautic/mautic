@@ -18,7 +18,6 @@ final readonly class ButtonSubscriber
 
     #[AsEventListener(
         event: CustomButtonEvent::class,
-        priority: 0
     )]
     public function injectContactBulkButtons(CustomButtonEvent $event): void
     {

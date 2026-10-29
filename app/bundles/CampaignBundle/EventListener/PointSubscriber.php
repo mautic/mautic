@@ -13,7 +13,6 @@ final class PointSubscriber
 {
     #[AsEventListener(
         event: TriggerBuilderEvent::class,
-        priority: 0
     )]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {

@@ -20,7 +20,6 @@ final readonly class DynamicContentSubscriber
 
     #[AsEventListener(
         event: ContactFiltersEvaluateEvent::class,
-        priority: 0
     )]
     public function onContactFilterEvaluate(ContactFiltersEvaluateEvent $event): void
     {

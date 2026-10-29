@@ -18,7 +18,6 @@ final readonly class DoNotContactSubscriber
 
     #[AsEventListener(
         event: DoNotContactRemoveEvent::class,
-        priority: 0
     )]
     public function removeDncForLead(DoNotContactRemoveEvent $doNotContactRemoveEvent): void
     {
@@ -31,7 +30,6 @@ final readonly class DoNotContactSubscriber
 
     #[AsEventListener(
         event: DoNotContactAddEvent::class,
-        priority: 0
     )]
     public function addDncForLead(DoNotContactAddEvent $doNotContactAddEvent): void
     {

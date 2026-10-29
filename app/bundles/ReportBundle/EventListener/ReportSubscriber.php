@@ -23,7 +23,6 @@ final readonly class ReportSubscriber
      */
     #[AsEventListener(
         event: ReportEvents::REPORT_POST_SAVE,
-        priority: 0
     )]
     public function onReportPostSave(ReportEvent $event): void
     {
@@ -46,7 +45,6 @@ final readonly class ReportSubscriber
      */
     #[AsEventListener(
         event: ReportEvents::REPORT_POST_DELETE,
-        priority: 0
     )]
     public function onReportDelete(ReportEvent $event): void
     {

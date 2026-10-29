@@ -18,7 +18,6 @@ final readonly class FormSubscriber
 
     #[AsEventListener(
         event: FormBuilderEvent::class,
-        priority: 0
     )]
     public function onFormBuild(FormBuilderEvent $event): void
     {
