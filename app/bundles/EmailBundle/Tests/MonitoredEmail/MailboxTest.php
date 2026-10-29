@@ -189,13 +189,15 @@ final class MailboxTest extends TestCase
 
         $mailbox = new Mailbox($parametersHelper, $pathsHelper);
 
-        $reflection = new \ReflectionClass($mailbox);
+        $mailboxFeflection = new \ReflectionClass($mailbox);
 
         // Set a value that is not an IMAP\Connection resource to trigger ValueError in imap_ping
-        $imapStreamProperty = $reflection->getProperty('imapStream');
-        $imapStreamProperty->setValue($mailbox, new \stdClass());
+        $connectionMock = new \IMAP\Connection();
 
-        $isConnectedMethod = $reflection->getMethod('isConnected');
+        $imapStreamProperty = $mailboxFeflection->getProperty('imapStream');
+        $imapStreamProperty->setValue($mailbox, $connectionMock);
+
+        $isConnectedMethod = $mailboxFeflection->getMethod('isConnected');
 
         $this->assertFalse($isConnectedMethod->invoke($mailbox));
     }
