@@ -28,9 +28,9 @@ final class ReadyToSendPublishStatusIconTest extends TestCase
             'status' => 'ready_to_send',
         ]);
 
-        self::assertStringContainsString('ri-toggle-fill text-success', $html);
-        self::assertStringContainsString('has-click-event', $html);
-        self::assertStringContainsString('data-status="ready_to_send"', $html);
-        self::assertStringContainsString('Mautic.togglePublishStatus', $html);
+        $this->assertStringContainsString('ri-toggle-fill text-success', $html);
+        $this->assertStringContainsString('has-click-event', $html);
+        $this->assertStringContainsString('data-status="ready_to_send"', $html);
+        $this->assertStringContainsString('Mautic.togglePublishStatus', $html);
     }
 }

@@ -102,7 +102,7 @@ final class EmailTest extends TestCase
         $email->setIsPublished(true);
         $email->setPendingCount(1);
 
-        self::assertSame('ready_to_send', $email->getSendingStatus());
+        $this->assertSame('ready_to_send', $email->getSendingStatus());
     }
 
     public function testScheduledSegmentEmailInActivePeriodWithPendingContactsIsSending(): void
@@ -113,6 +113,6 @@ final class EmailTest extends TestCase
         $email->setPublishUp(new \DateTime('2000-01-01 00:00:00', new \DateTimeZone('UTC')));
         $email->setPendingCount(1);
 
-        self::assertSame('sending', $email->getSendingStatus());
+        $this->assertSame('sending', $email->getSendingStatus());
     }
 }
