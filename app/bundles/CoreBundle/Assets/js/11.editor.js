@@ -1,5 +1,6 @@
 Mautic.builderTokensForCkEditor = {};
 Mautic.builderTokens = {};
+Mautic.builderTokensMethod = null;
 Mautic.dynamicContentTokens = {};
 Mautic.builderTokensRequestInProgress = false;
 Mautic.imageManagerLoadURL = mauticBaseUrl + 's/file/list';
@@ -184,7 +185,17 @@ Mautic.getFeedItems = function (queryText) {
 
 Mautic.getTokensForPlugIn = function(method) {
     method = typeof method != 'undefined' ? method : 'page:getBuilderTokens';
-    // OK, let's fetch the tokens.
+
+    // Reuse tokens already fetched for this callback (e.g. multiple DC variation editors).
+    // Cleared on page unload so the next email/page gets a fresh list.
+    if (
+        Mautic.builderTokensMethod === method
+        && !mQuery.isEmptyObject(Mautic.builderTokensForCkEditor)
+    ) {
+        return Mautic.builderTokensForCkEditor;
+    }
+
+    Mautic.builderTokensRequestInProgress = true;
     mQuery.ajax({
         url: mauticAjaxUrl,
         data: 'action=' + method,
@@ -196,6 +207,7 @@ Mautic.getTokensForPlugIn = function(method) {
                 Mautic.builderTokensForCkEditor = mQuery.map(Mautic.builderTokens, function(value, i) {
                     return {'id':i, 'name':value};
                 });
+                Mautic.builderTokensMethod = method;
             }
         },
         error: function (request, textStatus, errorThrown) {

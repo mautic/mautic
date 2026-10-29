@@ -846,10 +846,14 @@ Mautic.onPageUnload = function (container, response) {
             Mautic.mapObjects = [];
         }
 
-        // trash tokens to save some memory
+        // trash tokens to save some memory / avoid stale tokens on the next entity
         if (typeof Mautic.builderTokens !== 'undefined') {
             Mautic.builderTokens = {};
         }
+        if (typeof Mautic.builderTokensForCkEditor !== 'undefined') {
+            Mautic.builderTokensForCkEditor = {};
+        }
+        Mautic.builderTokensMethod = null;
     } else if (response && response.mauticContent) {
         contentSpecific = response.mauticContent;
     }
