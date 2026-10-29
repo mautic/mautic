@@ -94,4 +94,25 @@ final class EmailTest extends TestCase
 
         $this->assertSame(['subjectline' => 'Welcome!'], $email->getSettings());
     }
+
+    public function testUnscheduledSegmentEmailWithPendingContactsIsReadyToSend(): void
+    {
+        $email = new Email();
+        $email->setEmailType('list');
+        $email->setIsPublished(true);
+        $email->setPendingCount(1);
+
+        self::assertSame('ready_to_send', $email->getSendingStatus());
+    }
+
+    public function testScheduledSegmentEmailInActivePeriodWithPendingContactsIsSending(): void
+    {
+        $email = new Email();
+        $email->setEmailType('list');
+        $email->setIsPublished(true);
+        $email->setPublishUp(new \DateTime('-1 hour'));
+        $email->setPendingCount(1);
+
+        self::assertSame('sending', $email->getSendingStatus());
+    }
 }
