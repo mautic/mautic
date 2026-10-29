@@ -110,7 +110,7 @@ final class EmailTest extends TestCase
         $email = new Email();
         $email->setEmailType('list');
         $email->setIsPublished(true);
-        $email->setPublishUp(new \DateTime('-1 hour'));
+        $email->setPublishUp(new \DateTime('2000-01-01 00:00:00', new \DateTimeZone('UTC')));
         $email->setPendingCount(1);
 
         self::assertSame('sending', $email->getSendingStatus());
