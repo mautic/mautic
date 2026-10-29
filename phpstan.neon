@@ -487,6 +487,14 @@ services:
         tags:
             - phpstan.collector
     -
+        class: Utils\PHPStan\Rule\ReturnDocblockToNativeTypeRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Utils\PHPStan\Collector\ReturnObjectDocblockCollector
+        tags:
+            - phpstan.collector
+    -
         class: Utils\PHPStan\Rule\ParamTypeByVariableNameRule
         tags:
             - phpstan.rules.rule

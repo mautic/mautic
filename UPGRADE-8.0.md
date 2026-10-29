@@ -1197,3 +1197,4 @@
     ```
 
     `CommonApiController` and `FetchCommonApiController` also renamed their `@template`/`@extends` generic type parameter from `E` to `TEntity`; this only matters for static-analysis consumers that referenced the generic by name.
+- Many getters and setters now declare a native return type promoted from their `@return` docblock (entity getters returning the related entity, fluent setters returning `static`, and similar). A subclass that overrides one of these methods must declare the matching native return type, otherwise PHP raises an incompatible-signature error.
