@@ -7,10 +7,10 @@ namespace Mautic\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 use Mautic\AssetBundle\Entity\Asset;
-use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 
-final class Version20261028145757 extends PreUpAssertionMigration
+final class Version20261028145757 extends AbstractMauticMigration
 {
     protected const TABLE_NAME = Asset::TABLE_NAME;
     private const COLUMN_NAME  = 'track_downloads';
@@ -20,18 +20,13 @@ final class Version20261028145757 extends PreUpAssertionMigration
         return 'Add the per-asset download tracking toggle';
     }
 
-    protected function preUpAssertions(): void
-    {
-        $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable($this->getPrefixedTableName())->hasColumn(self::COLUMN_NAME),
-            sprintf('Column %s already exists', self::COLUMN_NAME)
-        );
-    }
-
     public function up(Schema $schema): void
     {
-        $schema->getTable($this->getPrefixedTableName())
-            ->addColumn(self::COLUMN_NAME, Types::BOOLEAN, ['default' => true]);
+        // Not skipped when the column exists, so a rerun after a failed backfill still runs the backfill
+        $table = $schema->getTable($this->getPrefixedTableName());
+        if (!$table->hasColumn(self::COLUMN_NAME)) {
+            $table->addColumn(self::COLUMN_NAME, Types::BOOLEAN, ['default' => true]);
+        }
     }
 
     public function postUp(Schema $schema): void
