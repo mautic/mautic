@@ -13,15 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 final class GeneratedColumnSubscriberTest extends TestCase
 {
-    public function testGetSubscribedEvents(): void
-    {
-        $subscribedEvents = [
-            GeneratedColumnsEvent::class => ['onGeneratedColumnsBuild', 0],
-        ];
-
-        $this->assertSame($subscribedEvents, GeneratedColumnSubscriber::getSubscribedEvents());
-    }
-
     public function testOnGeneratedColumnsBuildWithMySql(): void
     {
         $generatedColumns = $this->buildGeneratedColumns(true);

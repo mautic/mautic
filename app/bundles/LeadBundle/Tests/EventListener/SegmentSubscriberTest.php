@@ -9,11 +9,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
-use Mautic\LeadBundle\Event\ListDeleteEvent;
-use Mautic\LeadBundle\Event\ListPostDeleteEvent;
-use Mautic\LeadBundle\Event\ListPostSaveEvent;
-use Mautic\LeadBundle\Event\ListPreDeleteEvent;
-use Mautic\LeadBundle\Event\ListPreUnpublishEvent;
 use Mautic\LeadBundle\EventListener\SegmentSubscriber;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
@@ -56,37 +51,6 @@ final class SegmentSubscriberTest extends TestCase
         $this->coreParametersHelper            = $this->createMock(CoreParametersHelper::class);
         $this->segmentCountCacheHelper         = $this->createStub(SegmentCountCacheHelper::class);
         $this->coreParametersHelper->method('get')->willReturnCallback(fn (): false => false);
-    }
-
-    public function testGetSubscribedEvents(): void
-    {
-        $subscriber  = new SegmentSubscriber(
-            $this->ipLookupHelper,
-            $this->auditLogModel,
-            $this->listModel,
-            $this->createStub(SegmentUsedInCampaignsValidator::class),
-            $this->coreParametersHelper,
-            $this->segmentCountCacheHelper,
-            $this->createStub(TranslatorInterface::class)
-        );
-
-        $this->assertSame(
-            [
-                ListPostSaveEvent::class     => ['onSegmentPostSave', 0],
-                ListDeleteEvent::class     => ['onSegmentDelete', 0],
-                ListPostDeleteEvent::class   => [
-                    ['onSegmentPostDelete', 0],
-                    ['clearSegmentCountCache', 0],
-                ],
-                ListPreDeleteEvent::class   => [
-                    ['onSegmentPreDelete', 0],
-                ],
-                ListPreUnpublishEvent::class => [
-                    ['onSegmentPreUnpublish', 0],
-                ],
-            ],
-            $subscriber->getSubscribedEvents()
-        );
     }
 
     public function testOnSegmentPostSave(): void

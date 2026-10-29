@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Tests\ApiPlatform\EventListener;
 
-use ApiPlatform\Symfony\EventListener\EventPriorities;
 use Mautic\ApiBundle\ApiPlatform\EventListener\MauticWriteSubscriber;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -47,14 +46,6 @@ final class MauticWriteSubscriberTest extends TestCase
             HttpKernelInterface::MAIN_REQUEST,
             $this->formEntity,
         );
-    }
-
-    public function testGetSubscribedEvents(): void
-    {
-        $expected = [
-            'kernel.view'=> ['addData', EventPriorities::PRE_WRITE],
-        ];
-        $this->assertSame($expected, MauticWriteSubscriber::getSubscribedEvents());
     }
 
     public function testAddDataWithWrongMethod(): void

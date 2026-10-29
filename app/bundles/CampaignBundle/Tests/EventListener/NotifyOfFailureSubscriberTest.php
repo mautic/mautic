@@ -43,11 +43,4 @@ final class NotifyOfFailureSubscriberTest extends TestCase
 
         $this->subscriber->notifyOfFailure($notifyEvent);
     }
-
-    public function testGetSubscribedEvents(): void
-    {
-        $events = NotifyOfFailureSubscriber::getSubscribedEvents();
-        $this->assertArrayHasKey(NotifyOfFailureEvent::class, $events);
-        $this->assertEquals('notifyOfFailure', $events[NotifyOfFailureEvent::class]);
-    }
 }

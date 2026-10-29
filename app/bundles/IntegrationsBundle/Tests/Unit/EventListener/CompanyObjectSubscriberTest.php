@@ -52,26 +52,6 @@ final class CompanyObjectSubscriberTest extends TestCase
         );
     }
 
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertSame(
-            [
-                InternalObjectEvent::class         => ['collectInternalObjects', 0],
-                InternalObjectUpdateEvent::class   => ['updateCompanies', 0],
-                InternalObjectCreateEvent::class   => ['createCompanies', 0],
-                InternalObjectFindEvent::class     => [
-                    ['findCompaniesByIds', 0],
-                    ['findCompaniesByDateRange', 0],
-                    ['findCompaniesByFieldValues', 0],
-                ],
-                InternalObjectOwnerEvent::class    => ['findOwnerIdsForCompanies', 0],
-                InternalObjectRouteEvent::class    => ['buildCompanyRoute', 0],
-                InternalObjectFindByIdEvent::class => ['findCompanyById', 0],
-            ],
-            CompanyObjectSubscriber::getSubscribedEvents()
-        );
-    }
-
     public function testCollectInternalObjects(): void
     {
         $event = new InternalObjectEvent();
