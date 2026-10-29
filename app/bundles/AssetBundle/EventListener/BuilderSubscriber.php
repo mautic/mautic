@@ -13,12 +13,10 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber
 {
     private string $assetToken = '{assetlink=(.*?)}';
-
     public function __construct(
         private readonly CorePermissions $security,
         private readonly TokenHelper $tokenHelper,
@@ -26,18 +24,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
         private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailOnBuildEvent::class      => ['onBuilderBuild', 0],
-            EmailSendEvent::class         => ['onEmailGenerate', 0],
-            EmailDisplayEvent::class      => ['onEmailGenerate', 0],
-            PageBuilderEvent::class       => ['onBuilderBuild', 0],
-            PageDisplayEvent::class   => ['onPageDisplay', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailOnBuildEvent::class,
+        priority: 0
+    )]
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PageBuilderEvent::class,
+        priority: 0
+    )]
     public function onBuilderBuild(BuilderEvent $event): void
     {
         if ($event->tokensRequested($this->assetToken)) {
@@ -54,7 +48,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
             }
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailSendEvent::class,
+        priority: 0
+    )]
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailDisplayEvent::class,
+        priority: 0
+    )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $lead   = $event->getLead();
@@ -63,7 +64,10 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $tokens = $this->generateTokensFromContent($event, $leadId, $event->getSource(), $email?->getId());
         $event->addTokens($tokens);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PageDisplayEvent::class,
+        priority: 0
+    )]
     public function onPageDisplay(PageDisplayEvent $event): void
     {
         if (!$lead = $event->getLead()) {
@@ -80,7 +84,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
         $event->setContent($content);
     }
-
     /**
      * @param int[]|string[] $source
      *

@@ -20,16 +20,14 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber
 {
     /**
      * @var array<string, array{array{string, string}, Trackable[]|Redirect[]}>
      */
     private array $convertedContent = [];
-
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly EmailModel $emailModel,
@@ -42,26 +40,10 @@ final class BuilderSubscriber implements EventSubscriberInterface
         private readonly RedirectRepository $redirectRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailOnBuildEvent::class => ['onEmailBuild', 0],
-            EmailSendEvent::class    => [
-                ['fixEmailAccessibility', 10000],
-                ['onEmailGenerate', 0],
-                // Ensure this is done last in order to catch all tokenized URLs
-                ['convertUrlsToTokens', -9999],
-            ],
-            EmailDisplayEvent::class => [
-                ['fixEmailAccessibility', 10000],
-                ['onEmailGenerate', 0],
-                // Ensure this is done last in order to catch all tokenized URLs
-                ['convertUrlsToTokens', -9999],
-            ],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailOnBuildEvent::class,
+        priority: 0
+    )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
@@ -109,7 +91,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
             );
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailSendEvent::class,
+        priority: 10000
+    )]
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailDisplayEvent::class,
+        priority: 10000
+    )]
     public function fixEmailAccessibility(EmailSendEvent $event): void
     {
         if ($event->isDynamicContentParsing() || !$event->getEmail() instanceof Email) {
@@ -147,7 +136,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         $event->setContent($content);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailSendEvent::class,
+        priority: 0
+    )]
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailDisplayEvent::class,
+        priority: 0
+    )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $idHash = $event->getIdHash();
@@ -222,7 +218,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $event->addToken('{subject}', $event->getSubject());
         $event->addToken('{brand=name}', (string) $this->coreParametersHelper->get('brand_name'));
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailSendEvent::class,
+        priority: -9999
+    )]
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailDisplayEvent::class,
+        priority: -9999
+    )]
     public function convertUrlsToTokens(EmailSendEvent $event): void
     {
         if ($event->isInternalSend()) {
@@ -265,7 +268,6 @@ final class BuilderSubscriber implements EventSubscriberInterface
             $event->addToken($token, $url);
         }
     }
-
     /**
      * Parses the content for URLs and replaces them for trackables.
      *

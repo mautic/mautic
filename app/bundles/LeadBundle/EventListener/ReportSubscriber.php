@@ -20,29 +20,19 @@ use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\StageBundle\Model\StageModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ReportSubscriber implements EventSubscriberInterface
+final class ReportSubscriber
 {
     public const string CONTEXT_LEADS                     = 'leads';
-
     public const string CONTEXT_LEAD_POINT_LOG            = 'lead.pointlog';
-
     public const string CONTEXT_CONTACT_ATTRIBUTION_MULTI = 'contact.attribution.multi';
-
     public const string CONTEXT_CONTACT_ATTRIBUTION_FIRST = 'contact.attribution.first';
-
     public const string CONTEXT_CONTACT_ATTRIBUTION_LAST  = 'contact.attribution.last';
-
     public const string CONTEXT_CONTACT_FREQUENCYRULES    = 'contact.frequencyrules';
-
     public const string CONTEXT_CONTACT_MESSAGE_FREQUENCY = 'contact.message.frequency';
-
     public const string CONTEXT_COMPANIES                 = 'companies';
-
     public const string GROUP_CONTACTS = 'contacts';
-
     /**
      * @var string[]
      */
@@ -54,16 +44,12 @@ final class ReportSubscriber implements EventSubscriberInterface
         self::CONTEXT_CONTACT_ATTRIBUTION_LAST,
         self::CONTEXT_CONTACT_FREQUENCYRULES,
     ];
-
     /**
      * @var string[]
      */
     private array $companyContexts = [self::CONTEXT_COMPANIES];
-
     private ?array $channels = null;
-
     private ?array $channelActions = null;
-
     public function __construct(
         private readonly PointsChangeLogRepository $pointsChangeLogRepository,
         private readonly FieldModel $fieldModel,
@@ -77,21 +63,13 @@ final class ReportSubscriber implements EventSubscriberInterface
         private readonly CampaignRepository $campaignRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-            ReportGraphEvent::class     => ['onReportGraphGenerate', 0],
-            ReportDataEvent::class      => ['onReportDisplay', 0],
-            ColumnCollectEvent::class   => ['onReportColumnCollect', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportBuilderEvent::class,
+        priority: 0
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
@@ -191,10 +169,13 @@ final class ReportSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportGeneratorEvent::class,
+        priority: 0
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
@@ -375,10 +356,13 @@ final class ReportSubscriber implements EventSubscriberInterface
 
         $event->setQueryBuilder($qb);
     }
-
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportGraphEvent::class,
+        priority: 0
+    )]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         if (!$event->checkContext([
@@ -651,7 +635,10 @@ final class ReportSubscriber implements EventSubscriberInterface
             unset($queryBuilder);
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ColumnCollectEvent::class,
+        priority: 0
+    )]
     public function onReportColumnCollect(ColumnCollectEvent $event): void
     {
         if ('company' === $event->getObject()) {
@@ -683,7 +670,6 @@ final class ReportSubscriber implements EventSubscriberInterface
 
         $event->addColumns($fields);
     }
-
     private function injectPointsReportData(ReportBuilderEvent $event, array $columns, array $filters): void
     {
         $pointColumns = [
@@ -739,7 +725,6 @@ final class ReportSubscriber implements EventSubscriberInterface
             ->addGraph($context, 'table', 'mautic.lead.table.top.events')
             ->addGraph($context, 'table', 'mautic.lead.table.top.actions');
     }
-
     private function injectFrequencyReportData(ReportBuilderEvent $event, array $columns, array $filters): void
     {
         $frequencyColumns = [
@@ -780,7 +765,6 @@ final class ReportSubscriber implements EventSubscriberInterface
         ];
         $event->addTable(self::CONTEXT_CONTACT_FREQUENCYRULES, $data, self::GROUP_CONTACTS);
     }
-
     /**
      * @param array<string, mixed> $filters
      */
@@ -906,7 +890,10 @@ final class ReportSubscriber implements EventSubscriberInterface
 
         $event->addTable($context, $data, self::GROUP_CONTACTS);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReportDataEvent::class,
+        priority: 0
+    )]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();

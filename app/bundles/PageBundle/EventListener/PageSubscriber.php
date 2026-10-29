@@ -13,10 +13,9 @@ use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Model\PageDraftModel;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-final readonly class PageSubscriber implements EventSubscriberInterface
+final readonly class PageSubscriber
 {
     public function __construct(
         private AssetsHelper $assetsHelper,
@@ -27,20 +26,13 @@ final readonly class PageSubscriber implements EventSubscriberInterface
         private PageDraftModel $pageDraftModel,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PageEvents::PAGE_POST_SAVE      => ['onPagePostSave', 0],
-            PageEvents::PAGE_POST_DELETE    => ['onPageDelete', 0],
-            Events\PageDisplayEvent::class     => ['onPageDisplay', -255], // We want this to run last
-            PageEditSubmitEvent::class      => ['managePageDraft'],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PageEvents::PAGE_POST_SAVE,
+        priority: 0
+    )]
     public function onPagePostSave(PageEvent $event): void
     {
         $page = $event->getPage();
@@ -59,10 +51,13 @@ final readonly class PageSubscriber implements EventSubscriberInterface
             $this->languageHelper->extractLanguagePackage($page->getLanguage());
         }
     }
-
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PageEvents::PAGE_POST_DELETE,
+        priority: 0
+    )]
     public function onPageDelete(PageEvent $event): void
     {
         $page = $event->getPage();
@@ -76,13 +71,16 @@ final readonly class PageSubscriber implements EventSubscriberInterface
         ];
         $this->auditLogModel->writeToLog($log);
     }
-
     /**
      * Allow event listeners to add scripts to
      * - </head> : onPageDisplay_headClose
      * - <body>  : onPageDisplay_bodyOpen
      * - </body> : onPageDisplay_bodyClose.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: Events\PageDisplayEvent::class,
+        priority: -255
+    )]
     public function onPageDisplay(Events\PageDisplayEvent $event): void
     {
         $content = $event->getContent();
@@ -132,7 +130,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
 
         $event->setContent($content);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEditSubmitEvent::class)]
     public function managePageDraft(PageEditSubmitEvent $event): void
     {
         $livePage   = $event->getPreviousPage();
@@ -174,7 +172,6 @@ final readonly class PageSubscriber implements EventSubscriberInterface
             $editedPage->setDraft(null);
         }
     }
-
     public function deletePageDraft(PageEvent $event): void
     {
         try {
@@ -184,7 +181,6 @@ final readonly class PageSubscriber implements EventSubscriberInterface
             return;
         }
     }
-
     private function revertPageModifications(Page $livePage, Page $editedPage): void
     {
         $livePageReflection   = new \ReflectionObject($livePage);

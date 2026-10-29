@@ -13,9 +13,8 @@ use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\CompanyPreSaveEvent;
 use Mautic\LeadBundle\Event\CompanySoftDeleteEvent;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CompanySubscriber implements EventSubscriberInterface
+final readonly class CompanySubscriber
 {
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
@@ -26,20 +25,13 @@ final readonly class CompanySubscriber implements EventSubscriberInterface
         private CompanyModel $companyModel,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CompanyPreSaveEvent::class    => ['onCompanyPreSave', 0],
-            CompanyPostSaveEvent::class   => ['onCompanyPostSave', 0],
-            CompanyPostDeleteEvent::class => ['onCompanyDelete', 0],
-            CompanySoftDeleteEvent::class => ['onCompanySoftDelete', 0],
-        ];
-    }
-
     /**
      * Add a company entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CompanyPostSaveEvent::class,
+        priority: 0
+    )]
     public function onCompanyPostSave(Events\CompanyEvent $event): void
     {
         $company = $event->getCompany();
@@ -55,10 +47,13 @@ final readonly class CompanySubscriber implements EventSubscriberInterface
             $this->auditLogModel->writeToLog($log);
         }
     }
-
     /**
      * Add a company delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CompanyPostDeleteEvent::class,
+        priority: 0
+    )]
     public function onCompanyDelete(Events\CompanyEvent $event): void
     {
         $company = $event->getCompany();
@@ -73,7 +68,10 @@ final readonly class CompanySubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
         $this->clearCompanyInLeadsCompanyFields($company->getName());
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CompanySoftDeleteEvent::class,
+        priority: 0
+    )]
     public function onCompanySoftDelete(Events\CompanyEvent $event): void
     {
         if ($details = $event->getChanges()) {
@@ -95,7 +93,10 @@ final readonly class CompanySubscriber implements EventSubscriberInterface
         $this->companyLeadRepository->deleteCompanyLeads($event->getCompany()->getId());
         $this->companyModel->permanentDeleteCompany($event->getCompany());
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CompanyPreSaveEvent::class,
+        priority: 0
+    )]
     public function onCompanyPreSave(Events\CompanyEvent $event): void
     {
         if ($this->coreParametersHelper->get('update_company_mapping_data_in_background', false)) {
@@ -106,7 +107,6 @@ final readonly class CompanySubscriber implements EventSubscriberInterface
         }
         $this->companyLeadRepository->updateLeadsPrimaryCompanyName($event->getCompany());
     }
-
     private function clearCompanyInLeadsCompanyFields(?string $companyName): void
     {
         if (null === $companyName) {

@@ -17,14 +17,12 @@ use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-final readonly class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber
 {
     use QueryBuilderManipulatorTrait;
-
     public function __construct(
         private LeadModel $leadModel,
         private CompanyModel $companyModel,
@@ -37,20 +35,10 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         private LeadRepository $leadRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            GlobalSearchEvent::class               => [
-                ['onGlobalSearchForContacts', 0],
-                ['onGlobalSearchForCompanies', 0],
-                ['onGlobalSearchForSegments', 0],
-            ],
-            CommandListEvent::class                => ['onBuildCommandList', 0],
-            LeadBuildSearchEvent::class => ['onBuildSearchCommands', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: GlobalSearchEvent::class,
+        priority: 0
+    )]
     public function onGlobalSearchForContacts(GlobalSearchEvent $event): void
     {
         $str = $event->getSearchString();
@@ -93,7 +81,10 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             );
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: GlobalSearchEvent::class,
+        priority: 0
+    )]
     public function onGlobalSearchForSegments(GlobalSearchEvent $event): void
     {
         $results = $this->globalSearch->performSearch(
@@ -106,7 +97,10 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             $event->addResults('mautic.segment.segment', $results);
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: GlobalSearchEvent::class,
+        priority: 0
+    )]
     public function onGlobalSearchForCompanies(GlobalSearchEvent $event): void
     {
         $str = $event->getSearchString();
@@ -137,7 +131,10 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             );
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CommandListEvent::class,
+        priority: 0
+    )]
     public function onBuildCommandList(CommandListEvent $event): void
     {
         if ($this->security->isGranted(['lead:leads:viewown', 'lead:leads:viewother'], 'MATCH_ONE')) {
@@ -147,10 +144,13 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
             );
         }
     }
-
     /**
      * @throws \InvalidArgumentException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadBuildSearchEvent::class,
+        priority: 0
+    )]
     public function onBuildSearchCommands(LeadBuildSearchEvent $event): void
     {
         switch ($event->getCommand()) {
@@ -210,7 +210,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
                 break;
         }
     }
-
     private function buildEmailPendingQuery(LeadBuildSearchEvent $event): void
     {
         $q       = $event->getQueryBuilder();
@@ -252,7 +251,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
 
         $this->buildJoinQuery($event, $tables, $config);
     }
-
     private function buildPageHitSourceQuery(LeadBuildSearchEvent $event): void
     {
         $tables = [
@@ -270,7 +268,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
 
         $this->buildJoinQuery($event, $tables, $config);
     }
-
     private function buildPageHitSourceIdQuery(LeadBuildSearchEvent $event): void
     {
         $tables = [
@@ -288,7 +285,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
 
         $this->buildJoinQuery($event, $tables, $config);
     }
-
     private function buildImportIdQuery(LeadBuildSearchEvent $event): void
     {
         $tables = [
@@ -309,7 +305,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
 
         $this->buildJoinQuery($event, $tables, $config);
     }
-
     private function buildImportActionQuery(LeadBuildSearchEvent $event): void
     {
         $tables = [
@@ -327,7 +322,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
 
         $this->buildJoinQuery($event, $tables, $config);
     }
-
     private function buildPageHitIdQuery(LeadBuildSearchEvent $event): void
     {
         $tables = [
@@ -344,7 +338,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         ];
         $this->buildJoinQuery($event, $tables, $config);
     }
-
     private function buildEmailQueuedQuery(LeadBuildSearchEvent $event): void
     {
         $tables = [
@@ -380,7 +373,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         $event->setStrict(true);
         $event->setSearchStatus(true);
     }
-
     private function buildEmailSentQuery(LeadBuildSearchEvent $event): void
     {
         $tables = [
@@ -398,7 +390,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
 
         $this->buildJoinQuery($event, $tables, $config);
     }
-
     private function buildEmailReadQuery(LeadBuildSearchEvent $event): void
     {
         $tables = [
@@ -419,7 +410,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
 
         $this->buildJoinQuery($event, $tables, $config);
     }
-
     private function buildSmsSentQuery(LeadBuildSearchEvent $event): void
     {
         $tables = [
@@ -437,17 +427,14 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
 
         $this->buildJoinQuery($event, $tables, $config);
     }
-
     private function buildWebSentQuery(LeadBuildSearchEvent $event): void
     {
         $this->buildNotificationSentQuery($event);
     }
-
     private function buildMobileSentQuery(LeadBuildSearchEvent $event): void
     {
         $this->buildNotificationSentQuery($event, true);
     }
-
     private function buildNotificationSentQuery(LeadBuildSearchEvent $event, bool $isMobile = false): void
     {
         $tables = [
@@ -474,7 +461,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
 
         $this->buildJoinQuery($event, $tables, $config);
     }
-
     private function buildCampaignMembershipQuery(LeadBuildSearchEvent $event): void
     {
         $tables = [
@@ -492,7 +478,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
 
         $this->buildJoinQuery($event, $tables, $config);
     }
-
     /**
      * @param array<int, array<string, string>>  $tables
      * @param array<array<string, mixed>, mixed> $config
@@ -521,7 +506,6 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         $event->setStrict(true);           // don't use like
         $event->setSearchStatus(true);     // finish searching
     }
-
     /**
      * @param array<string, mixed> $results
      * @param array<string, mixed> $templateParameters

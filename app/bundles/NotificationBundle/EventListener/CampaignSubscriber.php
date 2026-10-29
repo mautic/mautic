@@ -20,20 +20,16 @@ use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+class CampaignSubscriber
 {
     public const string EVENT_ACTION_SEND_MOBILE_NOTIFICATION = 'notification.send_mobile_notification';
-
     public const string EVENT_ACTION_SEND_NOTIFICATION = 'notification.send_notification';
-
     /**
      * The maximum number of `include_player_ids` that can be sent within a single request.
      */
     protected const int MAX_PLAYER_IDS_PER_REQUEST = 2000;
-
     public function __construct(
         private readonly IntegrationHelper $integrationHelper,
         private readonly NotificationModel $notificationModel,
@@ -44,15 +40,10 @@ class CampaignSubscriber implements EventSubscriberInterface
         private readonly NotificationRepository $notificationRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            NotificationEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignBatchAction', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CampaignBuilderEvent::class,
+        priority: 0
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
@@ -95,7 +86,10 @@ class CampaignSubscriber implements EventSubscriberInterface
             ]
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: NotificationEvents::ON_CAMPAIGN_BATCH_ACTION,
+        priority: 0
+    )]
     public function onCampaignBatchAction(PendingEvent $event): void
     {
         if (!$event->checkContext(self::EVENT_ACTION_SEND_NOTIFICATION) && !$event->checkContext(self::EVENT_ACTION_SEND_MOBILE_NOTIFICATION)) {
@@ -125,7 +119,6 @@ class CampaignSubscriber implements EventSubscriberInterface
             $this->sendNotificationsInBatches($notification, $event);
         }
     }
-
     private function sendNotificationPerLead(Notification $notification, PendingEvent $event): void
     {
         foreach ($event->getPending() as $log) {
@@ -144,7 +137,6 @@ class CampaignSubscriber implements EventSubscriberInterface
             $this->processResponse($response, $event, $log, $notification, $sendNotification);
         }
     }
-
     private function sendNotificationsInBatches(Notification $notification, PendingEvent $event): void
     {
         $batches       = $this->buildBatches($event, $notification);
@@ -167,7 +159,6 @@ class CampaignSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     private function isLeadContactable(PendingEvent $event, LeadEventLog $log): bool
     {
         $contactable = DoNotContact::IS_CONTACTABLE === $this->doNotContact->isContactable($log->getLead(), 'notification');
@@ -178,7 +169,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         return $contactable;
     }
-
     /**
      * @return string[]
      */
@@ -206,7 +196,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         return $playerIds;
     }
-
     private function buildNotificationToSend(Notification $notification, Lead $lead): Notification
     {
         [$ignore, $notification] = $this->notificationModel->getTranslatedEntity($notification, $lead);
@@ -246,7 +235,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         return $sendNotification;
     }
-
     private function processResponse(ResponseInterface $response, PendingEvent $event, LeadEventLog $log, Notification $notification, Notification $sendNotification): void
     {
         // if for some reason the call failed, tell mautic to try again
@@ -270,7 +258,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         $log->appendToMetadata($result);
         $event->pass($log);
     }
-
     /**
      * @return array<string, array{sendNotification: Notification, playerIds: array<string, LeadEventLog>}>
      */

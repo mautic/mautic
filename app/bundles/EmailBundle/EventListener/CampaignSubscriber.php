@@ -30,10 +30,9 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber
 {
     public function __construct(
         private EmailModel $emailModel,
@@ -44,22 +43,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         private StatRepository $statRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            EventPreview::class                      => ['onEventPreviewRequest', 0],
-            EmailOpenEvent::class                    => ['onEmailOpen', 0],
-            EmailEvents::ON_CAMPAIGN_BATCH_ACTION    => [
-                ['onCampaignTriggerActionSendEmailToContact', 0],
-                ['onCampaignTriggerActionSendEmailToUser', 1],
-            ],
-            EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
-            EmailReplyEvent::class                    => ['onEmailReply', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CampaignBuilderEvent::class,
+        priority: 0
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addDecision(
@@ -139,7 +126,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             ]
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EventPreview::class,
+        priority: 0
+    )]
     public function onEventPreviewRequest(EventPreview $eventPreview): void
     {
         if ($eventPreview->isType('email.send')) {
@@ -154,7 +144,6 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             $eventPreview->addEventStat('click_through_open_rate', round($emailStats['click_through_open_rate'] * 100, 2).'%');
         }
     }
-
     /**
      * Trigger campaign event for opening of an email.
      *
@@ -163,6 +152,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
      * @throws CannotProcessEventException
      * @throws NotSchedulableException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailOpenEvent::class,
+        priority: 0
+    )]
     public function onEmailOpen(EmailOpenEvent $event): void
     {
         $email = $event->getEmail();
@@ -171,7 +164,6 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             $this->realTimeExecutioner->execute('email.open', $email, 'email', $email->getId());
         }
     }
-
     /**
      * Trigger campaign event for reply to an email.
      *
@@ -180,6 +172,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
      * @throws LogPassedAndFailedException
      * @throws NotSchedulableException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailReplyEvent::class,
+        priority: 0
+    )]
     public function onEmailReply(EmailReplyEvent $event): void
     {
         $email = $event->getEmail();
@@ -187,7 +183,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             $this->realTimeExecutioner->execute('email.reply', $email, 'email', $email->getId());
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+        priority: 0
+    )]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         /** @var Email $eventDetails */
@@ -238,13 +237,16 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     /**
      * Triggers the action which sends email to contacts.
      *
      * @throws ORMException
      * @throws NoContactsFoundException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
+        priority: 0
+    )]
     public function onCampaignTriggerActionSendEmailToContact(PendingEvent $event): void
     {
         if (!$event->checkContext('email.send')) {
@@ -377,10 +379,13 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     /**
      * @throws ORMException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
+        priority: 1
+    )]
     public function onCampaignTriggerActionSendEmailToUser(PendingEvent $event): void
     {
         if (!$event->checkContext('email.send.to.user')) {

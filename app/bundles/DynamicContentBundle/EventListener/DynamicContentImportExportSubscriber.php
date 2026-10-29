@@ -16,12 +16,10 @@ use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class DynamicContentImportExportSubscriber implements EventSubscriberInterface
+final readonly class DynamicContentImportExportSubscriber
 {
     use ImportExportTrait;
-
     public function __construct(
         private DynamicContentModel $dynamicContentModel,
         private EntityManagerInterface $entityManager,
@@ -31,17 +29,10 @@ final readonly class DynamicContentImportExportSubscriber implements EventSubscr
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onExport', 0],
-            EntityImportEvent::class        => ['onImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityExportEvent::class,
+        priority: 0
+    )]
     public function onExport(EntityExportEvent $event): void
     {
         if (DynamicContent::ENTITY_NAME !== $event->getEntityName()) {
@@ -76,7 +67,10 @@ final readonly class DynamicContentImportExportSubscriber implements EventSubscr
 
         $this->logAction('export', $object->getId(), $data);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportEvent::class,
+        priority: 0
+    )]
     public function onImport(EntityImportEvent $event): void
     {
         if (DynamicContent::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -118,7 +112,10 @@ final readonly class DynamicContentImportExportSubscriber implements EventSubscr
             }
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportUndoEvent::class,
+        priority: 0
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (DynamicContent::ENTITY_NAME !== $event->getEntityName()) {
@@ -141,7 +138,10 @@ final readonly class DynamicContentImportExportSubscriber implements EventSubscr
 
         $this->entityManager->flush();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+        priority: 0
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(
@@ -152,7 +152,6 @@ final readonly class DynamicContentImportExportSubscriber implements EventSubscr
             $this->entityManager
         );
     }
-
     /**
      * @param array<string, mixed> $details
      */

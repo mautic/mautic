@@ -12,14 +12,12 @@ use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\VideoHitRepository;
 use Mautic\PageBundle\Model\PageModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber
 {
     use ChannelTrait;
-
     /**
      * @param ModelFactory<object> $modelFactory
      */
@@ -33,22 +31,13 @@ final class LeadSubscriber implements EventSubscriberInterface
     ) {
         $this->setModelFactory($modelFactory);
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadTimelineEvent::class => [
-                ['onTimelineGenerate', 0],
-                ['onTimelineGenerateVideo', 0],
-            ],
-            LeadChangeEvent::class => ['onLeadChange', 0],
-            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
-        ];
-    }
-
     /**
      * Compile events for the lead timeline.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadTimelineEvent::class,
+        priority: 0
+    )]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -135,10 +124,13 @@ final class LeadSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     /**
      * Compile events for the lead timeline.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadTimelineEvent::class,
+        priority: 0
+    )]
     public function onTimelineGenerateVideo(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -180,7 +172,10 @@ final class LeadSubscriber implements EventSubscriberInterface
             }
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadChangeEvent::class,
+        priority: 0
+    )]
     public function onLeadChange(LeadChangeEvent $event): void
     {
         $this->hitRepository->updateLeadByTrackingId(
@@ -189,7 +184,10 @@ final class LeadSubscriber implements EventSubscriberInterface
             $event->getOldTrackingId()
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: LeadPostMergeEvent::class,
+        priority: 0
+    )]
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->hitRepository->updateLead(

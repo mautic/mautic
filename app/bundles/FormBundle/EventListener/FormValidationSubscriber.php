@@ -10,28 +10,22 @@ use Mautic\FormBundle\Form\Type\FormFieldCheckboxGroupType;
 use Mautic\FormBundle\Form\Type\FormFieldEmailType;
 use Mautic\FormBundle\Form\Type\FormFieldTelType;
 use Mautic\FormBundle\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class FormValidationSubscriber implements EventSubscriberInterface
+final readonly class FormValidationSubscriber
 {
     public function __construct(
         private TranslatorInterface $translator,
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            Events\FormBuilderEvent::class => ['onFormBuilder', 0],
-            FormEvents::ON_FORM_VALIDATE   => ['onFormValidate', 0],
-        ];
-    }
-
     /**
      * Add a simple email form.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: Events\FormBuilderEvent::class,
+        priority: 0
+    )]
     public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addValidator(
@@ -65,10 +59,13 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
             ]
         );
     }
-
     /**
      * Custom validation.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormEvents::ON_FORM_VALIDATE,
+        priority: 0
+    )]
     public function onFormValidate(Events\ValidationEvent $event): void
     {
         $value = $event->getValue();
@@ -80,7 +77,6 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
 
         $this->fieldCheckboxGroupValidation($event);
     }
-
     private function fieldEmailValidation(Events\ValidationEvent $event): void
     {
         $field = $event->getField();
@@ -109,7 +105,6 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
             }
         }
     }
-
     private function fieldTelValidation(Events\ValidationEvent $event): void
     {
         $field = $event->getField();
@@ -128,7 +123,6 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
             }
         }
     }
-
     private function fieldCheckboxGroupValidation(Events\ValidationEvent $event): void
     {
         $field = $event->getField();

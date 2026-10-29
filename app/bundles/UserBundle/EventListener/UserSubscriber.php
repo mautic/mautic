@@ -10,29 +10,21 @@ use Mautic\UserBundle\Event\PostDeleteRoleEvent;
 use Mautic\UserBundle\Event\PostDeleteUserEvent;
 use Mautic\UserBundle\Event\PostSaveRoleEvent;
 use Mautic\UserBundle\Event\PostSaveUserEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class UserSubscriber implements EventSubscriberInterface
+final readonly class UserSubscriber
 {
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PostSaveUserEvent::class   => ['onUserPostSave', 0],
-            PostDeleteUserEvent::class => ['onUserDelete', 0],
-            PostSaveRoleEvent::class   => ['onRolePostSave', 0],
-            PostDeleteRoleEvent::class => ['onRoleDelete', 0],
-        ];
-    }
-
     /**
      * Add a user entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PostSaveUserEvent::class,
+        priority: 0
+    )]
     public function onUserPostSave(PostSaveUserEvent $event): void
     {
         $user = $event->getUser();
@@ -49,10 +41,13 @@ final readonly class UserSubscriber implements EventSubscriberInterface
             $this->auditLogModel->writeToLog($log);
         }
     }
-
     /**
      * Add a user delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PostDeleteUserEvent::class,
+        priority: 0
+    )]
     public function onUserDelete(PostDeleteUserEvent $event): void
     {
         $user = $event->getUser();
@@ -66,10 +61,13 @@ final readonly class UserSubscriber implements EventSubscriberInterface
         ];
         $this->auditLogModel->writeToLog($log);
     }
-
     /**
      * Add a role entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PostSaveRoleEvent::class,
+        priority: 0
+    )]
     public function onRolePostSave(PostSaveRoleEvent $event): void
     {
         $role = $event->getRole();
@@ -85,10 +83,13 @@ final readonly class UserSubscriber implements EventSubscriberInterface
             $this->auditLogModel->writeToLog($log);
         }
     }
-
     /**
      * Add a role delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: PostDeleteRoleEvent::class,
+        priority: 0
+    )]
     public function onRoleDelete(PostDeleteRoleEvent $event): void
     {
         $role = $event->getRole();

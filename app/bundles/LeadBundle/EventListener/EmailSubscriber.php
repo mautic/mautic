@@ -9,39 +9,36 @@ use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\OnEmailAddressTokenReplacementEvent;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class EmailSubscriber implements EventSubscriberInterface
+final class EmailSubscriber
 {
     private static string $contactFieldRegex = '{contactfield=(.*?)}';
-
     public function __construct(
         private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
         private readonly TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailOnBuildEvent::class                   => ['onEmailBuild', 0],
-            EmailSendEvent::class                      => ['onEmailGenerate', 0],
-            EmailDisplayEvent::class                   => ['onEmailDisplay', 0],
-            OnEmailAddressTokenReplacementEvent::class => ['onEmailAddressReplacement', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailOnBuildEvent::class,
+        priority: 0
+    )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         $this->addContactFieldTokens($event);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailDisplayEvent::class,
+        priority: 0
+    )]
     public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailSendEvent::class,
+        priority: 0
+    )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         // Combine all possible content to find tokens across them
@@ -58,12 +55,14 @@ final class EmailSubscriber implements EventSubscriberInterface
             unset($tokenList);
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: OnEmailAddressTokenReplacementEvent::class,
+        priority: 0
+    )]
     public function onEmailAddressReplacement(TokenReplacementEvent $event): void
     {
         $event->setContent(TokenHelper::findLeadTokens($event->getContent(), $event->getLead()->getProfileFields(), true));
     }
-
     private function addContactFieldTokens(EmailOnBuildEvent $event): void
     {
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('lead.field', 'lead:fields', 'MauticLeadBundle');

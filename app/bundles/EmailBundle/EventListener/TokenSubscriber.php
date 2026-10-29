@@ -10,28 +10,24 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class TokenSubscriber implements EventSubscriberInterface
+final readonly class TokenSubscriber
 {
     use MatchFilterForLeadTrait;
-
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private PrimaryCompanyHelper $primaryCompanyHelper,
         private LeadListRepository $segmentRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailSendEvent::class          => ['decodeTokens', 254],
-            EmailDisplayEvent::class       => ['decodeTokens', 254],
-            TokenReplacementEvent::class   => ['onTokenReplacement', -254],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailSendEvent::class,
+        priority: 254
+    )]
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailDisplayEvent::class,
+        priority: 254
+    )]
     public function decodeTokens(EmailSendEvent $event): void
     {
         if ($event->isDynamicContentParsing()) {
@@ -69,7 +65,10 @@ final readonly class TokenSubscriber implements EventSubscriberInterface
             $event->addTokens($tokenEvent->getTokens());
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: TokenReplacementEvent::class,
+        priority: -254
+    )]
     public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         $clickthrough = $event->getClickthrough();
@@ -119,7 +118,6 @@ final readonly class TokenSubscriber implements EventSubscriberInterface
             $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
         }
     }
-
     private function urlDecodeTokens(string $content): string
     {
         return preg_replace('/(%7B)(.*?)(%3D|=)(.*?)(%7D)/i', '{$2=$4}', $content);

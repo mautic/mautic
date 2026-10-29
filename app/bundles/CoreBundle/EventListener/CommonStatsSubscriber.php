@@ -6,39 +6,31 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\StatsEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-abstract class CommonStatsSubscriber implements EventSubscriberInterface
+abstract class CommonStatsSubscriber
 {
     /**
      * @var mixed[]
      */
     protected $repositories = [];
-
     /**
      * @var array<string, mixed>
      */
     protected array $selects = [];
-
     /**
      * @var array
      */
     protected $permissions = [];
-
     public function __construct(
         protected CorePermissions $security,
         protected EntityManagerInterface $entityManager,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            StatsEvent::class => ['onStatsFetch', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: StatsEvent::class,
+        priority: 0
+    )]
     public function onStatsFetch(StatsEvent $event): void
     {
         /** @var CommonRepository<object> $repository */
@@ -95,7 +87,6 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
             $event->setSelect($select)->setRepository($repository, $allowedJoins);
         }
     }
-
     /**
      * Restrict stats based on contact permissions.
      *
@@ -105,7 +96,6 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
     {
         return $this->addRestrictedRepostories($repoNames, ['lead' => 'lead:leads']);
     }
-
     /**
      * @param array<string, string> $permissions
      */

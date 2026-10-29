@@ -28,12 +28,10 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\UserBundle\Model\UserModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignImportExportSubscriber implements EventSubscriberInterface
+final readonly class CampaignImportExportSubscriber
 {
     use ImportExportTrait;
-
     public function __construct(
         private CampaignModel $campaignModel,
         private UserModel $userModel,
@@ -45,17 +43,10 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         private IpLookupHelper $ipLookupHelper,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onCampaignExport', 0],
-            EntityImportEvent::class        => ['onCampaignImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityExportEvent::class,
+        priority: 0
+    )]
     public function onCampaignExport(EntityExportEvent $event): void
     {
         if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
@@ -82,7 +73,10 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         $this->exportRelatedEntities($event, $campaignId);
         $event->addEntity('dependencies', $event->getDependencies());
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportEvent::class,
+        priority: 0
+    )]
     public function onCampaignImport(EntityImportEvent $event): void
     {
         if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
@@ -103,7 +97,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         $this->importCampaigns($event, $entityData, $userName);
         $this->importDependentEntities($event, $entityData, $userId);
     }
-
     /**
      * @return array<string, mixed>
      */
@@ -125,7 +118,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             'uuid'            => $campaign->getUuid(),
         ];
     }
-
     private function exportRelatedEntities(EntityExportEvent $event, int $campaignId): void
     {
         $campaignSources = $this->campaignModel->getLeadSources($campaignId);
@@ -139,7 +131,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             }
         }
     }
-
     /**
      * @param array<string, int> $dependency
      */
@@ -168,7 +159,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
         $event->addDependencyEntity($type, $dependency);
     }
-
     /**
      * Import Campaigns and track progress.
      *
@@ -222,7 +212,10 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             }
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+        priority: 0
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(
@@ -233,7 +226,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             $this->entityManager
         );
     }
-
     /**
      * Import Dependent Entities Dynamically and Track Progress.
      *
@@ -296,7 +288,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
 
         $this->logger->info('Final entity ID map after import: ', ['entityIdMap' => $event->getEntityIdMap()]);
     }
-
     private function mergeStatus(EntityImportEvent $mainEvent, EntityImportEvent $subEvent): void
     {
         $subStatus = $subEvent->getStatus();
@@ -329,7 +320,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             $mainEvent->setStatus($type, $mainStatus[$type]);
         }
     }
-
     private function getUserName(?int $userId): string
     {
         if (!$userId) {
@@ -345,7 +335,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
 
         return $user->getFirstName().' '.$user->getLastName();
     }
-
     /**
      * @param array<string, mixed> $data
      * @param array<int, int>      $eventIdMap
@@ -365,7 +354,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
 
         $this->persistUpdatedCanvasSettings($data, $campaignIdMap);
     }
-
     /**
      * @param array<string, mixed> $canvasSettings
      * @param array<int, int>      $eventIdMap
@@ -383,7 +371,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
         unset($node);
     }
-
     /**
      * @param array<string, mixed> $canvasSettings
      * @param array<int, int>      $eventIdMap
@@ -404,7 +391,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
         unset($connection);
     }
-
     /**
      * @param array<string, mixed> $data
      * @param array<int, int>      $campaignIdMap
@@ -421,7 +407,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             }
         }
     }
-
     /**
      * @param array<int, array<string, mixed>>     $dependencies
      * @param array<int, array<string, mixed>|int> $idMap
@@ -454,7 +439,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
         unset($dependencyGroup);
     }
-
     /**
      * @param array<int, array<string, mixed>> $dependencies
      */
@@ -482,7 +466,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
         unset($dependencyGroup);
     }
-
     private function insertCampaignFormXref(int $campaignId, int $formId): void
     {
         $connection = $this->entityManager->getConnection();
@@ -501,7 +484,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
         $this->logger->info("Inserted campaign_form_xref: campaign_id={$campaignId}, form_id={$formId}");
     }
-
     private function insertCampaignSegmentXref(int $campaignId, int $segmentId): void
     {
         $connection = $this->entityManager->getConnection();
@@ -523,7 +505,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
         $this->logger->info("Inserted campaign_leadlist_xref: campaign_id={$campaignId}, leadlist_id={$segmentId}");
     }
-
     /**
      * @param array<string, mixed>             $data
      * @param array<int, array<string, mixed>> $dependencies
@@ -549,7 +530,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
         unset($event);
     }
-
     /**
      * @param array<string, mixed>             $data
      * @param array<int, array<string, mixed>> $dependencies
@@ -579,7 +559,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
         unset($email);
     }
-
     /**
      * @param array<string, mixed>             $data
      * @param array<int, array<string, mixed>> $dependencies
@@ -606,7 +585,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
         unset($item);
     }
-
     /**
      * @param array<string, mixed> $event
      * @param array<string, mixed> $eventDependency
@@ -623,7 +601,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             $this->processNonChannelEvent($event, $eventDependency);
         }
     }
-
     /**
      * Correctly updates channel properties, considering both array and non-array values.
      *
@@ -653,7 +630,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             }
         }
     }
-
     /**
      * @param array<string, mixed> $event
      * @param array<string, mixed> $eventDependency
@@ -689,7 +665,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
                 break;
         }
     }
-
     /**
      * Update a single property if it exists and is a valid reference.
      *
@@ -703,7 +678,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             $this->setNestedValue($event, $propertyPath, $eventDependency[$entityName][$propertyValue]);
         }
     }
-
     /**
      * Update an array property if it exists and contains valid references.
      *
@@ -723,7 +697,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             $this->setNestedValue($event, $propertyPath, $propertyValue);
         }
     }
-
     /**
      * Retrieve a nested array value using dot notation.
      *
@@ -743,7 +716,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
 
         return $temp;
     }
-
     /**
      * Set a nested array value using dot notation.
      *
@@ -763,7 +735,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
 
         $temp = $value;
     }
-
     /**
      * @param array<int, array<string, mixed>> $dependencies
      *
@@ -779,7 +750,10 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
 
         return [];
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportUndoEvent::class,
+        priority: 0
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
@@ -802,7 +776,6 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
 
         $this->entityManager->flush();
     }
-
     /**
      * @param array<string, mixed> $details
      */

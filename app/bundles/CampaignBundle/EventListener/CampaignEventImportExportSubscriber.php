@@ -23,9 +23,8 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignEventImportExportSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventImportExportSubscriber
 {
     public function __construct(
         private CampaignModel $campaignModel,
@@ -37,17 +36,10 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         private EventModel $eventModel,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onExport', 0],
-            EntityImportEvent::class        => ['onImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityExportEvent::class,
+        priority: 0
+    )]
     public function onExport(EntityExportEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName()) {
@@ -84,7 +76,6 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
             $event->addEntities([$entityName => $entities]);
         }
     }
-
     /**
      * @return array<string, mixed>
      */
@@ -117,7 +108,6 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
             'uuid'                         => $campaignEvent->getUuid(),
         ];
     }
-
     /**
      * @phpstan-ignore-next-line
      */
@@ -195,7 +185,6 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
 
         $event->addDependencyEntity(Event::ENTITY_NAME, $dependencies);
     }
-
     /**
      * @param array<string, mixed> $data
      */
@@ -210,7 +199,6 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
             }
         }
     }
-
     /**
      * @phpstan-ignore-next-line
      */
@@ -223,7 +211,10 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
             $this->mergeExportData($data, $subEvent);
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportEvent::class,
+        priority: 0
+    )]
     public function onImport(EntityImportEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -290,7 +281,10 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
 
         $this->updateParentEvents($event);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+        priority: 0
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
@@ -332,7 +326,6 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
             }
         }
     }
-
     private function updateParentEvents(EntityImportEvent $event): void
     {
         $idMap = $event->getEntityIdMap();
@@ -372,7 +365,10 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
 
         $this->entityManager->flush();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EntityImportUndoEvent::class,
+        priority: 0
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName()) {
@@ -406,7 +402,6 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
 
         $this->entityManager->flush();
     }
-
     /**
      * @param array<string, mixed> $details
      */

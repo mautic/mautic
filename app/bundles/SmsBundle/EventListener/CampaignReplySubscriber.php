@@ -14,27 +14,19 @@ use Mautic\SmsBundle\Form\Type\CampaignReplyType;
 use Mautic\SmsBundle\Helper\ReplyHelper;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignReplySubscriber implements EventSubscriberInterface
+final readonly class CampaignReplySubscriber
 {
     public const string TYPE = 'sms.reply';
-
     public function __construct(
         private TransportChain $transportChain,
         private RealTimeExecutioner $realTimeExecutioner,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            SmsEvents::ON_CAMPAIGN_REPLY      => ['onCampaignReply', 0],
-            ReplyEvent::class                 => ['onReply', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CampaignBuilderEvent::class,
+        priority: 0
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (0 === count($this->transportChain->getEnabledTransports())) {
@@ -51,7 +43,10 @@ final readonly class CampaignReplySubscriber implements EventSubscriberInterface
             ]
         );
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: SmsEvents::ON_CAMPAIGN_REPLY,
+        priority: 0
+    )]
     public function onCampaignReply(DecisionEvent $decisionEvent): void
     {
         /** @var ReplyEvent $replyEvent */
@@ -74,13 +69,16 @@ final readonly class CampaignReplySubscriber implements EventSubscriberInterface
         $decisionEvent->setChannel('sms');
         $decisionEvent->setAsApplicable();
     }
-
     /**
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      * @throws CannotProcessEventException
      * @throws NotSchedulableException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ReplyEvent::class,
+        priority: 0
+    )]
     public function onReply(ReplyEvent $event): void
     {
         $this->realTimeExecutioner->execute(self::TYPE, $event, 'sms');

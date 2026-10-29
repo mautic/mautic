@@ -6,27 +6,22 @@ use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class DetermineWinnerSubscriber implements EventSubscriberInterface
+final readonly class DetermineWinnerSubscriber
 {
     public function __construct(
         private DownloadRepository $downloadRepository,
         private TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            AssetEvents::ON_DETERMINE_DOWNLOAD_RATE_WINNER => ['onDetermineDownloadRateWinner', 0],
-        ];
-    }
-
     /**
      * Determines the winner of A/B test based on number of asset downloads.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: AssetEvents::ON_DETERMINE_DOWNLOAD_RATE_WINNER,
+        priority: 0
+    )]
     public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event): void
     {
         $parameters = $event->getParameters();

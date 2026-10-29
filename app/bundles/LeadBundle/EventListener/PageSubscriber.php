@@ -8,23 +8,18 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class PageSubscriber implements EventSubscriberInterface
+final readonly class PageSubscriber
 {
     public function __construct(
         private LeadRepository $leadRepository,
         private PrimaryCompanyHelper $primaryCompanyHelper,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            UrlTokenReplaceEvent::class => ['onUrlTokenReplace', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: UrlTokenReplaceEvent::class,
+        priority: 0
+    )]
     public function onUrlTokenReplace(UrlTokenReplaceEvent $event): void
     {
         if (!preg_match(TokenHelper::REGEX, $event->getContent())) {

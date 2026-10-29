@@ -5,30 +5,24 @@ namespace Mautic\PageBundle\EventListener;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class MaintenanceSubscriber implements EventSubscriberInterface
+final readonly class MaintenanceSubscriber
 {
     public function __construct(
         private Connection $db,
         private TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MaintenanceEvent::class => ['onDataCleanup', 10], // Cleanup before visitors are processed
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: MaintenanceEvent::class,
+        priority: 10
+    )]
     public function onDataCleanup(MaintenanceEvent $event): void
     {
         $this->cleanData($event, 'page_hits');
         $this->cleanData($event, 'lead_utmtags');
     }
-
     private function cleanData(MaintenanceEvent $event, string $table): void
     {
         $qb = $this->db->createQueryBuilder()

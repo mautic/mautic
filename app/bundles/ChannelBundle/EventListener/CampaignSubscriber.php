@@ -20,23 +20,19 @@ use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\ChannelBundle\PreferenceBuilder\PreferenceBuilder;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class CampaignSubscriber implements EventSubscriberInterface
+final class CampaignSubscriber
 {
     private ?Event $pseudoEvent = null;
-
     /**
      * @var Collection<int, LeadEventLog>|null
      */
     private ?Collection $mmLogs = null;
-
     /**
      * @var mixed[]
      */
     private array $messageChannels = [];
-
     public function __construct(
         private readonly MessageModel $messageModel,
         private readonly ActionDispatcher $actionDispatcher,
@@ -45,15 +41,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
         private readonly TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            ChannelEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CampaignBuilderEvent::class,
+        priority: 0
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $channels  = $this->messageModel->getChannels();
@@ -83,12 +74,15 @@ final class CampaignSubscriber implements EventSubscriberInterface
         ];
         $event->addAction('message.send', $action);
     }
-
     /**
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      * @throws \ReflectionException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
+        priority: 0
+    )]
     public function onCampaignTriggerAction(PendingEvent $pendingEvent): void
     {
         $this->pseudoEvent = clone $pendingEvent->getEvent();
@@ -140,7 +134,6 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
         $pendingEvent->failRemainingPending($this->translator->trans('mautic.channel.message.failed'));
     }
-
     /**
      * @param array<string, mixed> $messageChannel
      *
@@ -185,7 +178,6 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
         return $success;
     }
-
     /**
      * @param Collection<int, LeadEventLog> $logs
      */
@@ -203,7 +195,6 @@ final class CampaignSubscriber implements EventSubscriberInterface
             $pendingEvent->pass($mmLog);
         }
     }
-
     /**
      * @param Collection<int,LeadEventLog> $success
      */
@@ -215,7 +206,6 @@ final class CampaignSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     private function removeSuccessfulFromFailures(PendingEvent $pendingEvent): void
     {
         $successfulKeys = $pendingEvent->getSuccessful()->getKeys();
@@ -225,7 +215,6 @@ final class CampaignSubscriber implements EventSubscriberInterface
             }
         }
     }
-
     private function recordChannelMetadata(PendingEvent $pendingEvent, string $channel): void
     {
         /** @var LeadEventLog $log */

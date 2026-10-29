@@ -9,20 +9,13 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\LeadBundle\Form\Type\ConfigCompanyType;
 use Mautic\LeadBundle\Form\Type\ConfigType;
 use Mautic\LeadBundle\Form\Type\SegmentConfigType;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class ConfigSubscriber implements EventSubscriberInterface
+final class ConfigSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ConfigBuilderEvent::class => [
-                ['onConfigGenerate', 0],
-                ['onConfigCompanyGenerate', 0],
-            ],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ConfigBuilderEvent::class,
+        priority: 0
+    )]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $leadParameters = $event->getParametersFromConfig('MauticLeadBundle');
@@ -54,7 +47,10 @@ final class ConfigSubscriber implements EventSubscriberInterface
             'parameters' => $segmentParameters,
         ]);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ConfigBuilderEvent::class,
+        priority: 0
+    )]
     public function onConfigCompanyGenerate(ConfigBuilderEvent $event): void
     {
         $parameters = $event->getParametersFromConfig('MauticLeadBundle');

@@ -15,39 +15,27 @@ use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Mautic\LeadBundle\Exception\ImportFailedException;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-final readonly class ContactObjectSubscriber implements EventSubscriberInterface
+final readonly class ContactObjectSubscriber
 {
     public function __construct(
         private ContactObjectHelper $contactObjectHelper,
         private RouterInterface $router,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            InternalObjectEvent::class         => ['collectInternalObjects', 0],
-            InternalObjectUpdateEvent::class   => ['updateContacts', 0],
-            InternalObjectCreateEvent::class   => ['createContacts', 0],
-            InternalObjectFindEvent::class     => [
-                ['findContactsByIds', 0],
-                ['findContactsByDateRange', 0],
-                ['findContactsByFieldValues', 0],
-            ],
-            InternalObjectOwnerEvent::class    => ['findOwnerIdsForContacts', 0],
-            InternalObjectRouteEvent::class    => ['buildContactRoute', 0],
-            InternalObjectFindByIdEvent::class => ['findContactById', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectEvent::class,
+        priority: 0
+    )]
     public function collectInternalObjects(InternalObjectEvent $event): void
     {
         $event->addObject(new Contact());
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectUpdateEvent::class,
+        priority: 0
+    )]
     public function updateContacts(InternalObjectUpdateEvent $event): void
     {
         if (Contact::NAME !== $event->getObject()->getName()) {
@@ -62,7 +50,10 @@ final readonly class ContactObjectSubscriber implements EventSubscriberInterface
         );
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectCreateEvent::class,
+        priority: 0
+    )]
     public function createContacts(InternalObjectCreateEvent $event): void
     {
         if (Contact::NAME !== $event->getObject()->getName()) {
@@ -72,7 +63,10 @@ final readonly class ContactObjectSubscriber implements EventSubscriberInterface
         $event->setObjectMappings($this->contactObjectHelper->create($event->getCreateObjects()));
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectFindEvent::class,
+        priority: 0
+    )]
     public function findContactsByIds(InternalObjectFindEvent $event): void
     {
         if (Contact::NAME !== $event->getObject()->getName() || empty($event->getIds())) {
@@ -82,7 +76,10 @@ final readonly class ContactObjectSubscriber implements EventSubscriberInterface
         $event->setFoundObjects($this->contactObjectHelper->findObjectsByIds($event->getIds()));
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectFindEvent::class,
+        priority: 0
+    )]
     public function findContactsByDateRange(InternalObjectFindEvent $event): void
     {
         if (Contact::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof DateRange) {
@@ -99,7 +96,10 @@ final readonly class ContactObjectSubscriber implements EventSubscriberInterface
         );
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectFindEvent::class,
+        priority: 0
+    )]
     public function findContactsByFieldValues(InternalObjectFindEvent $event): void
     {
         if (Contact::NAME !== $event->getObject()->getName() || empty($event->getFieldValues())) {
@@ -113,7 +113,10 @@ final readonly class ContactObjectSubscriber implements EventSubscriberInterface
         );
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectOwnerEvent::class,
+        priority: 0
+    )]
     public function findOwnerIdsForContacts(InternalObjectOwnerEvent $event): void
     {
         if (Contact::NAME !== $event->getObject()->getName()) {
@@ -127,7 +130,10 @@ final readonly class ContactObjectSubscriber implements EventSubscriberInterface
         );
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectRouteEvent::class,
+        priority: 0
+    )]
     public function buildContactRoute(InternalObjectRouteEvent $event): void
     {
         if (Contact::NAME !== $event->getObject()->getName()) {
@@ -145,10 +151,13 @@ final readonly class ContactObjectSubscriber implements EventSubscriberInterface
         );
         $event->stopPropagation();
     }
-
     /**
      * @throws ImportFailedException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: InternalObjectFindByIdEvent::class,
+        priority: 0
+    )]
     public function findContactById(InternalObjectFindByIdEvent $event): void
     {
         if (null === $event->getId() || Contact::NAME !== $event->getObject()->getName()) {

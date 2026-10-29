@@ -23,19 +23,16 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Entity\StageRepository;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class TypeOperatorSubscriber implements EventSubscriberInterface
+final class TypeOperatorSubscriber
 {
     use OperatorListTrait;
-
     private const string EMAIL_ALIAS = 'email';
-
     public function __construct(
         private readonly LeadModel $leadModel,
         private readonly ListModel $listModel,
@@ -47,24 +44,10 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         private readonly StageRepository $stageRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            TypeOperatorsEvent::class => ['onTypeOperatorsCollect', 0],
-            ListFieldChoicesEvent::class => ['onTypeListCollect', 0],
-            FormAdjustmentEvent::class => [
-                ['onSegmentFilterFormHandleTags', 1000],
-                ['onSegmentFilterFormHandleLookupId', 800],
-                ['onSegmentFilterFormHandleLookup', 600],
-                ['onSegmentFilterFormHandleGlobalCategory', 400],
-                ['onSegmentFilterFormHandleSelect', 200],
-                ['onSegmentFilterFormHandleDateSpan', 100],
-                ['onSegmentFilterFormHandleDefault', 0],
-            ],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: TypeOperatorsEvent::class,
+        priority: 0
+    )]
     public function onTypeOperatorsCollect(TypeOperatorsEvent $event): void
     {
         // Subscribe basic field types.
@@ -92,7 +75,10 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             $event->setOperatorsForFieldType($textAlias, $this->typeOperators['text']);
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ListFieldChoicesEvent::class,
+        priority: 0
+    )]
     public function onTypeListCollect(ListFieldChoicesEvent $event): void
     {
         $event->setChoicesForFieldType(
@@ -121,7 +107,10 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->setChoicesForFieldType('region', FormFieldHelper::getRegionChoices());
         $event->setChoicesForFieldType('timezone', FormFieldHelper::getTimezonesChoices());
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormAdjustmentEvent::class,
+        priority: 1000
+    )]
     public function onSegmentFilterFormHandleTags(FormAdjustmentEvent $event): void
     {
         if ('tags' !== $event->getFieldAlias()) {
@@ -152,10 +141,13 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         );
         $event->stopPropagation();
     }
-
     /**
      * For fields where users search by label but we need the ID. Example: owner.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormAdjustmentEvent::class,
+        priority: 800
+    )]
     public function onSegmentFilterFormHandleLookupId(FormAdjustmentEvent $event): void
     {
         if (!$event->fieldTypeIsOneOf('lookup_id') || !$event->operatorIsOneOf(OperatorOptions::EQUAL_TO, OperatorOptions::NOT_EQUAL_TO)) {
@@ -216,7 +208,10 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         );
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormAdjustmentEvent::class,
+        priority: 600
+    )]
     public function onSegmentFilterFormHandleLookup(FormAdjustmentEvent $event): void
     {
         if (!$event->fieldTypeIsOneOf('lookup')) {
@@ -245,7 +240,10 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormAdjustmentEvent::class,
+        priority: 400
+    )]
     public function onSegmentFilterFormHandleGlobalCategory(FormAdjustmentEvent $event): void
     {
         if (!$event->fieldTypeIsOneOf('globalcategory')) {
@@ -273,7 +271,10 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormAdjustmentEvent::class,
+        priority: 200
+    )]
     public function onSegmentFilterFormHandleSelect(FormAdjustmentEvent $event): void
     {
         $form       = $event->getForm();
@@ -317,7 +318,10 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             $event->stopPropagation();
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormAdjustmentEvent::class,
+        priority: 100
+    )]
     public function onSegmentFilterFormHandleDateSpan(FormAdjustmentEvent $event): void
     {
         if (!$event->operatorIsOneOf(OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT)
@@ -337,7 +341,10 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
 
         $event->stopPropagation();
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: FormAdjustmentEvent::class,
+        priority: 0
+    )]
     public function onSegmentFilterFormHandleDefault(FormAdjustmentEvent $event): void
     {
         $form        = $event->getForm();
@@ -361,7 +368,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $this->showOperatorsBasedAlertMessages($event);
         $event->stopPropagation();
     }
-
     private function showOperatorsBasedAlertMessages(FormAdjustmentEvent $event): void
     {
         switch ($event->getOperator()) {
@@ -392,7 +398,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
             'message_type' => 'warning',
         ]);
     }
-
     /**
      * @return mixed[]
      */
@@ -400,7 +405,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     {
         return $this->makeChoices($this->campaignModel->getPublishedCampaigns(true), 'name', 'id');
     }
-
     /**
      * @return mixed[]
      */
@@ -408,7 +412,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     {
         return $this->makeChoices($this->listModel->getUserLists(), 'name', 'id');
     }
-
     /**
      * @return mixed[]
      */
@@ -416,7 +419,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     {
         return $this->makeChoices($this->leadModel->getTagList(), 'label', 'value');
     }
-
     /**
      * @return mixed[]
      */
@@ -424,7 +426,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     {
         return $this->makeChoices($this->stageRepository->getSimpleList(), 'label', 'value');
     }
-
     /**
      * @return mixed[]
      */
@@ -432,7 +433,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     {
         return $this->makeChoices($this->categoryModel->getLookupResults('global', '', 300), 'title', 'id');
     }
-
     /**
      * @return mixed[]
      */
@@ -440,7 +440,6 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     {
         return $this->makeChoices($this->assetModel->getLookupResults('asset', $filter), 'title', 'id');
     }
-
     /**
      * @param mixed[] $items
      *

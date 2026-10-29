@@ -10,10 +10,9 @@ use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Form\Type\StageActionChangeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber
 {
     public function __construct(
         private LeadModel $leadModel,
@@ -21,15 +20,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            StageEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerStageChange', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CampaignBuilderEvent::class,
+        priority: 0
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $action = [
@@ -41,7 +35,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         ];
         $event->addAction('stage.change', $action);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: StageEvents::ON_CAMPAIGN_BATCH_ACTION,
+        priority: 0
+    )]
     public function onCampaignTriggerStageChange(PendingEvent $event): void
     {
         $logs    = $event->getPending();
@@ -59,7 +56,6 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             $this->changeStage($log, $stage, $event);
         }
     }
-
     private function changeStage(LeadEventLog $log, Stage $stage, PendingEvent $pendingEvent): void
     {
         try {

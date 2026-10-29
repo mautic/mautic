@@ -4,25 +4,20 @@ namespace Mautic\CategoryBundle\EventListener;
 
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ButtonSubscriber implements EventSubscriberInterface
+final readonly class ButtonSubscriber
 {
     public function __construct(
         private RouterInterface $router,
         private TranslatorInterface $translator,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomButtonEvent::class => ['injectContactBulkButtons', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: CustomButtonEvent::class,
+        priority: 0
+    )]
     public function injectContactBulkButtons(CustomButtonEvent $event): void
     {
         if (str_starts_with($event->getRoute(), 'mautic_contact_')) {

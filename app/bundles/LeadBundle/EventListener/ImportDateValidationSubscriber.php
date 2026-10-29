@@ -9,9 +9,8 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportRowFailedException;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class ImportDateValidationSubscriber implements EventSubscriberInterface
+final class ImportDateValidationSubscriber
 {
     /**
      * Cached mapping of date/datetime fields.
@@ -21,22 +20,17 @@ final class ImportDateValidationSubscriber implements EventSubscriberInterface
      * @var array<string,'date'|'datetime'>|null
      */
     private ?array $dateFields = null;
-
     public function __construct(
         private readonly FieldModel $fieldModel,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ImportProcessEvent::class => ['onImportProcess', 100],
-        ];
-    }
-
     /**
      * @throws ImportRowFailedException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: ImportProcessEvent::class,
+        priority: 100
+    )]
     public function onImportProcess(ImportProcessEvent $event): void
     {
         if (!in_array($event->import->getObject(), ['lead', 'company'], true)) {
@@ -46,7 +40,6 @@ final class ImportDateValidationSubscriber implements EventSubscriberInterface
             $this->validateDateTimeField($event->import->getMatchedFields(), $event->rowData, $alias, $type);
         }
     }
-
     /**
      * Validate one field value if it's date/datetime.
      *
@@ -80,7 +73,6 @@ final class ImportDateValidationSubscriber implements EventSubscriberInterface
                 break;
         }
     }
-
     /**
      * Get all published date/datetime fields (cached).
      *
@@ -110,7 +102,6 @@ final class ImportDateValidationSubscriber implements EventSubscriberInterface
 
         return $this->dateFields;
     }
-
     private function createDate(string $format, string $value, string $alias, string $errorMessage): void
     {
         $dt = \DateTime::createFromFormat($format, $value);

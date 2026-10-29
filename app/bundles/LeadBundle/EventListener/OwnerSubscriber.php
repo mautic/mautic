@@ -10,59 +10,58 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class OwnerSubscriber implements EventSubscriberInterface
+final class OwnerSubscriber
 {
     private const array OWNER_COLUMNS = ['email', 'firstname', 'lastname', 'position', 'signature'];
-
     private string $ownerFieldSprintf = '{ownerfield=%s}';
-
     /**
      * @var array<int, mixed>|null
      */
     private ?array $owners = null;
-
     public function __construct(
         private readonly TranslatorInterface $translator,
         private readonly LeadRepository $leadRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailOnBuildEvent::class     => ['onEmailBuild', 0],
-            EmailSendEvent::class        => ['onEmailGenerate', 0],
-            EmailDisplayEvent::class     => ['onEmailDisplay', 0],
-            TokensBuildEvent::class      => ['onSmsTokensBuild', 0],
-            SmsEvents::TOKEN_REPLACEMENT => ['onSmsTokenReplacement', 0],
-            UrlTokenReplaceEvent::class  => ['onUrlTokenReplace', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailOnBuildEvent::class,
+        priority: 0
+    )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         $event->addTokens($this->getTokens());
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailDisplayEvent::class,
+        priority: 0
+    )]
     public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailSendEvent::class,
+        priority: 0
+    )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $event->addTokens($this->getGeneratedTokens($event));
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: TokensBuildEvent::class,
+        priority: 0
+    )]
     public function onSmsTokensBuild(TokensBuildEvent $event): void
     {
         $tokens = array_merge($event->getTokens(), $this->getTokens());
         $event->setTokens($tokens);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: SmsEvents::TOKEN_REPLACEMENT,
+        priority: 0
+    )]
     public function onSmsTokenReplacement(TokenReplacementEvent $event): void
     {
         $contact             = $event->getLead()->getProfileFields();
@@ -74,7 +73,10 @@ final class OwnerSubscriber implements EventSubscriberInterface
         $content     = str_replace(array_keys($ownerTokens), $ownerTokens, $event->getContent());
         $event->setContent($content);
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: UrlTokenReplaceEvent::class,
+        priority: 0
+    )]
     public function onUrlTokenReplace(UrlTokenReplaceEvent $event): void
     {
         $contact             = $event->getLead()->getProfileFields();
@@ -84,7 +86,6 @@ final class OwnerSubscriber implements EventSubscriberInterface
 
         $event->setContent($content);
     }
-
     /**
      * Generates an array of tokens based on the given token.
      *
@@ -102,7 +103,6 @@ final class OwnerSubscriber implements EventSubscriberInterface
 
         return $this->getOwnerTokens($contact, $event->getCombinedContent());
     }
-
     /**
      * Used to replace all owner tokens with emptiness so not to email out tokens.
      */
@@ -116,7 +116,6 @@ final class OwnerSubscriber implements EventSubscriberInterface
 
         return $tokens;
     }
-
     /**
      * Used to replace all owner tokens with emptiness so not to email out tokens.
      */
@@ -130,7 +129,6 @@ final class OwnerSubscriber implements EventSubscriberInterface
 
         return $tokens;
     }
-
     /**
      * Creates a token using defined pattern.
      */
@@ -138,7 +136,6 @@ final class OwnerSubscriber implements EventSubscriberInterface
     {
         return sprintf($this->ownerFieldSprintf, $field);
     }
-
     /**
      * Creates translation ready label Owner: Firstname etc.
      */
@@ -150,7 +147,6 @@ final class OwnerSubscriber implements EventSubscriberInterface
             $this->translator->trans('mautic.core.'.$field)
         );
     }
-
     /**
      * @return mixed[]|null
      */
@@ -160,7 +156,6 @@ final class OwnerSubscriber implements EventSubscriberInterface
 
         return $this->owners[$ownerId];
     }
-
     /**
      * @param array<int|string>|null $contact
      *
@@ -188,7 +183,6 @@ final class OwnerSubscriber implements EventSubscriberInterface
 
         return $tokens;
     }
-
     /**
      * @return array<string>
      */
@@ -201,7 +195,6 @@ final class OwnerSubscriber implements EventSubscriberInterface
 
         return $tokens;
     }
-
     private function getOwnerColumnNormalized(string $ownerColumn): string
     {
         return str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);

@@ -14,14 +14,11 @@ use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class EmailSubscriber implements EventSubscriberInterface
+final class EmailSubscriber
 {
     private string $existingMjml = '';
-
     private string $existingHtml = '';
-
     public function __construct(
         private readonly Config $config,
         private readonly GrapesJsBuilderModel $grapesJsBuilderModel,
@@ -30,20 +27,13 @@ final class EmailSubscriber implements EventSubscriberInterface
         private readonly EmailRepository $emailRepository,
     ) {
     }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailPreSaveEvent::class    => ['onEmailPreSave', 0],
-            EmailPostSaveEvent::class   => ['onEmailPostSave', 0],
-            EmailPostDeleteEvent::class => ['onEmailDelete', 0],
-            EmailEditSubmitEvent::class => ['manageEmailDraft'],
-        ];
-    }
-
     /**
      * Stores the current MJML for use when managing drafts.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailPreSaveEvent::class,
+        priority: 0
+    )]
     public function onEmailPreSave(Events\EmailEvent $event): void
     {
         if (!$this->config->isPublished() || !$this->emailConfig->isDraftEnabled()) {
@@ -58,10 +48,13 @@ final class EmailSubscriber implements EventSubscriberInterface
             $this->existingMjml = $grapesJsBuilder->getCustomMjml();
         }
     }
-
     /**
      * Add an entry.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailPostSaveEvent::class,
+        priority: 0
+    )]
     public function onEmailPostSave(Events\EmailEvent $event): void
     {
         if (!$this->config->isPublished()) {
@@ -70,10 +63,13 @@ final class EmailSubscriber implements EventSubscriberInterface
 
         $this->grapesJsBuilderModel->addOrEditEntity($event->getEmail());
     }
-
     /**
      * Delete an entry.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailPostDeleteEvent::class,
+        priority: 0
+    )]
     public function onEmailDelete(Events\EmailEvent $event): void
     {
         if (!$this->config->isPublished()) {
@@ -87,7 +83,7 @@ final class EmailSubscriber implements EventSubscriberInterface
             $this->grapesJsBuilderRepository->deleteEntity($grapesJsBuilder);
         }
     }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEditSubmitEvent::class)]
     public function manageEmailDraft(EmailEditSubmitEvent $event): void
     {
         if (!$this->config->isPublished()) {
