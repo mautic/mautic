@@ -395,10 +395,8 @@ final class ListController extends AbstractStandardFormController
      * Create modifying response for segments - edit.
      *
      * @param array<string, mixed> $postActionVars
-     *
-     * @return Response
      */
-    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, bool $ignorePost)
+    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, bool $ignorePost): Response
     {
         if ($segmentModel->isLocked($segment)) {
             return $this->isLocked($postActionVars, $segment, 'lead.list');
@@ -659,10 +657,8 @@ final class ListController extends AbstractStandardFormController
         return $this->changeList($request, $objectId, 'add');
     }
 
-    /**
-     * @return Response
-     */
-    protected function changeList(Request $request, $listId, $action)
+    
+    protected function changeList(Request $request, $listId, $action): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
