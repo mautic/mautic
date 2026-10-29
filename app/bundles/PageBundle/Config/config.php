@@ -94,7 +94,6 @@ return [
         'cat_in_page_url'                       => false,
         'google_analytics'                      => null,
         'track_contact_by_ip'                   => false,
-        'track_by_fingerprint'                  => false,
         'google_analytics_id'                   => null,
         'google_analytics_trackingpage_enabled' => false,
         'google_analytics_landingpage_enabled'  => false,

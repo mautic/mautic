@@ -34,7 +34,7 @@ final class ReviewCollection implements \Iterator, \Countable
         return new self(
             array_map(
                 Review::fromArray(...),
-                array_filter($array, is_array(...))
+                array_filter($array, static fn ($review): bool => is_array($review) && null !== ($review['rating'] ?? null))
             )
         );
     }

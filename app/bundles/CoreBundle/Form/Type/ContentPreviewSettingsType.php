@@ -69,6 +69,26 @@ final class ContentPreviewSettingsType extends AbstractType
                     ],
                 ]
             );
+
+            $builder->add(
+                'company',
+                LookupType::class,
+                [
+                    'attr' => [
+                        'class'                => 'form-control',
+                        'data-callback'        => 'activatePreviewCompanyLookupField',
+                        'data-toggle'          => 'field-lookup',
+                        'data-lookup-callback' => 'updatePreviewCompanyLookupListFilter',
+                        'data-chosen-lookup'   => 'lead:companyList',
+                        'placeholder'          => $this->translator->trans(
+                            'mautic.lead.list.form.startTyping'
+                        ),
+                        'data-no-record-message' => $this->translator->trans(
+                            'mautic.core.form.nomatches'
+                        ),
+                    ],
+                ]
+            );
         }
     }
 

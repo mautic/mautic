@@ -83,7 +83,7 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
             disable_search_threshold: 10
         });
 
-        mQuery('.popover-content [data-toggle="tooltip"]').tooltip();
+        mQuery('.popover-content [data-toggle="tooltip"], .popover-content [data-bs-toggle="tooltip"]').tooltip();
     });
 });
 
@@ -733,8 +733,8 @@ var Mautic = {
         //dismiss modal if activated
         Mautic.dismissConfirmation();
 
-        if (action.indexOf('batchExport') >= 0) {
-            delete Mautic.activeActions[action]
+        if (action.includes('batchExport')) {
+            delete Mautic.activeActions[action];
             Mautic.initiateFileDownload(action);
             return;
         }
@@ -1001,7 +1001,7 @@ var Mautic = {
     clearNotification: function (id) {
         if (id) {
             mQuery("#notification" + id).fadeTo("fast", 0.01).slideUp("fast", function () {
-                mQuery(this).find("*[data-toggle='tooltip']").tooltip('destroy');
+                mQuery(this).find("*[data-toggle='tooltip'], *[data-bs-toggle='tooltip']").tooltip('destroy');
                 mQuery(this).remove();
 
                 if (!mQuery('#notifications .notification').length) {
