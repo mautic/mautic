@@ -135,10 +135,8 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
      * @param string          $field
      * @param string[]|string $value
      * @param ?int            $ignoreId
-     *
-     * @return QueryBuilder
      */
-    protected function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null)
+    protected function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null): QueryBuilder
     {
         $col = 'l.'.$field;
 

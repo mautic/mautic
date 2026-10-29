@@ -19,12 +19,10 @@ final readonly class UploadFieldValidator
     }
 
     /**
-     * @return UploadedFile
-     *
      * @throws FileValidationException
      * @throws NoFileGivenException
      */
-    public function processFileValidation(Field $field, Request $request)
+    public function processFileValidation(Field $field, Request $request): UploadedFile
     {
         $files = $request->files->get('mauticform');
 

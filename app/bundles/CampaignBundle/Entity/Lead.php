@@ -109,10 +109,7 @@ class Lead
         $this->dateAdded = $date;
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\Lead
-     */
-    public function getLead()
+    public function getLead(): \Mautic\LeadBundle\Entity\Lead
     {
         return $this->lead;
     }
@@ -122,10 +119,7 @@ class Lead
         $this->lead = $lead;
     }
 
-    /**
-     * @return Campaign
-     */
-    public function getCampaign()
+    public function getCampaign(): Campaign
     {
         return $this->campaign;
     }
