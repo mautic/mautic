@@ -261,16 +261,36 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->getIpHelper($request, $coreParametersHelper)->isRequestCountable());
     }
 
-    public function testIsRequestCountableChecksTheVisitorBehindAProxy(): void
+    public function testIsRequestCountableIgnoresAForwardedAddressFromAnUntrustedSender(): void
+    {
+        // An excluded visitor can't get counted by sending a forwarded address of their own
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')
+            ->willReturnCallback(static fn (string $name): ?array => 'do_not_track_ips' === $name ? ['203.0.113.9'] : null);
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '203.0.113.9', 'HTTP_X_FORWARDED_FOR' => '73.77.245.52']);
+        $request->headers->set('DNT', '1');
+
+        $this->assertFalse($this->getIpHelper($request, $coreParametersHelper)->isRequestCountable());
+    }
+
+    public function testIsRequestCountableChecksTheVisitorBehindATrustedProxy(): void
     {
         // The proxy is excluded, the visitor it forwards for isn't
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->method('get')
             ->willReturnCallback(static fn (string $name): ?array => 'do_not_track_internal_ips' === $name ? ['10.0.0.1'] : null);
-        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '10.0.0.1', 'HTTP_X_FORWARDED_FOR' => '73.77.245.52, 10.0.0.1']);
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '10.0.0.1', 'HTTP_X_FORWARDED_FOR' => '73.77.245.52']);
         $request->headers->set('DNT', '1');
 
-        $this->assertTrue($this->getIpHelper($request, $coreParametersHelper)->isRequestCountable());
+        $trustedProxies   = Request::getTrustedProxies();
+        $trustedHeaderSet = Request::getTrustedHeaderSet();
+        Request::setTrustedProxies(['10.0.0.1'], Request::HEADER_X_FORWARDED_FOR);
+
+        try {
+            $this->assertTrue($this->getIpHelper($request, $coreParametersHelper)->isRequestCountable());
+        } finally {
+            Request::setTrustedProxies($trustedProxies, $trustedHeaderSet);
+        }
     }
 
     public function testIsRequestCountableIgnoresAnExcludedFallbackAddress(): void
