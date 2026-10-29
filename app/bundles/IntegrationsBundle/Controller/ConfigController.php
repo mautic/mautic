@@ -22,7 +22,6 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormAuthorizeButtonIn
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormCallbackInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
-use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormNotesInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\PluginBundle\Entity\Integration;
@@ -34,10 +33,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class ConfigController extends AbstractFormController
 {
-    /**
-     * @var BasicIntegration|ConfigFormInterface
-     */
-    private ?\Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface $integrationObject = null;
+    private \Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface|BasicIntegration|null $integrationObject = null;
 
     private ?Integration $integrationConfiguration = null;
 
@@ -202,7 +198,7 @@ final class ConfigController extends AbstractFormController
 
         $useConfigFormNotes = $this->integrationObject instanceof ConfigFormNotesInterface;
 
-        $plugin  = $this->integrationObject->getIntegrationSettings()->getPlugin();
+        $plugin  = $this->integrationObject?->getIntegrationSettings()?->getPlugin();
         $version = $plugin?->getVersion();
 
         return $this->delegateView(
