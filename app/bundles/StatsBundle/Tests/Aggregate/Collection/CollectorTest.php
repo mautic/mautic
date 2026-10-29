@@ -34,7 +34,7 @@ final class CollectorTest extends TestCase
         $stats          = $statCollection->getStats();
         $year           = $stats->getYear(2018);
 
-        $this->assertEquals(210, $year->getSum());
+        $this->assertSame(210, $year->getSum());
     }
 
     private function getCollector(): Collector

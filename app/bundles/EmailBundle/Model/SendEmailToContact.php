@@ -7,7 +7,6 @@ use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
-use Mautic\EmailBundle\Stat\Reference;
 use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -243,7 +242,6 @@ final class SendEmailToContact
         // Delete the stat
         foreach ($failedEmailAddresses as $failedEmail) {
             try {
-                /** @var Reference $stat */
                 $stat = $this->statHelper->getStat($failedEmail);
             } catch (StatNotFoundException) {
                 continue;
