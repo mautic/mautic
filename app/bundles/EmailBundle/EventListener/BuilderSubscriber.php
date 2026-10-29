@@ -231,10 +231,10 @@ final class BuilderSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $disableTrackableUrls = $this->coreParametersHelper->get('disable_trackable_urls');
+        $email                = $event->getEmail();
+        $disableTrackableUrls = $this->coreParametersHelper->get('disable_trackable_urls') || ($email instanceof Email && !$email->getTrackingEnabled());
         $shortenEnabled       = $this->coreParametersHelper->get('shortener_email_enable', false);
 
-        $email          = $event->getEmail();
         $emailId        = $email instanceof Email ? $email->getId() : null;
         $utmTags        = $email instanceof Email ? $email->getUtmTags() : [];
 

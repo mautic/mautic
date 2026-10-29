@@ -119,6 +119,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private bool $sendToDnc = false;
 
+    /**
+     * With tracking off, the email gets no open pixel and its links aren't turned into tracked links. With it on,
+     * the tracking settings in the configuration apply.
+     */
+    #[Groups(['email:read', 'email:write', 'download:read'])]
+    private bool $trackingEnabled = true;
+
     #[Groups(['email:read', 'email:write', 'download:read'])]
     private ?string $preheaderText = null;
 
@@ -386,6 +393,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
             ->option('default', 0)
             ->build();
 
+        $builder->createField('trackingEnabled', Types::BOOLEAN)
+            ->columnName('tracking_enabled')
+            ->option('default', 1)
+            ->build();
+
         $builder->addNullableField('template', Types::STRING);
         $builder->addNullableField('content', Types::ARRAY);
         $builder->addNullableField('utmTags', Types::ARRAY, 'utm_tags');
@@ -572,6 +584,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'bccAddress',
                     'useOwnerAsMailer',
                     'sendToDnc',
+                    'trackingEnabled',
                     'utmTags',
                     'preheaderText',
                     'customHtml',
@@ -819,6 +832,19 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getSendToDnc(): bool
     {
         return $this->sendToDnc;
+    }
+
+    public function getTrackingEnabled(): bool
+    {
+        return $this->trackingEnabled;
+    }
+
+    public function setTrackingEnabled(bool $trackingEnabled): self
+    {
+        $this->isChanged('trackingEnabled', $trackingEnabled);
+        $this->trackingEnabled = $trackingEnabled;
+
+        return $this;
     }
 
     public function setSendToDnc(bool $sendToDnc): self

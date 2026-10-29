@@ -252,6 +252,11 @@ final class EmailApiController extends CommonApiController
             $parameters['sendToDnc'] = false;
         }
 
+        if (Request::METHOD_PUT === $method && !array_key_exists('trackingEnabled', $parameters)) {
+            // Same as above, a PUT that leaves the option out falls back to tracking on
+            $parameters['trackingEnabled'] = true;
+        }
+
         if (Request::METHOD_PATCH === $method && !array_key_exists('dynamicContent', $parameters)) {
             // EmailType replaces a missing dynamicContent with the default one, so a partial update must send the current one.
             $parameters['dynamicContent'] = $entity->getDynamicContent();
