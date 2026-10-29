@@ -1056,7 +1056,7 @@ final class PublicController extends CommonFormController
             $content = $emailEntity->getDraftContent();
         }
 
-        if (!$content && ($template = $emailEntity->getTemplate())) {
+        if (!$content && ($template = $emailEntity->getTemplate()) && 'mautic_code_mode' !== $template) {
             $assetsHelper->addCustomDeclaration('<meta name="robots" content="noindex">');
 
             $logicalName = $this->themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
