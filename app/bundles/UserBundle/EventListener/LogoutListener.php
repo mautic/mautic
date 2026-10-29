@@ -6,18 +6,11 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LogoutEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-<<<<<<< HEAD
-final readonly class LogoutListener implements EventSubscriberInterface
+final readonly class LogoutListener
 {
     private ?User $user;
 
-=======
-final readonly class LogoutListener
-{
-    private ?\Mautic\UserBundle\Entity\User $user;
->>>>>>> 9d2fcd5904 (rebase)
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         UserHelper $userHelper,

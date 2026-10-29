@@ -7,11 +7,7 @@ use Mautic\DashboardBundle\Event\PreLoadWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
-<<<<<<< HEAD
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-=======
->>>>>>> 647a48f3a0 (fixup! rebase)
 
 class DashboardSubscriber
 {

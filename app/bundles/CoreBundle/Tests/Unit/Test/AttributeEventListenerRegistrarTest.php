@@ -51,7 +51,10 @@ final class AttributeEventListenerRegistrarTest extends TestCase
 
     public function testRegistersClassLevelAttribute(): void
     {
-        $listener = new #[AsEventListener(event: Event::class, method: 'handle')] class() {
+        $listener = new #[AsEventListener(
+            event: Event::class,
+            method: 'handle'
+        )] class() {
             public bool $called = false;
 
             public function handle(Event $event): void

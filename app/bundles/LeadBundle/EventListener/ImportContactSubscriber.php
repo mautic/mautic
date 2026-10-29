@@ -14,11 +14,7 @@ use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\LeadModel;
-<<<<<<< HEAD
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-=======
->>>>>>> 647a48f3a0 (fixup! rebase)
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;

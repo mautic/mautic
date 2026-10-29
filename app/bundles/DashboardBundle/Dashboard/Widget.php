@@ -26,7 +26,6 @@ final readonly class Widget
      */
     public function get(int $widgetId): \Mautic\DashboardBundle\Entity\Widget
     {
-        /** @var \Mautic\DashboardBundle\Entity\Widget $widget */
         $widget = $this->dashboardModel->getEntity($widgetId);
 
         if (null === $widget || !$widget->getId()) {
