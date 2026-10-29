@@ -16,7 +16,6 @@ final class StatsDAO
      */
     private array $years = [];
 
-    
     public function getYear($year): YearStat
     {
         $this->years[$year] ??= new YearStat($year);

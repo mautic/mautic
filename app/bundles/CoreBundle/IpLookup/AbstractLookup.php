@@ -57,7 +57,6 @@ abstract class AbstractLookup
     ) {
     }
 
-    
     public function setIpAddress($ip): static
     {
         $this->ip = $ip;
