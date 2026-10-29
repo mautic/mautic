@@ -1,0 +1,30 @@
+{% set labelText = trackingpreference['label-text']|default('mautic.lead.preference.allow_activity_tracking'|trans) %}
+{% if form is defined %}
+    {% if form.allow_activity_tracking is defined %}
+        <div class="activity-tracking text-left">
+            <div>
+                <label class="control-label">{{ labelText }}</label>
+            </div>
+            {% for choice in form.allow_activity_tracking %}
+                <div class="text-left">
+                    {{ form_widget(choice) }}
+                    {{ form_label(choice) }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% else %}
+    <div class="activity-tracking text-left">
+        <div>
+            <label class="control-label">{{ labelText }}</label>
+        </div>
+        <div class="text-left">
+            <input type="radio" id="lead_contact_frequency_rules_allow_activity_tracking_1" name="lead_contact_frequency_rules[allow_activity_tracking]" value="1" checked>
+            <label for="lead_contact_frequency_rules_allow_activity_tracking_1">{{ 'mautic.core.form.yes'|trans }}</label>
+        </div>
+        <div class="text-left">
+            <input type="radio" id="lead_contact_frequency_rules_allow_activity_tracking_0" name="lead_contact_frequency_rules[allow_activity_tracking]" value="0">
+            <label for="lead_contact_frequency_rules_allow_activity_tracking_0">{{ 'mautic.core.form.no'|trans }}</label>
+        </div>
+    </div>
+{% endif %}

@@ -20,6 +20,8 @@ class TrackingPreference
      */
     public const PURPOSE_ACTIVITY = 'activity';
 
+    public const SOURCE_PREFERENCE_CENTRE = 'preference_centre';
+
     private ?int $id = null;
 
     private \DateTimeInterface $dateModified;
