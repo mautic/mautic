@@ -21,11 +21,9 @@ final readonly class Parser
     }
 
     /**
-     * @return BouncedEmail
-     *
      * @throws BounceNotFound
      */
-    public function parse()
+    public function parse(): BouncedEmail
     {
         $bouncerAddress = null;
         foreach ($this->message->to as $to => $name) {

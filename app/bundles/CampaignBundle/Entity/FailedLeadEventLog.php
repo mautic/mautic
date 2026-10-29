@@ -56,10 +56,8 @@ class FailedLeadEventLog
             ->build();
     }
 
-    /**
-     * @return LeadEventLog
-     */
-    public function getLog()
+    
+    public function getLog(): LeadEventLog
     {
         return $this->log;
     }

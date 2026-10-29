@@ -59,10 +59,8 @@ final class MailboxOrganizer
         return $this->containers;
     }
 
-    /**
-     * @return MailboxContainer
-     */
-    private function getContainer(ConfigAccessor $config)
+    
+    private function getContainer(ConfigAccessor $config): MailboxContainer
     {
         $key = $config->getKey();
         $this->containers[$key] ??= new MailboxContainer($config);
