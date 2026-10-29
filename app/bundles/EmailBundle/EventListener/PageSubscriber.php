@@ -9,7 +9,7 @@ use Mautic\PageBundle\Event as Events;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final readonly class PageSubscriber implements EventSubscriberInterface
+final readonly class PageSubscriber
 {
     public function __construct(
         private EmailModel $emailModel,
@@ -18,16 +18,10 @@ final readonly class PageSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            Events\PageHitEvent::class => ['onPageHit', 0],
-        ];
-    }
-
     /**
      * Trigger point actions for page hits.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\PageHitEvent::class)]
     public function onPageHit(Events\PageHitEvent $event): void
     {
         $hit      = $event->getHit();

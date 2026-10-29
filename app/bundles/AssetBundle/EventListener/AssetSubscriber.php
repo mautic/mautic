@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class AssetSubscriber implements EventSubscriberInterface
+final readonly class AssetSubscriber
 {
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
@@ -18,17 +18,10 @@ final readonly class AssetSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            AssetPostSaveEvent::class   => ['onAssetPostSave', 0],
-            AssetPostDeleteEvent::class => ['onAssetDelete', 0],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: AssetPostSaveEvent::class)]
     public function onAssetPostSave(AssetPostSaveEvent $event): void
     {
         $asset = $event->getAsset();
@@ -48,6 +41,7 @@ final readonly class AssetSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: AssetPostDeleteEvent::class)]
     public function onAssetDelete(AssetPostDeleteEvent $event): void
     {
         $asset = $event->getAsset();

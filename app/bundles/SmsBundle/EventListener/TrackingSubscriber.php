@@ -7,20 +7,14 @@ use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Entity\StatRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class TrackingSubscriber implements EventSubscriberInterface
+final readonly class TrackingSubscriber
 {
     public function __construct(
         private StatRepository $statRepository,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ContactIdentificationEvent::class => ['onIdentifyContact', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactIdentificationEvent::class)]
     public function onIdentifyContact(ContactIdentificationEvent $event): void
     {
         $clickthrough = $event->getClickthrough();

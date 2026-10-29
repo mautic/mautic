@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Exception\ImportRowFailedException;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class ImportDateValidationSubscriber implements EventSubscriberInterface
+final class ImportDateValidationSubscriber
 {
     /**
      * Cached mapping of date/datetime fields.
@@ -27,16 +27,10 @@ final class ImportDateValidationSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ImportProcessEvent::class => ['onImportProcess', 100],
-        ];
-    }
-
     /**
      * @throws ImportRowFailedException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportProcessEvent::class, priority: 100)]
     public function onImportProcess(ImportProcessEvent $event): void
     {
         if (!in_array($event->import->getObject(), ['lead', 'company'], true)) {

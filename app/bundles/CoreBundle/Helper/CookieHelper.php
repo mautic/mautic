@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final class CookieHelper implements EventSubscriberInterface
+final class CookieHelper
 {
     private ?Request $request = null;
 
@@ -70,18 +70,12 @@ final class CookieHelper implements EventSubscriberInterface
         $this->setCookie($name, '', -86400, $path, $domain, $secure, $httponly, $sameSite);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::RESPONSE)]
     public function onResponse(ResponseEvent $event): void
     {
         foreach ($this->cookies as $cookie) {
             $event->getResponse()->headers->setCookie($cookie);
         }
-    }
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::RESPONSE => 'onResponse',
-        ];
     }
 
     private function getRequest(): ?Request

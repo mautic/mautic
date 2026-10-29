@@ -11,7 +11,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final readonly class ControllerSubscriber implements EventSubscriberInterface
+final readonly class ControllerSubscriber
 {
     public function __construct(
         private IntegrationsHelper $integrationsHelper,
@@ -19,13 +19,7 @@ final readonly class ControllerSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::CONTROLLER => ['onKernelController', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::CONTROLLER)]
     public function onKernelController(ControllerEvent $event): void
     {
         $request = $event->getRequest();

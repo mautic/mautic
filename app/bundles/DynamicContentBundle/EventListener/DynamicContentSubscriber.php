@@ -25,7 +25,7 @@ use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class DynamicContentSubscriber implements EventSubscriberInterface
+final readonly class DynamicContentSubscriber
 {
     use MatchFilterForLeadTrait;
 
@@ -44,19 +44,10 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            DynamicContentEvents::POST_SAVE         => ['onPostSave', 0],
-            DynamicContentEvents::POST_DELETE       => ['onDelete', 0],
-            MauticEvents\TokenReplacementEvent::class => ['onTokenReplacement', 0],
-            PageDisplayEvent::class             => ['decodeTokens', 254],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DynamicContentEvents::POST_SAVE)]
     public function onPostSave(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
@@ -75,6 +66,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DynamicContentEvents::POST_DELETE)]
     public function onDelete(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
@@ -88,6 +80,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
         $this->auditLogModel->writeToLog($log);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MauticEvents\TokenReplacementEvent::class)]
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
@@ -138,6 +131,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageDisplayEvent::class, priority: 254)]
     public function decodeTokens(PageDisplayEvent $event): void
     {
         if (!$lead = $event->getLead()) {

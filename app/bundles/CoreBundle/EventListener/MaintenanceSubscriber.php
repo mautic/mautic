@@ -9,7 +9,7 @@ use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class MaintenanceSubscriber implements EventSubscriberInterface
+final readonly class MaintenanceSubscriber
 {
     public function __construct(
         private Connection $db,
@@ -18,13 +18,7 @@ final readonly class MaintenanceSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MaintenanceEvent::class => ['onDataCleanup', -50],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MaintenanceEvent::class, priority: -50)]
     public function onDataCleanup(MaintenanceEvent $event): void
     {
         $this->cleanupData($event, 'audit_log');

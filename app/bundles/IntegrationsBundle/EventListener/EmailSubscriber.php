@@ -19,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * This class subscribes to events related to building and providing
  * tokens for emails, particularly the IntegrationObjectToken.
  */
-final readonly class EmailSubscriber implements EventSubscriberInterface
+final readonly class EmailSubscriber
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
@@ -28,15 +28,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailOnBuildEvent::class      => ['onEmailBuild', 0],
-            EmailSendEvent::class         => ['decodeTokens', 0],
-            EmailDisplayEvent::class      => ['decodeTokens', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailOnBuildEvent::class)]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         $tokens = [];
@@ -65,6 +57,8 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class)]
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class)]
     public function decodeTokens(EmailSendEvent $event): void
     {
         $tokens = $this->tokenParser->findTokens($event->getContent());

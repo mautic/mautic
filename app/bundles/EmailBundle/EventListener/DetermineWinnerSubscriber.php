@@ -10,7 +10,7 @@ use Mautic\PageBundle\Entity\HitRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class DetermineWinnerSubscriber implements EventSubscriberInterface
+final readonly class DetermineWinnerSubscriber
 {
     public function __construct(
         private StatRepository $statRepository,
@@ -19,17 +19,10 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER         => ['onDetermineOpenRateWinner', 0],
-            EmailEvents::ON_DETERMINE_CLICKTHROUGH_RATE_WINNER => ['onDetermineClickthroughRateWinner', 0],
-        ];
-    }
-
     /**
      * Determines the winner of A/B test based on open rate.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER)]
     public function onDetermineOpenRateWinner(DetermineWinnerEvent $event): void
     {
         $parameters = $event->getParameters();
@@ -121,6 +114,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
     /**
      * Determines the winner of A/B test based on clickthrough rates.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEvents::ON_DETERMINE_CLICKTHROUGH_RATE_WINNER)]
     public function onDetermineClickthroughRateWinner(DetermineWinnerEvent $event): void
     {
         $parameters = $event->getParameters();

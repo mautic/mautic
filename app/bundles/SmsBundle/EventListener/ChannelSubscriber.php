@@ -13,20 +13,14 @@ use Mautic\SmsBundle\Form\Type\SmsListType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class ChannelSubscriber implements EventSubscriberInterface
+final readonly class ChannelSubscriber
 {
     public function __construct(
         private TransportChain $transportChain,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ChannelEvent::class => ['onAddChannel', 90],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ChannelEvent::class, priority: 90)]
     public function onAddChannel(ChannelEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {

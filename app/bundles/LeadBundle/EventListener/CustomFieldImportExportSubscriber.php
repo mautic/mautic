@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CustomFieldImportExportSubscriber implements EventSubscriberInterface
+final readonly class CustomFieldImportExportSubscriber
 {
     use ImportExportTrait;
 
@@ -32,16 +32,7 @@ final readonly class CustomFieldImportExportSubscriber implements EventSubscribe
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onLeadFieldExport', 0],
-            EntityImportEvent::class        => ['onLeadFieldImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityExportEvent::class)]
     public function onLeadFieldExport(EntityExportEvent $event): void
     {
         if (LeadField::ENTITY_NAME !== $event->getEntityName()) {
@@ -83,6 +74,7 @@ final readonly class CustomFieldImportExportSubscriber implements EventSubscribe
         $this->logAction('export', $leadField->getId(), $leadFieldData);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportEvent::class)]
     public function onLeadFieldImport(EntityImportEvent $event): void
     {
         if (LeadField::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -133,6 +125,7 @@ final readonly class CustomFieldImportExportSubscriber implements EventSubscribe
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportUndoEvent::class)]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (LeadField::ENTITY_NAME !== $event->getEntityName()) {
@@ -156,6 +149,7 @@ final readonly class CustomFieldImportExportSubscriber implements EventSubscribe
         $this->entityManager->flush();
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportAnalyzeEvent::class)]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(

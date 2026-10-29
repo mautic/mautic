@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-final class PageSubscriber implements EventSubscriberInterface
+final class PageSubscriber
 {
     private string $regex = '{focus=(.*?)}';
 
@@ -24,17 +24,10 @@ final class PageSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PageDisplayEvent::class => ['onPageDisplay', 0],
-            PageBuilderEvent::class   => ['onPageBuild', 0],
-        ];
-    }
-
     /**
      * Add forms to available page tokens.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageBuilderEvent::class)]
     public function onPageBuild(PageBuilderEvent $event): void
     {
         if ($event->tokensRequested($this->regex)) {
@@ -51,6 +44,7 @@ final class PageSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageDisplayEvent::class)]
     public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content = $event->getContent();

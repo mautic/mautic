@@ -13,7 +13,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ContactExportSchedulerNotificationSubscriber implements EventSubscriberInterface
+final readonly class ContactExportSchedulerNotificationSubscriber
 {
     public function __construct(
         private NotificationModel $notificationModel,
@@ -22,14 +22,7 @@ final readonly class ContactExportSchedulerNotificationSubscriber implements Eve
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ContactExportScheduledEvent::class  => 'onContactExportScheduled',
-            ContactExportEmailSentEvent::class => 'onContactExportEmailSent',
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactExportScheduledEvent::class)]
     public function onContactExportScheduled(ContactExportSchedulerEvent $event): void
     {
         /** @var User $user */
@@ -49,6 +42,7 @@ final readonly class ContactExportSchedulerNotificationSubscriber implements Eve
         $this->contactExportAdminNotification->notifyRequested($event->getContactExportScheduler());
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactExportEmailSentEvent::class)]
     public function onContactExportEmailSent(ContactExportSchedulerEvent $event): void
     {
         $this->contactExportAdminNotification->notifyCompleted($event->getContactExportScheduler());

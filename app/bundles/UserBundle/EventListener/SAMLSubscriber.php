@@ -10,24 +10,18 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
-final readonly class SAMLSubscriber implements EventSubscriberInterface
+final readonly class SAMLSubscriber
 {
     public function __construct(
         private RouterInterface $router,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::REQUEST => ['onKernelRequest', 256],
-        ];
-    }
-
     /**
      * Block access to SAML URLs if SAML is disabled.
      * This listener is removed from Kernel if SAML is not enabled. See mautic.saml_enabled parameter.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::REQUEST, priority: 256)]
     public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMainRequest()) {

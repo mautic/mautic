@@ -11,7 +11,7 @@ use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber
 {
     public function __construct(
         private FocusModel $model,
@@ -19,16 +19,10 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormEvents::FORM_POST_DELETE => ['onFormDelete', 0],
-        ];
-    }
-
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::FORM_POST_DELETE)]
     public function onFormDelete(Events\FormEvent $event): void
     {
         $form   = $event->getForm();

@@ -7,7 +7,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class PageSubscriber implements EventSubscriberInterface
+final readonly class PageSubscriber
 {
     public function __construct(
         private AssetsHelper $assetsHelper,
@@ -15,13 +15,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PageDisplayEvent::class => ['onPageDisplay', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageDisplayEvent::class)]
     public function onPageDisplay(PageDisplayEvent $event): void
     {
         $integrationObject = $this->integrationHelper->getIntegrationObject('OneSignal');

@@ -11,7 +11,7 @@ use Mautic\WebhookBundle\Event\WebhookPostSaveEvent;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class WebhookSubscriber implements EventSubscriberInterface
+final readonly class WebhookSubscriber
 {
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
@@ -20,18 +20,10 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            WebhookPostSaveEvent::class   => ['onWebhookSave', 0],
-            WebhookPostDeleteEvent::class => ['onWebhookDelete', 0],
-            WebhookKillEvent::class       => ['onWebhookKill', 0],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: WebhookPostSaveEvent::class)]
     public function onWebhookSave(WebhookEvent $event): void
     {
         $webhook = $event->getWebhook();
@@ -52,6 +44,7 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: WebhookPostDeleteEvent::class)]
     public function onWebhookDelete(WebhookEvent $event): void
     {
         $webhook = $event->getWebhook();
@@ -69,6 +62,7 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     /**
      * Send notification about killed webhook.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: WebhookKillEvent::class)]
     public function onWebhookKill(WebhookEvent $event): void
     {
         $this->webhookKillNotificator->send($event->getWebhook(), $event->getReason());

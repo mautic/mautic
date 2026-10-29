@@ -10,24 +10,17 @@ use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class WebhookSubscriber implements EventSubscriberInterface
+final readonly class WebhookSubscriber
 {
     public function __construct(
         private WebhookModel $webhookModel,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            SmsSendEvent::class        => 'onSend',
-            WebhookBuilderEvent::class => 'onWebhookBuild',
-        ];
-    }
-
     /**
      * Add event triggers and actions.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: WebhookBuilderEvent::class)]
     public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         $event->addEvent(
@@ -39,6 +32,7 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SmsSendEvent::class)]
     public function onSend(SmsSendEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(

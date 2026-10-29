@@ -9,7 +9,7 @@ use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final readonly class StatSubscriber implements EventSubscriberInterface
+final readonly class StatSubscriber
 {
     public function __construct(
         private FocusModel $model,
@@ -17,14 +17,7 @@ final readonly class StatSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PageHitEvent::class    => ['onPageHit', 0],
-            SubmissionEvent::class => ['onFormSubmit', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageHitEvent::class)]
     public function onPageHit(PageHitEvent $event): void
     {
         $hit    = $event->getHit();
@@ -43,6 +36,7 @@ final readonly class StatSubscriber implements EventSubscriberInterface
     /**
      * Note if this submission is from a focus submit.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SubmissionEvent::class)]
     public function onFormSubmit(SubmissionEvent $event): void
     {
         // Check the request for a focus field

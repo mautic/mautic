@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber
 {
     public function __construct(
         private StagesChangeLogRepository $stagesChangeLogRepository,
@@ -23,17 +23,10 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
-        ];
-    }
-
     /**
      * Compile events for the lead timeline.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -82,6 +75,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostMergeEvent::class)]
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->leadStageLogRepository->updateLead(

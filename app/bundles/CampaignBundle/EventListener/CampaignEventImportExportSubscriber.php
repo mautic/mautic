@@ -25,7 +25,7 @@ use Mautic\PointBundle\Entity\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignEventImportExportSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventImportExportSubscriber
 {
     public function __construct(
         private CampaignModel $campaignModel,
@@ -38,16 +38,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onExport', 0],
-            EntityImportEvent::class        => ['onImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityExportEvent::class)]
     public function onExport(EntityExportEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName()) {
@@ -224,6 +215,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportEvent::class)]
     public function onImport(EntityImportEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -291,6 +283,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         $this->updateParentEvents($event);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportAnalyzeEvent::class)]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
@@ -373,6 +366,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         $this->entityManager->flush();
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportUndoEvent::class)]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName()) {

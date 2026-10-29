@@ -16,7 +16,7 @@ use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-final readonly class PageSubscriber implements EventSubscriberInterface
+final readonly class PageSubscriber
 {
     public function __construct(
         private AssetsHelper $assetsHelper,
@@ -28,19 +28,10 @@ final readonly class PageSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PageEvents::PAGE_POST_SAVE      => ['onPagePostSave', 0],
-            PageEvents::PAGE_POST_DELETE    => ['onPageDelete', 0],
-            Events\PageDisplayEvent::class     => ['onPageDisplay', -255], // We want this to run last
-            PageEditSubmitEvent::class      => ['managePageDraft'],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEvents::PAGE_POST_SAVE)]
     public function onPagePostSave(PageEvent $event): void
     {
         $page = $event->getPage();
@@ -63,6 +54,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEvents::PAGE_POST_DELETE)]
     public function onPageDelete(PageEvent $event): void
     {
         $page = $event->getPage();
@@ -83,6 +75,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
      * - <body>  : onPageDisplay_bodyOpen
      * - </body> : onPageDisplay_bodyClose.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\PageDisplayEvent::class, priority: -255)]
     public function onPageDisplay(Events\PageDisplayEvent $event): void
     {
         $content = $event->getContent();
@@ -133,6 +126,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
         $event->setContent($content);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEditSubmitEvent::class)]
     public function managePageDraft(PageEditSubmitEvent $event): void
     {
         $livePage   = $event->getPreviousPage();

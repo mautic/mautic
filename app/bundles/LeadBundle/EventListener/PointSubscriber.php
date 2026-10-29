@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber
 {
     public function __construct(
         private LeadModel $leadModel,
@@ -25,15 +25,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            TriggerBuilderEvent::class                   => ['onTriggerBuild', 0],
-            PointEvents::TRIGGER_ON_EVENT_EXECUTE        => ['onTriggerExecute', 0],
-            PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE => ['onLeadSegmentsChange', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: TriggerBuilderEvent::class)]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $event->addEvent(
@@ -76,6 +68,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointEvents::TRIGGER_ON_EVENT_EXECUTE)]
     public function onTriggerExecute(TriggerExecutedEvent $event): void
     {
         if ('lead.changetags' === $event->getTriggerEvent()->getType()) {
@@ -141,6 +134,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE)]
     public function onLeadSegmentsChange(TriggerExecutedEvent $event): void
     {
         $lead = $event->getLead();

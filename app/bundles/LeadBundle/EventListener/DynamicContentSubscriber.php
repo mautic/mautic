@@ -10,20 +10,14 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class DynamicContentSubscriber implements EventSubscriberInterface
+final readonly class DynamicContentSubscriber
 {
     public function __construct(
         private LeadListRepository $segmentRepository,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ContactFiltersEvaluateEvent::class => ['onContactFilterEvaluate', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactFiltersEvaluateEvent::class)]
     public function onContactFilterEvaluate(ContactFiltersEvaluateEvent $event): void
     {
         foreach ($event->getFilters() as $filter) {

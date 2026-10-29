@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class SetContactAvatarFormSubscriber implements EventSubscriberInterface
+final readonly class SetContactAvatarFormSubscriber
 {
     public function __construct(
         private AvatarHelper $avatarHelper,
@@ -19,13 +19,7 @@ final readonly class SetContactAvatarFormSubscriber implements EventSubscriberIn
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            SubmissionEvent::class => ['onFormSubmit', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SubmissionEvent::class)]
     public function onFormSubmit(SubmissionEvent $submissionEvent): void
     {
         $fields  = $submissionEvent->getForm()->getFields();

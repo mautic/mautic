@@ -12,21 +12,14 @@ use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class ContactExportSchedulerLoggerSubscriber implements EventSubscriberInterface
+final readonly class ContactExportSchedulerLoggerSubscriber
 {
     public function __construct(
         private LoggerInterface $logger,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ContactExportScheduledEvent::class  => 'onContactExportScheduled',
-            ContactExportEmailSentEvent::class => 'onContactExportEmailSent',
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactExportScheduledEvent::class)]
     public function onContactExportScheduled(ContactExportSchedulerEvent $event): void
     {
         $utcScheduledDateTimeStr = $this->getContactExportScheduledDateTimeStr($event->getContactExportScheduler());
@@ -37,6 +30,7 @@ final readonly class ContactExportSchedulerLoggerSubscriber implements EventSubs
         );
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactExportEmailSentEvent::class)]
     public function onContactExportEmailSent(ContactExportSchedulerEvent $event): void
     {
         $utcScheduledDateTimeStr = $this->getContactExportScheduledDateTimeStr($event->getContactExportScheduler());

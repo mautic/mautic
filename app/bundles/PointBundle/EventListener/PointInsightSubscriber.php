@@ -8,20 +8,14 @@ use Mautic\PointBundle\Event\GroupScoreChangeEvent;
 use Mautic\PointBundle\Model\InsightModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class PointInsightSubscriber implements EventSubscriberInterface
+final readonly class PointInsightSubscriber
 {
     public function __construct(
         private InsightModel $insightModel,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            GroupScoreChangeEvent::class => ['onGroupScoreChange', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: GroupScoreChangeEvent::class)]
     public function onGroupScoreChange(GroupScoreChangeEvent $event): void
     {
         $this->insightModel->executePointInsights($event->getContact(), $event->getGroup());

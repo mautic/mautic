@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Event\CustomAssetsEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class EditorFontsSubscriber implements EventSubscriberInterface
+final readonly class EditorFontsSubscriber
 {
     public const string PARAMETER_EDITOR_FONTS = 'editor_fonts';
 
@@ -17,13 +17,7 @@ final readonly class EditorFontsSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomAssetsEvent::class => ['addGlobalAssets', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomAssetsEvent::class)]
     public function addGlobalAssets(CustomAssetsEvent $customAssetsEvent): void
     {
         $this->addEditorFonts($customAssetsEvent);

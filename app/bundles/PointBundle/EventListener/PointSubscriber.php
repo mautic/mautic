@@ -10,7 +10,7 @@ use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\PointEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber
 {
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
@@ -18,19 +18,10 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PointEvents::POINT_POST_SAVE     => ['onPointPostSave', 0],
-            PointEvents::POINT_POST_DELETE   => ['onPointDelete', 0],
-            PointEvents::TRIGGER_POST_SAVE   => ['onTriggerPostSave', 0],
-            PointEvents::TRIGGER_POST_DELETE => ['onTriggerDelete', 0],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointEvents::POINT_POST_SAVE)]
     public function onPointPostSave(Events\PointEvent $event): void
     {
         $point = $event->getPoint();
@@ -50,6 +41,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointEvents::POINT_POST_DELETE)]
     public function onPointDelete(Events\PointEvent $event): void
     {
         $point = $event->getPoint();
@@ -67,6 +59,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointEvents::TRIGGER_POST_SAVE)]
     public function onTriggerPostSave(Events\TriggerEvent $event): void
     {
         $trigger = $event->getTrigger();
@@ -86,6 +79,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointEvents::TRIGGER_POST_DELETE)]
     public function onTriggerDelete(Events\TriggerEvent $event): void
     {
         $trigger = $event->getTrigger();

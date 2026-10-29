@@ -8,20 +8,14 @@ use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\SmsBundle\Broadcast\BroadcastExecutioner;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class BroadcastSubscriber implements EventSubscriberInterface
+final readonly class BroadcastSubscriber
 {
     public function __construct(
         private BroadcastExecutioner $broadcastExecutioner,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ChannelBroadcastEvent::class => ['onBroadcast', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ChannelBroadcastEvent::class)]
     public function onBroadcast(ChannelBroadcastEvent $event): void
     {
         if (!$event->checkContext('sms')) {

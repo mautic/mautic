@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-abstract class CommonStatsSubscriber implements EventSubscriberInterface
+abstract class CommonStatsSubscriber
 {
     /**
      * @var mixed[]
@@ -32,13 +32,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            StatsEvent::class => ['onStatsFetch', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: StatsEvent::class)]
     public function onStatsFetch(StatsEvent $event): void
     {
         /** @var CommonRepository<object> $repository */

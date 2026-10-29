@@ -13,7 +13,7 @@ use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class FormValidationSubscriber implements EventSubscriberInterface
+final readonly class FormValidationSubscriber
 {
     public function __construct(
         private TranslatorInterface $translator,
@@ -21,17 +21,10 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            Events\FormBuilderEvent::class => ['onFormBuilder', 0],
-            FormEvents::ON_FORM_VALIDATE   => ['onFormValidate', 0],
-        ];
-    }
-
     /**
      * Add a simple email form.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\FormBuilderEvent::class)]
     public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addValidator(
@@ -69,6 +62,7 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
     /**
      * Custom validation.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_FORM_VALIDATE)]
     public function onFormValidate(Events\ValidationEvent $event): void
     {
         $value = $event->getValue();

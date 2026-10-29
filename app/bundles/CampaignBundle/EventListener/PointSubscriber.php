@@ -9,15 +9,9 @@ use Mautic\CampaignBundle\Helper\CampaignEventHelper;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class PointSubscriber implements EventSubscriberInterface
+final class PointSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            TriggerBuilderEvent::class => ['onTriggerBuild', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: TriggerBuilderEvent::class)]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $changeLists = [

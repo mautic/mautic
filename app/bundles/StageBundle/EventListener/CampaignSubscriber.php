@@ -13,7 +13,7 @@ use Mautic\StageBundle\StageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber
 {
     public function __construct(
         private LeadModel $leadModel,
@@ -22,14 +22,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            StageEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerStageChange', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $action = [
@@ -42,6 +35,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('stage.change', $action);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: StageEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignTriggerStageChange(PendingEvent $event): void
     {
         $logs    = $event->getPending();

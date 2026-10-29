@@ -23,7 +23,7 @@ use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignEventSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventSubscriber
 {
     public const int LOOPS_TO_FAIL = 100;
 
@@ -41,24 +41,10 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Get the subscribed events for this listener.
-     *
-     * @return array<string,mixed>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignPreSaveEvent::class              => ['onCampaignPreSave', 0],
-            FailedEvent::class                       => ['onEventFailed', 0],
-            ExecutedEvent::class                     => ['onEventExecuted', 0],
-            EventPreview::class                      => ['onEventPreviewRequest', 0],
-        ];
-    }
-
-    /**
      * Reset all campaign event failed_count's
      * to 0 when the campaign is published.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignPreSaveEvent::class)]
     public function onCampaignPreSave(CampaignPreSaveEvent $event): void
     {
         $campaign = $event->getCampaign();
@@ -95,6 +81,7 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
      * @throws OptimisticLockException
      * @throws TransactionRequiredException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FailedEvent::class)]
     public function onEventFailed(FailedEvent $event): void
     {
         $log                  = $event->getLog();
@@ -144,6 +131,7 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
      *
      * @throws NonUniqueResultException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ExecutedEvent::class)]
     public function onEventExecuted(ExecutedEvent $event): void
     {
         $log                  = $event->getLog();
@@ -163,6 +151,7 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
         $this->eventRepository->decreaseFailedCount($executedEvent);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EventPreview::class)]
     public function onEventPreviewRequest(EventPreview $eventPreview): void
     {
         $logStats = $this->leadEventLogRepository->getEventLogStats($eventPreview->event->getId());

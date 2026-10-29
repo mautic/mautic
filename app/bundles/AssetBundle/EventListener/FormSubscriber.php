@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber
 {
     public function __construct(
         private AssetModel $assetModel,
@@ -33,20 +33,10 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormBuilderEvent::class                   => ['onFormBuilder', 0],
-            FormEvents::ON_EXECUTE_SUBMIT_ACTION      => [
-                ['onFormSubmitActionAssetDownload', 0],
-                ['onFormSubmitActionDownloadFile', 0],
-            ],
-        ];
-    }
-
     /**
      * Add a lead generation action to available form submit actions.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormBuilderEvent::class)]
     public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('asset.download', [
@@ -60,6 +50,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         ]);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
     public function onFormSubmitActionAssetDownload(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('asset.download')) {
@@ -91,6 +82,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
     public function onFormSubmitActionDownloadFile(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('asset.download_file')) {

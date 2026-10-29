@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber
 {
     use ChannelTrait;
 
@@ -34,21 +34,10 @@ final class LeadSubscriber implements EventSubscriberInterface
         $this->setModelFactory($modelFactory);
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadTimelineEvent::class => [
-                ['onTimelineGenerate', 0],
-                ['onTimelineGenerateVideo', 0],
-            ],
-            LeadChangeEvent::class => ['onLeadChange', 0],
-            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
-        ];
-    }
-
     /**
      * Compile events for the lead timeline.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -139,6 +128,7 @@ final class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerateVideo(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -181,6 +171,7 @@ final class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadChangeEvent::class)]
     public function onLeadChange(LeadChangeEvent $event): void
     {
         $this->hitRepository->updateLeadByTrackingId(
@@ -190,6 +181,7 @@ final class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostMergeEvent::class)]
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->hitRepository->updateLead(

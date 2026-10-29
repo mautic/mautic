@@ -13,15 +13,9 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  * This must record a PW before CheckCredentialsListener will take an effect.
  * Subscriber will add a password check badge.
  */
-final class PasswordStrengthSubscriber implements EventSubscriberInterface
+final class PasswordStrengthSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CheckPassportEvent::class => ['checkPassport', 100],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CheckPassportEvent::class, priority: 100)]
     public function checkPassport(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();

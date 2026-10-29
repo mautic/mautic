@@ -10,18 +10,14 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class EmailToUserSubscriber implements EventSubscriberInterface
+final readonly class EmailToUserSubscriber
 {
     public function __construct(
         private SendEmailToUser $sendEmailToUser,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [EmailEvents::ON_SENT_EMAIL_TO_USER => ['onEmailToUser', 0]];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEvents::ON_SENT_EMAIL_TO_USER)]
     public function onEmailToUser(TriggerExecutedEvent $event): void
     {
         $triggerEvent = $event->getTriggerEvent();

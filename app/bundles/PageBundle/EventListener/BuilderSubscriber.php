@@ -21,7 +21,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-final class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber
 {
     private const string pageTokenRegex         = '{pagelink=(.*?)}';
 
@@ -72,17 +72,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            Events\PageDisplayEvent::class   => ['onPageDisplay', 0],
-            Events\PageBuilderEvent::class     => ['onPageBuild', 0],
-            EmailOnBuildEvent::class      => ['onEmailBuild', 0],
-            EmailSendEvent::class         => ['onEmailGenerate', 0],
-            EmailDisplayEvent::class      => ['onEmailGenerate', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailOnBuildEvent::class)]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         if ($event->tokensRequested([self::pageTokenRegex])) {
@@ -101,6 +91,8 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class)]
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class)]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $content      = $event->getContent();
@@ -114,6 +106,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
     /**
      * Add forms to available page tokens.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\PageBuilderEvent::class)]
     public function onPageBuild(Events\PageBuilderEvent $event): void
     {
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
@@ -185,6 +178,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\PageDisplayEvent::class)]
     public function onPageDisplay(Events\PageDisplayEvent $event): void
     {
         if (empty($content = $event->getContent())) {

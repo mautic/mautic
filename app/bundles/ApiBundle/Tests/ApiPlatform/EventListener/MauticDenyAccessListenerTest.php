@@ -45,14 +45,9 @@ final class MauticDenyAccessListenerTest extends TestCase
         $this->configureRequest($this->createFormEntityMock());
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new class() implements EventSubscriberInterface {
-            public static function getSubscribedEvents(): array
-            {
-                return [
-                    ApiPlatformPermissionContextEvent::class => ['onApiPlatformPermissionContext', 0],
-                ];
-            }
-
+        $dispatcher->addSubscriber(new class
+        {
+            #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ApiPlatformPermissionContextEvent::class)]
             public function onApiPlatformPermissionContext(ApiPlatformPermissionContextEvent $event): void
             {
                 $permission = $event->getPermission();

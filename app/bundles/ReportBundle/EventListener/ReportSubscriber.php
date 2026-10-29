@@ -10,7 +10,7 @@ use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber
 {
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
@@ -18,17 +18,10 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportEvents::REPORT_POST_SAVE   => ['onReportPostSave', 0],
-            ReportEvents::REPORT_POST_DELETE => ['onReportDelete', 0],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportEvents::REPORT_POST_SAVE)]
     public function onReportPostSave(ReportEvent $event): void
     {
         $report = $event->getReport();
@@ -48,6 +41,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportEvents::REPORT_POST_DELETE)]
     public function onReportDelete(ReportEvent $event): void
     {
         $report = $event->getReport();

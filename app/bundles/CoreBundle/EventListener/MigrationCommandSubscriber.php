@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-final readonly class MigrationCommandSubscriber implements EventSubscriberInterface
+final readonly class MigrationCommandSubscriber
 {
     public function __construct(
         private VersionProviderInterface $versionProvider,
@@ -25,13 +25,7 @@ final readonly class MigrationCommandSubscriber implements EventSubscriberInterf
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ConsoleEvents::TERMINATE => ['addGeneratedColumns'],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ConsoleEvents::TERMINATE)]
     public function addGeneratedColumns(ConsoleTerminateEvent $event): void
     {
         $command = $event->getCommand();

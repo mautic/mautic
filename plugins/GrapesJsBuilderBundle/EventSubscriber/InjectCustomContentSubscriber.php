@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
-final readonly class InjectCustomContentSubscriber implements EventSubscriberInterface
+final readonly class InjectCustomContentSubscriber
 {
     public function __construct(
         private Config $config,
@@ -28,13 +28,7 @@ final readonly class InjectCustomContentSubscriber implements EventSubscriberInt
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomContentEvent::class => ['injectViewCustomContent', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomContentEvent::class)]
     public function injectViewCustomContent(CustomContentEvent $customContentEvent): void
     {
         if (!$this->config->isPublished()) {

@@ -10,7 +10,7 @@ use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class PageSubscriber implements EventSubscriberInterface
+final readonly class PageSubscriber
 {
     public function __construct(
         private Config $config,
@@ -18,13 +18,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PageEvents::PAGE_POST_SAVE => ['onPagePostSave', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEvents::PAGE_POST_SAVE)]
     public function onPagePostSave(PageEvent $event): void
     {
         if (!$this->config->isPublished()) {

@@ -9,7 +9,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-final readonly class BuildJsSubscriber implements EventSubscriberInterface
+final readonly class BuildJsSubscriber
 {
     public function __construct(
         private TrackingHelper $trackingHelper,
@@ -17,17 +17,7 @@ final readonly class BuildJsSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            BuildJsEvent::class => [
-                // onBuildJs must always needs to be last to ensure setup before delivering the event
-                ['onBuildJs', -255],
-                ['onBuildJsForTrackingEvent', 256],
-            ],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: BuildJsEvent::class, priority: -255)]
     public function onBuildJs(BuildJsEvent $event): void
     {
         if (!$event->acceptsScope(BuildJsScope::TRACKING)) {
@@ -192,6 +182,7 @@ JS;
         $event->appendJsForScope($js, BuildJsScope::TRACKING, 'Mautic Tracking Pixel');
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: BuildJsEvent::class, priority: 256)]
     public function onBuildJsForTrackingEvent(BuildJsEvent $event): void
     {
         if (!$event->acceptsScope(BuildJsScope::TRACKING)) {

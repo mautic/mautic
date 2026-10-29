@@ -11,7 +11,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class BroadcastSubscriber implements EventSubscriberInterface
+final readonly class BroadcastSubscriber
 {
     public function __construct(
         private EmailModel $model,
@@ -21,13 +21,7 @@ final readonly class BroadcastSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ChannelBroadcastEvent::class => ['onBroadcast', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ChannelBroadcastEvent::class)]
     public function onBroadcast(ChannelBroadcastEvent $event): void
     {
         if (!$event->checkContext('email')) {

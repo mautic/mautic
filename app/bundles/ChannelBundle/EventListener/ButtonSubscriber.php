@@ -8,7 +8,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ButtonSubscriber implements EventSubscriberInterface
+final readonly class ButtonSubscriber
 {
     public function __construct(
         private RouterInterface $router,
@@ -16,13 +16,7 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomButtonEvent::class => ['injectContactBulkButtons', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomButtonEvent::class)]
     public function injectContactBulkButtons(CustomButtonEvent $event): void
     {
         if (str_starts_with($event->getRoute(), 'mautic_contact_')) {

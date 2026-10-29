@@ -8,18 +8,11 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class FormSubscriber implements EventSubscriberInterface
+final class FormSubscriber
 {
     use PushToIntegrationTrait;
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormBuilderEvent::class             => ['onFormBuild', 0],
-            FormEvents::ON_EXECUTE_SUBMIT_ACTION => ['onFormSubmitActionTriggered', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormBuilderEvent::class)]
     public function onFormBuild(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('plugin.leadpush', [
@@ -33,6 +26,7 @@ final class FormSubscriber implements EventSubscriberInterface
         ]);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
     public function onFormSubmitActionTriggered(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('plugin.leadpush')) {

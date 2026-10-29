@@ -10,15 +10,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final readonly class ErrorHandlingListener implements EventSubscriberInterface
+final readonly class ErrorHandlingListener
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::REQUEST => ['onKernelRequest', 2047],
-        ];
-    }
-
     public function __construct(LoggerInterface $logger, LoggerInterface $mainLogger, ?LoggerInterface $debugLogger = null)
     {
         ErrorHandler::getHandler()
@@ -27,6 +20,7 @@ final readonly class ErrorHandlingListener implements EventSubscriberInterface
             ->setDebugLogger($debugLogger);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::REQUEST, priority: 2047)]
     public function onKernelRequest(RequestEvent $event): void
     {
         // Do nothing.  Just want symfony to call the class to set the error handling functions

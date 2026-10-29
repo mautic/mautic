@@ -17,7 +17,7 @@ use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber
 {
     public function __construct(
         private DynamicContentModel $dynamicContentModel,
@@ -27,15 +27,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
-            DynamicContentEvents::ON_CAMPAIGN_BATCH_ACTION     => ['onCampaignTriggerAction', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addAction(
@@ -82,6 +74,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     /**
      * @throws InvalidArgumentException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION)]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         $eventConfig  = $event->getConfig();
@@ -109,6 +102,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $event->setAsApplicable();
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DynamicContentEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignTriggerAction(PendingEvent $event): void
     {
         $eventConfig = $event->getEvent()->getProperties();

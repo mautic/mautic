@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class LeadFieldSubscriber implements EventSubscriberInterface
+final readonly class LeadFieldSubscriber
 {
     public function __construct(
         private FieldModel $fieldModel,
@@ -20,16 +20,10 @@ final readonly class LeadFieldSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FieldPreDeleteEvent::class    => ['onFieldPreDelete', 0],
-        ];
-    }
-
     /**
      * Check if Custom field is used in any segment before delete operation.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FieldPreDeleteEvent::class)]
     public function onFieldPreDelete(LeadFieldEvent $event): void
     {
         $field    = $event->getField();

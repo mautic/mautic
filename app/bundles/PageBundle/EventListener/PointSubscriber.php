@@ -10,7 +10,7 @@ use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber
 {
     public function __construct(
         private PointModel $pointModel,
@@ -18,14 +18,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PointBuilderEvent::class => ['onPointBuild', 0],
-            Events\PageHitEvent::class     => ['onPageHit', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointBuilderEvent::class)]
     public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
@@ -53,6 +46,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for page hits.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\PageHitEvent::class)]
     public function onPageHit(Events\PageHitEvent $event): void
     {
         if ($event->getPage()) {

@@ -22,15 +22,9 @@ use Mautic\StageBundle\Entity\Stage;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class ApiSubscriber implements EventSubscriberInterface
+final class ApiSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ApiInitializeEvent::class=> ['onApiInitializeEvent', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ApiInitializeEvent::class)]
     public function onApiInitializeEvent(ApiInitializeEvent $event): void
     {
         if (!in_array($event->getEntityClass(), [

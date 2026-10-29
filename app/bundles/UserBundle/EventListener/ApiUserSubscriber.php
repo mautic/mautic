@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
-final readonly class ApiUserSubscriber implements EventSubscriberInterface
+final readonly class ApiUserSubscriber
 {
     public function __construct(
         private UserProviderInterface $userProvider,
@@ -27,6 +27,7 @@ final readonly class ApiUserSubscriber implements EventSubscriberInterface
      * Execute the authentication if authentication is oAuth and has no UserLoader set.
      * Sets permissions, and if user is not yet fetched - gets the user from TokenStorage, or creates one.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CheckPassportEvent::class, priority: 2048)]
     public function onCheckPassport(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();
@@ -73,6 +74,7 @@ final readonly class ApiUserSubscriber implements EventSubscriberInterface
      * Transfers User instance from \Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions::setActivePermissionsOnAuthToken
      * to the token, to be authorized later.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: AuthenticationTokenCreatedEvent::class)]
     public function onTokenCreated(AuthenticationTokenCreatedEvent $event): void
     {
         $passport = $event->getPassport();
@@ -92,16 +94,5 @@ final readonly class ApiUserSubscriber implements EventSubscriberInterface
         }
 
         $authenticatedToken->setUser($accessTokenBadge->getAccessToken()->getUser());
-    }
-
-    /**
-     * @return array<string, string|array{0: string, 1: int}|list<array{0: string, 1?: int}>>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CheckPassportEvent::class              => ['onCheckPassport', 2048],
-            AuthenticationTokenCreatedEvent::class => 'onTokenCreated',
-        ];
     }
 }

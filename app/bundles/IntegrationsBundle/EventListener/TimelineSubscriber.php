@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class TimelineSubscriber implements EventSubscriberInterface
+final readonly class TimelineSubscriber
 {
     public function __construct(
         private LeadEventLogRepository $eventLogRepository,
@@ -17,13 +17,7 @@ final readonly class TimelineSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $eventType     = 'integration_sync_issues';

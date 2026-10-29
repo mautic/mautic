@@ -30,7 +30,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class TypeOperatorSubscriber implements EventSubscriberInterface
+final class TypeOperatorSubscriber
 {
     use OperatorListTrait;
 
@@ -48,23 +48,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            TypeOperatorsEvent::class => ['onTypeOperatorsCollect', 0],
-            ListFieldChoicesEvent::class => ['onTypeListCollect', 0],
-            FormAdjustmentEvent::class => [
-                ['onSegmentFilterFormHandleTags', 1000],
-                ['onSegmentFilterFormHandleLookupId', 800],
-                ['onSegmentFilterFormHandleLookup', 600],
-                ['onSegmentFilterFormHandleGlobalCategory', 400],
-                ['onSegmentFilterFormHandleSelect', 200],
-                ['onSegmentFilterFormHandleDateSpan', 100],
-                ['onSegmentFilterFormHandleDefault', 0],
-            ],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: TypeOperatorsEvent::class)]
     public function onTypeOperatorsCollect(TypeOperatorsEvent $event): void
     {
         // Subscribe basic field types.
@@ -93,6 +77,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListFieldChoicesEvent::class)]
     public function onTypeListCollect(ListFieldChoicesEvent $event): void
     {
         $event->setChoicesForFieldType(
@@ -122,6 +107,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->setChoicesForFieldType('timezone', FormFieldHelper::getTimezonesChoices());
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormAdjustmentEvent::class, priority: 1000)]
     public function onSegmentFilterFormHandleTags(FormAdjustmentEvent $event): void
     {
         if ('tags' !== $event->getFieldAlias()) {
@@ -156,6 +142,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
     /**
      * For fields where users search by label but we need the ID. Example: owner.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormAdjustmentEvent::class, priority: 800)]
     public function onSegmentFilterFormHandleLookupId(FormAdjustmentEvent $event): void
     {
         if (!$event->fieldTypeIsOneOf('lookup_id') || !$event->operatorIsOneOf(OperatorOptions::EQUAL_TO, OperatorOptions::NOT_EQUAL_TO)) {
@@ -217,6 +204,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormAdjustmentEvent::class, priority: 600)]
     public function onSegmentFilterFormHandleLookup(FormAdjustmentEvent $event): void
     {
         if (!$event->fieldTypeIsOneOf('lookup')) {
@@ -246,6 +234,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormAdjustmentEvent::class, priority: 400)]
     public function onSegmentFilterFormHandleGlobalCategory(FormAdjustmentEvent $event): void
     {
         if (!$event->fieldTypeIsOneOf('globalcategory')) {
@@ -274,6 +263,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormAdjustmentEvent::class, priority: 200)]
     public function onSegmentFilterFormHandleSelect(FormAdjustmentEvent $event): void
     {
         $form       = $event->getForm();
@@ -318,6 +308,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormAdjustmentEvent::class, priority: 100)]
     public function onSegmentFilterFormHandleDateSpan(FormAdjustmentEvent $event): void
     {
         if (!$event->operatorIsOneOf(OperatorOptions::IN_LAST, OperatorOptions::IN_NEXT)
@@ -338,6 +329,7 @@ final class TypeOperatorSubscriber implements EventSubscriberInterface
         $event->stopPropagation();
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormAdjustmentEvent::class)]
     public function onSegmentFilterFormHandleDefault(FormAdjustmentEvent $event): void
     {
         $form        = $event->getForm();

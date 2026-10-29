@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+class CampaignSubscriber
 {
     public const string EVENT_ACTION_SEND_MOBILE_NOTIFICATION = 'notification.send_mobile_notification';
 
@@ -45,14 +45,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            NotificationEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignBatchAction', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
@@ -96,6 +89,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: NotificationEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignBatchAction(PendingEvent $event): void
     {
         if (!$event->checkContext(self::EVENT_ACTION_SEND_NOTIFICATION) && !$event->checkContext(self::EVENT_ACTION_SEND_MOBILE_NOTIFICATION)) {

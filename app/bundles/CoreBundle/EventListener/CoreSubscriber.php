@@ -21,7 +21,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 
-final readonly class CoreSubscriber implements EventSubscriberInterface
+final readonly class CoreSubscriber
 {
     public function __construct(
         private BundleHelper $bundleHelper,
@@ -35,19 +35,10 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MenuEvent::class                  => ['onBuildMenu', 9999],
-            RouteEvent::class                 => ['onBuildRoute', 0],
-            IconEvent::class                  => ['onFetchIcons', 9999],
-            SecurityEvents::INTERACTIVE_LOGIN => ['onSecurityInteractiveLogin', 0],
-        ];
-    }
-
     /**
      * Set vars on login.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SecurityEvents::INTERACTIVE_LOGIN)]
     public function onSecurityInteractiveLogin(InteractiveLoginEvent $event): void
     {
         if (defined('MAUTIC_INSTALLER')) {
@@ -92,6 +83,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MenuEvent::class, priority: 9999)]
     public function onBuildMenu(MenuEvent $event): void
     {
         $name    = $event->getType();
@@ -109,6 +101,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: RouteEvent::class)]
     public function onBuildRoute(RouteEvent $event): void
     {
         $type       = $event->getType();
@@ -205,6 +198,7 @@ final readonly class CoreSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: IconEvent::class, priority: 9999)]
     public function onFetchIcons(IconEvent $event): void
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();

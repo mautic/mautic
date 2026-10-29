@@ -12,7 +12,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-final readonly class BuildJsSubscriber implements EventSubscriberInterface
+final readonly class BuildJsSubscriber
 {
     public function __construct(
         private NotificationHelper $notificationHelper,
@@ -21,13 +21,7 @@ final readonly class BuildJsSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            BuildJsEvent::class => ['onBuildJs', 254],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: BuildJsEvent::class, priority: 254)]
     public function onBuildJs(BuildJsEvent $event): void
     {
         if (!$event->acceptsScope(BuildJsScope::TRACKING)) {

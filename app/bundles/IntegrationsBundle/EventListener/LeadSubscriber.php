@@ -27,7 +27,7 @@ use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber
 {
     public function __construct(
         private FieldChangeRepository $fieldChangeRepo,
@@ -38,21 +38,11 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadPostSaveEvent::class      => ['onLeadPostSave', 0],
-            LeadPostDeleteEvent::class    => ['onLeadPostDelete', 255],
-            CompanyPostSaveEvent::class   => ['onCompanyPostSave', 0],
-            CompanyPostDeleteEvent::class => ['onCompanyPostDelete', 255],
-            LeadChangeCompanyEvent::class => ['onLeadCompanyChange', 128],
-        ];
-    }
-
     /**
      * @throws IntegrationNotFoundException
      * @throws ObjectNotFoundException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostSaveEvent::class)]
     public function onLeadPostSave(Events\LeadEvent $event): void
     {
         $lead = $event->getLead();
@@ -100,6 +90,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostDeleteEvent::class, priority: 255)]
     public function onLeadPostDelete(Events\LeadEvent $event): void
     {
         if ($event->getLead()->isAnonymous()) {
@@ -114,6 +105,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
      * @throws IntegrationNotFoundException
      * @throws ObjectNotFoundException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CompanyPostSaveEvent::class)]
     public function onCompanyPostSave(Events\CompanyEvent $event): void
     {
         if (defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS')) {
@@ -141,12 +133,14 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         $this->recordFieldChanges($changes['fields'], $company->getId(), Company::class, $company);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CompanyPostDeleteEvent::class, priority: 255)]
     public function onCompanyPostDelete(Events\CompanyEvent $event): void
     {
         $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getCompany()->deletedId, Company::class);
         $this->objectMappingRepository->deleteEntitiesForObject((int) $event->getCompany()->deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadChangeCompanyEvent::class, priority: 128)]
     public function onLeadCompanyChange(Events\LeadChangeCompanyEvent $event): void
     {
         $lead = $event->getLead();

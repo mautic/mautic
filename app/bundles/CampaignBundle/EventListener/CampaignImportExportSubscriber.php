@@ -30,7 +30,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignImportExportSubscriber implements EventSubscriberInterface
+final readonly class CampaignImportExportSubscriber
 {
     use ImportExportTrait;
 
@@ -46,16 +46,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onCampaignExport', 0],
-            EntityImportEvent::class        => ['onCampaignImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityExportEvent::class)]
     public function onCampaignExport(EntityExportEvent $event): void
     {
         if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
@@ -83,6 +74,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         $event->addEntity('dependencies', $event->getDependencies());
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportEvent::class)]
     public function onCampaignImport(EntityImportEvent $event): void
     {
         if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
@@ -223,6 +215,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportAnalyzeEvent::class)]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(
@@ -780,6 +773,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         return [];
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportUndoEvent::class)]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Campaign::ENTITY_NAME !== $event->getEntityName()) {

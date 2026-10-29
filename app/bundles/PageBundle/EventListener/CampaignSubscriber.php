@@ -18,7 +18,7 @@ use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber
 {
     public function __construct(
         private LeadDeviceRepository $leadDeviceRepository,
@@ -27,22 +27,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            PageHitEvent::class                  => ['onPageHit', 0],
-            PageEvents::ON_CAMPAIGN_TRIGGER_DECISION => [
-                ['onCampaignTriggerDecision', 0],
-                ['onCampaignTriggerDecisionDeviceHit', 1],
-            ],
-            PageEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
-        ];
-    }
-
     /**
      * Add event triggers and actions.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add trigger
@@ -92,6 +80,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Trigger actions for page hits.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageHitEvent::class)]
     public function onPageHit(PageHitEvent $event): void
     {
         $hit       = $event->getHit();
@@ -107,6 +96,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $this->realTimeExecutioner->execute('page.devicehit', $hit, $channel, $channelId);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEvents::ON_CAMPAIGN_TRIGGER_DECISION, priority: 1)]
     public function onCampaignTriggerDecisionDeviceHit(DecisionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();
@@ -154,6 +144,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEvents::ON_CAMPAIGN_TRIGGER_DECISION)]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();
@@ -222,6 +213,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignTriggerAction(PendingEvent $event): void
     {
         $config = $event->getEvent()->getProperties();

@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Twig\Environment;
 
-final readonly class CampaignInjectCustomContentSubscriber implements EventSubscriberInterface
+final readonly class CampaignInjectCustomContentSubscriber
 {
     public function __construct(
         private AuditLogModel $auditLogModel,
@@ -18,16 +18,7 @@ final readonly class CampaignInjectCustomContentSubscriber implements EventSubsc
     ) {
     }
 
-    /**
-     * @return array<string, string|array{0: string, 1: int}|list<array{0: string, 1?: int}>>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomContentEvent::class => ['injectViewCustomContent', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomContentEvent::class)]
     public function injectViewCustomContent(CustomContentEvent $customContentEvent): void
     {
         $parameters = $customContentEvent->getVars();

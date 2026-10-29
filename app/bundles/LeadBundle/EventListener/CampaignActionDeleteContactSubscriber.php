@@ -9,7 +9,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignActionDeleteContactSubscriber implements EventSubscriberInterface
+final readonly class CampaignActionDeleteContactSubscriber
 {
     public function __construct(
         private LeadModel $leadModel,
@@ -17,14 +17,7 @@ final readonly class CampaignActionDeleteContactSubscriber implements EventSubsc
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['configureAction', 0],
-            LeadEvents::ON_CAMPAIGN_ACTION_DELETE_CONTACT => ['deleteContacts', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
     public function configureAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
@@ -44,6 +37,7 @@ final readonly class CampaignActionDeleteContactSubscriber implements EventSubsc
         );
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::ON_CAMPAIGN_ACTION_DELETE_CONTACT)]
     public function deleteContacts(PendingEvent $event): void
     {
         $contactIds = $event->getContactIds();

@@ -7,7 +7,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class SegmentLogReportSubscriber implements EventSubscriberInterface
+final readonly class SegmentLogReportSubscriber
 {
     public const string SEGMENT_LOG = 'segment.log';
 
@@ -16,17 +16,10 @@ final readonly class SegmentLogReportSubscriber implements EventSubscriberInterf
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportBuilderEvent::class)]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::SEGMENT_LOG])) {
@@ -67,6 +60,7 @@ final readonly class SegmentLogReportSubscriber implements EventSubscriberInterf
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGeneratorEvent::class)]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::SEGMENT_LOG])) {

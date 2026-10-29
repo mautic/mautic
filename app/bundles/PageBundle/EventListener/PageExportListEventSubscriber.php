@@ -16,20 +16,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * listener scans the exported page content for such media images and adds the local files
  * to the export asset list so they are packed alongside the entity data.
  */
-final readonly class PageExportListEventSubscriber implements EventSubscriberInterface
+final readonly class PageExportListEventSubscriber
 {
     public function __construct(
         private EmailMediaImageHelper $mediaImageHelper,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            AssetExportListEvent::class => ['onExportList', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: AssetExportListEvent::class)]
     public function onExportList(AssetExportListEvent $event): void
     {
         foreach ($event->getEntityData() as $section) {

@@ -9,20 +9,14 @@ use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class GeneratedColumnSubscriber implements EventSubscriberInterface
+final readonly class GeneratedColumnSubscriber
 {
     public function __construct(
         private VersionProviderInterface $versionProvider,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            GeneratedColumnsEvent::class => ['onGeneratedColumnsBuild', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: GeneratedColumnsEvent::class)]
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
         if (!$this->versionProvider->isMySql()) {

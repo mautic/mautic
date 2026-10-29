@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber
 {
     private MailHelper $mailer;
 
@@ -37,22 +37,10 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $this->mailer = $mailer->getMailer();
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],
-            FormEvents::FORM_POST_DELETE         => ['onFormDelete', 0],
-            Events\FormBuilderEvent::class       => ['onFormBuilder', 0],
-            FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
-                ['onFormSubmitActionSendEmail', 0],
-                ['onFormSubmitActionRepost', 0],
-            ],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::FORM_POST_SAVE)]
     public function onFormPostSave(Events\FormEvent $event): void
     {
         $form = $event->getForm();
@@ -75,6 +63,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::FORM_POST_DELETE)]
     public function onFormDelete(Events\FormEvent $event): void
     {
         $form = $event->getForm();
@@ -92,6 +81,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a simple email form.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\FormBuilderEvent::class)]
     public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addSubmitAction('form.email', [
@@ -122,6 +112,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         ]);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
     public function onFormSubmitActionSendEmail(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.email')) {
@@ -188,6 +179,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
     public function onFormSubmitActionRepost(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.repost')) {

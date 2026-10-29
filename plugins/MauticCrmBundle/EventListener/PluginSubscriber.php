@@ -10,7 +10,7 @@ use Mautic\PluginBundle\Bundle\PluginDatabase;
 use Mautic\PluginBundle\Event\PluginInstallEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class PluginSubscriber implements EventSubscriberInterface
+final readonly class PluginSubscriber
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
@@ -18,6 +18,7 @@ final readonly class PluginSubscriber implements EventSubscriberInterface
     ) {
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PluginInstallEvent::class, priority: 100)]
     public function onInstall(PluginInstallEvent $event): void
     {
         $eventMetadata = $event->getMetadata();
@@ -41,16 +42,6 @@ final readonly class PluginSubscriber implements EventSubscriberInterface
                 $event->getInstalledSchema()
             );
         }
-    }
-
-    /**
-     * @return array<string, string|array{0: string, 1: int}|list<array{0: string, 1?: int}>>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PluginInstallEvent::class => ['onInstall', 100],
-        ];
     }
 
     /**

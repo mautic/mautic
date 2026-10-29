@@ -15,7 +15,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-final readonly class RequestSubscriber implements EventSubscriberInterface
+final readonly class RequestSubscriber
 {
     public function __construct(
         private CsrfTokenManagerInterface $tokenManager,
@@ -24,13 +24,7 @@ final readonly class RequestSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::REQUEST => ['validateCsrfTokenForAjaxPost', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::REQUEST)]
     public function validateCsrfTokenForAjaxPost(RequestEvent $event): void
     {
         $request = $event->getRequest();

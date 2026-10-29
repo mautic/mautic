@@ -14,7 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 /**
  * Appends contact segment IDs to tracking URLs for third-party integrations like VWO.
  */
-final readonly class SegmentTrackingSubscriber implements EventSubscriberInterface
+final readonly class SegmentTrackingSubscriber
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
@@ -22,16 +22,10 @@ final readonly class SegmentTrackingSubscriber implements EventSubscriberInterfa
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            UrlTokenReplaceEvent::class => ['onUrlTokenReplace', -100],
-        ];
-    }
-
     /**
      * Append segment IDs to the final redirect URL.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: UrlTokenReplaceEvent::class, priority: -100)]
     public function onUrlTokenReplace(UrlTokenReplaceEvent $event): void
     {
         $lead = $event->getLead();

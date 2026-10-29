@@ -8,7 +8,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class ReportSubscriber implements EventSubscriberInterface
+final class ReportSubscriber
 {
     public const string CONTEXT_FOCUS_STATS = 'focus_stats';
 
@@ -28,17 +28,10 @@ final class ReportSubscriber implements EventSubscriberInterface
 
     public const string PREFIX_LEADS        = 'l';
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportBuilderEvent::class)]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_FOCUS_LEADS, self::CONTEXT_FOCUS_STATS])) {
@@ -308,6 +301,7 @@ final class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGeneratorEvent::class)]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_FOCUS_STATS, self::CONTEXT_FOCUS_LEADS])) {

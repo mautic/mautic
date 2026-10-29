@@ -23,7 +23,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class EmailSubscriber implements EventSubscriberInterface
+final readonly class EmailSubscriber
 {
     public const string PREHEADER_HTML_ELEMENT_BEFORE  = '<div class="preheader" style="font-size:1px;line-height:1px;display:none;color:#fff;max-height:0;max-width:0;opacity:0;overflow:hidden">';
 
@@ -46,21 +46,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailPreSaveEvent::class    => ['cloneParentEmailDataForVariant', 0],
-            EmailPostSaveEvent::class   => ['onEmailPostSave', 0],
-            EmailSendEvent::class       => ['onEmailSendAddPreheaderText', 200],
-            EmailDisplayEvent::class    => ['onEmailSendAddPreheaderText', 200],
-            EmailPostDeleteEvent::class => ['onEmailDelete', 0],
-            EmailEvents::EMAIL_FAILED   => ['onEmailFailed', 0],
-            EmailEvents::EMAIL_RESEND   => ['onEmailResend', 0],
-            EmailEditSubmitEvent::class => ['manageEmailDraft'],
-            EmailPreDeleteEvent::class  => ['deleteEmailDraft'],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPreSaveEvent::class)]
     public function cloneParentEmailDataForVariant(EmailEvent $event): void
     {
         $email = $event->getEmail();
@@ -72,6 +58,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPostSaveEvent::class)]
     public function onEmailPostSave(EmailEvent $event): void
     {
         $email = $event->getEmail();
@@ -91,6 +78,8 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     /**
      * Add preheader text to email body.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class, priority: 200)]
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class, priority: 200)]
     public function onEmailSendAddPreheaderText(EmailSendEvent $event): void
     {
         $email = $event->getEmail();
@@ -111,6 +100,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPostDeleteEvent::class)]
     public function onEmailDelete(EmailEvent $event): void
     {
         $email = $event->getEmail();
@@ -128,6 +118,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     /**
      * Process if an email has failed.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEvents::EMAIL_FAILED)]
     public function onEmailFailed(Events\QueueEmailEvent $event): void
     {
         $message    = $event->getMessage();
@@ -148,6 +139,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     /**
      * Process if an email is resent.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEvents::EMAIL_RESEND)]
     public function onEmailResend(Events\QueueEmailEvent $event): void
     {
         $message = $event->getMessage();
@@ -178,6 +170,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         $this->emailModel->saveEmailStat($stat);
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEditSubmitEvent::class)]
     public function manageEmailDraft(EmailEditSubmitEvent $event): void
     {
         $liveEmail   = $event->getPreviousEmail();
@@ -222,6 +215,7 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         $this->entityManager->flush();
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPreDeleteEvent::class)]
     public function deleteEmailDraft(EmailEvent $event): void
     {
         try {

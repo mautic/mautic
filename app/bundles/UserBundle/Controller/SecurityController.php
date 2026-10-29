@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class SecurityController extends CommonController implements EventSubscriberInterface
+final class SecurityController extends CommonController
 {
     private AuthorizationCheckerInterface $authorizationChecker;
 
@@ -36,6 +36,7 @@ final class SecurityController extends CommonController implements EventSubscrib
         $this->authorizationChecker = $authorizationChecker;
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::REQUEST)]
     public function onRequest(RequestEvent $event): void
     {
         $controller = $event->getRequest()->attributes->get('_controller');
@@ -154,15 +155,5 @@ final class SecurityController extends CommonController implements EventSubscrib
                 'sessionExpired' => true,
             ],
         ]);
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::REQUEST => 'onRequest',
-        ];
     }
 }

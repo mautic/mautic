@@ -23,7 +23,7 @@ use Mautic\FormBundle\Model\ActionModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class ActionImportExportSubscriber implements EventSubscriberInterface
+final readonly class ActionImportExportSubscriber
 {
     use ImportExportTrait;
 
@@ -39,16 +39,7 @@ final readonly class ActionImportExportSubscriber implements EventSubscriberInte
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onExport', 0],
-            EntityImportEvent::class        => ['onImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityExportEvent::class)]
     public function onExport(EntityExportEvent $event): void
     {
         if (Action::ENTITY_NAME !== $event->getEntityName()) {
@@ -97,6 +88,7 @@ final readonly class ActionImportExportSubscriber implements EventSubscriberInte
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportEvent::class)]
     public function onImport(EntityImportEvent $event): void
     {
         if (Action::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -151,6 +143,7 @@ final readonly class ActionImportExportSubscriber implements EventSubscriberInte
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportUndoEvent::class)]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Action::ENTITY_NAME !== $event->getEntityName()) {
@@ -174,6 +167,7 @@ final readonly class ActionImportExportSubscriber implements EventSubscriberInte
         $this->entityManager->flush();
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportAnalyzeEvent::class)]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         if (Action::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {

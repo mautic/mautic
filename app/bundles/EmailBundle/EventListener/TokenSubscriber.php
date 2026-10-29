@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class TokenSubscriber implements EventSubscriberInterface
+final readonly class TokenSubscriber
 {
     use MatchFilterForLeadTrait;
 
@@ -23,15 +23,8 @@ final readonly class TokenSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailSendEvent::class          => ['decodeTokens', 254],
-            EmailDisplayEvent::class       => ['decodeTokens', 254],
-            TokenReplacementEvent::class   => ['onTokenReplacement', -254],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class, priority: 254)]
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class, priority: 254)]
     public function decodeTokens(EmailSendEvent $event): void
     {
         if ($event->isDynamicContentParsing()) {
@@ -70,6 +63,7 @@ final readonly class TokenSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: TokenReplacementEvent::class, priority: -254)]
     public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         $clickthrough = $event->getClickthrough();

@@ -9,18 +9,9 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\AbTest\EmailStatus;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class EmailDetailsRightColumnSubscriber implements EventSubscriberInterface
+final class EmailDetailsRightColumnSubscriber
 {
-    /**
-     * @return mixed[]
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomContentEvent::class => ['injectContent', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomContentEvent::class)]
     public function injectContent(CustomContentEvent $event): void
     {
         if ($event->checkContext('@MauticEmail/Email/details.html.twig', 'right.section.start')) {

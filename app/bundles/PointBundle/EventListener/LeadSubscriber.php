@@ -15,7 +15,7 @@ use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber
 {
     public function __construct(
         private TriggerModel $triggerModel,
@@ -26,19 +26,10 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PointsChangeEvent::class   => ['onLeadPointsChange', 0],
-            LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
-            LeadPostSaveEvent::class       => ['onLeadSave', -1],
-        ];
-    }
-
     /**
      * Trigger applicable events for the lead.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointsChangeEvent::class)]
     public function onLeadPointsChange(PointsChangeEvent $event): void
     {
         $this->triggerModel->triggerEvents($event->getLead());
@@ -47,6 +38,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     /**
      * Handle point triggers for new leads (including 0 point triggers).
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostSaveEvent::class, priority: -1)]
     public function onLeadSave(LeadEvent $event): void
     {
         if ($event->isNew()) {
@@ -57,6 +49,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -100,6 +93,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostMergeEvent::class)]
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->leadPointLogRepository->updateLead(

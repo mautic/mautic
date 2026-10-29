@@ -19,7 +19,7 @@ use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
+final readonly class CampaignActionJumpToEventSubscriber
 {
     public const string EVENT_NAME = 'campaign.jump_to_event';
 
@@ -32,18 +32,10 @@ final readonly class CampaignActionJumpToEventSubscriber implements EventSubscri
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignPostSaveEvent::class           => ['processCampaignEventsAfterSave', 1],
-            CampaignBuilderEvent::class            => ['onCampaignBuild', 0],
-            CampaignEvents::ON_EVENT_JUMP_TO_EVENT => ['onJumpToEvent', 0],
-        ];
-    }
-
     /**
      * Add event triggers and actions.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add action to jump to another event in the campaign flow.
@@ -71,6 +63,7 @@ final readonly class CampaignActionJumpToEventSubscriber implements EventSubscri
      * @throws CannotProcessEventException
      * @throws NotSchedulableException
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignEvents::ON_EVENT_JUMP_TO_EVENT)]
     public function onJumpToEvent(PendingEvent $campaignEvent): void
     {
         $event      = $campaignEvent->getEvent();
@@ -116,6 +109,7 @@ final readonly class CampaignActionJumpToEventSubscriber implements EventSubscri
      * to ensure that it has the actual ID and not the temp_id as the
      * target for the jump.
      */
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignPostSaveEvent::class, priority: 1)]
     public function processCampaignEventsAfterSave(CampaignPostSaveEvent $campaignEvent): void
     {
         $campaign = $campaignEvent->getCampaign();
