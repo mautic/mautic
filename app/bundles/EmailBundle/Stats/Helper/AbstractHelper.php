@@ -47,10 +47,8 @@ abstract class AbstractHelper implements StatHelperInterface
         return array_values($stats->getStats());
     }
 
-    /**
-     * @return ChartQuery
-     */
-    protected function getQuery(\DateTime $fromDateTime, \DateTime $toDateTime)
+    
+    protected function getQuery(\DateTime $fromDateTime, \DateTime $toDateTime): ChartQuery
     {
         $unit = $this->getTimeUnitFromDateRange($fromDateTime, $toDateTime);
 
