@@ -3,7 +3,6 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -601,7 +600,7 @@ class LeadRepository extends CommonRepository
     /**
      * @return array{}|array<int, array<string, string|null>>
      *
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
     {
