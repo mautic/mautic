@@ -54,6 +54,8 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      */
     protected $maxAssetSize;
 
+    private readonly AggregateAnalyticsHelper $aggregateAnalyticsHelper;
+
     public function __construct(
         protected LeadModel $leadModel,
         protected CategoryModel $categoryModel,
@@ -75,8 +77,11 @@ class AssetModel extends FormModel implements GlobalSearchInterface
         private readonly AssetRepository $assetRepository,
         private readonly DownloadRepository $downloadRepository,
         private readonly CategoryRepository $categoryRepository,
+        // Optional, so existing constructor calls keep working. The container always passes it.
+        ?AggregateAnalyticsHelper $aggregateAnalyticsHelper = null, // @phpstan-ignore mautic.noNullableServiceInConstructor
     ) {
-        $this->maxAssetSize           = $coreParametersHelper->get('max_size');
+        $this->maxAssetSize             = $coreParametersHelper->get('max_size');
+        $this->aggregateAnalyticsHelper = $aggregateAnalyticsHelper ?? new AggregateAnalyticsHelper($coreParametersHelper);
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
@@ -307,7 +312,7 @@ class AssetModel extends FormModel implements GlobalSearchInterface
      */
     public function upDownloadCount($asset, $increaseBy = 1, $unique = false): void
     {
-        if (!(new AggregateAnalyticsHelper($this->coreParametersHelper))->isEnabled()) {
+        if (!$this->aggregateAnalyticsHelper->isEnabled()) {
             return;
         }
 
