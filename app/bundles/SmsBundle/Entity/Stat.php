@@ -298,10 +298,7 @@ class Stat
         return $this->details;
     }
 
-    /**
-     * @param array $details
-     */
-    public function setDetails($details): static
+    public function setDetails(array $details): static
     {
         $this->details = $details;
 

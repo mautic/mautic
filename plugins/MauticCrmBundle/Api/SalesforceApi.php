@@ -44,7 +44,6 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array  $elementData
      * @param string $method
      * @param bool   $isRetry
      *
@@ -52,7 +51,7 @@ final class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function request($operation, $elementData = [], $method = 'GET', $isRetry = false, $object = null, $queryUrl = null)
+    public function request($operation, array $elementData = [], $method = 'GET', $isRetry = false, $object = null, $queryUrl = null)
     {
         if (!$object) {
             $object = $this->object;

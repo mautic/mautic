@@ -65,14 +65,11 @@ final class MailchimpApi extends EmailMarketingApi
     }
 
     /**
-     * @param array $fields
-     * @param array $config
-     *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function subscribeLead($email, $listId, $fields = [], $config = [])
+    public function subscribeLead($email, $listId, array $fields = [], array $config = [])
     {
         $emailStruct        = new \stdClass();
         $emailStruct->email = $email;
@@ -80,7 +77,7 @@ final class MailchimpApi extends EmailMarketingApi
         $parameters = array_merge($config, [
             'id' => $listId,
         ]);
-        if (!empty($fields)) {
+        if ($fields !== []) {
             $parameters = array_merge($parameters, ['merge_fields' => $fields]);
         }
         $parameters['email_address'] = $email;

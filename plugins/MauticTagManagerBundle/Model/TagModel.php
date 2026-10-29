@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticTagManagerBundle\Model;
 
 use Mautic\CoreBundle\Model\GlobalSearchInterface;

@@ -39,9 +39,9 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     private $supportedFeatures = [];
 
     /**
-     * @var array
+     * @var array<array-key, mixed>
      */
-    private $apiKeys = [];
+    private array $apiKeys = [];
 
     /**
      * @var array
@@ -166,15 +166,15 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getApiKeys()
+    public function getApiKeys(): array
     {
         return $this->apiKeys;
     }
 
     /**
-     * @param mixed $apiKeys
+     * @param array<array-key, mixed> $apiKeys
      */
-    public function setApiKeys($apiKeys): static
+    public function setApiKeys(array $apiKeys): static
     {
         $this->apiKeys = $apiKeys;
 

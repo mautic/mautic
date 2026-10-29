@@ -131,11 +131,10 @@ final class DynamicsApi extends CrmApi
     /**
      * Batch create leads.
      *
-     * @param array  $data
      * @param string $object
      * @param bool   $isUpdate
      */
-    public function createLeads($data, $object = 'contacts', $isUpdate = false): array
+    public function createLeads(array $data, $object = 'contacts', $isUpdate = false): array
     {
         if (0 === count($data)) {
             return [];
@@ -191,10 +190,7 @@ final class DynamicsApi extends CrmApi
         return $this->parseRawHttpResponse($response);
     }
 
-    /**
-     * @param array $data
-     */
-    public function updateLeads($data, $object = 'contacts'): array
+    public function updateLeads(array $data, $object = 'contacts'): array
     {
         return $this->createLeads($data, $object, true);
     }
