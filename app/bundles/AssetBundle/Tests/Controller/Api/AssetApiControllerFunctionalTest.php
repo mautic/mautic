@@ -161,6 +161,32 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         unlink($assetsPath.'/tracking.txt');
     }
 
+    public function testPutWithoutTrackDownloadsKeepsTheAssetsOption(): void
+    {
+        $assetsPath = $this->client->getKernel()->getContainer()->getParameter('mautic.upload_dir');
+        file_put_contents($assetsPath.'/put.txt', 'test');
+
+        $this->client->request('POST', 'api/assets/new', [
+            'file'            => 'put.txt',
+            'storageLocation' => 'local',
+            'title'           => 'put',
+            'trackDownloads'  => 0,
+        ]);
+        $this->assertResponseStatusCodeSame(201, (string) $this->client->getResponse()->getContent());
+        $asset = json_decode((string) $this->client->getResponse()->getContent(), true)['asset'];
+
+        $this->client->request('PUT', sprintf('/api/assets/%d/edit', $asset['id']), [
+            'file'            => 'put.txt',
+            'storageLocation' => 'local',
+            'title'           => 'put again',
+            'language'        => 'en',
+        ]);
+        $this->assertResponseIsSuccessful((string) $this->client->getResponse()->getContent());
+        $this->assertFalse(json_decode((string) $this->client->getResponse()->getContent(), true)['asset']['trackDownloads']);
+
+        unlink($assetsPath.'/put.txt');
+    }
+
     public function testNewAssetFollowsTheGlobalDownloadTrackingSetting(): void
     {
         $assetsPath = $this->client->getKernel()->getContainer()->getParameter('mautic.upload_dir');
