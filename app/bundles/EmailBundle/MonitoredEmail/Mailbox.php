@@ -361,11 +361,9 @@ final class Mailbox
     }
 
     /**
-     * @return Connection
-     *
      * @throws MailboxException
      */
-    private function initImapStream()
+    private function initImapStream(): Connection
     {
         imap_timeout(IMAP_OPENTIMEOUT, 15);
         imap_timeout(IMAP_CLOSETIMEOUT, 15);

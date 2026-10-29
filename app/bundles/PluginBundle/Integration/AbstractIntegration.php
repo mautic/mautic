@@ -41,7 +41,6 @@ use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -169,10 +168,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $this->cache;
     }
 
-    /**
-     * @return TranslatorInterface
-     */
-    public function getTranslator()
+    public function getTranslator(): TranslatorInterface
     {
         return $this->translator;
     }
@@ -1974,10 +1970,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $this->lastIntegrationError;
     }
 
-    /**
-     * @return $this
-     */
-    public function resetLastIntegrationError()
+    public function resetLastIntegrationError(): static
     {
         $this->lastIntegrationError = null;
 
@@ -2155,10 +2148,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return Cleaner::clean($value, $fieldType);
     }
 
-    /**
-     * @return Logger|LoggerInterface
-     */
-    public function getLogger()
+    public function getLogger(): LoggerInterface
     {
         return $this->logger;
     }

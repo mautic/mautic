@@ -35,11 +35,9 @@ final class ConfigIntegrationsHelper
     }
 
     /**
-     * @return ConfigFormInterface
-     *
      * @throws IntegrationNotFoundException
      */
-    public function getIntegration(string $integration)
+    public function getIntegration(string $integration): ConfigFormInterface
     {
         if (!isset($this->integrations[$integration])) {
             throw new IntegrationNotFoundException("{$integration} either doesn't exist or has not been tagged with mautic.config_integration");

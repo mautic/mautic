@@ -255,12 +255,10 @@ final readonly class ContactSegmentService
     /**
      * @param int|null $limit
      *
-     * @return QueryBuilder
-     *
      * @throws Exception\SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [], $limit = null)
+    public function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [], $limit = null): QueryBuilder
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters);
 

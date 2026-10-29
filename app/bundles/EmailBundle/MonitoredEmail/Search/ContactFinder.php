@@ -19,10 +19,8 @@ class ContactFinder
 
     /**
      * @param string $returnPathEmail
-     *
-     * @return Result
      */
-    public function find($contactEmail, $returnPathEmail = null)
+    public function find($contactEmail, $returnPathEmail = null): Result
     {
         $this->logger->debug("MONITORED EMAIL: Searching for a contact {$contactEmail}/{$returnPathEmail}");
 

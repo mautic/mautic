@@ -902,10 +902,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         return array_unique($dependents);
     }
 
-    /**
-     * @return Connection
-     */
-    private function getConnection()
+    private function getConnection(): Connection
     {
         $connection = $this->em->getConnection();
         if ($connection instanceof PrimaryReadReplicaConnection) {

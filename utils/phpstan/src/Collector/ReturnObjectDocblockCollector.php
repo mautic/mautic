@@ -72,9 +72,12 @@ final readonly class ReturnObjectDocblockCollector implements Collector
         // the declared return type, which with no native type is the "@return" docblock type
         $docType = $node->getMethodReflection()->getVariants()[0]->getReturnType();
 
-        // "static" and "$this" (ThisType extends StaticType) map to a native "static" return
-        if ($docType instanceof StaticType) {
-            $nativeType = $docType;
+        $nativeType = $docType;
+
+        // "static" and "$this" map to a native "static" return; in a final class "static" resolves to a plain
+        // object type, so the raw tag is read to tell it apart from "self"
+        $rawReturnTag = $this->rawReturnTag($node);
+        if ($docType instanceof StaticType || 'static' === $rawReturnTag || '$this' === $rawReturnTag) {
             $typeString = 'static';
         } else {
             if (!$docType->isObject()->yes()) {
@@ -109,7 +112,6 @@ final readonly class ReturnObjectDocblockCollector implements Collector
                 }
             }
 
-            $nativeType = $docType;
             // "@return self" resolves to the declaring class, so render it back as "self"
             $typeString = $objectClassNames[0] === $classReflection->getName() ? 'self' : $objectClassNames[0];
         }
@@ -124,6 +126,24 @@ final readonly class ReturnObjectDocblockCollector implements Collector
         ];
 
         return $entry;
+    }
+
+    private function rawReturnTag(MethodReturnStatementsNode $node): ?string
+    {
+        $docComment = $node->getClassReflection()
+            ->getNativeReflection()
+            ->getMethod($node->getMethodName())
+            ->getDocComment();
+
+        if (false === $docComment) {
+            return null;
+        }
+
+        if (1 === preg_match('/@return\s+(\S+)/', $docComment, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
     }
 
     private function isDateTimeType(string $className): bool

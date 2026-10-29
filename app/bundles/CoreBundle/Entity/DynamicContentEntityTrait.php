@@ -48,10 +48,7 @@ trait DynamicContentEntityTrait
         return (empty($this->dynamicContent)) ? $this->getDefaultDynamicContent() : $this->dynamicContent;
     }
 
-    /**
-     * @return $this
-     */
-    public function setDynamicContent($dynamicContent)
+    public function setDynamicContent($dynamicContent): static
     {
         if (empty($dynamicContent)) {
             $dynamicContent = $this->getDefaultDynamicContent();

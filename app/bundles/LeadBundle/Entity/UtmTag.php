@@ -143,10 +143,7 @@ class UtmTag
         return $this->dateAdded;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->lead;
     }

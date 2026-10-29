@@ -48,11 +48,9 @@ class SyncIntegrationsHelper
     }
 
     /**
-     * @return SyncInterface
-     *
      * @throws IntegrationNotFoundException
      */
-    public function getIntegration(string $integration)
+    public function getIntegration(string $integration): SyncInterface
     {
         if (!isset($this->integrations[$integration])) {
             throw new IntegrationNotFoundException("{$integration} either doesn't exist or has not been tagged with mautic.sync_integration");

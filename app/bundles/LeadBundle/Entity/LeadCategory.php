@@ -132,10 +132,7 @@ class LeadCategory
         $this->lead = $lead;
     }
 
-    /**
-     * @return Category
-     */
-    public function getCategory()
+    public function getCategory(): Category
     {
         return $this->category;
     }
