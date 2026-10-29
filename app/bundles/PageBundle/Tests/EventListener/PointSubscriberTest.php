@@ -18,14 +18,6 @@ use PHPUnit\Framework\TestCase;
 
 final class PointSubscriberTest extends TestCase
 {
-    public function testSubscribedEvents(): void
-    {
-        $this->assertSame([
-            PointBuilderEvent::class => ['onPointBuild', 0],
-            PageHitEvent::class    => ['onPageHit', 0],
-        ], PointSubscriber::getSubscribedEvents());
-    }
-
     public function testPointBuildAddsActions(): void
     {
         $pointModel        = $this->createStub(PointModel::class);

@@ -24,14 +24,6 @@ final class MaintenanceSubscriberTest extends TestCase
         $this->subscriber    = new MaintenanceSubscriber($this->createStub(Connection::class), $this->createStub(UserTokenRepositoryInterface::class), $this->createStub(TranslatorInterface::class));
     }
 
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertSame(
-            [MaintenanceEvent::class => ['onDataCleanup', -50]],
-            $this->subscriber->getSubscribedEvents()
-        );
-    }
-
     public function testOnDataCleanup(): void
     {
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');

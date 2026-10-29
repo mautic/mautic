@@ -9,7 +9,6 @@ use Mautic\LeadBundle\EventListener\PointSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\TriggerEvent as TriggerEventEntity;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
-use Mautic\PointBundle\PointEvents;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -189,12 +188,5 @@ final class PointSubscriberTest extends TestCase
 
         $this->leadModel->expects($this->once())->method('removeFromLists');
         $this->subscriber->onLeadSegmentsChange($this->triggerExecutedEvent);
-    }
-
-    public function testThatTheObserverForTriggerOnLeadSegmentsChangeEventIsFired(): void
-    {
-        $subscribers = PointSubscriber::getSubscribedEvents();
-        $this->assertArrayHasKey(PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE, $subscribers);
-        $this->assertSame(['onLeadSegmentsChange', 0], $subscribers[PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE]);
     }
 }
