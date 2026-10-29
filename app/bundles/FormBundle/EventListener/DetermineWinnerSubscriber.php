@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\FormEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class DetermineWinnerSubscriber
@@ -15,10 +16,11 @@ final readonly class DetermineWinnerSubscriber
         private TranslatorInterface $translator,
     ) {
     }
+
     /**
      * Determines the winner of A/B test based on number of form submissions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FormEvents::ON_DETERMINE_SUBMISSION_RATE_WINNER,
         priority: 0
     )]

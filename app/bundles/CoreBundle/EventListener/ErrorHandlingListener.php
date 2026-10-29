@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 final readonly class ErrorHandlingListener
@@ -17,7 +18,8 @@ final readonly class ErrorHandlingListener
             ->setMainLogger($mainLogger)
             ->setDebugLogger($debugLogger);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: KernelEvents::REQUEST,
         priority: 2047
     )]

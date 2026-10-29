@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Segment;
 
+use DateTime;
+use Exception;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
@@ -62,7 +64,7 @@ final readonly class ContactSegmentService
     /**
      * @param array|null $batchLimiters for debug purpose only
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getTotalLeadListLeadsCount(LeadList $segment, ?array $batchLimiters = null): array
     {
@@ -220,7 +222,7 @@ final readonly class ContactSegmentService
      * @param array<string, mixed> $batchLimiters
      *
      * @throws Exception\SegmentQueryException
-     * @throws \Exception
+     * @throws Exception
      */
     private function getNewSegmentContactsQuery(LeadList $segment, array $batchLimiters = [], bool $addNewContactsRestrictions = true): QueryBuilder
     {
@@ -240,7 +242,7 @@ final readonly class ContactSegmentService
 
     /**
      * @throws Exception\SegmentQueryException
-     * @throws \Exception
+     * @throws Exception
      */
     private function getTotalSegmentContactsQuery(LeadList $segment): QueryBuilder
     {
@@ -298,13 +300,13 @@ final readonly class ContactSegmentService
      */
     private function formatPeriod(float $inputSeconds): string
     {
-        $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
+        $now = DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
 
         return $now->format('H:i:s.u');
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     private function timedFetch(QueryBuilder $qb, ?int $segmentId): array|false
     {
@@ -316,7 +318,7 @@ final readonly class ContactSegmentService
             $end = microtime(true) - $start;
 
             $this->logger->debug('Segment QB: Query took: '.$this->formatPeriod($end).', Result count: '.count($result), ['segmentId' => $segmentId]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error(
                 'Segment QB: Query Exception: '.$e->getMessage(),
                 [
@@ -333,7 +335,7 @@ final readonly class ContactSegmentService
     /**
      * @return mixed
      *
-     * @throws \Exception
+     * @throws Exception
      */
     private function timedFetchAll(QueryBuilder $qb, ?int $segmentId)
     {
@@ -347,7 +349,7 @@ final readonly class ContactSegmentService
                 'Segment QB: Query took: '.$this->formatPeriod($end).'ms. Result count: '.count($result),
                 ['segmentId' => $segmentId]
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error(
                 'Segment QB: Query Exception: '.$e->getMessage(),
                 [

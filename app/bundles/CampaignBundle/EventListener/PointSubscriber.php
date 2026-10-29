@@ -7,10 +7,11 @@ namespace Mautic\CampaignBundle\EventListener;
 use Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType;
 use Mautic\CampaignBundle\Helper\CampaignEventHelper;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class PointSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: TriggerBuilderEvent::class,
         priority: 0
     )]

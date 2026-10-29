@@ -16,10 +16,12 @@ use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupRepository;
 use Mautic\PointBundle\Model\PointGroupModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class GroupImportExportSubscriber
 {
     use ImportExportTrait;
+
     public function __construct(
         private PointGroupModel $pointGroupModel,
         private EntityManagerInterface $entityManager,
@@ -29,7 +31,8 @@ final readonly class GroupImportExportSubscriber
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityExportEvent::class,
         priority: 0
     )]
@@ -41,7 +44,7 @@ final readonly class GroupImportExportSubscriber
 
         $pointGroupId = $event->getEntityId();
         $pointGroup   = $this->pointGroupModel->getEntity($pointGroupId);
-        if (!$pointGroup) {
+        if (!$pointGroup instanceof Group) {
             return;
         }
 
@@ -56,7 +59,8 @@ final readonly class GroupImportExportSubscriber
         $event->addEntity(Group::ENTITY_NAME, $pointGroupData);
         $this->logAction('export', $pointGroup->getId(), $pointGroupData);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportEvent::class,
         priority: 0
     )]
@@ -100,7 +104,8 @@ final readonly class GroupImportExportSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportUndoEvent::class,
         priority: 0
     )]
@@ -118,7 +123,7 @@ final readonly class GroupImportExportSubscriber
         foreach ($summary['ids'] as $id) {
             $entity = $this->groupRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof Group) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Group::class]);
             }
@@ -126,7 +131,8 @@ final readonly class GroupImportExportSubscriber
 
         $this->entityManager->flush();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
         priority: 0
     )]
@@ -140,6 +146,7 @@ final readonly class GroupImportExportSubscriber
             $this->entityManager
         );
     }
+
     /**
      * @param array<string, mixed> $details
      */

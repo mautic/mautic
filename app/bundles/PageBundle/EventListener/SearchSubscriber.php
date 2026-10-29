@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class SearchSubscriber
 {
@@ -18,7 +19,8 @@ final readonly class SearchSubscriber
         private GlobalSearch $globalSearch,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
         priority: 0
     )]
@@ -35,7 +37,8 @@ final readonly class SearchSubscriber
             $event->addResults('mautic.page.pages', $results);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MauticEvents\CommandListEvent::class,
         priority: 0
     )]

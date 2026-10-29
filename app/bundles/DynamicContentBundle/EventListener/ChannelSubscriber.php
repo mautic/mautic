@@ -6,10 +6,11 @@ namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class ChannelSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ChannelEvent::class,
         priority: 0
     )]

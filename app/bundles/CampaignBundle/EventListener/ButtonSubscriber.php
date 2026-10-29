@@ -7,6 +7,7 @@ namespace Mautic\CampaignBundle\EventListener;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -18,7 +19,8 @@ final readonly class ButtonSubscriber
         private CorePermissions $security,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CustomButtonEvent::class,
         priority: 0
     )]
@@ -36,6 +38,7 @@ final readonly class ButtonSubscriber
             $this->addListRowExportButton($event);
         }
     }
+
     private function addListPageButtons(CustomButtonEvent $event): void
     {
         $exportRoute = $this->router->generate('mautic_campaign_action', ['objectAction' => 'batchExport']);
@@ -72,6 +75,7 @@ final readonly class ButtonSubscriber
             ButtonHelper::LOCATION_PAGE_ACTIONS
         );
     }
+
     private function addListRowExportButton(CustomButtonEvent $event): void
     {
         $item = $event->getItem();

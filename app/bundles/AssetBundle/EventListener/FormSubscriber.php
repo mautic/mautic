@@ -16,6 +16,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -31,10 +32,11 @@ final readonly class FormSubscriber
         private AssetRepository $assetRepository,
     ) {
     }
+
     /**
      * Add a lead generation action to available form submit actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FormBuilderEvent::class,
         priority: 0
     )]
@@ -50,7 +52,8 @@ final readonly class FormSubscriber
             'template'           => '@MauticAsset/Action/asset.html.twig',
         ]);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 0
     )]
@@ -84,7 +87,8 @@ final readonly class FormSubscriber
             ]);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 0
     )]

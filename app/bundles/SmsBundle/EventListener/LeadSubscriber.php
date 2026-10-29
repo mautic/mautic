@@ -4,6 +4,7 @@ namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\SmsBundle\Entity\StatRepository;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -15,10 +16,11 @@ final readonly class LeadSubscriber
         private StatRepository $statRepository,
     ) {
     }
+
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadTimelineEvent::class,
         priority: 0
     )]
@@ -27,6 +29,7 @@ final readonly class LeadSubscriber
         $this->addSmsEvents($event, 'sent');
         $this->addSmsEvents($event, 'failed');
     }
+
     private function addSmsEvents(LeadTimelineEvent $event, string $state): void
     {
         // Set available event types

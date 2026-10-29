@@ -5,6 +5,7 @@ namespace Mautic\NotificationBundle\EventListener;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PageSubscriber
 {
@@ -13,7 +14,8 @@ final readonly class PageSubscriber
         private IntegrationHelper $integrationHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageDisplayEvent::class,
         priority: 0
     )]

@@ -9,6 +9,7 @@ use Mautic\WebhookBundle\Event\WebhookKillEvent;
 use Mautic\WebhookBundle\Event\WebhookPostDeleteEvent;
 use Mautic\WebhookBundle\Event\WebhookPostSaveEvent;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class WebhookSubscriber
 {
@@ -18,10 +19,11 @@ final readonly class WebhookSubscriber
         private WebhookKillNotificator $webhookKillNotificator,
     ) {
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: WebhookPostSaveEvent::class,
         priority: 0
     )]
@@ -41,10 +43,11 @@ final readonly class WebhookSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: WebhookPostDeleteEvent::class,
         priority: 0
     )]
@@ -61,10 +64,11 @@ final readonly class WebhookSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
+
     /**
      * Send notification about killed webhook.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: WebhookKillEvent::class,
         priority: 0
     )]

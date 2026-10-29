@@ -9,6 +9,7 @@ use Mautic\FormBundle\FormEvents;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class FormSubscriber
 {
@@ -17,10 +18,11 @@ final readonly class FormSubscriber
         private FocusRepository $focusRepository,
     ) {
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FormEvents::FORM_POST_DELETE,
         priority: 0
     )]

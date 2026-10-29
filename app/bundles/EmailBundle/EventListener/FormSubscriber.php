@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\Exception\ORMException;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -11,6 +12,7 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class FormSubscriber
 {
@@ -19,10 +21,11 @@ final readonly class FormSubscriber
         private ContactTracker $contactTracker,
     ) {
     }
+
     /**
      * Add a send email actions to available form submit actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FormBuilderEvent::class,
         priority: 0
     )]
@@ -49,10 +52,11 @@ final readonly class FormSubscriber
             'template'        => '@MauticEmail/Action/email.html.twig',
         ]);
     }
+
     /**
      * @throws ORMException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 0
     )]
@@ -66,7 +70,7 @@ final readonly class FormSubscriber
         $emailId    = isset($properties['useremail']) ? (int) $properties['useremail']['email'] : (int) $properties['email'];
         $email      = $this->emailModel->getEntity($emailId);
 
-        if (null === $email || false === $email->isPublished()) {
+        if (!$email instanceof Email || false === $email->isPublished()) {
             return;
         }
 
@@ -82,6 +86,7 @@ final readonly class FormSubscriber
             ]);
         }
     }
+
     /**
      * @param array<string, mixed> $feedback
      */

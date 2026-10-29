@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
@@ -19,6 +20,8 @@ use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Model\EmailDraftModel;
 use Mautic\EmailBundle\Model\EmailModel;
+use ReflectionObject;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -29,6 +32,7 @@ final readonly class EmailSubscriber
     public const string PREHEADER_HTML_SEARCH_PATTERN  = '/<body[^>]*>.*?<div class="preheader"[^>]*>(.*?)<\/div>/s';
     public const string PREHEADER_HTML_REPLACE_PATTERN = '/<div class="preheader"[^>]*>(.*?)<\/div>/s';
     private const int RETRY_COUNT = 3;
+
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel,
@@ -39,7 +43,8 @@ final readonly class EmailSubscriber
         private EmailRepository $emailRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailPreSaveEvent::class,
         priority: 0
     )]
@@ -50,10 +55,11 @@ final readonly class EmailSubscriber
             $this->emailRepository->cloneFromParentToVariant($email);
         }
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailPostSaveEvent::class,
         priority: 0
     )]
@@ -72,14 +78,15 @@ final readonly class EmailSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add preheader text to email body.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailSendEvent::class,
         priority: 200
     )]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailDisplayEvent::class,
         priority: 200
     )]
@@ -88,7 +95,7 @@ final readonly class EmailSubscriber
         $email = $event->getEmail();
         $html  = $event->getContent();
 
-        if ($email && $email->getPreheaderText()) {
+        if ($email instanceof Email && $email->getPreheaderText()) {
             $preheaderTextElement = self::PREHEADER_HTML_ELEMENT_BEFORE.$email->getPreheaderText().self::PREHEADER_HTML_ELEMENT_AFTER;
             $preheaderExists      = preg_match(self::PREHEADER_HTML_SEARCH_PATTERN, $html, $preheaderMatches);
             if ($preheaderExists) {
@@ -99,10 +106,11 @@ final readonly class EmailSubscriber
             $event->setContent($html);
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailPostDeleteEvent::class,
         priority: 0
     )]
@@ -119,10 +127,11 @@ final readonly class EmailSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
+
     /**
      * Process if an email has failed.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailEvents::EMAIL_FAILED,
         priority: 0
     )]
@@ -134,7 +143,7 @@ final readonly class EmailSubscriber
         if (isset($leadIdHash)) {
             $stat = $this->emailModel->getEmailStatus($leadIdHash);
 
-            if (null !== $stat) {
+            if ($stat instanceof Stat) {
                 $reason = $this->translator->trans('mautic.email.dnc.failed', [
                     '%subject%' => $message->getSubject(),
                 ]);
@@ -142,10 +151,11 @@ final readonly class EmailSubscriber
             }
         }
     }
+
     /**
      * Process if an email is resent.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailEvents::EMAIL_RESEND,
         priority: 0
     )]
@@ -159,7 +169,7 @@ final readonly class EmailSubscriber
 
         $stat = $this->emailModel->getEmailStatus($message->getLeadIdHash());
 
-        if (!$stat) {
+        if (!$stat instanceof Stat) {
             return;
         }
 
@@ -178,7 +188,8 @@ final readonly class EmailSubscriber
 
         $this->emailModel->saveEmailStat($stat);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEditSubmitEvent::class)]
+
+    #[AsEventListener(event: EmailEditSubmitEvent::class)]
     public function manageEmailDraft(EmailEditSubmitEvent $event): void
     {
         $liveEmail   = $event->getPreviousEmail();
@@ -222,7 +233,8 @@ final readonly class EmailSubscriber
 
         $this->entityManager->flush();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPreDeleteEvent::class)]
+
+    #[AsEventListener(event: EmailPreDeleteEvent::class)]
     public function deleteEmailDraft(EmailEvent $event): void
     {
         try {
@@ -232,10 +244,11 @@ final readonly class EmailSubscriber
             return;
         }
     }
+
     private function revertEmailModifications(Email $liveEmail, Email $editedEmail): void
     {
-        $liveEmailReflection   = new \ReflectionObject($liveEmail);
-        $editedEmailReflection = new \ReflectionObject($editedEmail);
+        $liveEmailReflection   = new ReflectionObject($liveEmail);
+        $editedEmailReflection = new ReflectionObject($editedEmail);
         foreach ($liveEmailReflection->getProperties() as $property) {
             if (in_array($property->getName(), ['id', 'emailType'])) {
                 continue;

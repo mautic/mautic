@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use stdClass;
 
 final class MailchimpApi extends EmailMarketingApi
 {
@@ -71,7 +72,7 @@ final class MailchimpApi extends EmailMarketingApi
      */
     public function subscribeLead($email, $listId, array $fields = [], array $config = [])
     {
-        $emailStruct        = new \stdClass();
+        $emailStruct        = new stdClass();
         $emailStruct->email = $email;
 
         $parameters = array_merge($config, [

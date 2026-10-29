@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\ContactExportEmailSentEvent;
 use Mautic\LeadBundle\Event\ContactExportScheduledEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ContactExportSchedulerAuditLogSubscriber
 {
@@ -17,7 +18,8 @@ final readonly class ContactExportSchedulerAuditLogSubscriber
         private IpLookupHelper $ipLookupHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactExportScheduledEvent::class)]
+
+    #[AsEventListener(event: ContactExportScheduledEvent::class)]
     public function onContactExportScheduled(ContactExportSchedulerEvent $event): void
     {
         $this->auditLogModel->writeToLog(
@@ -31,7 +33,8 @@ final readonly class ContactExportSchedulerAuditLogSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactExportEmailSentEvent::class)]
+
+    #[AsEventListener(event: ContactExportEmailSentEvent::class)]
     public function onContactExportEmailSent(ContactExportSchedulerEvent $event): void
     {
         $this->auditLogModel->writeToLog(

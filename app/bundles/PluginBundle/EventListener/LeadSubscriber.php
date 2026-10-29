@@ -11,16 +11,19 @@ use Mautic\LeadBundle\Event\LeadPreDeleteEvent;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class LeadSubscriber
 {
     private const string FEATURE_PUSH_LEAD = 'push_lead';
+
     public function __construct(
         private IntegrationEntityRepository $integrationEntityRepository,
         private IntegrationRepository $integrationRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadPreDeleteEvent::class,
         priority: 0
     )]
@@ -31,7 +34,8 @@ final readonly class LeadSubscriber
 
         return false;
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CompanyPreDeleteEvent::class,
         priority: 0
     )]
@@ -43,10 +47,11 @@ final readonly class LeadSubscriber
 
         return false;
     }
+
     /*
      * Change lead event
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadPostSaveEvent::class,
         priority: 0
     )]
@@ -57,6 +62,7 @@ final readonly class LeadSubscriber
             $this->integrationEntityRepository->updateErrorLeads('lead-error', $lead->getId());
         }
     }
+
     private function isAnyIntegrationEnabled(): bool
     {
         $integrations = $this->integrationRepository->getIntegrations();

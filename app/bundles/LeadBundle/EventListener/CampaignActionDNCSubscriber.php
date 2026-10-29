@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Form\Type\CampaignActionRemoveDNCType;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class CampaignActionDNCSubscriber
 {
@@ -18,7 +19,8 @@ final readonly class CampaignActionDNCSubscriber
         private LeadModel $leadModel,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -44,7 +46,8 @@ final readonly class CampaignActionDNCSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_ACTION_ADD_DONOTCONTACT,
         priority: 0
     )]
@@ -72,7 +75,8 @@ final readonly class CampaignActionDNCSubscriber
 
         $event->passAll();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_ACTION_REMOVE_DONOTCONTACT,
         priority: 0
     )]

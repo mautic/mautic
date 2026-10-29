@@ -10,6 +10,8 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\SmsEvents;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class OwnerSubscriber
@@ -20,12 +22,14 @@ final class OwnerSubscriber
      * @var array<int, mixed>|null
      */
     private ?array $owners = null;
+
     public function __construct(
         private readonly TranslatorInterface $translator,
         private readonly LeadRepository $leadRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailOnBuildEvent::class,
         priority: 0
     )]
@@ -33,7 +37,8 @@ final class OwnerSubscriber
     {
         $event->addTokens($this->getTokens());
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailDisplayEvent::class,
         priority: 0
     )]
@@ -41,7 +46,8 @@ final class OwnerSubscriber
     {
         $this->onEmailGenerate($event);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailSendEvent::class,
         priority: 0
     )]
@@ -49,7 +55,8 @@ final class OwnerSubscriber
     {
         $event->addTokens($this->getGeneratedTokens($event));
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: TokensBuildEvent::class,
         priority: 0
     )]
@@ -58,14 +65,15 @@ final class OwnerSubscriber
         $tokens = array_merge($event->getTokens(), $this->getTokens());
         $event->setTokens($tokens);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: SmsEvents::TOKEN_REPLACEMENT,
         priority: 0
     )]
     public function onSmsTokenReplacement(TokenReplacementEvent $event): void
     {
         $contact             = $event->getLead()->getProfileFields();
-        $contact['owner_id'] = $event->getLead()->getOwner() ? $event->getLead()->getOwner()->getId() : null;
+        $contact['owner_id'] = $event->getLead()->getOwner() instanceof User ? $event->getLead()->getOwner()->getId() : null;
         if (empty($contact['id']) && $event->getEntity()) {
             return;
         }
@@ -73,7 +81,8 @@ final class OwnerSubscriber
         $content     = str_replace(array_keys($ownerTokens), $ownerTokens, $event->getContent());
         $event->setContent($content);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: UrlTokenReplaceEvent::class,
         priority: 0
     )]
@@ -86,6 +95,7 @@ final class OwnerSubscriber
 
         $event->setContent($content);
     }
+
     /**
      * Generates an array of tokens based on the given token.
      *
@@ -103,6 +113,7 @@ final class OwnerSubscriber
 
         return $this->getOwnerTokens($contact, $event->getCombinedContent());
     }
+
     /**
      * Used to replace all owner tokens with emptiness so not to email out tokens.
      */
@@ -116,6 +127,7 @@ final class OwnerSubscriber
 
         return $tokens;
     }
+
     /**
      * Used to replace all owner tokens with emptiness so not to email out tokens.
      */
@@ -129,6 +141,7 @@ final class OwnerSubscriber
 
         return $tokens;
     }
+
     /**
      * Creates a token using defined pattern.
      */
@@ -136,6 +149,7 @@ final class OwnerSubscriber
     {
         return sprintf($this->ownerFieldSprintf, $field);
     }
+
     /**
      * Creates translation ready label Owner: Firstname etc.
      */
@@ -147,6 +161,7 @@ final class OwnerSubscriber
             $this->translator->trans('mautic.core.'.$field)
         );
     }
+
     /**
      * @return mixed[]|null
      */
@@ -156,6 +171,7 @@ final class OwnerSubscriber
 
         return $this->owners[$ownerId];
     }
+
     /**
      * @param array<int|string>|null $contact
      *
@@ -183,6 +199,7 @@ final class OwnerSubscriber
 
         return $tokens;
     }
+
     /**
      * @return array<string>
      */
@@ -195,6 +212,7 @@ final class OwnerSubscriber
 
         return $tokens;
     }
+
     private function getOwnerColumnNormalized(string $ownerColumn): string
     {
         return str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);

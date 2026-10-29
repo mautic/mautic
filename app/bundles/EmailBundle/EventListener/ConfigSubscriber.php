@@ -9,6 +9,7 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\ConfigType;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ConfigSubscriber
 {
@@ -16,7 +17,8 @@ final readonly class ConfigSubscriber
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ConfigBuilderEvent::class,
         priority: 0
     )]
@@ -30,7 +32,8 @@ final readonly class ConfigSubscriber
             'parameters' => $event->getParametersFromConfig('MauticEmailBundle'),
         ]);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ConfigPreSaveEvent::class,
         priority: 0
     )]

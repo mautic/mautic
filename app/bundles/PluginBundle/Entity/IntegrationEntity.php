@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Entity;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
@@ -39,12 +41,12 @@ class IntegrationEntity extends CommonEntity
     private $integrationEntityId;
 
     /**
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     private $lastSyncDate;
 
@@ -158,7 +160,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -166,7 +168,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @param \DateTime $dateAdded
+     * @param DateTime $dateAdded
      */
     public function setDateAdded($dateAdded): static
     {
@@ -176,7 +178,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return DateTimeInterface|null
      */
     public function getLastSyncDate()
     {
@@ -184,7 +186,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @param \DateTime $lastSyncDate
+     * @param DateTime $lastSyncDate
      */
     public function setLastSyncDate($lastSyncDate): static
     {

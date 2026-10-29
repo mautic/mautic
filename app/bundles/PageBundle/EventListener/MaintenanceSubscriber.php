@@ -5,6 +5,7 @@ namespace Mautic\PageBundle\EventListener;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class MaintenanceSubscriber
@@ -14,7 +15,8 @@ final readonly class MaintenanceSubscriber
         private TranslatorInterface $translator,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MaintenanceEvent::class,
         priority: 10
     )]
@@ -23,6 +25,7 @@ final readonly class MaintenanceSubscriber
         $this->cleanData($event, 'page_hits');
         $this->cleanData($event, 'lead_utmtags');
     }
+
     private function cleanData(MaintenanceEvent $event, string $table): void
     {
         $qb = $this->db->createQueryBuilder()

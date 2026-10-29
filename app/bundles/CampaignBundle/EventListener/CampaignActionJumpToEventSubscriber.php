@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use DateTime;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
@@ -16,11 +17,13 @@ use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class CampaignActionJumpToEventSubscriber
 {
     public const string EVENT_NAME = 'campaign.jump_to_event';
+
     public function __construct(
         private EventRepository $eventRepository,
         private EventExecutioner $eventExecutioner,
@@ -29,10 +32,11 @@ final readonly class CampaignActionJumpToEventSubscriber
         private EventScheduler $eventScheduler,
     ) {
     }
+
     /**
      * Add event triggers and actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -54,6 +58,7 @@ final readonly class CampaignActionJumpToEventSubscriber
             ],
         ]);
     }
+
     /**
      * Process campaign.jump_to_event actions.
      *
@@ -62,7 +67,7 @@ final readonly class CampaignActionJumpToEventSubscriber
      * @throws CannotProcessEventException
      * @throws NotSchedulableException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
         priority: 0
     )]
@@ -71,7 +76,7 @@ final readonly class CampaignActionJumpToEventSubscriber
         $event      = $campaignEvent->getEvent();
         $jumpTarget = $this->getJumpTargetForEvent($event, 'e.id');
 
-        if (null === $jumpTarget) {
+        if (!$jumpTarget instanceof Event) {
             // Target event has been removed.
             $pending  = $campaignEvent->getPending();
             $contacts = $campaignEvent->getContacts();
@@ -92,7 +97,7 @@ final readonly class CampaignActionJumpToEventSubscriber
             );
 
             // Schedule the jump action as per configuration, if any.
-            $executionDate       = $event->getTriggerDate() ?? new \DateTime();
+            $executionDate       = $event->getTriggerDate() ?? new DateTime();
             $targetExecutionDate = $this->eventScheduler->getExecutionDateTime($jumpTarget, $executionDate);
             if ($this->eventScheduler->shouldScheduleEvent($jumpTarget, $targetExecutionDate, $executionDate)) {
                 $this->eventScheduler->schedule($jumpTarget, $targetExecutionDate, $contacts);
@@ -103,6 +108,7 @@ final readonly class CampaignActionJumpToEventSubscriber
             $campaignEvent->passRemaining();
         }
     }
+
     /**
      * Update campaign events.
      *
@@ -110,7 +116,7 @@ final readonly class CampaignActionJumpToEventSubscriber
      * to ensure that it has the actual ID and not the temp_id as the
      * target for the jump.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CampaignPostSaveEvent::class,
         priority: 1
     )]
@@ -127,7 +133,7 @@ final readonly class CampaignActionJumpToEventSubscriber
 
             $jumpTarget = $this->getJumpTargetForEvent($event, 'e.tempId');
 
-            if (null !== $jumpTarget) {
+            if ($jumpTarget instanceof Event) {
                 $event->setProperties(array_merge(
                     $event->getProperties(),
                     [
@@ -143,6 +149,7 @@ final readonly class CampaignActionJumpToEventSubscriber
             $this->eventRepository->saveEntities($toSave);
         }
     }
+
     /**
      * Inspect a jump event and get its target.
      */

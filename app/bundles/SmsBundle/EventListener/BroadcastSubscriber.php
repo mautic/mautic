@@ -6,6 +6,7 @@ namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\SmsBundle\Broadcast\BroadcastExecutioner;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class BroadcastSubscriber
 {
@@ -13,7 +14,8 @@ final readonly class BroadcastSubscriber
         private BroadcastExecutioner $broadcastExecutioner,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ChannelBroadcastEvent::class,
         priority: 0
     )]

@@ -6,6 +6,7 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class MaintenanceSubscriber
@@ -16,7 +17,8 @@ final readonly class MaintenanceSubscriber
         private TranslatorInterface $translator,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MaintenanceEvent::class,
         priority: -50
     )]
@@ -28,6 +30,7 @@ final readonly class MaintenanceSubscriber
         $rows = $this->userTokenRepository->deleteExpired($event->isDryRun());
         $event->setStat($this->translator->trans('mautic.maintenance.user_tokens'), $rows);
     }
+
     private function cleanupData(MaintenanceEvent $event, string $table): void
     {
         $qb = $this->db->createQueryBuilder()

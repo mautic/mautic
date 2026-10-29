@@ -8,6 +8,7 @@ use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class FormConditionalSubscriber
 {
@@ -16,10 +17,11 @@ final readonly class FormConditionalSubscriber
         private FieldModel $fieldModel,
     ) {
     }
+
     /**
      * Replace session field Id with field Id after save entity.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FormEvents::FORM_POST_SAVE,
         priority: 0
     )]

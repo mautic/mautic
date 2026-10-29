@@ -13,6 +13,8 @@ use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Model\PageDraftModel;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
+use ReflectionObject;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final readonly class PageSubscriber
@@ -26,10 +28,11 @@ final readonly class PageSubscriber
         private PageDraftModel $pageDraftModel,
     ) {
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PageEvents::PAGE_POST_SAVE,
         priority: 0
     )]
@@ -51,10 +54,11 @@ final readonly class PageSubscriber
             $this->languageHelper->extractLanguagePackage($page->getLanguage());
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PageEvents::PAGE_POST_DELETE,
         priority: 0
     )]
@@ -71,13 +75,14 @@ final readonly class PageSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
+
     /**
      * Allow event listeners to add scripts to
      * - </head> : onPageDisplay_headClose
      * - <body>  : onPageDisplay_bodyOpen
      * - </body> : onPageDisplay_bodyClose.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: Events\PageDisplayEvent::class,
         priority: -255
     )]
@@ -130,7 +135,8 @@ final readonly class PageSubscriber
 
         $event->setContent($content);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEditSubmitEvent::class)]
+
+    #[AsEventListener(event: PageEditSubmitEvent::class)]
     public function managePageDraft(PageEditSubmitEvent $event): void
     {
         $livePage   = $event->getPreviousPage();
@@ -172,6 +178,7 @@ final readonly class PageSubscriber
             $editedPage->setDraft(null);
         }
     }
+
     public function deletePageDraft(PageEvent $event): void
     {
         try {
@@ -181,10 +188,11 @@ final readonly class PageSubscriber
             return;
         }
     }
+
     private function revertPageModifications(Page $livePage, Page $editedPage): void
     {
-        $livePageReflection   = new \ReflectionObject($livePage);
-        $editedPageReflection = new \ReflectionObject($editedPage);
+        $livePageReflection   = new ReflectionObject($livePage);
+        $editedPageReflection = new ReflectionObject($editedPage);
         foreach ($livePageReflection->getProperties() as $property) {
             if ('id' === $property->getName()) {
                 continue;

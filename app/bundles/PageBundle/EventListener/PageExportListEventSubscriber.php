@@ -7,6 +7,7 @@ namespace Mautic\PageBundle\EventListener;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\EmailBundle\Helper\EmailMediaImageHelper;
 use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 /**
  * Builder-embedded images in landing pages are referenced by absolute URL inside the page
@@ -21,7 +22,8 @@ final readonly class PageExportListEventSubscriber
         private EmailMediaImageHelper $mediaImageHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: AssetExportListEvent::class,
         priority: 0
     )]
@@ -43,6 +45,7 @@ final readonly class PageExportListEventSubscriber
             }
         }
     }
+
     /**
      * @param array<string, mixed> $page
      */

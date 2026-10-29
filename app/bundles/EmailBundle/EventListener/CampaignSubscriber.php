@@ -14,6 +14,7 @@ use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\StatRepository;
@@ -30,6 +31,7 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class CampaignSubscriber
@@ -43,7 +45,8 @@ final readonly class CampaignSubscriber
         private StatRepository $statRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -126,7 +129,8 @@ final readonly class CampaignSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EventPreview::class,
         priority: 0
     )]
@@ -144,6 +148,7 @@ final readonly class CampaignSubscriber
             $eventPreview->addEventStat('click_through_open_rate', round($emailStats['click_through_open_rate'] * 100, 2).'%');
         }
     }
+
     /**
      * Trigger campaign event for opening of an email.
      *
@@ -152,7 +157,7 @@ final readonly class CampaignSubscriber
      * @throws CannotProcessEventException
      * @throws NotSchedulableException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailOpenEvent::class,
         priority: 0
     )]
@@ -160,10 +165,11 @@ final readonly class CampaignSubscriber
     {
         $email = $event->getEmail();
 
-        if (null !== $email) {
+        if ($email instanceof Email) {
             $this->realTimeExecutioner->execute('email.open', $email, 'email', $email->getId());
         }
     }
+
     /**
      * Trigger campaign event for reply to an email.
      *
@@ -172,18 +178,19 @@ final readonly class CampaignSubscriber
      * @throws LogPassedAndFailedException
      * @throws NotSchedulableException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailReplyEvent::class,
         priority: 0
     )]
     public function onEmailReply(EmailReplyEvent $event): void
     {
         $email = $event->getEmail();
-        if (null !== $email) {
+        if ($email instanceof Email) {
             $this->realTimeExecutioner->execute('email.reply', $email, 'email', $email->getId());
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailEvents::ON_CAMPAIGN_TRIGGER_DECISION,
         priority: 0
     )]
@@ -237,13 +244,14 @@ final readonly class CampaignSubscriber
             }
         }
     }
+
     /**
      * Triggers the action which sends email to contacts.
      *
      * @throws ORMException
      * @throws NoContactsFoundException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 0
     )]
@@ -264,7 +272,7 @@ final readonly class CampaignSubscriber
         $emailId = (int) $config['email'];
         $email   = $this->emailModel->getEntity($emailId);
 
-        if (!$email || !$email->isPublished()) {
+        if (!$email instanceof Email || !$email->isPublished()) {
             $event->passAllWithError($this->translator->trans('mautic.email.campaign.event.failure_missing_email'));
 
             return;
@@ -290,7 +298,7 @@ final readonly class CampaignSubscriber
         $contacts        = $event->getContacts();
         $contactIds      = $event->getContactIds();
         $credentialArray = [];
-        $emailCategory   = $email->getCategory() ? $email->getCategory()->getId() : null;
+        $emailCategory   = $email->getCategory() instanceof Category ? $email->getCategory()->getId() : null;
 
         foreach ($contacts as $logId => $contact) {
             $leadCredentials                      = $contact->getProfileFields();
@@ -379,10 +387,11 @@ final readonly class CampaignSubscriber
             }
         }
     }
+
     /**
      * @throws ORMException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 1
     )]

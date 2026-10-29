@@ -7,6 +7,7 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use MauticPlugin\MauticSocialBundle\Form\Type\ConfigType;
 use MauticPlugin\MauticSocialBundle\Integration\Config;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ConfigSubscriber
 {
@@ -14,7 +15,8 @@ final readonly class ConfigSubscriber
         private Config $config,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ConfigBuilderEvent::class,
         priority: 0
     )]
@@ -32,7 +34,8 @@ final readonly class ConfigSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ConfigPreSaveEvent::class,
         priority: 0
     )]

@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\StatsBundle\Event\AggregateStatRequestEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class GraphAggregateStatsSubscriber
 {
@@ -11,7 +12,8 @@ final readonly class GraphAggregateStatsSubscriber
         private StatsCollectionHelper $statsCollectionHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: AggregateStatRequestEvent::class,
         priority: 0
     )]

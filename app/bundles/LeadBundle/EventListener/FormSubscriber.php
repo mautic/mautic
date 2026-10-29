@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateTime;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
@@ -10,6 +11,7 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\ObjectCollectEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -30,6 +32,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Model\PointGroupModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class FormSubscriber
 {
@@ -44,10 +47,11 @@ final readonly class FormSubscriber
         private UtmTagRepository $utmTagRepository,
     ) {
     }
+
     /**
      * Add a lead generation action to available form submit actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FormBuilderEvent::class,
         priority: 0
     )]
@@ -116,7 +120,8 @@ final readonly class FormSubscriber
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ObjectCollectEvent::class,
         priority: 0
     )]
@@ -125,7 +130,8 @@ final readonly class FormSubscriber
         $event->appendObject(new ObjectCrate('contact', 'mautic.lead.contact'));
         $event->appendObject(new ObjectCrate('company', 'mautic.core.company'));
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FieldCollectEvent::class,
         priority: 0
     )]
@@ -152,7 +158,8 @@ final readonly class FormSubscriber
             $event->appendField(new FieldCrate('stagebyname', 'mautic.lead.field.stagebyname', 'text', []));
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 0
     )]
@@ -162,7 +169,7 @@ final readonly class FormSubscriber
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof Lead) {
             return;
         }
 
@@ -173,7 +180,7 @@ final readonly class FormSubscriber
         $pointsChangeLog->setEventName($form->getId().':'.$form->getName());
         $pointsChangeLog->setActionName($event->getAction()->getName());
         $pointsChangeLog->setIpAddress($this->ipLookupHelper->getIpAddress());
-        $pointsChangeLog->setDateAdded(new \DateTime());
+        $pointsChangeLog->setDateAdded(new DateTime());
         $pointsChangeLog->setLead($contact);
 
         $oldPoints  = $contact->getPoints();
@@ -199,7 +206,8 @@ final readonly class FormSubscriber
 
         $event->getSubmission()->getLead()->setPoints($contact->getPoints());
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 1
     )]
@@ -209,7 +217,7 @@ final readonly class FormSubscriber
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof Lead) {
             return;
         }
 
@@ -225,7 +233,8 @@ final readonly class FormSubscriber
             $this->leadModel->removeFromLists($contact, $removeFrom);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 2
     )]
@@ -235,7 +244,7 @@ final readonly class FormSubscriber
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof Lead) {
             return;
         }
 
@@ -245,7 +254,8 @@ final readonly class FormSubscriber
 
         $this->leadModel->modifyTags($contact, $addTags, $removeTags);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 3
     )]
@@ -255,7 +265,7 @@ final readonly class FormSubscriber
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof Lead) {
             return;
         }
 
@@ -274,7 +284,7 @@ final readonly class FormSubscriber
         $utmValues->setQuery($event->getRequest()->query->all());
         $utmValues->setReferer($refererURL);
         $utmValues->setUrl($event->getRequest()->server->get('REQUEST_URI'));
-        $utmValues->setDateAdded(new \DateTime());
+        $utmValues->setDateAdded(new DateTime());
         $utmValues->setRemoteHost($refererParsedUrl['host'] ?? null);
         $utmValues->setUserAgent($event->getRequest()->server->get('HTTP_USER_AGENT') ?? null);
         $utmValues->setUtmCampaign($queryArray['utm_campaign'] ?? $queryReferer['utm_campaign'] ?? null);
@@ -288,7 +298,8 @@ final readonly class FormSubscriber
             $this->leadModel->setUtmTags($utmValues->getLead(), $utmValues);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 4
     )]
@@ -298,7 +309,7 @@ final readonly class FormSubscriber
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof Lead) {
             return;
         }
 
@@ -308,7 +319,8 @@ final readonly class FormSubscriber
             $this->leadModel->scoreContactsCompany($contact, $properties['score']);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 5
     )]
@@ -322,7 +334,8 @@ final readonly class FormSubscriber
             $this->doNotContact->removeDncForContact($event->getLead()->getId(), 'email');
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::LEAD_ON_SEGMENTS_CHANGE,
         priority: 0
     )]
@@ -342,7 +355,8 @@ final readonly class FormSubscriber
             $this->leadModel->removeFromLists($lead, $removeFrom);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 5
     )]
@@ -352,7 +366,7 @@ final readonly class FormSubscriber
             return;
         }
 
-        if (!$lead = $this->contactTracker->getContact()) {
+        if (!($lead = $this->contactTracker->getContact()) instanceof Lead) {
             return;
         }
 

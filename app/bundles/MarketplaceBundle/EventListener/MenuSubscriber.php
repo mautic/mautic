@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class MenuSubscriber
 {
@@ -15,7 +16,8 @@ final readonly class MenuSubscriber
         private Config $config,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MenuEvent::class,
         priority: 9999
     )]

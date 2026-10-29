@@ -10,6 +10,7 @@ use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -26,7 +27,8 @@ final readonly class InjectCustomContentSubscriber
         private GrapesJsBuilderRepository $grapesJsBuilderRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CustomContentEvent::class,
         priority: 0
     )]

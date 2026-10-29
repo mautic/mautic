@@ -8,6 +8,7 @@ use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\PageEvents;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PageSubscriber
 {
@@ -16,7 +17,8 @@ final readonly class PageSubscriber
         private GrapesJsBuilderModel $grapesJsBuilderModel,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageEvents::PAGE_POST_SAVE,
         priority: 0
     )]

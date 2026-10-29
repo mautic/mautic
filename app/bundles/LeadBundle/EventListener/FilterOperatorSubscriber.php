@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriber
@@ -56,6 +57,7 @@ final class FilterOperatorSubscriber
             OperatorOptions::EXCLUDING_ALL,
         ],
     ];
+
     public function __construct(
         private readonly OperatorOptions $operatorOptions,
         private readonly LeadFieldRepository $leadFieldRepository,
@@ -64,7 +66,8 @@ final class FilterOperatorSubscriber
         private readonly TranslatorInterface $translator,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadListFiltersOperatorsEvent::class,
         priority: 0
     )]
@@ -74,7 +77,8 @@ final class FilterOperatorSubscriber
             $event->addOperator($operatorName, $operatorOptions);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadListFiltersChoicesEvent::class,
         priority: 0
     )]
@@ -113,7 +117,8 @@ final class FilterOperatorSubscriber
             );
         });
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadListFiltersChoicesEvent::class,
         priority: 0
     )]
@@ -353,7 +358,8 @@ final class FilterOperatorSubscriber
             $event->addChoice('lead', $alias, $fieldOptions);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadListFiltersChoicesEvent::class,
         priority: 0
     )]
@@ -527,6 +533,7 @@ final class FilterOperatorSubscriber
             $event->addChoice('behaviors', $alias, $fieldOptions);
         }
     }
+
     private function setIncludeExcludeOperatorsToTextFilters(LeadListFiltersChoicesEvent $event): void
     {
         $choices = $event->getChoices();
@@ -556,6 +563,7 @@ final class FilterOperatorSubscriber
 
         $event->setChoices($choices);
     }
+
     /**
      * @return mixed[]
      */
@@ -568,7 +576,8 @@ final class FilterOperatorSubscriber
 
         return $this->typeOperatorProvider->getOperatorsIncluding($this->behaviorOperators[$fieldType]);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadListFiltersChoicesEvent::class,
         priority: -1000
     )]
@@ -588,6 +597,7 @@ final class FilterOperatorSubscriber
 
         $event->setChoices($choices);
     }
+
     /**
      * @param array<string, string> $operators
      *

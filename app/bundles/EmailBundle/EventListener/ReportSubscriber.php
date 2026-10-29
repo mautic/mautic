@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use LogicException;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -22,6 +23,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportSubscriber
@@ -149,6 +151,7 @@ final readonly class ReportSubscriber
             'suffix'  => '%',
         ],
     ];
+
     public function __construct(
         private Connection $db,
         private CompanyReportData $companyReportData,
@@ -159,10 +162,11 @@ final readonly class ReportSubscriber
         private DncReportService $dncReportService,
     ) {
     }
+
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportBuilderEvent::class,
         priority: 0
     )]
@@ -323,10 +327,11 @@ final readonly class ReportSubscriber
             $event->addGraph($context, 'table', 'mautic.email.table.most.emails.clicks');
         }
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGeneratorEvent::class,
         priority: 0
     )]
@@ -461,10 +466,11 @@ final readonly class ReportSubscriber
 
         $event->setQueryBuilder($qb);
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGraphEvent::class,
         priority: 0
     )]
@@ -787,7 +793,8 @@ final readonly class ReportSubscriber
             unset($queryBuilder);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportDataEvent::class,
         priority: 0
     )]
@@ -802,6 +809,7 @@ final readonly class ReportSubscriber
         $event->setData($data);
         unset($data);
     }
+
     /**
      * @param array<string, int> $emailCounts
      *
@@ -822,12 +830,14 @@ final readonly class ReportSubscriber
 
         return $result;
     }
+
     private function joinEmailsTableIfMissing(TrackingQueryBuilder $queryBuilder, ReportGraphEvent $event): void
     {
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS) && !$this->isJoined($queryBuilder, MAUTIC_TABLE_PREFIX.'emails', self::EMAIL_STATS_PREFIX, self::EMAILS_PREFIX)) {
             $queryBuilder->leftJoin(self::EMAIL_STATS_PREFIX, MAUTIC_TABLE_PREFIX.'emails', self::EMAILS_PREFIX, 'e.id = es.email_id');
         }
     }
+
     /**
      * Add the Do Not Contact table to the query builder.
      */
@@ -844,6 +854,7 @@ final readonly class ReportSubscriber
             );
         }
     }
+
     private function addTrackableTablesForEmailStats(TrackingQueryBuilder $qb): void
     {
         $trTable = MAUTIC_TABLE_PREFIX.'channel_url_trackables';
@@ -866,6 +877,7 @@ final readonly class ReportSubscriber
             );
         }
     }
+
     /**
      * Add the Do Not Contact table to the query builder.
      */
@@ -882,6 +894,7 @@ final readonly class ReportSubscriber
             );
         }
     }
+
     /**
      * Only Mautic's builder records its parts, and this subscriber reads a query back to
      * see whether a table is already joined. Connections hand out the tracking builder,
@@ -891,11 +904,12 @@ final readonly class ReportSubscriber
     private function trackingBuilder(QueryBuilder $queryBuilder): TrackingQueryBuilder
     {
         if (!$queryBuilder instanceof TrackingQueryBuilder) {
-            throw new \LogicException(sprintf('%s needs a query builder that records its parts, got %s.', self::class, $queryBuilder::class));
+            throw new LogicException(sprintf('%s needs a query builder that records its parts, got %s.', self::class, $queryBuilder::class));
         }
 
         return $queryBuilder;
     }
+
     private function isJoined(TrackingQueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
         $joins = $query->getQueryParts()['join'];

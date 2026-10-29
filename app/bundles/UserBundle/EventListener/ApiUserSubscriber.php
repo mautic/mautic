@@ -7,6 +7,7 @@ namespace Mautic\UserBundle\EventListener;
 use FOS\OAuthServerBundle\Security\Authenticator\Passport\Badge\AccessTokenBadge;
 use FOS\OAuthServerBundle\Security\Authenticator\Token\OAuthToken;
 use Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -21,11 +22,12 @@ final readonly class ApiUserSubscriber
         private TokenPermissions $tokenPermissions,
     ) {
     }
+
     /**
      * Execute the authentication if authentication is oAuth and has no UserLoader set.
      * Sets permissions, and if user is not yet fetched - gets the user from TokenStorage, or creates one.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CheckPassportEvent::class,
         priority: 2048
     )]
@@ -61,7 +63,7 @@ final readonly class ApiUserSubscriber
             $accessToken = $accessTokenBadge->getAccessToken();
             $user ??= $this->tokenPermissions->setActivePermissionsOnAuthToken($accessToken);
 
-            if (null === $user) {
+            if (!$user instanceof UserInterface) {
                 return null;
             }
 
@@ -70,11 +72,12 @@ final readonly class ApiUserSubscriber
             return $user;
         });
     }
+
     /**
      * Transfers User instance from \Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions::setActivePermissionsOnAuthToken
      * to the token, to be authorized later.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: AuthenticationTokenCreatedEvent::class)]
+    #[AsEventListener(event: AuthenticationTokenCreatedEvent::class)]
     public function onTokenCreated(AuthenticationTokenCreatedEvent $event): void
     {
         $passport = $event->getPassport();
@@ -89,7 +92,7 @@ final readonly class ApiUserSubscriber
         $authenticatedToken = $event->getAuthenticatedToken();
         \assert($authenticatedToken instanceof OAuthToken);
 
-        if (null !== $authenticatedToken->getUser()) {
+        if ($authenticatedToken->getUser() instanceof UserInterface) {
             return;
         }
 

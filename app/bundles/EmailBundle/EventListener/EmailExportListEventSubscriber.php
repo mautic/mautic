@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\EmailMediaImageHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 /**
  * Builder-embedded images (uploaded through the file manager into the media images directory) are
@@ -21,7 +22,8 @@ final readonly class EmailExportListEventSubscriber
         private EmailMediaImageHelper $mediaImageHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: AssetExportListEvent::class,
         priority: 0
     )]
@@ -43,6 +45,7 @@ final readonly class EmailExportListEventSubscriber
             }
         }
     }
+
     /**
      * @param array<string, mixed> $email
      */

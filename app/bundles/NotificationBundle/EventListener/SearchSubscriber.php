@@ -8,6 +8,7 @@ use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\NotificationBundle\Model\NotificationModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class SearchSubscriber
 {
@@ -16,7 +17,8 @@ final readonly class SearchSubscriber
         private GlobalSearch $globalSearch,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
         priority: 0
     )]
@@ -42,7 +44,8 @@ final readonly class SearchSubscriber
             $event->addResults('mautic.notification.notification.header', $results);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
         priority: 0
     )]

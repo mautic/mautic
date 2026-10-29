@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\EventListener;
 
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
@@ -16,10 +17,12 @@ use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PageImportExportSubscriber
 {
     use ImportExportTrait;
+
     public function __construct(
         private PageModel $pageModel,
         private EntityManagerInterface $entityManager,
@@ -29,7 +32,8 @@ final readonly class PageImportExportSubscriber
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityExportEvent::class,
         priority: 0
     )]
@@ -41,7 +45,7 @@ final readonly class PageImportExportSubscriber
 
         $pageId = $event->getEntityId();
         $page   = $this->pageModel->getEntity($pageId);
-        if (!$page) {
+        if (!$page instanceof Page) {
             return;
         }
 
@@ -53,8 +57,8 @@ final readonly class PageImportExportSubscriber
             'template'             => $page->getTemplate(),
             'custom_html'          => $page->getCustomHtml(),
             'content'              => $page->getContent(),
-            'publish_up'           => $page->getPublishUp() ? $page->getPublishUp()->format(DATE_ATOM) : null,
-            'publish_down'         => $page->getPublishDown() ? $page->getPublishDown()->format(DATE_ATOM) : null,
+            'publish_up'           => $page->getPublishUp() instanceof DateTimeInterface ? $page->getPublishUp()->format(DATE_ATOM) : null,
+            'publish_down'         => $page->getPublishDown() instanceof DateTimeInterface ? $page->getPublishDown()->format(DATE_ATOM) : null,
             'hits'                 => $page->getHits(),
             'unique_hits'          => $page->getUniqueHits(),
             'variant_hits'         => $page->getVariantHits(),
@@ -74,7 +78,8 @@ final readonly class PageImportExportSubscriber
         $event->addEntity(Page::ENTITY_NAME, $pageData);
         $this->logAction('export', $page->getId(), $pageData);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportEvent::class,
         priority: 0
     )]
@@ -118,7 +123,8 @@ final readonly class PageImportExportSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportUndoEvent::class,
         priority: 0
     )]
@@ -136,7 +142,7 @@ final readonly class PageImportExportSubscriber
         foreach ($summary['ids'] as $id) {
             $entity = $this->pageRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof Page) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Page::class]);
             }
@@ -144,7 +150,8 @@ final readonly class PageImportExportSubscriber
 
         $this->entityManager->flush();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
         priority: 0
     )]
@@ -158,6 +165,7 @@ final readonly class PageImportExportSubscriber
             $this->entityManager
         );
     }
+
     /**
      * @param array<string, mixed> $details
      */

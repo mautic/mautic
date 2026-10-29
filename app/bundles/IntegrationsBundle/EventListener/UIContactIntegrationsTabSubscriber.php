@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class UIContactIntegrationsTabSubscriber
 {
@@ -15,7 +16,8 @@ final readonly class UIContactIntegrationsTabSubscriber
         private ObjectMappingRepository $objectMappingRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CustomTemplateEvent::class,
         priority: 0
     )]

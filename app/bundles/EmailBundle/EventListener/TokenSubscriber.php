@@ -9,22 +9,25 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class TokenSubscriber
 {
     use MatchFilterForLeadTrait;
+
     public function __construct(
         private EventDispatcherInterface $dispatcher,
         private PrimaryCompanyHelper $primaryCompanyHelper,
         private LeadListRepository $segmentRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailSendEvent::class,
         priority: 254
     )]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailDisplayEvent::class,
         priority: 254
     )]
@@ -65,7 +68,8 @@ final readonly class TokenSubscriber
             $event->addTokens($tokenEvent->getTokens());
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: TokenReplacementEvent::class,
         priority: -254
     )]
@@ -118,6 +122,7 @@ final readonly class TokenSubscriber
             $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
         }
     }
+
     private function urlDecodeTokens(string $content): string
     {
         return preg_replace('/(%7B)(.*?)(%3D|=)(.*?)(%7D)/i', '{$2=$4}', $content);

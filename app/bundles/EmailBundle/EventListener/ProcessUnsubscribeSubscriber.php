@@ -8,18 +8,21 @@ use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ProcessUnsubscribeSubscriber
 {
     public const string BUNDLE     = 'EmailBundle';
     public const string FOLDER_KEY = 'unsubscribes';
+
     public function __construct(
         private Unsubscribe $unsubscriber,
         private FeedbackLoop $looper,
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MonitoredEmailEvent::class,
         priority: 0
     )]
@@ -27,7 +30,8 @@ final readonly class ProcessUnsubscribeSubscriber
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.unsubscribe_folder');
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ParseEmailEvent::class,
         priority: 0
     )]
@@ -43,10 +47,11 @@ final readonly class ProcessUnsubscribeSubscriber
             }
         }
     }
+
     /**
      * Add an unsubscribe email to the List-Unsubscribe header if applicable.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailSendEvent::class,
         priority: 0
     )]

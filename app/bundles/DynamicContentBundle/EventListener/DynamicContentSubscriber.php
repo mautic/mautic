@@ -2,6 +2,10 @@
 
 namespace Mautic\DynamicContentBundle\EventListener;
 
+use DOMDocument;
+use DOMElement;
+use DOMNode;
+use DOMXPath;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -23,10 +27,12 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class DynamicContentSubscriber
 {
     use MatchFilterForLeadTrait;
+
     public function __construct(
         private TrackableModel $trackableModel,
         private PageTokenHelper $pageTokenHelper,
@@ -41,10 +47,11 @@ final readonly class DynamicContentSubscriber
         private CompanyLeadRepository $companyLeadRepository,
     ) {
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: DynamicContentEvents::POST_SAVE,
         priority: 0
     )]
@@ -62,10 +69,11 @@ final readonly class DynamicContentSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: DynamicContentEvents::POST_DELETE,
         priority: 0
     )]
@@ -81,7 +89,8 @@ final readonly class DynamicContentSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MauticEvents\TokenReplacementEvent::class,
         priority: 0
     )]
@@ -134,17 +143,18 @@ final readonly class DynamicContentSubscriber
             $event->setContent($content);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageDisplayEvent::class,
         priority: 254
     )]
     public function decodeTokens(PageDisplayEvent $event): void
     {
-        if (!$lead = $event->getLead()) {
+        if (!($lead = $event->getLead()) instanceof Lead) {
             $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
         }
 
-        if (!$lead) {
+        if (!$lead instanceof Lead) {
             return;
         }
 
@@ -156,15 +166,15 @@ final readonly class DynamicContentSubscriber
         $tokens = $this->dynamicContentHelper->findDwcTokens($content, $lead);
 
         // replace slots
-        $dom = new \DOMDocument('1.0', 'utf-8');
+        $dom = new DOMDocument('1.0', 'utf-8');
         $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
-        $xpath = new \DOMXPath($dom);
+        $xpath = new DOMXPath($dom);
 
         $contentSlots = $xpath->query('//*[@data-slot="dwc"]');
 
         for ($i = 0; $i < $contentSlots->length; ++$i) {
             $slot = $contentSlots->item($i);
-            if (!$slot instanceof \DOMElement) {
+            if (!$slot instanceof DOMElement) {
                 continue;
             }
             if (!$slotName = $slot->getAttribute('data-param-slot-name')) {
@@ -177,7 +187,7 @@ final readonly class DynamicContentSubscriber
 
             $newnode = $dom->createDocumentFragment();
             $newnode->appendXML('<![CDATA['.mb_encode_numericentity($slotContent, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8').']]>');
-            if ($slot->parentNode instanceof \DOMNode) {
+            if ($slot->parentNode instanceof DOMNode) {
                 $slot->parentNode->replaceChild($newnode, $slot);
             }
         }

@@ -20,6 +20,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class BuilderSubscriber
@@ -28,6 +29,7 @@ final class BuilderSubscriber
      * @var array<string, array{array{string, string}, Trackable[]|Redirect[]}>
      */
     private array $convertedContent = [];
+
     public function __construct(
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly EmailModel $emailModel,
@@ -40,7 +42,8 @@ final class BuilderSubscriber
         private readonly RedirectRepository $redirectRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailOnBuildEvent::class,
         priority: 0
     )]
@@ -91,11 +94,12 @@ final class BuilderSubscriber
             );
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailSendEvent::class,
         priority: 10000
     )]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailDisplayEvent::class,
         priority: 10000
     )]
@@ -136,11 +140,12 @@ final class BuilderSubscriber
 
         $event->setContent($content);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailSendEvent::class,
         priority: 0
     )]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailDisplayEvent::class,
         priority: 0
     )]
@@ -192,7 +197,7 @@ final class BuilderSubscriber
         $event->addToken('{webview_text}', $webviewText);
 
         // Show public email preview if the lead is not known to prevent 404
-        if (empty($lead['id']) && $email) {
+        if (empty($lead['id']) && $email instanceof Email) {
             $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_preview', ['objectId' => $email->getId()]));
         } else {
             $event->addToken('{webview_url}', $webviewLink);
@@ -201,7 +206,7 @@ final class BuilderSubscriber
         $signatureText = (string) $this->coreParametersHelper->get('default_signature_text');
 
         // In owner-mailer mode, use the owner's signature for display/send generation.
-        if ($email && $email->getUseOwnerAsMailer() && is_array($lead)) {
+        if ($email instanceof Email && $email->getUseOwnerAsMailer() && is_array($lead)) {
             $this->fromEmailHelper->getFromAddressConsideringOwner($this->fromEmailHelper->getFrom($email), $lead, $email);
             if ($this->fromEmailHelper->hasSignature()) {
                 $signatureText = $this->fromEmailHelper->getSignature();
@@ -218,11 +223,12 @@ final class BuilderSubscriber
         $event->addToken('{subject}', $event->getSubject());
         $event->addToken('{brand=name}', (string) $this->coreParametersHelper->get('brand_name'));
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailSendEvent::class,
         priority: -9999
     )]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailDisplayEvent::class,
         priority: -9999
     )]
@@ -268,6 +274,7 @@ final class BuilderSubscriber
             $event->addToken($token, $url);
         }
     }
+
     /**
      * Parses the content for URLs and replaces them for trackables.
      *

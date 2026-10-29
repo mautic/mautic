@@ -7,6 +7,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\FocusEventTypes;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 
 final readonly class LeadSubscriber
@@ -17,10 +18,11 @@ final readonly class LeadSubscriber
         private StatRepository $statRepository,
     ) {
     }
+
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadTimelineEvent::class,
         priority: 0
     )]

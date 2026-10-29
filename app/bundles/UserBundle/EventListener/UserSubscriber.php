@@ -10,6 +10,7 @@ use Mautic\UserBundle\Event\PostDeleteRoleEvent;
 use Mautic\UserBundle\Event\PostDeleteUserEvent;
 use Mautic\UserBundle\Event\PostSaveRoleEvent;
 use Mautic\UserBundle\Event\PostSaveUserEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class UserSubscriber
 {
@@ -18,10 +19,11 @@ final readonly class UserSubscriber
         private AuditLogModel $auditLogModel,
     ) {
     }
+
     /**
      * Add a user entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PostSaveUserEvent::class,
         priority: 0
     )]
@@ -41,10 +43,11 @@ final readonly class UserSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a user delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PostDeleteUserEvent::class,
         priority: 0
     )]
@@ -61,10 +64,11 @@ final readonly class UserSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
+
     /**
      * Add a role entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PostSaveRoleEvent::class,
         priority: 0
     )]
@@ -83,10 +87,11 @@ final readonly class UserSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a role delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PostDeleteRoleEvent::class,
         priority: 0
     )]

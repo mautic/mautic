@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -25,10 +26,11 @@ final readonly class LeadSubscriber
         private LeadRepository $campaignLeadRepository,
     ) {
     }
+
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadTimelineEvent::class,
         priority: 0
     )]
@@ -37,10 +39,11 @@ final readonly class LeadSubscriber
         $this->addTimelineEvents($event, 'campaign.event', $this->translator->trans('mautic.campaign.triggered'));
         $this->addTimelineEvents($event, 'campaign.event.scheduled', $this->translator->trans('mautic.campaign.scheduled'));
     }
+
     /**
      * Update records after lead merge.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadPostMergeEvent::class,
         priority: 0
     )]
@@ -49,6 +52,7 @@ final readonly class LeadSubscriber
         $this->leadEventLogRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
         $this->campaignLeadRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
+
     private function addTimelineEvents(LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName): void
     {
         $event->addEventType($eventTypeKey, $eventTypeName);
@@ -117,7 +121,7 @@ final readonly class LeadSubscriber
 
                 // check if the event is a condition or decision event
                 $eventEntity = $this->getConditionOrDecisionEvent($log['event_id']);
-                if ($eventEntity) {
+                if ($eventEntity instanceof Event) {
                     $extra['eventDetails'] = $this->getCampaignEventDetails($log);
 
                     $toolTipClass = 'yes' === $extra['eventDetails']['path'] ? 'text-success' : 'text-danger';
@@ -152,6 +156,7 @@ final readonly class LeadSubscriber
             }
         }
     }
+
     /**
      * Check if the given campaign event is a condition or decision event.
      */
@@ -164,6 +169,7 @@ final readonly class LeadSubscriber
 
         return $entities[0] ?? null;
     }
+
     /**
      * Get details for the campaign event.
      *

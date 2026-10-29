@@ -12,6 +12,7 @@ use Mautic\IntegrationsBundle\DTO\IntegrationObjectToken as Token;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\MappedIntegrationObjectTokenEvent;
 use Mautic\IntegrationsBundle\Helper\TokenParser;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -26,7 +27,8 @@ final readonly class EmailSubscriber
         private ObjectMappingRepository $objectMappingRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailOnBuildEvent::class,
         priority: 0
     )]
@@ -57,11 +59,12 @@ final readonly class EmailSubscriber
             );
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailSendEvent::class,
         priority: 0
     )]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailDisplayEvent::class,
         priority: 0
     )]

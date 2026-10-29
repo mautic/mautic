@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use InvalidArgumentException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
@@ -10,9 +11,12 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Mautic\PointBundle\PointEvents;
+use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Model\StageModel;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use UnexpectedValueException;
 
 final readonly class PointSubscriber
 {
@@ -23,7 +27,8 @@ final readonly class PointSubscriber
         private LoggerInterface $logger,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: TriggerBuilderEvent::class,
         priority: 0
     )]
@@ -68,7 +73,8 @@ final readonly class PointSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PointEvents::TRIGGER_ON_EVENT_EXECUTE,
         priority: 0
     )]
@@ -80,6 +86,7 @@ final readonly class PointSubscriber
             $this->handleChangeStage($event);
         }
     }
+
     private function handleChangeTags(TriggerExecutedEvent $event): void
     {
         $properties = $event->getTriggerEvent()->getProperties();
@@ -90,6 +97,7 @@ final readonly class PointSubscriber
             $event->setSucceded();
         }
     }
+
     private function handleChangeStage(TriggerExecutedEvent $event): void
     {
         $properties = $event->getTriggerEvent()->getProperties();
@@ -105,8 +113,8 @@ final readonly class PointSubscriber
 
         try {
             $stage = $this->stageModel->getEntity($stageId);
-            if (null === $stage || false === $stage->isPublished()) {
-                throw new \InvalidArgumentException("Stage for ID {$stageId} not found");
+            if (!$stage instanceof Stage || false === $stage->isPublished()) {
+                throw new InvalidArgumentException("Stage for ID {$stageId} not found");
             }
 
             $this->leadModel->changeStage(
@@ -116,16 +124,17 @@ final readonly class PointSubscriber
             );
 
             $event->setSucceded();
-        } catch (\UnexpectedValueException|\InvalidArgumentException $exception) {
+        } catch (UnexpectedValueException|InvalidArgumentException $exception) {
             $event->setFailed();
             $this->logger->info("LeadBundle: Stage not updated for lead {$event->getLead()->getId()} by trigger because: {$exception->getMessage()}");
         }
     }
+
     private function handleRemoveStage(Lead $lead): void
     {
         $stage = $lead->getStage();
 
-        if (null !== $stage) {
+        if ($stage instanceof Stage) {
             $this->leadModel->removeFromStage(
                 $lead,
                 $stage,
@@ -133,7 +142,8 @@ final readonly class PointSubscriber
             );
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE,
         priority: 0
     )]

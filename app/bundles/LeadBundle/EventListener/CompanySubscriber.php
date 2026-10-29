@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\CompanyPreSaveEvent;
 use Mautic\LeadBundle\Event\CompanySoftDeleteEvent;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class CompanySubscriber
 {
@@ -25,10 +26,11 @@ final readonly class CompanySubscriber
         private CompanyModel $companyModel,
     ) {
     }
+
     /**
      * Add a company entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CompanyPostSaveEvent::class,
         priority: 0
     )]
@@ -47,10 +49,11 @@ final readonly class CompanySubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a company delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CompanyPostDeleteEvent::class,
         priority: 0
     )]
@@ -68,7 +71,8 @@ final readonly class CompanySubscriber
         $this->auditLogModel->writeToLog($log);
         $this->clearCompanyInLeadsCompanyFields($company->getName());
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CompanySoftDeleteEvent::class,
         priority: 0
     )]
@@ -93,7 +97,8 @@ final readonly class CompanySubscriber
         $this->companyLeadRepository->deleteCompanyLeads($event->getCompany()->getId());
         $this->companyModel->permanentDeleteCompany($event->getCompany());
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CompanyPreSaveEvent::class,
         priority: 0
     )]
@@ -107,6 +112,7 @@ final readonly class CompanySubscriber
         }
         $this->companyLeadRepository->updateLeadsPrimaryCompanyName($event->getCompany());
     }
+
     private function clearCompanyInLeadsCompanyFields(?string $companyName): void
     {
         if (null === $companyName) {

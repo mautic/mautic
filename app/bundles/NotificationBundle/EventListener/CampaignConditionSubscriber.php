@@ -6,10 +6,11 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\NotificationBundle\NotificationEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class CampaignConditionSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -24,7 +25,8 @@ final class CampaignConditionSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: NotificationEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         priority: 0
     )]

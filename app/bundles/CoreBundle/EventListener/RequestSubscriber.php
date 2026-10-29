@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,7 +23,8 @@ final readonly class RequestSubscriber
         private Environment $twig,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: KernelEvents::REQUEST,
         priority: 0
     )]
@@ -39,14 +41,17 @@ final readonly class RequestSubscriber
             $event->stopPropagation();
         }
     }
+
     private function isAjaxPost(Request $request): bool
     {
         return $request->isXmlHttpRequest() && Request::METHOD_POST === $request->getMethod();
     }
+
     private function isSecurePath(Request $request): bool
     {
         return 1 === preg_match('/^\/s\//', $request->getPathinfo());
     }
+
     private function isCsrfTokenFromRequestHeaderValid(Request $request): bool
     {
         $csrfRequestToken = $request->headers->get('X-CSRF-Token');

@@ -19,11 +19,13 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Model\PluginModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class SegmentImportExportSubscriber
 {
     use ImportExportTrait;
+
     public function __construct(
         private ListModel $leadListModel,
         private EntityManagerInterface $entityManager,
@@ -36,7 +38,8 @@ final readonly class SegmentImportExportSubscriber
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityExportEvent::class,
         priority: 0
     )]
@@ -48,7 +51,7 @@ final readonly class SegmentImportExportSubscriber
 
         $leadListId = $event->getEntityId();
         $leadList   = $this->leadListModel->getEntity($leadListId);
-        if (!$leadList) {
+        if (!$leadList instanceof LeadList) {
             return;
         }
         $segmentData = [
@@ -89,7 +92,8 @@ final readonly class SegmentImportExportSubscriber
         $event->addEntity(LeadList::ENTITY_NAME, $segmentData);
         $this->logAction('export', $leadListId, $segmentData);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportEvent::class,
         priority: 0
     )]
@@ -134,7 +138,8 @@ final readonly class SegmentImportExportSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportUndoEvent::class,
         priority: 0
     )]
@@ -152,7 +157,7 @@ final readonly class SegmentImportExportSubscriber
         foreach ($summary['ids'] as $id) {
             $entity = $this->leadListRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof LeadList) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => LeadList::class]);
             }
@@ -160,7 +165,8 @@ final readonly class SegmentImportExportSubscriber
 
         $this->entityManager->flush();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
         priority: 0
     )]
@@ -195,6 +201,7 @@ final readonly class SegmentImportExportSubscriber
             $this->entityManager
         );
     }
+
     /**
      * @param array<string, mixed> $details
      */

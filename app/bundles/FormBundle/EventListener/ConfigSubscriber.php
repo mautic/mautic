@@ -6,10 +6,11 @@ namespace Mautic\FormBundle\EventListener;
 
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\FormBundle\Form\Type\ConfigFormType;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class ConfigSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ConfigBuilderEvent::class,
         priority: 0
     )]

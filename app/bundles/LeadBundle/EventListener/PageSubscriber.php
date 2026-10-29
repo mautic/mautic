@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PageSubscriber
 {
@@ -16,7 +17,8 @@ final readonly class PageSubscriber
         private PrimaryCompanyHelper $primaryCompanyHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: UrlTokenReplaceEvent::class,
         priority: 0
     )]

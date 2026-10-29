@@ -20,10 +20,11 @@ use Mautic\PointBundle\Entity\Trigger;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\StageBundle\Entity\Stage;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class ApiSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ApiInitializeEvent::class,
         priority: 0
     )]

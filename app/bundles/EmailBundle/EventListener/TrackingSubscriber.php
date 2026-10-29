@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class TrackingSubscriber
 {
@@ -12,7 +13,8 @@ final readonly class TrackingSubscriber
         private StatRepository $statRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ContactIdentificationEvent::class,
         priority: 0
     )]

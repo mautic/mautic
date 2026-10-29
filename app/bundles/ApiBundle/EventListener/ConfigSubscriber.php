@@ -8,10 +8,11 @@ use Mautic\ApiBundle\Form\Type\ConfigType;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class ConfigSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ConfigBuilderEvent::class,
         priority: 0
     )]
@@ -25,7 +26,8 @@ final class ConfigSubscriber
             'parameters' => $event->getParametersFromConfig('MauticApiBundle'),
         ]);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ConfigPreSaveEvent::class,
         priority: 0
     )]

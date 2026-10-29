@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class BroadcastSubscriber
@@ -19,7 +20,8 @@ final readonly class BroadcastSubscriber
         private EmailRepository $emailRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ChannelBroadcastEvent::class,
         priority: 0
     )]
@@ -104,6 +106,7 @@ final readonly class BroadcastSubscriber
             $this->em->detach($emailEntity);
         }
     }
+
     private function setStartDateOfABTesting(Email $emailEntity): void
     {
         if (!$emailEntity->getVariantSentCount(true)) {
@@ -117,6 +120,7 @@ final readonly class BroadcastSubscriber
             $emailEntity->setVariantStartDate($dateTimeHelper->getDateTime());
         }
     }
+
     private function getLimitForABTest(int $limit, Email $emailEntity, int $totalLeadCountForVariants): int
     {
         $diff = ($emailEntity->getVariantSentCount(true) + $limit) - $totalLeadCountForVariants;

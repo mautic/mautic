@@ -9,6 +9,7 @@ use Mautic\FormBundle\Form\Type\PointActionFormSubmitType;
 use Mautic\FormBundle\Helper\PointActionHelper;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PointSubscriber
 {
@@ -16,7 +17,8 @@ final readonly class PointSubscriber
         private PointModel $pointModel,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PointBuilderEvent::class,
         priority: 0
     )]
@@ -32,10 +34,11 @@ final readonly class PointSubscriber
 
         $event->addAction('form.submit', $action);
     }
+
     /**
      * Trigger point actions for form submit.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: SubmissionEvent::class,
         priority: 0
     )]

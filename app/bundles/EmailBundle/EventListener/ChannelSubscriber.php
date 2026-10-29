@@ -9,10 +9,11 @@ use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\EmailBundle\Form\Type\EmailListType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class ChannelSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ChannelEvent::class,
         priority: 100
     )]

@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -19,7 +20,8 @@ final readonly class ButtonSubscriber
         private RouterInterface $router,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CustomButtonEvent::class,
         priority: 0
     )]

@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class MaintenanceSubscriber
@@ -13,7 +14,8 @@ final readonly class MaintenanceSubscriber
         private TranslatorInterface $translator,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MaintenanceEvent::class,
         priority: 0
     )]

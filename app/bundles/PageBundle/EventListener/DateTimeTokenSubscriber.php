@@ -4,9 +4,11 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\DateTime\DateTimeToken;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class DateTimeTokenSubscriber
@@ -18,7 +20,8 @@ final readonly class DateTimeTokenSubscriber
         private ContactTracker $contactTracker,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageBuilderEvent::class,
         priority: 0
     )]
@@ -26,7 +29,8 @@ final readonly class DateTimeTokenSubscriber
     {
         $event->addToken('{today}', $this->translator->trans('mautic.core.token.group.other').': '.$this->translator->trans('mautic.email.token.today'));
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageDisplayEvent::class,
         priority: 0
     )]
@@ -35,7 +39,7 @@ final readonly class DateTimeTokenSubscriber
         $content   = $event->getContent();
         $contact   = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
 
-        $tokenList = $this->dateTokenHelper->getTokens($content, $contact ? $contact->getTimezone() : null);
+        $tokenList = $this->dateTokenHelper->getTokens($content, $contact instanceof Lead ? $contact->getTimezone() : null);
         $event->setContent(str_replace(array_keys($tokenList), $tokenList, $content));
     }
 }

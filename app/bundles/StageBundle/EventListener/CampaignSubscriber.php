@@ -10,7 +10,9 @@ use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Form\Type\StageActionChangeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use UnexpectedValueException;
 
 final readonly class CampaignSubscriber
 {
@@ -20,7 +22,8 @@ final readonly class CampaignSubscriber
         private TranslatorInterface $translator,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -35,7 +38,8 @@ final readonly class CampaignSubscriber
         ];
         $event->addAction('stage.change', $action);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: StageEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 0
     )]
@@ -46,7 +50,7 @@ final readonly class CampaignSubscriber
         $stageId = (int) $config['stage'];
         $stage   = $this->stageModel->getEntity($stageId);
 
-        if (!$stage || !$stage->isPublished()) {
+        if (!$stage instanceof Stage || !$stage->isPublished()) {
             $event->passAllWithError($this->translator->trans('mautic.stage.campaign.event.stage_missing'));
 
             return;
@@ -56,12 +60,13 @@ final readonly class CampaignSubscriber
             $this->changeStage($log, $stage, $event);
         }
     }
+
     private function changeStage(LeadEventLog $log, Stage $stage, PendingEvent $pendingEvent): void
     {
         try {
             $this->leadModel->changeStage($log->getLead(), $stage, $log->getEvent()->getName());
             $pendingEvent->pass($log);
-        } catch (\UnexpectedValueException $exception) {
+        } catch (UnexpectedValueException $exception) {
             $pendingEvent->passWithError($log, $exception->getMessage());
         }
     }

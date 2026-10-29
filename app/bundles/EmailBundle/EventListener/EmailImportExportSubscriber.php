@@ -22,11 +22,13 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class EmailImportExportSubscriber
 {
     use ImportExportTrait;
+
     public function __construct(
         private EmailModel $emailModel,
         private EntityManagerInterface $entityManager,
@@ -40,7 +42,8 @@ final readonly class EmailImportExportSubscriber
         private EmailMediaImageHelper $mediaImageHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityExportEvent::class,
         priority: 0
     )]
@@ -52,7 +55,7 @@ final readonly class EmailImportExportSubscriber
 
         $emailId = $event->getEntityId();
         $email   = $this->emailModel->getEntity($emailId);
-        if (!$email) {
+        if (!$email instanceof Email) {
             return;
         }
 
@@ -104,7 +107,7 @@ final readonly class EmailImportExportSubscriber
         }
 
         $form = $email->getUnsubscribeForm();
-        if ($form) {
+        if ($form instanceof Form) {
             $subEvent = new EntityExportEvent(Form::ENTITY_NAME, (int) $form->getId());
             $this->dispatcher->dispatch($subEvent);
             $event->addEntities($subEvent->getEntities());
@@ -114,7 +117,7 @@ final readonly class EmailImportExportSubscriber
             ]);
         }
         $page = $email->getPreferenceCenter();
-        if ($page) {
+        if ($page instanceof Page) {
             $subEvent = new EntityExportEvent(Page::ENTITY_NAME, (int) $page->getId());
             $this->dispatcher->dispatch($subEvent);
             $event->addEntities($subEvent->getEntities());
@@ -124,7 +127,8 @@ final readonly class EmailImportExportSubscriber
             ]);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportEvent::class,
         priority: 0
     )]
@@ -188,7 +192,8 @@ final readonly class EmailImportExportSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportUndoEvent::class,
         priority: 0
     )]
@@ -206,7 +211,7 @@ final readonly class EmailImportExportSubscriber
         foreach ($summary['ids'] as $id) {
             $entity = $this->emailRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof Email) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Email::class]);
             }
@@ -214,7 +219,8 @@ final readonly class EmailImportExportSubscriber
 
         $this->entityManager->flush();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
         priority: 0
     )]
@@ -228,6 +234,7 @@ final readonly class EmailImportExportSubscriber
             $this->entityManager
         );
     }
+
     /**
      * @param array<string, mixed> $details
      */

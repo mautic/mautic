@@ -19,6 +19,7 @@ use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -30,6 +31,7 @@ class CampaignSubscriber
      * The maximum number of `include_player_ids` that can be sent within a single request.
      */
     protected const int MAX_PLAYER_IDS_PER_REQUEST = 2000;
+
     public function __construct(
         private readonly IntegrationHelper $integrationHelper,
         private readonly NotificationModel $notificationModel,
@@ -40,7 +42,8 @@ class CampaignSubscriber
         private readonly NotificationRepository $notificationRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -86,7 +89,8 @@ class CampaignSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: NotificationEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 0
     )]
@@ -99,7 +103,7 @@ class CampaignSubscriber
         $notificationId = $event->getEvent()->getProperties()['notification'] ?? null;
         $notification   = $notificationId ? $this->notificationModel->getEntity((int) $notificationId) : null;
 
-        if (!$notification) {
+        if (!$notification instanceof Notification) {
             $event->passAllWithError($this->translator->trans('mautic.notification.campaign.failed.missing_entity'));
 
             return;
@@ -119,6 +123,7 @@ class CampaignSubscriber
             $this->sendNotificationsInBatches($notification, $event);
         }
     }
+
     private function sendNotificationPerLead(Notification $notification, PendingEvent $event): void
     {
         foreach ($event->getPending() as $log) {
@@ -137,6 +142,7 @@ class CampaignSubscriber
             $this->processResponse($response, $event, $log, $notification, $sendNotification);
         }
     }
+
     private function sendNotificationsInBatches(Notification $notification, PendingEvent $event): void
     {
         $batches       = $this->buildBatches($event, $notification);
@@ -159,6 +165,7 @@ class CampaignSubscriber
             }
         }
     }
+
     private function isLeadContactable(PendingEvent $event, LeadEventLog $log): bool
     {
         $contactable = DoNotContact::IS_CONTACTABLE === $this->doNotContact->isContactable($log->getLead(), 'notification');
@@ -169,6 +176,7 @@ class CampaignSubscriber
 
         return $contactable;
     }
+
     /**
      * @return string[]
      */
@@ -196,6 +204,7 @@ class CampaignSubscriber
 
         return $playerIds;
     }
+
     private function buildNotificationToSend(Notification $notification, Lead $lead): Notification
     {
         [$ignore, $notification] = $this->notificationModel->getTranslatedEntity($notification, $lead);
@@ -235,6 +244,7 @@ class CampaignSubscriber
 
         return $sendNotification;
     }
+
     private function processResponse(ResponseInterface $response, PendingEvent $event, LeadEventLog $log, Notification $notification, Notification $sendNotification): void
     {
         // if for some reason the call failed, tell mautic to try again
@@ -258,6 +268,7 @@ class CampaignSubscriber
         $log->appendToMetadata($result);
         $event->pass($log);
     }
+
     /**
      * @return array<string, array{sendNotification: Notification, playerIds: array<string, LeadEventLog>}>
      */

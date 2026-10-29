@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\GetStatDataEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class SegmentStatsSubscriber
 {
@@ -13,7 +14,8 @@ final readonly class SegmentStatsSubscriber
         private LeadListRepository $leadListRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: GetStatDataEvent::class,
         priority: 0
     )]

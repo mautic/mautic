@@ -10,6 +10,7 @@ use Oneup\UploaderBundle\Event\PostUploadEvent;
 use Oneup\UploaderBundle\Event\ValidationEvent;
 use Oneup\UploaderBundle\Uploader\Exception\ValidationException;
 use Oneup\UploaderBundle\UploadEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final readonly class UploadSubscriber
@@ -20,11 +21,12 @@ final readonly class UploadSubscriber
         private FileUploadValidator $fileUploadValidator,
     ) {
     }
+
     /**
      * Moves upladed file to temporary directory where it can be found later
      * and all uploaded files in there cleared. Also sets file name to the response.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: UploadEvents::POST_UPLOAD,
         priority: 0
     )]
@@ -45,12 +47,13 @@ final readonly class UploadSubscriber
         $response['state']       = 1;
         $response['tmpFileName'] = $file->getBasename();
     }
+
     /**
      * Validates file before upload.
      *
      * @throws ValidationException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: UploadEvents::VALIDATION,
         priority: 0
     )]

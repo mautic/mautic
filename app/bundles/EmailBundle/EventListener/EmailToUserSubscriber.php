@@ -8,6 +8,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class EmailToUserSubscriber
 {
@@ -15,7 +16,8 @@ final readonly class EmailToUserSubscriber
         private SendEmailToUser $sendEmailToUser,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailEvents::ON_SENT_EMAIL_TO_USER,
         priority: 0
     )]

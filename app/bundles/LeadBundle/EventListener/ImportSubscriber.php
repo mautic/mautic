@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\ImportEvent;
 use Mautic\LeadBundle\Event\ImportPostDeleteEvent;
 use Mautic\LeadBundle\Event\ImportPostSaveEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ImportSubscriber
 {
@@ -17,10 +18,11 @@ final readonly class ImportSubscriber
         private AuditLogModel $auditLogModel,
     ) {
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ImportPostSaveEvent::class,
         priority: 0
     )]
@@ -39,10 +41,11 @@ final readonly class ImportSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ImportPostDeleteEvent::class,
         priority: 0
     )]

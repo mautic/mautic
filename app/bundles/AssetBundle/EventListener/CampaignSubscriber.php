@@ -9,6 +9,7 @@ use Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class CampaignSubscriber
 {
@@ -16,7 +17,8 @@ final readonly class CampaignSubscriber
         private RealTimeExecutioner $realTimeExecutioner,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -33,10 +35,11 @@ final readonly class CampaignSubscriber
 
         $event->addDecision('asset.download', $trigger);
     }
+
     /**
      * Trigger point actions for asset download.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: AssetLoadEvent::class,
         priority: 0
     )]
@@ -48,7 +51,8 @@ final readonly class CampaignSubscriber
             $this->realTimeExecutioner->execute('asset.download', $asset, 'asset', $asset->getId());
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION,
         priority: 0
     )]

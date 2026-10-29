@@ -6,6 +6,7 @@ namespace Mautic\PointBundle\EventListener;
 
 use Mautic\PointBundle\Event\GroupScoreChangeEvent;
 use Mautic\PointBundle\Model\TriggerModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class GroupScoreSubscriber
 {
@@ -13,7 +14,8 @@ final readonly class GroupScoreSubscriber
         private TriggerModel $triggerModel,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: GroupScoreChangeEvent::class,
         priority: 0
     )]

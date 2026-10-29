@@ -2,11 +2,13 @@
 
 namespace Mautic\WebhookBundle\EventListener;
 
+use Exception;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use Mautic\WebhookBundle\WebhookEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class CampaignSubscriber
 {
@@ -14,7 +16,8 @@ final readonly class CampaignSubscriber
         private CampaignHelper $campaignHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: WebhookEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 0
     )]
@@ -30,15 +33,16 @@ final readonly class CampaignSubscriber
             try {
                 $this->campaignHelper->fireWebhook($config, $log->getLead());
                 $event->pass($log);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $event->fail($log, $e->getMessage());
             }
         }
     }
+
     /**
      * Add event triggers and actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]

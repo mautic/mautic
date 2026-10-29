@@ -14,6 +14,7 @@ use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 
 final readonly class CompanyObjectSubscriber
@@ -23,7 +24,8 @@ final readonly class CompanyObjectSubscriber
         private RouterInterface $router,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectEvent::class,
         priority: 0
     )]
@@ -31,7 +33,8 @@ final readonly class CompanyObjectSubscriber
     {
         $event->addObject(new Company());
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectUpdateEvent::class,
         priority: 0
     )]
@@ -49,7 +52,8 @@ final readonly class CompanyObjectSubscriber
         );
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectCreateEvent::class,
         priority: 0
     )]
@@ -62,7 +66,8 @@ final readonly class CompanyObjectSubscriber
         $event->setObjectMappings($this->companyObjectHelper->create($event->getCreateObjects()));
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectFindEvent::class,
         priority: 0
     )]
@@ -75,7 +80,8 @@ final readonly class CompanyObjectSubscriber
         $event->setFoundObjects($this->companyObjectHelper->findObjectsByIds($event->getIds()));
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectFindEvent::class,
         priority: 0
     )]
@@ -95,7 +101,8 @@ final readonly class CompanyObjectSubscriber
         );
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectFindEvent::class,
         priority: 0
     )]
@@ -112,7 +119,8 @@ final readonly class CompanyObjectSubscriber
         );
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectOwnerEvent::class,
         priority: 0
     )]
@@ -129,7 +137,8 @@ final readonly class CompanyObjectSubscriber
         );
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectRouteEvent::class,
         priority: 0
     )]
@@ -150,7 +159,8 @@ final readonly class CompanyObjectSubscriber
         );
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectFindByIdEvent::class,
         priority: 0
     )]
@@ -162,7 +172,7 @@ final readonly class CompanyObjectSubscriber
 
         $company = $this->companyObjectHelper->findObjectById($event->getId());
 
-        if (null === $company) {
+        if (!$company instanceof \Mautic\LeadBundle\Entity\Company) {
             return;
         }
 

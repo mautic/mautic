@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\Model\TriggerModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class SearchSubscriber
 {
@@ -22,7 +23,8 @@ final readonly class SearchSubscriber
         private GlobalSearch $globalSearch,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
         priority: 0
     )]
@@ -39,7 +41,8 @@ final readonly class SearchSubscriber
             $event->addResults('mautic.point.actions.header.index', $results);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
         priority: 0
     )]
@@ -56,7 +59,8 @@ final readonly class SearchSubscriber
             $event->addResults('mautic.point.group.header.index', $results);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
         priority: 0
     )]
@@ -73,7 +77,8 @@ final readonly class SearchSubscriber
             $event->addResults('mautic.point.trigger.header.index', $results);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MauticEvents\CommandListEvent::class,
         priority: 0
     )]

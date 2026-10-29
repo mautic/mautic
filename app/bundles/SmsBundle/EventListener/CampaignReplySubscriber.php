@@ -14,16 +14,19 @@ use Mautic\SmsBundle\Form\Type\CampaignReplyType;
 use Mautic\SmsBundle\Helper\ReplyHelper;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class CampaignReplySubscriber
 {
     public const string TYPE = 'sms.reply';
+
     public function __construct(
         private TransportChain $transportChain,
         private RealTimeExecutioner $realTimeExecutioner,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -43,7 +46,8 @@ final readonly class CampaignReplySubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: SmsEvents::ON_CAMPAIGN_REPLY,
         priority: 0
     )]
@@ -69,13 +73,14 @@ final readonly class CampaignReplySubscriber
         $decisionEvent->setChannel('sms');
         $decisionEvent->setAsApplicable();
     }
+
     /**
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
      * @throws CannotProcessEventException
      * @throws NotSchedulableException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReplyEvent::class,
         priority: 0
     )]

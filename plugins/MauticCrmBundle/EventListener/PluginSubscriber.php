@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\PluginBundle\Bundle\PluginDatabase;
 use Mautic\PluginBundle\Event\PluginInstallEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PluginSubscriber
 {
@@ -16,7 +17,8 @@ final readonly class PluginSubscriber
         private PluginDatabase $pluginDatabase,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PluginInstallEvent::class,
         priority: 100
     )]
@@ -44,6 +46,7 @@ final readonly class PluginSubscriber
             );
         }
     }
+
     /**
      * Fix: plugin installer doesn't find metadata entities for the plugin
      * PluginBundle/Controller/PluginController:410.

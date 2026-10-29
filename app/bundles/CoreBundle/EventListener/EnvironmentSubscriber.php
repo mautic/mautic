@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -12,7 +13,8 @@ final readonly class EnvironmentSubscriber
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: KernelEvents::REQUEST,
         priority: 128
     )]
@@ -29,10 +31,11 @@ final readonly class EnvironmentSubscriber
             $this->coreParametersHelper->getDefaultTimezone()
         ));
     }
+
     /**
      * Set default locale.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: KernelEvents::REQUEST,
         priority: 101
     )]

@@ -6,10 +6,11 @@ namespace Mautic\ReportBundle\EventListener;
 
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ReportBundle\Form\Type\ConfigType;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class ConfigSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ConfigBuilderEvent::class,
         priority: 0
     )]

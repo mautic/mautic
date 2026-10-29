@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\Uri;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 /**
  * Appends contact segment IDs to tracking URLs for third-party integrations like VWO.
@@ -20,10 +21,11 @@ final readonly class SegmentTrackingSubscriber
         private LeadListRepository $leadListRepository,
     ) {
     }
+
     /**
      * Append segment IDs to the final redirect URL.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: UrlTokenReplaceEvent::class,
         priority: -100
     )]
@@ -45,6 +47,7 @@ final readonly class SegmentTrackingSubscriber
             $this->appendSegmentIdsToUrl($event, $segmentIds);
         }
     }
+
     /**
      * Append segment IDs as a query parameter to the URL in the event.
      *

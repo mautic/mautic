@@ -8,18 +8,21 @@ use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\Event\PreFetchEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ProcessReplySubscriber
 {
     public const string BUNDLE     = 'EmailBundle';
     public const string FOLDER_KEY = 'replies';
     public const string CACHE_KEY  = self::BUNDLE.'_'.self::FOLDER_KEY;
+
     public function __construct(
         private Reply $replier,
         private CacheProviderInterface $cache,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MonitoredEmailEvent::class,
         priority: 0
     )]
@@ -27,7 +30,8 @@ final readonly class ProcessReplySubscriber
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.reply_folder');
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PreFetchEmailEvent::class,
         priority: 0
     )]
@@ -44,7 +48,8 @@ final readonly class ProcessReplySubscriber
 
         $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, Mailbox::CRITERIA_UID." {$startingUID}:{$endingUID}");
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ParseEmailEvent::class,
         priority: 1
     )]

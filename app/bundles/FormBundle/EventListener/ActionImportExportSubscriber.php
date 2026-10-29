@@ -20,11 +20,13 @@ use Mautic\FormBundle\Entity\ActionRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\ActionModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class ActionImportExportSubscriber
 {
     use ImportExportTrait;
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private ActionRepository $actionRepository,
@@ -36,7 +38,8 @@ final readonly class ActionImportExportSubscriber
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityExportEvent::class,
         priority: 0
     )]
@@ -87,7 +90,8 @@ final readonly class ActionImportExportSubscriber
             $event->addEntities([$entityName => $entities]);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportEvent::class,
         priority: 0
     )]
@@ -144,7 +148,8 @@ final readonly class ActionImportExportSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportUndoEvent::class,
         priority: 0
     )]
@@ -162,7 +167,7 @@ final readonly class ActionImportExportSubscriber
 
         foreach ($summary['ids'] as $id) {
             $action = $this->actionRepository->find($id);
-            if ($action) {
+            if ($action instanceof Action) {
                 $this->entityManager->remove($action);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Action::class], 'formAction');
             }
@@ -170,7 +175,8 @@ final readonly class ActionImportExportSubscriber
 
         $this->entityManager->flush();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
         priority: 0
     )]
@@ -193,7 +199,7 @@ final readonly class ActionImportExportSubscriber
             }
 
             $existing = $this->actionRepository->findOneBy(['uuid' => $item['uuid']]);
-            if ($existing) {
+            if ($existing instanceof Action) {
                 $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
                 $summary[EntityImportEvent::UPDATE]['uuids'][] = $existing->getUuid();
             } else {
@@ -214,6 +220,7 @@ final readonly class ActionImportExportSubscriber
             }
         }
     }
+
     /**
      * @param array<string, mixed> $details
      */

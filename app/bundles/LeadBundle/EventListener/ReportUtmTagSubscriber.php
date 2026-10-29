@@ -8,19 +8,22 @@ use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ReportUtmTagSubscriber
 {
     public const string UTM_TAG = 'lead.utmTag';
+
     public function __construct(
         private FieldsBuilder $fieldsBuilder,
         private CompanyReportData $companyReportData,
     ) {
     }
+
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportBuilderEvent::class,
         priority: 0
     )]
@@ -64,10 +67,11 @@ final readonly class ReportUtmTagSubscriber
         ];
         $event->addTable(self::UTM_TAG, $data, ReportSubscriber::GROUP_CONTACTS);
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGeneratorEvent::class,
         priority: 0
     )]

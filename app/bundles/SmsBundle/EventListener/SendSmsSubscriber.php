@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Event\DncEvent;
 use Mautic\SmsBundle\Event\FilterEvent;
 use Mautic\SmsBundle\Event\QueueEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class SendSmsSubscriber
 {
@@ -19,7 +20,8 @@ final readonly class SendSmsSubscriber
         private MessageQueueModel $messageQueueModel,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: DncEvent::class,
         priority: 0
     )]
@@ -33,7 +35,8 @@ final readonly class SendSmsSubscriber
 
         $event->removeContacts(array_keys($dnc));
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: QueueEvent::class,
         priority: 0
     )]
@@ -58,7 +61,8 @@ final readonly class SendSmsSubscriber
 
         $event->queueContacts($queuedContacts);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FilterEvent::class,
         priority: 0
     )]

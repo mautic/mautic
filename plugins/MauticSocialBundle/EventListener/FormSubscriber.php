@@ -7,6 +7,7 @@ namespace MauticPlugin\MauticSocialBundle\EventListener;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use MauticPlugin\MauticSocialBundle\Form\Type\SocialLoginType;
 use MauticPlugin\MauticSocialBundle\Integration\Config;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class FormSubscriber
 {
@@ -14,7 +15,8 @@ final readonly class FormSubscriber
         private Config $config,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormBuilderEvent::class,
         priority: 0
     )]

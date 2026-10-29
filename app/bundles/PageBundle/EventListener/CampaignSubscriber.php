@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\EmailBundle\Helper\UrlMatcher;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\PageBundle\Entity\Hit;
@@ -16,6 +17,7 @@ use Mautic\PageBundle\Form\Type\CampaignEventPageHitType;
 use Mautic\PageBundle\Form\Type\TrackingPixelSendType;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class CampaignSubscriber
 {
@@ -25,10 +27,11 @@ final readonly class CampaignSubscriber
         private RealTimeExecutioner $realTimeExecutioner,
     ) {
     }
+
     /**
      * Add event triggers and actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -77,10 +80,11 @@ final readonly class CampaignSubscriber
             $event->addAction('tracking.pixel.send', $action);
         }
     }
+
     /**
      * Trigger actions for page hits.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PageHitEvent::class,
         priority: 0
     )]
@@ -98,7 +102,8 @@ final readonly class CampaignSubscriber
         $this->realTimeExecutioner->execute('page.pagehit', $hit, $channel, $channelId);
         $this->realTimeExecutioner->execute('page.devicehit', $hit, $channel, $channelId);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
         priority: 1
     )]
@@ -118,7 +123,7 @@ final readonly class CampaignSubscriber
 
         $result = false;
 
-        $deviceId     = $eventDetails->getDeviceStat() ? $eventDetails->getDeviceStat()->getId() : null;
+        $deviceId     = $eventDetails->getDeviceStat() instanceof LeadDevice ? $eventDetails->getDeviceStat()->getId() : null;
         $deviceType   = $config['device_type'];
         $deviceBrands = $config['device_brand'];
         $deviceOs     = $config['device_os'];
@@ -148,7 +153,8 @@ final readonly class CampaignSubscriber
             $event->setAsApplicable();
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
         priority: 0
     )]
@@ -219,7 +225,8 @@ final readonly class CampaignSubscriber
             $event->setAsApplicable();
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 0
     )]

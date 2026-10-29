@@ -17,6 +17,7 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class CampaignSubscriber
 {
@@ -28,10 +29,11 @@ final readonly class CampaignSubscriber
         private SubmissionRepository $submissionRepository,
     ) {
     }
+
     /**
      * Add the option to the list.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -54,10 +56,11 @@ final readonly class CampaignSubscriber
         ];
         $event->addCondition('form.field_value', $trigger);
     }
+
     /**
      * Trigger campaign event for when a form is submitted.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: SubmissionEvent::class,
         priority: 0
     )]
@@ -66,7 +69,8 @@ final readonly class CampaignSubscriber
         $form = $event->getSubmission()->getForm();
         $this->realTimeExecutioner->execute('form.submit', $form, 'form', $form->getId());
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_CAMPAIGN_TRIGGER_DECISION,
         priority: 0
     )]
@@ -93,7 +97,8 @@ final readonly class CampaignSubscriber
 
         $event->setAsApplicable();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         priority: 0
     )]

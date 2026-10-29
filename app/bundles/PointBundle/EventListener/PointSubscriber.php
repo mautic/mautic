@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PointSubscriber
 {
@@ -16,10 +17,11 @@ final readonly class PointSubscriber
         private AuditLogModel $auditLogModel,
     ) {
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PointEvents::POINT_POST_SAVE,
         priority: 0
     )]
@@ -38,10 +40,11 @@ final readonly class PointSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PointEvents::POINT_POST_DELETE,
         priority: 0
     )]
@@ -58,10 +61,11 @@ final readonly class PointSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PointEvents::TRIGGER_POST_SAVE,
         priority: 0
     )]
@@ -80,10 +84,11 @@ final readonly class PointSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PointEvents::TRIGGER_POST_DELETE,
         priority: 0
     )]

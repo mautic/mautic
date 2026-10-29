@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupRepository;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class SegmentFilterSubscriber
@@ -20,7 +21,8 @@ final readonly class SegmentFilterSubscriber
         private TranslatorInterface $translator,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadListFiltersChoicesEvent::class,
         priority: -10
     )]
@@ -48,7 +50,8 @@ final readonly class SegmentFilterSubscriber
             $event->addChoice('groups', $alias, $fieldOptions);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: SegmentDictionaryGenerationEvent::class,
         priority: 0
     )]

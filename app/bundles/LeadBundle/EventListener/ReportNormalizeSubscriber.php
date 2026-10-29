@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\ReportBundle\Event\ReportDataEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ReportNormalizeSubscriber
 {
@@ -12,7 +13,8 @@ final readonly class ReportNormalizeSubscriber
         private LeadFieldRepository $leadFieldRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportDataEvent::class,
         priority: 0
     )]
@@ -37,6 +39,7 @@ final readonly class ReportNormalizeSubscriber
         }
         $event->setData($rows);
     }
+
     /**
      * @param array<string> $columns
      */

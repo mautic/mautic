@@ -6,6 +6,7 @@ namespace Mautic\IntegrationsBundle\EventListener;
 
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -17,7 +18,8 @@ final readonly class ControllerSubscriber
         private ControllerResolverInterface $resolver,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: KernelEvents::CONTROLLER,
         priority: 0
     )]

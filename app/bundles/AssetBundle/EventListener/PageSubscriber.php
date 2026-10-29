@@ -6,13 +6,14 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\PageBundle\Event\PageBuilderEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class PageSubscriber
 {
     /**
      * Add forms to available page tokens.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PageBuilderEvent::class,
         priority: 0
     )]

@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CampaignBundle\Helper\CampaignConfig;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class CampaignEventDeleteSubscriber
 {
@@ -20,7 +21,8 @@ final readonly class CampaignEventDeleteSubscriber
         private EventModel $eventModel,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: DeleteCampaign::class,
         priority: 0
     )]
@@ -36,7 +38,8 @@ final readonly class CampaignEventDeleteSubscriber
         $this->eventModel->deleteEventsByCampaignId($campaignId);
         $this->campaignModel->deleteCampaign($event->getCampaign());
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: DeleteEvent::class,
         priority: 0
     )]

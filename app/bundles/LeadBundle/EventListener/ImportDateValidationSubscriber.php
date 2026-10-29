@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateTime;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportRowFailedException;
 use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class ImportDateValidationSubscriber
 {
@@ -20,14 +22,16 @@ final class ImportDateValidationSubscriber
      * @var array<string,'date'|'datetime'>|null
      */
     private ?array $dateFields = null;
+
     public function __construct(
         private readonly FieldModel $fieldModel,
     ) {
     }
+
     /**
      * @throws ImportRowFailedException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ImportProcessEvent::class,
         priority: 100
     )]
@@ -40,6 +44,7 @@ final class ImportDateValidationSubscriber
             $this->validateDateTimeField($event->import->getMatchedFields(), $event->rowData, $alias, $type);
         }
     }
+
     /**
      * Validate one field value if it's date/datetime.
      *
@@ -73,6 +78,7 @@ final class ImportDateValidationSubscriber
                 break;
         }
     }
+
     /**
      * Get all published date/datetime fields (cached).
      *
@@ -102,11 +108,12 @@ final class ImportDateValidationSubscriber
 
         return $this->dateFields;
     }
+
     private function createDate(string $format, string $value, string $alias, string $errorMessage): void
     {
-        $dt = \DateTime::createFromFormat($format, $value);
+        $dt = DateTime::createFromFormat($format, $value);
 
-        $errors = $dt ? \DateTime::getLastErrors() : null;
+        $errors = $dt ? DateTime::getLastErrors() : null;
         if (!$dt || ($errors && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
             $message = sprintf(
                 'Row skipped: invalid value "%s" for field "%s". %s',

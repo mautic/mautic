@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -9,6 +10,7 @@ final readonly class RouterSubscriber
 {
     private int $httpsPort;
     private int $httpPort;
+
     public function __construct(
         private RouterInterface $router,
         private ?string $scheme,
@@ -20,16 +22,17 @@ final readonly class RouterSubscriber
         $this->httpsPort = $httpsPort ?? 443;
         $this->httpPort  = $httpPort ?? 80;
     }
+
     /**
      * This forces generated routes to be the same as what is configured as Mautic's site_url
      * in order to prevent mismatches between cached URLs generated during web requests and URLs generated
      * via CLI/cron jobs.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: KernelEvents::REQUEST,
         priority: 1
     )]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: KernelEvents::FINISH_REQUEST,
         priority: -1
     )]

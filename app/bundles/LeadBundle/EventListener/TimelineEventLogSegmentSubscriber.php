@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
@@ -12,10 +13,12 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\ListBatchChangeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class TimelineEventLogSegmentSubscriber
 {
     use TimelineEventLogTrait;
+
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
         private readonly UserHelper $userHelper,
@@ -25,10 +28,11 @@ final class TimelineEventLogSegmentSubscriber
         $this->eventLogRepository = $eventLogRepository;
         $this->translator         = $translator;
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListChangeEvent::class)]
+
+    #[AsEventListener(event: ListChangeEvent::class)]
     public function onChange(ListChangeEvent $event): void
     {
-        if (!$contact = $event->getLead()) {
+        if (!($contact = $event->getLead()) instanceof Lead) {
             return;
         }
 
@@ -39,7 +43,8 @@ final class TimelineEventLogSegmentSubscriber
             $event->getDate()
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
+
+    #[AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
@@ -51,7 +56,8 @@ final class TimelineEventLogSegmentSubscriber
             'segment'
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListBatchChangeEvent::class)]
+
+    #[AsEventListener(event: ListBatchChangeEvent::class)]
     public function onBatchChange(ListChangeEvent $event): void
     {
         if (!$contacts = $event->getLeads()) {
@@ -65,10 +71,11 @@ final class TimelineEventLogSegmentSubscriber
             $event->getDate()
         );
     }
+
     /**
      * @param Lead[] $contacts
      */
-    private function writeEntries(array $contacts, LeadList $segment, string $action, ?\DateTime $date = null): void
+    private function writeEntries(array $contacts, LeadList $segment, string $action, ?DateTime $date = null): void
     {
         $user                    = $this->userHelper->getUser();
         $logs                    = [];
@@ -96,7 +103,7 @@ final class TimelineEventLogSegmentSubscriber
                     ]
                 );
 
-            if ($date) {
+            if ($date instanceof DateTime) {
                 $log->setDateAdded($date);
             }
 

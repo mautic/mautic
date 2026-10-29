@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Event\ListBatchChangeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class SegmentSubscriber
 {
@@ -14,11 +15,12 @@ final readonly class SegmentSubscriber
         private EmailModel $emailModel,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ListChangeEvent::class,
         priority: 0
     )]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ListBatchChangeEvent::class,
         priority: 0
     )]

@@ -10,13 +10,16 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class BuilderSubscriber
 {
     private string $assetToken = '{assetlink=(.*?)}';
+
     public function __construct(
         private readonly CorePermissions $security,
         private readonly TokenHelper $tokenHelper,
@@ -24,11 +27,12 @@ final class BuilderSubscriber
         private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailOnBuildEvent::class,
         priority: 0
     )]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PageBuilderEvent::class,
         priority: 0
     )]
@@ -48,11 +52,12 @@ final class BuilderSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailSendEvent::class,
         priority: 0
     )]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailDisplayEvent::class,
         priority: 0
     )]
@@ -64,17 +69,18 @@ final class BuilderSubscriber
         $tokens = $this->generateTokensFromContent($event, $leadId, $event->getSource(), $email?->getId());
         $event->addTokens($tokens);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageDisplayEvent::class,
         priority: 0
     )]
     public function onPageDisplay(PageDisplayEvent $event): void
     {
-        if (!$lead = $event->getLead()) {
+        if (!($lead = $event->getLead()) instanceof Lead) {
             $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
         }
 
-        $leadId  = $lead ? $lead->getId() : null;
+        $leadId  = $lead instanceof Lead ? $lead->getId() : null;
         $page    = $event->getPage();
         $tokens  = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
         $content = $event->getContent();
@@ -84,6 +90,7 @@ final class BuilderSubscriber
         }
         $event->setContent($content);
     }
+
     /**
      * @param int[]|string[] $source
      *

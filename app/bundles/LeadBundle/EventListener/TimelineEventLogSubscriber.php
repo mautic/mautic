@@ -7,10 +7,12 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class TimelineEventLogSubscriber
 {
     use TimelineEventLogTrait;
+
     public function __construct(
         Translator $translator,
         LeadEventLogRepository $leadEventLogRepository,
@@ -18,7 +20,8 @@ final class TimelineEventLogSubscriber
         $this->translator         = $translator;
         $this->eventLogRepository = $leadEventLogRepository;
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadTimelineEvent::class,
         priority: 0
     )]

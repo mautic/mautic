@@ -2,11 +2,13 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
+use DOMDocument;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationResponseEvent;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 /**
  * This class can provide useful debugging information for API requests and responses.
@@ -18,7 +20,8 @@ final readonly class IntegrationSubscriber
         private LoggerInterface $logger,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PluginIntegrationRequestEvent::class,
         priority: 0
     )]
@@ -54,7 +57,8 @@ final readonly class IntegrationSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PluginIntegrationResponseEvent::class,
         priority: 0
     )]
@@ -68,7 +72,7 @@ final readonly class IntegrationSubscriber
         $xml      = '';
         $isXml    = isset($response->getHeaders()['Content-Type']) && preg_grep('/text\/xml/', $response->getHeaders()['Content-Type']);
         if ($isXml) {
-            $doc                     = new \DOMDocument('1.0');
+            $doc                     = new DOMDocument('1.0');
             $doc->preserveWhiteSpace = false;
             $doc->formatOutput       = true;
             $doc->loadXML($response->getBody());

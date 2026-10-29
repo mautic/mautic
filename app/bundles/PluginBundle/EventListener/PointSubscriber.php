@@ -7,6 +7,7 @@ namespace Mautic\PluginBundle\EventListener;
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Mautic\PluginBundle\Helper\EventHelper;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PointSubscriber
 {
@@ -14,7 +15,8 @@ final readonly class PointSubscriber
         private EventHelper $eventHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: TriggerBuilderEvent::class,
         priority: 0
     )]

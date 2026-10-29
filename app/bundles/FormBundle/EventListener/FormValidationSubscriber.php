@@ -10,6 +10,7 @@ use Mautic\FormBundle\Form\Type\FormFieldCheckboxGroupType;
 use Mautic\FormBundle\Form\Type\FormFieldEmailType;
 use Mautic\FormBundle\Form\Type\FormFieldTelType;
 use Mautic\FormBundle\FormEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class FormValidationSubscriber
@@ -19,10 +20,11 @@ final readonly class FormValidationSubscriber
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }
+
     /**
      * Add a simple email form.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: Events\FormBuilderEvent::class,
         priority: 0
     )]
@@ -59,10 +61,11 @@ final readonly class FormValidationSubscriber
             ]
         );
     }
+
     /**
      * Custom validation.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FormEvents::ON_FORM_VALIDATE,
         priority: 0
     )]
@@ -77,6 +80,7 @@ final readonly class FormValidationSubscriber
 
         $this->fieldCheckboxGroupValidation($event);
     }
+
     private function fieldEmailValidation(Events\ValidationEvent $event): void
     {
         $field = $event->getField();
@@ -105,6 +109,7 @@ final readonly class FormValidationSubscriber
             }
         }
     }
+
     private function fieldTelValidation(Events\ValidationEvent $event): void
     {
         $field = $event->getField();
@@ -123,6 +128,7 @@ final readonly class FormValidationSubscriber
             }
         }
     }
+
     private function fieldCheckboxGroupValidation(Events\ValidationEvent $event): void
     {
         $field = $event->getField();

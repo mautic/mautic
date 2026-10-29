@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportRowFailedException;
 use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class ImportUrlValidationSubscriber
 {
@@ -20,16 +21,18 @@ final class ImportUrlValidationSubscriber
      * @var array<string,'url'|'website'>|null
      */
     private ?array $urlFields = null;
+
     public function __construct(
         private readonly FieldModel $fieldModel,
     ) {
     }
+
     /**
      * Validate URL fields during CSV import (lead + company).
      *
      * @throws ImportRowFailedException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ImportProcessEvent::class,
         priority: 210
     )]
@@ -48,6 +51,7 @@ final class ImportUrlValidationSubscriber
             );
         }
     }
+
     /**
      * Validate one field value if it's url/website.
      *
@@ -90,6 +94,7 @@ final class ImportUrlValidationSubscriber
             }
         }
     }
+
     /**
      * Get all published url/website fields (cached).
      *

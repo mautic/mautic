@@ -8,6 +8,7 @@ use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetListType;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ChannelSubscriber
 {
@@ -15,7 +16,8 @@ final readonly class ChannelSubscriber
         private IntegrationHelper $helper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ChannelEvent::class,
         priority: 80
     )]

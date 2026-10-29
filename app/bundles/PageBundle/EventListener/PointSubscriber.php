@@ -2,12 +2,14 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\Form\Type\PointActionPageHitType;
 use Mautic\PageBundle\Form\Type\PointActionUrlHitType;
 use Mautic\PageBundle\Helper\PointActionHelper;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PointSubscriber
 {
@@ -16,7 +18,8 @@ final readonly class PointSubscriber
         private PointActionHelper $pointActionHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PointBuilderEvent::class,
         priority: 0
     )]
@@ -43,16 +46,17 @@ final readonly class PointSubscriber
 
         $event->addAction('url.hit', $action);
     }
+
     /**
      * Trigger point actions for page hits.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: Events\PageHitEvent::class,
         priority: 0
     )]
     public function onPageHit(Events\PageHitEvent $event): void
     {
-        if ($event->getPage()) {
+        if ($event->getPage() instanceof Page) {
             // Mautic Landing Page was hit
             $this->pointModel->triggerAction('page.hit', $event->getHit(), null, $event->getLead());
         } else {

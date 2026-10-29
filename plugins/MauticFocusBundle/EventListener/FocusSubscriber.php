@@ -16,6 +16,7 @@ use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\Event\FocusTokenReplacementEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -35,10 +36,11 @@ final readonly class FocusSubscriber
         private RequestStack $requestStack,
     ) {
     }
+
     /**
      * Check and hijack the form's generate link if the ID has mf- in it.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: KernelEvents::REQUEST,
         priority: 0
     )]
@@ -62,10 +64,11 @@ final readonly class FocusSubscriber
             }
         }
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FocusEvents::POST_SAVE,
         priority: 0
     )]
@@ -84,10 +87,11 @@ final readonly class FocusSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FocusEvents::POST_DELETE,
         priority: 0
     )]
@@ -104,7 +108,8 @@ final readonly class FocusSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportBuilderEvent::class,
         priority: -10
     )]
@@ -120,7 +125,8 @@ final readonly class FocusSubscriber
 
         $event->addTable('audit.log', $tables['audit.log']);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FocusTokenReplacementEvent::class,
         priority: 0
     )]

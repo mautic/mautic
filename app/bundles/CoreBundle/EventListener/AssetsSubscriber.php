@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Event\CustomAssetsEvent;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -17,7 +18,8 @@ final readonly class AssetsSubscriber
         private EventDispatcherInterface $dispatcher,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: KernelEvents::REQUEST,
         priority: 0
     )]

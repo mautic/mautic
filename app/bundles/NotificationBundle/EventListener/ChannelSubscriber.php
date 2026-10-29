@@ -8,6 +8,7 @@ use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Form\Type\NotificationListType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ChannelSubscriber
 {
@@ -15,7 +16,8 @@ final readonly class ChannelSubscriber
         private IntegrationHelper $integrationHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ChannelEvent::class,
         priority: 70
     )]

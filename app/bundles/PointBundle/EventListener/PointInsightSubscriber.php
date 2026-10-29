@@ -6,6 +6,7 @@ namespace Mautic\PointBundle\EventListener;
 
 use Mautic\PointBundle\Event\GroupScoreChangeEvent;
 use Mautic\PointBundle\Model\InsightModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PointInsightSubscriber
 {
@@ -13,7 +14,8 @@ final readonly class PointInsightSubscriber
         private InsightModel $insightModel,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: GroupScoreChangeEvent::class,
         priority: 0
     )]

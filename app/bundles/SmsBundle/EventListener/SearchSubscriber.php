@@ -8,6 +8,7 @@ use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\SmsBundle\Model\SmsModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class SearchSubscriber
 {
@@ -16,7 +17,8 @@ final readonly class SearchSubscriber
         private GlobalSearch $globalSearch,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MauticEvents\GlobalSearchEvent::class,
         priority: 0
     )]

@@ -2,12 +2,14 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -20,10 +22,11 @@ final readonly class LeadSubscriber
         private DownloadRepository $downloadRepository,
     ) {
     }
+
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadTimelineEvent::class,
         priority: 0
     )]
@@ -49,7 +52,7 @@ final readonly class LeadSubscriber
             // Add the downloads to the event array
             foreach ($downloads['results'] as $download) {
                 $asset    = $download['asset_id'] ? $this->assetModel->getEntity($download['asset_id']) : null;
-                $hasAsset = $asset && $asset->getId();
+                $hasAsset = $asset instanceof Asset && $asset->getId();
 
                 $eventLabel = $hasAsset
                     ? [
@@ -77,7 +80,8 @@ final readonly class LeadSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadChangeEvent::class,
         priority: 0
     )]
@@ -89,7 +93,8 @@ final readonly class LeadSubscriber
             $event->getOldTrackingId()
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadPostMergeEvent::class,
         priority: 0
     )]

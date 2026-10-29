@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Helper\DateTime\DateTimeToken;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class DateTimeTokenSubscriber
@@ -15,7 +16,8 @@ final readonly class DateTimeTokenSubscriber
         private DateTimeToken $dateTokenHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailOnBuildEvent::class,
         priority: 0
     )]
@@ -23,7 +25,8 @@ final readonly class DateTimeTokenSubscriber
     {
         $event->addToken('{today}', $this->translator->trans('mautic.core.token.group.other').': '.$this->translator->trans('mautic.email.token.today'));
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailDisplayEvent::class,
         priority: 0
     )]
@@ -31,7 +34,8 @@ final readonly class DateTimeTokenSubscriber
     {
         $this->onEmailGenerate($event);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailSendEvent::class,
         priority: 0
     )]

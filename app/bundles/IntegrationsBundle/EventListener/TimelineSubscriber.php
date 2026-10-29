@@ -6,6 +6,7 @@ namespace Mautic\IntegrationsBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class TimelineSubscriber
@@ -15,7 +16,8 @@ final readonly class TimelineSubscriber
         private TranslatorInterface $translator,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadTimelineEvent::class,
         priority: 0
     )]
@@ -45,6 +47,7 @@ final readonly class TimelineSubscriber
             );
         }
     }
+
     /**
      * @param array<string, mixed> $log
      *

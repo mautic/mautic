@@ -7,13 +7,16 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 final class PageSubscriber
 {
     private string $regex = '{focus=(.*?)}';
+
     public function __construct(
         private readonly CorePermissions $security,
         private readonly FocusModel $model,
@@ -21,10 +24,11 @@ final class PageSubscriber
         private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
     ) {
     }
+
     /**
      * Add forms to available page tokens.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PageBuilderEvent::class,
         priority: 0
     )]
@@ -43,7 +47,8 @@ final class PageSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageDisplayEvent::class,
         priority: 0
     )]
@@ -57,7 +62,7 @@ final class PageSubscriber
         if (count($matches[0])) {
             foreach ($matches[1] as $id) {
                 $focus = $this->model->getEntity((int) $id);
-                if (null !== $focus
+                if ($focus instanceof Focus
                     && (
                         $focus->isPublished()
                         || $this->security->hasEntityAccess(

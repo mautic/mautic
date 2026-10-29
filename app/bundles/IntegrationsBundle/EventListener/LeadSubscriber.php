@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\EventListener;
 
+use DateTime;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
@@ -24,6 +25,7 @@ use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadPostDeleteEvent;
 use Mautic\LeadBundle\Event\LeadPostSaveEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class LeadSubscriber
@@ -36,11 +38,12 @@ final readonly class LeadSubscriber
         private EventDispatcherInterface $dispatcher,
     ) {
     }
+
     /**
      * @throws IntegrationNotFoundException
      * @throws ObjectNotFoundException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadPostSaveEvent::class,
         priority: 0
     )]
@@ -90,7 +93,8 @@ final readonly class LeadSubscriber
             $this->recordFieldChanges($dncChanges, $lead->getId(), Lead::class, $lead);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadPostDeleteEvent::class,
         priority: 255
     )]
@@ -103,11 +107,12 @@ final readonly class LeadSubscriber
         $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getLead()->deletedId, Lead::class);
         $this->objectMappingRepository->deleteEntitiesForObject((int) $event->getLead()->deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
     }
+
     /**
      * @throws IntegrationNotFoundException
      * @throws ObjectNotFoundException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CompanyPostSaveEvent::class,
         priority: 0
     )]
@@ -137,7 +142,8 @@ final readonly class LeadSubscriber
 
         $this->recordFieldChanges($changes['fields'], $company->getId(), Company::class, $company);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CompanyPostDeleteEvent::class,
         priority: 255
     )]
@@ -146,7 +152,8 @@ final readonly class LeadSubscriber
         $this->fieldChangeRepo->deleteEntitiesForObject((int) $event->getCompany()->deletedId, Company::class);
         $this->objectMappingRepository->deleteEntitiesForObject((int) $event->getCompany()->deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadChangeCompanyEvent::class,
         priority: 128
     )]
@@ -163,6 +170,7 @@ final readonly class LeadSubscriber
 
         $this->recordFieldChanges($changes, $lead->getId(), Lead::class, $lead);
     }
+
     /**
      * @throws IntegrationNotFoundException
      */
@@ -185,7 +193,7 @@ final readonly class LeadSubscriber
                 $fieldChangeEntity = new FieldChange()
                     ->setObjectType($objectType)
                     ->setObjectId($objectId)
-                    ->setModifiedAt(new \DateTime())
+                    ->setModifiedAt(new DateTime())
                     ->setColumnName($key)
                     ->setColumnType($valueDAO->getType())
                     ->setColumnValue($valueDAO->getValue())
@@ -199,6 +207,7 @@ final readonly class LeadSubscriber
         $this->fieldChangeRepo->saveEntities($toPersist);
         $this->fieldChangeRepo->detachEntities($toPersist);
     }
+
     /**
      * @throws InvalidValueException
      */

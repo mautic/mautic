@@ -10,6 +10,7 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class CategorySubscriber
@@ -22,10 +23,11 @@ final readonly class CategorySubscriber
         private TranslatorInterface $translator,
     ) {
     }
+
     /**
      * Add bundle to the category.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CategoryTypesEvent::class,
         priority: 0
     )]
@@ -41,10 +43,11 @@ final readonly class CategorySubscriber
             }
         }
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CategoryEvents::CATEGORY_POST_SAVE,
         priority: 0
     )]
@@ -63,10 +66,11 @@ final readonly class CategorySubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CategoryEvents::CATEGORY_POST_DELETE,
         priority: 0
     )]
@@ -83,7 +87,8 @@ final readonly class CategorySubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CategoryEvents::CATEGORY_PRE_DELETE,
         priority: 0
     )]
@@ -101,7 +106,8 @@ final readonly class CategorySubscriber
             $event->addDependencyError($message);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CategoryTypeEntityEvent::class,
         priority: 0
     )]

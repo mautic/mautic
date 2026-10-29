@@ -4,7 +4,9 @@ namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
+use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class MessageQueueSubscriber
 {
@@ -12,10 +14,11 @@ final readonly class MessageQueueSubscriber
         private SmsModel $model,
     ) {
     }
+
     /**
      * Sends campaign emails.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: MessageQueueBatchProcessEvent::class,
         priority: 0
     )]
@@ -33,7 +36,7 @@ final readonly class MessageQueueSubscriber
 
         /** @var MessageQueue $message */
         foreach ($messages as $message) {
-            if ($sms && $message->getLead() && $sms->isPublished()) {
+            if ($sms instanceof Sms && $message->getLead() && $sms->isPublished()) {
                 $contact = $message->getLead();
                 $mobile  = $contact->getMobile();
                 $phone   = $contact->getPhone();

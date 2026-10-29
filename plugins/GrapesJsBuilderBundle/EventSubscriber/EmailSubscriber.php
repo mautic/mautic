@@ -11,14 +11,17 @@ use Mautic\EmailBundle\Event\EmailPostDeleteEvent;
 use Mautic\EmailBundle\Event\EmailPostSaveEvent;
 use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class EmailSubscriber
 {
     private string $existingMjml = '';
     private string $existingHtml = '';
+
     public function __construct(
         private readonly Config $config,
         private readonly GrapesJsBuilderModel $grapesJsBuilderModel,
@@ -27,10 +30,11 @@ final class EmailSubscriber
         private readonly EmailRepository $emailRepository,
     ) {
     }
+
     /**
      * Stores the current MJML for use when managing drafts.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailPreSaveEvent::class,
         priority: 0
     )]
@@ -44,14 +48,15 @@ final class EmailSubscriber
 
         $this->existingHtml = $email->getCustomHtml() ?? '';
 
-        if ($grapesJsBuilder = $this->grapesJsBuilderRepository->findOneBy(['email' => $email])) {
+        if (($grapesJsBuilder = $this->grapesJsBuilderRepository->findOneBy(['email' => $email])) instanceof GrapesJsBuilder) {
             $this->existingMjml = $grapesJsBuilder->getCustomMjml();
         }
     }
+
     /**
      * Add an entry.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailPostSaveEvent::class,
         priority: 0
     )]
@@ -63,10 +68,11 @@ final class EmailSubscriber
 
         $this->grapesJsBuilderModel->addOrEditEntity($event->getEmail());
     }
+
     /**
      * Delete an entry.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailPostDeleteEvent::class,
         priority: 0
     )]
@@ -79,11 +85,12 @@ final class EmailSubscriber
         $email           = $event->getEmail();
         $grapesJsBuilder = $this->grapesJsBuilderRepository->findOneBy(['email' => $email]);
 
-        if ($grapesJsBuilder) {
+        if ($grapesJsBuilder instanceof GrapesJsBuilder) {
             $this->grapesJsBuilderRepository->deleteEntity($grapesJsBuilder);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEditSubmitEvent::class)]
+
+    #[AsEventListener(event: EmailEditSubmitEvent::class)]
     public function manageEmailDraft(EmailEditSubmitEvent $event): void
     {
         if (!$this->config->isPublished()) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -22,6 +23,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class CampaignEventImportExportSubscriber
@@ -36,7 +38,8 @@ final readonly class CampaignEventImportExportSubscriber
         private EventModel $eventModel,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityExportEvent::class,
         priority: 0
     )]
@@ -76,6 +79,7 @@ final readonly class CampaignEventImportExportSubscriber
             $event->addEntities([$entityName => $entities]);
         }
     }
+
     /**
      * @return array<string, mixed>
      */
@@ -108,6 +112,7 @@ final readonly class CampaignEventImportExportSubscriber
             'uuid'                         => $campaignEvent->getUuid(),
         ];
     }
+
     /**
      * @phpstan-ignore-next-line
      */
@@ -185,6 +190,7 @@ final readonly class CampaignEventImportExportSubscriber
 
         $event->addDependencyEntity(Event::ENTITY_NAME, $dependencies);
     }
+
     /**
      * @param array<string, mixed> $data
      */
@@ -199,6 +205,7 @@ final readonly class CampaignEventImportExportSubscriber
             }
         }
     }
+
     /**
      * @phpstan-ignore-next-line
      */
@@ -211,7 +218,8 @@ final readonly class CampaignEventImportExportSubscriber
             $this->mergeExportData($data, $subEvent);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportEvent::class,
         priority: 0
     )]
@@ -246,7 +254,7 @@ final readonly class CampaignEventImportExportSubscriber
             $campaignEvent->setTriggerInterval($element['trigger_interval'] ?? 0);
             $campaignEvent->setTriggerIntervalUnit($element['trigger_interval_unit'] ?? '');
             $campaignEvent->setTriggerMode($element['trigger_mode'] ?? '');
-            $campaignEvent->setTriggerDate(isset($element['trigger_date']) ? new \DateTime($element['triggerDate']) : null);
+            $campaignEvent->setTriggerDate(isset($element['trigger_date']) ? new DateTime($element['triggerDate']) : null);
             $campaignEvent->setTriggerHour($element['trigger_hour'] ?? null);
             $campaignEvent->setDecisionPath($element['decisionPath'] ?? '');
             $campaignEvent->setTriggerWindow($element['triggerWindow'] ?? null);
@@ -281,7 +289,8 @@ final readonly class CampaignEventImportExportSubscriber
 
         $this->updateParentEvents($event);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
         priority: 0
     )]
@@ -305,7 +314,7 @@ final readonly class CampaignEventImportExportSubscriber
 
             $existing = $this->eventRepository->findOneBy(['uuid' => $element['uuid'] ?? null]);
 
-            if ($existing) {
+            if ($existing instanceof Event) {
                 $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
                 $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
             } else {
@@ -326,6 +335,7 @@ final readonly class CampaignEventImportExportSubscriber
             }
         }
     }
+
     private function updateParentEvents(EntityImportEvent $event): void
     {
         $idMap = $event->getEntityIdMap();
@@ -355,7 +365,7 @@ final readonly class CampaignEventImportExportSubscriber
                     $campaignEvent   = $this->eventRepository->find($campaignEventId);
 
                     $element['properties']['jumpToEvent'] = $newJumpToEventId;
-                    if ($campaignEvent) {
+                    if ($campaignEvent instanceof Event) {
                         $campaignEvent->setProperties($element['properties'] ?? []);
                         $this->entityManager->persist($campaignEvent);
                     }
@@ -365,7 +375,8 @@ final readonly class CampaignEventImportExportSubscriber
 
         $this->entityManager->flush();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportUndoEvent::class,
         priority: 0
     )]
@@ -383,7 +394,7 @@ final readonly class CampaignEventImportExportSubscriber
         foreach ($summary['ids'] as $id) {
             $entity = $this->eventRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof Event) {
                 $dependentEvents = $this->eventRepository->findBy(['parent' => $id]);
 
                 foreach ($dependentEvents as $dependentEvent) {
@@ -402,6 +413,7 @@ final readonly class CampaignEventImportExportSubscriber
 
         $this->entityManager->flush();
     }
+
     /**
      * @param array<string, mixed> $details
      */

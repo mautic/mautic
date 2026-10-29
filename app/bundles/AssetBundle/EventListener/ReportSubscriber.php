@@ -10,22 +10,25 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportSubscriber
 {
     public const string CONTEXT_ASSET          = 'assets';
     public const string CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
+
     public function __construct(
         private CompanyReportData $companyReportData,
         private DownloadRepository $downloadRepository,
         private DncReportService $dncReportService,
     ) {
     }
+
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportBuilderEvent::class,
         priority: 0
     )]
@@ -158,10 +161,11 @@ final readonly class ReportSubscriber
             $event->addGraph($context, 'pie', 'mautic.asset.graph.pie.statuses', ['translate' => false]);
         }
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGeneratorEvent::class,
         priority: 0
     )]
@@ -197,10 +201,11 @@ final readonly class ReportSubscriber
 
         $event->setQueryBuilder($queryBuilder);
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGraphEvent::class,
         priority: 0
     )]
@@ -268,7 +273,8 @@ final readonly class ReportSubscriber
             unset($queryBuilder);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportDataEvent::class,
         priority: 0
     )]

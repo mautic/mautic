@@ -6,10 +6,11 @@ namespace Mautic\FormBundle\EventListener;
 
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\FormBundle\FormEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class EmailSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailOnBuildEvent::class,
         priority: 0
     )]

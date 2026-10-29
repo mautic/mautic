@@ -8,6 +8,7 @@ use Mautic\DynamicContentBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -19,10 +20,11 @@ final readonly class LeadSubscriber
         private StatRepository $statRepository,
     ) {
     }
+
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadTimelineEvent::class,
         priority: 0
     )]
@@ -75,7 +77,8 @@ final readonly class LeadSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadPostMergeEvent::class,
         priority: 0
     )]

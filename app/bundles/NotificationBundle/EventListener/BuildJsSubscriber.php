@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
 use Mautic\NotificationBundle\Helper\NotificationHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -19,7 +20,8 @@ final readonly class BuildJsSubscriber
         private RouterInterface $router,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: BuildJsEvent::class,
         priority: 254
     )]

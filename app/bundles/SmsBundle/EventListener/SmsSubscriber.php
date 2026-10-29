@@ -15,6 +15,7 @@ use Mautic\SmsBundle\Event\SmsPostDeleteEvent;
 use Mautic\SmsBundle\Event\SmsPostSaveEvent;
 use Mautic\SmsBundle\Helper\SmsHelper;
 use Mautic\SmsBundle\SmsEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class SmsSubscriber
 {
@@ -27,10 +28,11 @@ final readonly class SmsSubscriber
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: SmsPostSaveEvent::class,
         priority: 0
     )]
@@ -48,10 +50,11 @@ final readonly class SmsSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: SmsPostDeleteEvent::class,
         priority: 0
     )]
@@ -67,7 +70,8 @@ final readonly class SmsSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: SmsEvents::TOKEN_REPLACEMENT,
         priority: 0
     )]

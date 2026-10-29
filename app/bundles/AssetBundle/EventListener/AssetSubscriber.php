@@ -8,6 +8,7 @@ use Mautic\AssetBundle\Event\AssetPostDeleteEvent;
 use Mautic\AssetBundle\Event\AssetPostSaveEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class AssetSubscriber
 {
@@ -16,10 +17,11 @@ final readonly class AssetSubscriber
         private AuditLogModel $auditLogModel,
     ) {
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: AssetPostSaveEvent::class,
         priority: 0
     )]
@@ -38,10 +40,11 @@ final readonly class AssetSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: AssetPostDeleteEvent::class,
         priority: 0
     )]

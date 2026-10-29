@@ -14,7 +14,9 @@ use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Exception\ImportFailedException;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 
 final readonly class ContactObjectSubscriber
@@ -24,7 +26,8 @@ final readonly class ContactObjectSubscriber
         private RouterInterface $router,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectEvent::class,
         priority: 0
     )]
@@ -32,7 +35,8 @@ final readonly class ContactObjectSubscriber
     {
         $event->addObject(new Contact());
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectUpdateEvent::class,
         priority: 0
     )]
@@ -50,7 +54,8 @@ final readonly class ContactObjectSubscriber
         );
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectCreateEvent::class,
         priority: 0
     )]
@@ -63,7 +68,8 @@ final readonly class ContactObjectSubscriber
         $event->setObjectMappings($this->contactObjectHelper->create($event->getCreateObjects()));
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectFindEvent::class,
         priority: 0
     )]
@@ -76,7 +82,8 @@ final readonly class ContactObjectSubscriber
         $event->setFoundObjects($this->contactObjectHelper->findObjectsByIds($event->getIds()));
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectFindEvent::class,
         priority: 0
     )]
@@ -96,7 +103,8 @@ final readonly class ContactObjectSubscriber
         );
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectFindEvent::class,
         priority: 0
     )]
@@ -113,7 +121,8 @@ final readonly class ContactObjectSubscriber
         );
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectOwnerEvent::class,
         priority: 0
     )]
@@ -130,7 +139,8 @@ final readonly class ContactObjectSubscriber
         );
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: InternalObjectRouteEvent::class,
         priority: 0
     )]
@@ -151,10 +161,11 @@ final readonly class ContactObjectSubscriber
         );
         $event->stopPropagation();
     }
+
     /**
      * @throws ImportFailedException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: InternalObjectFindByIdEvent::class,
         priority: 0
     )]
@@ -166,7 +177,7 @@ final readonly class ContactObjectSubscriber
 
         $contact = $this->contactObjectHelper->findObjectById($event->getId());
 
-        if (null === $contact) {
+        if (!$contact instanceof Lead) {
             return;
         }
 

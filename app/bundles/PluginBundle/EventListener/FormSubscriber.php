@@ -6,11 +6,13 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class FormSubscriber
 {
     use PushToIntegrationTrait;
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormBuilderEvent::class,
         priority: 0
     )]
@@ -26,7 +28,8 @@ final class FormSubscriber
             'template'    => '@MauticPlugin/Action/integration.html.twig',
         ]);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 0
     )]

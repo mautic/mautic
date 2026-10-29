@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Form\Validator\Constraints\InfiniteLoopValidator;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityValidateEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class CampaignActionChangeMembershipSubscriber
 {
@@ -21,10 +22,11 @@ final readonly class CampaignActionChangeMembershipSubscriber
         private InfiniteLoopValidator $infiniteLoopValidator,
     ) {
     }
+
     /**
      * Add change membership action.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -43,7 +45,8 @@ final readonly class CampaignActionChangeMembershipSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP,
         priority: 0
     )]
@@ -81,7 +84,8 @@ final readonly class CampaignActionChangeMembershipSubscriber
 
         $event->passAll();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityValidateEvent::class,
         priority: 0
     )]
@@ -105,6 +109,7 @@ final readonly class CampaignActionChangeMembershipSubscriber
             $campaignEvent->getTriggerIntervalUnit()
         );
     }
+
     private function getCampaigns(array $campaigns, Campaign $executingCampaign): array
     {
         // Check for the keyword "this"

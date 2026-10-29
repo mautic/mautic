@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use InvalidArgumentException;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
@@ -12,6 +13,7 @@ use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\LoginEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
@@ -33,10 +35,11 @@ final readonly class CoreSubscriber
         private UserRepository $userRepository,
     ) {
     }
+
     /**
      * Set vars on login.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: SecurityEvents::INTERACTIVE_LOGIN,
         priority: 0
     )]
@@ -83,7 +86,8 @@ final readonly class CoreSubscriber
             $session->remove('mautic.user');
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: MenuEvent::class,
         priority: 9999
     )]
@@ -103,7 +107,8 @@ final readonly class CoreSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: RouteEvent::class,
         priority: 0
     )]
@@ -172,7 +177,7 @@ final readonly class CoreSubscriber
 
                         foreach (['name', 'path', 'controller'] as $required) {
                             if (empty($details[$required])) {
-                                throw new \InvalidArgumentException("{$bundle}.{$name} must have {$required} defined");
+                                throw new InvalidArgumentException("{$bundle}.{$name} must have {$required} defined");
                             }
                         }
 
@@ -202,7 +207,8 @@ final readonly class CoreSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: IconEvent::class,
         priority: 9999
     )]
@@ -243,6 +249,7 @@ final readonly class CoreSubscriber
             $event->setIcons($icons);
         }
     }
+
     /**
      * @param array<string, mixed> $details
      */

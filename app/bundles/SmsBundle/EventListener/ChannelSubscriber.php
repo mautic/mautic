@@ -11,6 +11,7 @@ use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Form\Type\SmsListType;
 use Mautic\SmsBundle\Sms\TransportChain;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ChannelSubscriber
 {
@@ -18,7 +19,8 @@ final readonly class ChannelSubscriber
         private TransportChain $transportChain,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ChannelEvent::class,
         priority: 90
     )]

@@ -8,6 +8,7 @@ use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class WebhookSubscriber
 {
@@ -15,10 +16,11 @@ final readonly class WebhookSubscriber
         private WebhookModel $webhookModel,
     ) {
     }
+
     /**
      * Add event triggers and actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: WebhookBuilderEvent::class,
         priority: 0
     )]
@@ -33,7 +35,8 @@ final readonly class WebhookSubscriber
         // add it to the list
         $event->addEvent(PageEvents::PAGE_ON_HIT, $pageHit);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageHitEvent::class,
         priority: 0
     )]

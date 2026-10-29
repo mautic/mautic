@@ -14,6 +14,7 @@ use Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class CampaignSubscriber
@@ -25,7 +26,8 @@ final readonly class CampaignSubscriber
         private DynamicContentRepository $dynamicContentRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -71,10 +73,11 @@ final readonly class CampaignSubscriber
             ]
         );
     }
+
     /**
      * @throws InvalidArgumentException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION,
         priority: 0
     )]
@@ -104,7 +107,8 @@ final readonly class CampaignSubscriber
         $event->stopPropagation();
         $event->setAsApplicable();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: DynamicContentEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 0
     )]

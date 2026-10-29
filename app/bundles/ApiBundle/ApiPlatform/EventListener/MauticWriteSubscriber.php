@@ -8,6 +8,8 @@ use ApiPlatform\Symfony\EventListener\EventPriorities;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -18,7 +20,8 @@ final readonly class MauticWriteSubscriber
         private UserHelper $userHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: KernelEvents::VIEW,
         priority: EventPriorities::PRE_WRITE
     )]
@@ -42,14 +45,14 @@ final readonly class MauticWriteSubscriber
 
         if ($entity->isNew()) {
             $entity->setDateAdded($now->getUtcDateTime());
-            if ($user) {
+            if ($user instanceof User) {
                 $entity->setCreatedBy($user);
                 $entity->setCreatedByUser($user->getName());
             }
         }
 
         $entity->setDateModified($now->getUtcDateTime());
-        if ($user) {
+        if ($user instanceof User) {
             $entity->setModifiedBy($user);
             $entity->setModifiedByUser($user->getName());
         }

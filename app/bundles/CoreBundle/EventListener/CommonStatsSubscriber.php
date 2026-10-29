@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\StatsEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 abstract class CommonStatsSubscriber
@@ -22,12 +23,14 @@ abstract class CommonStatsSubscriber
      * @var array
      */
     protected $permissions = [];
+
     public function __construct(
         protected CorePermissions $security,
         protected EntityManagerInterface $entityManager,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: StatsEvent::class,
         priority: 0
     )]
@@ -87,6 +90,7 @@ abstract class CommonStatsSubscriber
             $event->setSelect($select)->setRepository($repository, $allowedJoins);
         }
     }
+
     /**
      * Restrict stats based on contact permissions.
      *
@@ -96,6 +100,7 @@ abstract class CommonStatsSubscriber
     {
         return $this->addRestrictedRepostories($repoNames, ['lead' => 'lead:leads']);
     }
+
     /**
      * @param array<string, string> $permissions
      */

@@ -3,10 +3,11 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class TokenSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PageDisplayEvent::class,
         priority: 254
     )]

@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Doctrine\Schema\ColumnIntrospector;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 final readonly class MigrationCommandSubscriber
@@ -23,7 +24,8 @@ final readonly class MigrationCommandSubscriber
         private Connection $connection,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ConsoleEvents::TERMINATE)]
+
+    #[AsEventListener(event: ConsoleEvents::TERMINATE)]
     public function addGeneratedColumns(ConsoleTerminateEvent $event): void
     {
         $command = $event->getCommand();
@@ -66,6 +68,7 @@ final readonly class MigrationCommandSubscriber
             $this->executeAlterQuery($query, $tableName, 'adding indices', $output);
         }
     }
+
     private function executeAlterQuery(string $query, string $tableName, string $comment, OutputInterface $output): void
     {
         $stopwatch = new Stopwatch();
@@ -81,6 +84,7 @@ final readonly class MigrationCommandSubscriber
         $output->writeln("<info>++</info> Execution finished ({$duration})");
         $output->writeln('');
     }
+
     private function generatedColumnExistsInSchema(GeneratedColumn $generatedColumn): bool
     {
         $tableColumns = ColumnIntrospector::listColumns($this->connection->createSchemaManager(), $generatedColumn->getTableName());

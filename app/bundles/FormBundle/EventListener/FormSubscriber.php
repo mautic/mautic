@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\EventListener;
 
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
@@ -16,6 +17,8 @@ use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -24,6 +27,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final readonly class FormSubscriber
 {
     private MailHelper $mailer;
+
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
         private AuditLogModel $auditLogModel,
@@ -34,10 +38,11 @@ final readonly class FormSubscriber
     ) {
         $this->mailer = $mailer->getMailer();
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FormEvents::FORM_POST_SAVE,
         priority: 0
     )]
@@ -59,10 +64,11 @@ final readonly class FormSubscriber
             $this->languageHelper->extractLanguagePackage($form->getLanguage());
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FormEvents::FORM_POST_DELETE,
         priority: 0
     )]
@@ -79,10 +85,11 @@ final readonly class FormSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
+
     /**
      * Add a simple email form.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: Events\FormBuilderEvent::class,
         priority: 0
     )]
@@ -115,7 +122,8 @@ final readonly class FormSubscriber
             'eventName' => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 0
     )]
@@ -177,14 +185,15 @@ final readonly class FormSubscriber
         }
 
         $owner = $lead?->getOwner();
-        if (!empty($config['email_to_owner']) && null !== $owner) {
+        if (!empty($config['email_to_owner']) && $owner instanceof User) {
             // Send copy to owner
             $this->setMailer($config, $tokens, [$owner->getEmail() => null], $lead);
 
             $this->mailer->send(true);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         priority: 0
     )]
@@ -256,7 +265,7 @@ final readonly class FormSubscriber
             }
         } catch (ClientException|ServerException $exception) {
             $this->parseResponse($exception->getResponse(), $matchedFields);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             if ($exception instanceof ValidationException) {
                 if ($violations = $exception->getViolations()) {
                     throw $exception;
@@ -305,6 +314,7 @@ final readonly class FormSubscriber
             }
         }
     }
+
     /**
      * @return bool|mixed
      */
@@ -359,6 +369,7 @@ final readonly class FormSubscriber
 
         return $redirect;
     }
+
     private function postToHtml(array $post): string
     {
         $output = '<table>';
@@ -374,6 +385,7 @@ final readonly class FormSubscriber
 
         return $output.'</table>';
     }
+
     /**
      * @return array<string, null>
      */
@@ -381,6 +393,7 @@ final readonly class FormSubscriber
     {
         return (!empty($emailString)) ? array_fill_keys(array_map(trim(...), explode(',', $emailString)), null) : [];
     }
+
     /**
      * @param array<mixed>               $config
      * @param array<mixed>               $tokens
@@ -399,7 +412,7 @@ final readonly class FormSubscriber
         $this->mailer->setBody($config['message']);
         $this->mailer->parsePlainText($config['message']);
 
-        if ($lead) {
+        if ($lead instanceof Lead) {
             $this->mailer->setLead($lead->getProfileFields(), $internalSend);
         }
     }

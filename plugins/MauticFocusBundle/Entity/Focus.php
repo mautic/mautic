@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -113,13 +114,13 @@ class Focus extends FormEntity implements UuidInterface
     private $style;
 
     /**
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
     private $publishUp;
 
     /**
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
     private $publishDown;

@@ -18,11 +18,13 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class FormImportExportSubscriber
 {
     use ImportExportTrait;
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private FormRepository $formRepository,
@@ -33,7 +35,8 @@ final readonly class FormImportExportSubscriber
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityExportEvent::class,
         priority: 0
     )]
@@ -46,7 +49,7 @@ final readonly class FormImportExportSubscriber
         $formId       = $event->getEntityId();
 
         $form = $this->formModel->getEntity($formId);
-        if (!$form) {
+        if (!$form instanceof Form) {
             return;
         }
 
@@ -98,7 +101,8 @@ final readonly class FormImportExportSubscriber
             $event->addEntities([$entityName => $entities]);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportEvent::class,
         priority: 0
     )]
@@ -141,7 +145,8 @@ final readonly class FormImportExportSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportUndoEvent::class,
         priority: 0
     )]
@@ -159,7 +164,7 @@ final readonly class FormImportExportSubscriber
         foreach ($summary['ids'] as $id) {
             $entity = $this->formRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof Form) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Form::class], 'form');
             }
@@ -167,7 +172,8 @@ final readonly class FormImportExportSubscriber
 
         $this->entityManager->flush();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
         priority: 0
     )]
@@ -181,6 +187,7 @@ final readonly class FormImportExportSubscriber
             $this->entityManager
         );
     }
+
     /**
      * @param array<string, mixed> $details
      */

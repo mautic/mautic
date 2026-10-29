@@ -7,6 +7,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\PageBundle\Entity\HitRepository;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class DetermineWinnerSubscriber
@@ -17,10 +18,11 @@ final readonly class DetermineWinnerSubscriber
         private TranslatorInterface $translator,
     ) {
     }
+
     /**
      * Determines the winner of A/B test based on open rate.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailEvents::ON_DETERMINE_OPEN_RATE_WINNER,
         priority: 0
     )]
@@ -111,10 +113,11 @@ final readonly class DetermineWinnerSubscriber
             'basedOn' => 'email.openrate',
         ]);
     }
+
     /**
      * Determines the winner of A/B test based on clickthrough rates.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailEvents::ON_DETERMINE_CLICKTHROUGH_RATE_WINNER,
         priority: 0
     )]

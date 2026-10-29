@@ -12,6 +12,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportSubscriber
@@ -19,6 +20,7 @@ final readonly class ReportSubscriber
     public const string CONTEXT_PAGES      = 'pages';
     public const string CONTEXT_PAGE_HITS  = 'page.hits';
     public const string CONTEXT_VIDEO_HITS = 'video.hits';
+
     public function __construct(
         private CompanyReportData $companyReportData,
         private HitRepository $hitRepository,
@@ -26,10 +28,11 @@ final readonly class ReportSubscriber
         private DncReportService $dncReportService,
     ) {
     }
+
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportBuilderEvent::class,
         priority: 0
     )]
@@ -342,10 +345,11 @@ final readonly class ReportSubscriber
             $event->addTable(self::CONTEXT_VIDEO_HITS, $data, 'videos');
         }
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGeneratorEvent::class,
         priority: 0
     )]
@@ -395,10 +399,11 @@ final readonly class ReportSubscriber
         }
         $event->setQueryBuilder($qb);
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGraphEvent::class,
         priority: 0
     )]
@@ -569,7 +574,8 @@ final readonly class ReportSubscriber
             unset($queryBuilder);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportDataEvent::class,
         priority: 0
     )]

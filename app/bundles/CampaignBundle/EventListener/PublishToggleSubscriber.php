@@ -7,6 +7,7 @@ namespace Mautic\CampaignBundle\EventListener;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class PublishToggleSubscriber
@@ -16,7 +17,8 @@ final readonly class PublishToggleSubscriber
         private TranslatorInterface $translator,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CustomTemplateEvent::class,
         priority: 0
     )]

@@ -20,6 +20,8 @@ use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\ChannelBundle\PreferenceBuilder\PreferenceBuilder;
 use Psr\Log\LoggerInterface;
+use ReflectionException;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignSubscriber
@@ -33,6 +35,7 @@ final class CampaignSubscriber
      * @var mixed[]
      */
     private array $messageChannels = [];
+
     public function __construct(
         private readonly MessageModel $messageModel,
         private readonly ActionDispatcher $actionDispatcher,
@@ -41,7 +44,8 @@ final class CampaignSubscriber
         private readonly TranslatorInterface $translator,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -74,12 +78,17 @@ final class CampaignSubscriber
         ];
         $event->addAction('message.send', $action);
     }
+
     /**
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
+<<<<<<< HEAD
      * @throws \ReflectionException
+=======
+     * @throws ReflectionException
+>>>>>>> 3024571ab4 (Import AsEventListener attribute and restore blank lines between methods)
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 0
     )]
@@ -134,6 +143,7 @@ final class CampaignSubscriber
 
         $pendingEvent->failRemainingPending($this->translator->trans('mautic.channel.message.failed'));
     }
+
     /**
      * @param array<string, mixed> $messageChannel
      *
@@ -141,7 +151,11 @@ final class CampaignSubscriber
      *
      * @throws LogNotProcessedException
      * @throws LogPassedAndFailedException
+<<<<<<< HEAD
      * @throws \ReflectionException
+=======
+     * @throws ReflectionException
+>>>>>>> 3024571ab4 (Import AsEventListener attribute and restore blank lines between methods)
      * @param Collection<int, LeadEventLog> $logs
      */
     private function sendChannelMessage(Collection $logs, int|string $channel, array $messageChannel)
@@ -178,6 +192,7 @@ final class CampaignSubscriber
 
         return $success;
     }
+
     /**
      * @param Collection<int, LeadEventLog> $logs
      */
@@ -195,6 +210,7 @@ final class CampaignSubscriber
             $pendingEvent->pass($mmLog);
         }
     }
+
     /**
      * @param Collection<int,LeadEventLog> $success
      */
@@ -206,6 +222,7 @@ final class CampaignSubscriber
             }
         }
     }
+
     private function removeSuccessfulFromFailures(PendingEvent $pendingEvent): void
     {
         $successfulKeys = $pendingEvent->getSuccessful()->getKeys();
@@ -215,6 +232,7 @@ final class CampaignSubscriber
             }
         }
     }
+
     private function recordChannelMetadata(PendingEvent $pendingEvent, string $channel): void
     {
         /** @var LeadEventLog $log */

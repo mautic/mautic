@@ -8,20 +8,23 @@ use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 
 final readonly class ReportSubscriber
 {
     public const string CONTEXT_MESSAGE_CHANNEL = 'message.channel';
+
     public function __construct(
         private CompanyReportData $companyReportData,
         private RouterInterface $router,
     ) {
     }
+
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportBuilderEvent::class,
         priority: 0
     )]
@@ -96,10 +99,11 @@ final readonly class ReportSubscriber
             ]
         );
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGeneratorEvent::class,
         priority: 0
     )]
@@ -119,7 +123,8 @@ final readonly class ReportSubscriber
 
         $event->setQueryBuilder($queryBuilder);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportDataEvent::class,
         priority: 0
     )]

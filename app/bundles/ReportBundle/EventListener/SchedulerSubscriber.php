@@ -6,6 +6,7 @@ namespace Mautic\ReportBundle\EventListener;
 
 use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class SchedulerSubscriber
 {
@@ -13,7 +14,8 @@ final readonly class SchedulerSubscriber
         private SendSchedule $sendSchedule,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportScheduleSendEvent::class,
         priority: 0
     )]

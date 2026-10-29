@@ -4,6 +4,7 @@ namespace Mautic\CategoryBundle\EventListener;
 
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -14,7 +15,8 @@ final readonly class ButtonSubscriber
         private TranslatorInterface $translator,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CustomButtonEvent::class,
         priority: 0
     )]

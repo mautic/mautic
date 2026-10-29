@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
+use DateTimeInterface;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -11,15 +12,18 @@ use Mautic\ReportBundle\Event\AbstractReportEvent;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ReportSubscriber
 {
     public const string CONTEXT_AUDIT_LOG = 'audit.log';
+
     public function __construct(
         private CorePermissions $security,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportBuilderEvent::class,
         priority: 0
     )]
@@ -122,7 +126,8 @@ final readonly class ReportSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportGeneratorEvent::class,
         priority: 0
     )]
@@ -139,19 +144,20 @@ final readonly class ReportSubscriber
         $dateTo   = $options['dateTo'];
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'audit_log', 'al');
 
-        if ($dateFrom instanceof \DateTimeInterface) {
+        if ($dateFrom instanceof DateTimeInterface) {
             $queryBuilder->andWhere($queryBuilder->expr()->gte('al.date_added', ':dateFrom'));
             $queryBuilder->setParameter('dateFrom', $dateFrom->format(DateTimeHelper::FORMAT_DB));
         }
 
-        if ($dateTo instanceof \DateTimeInterface) {
+        if ($dateTo instanceof DateTimeInterface) {
             $queryBuilder->andWhere($queryBuilder->expr()->lte('al.date_added', ':dateTo'));
             $queryBuilder->setParameter('dateTo', $dateTo->format(DateTimeHelper::FORMAT_DB));
         }
 
         $event->setQueryBuilder($queryBuilder);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportDataEvent::class,
         priority: 0
     )]
@@ -173,6 +179,7 @@ final readonly class ReportSubscriber
 
         $event->setData($data);
     }
+
     private function allowAuditLogReportBuild(AbstractReportEvent $event): bool
     {
         // Allow to create audit_log report only for admin user and cli

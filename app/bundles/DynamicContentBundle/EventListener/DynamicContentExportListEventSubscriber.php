@@ -7,6 +7,7 @@ namespace Mautic\DynamicContentBundle\EventListener;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Helper\EmailMediaImageHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 /**
  * Dynamic content HTML can embed builder images by absolute URL, the same way emails and
@@ -19,7 +20,8 @@ final readonly class DynamicContentExportListEventSubscriber
         private EmailMediaImageHelper $mediaImageHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: AssetExportListEvent::class,
         priority: 0
     )]
@@ -41,6 +43,7 @@ final readonly class DynamicContentExportListEventSubscriber
             }
         }
     }
+
     /**
      * @param array<string, mixed> $dynamicContent
      */

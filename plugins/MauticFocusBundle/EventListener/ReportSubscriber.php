@@ -6,6 +6,7 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class ReportSubscriber
 {
@@ -18,10 +19,11 @@ final class ReportSubscriber
     public const string PREFIX_TRACKABLES   = 't';
     public const string PREFIX_CATEGORIES   = 'c';
     public const string PREFIX_LEADS        = 'l';
+
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportBuilderEvent::class,
         priority: 0
     )]
@@ -187,6 +189,7 @@ final class ReportSubscriber
             $this->addFocusLeadsTable($event, $commonColumns);
         }
     }
+
     /**
      * @param array<string, array<string, string>> $columns
      */
@@ -289,10 +292,11 @@ final class ReportSubscriber
 
         $event->addTable(self::CONTEXT_FOCUS_LEADS, $data, self::FOCUS_GROUP);
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGeneratorEvent::class,
         priority: 0
     )]

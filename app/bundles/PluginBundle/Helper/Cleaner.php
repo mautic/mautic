@@ -2,6 +2,8 @@
 
 namespace Mautic\PluginBundle\Helper;
 
+use DateTime;
+
 final class Cleaner
 {
     public const string FIELD_TYPE_STRING   = 'string';
@@ -23,11 +25,11 @@ final class Cleaner
             case self::FIELD_TYPE_NUMBER:
                 return (float) $clean;
             case self::FIELD_TYPE_DATETIME:
-                $dateTimeValue = new \DateTime($value);
+                $dateTimeValue = new DateTime($value);
 
                 return (!empty($clean)) ? $dateTimeValue->format('c') : '';
             case self::FIELD_TYPE_DATE:
-                $dateTimeValue = new \DateTime($value);
+                $dateTimeValue = new DateTime($value);
 
                 return (!empty($clean)) ? $dateTimeValue->format('Y-m-d') : '';
             default:

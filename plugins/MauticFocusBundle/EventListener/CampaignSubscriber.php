@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -19,7 +20,8 @@ final readonly class CampaignSubscriber
         private RouterInterface $router,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -45,7 +47,8 @@ final readonly class CampaignSubscriber
         ];
         $event->addAction('focus.show', $action);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FocusEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 0
     )]

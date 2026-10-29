@@ -9,6 +9,7 @@ use Mautic\ApiBundle\Event\ClientPostDeleteEvent;
 use Mautic\ApiBundle\Event\ClientPostSaveEvent;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ClientSubscriber
 {
@@ -17,10 +18,11 @@ final readonly class ClientSubscriber
         private AuditLogModel $auditLogModel,
     ) {
     }
+
     /**
      * Add a client change entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ClientPostSaveEvent::class,
         priority: 0
     )]
@@ -41,10 +43,11 @@ final readonly class ClientSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
+
     /**
      * Add a role delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ClientPostDeleteEvent::class,
         priority: 0
     )]

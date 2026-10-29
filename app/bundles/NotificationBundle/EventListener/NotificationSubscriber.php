@@ -12,6 +12,7 @@ use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class NotificationSubscriber
 {
@@ -22,10 +23,11 @@ final readonly class NotificationSubscriber
         private AssetTokenHelper $assetTokenHelper,
     ) {
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: NotificationEvents::NOTIFICATION_POST_SAVE,
         priority: 0
     )]
@@ -43,10 +45,11 @@ final readonly class NotificationSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: NotificationEvents::NOTIFICATION_POST_DELETE,
         priority: 0
     )]
@@ -62,7 +65,8 @@ final readonly class NotificationSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: NotificationEvents::TOKEN_REPLACEMENT,
         priority: 0
     )]

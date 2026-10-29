@@ -2,6 +2,7 @@
 
 namespace Mautic\NotificationBundle\Entity;
 
+use DateTime;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -146,7 +147,7 @@ final class StatRepository extends CommonRepository
     /**
      * Get sent counts based grouped by notification Id.
      */
-    public function getSentCounts(array $notificationIds = [], ?\DateTime $fromDate = null): array
+    public function getSentCounts(array $notificationIds = [], ?DateTime $fromDate = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.notification_id, count(n.id) as sentcount')
@@ -156,7 +157,7 @@ final class StatRepository extends CommonRepository
             )
             ->setParameter('ids', $notificationIds, ArrayParameterType::INTEGER);
 
-        if (null !== $fromDate) {
+        if ($fromDate instanceof DateTime) {
             // make sure the date is UTC
             $dt = new DateTimeHelper($fromDate);
             $q->andWhere(

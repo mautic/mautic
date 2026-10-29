@@ -5,6 +5,7 @@ namespace Mautic\ApiBundle\EventListener;
 use Mautic\ApiBundle\Helper\RequestHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -19,12 +20,13 @@ final readonly class ApiSubscriber
         private Translator $translator,
     ) {
     }
+
     /**
      * Check for API requests and throw denied access if API is disabled.
      *
      * @throws AccessDeniedHttpException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: KernelEvents::REQUEST,
         priority: 255
     )]
@@ -83,7 +85,8 @@ final readonly class ApiSubscriber
             $event->setResponse($response);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: KernelEvents::RESPONSE,
         priority: 0
     )]

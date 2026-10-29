@@ -2,21 +2,25 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateTime;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class SegmentLogReportSubscriber
 {
     public const string SEGMENT_LOG = 'segment.log';
+
     public function __construct(
         private FieldsBuilder $fieldsBuilder,
     ) {
     }
+
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportBuilderEvent::class,
         priority: 0
     )]
@@ -56,10 +60,11 @@ final readonly class SegmentLogReportSubscriber
 
         unset($columns, $filters, $segmentColumns, $data);
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGeneratorEvent::class,
         priority: 0
     )]
@@ -81,8 +86,8 @@ final readonly class SegmentLogReportSubscriber
             )
         );
 
-        $dateFrom = $event->getOptions()['dateFrom'] ?? (new \DateTime('-30 days'));
-        $dateTo   = $event->getOptions()['dateTo'] ?? (new \DateTime());
+        $dateFrom = $event->getOptions()['dateFrom'] ?? (new DateTime('-30 days'));
+        $dateTo   = $event->getOptions()['dateTo'] ?? (new DateTime());
 
         $qb->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
         $qb->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
@@ -100,6 +105,7 @@ final readonly class SegmentLogReportSubscriber
 
         $event->setQueryBuilder($qb);
     }
+
     private function generateLeftJoinCondition(string $alias, string $action): string
     {
         return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.`action` =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';

@@ -21,11 +21,13 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class FieldImportExportSubscriber
 {
     use ImportExportTrait;
+
     public function __construct(
         private EntityManagerInterface $entityManager,
         private FieldRepository $fieldRepository,
@@ -38,7 +40,8 @@ final readonly class FieldImportExportSubscriber
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityExportEvent::class,
         priority: 0
     )]
@@ -109,7 +112,8 @@ final readonly class FieldImportExportSubscriber
             $event->addEntities([$entityName => $entities]);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportEvent::class,
         priority: 0
     )]
@@ -172,7 +176,8 @@ final readonly class FieldImportExportSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportUndoEvent::class,
         priority: 0
     )]
@@ -191,7 +196,7 @@ final readonly class FieldImportExportSubscriber
         foreach ($summary['ids'] as $id) {
             $field = $this->fieldRepository->find($id);
 
-            if ($field) {
+            if ($field instanceof Field) {
                 $this->entityManager->remove($field);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Field::class], 'formField');
             }
@@ -199,7 +204,8 @@ final readonly class FieldImportExportSubscriber
 
         $this->entityManager->flush();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
         priority: 0
     )]
@@ -222,7 +228,7 @@ final readonly class FieldImportExportSubscriber
             }
 
             $existing = $this->fieldRepository->findOneBy(['uuid' => $item['uuid']]);
-            if ($existing) {
+            if ($existing instanceof Field) {
                 $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getLabel() ?? $existing->getAlias();
                 $summary[EntityImportEvent::UPDATE]['uuids'][] = $existing->getUuid();
             } else {
@@ -243,6 +249,7 @@ final readonly class FieldImportExportSubscriber
             }
         }
     }
+
     /**
      * @param array<string, mixed> $details
      */

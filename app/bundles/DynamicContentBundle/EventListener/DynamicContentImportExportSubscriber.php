@@ -16,10 +16,12 @@ use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class DynamicContentImportExportSubscriber
 {
     use ImportExportTrait;
+
     public function __construct(
         private DynamicContentModel $dynamicContentModel,
         private EntityManagerInterface $entityManager,
@@ -29,7 +31,8 @@ final readonly class DynamicContentImportExportSubscriber
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityExportEvent::class,
         priority: 0
     )]
@@ -40,7 +43,7 @@ final readonly class DynamicContentImportExportSubscriber
         }
 
         $object = $this->dynamicContentModel->getEntity($event->getEntityId());
-        if (!$object) {
+        if (!$object instanceof DynamicContent) {
             return;
         }
 
@@ -67,7 +70,8 @@ final readonly class DynamicContentImportExportSubscriber
 
         $this->logAction('export', $object->getId(), $data);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportEvent::class,
         priority: 0
     )]
@@ -112,7 +116,8 @@ final readonly class DynamicContentImportExportSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportUndoEvent::class,
         priority: 0
     )]
@@ -130,7 +135,7 @@ final readonly class DynamicContentImportExportSubscriber
         foreach ($summary['ids'] as $id) {
             $entity = $this->dynamicContentRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof DynamicContent) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => DynamicContent::class]);
             }
@@ -138,7 +143,8 @@ final readonly class DynamicContentImportExportSubscriber
 
         $this->entityManager->flush();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
         priority: 0
     )]
@@ -152,6 +158,7 @@ final readonly class DynamicContentImportExportSubscriber
             $this->entityManager
         );
     }
+
     /**
      * @param array<string, mixed> $details
      */

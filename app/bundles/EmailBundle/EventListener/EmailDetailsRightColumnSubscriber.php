@@ -7,10 +7,11 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\AbTest\EmailStatus;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class EmailDetailsRightColumnSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CustomContentEvent::class,
         priority: 0
     )]

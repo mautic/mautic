@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Event\ListTypeaheadEvent;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class SegmentFilterTypeaheadSubscriber
 {
@@ -17,7 +18,8 @@ final readonly class SegmentFilterTypeaheadSubscriber
         private CompanyModel $companyModel,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ListTypeaheadEvent::class,
         priority: 1
     )]
@@ -34,7 +36,8 @@ final readonly class SegmentFilterTypeaheadSubscriber
         $event->setDataArray($dataArray);
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ListTypeaheadEvent::class,
         priority: 0
     )]
@@ -58,7 +61,8 @@ final readonly class SegmentFilterTypeaheadSubscriber
         $event->setDataArray($dataArray);
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ListTypeaheadEvent::class,
         priority: 0
     )]
@@ -72,7 +76,8 @@ final readonly class SegmentFilterTypeaheadSubscriber
 
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ListTypeaheadEvent::class,
         priority: 0
     )]
@@ -90,7 +95,8 @@ final readonly class SegmentFilterTypeaheadSubscriber
 
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ListTypeaheadEvent::class,
         priority: 0
     )]

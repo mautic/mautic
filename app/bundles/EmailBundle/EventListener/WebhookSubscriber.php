@@ -8,6 +8,7 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Event\WebhookQueueEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class WebhookSubscriber
 {
@@ -16,10 +17,11 @@ final readonly class WebhookSubscriber
         private bool $includeDetails,
     ) {
     }
+
     /**
      * Add event triggers and actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: WebhookBuilderEvent::class,
         priority: 0
     )]
@@ -39,7 +41,8 @@ final readonly class WebhookSubscriber
         $event->addEvent(EmailEvents::EMAIL_ON_SEND, $mailSend);
         $event->addEvent(EmailEvents::EMAIL_ON_OPEN, $mailOpen);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailSendEvent::class,
         priority: 0
     )]
@@ -67,7 +70,8 @@ final readonly class WebhookSubscriber
 
         $this->webhookModel->queueWebhooksByType(EmailEvents::EMAIL_ON_SEND, $payload);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailOpenEvent::class,
         priority: 0
     )]
@@ -85,7 +89,8 @@ final readonly class WebhookSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: WebhookQueueEvent::class,
         priority: 0
     )]

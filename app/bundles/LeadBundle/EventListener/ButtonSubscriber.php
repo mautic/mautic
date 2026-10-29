@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -16,7 +17,8 @@ final readonly class ButtonSubscriber
         private CorePermissions $security,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CustomButtonEvent::class,
         priority: 0
     )]

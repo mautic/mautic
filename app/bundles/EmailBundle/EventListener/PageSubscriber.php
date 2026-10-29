@@ -6,6 +6,7 @@ use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Event as Events;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final readonly class PageSubscriber
@@ -16,10 +17,11 @@ final readonly class PageSubscriber
         private RequestStack $requestStack,
     ) {
     }
+
     /**
      * Trigger point actions for page hits.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: Events\PageHitEvent::class,
         priority: 0
     )]

@@ -7,6 +7,7 @@ namespace Mautic\CampaignBundle\EventListener;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ExecutedBatchEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class CampaignEventLogCleanupSubscriber
 {
@@ -14,10 +15,11 @@ final readonly class CampaignEventLogCleanupSubscriber
         private FailedLeadEventLogRepository $failedLeadEventLogRepository,
     ) {
     }
+
     /**
      * Deletes failed log entries for all successful event logs.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ExecutedBatchEvent::class,
         priority: -100
     )]

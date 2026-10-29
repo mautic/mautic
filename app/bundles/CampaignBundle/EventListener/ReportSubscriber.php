@@ -11,19 +11,22 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ReportSubscriber
 {
     public const string CONTEXT_CAMPAIGN_LEAD_EVENT_LOG = 'campaign_lead_event_log';
+
     public function __construct(
         private CompanyReportData $companyReportData,
         private DncReportService $dncReportService,
     ) {
     }
+
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportBuilderEvent::class,
         priority: 0
     )]
@@ -154,10 +157,11 @@ final readonly class ReportSubscriber
         // Register graphs
         // $event->addGraph($context, 'line', 'mautic.page.graph.line.hits');
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGeneratorEvent::class,
         priority: 0
     )]
@@ -187,10 +191,11 @@ final readonly class ReportSubscriber
 
         $event->setQueryBuilder($qb);
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGraphEvent::class,
         priority: 0
     )]
@@ -228,7 +233,8 @@ final readonly class ReportSubscriber
             unset($queryBuilder);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportDataEvent::class,
         priority: 0
     )]

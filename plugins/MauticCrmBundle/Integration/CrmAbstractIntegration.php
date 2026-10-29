@@ -2,12 +2,15 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use DateTime;
+use Exception;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
 /**
@@ -74,7 +77,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -93,7 +96,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
                 return $this->amendLeadDataBeforeMauticPopulate($result, $object);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -167,7 +170,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return mixed[]
      */
-    public function getLeadData(?\DateTime $startDate = null, ?\DateTime $endDate = null, $leadId = []): array
+    public function getLeadData(?DateTime $startDate = null, ?DateTime $endDate = null, $leadId = []): array
     {
         $leadIds      = (!is_array($leadId)) ? [$leadId] : $leadId;
         $leadActivity = [];
@@ -187,7 +190,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             'excludeEvents' => [],
         ];
 
-        if ($startDate) {
+        if ($startDate instanceof DateTime) {
             $filters['dateFrom'] = $startDate;
             $filters['dateTo']   = $endDate;
         }
@@ -280,11 +283,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                         $matchedFields[$companyField] = substr($value, 0, 255);
                         break;
                     case 'date':
-                        $date                         = new \DateTime($value);
+                        $date                         = new DateTime($value);
                         $matchedFields[$companyField] = $date->format('Y-m-d');
                         break;
                     case 'datetime':
-                        $date                         = new \DateTime($value);
+                        $date                         = new DateTime($value);
                         $matchedFields[$companyField] = $date->format('Y-m-d H:i:s');
                         break;
                 }
@@ -427,7 +430,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         if (isset($data['owner_email']) && isset($config['updateOwner']) && isset($config['updateOwner'][0])
             && 'updateOwner' == $config['updateOwner'][0]
         ) {
-            if ($mauticUser = $this->userRepository->findOneBy(['email' => $data['owner_email']])) {
+            if (($mauticUser = $this->userRepository->findOneBy(['email' => $data['owner_email']])) instanceof User) {
                 $lead->setOwner($mauticUser);
             }
         }
@@ -513,9 +516,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     protected function getSyncTimeframeDates(array $params): array
     {
-        $fromDate = (isset($params['start'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['start'])->format('Y-m-d H:i:s')
+        $fromDate = (isset($params['start'])) ? DateTime::createFromFormat(DateTime::ISO8601, $params['start'])->format('Y-m-d H:i:s')
             : null;
-        $toDate = (isset($params['end'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['end'])->format('Y-m-d H:i:s')
+        $toDate = (isset($params['end'])) ? DateTime::createFromFormat(DateTime::ISO8601, $params['end'])->format('Y-m-d H:i:s')
             : null;
 
         return [$fromDate, $toDate];

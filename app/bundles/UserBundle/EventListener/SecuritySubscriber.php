@@ -7,6 +7,7 @@ namespace Mautic\UserBundle\EventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\UserBundle\Event\LoginEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class SecuritySubscriber
 {
@@ -15,7 +16,8 @@ final readonly class SecuritySubscriber
         private AuditLogModel $auditLogModel,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LoginEvent::class,
         priority: 0
     )]

@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use DateTime;
+use Exception;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -184,7 +186,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
 
             if (!$silenceExceptions) {
@@ -370,7 +372,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
 
                 return $executed;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -416,7 +418,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
 
                 return $executed;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -458,7 +460,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
             if (isset($stageName)) {
                 $stage = $this->stageRepository->getStageByName($stageName);
 
-                if (null === $stage) {
+                if (!$stage instanceof Stage) {
                     $stage = new Stage();
                     $stage->setName($stageName);
                     $stages             = [$stageName => $stage];
@@ -479,7 +481,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
                             ]
                         )
                     );
-                    $log->setDateAdded(new \DateTime());
+                    $log->setDateAdded(new DateTime());
                     $lead->stageChangeLog($log);
                 }
             }
@@ -498,7 +500,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
                         $this->leadModel->addToCompany($lead, $company);
                         $this->em->detach($company);
                     }
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $this->logger->warning($exception->getMessage());
 
                     return;
@@ -586,7 +588,7 @@ final class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     private function getReadOnlyFields(string $object): array
     {

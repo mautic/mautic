@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class LeadListSubscriber
@@ -18,7 +19,8 @@ final readonly class LeadListSubscriber
         private TranslatorInterface $translator,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadListFiltersChoicesEvent::class,
         priority: 0
     )]
@@ -72,10 +74,11 @@ final readonly class LeadListSubscriber
             $event->addChoice('lead', 'integration_campaigns', $config);
         }
     }
+
     /**
      * Add/remove contacts to a segment based on contacts found in Integration Campaigns.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ListPreProcessListEvent::class,
         priority: 0
     )]

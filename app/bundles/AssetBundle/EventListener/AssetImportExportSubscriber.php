@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\EventListener;
 
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
@@ -16,10 +17,12 @@ use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class AssetImportExportSubscriber
 {
     use ImportExportTrait;
+
     public function __construct(
         private AssetModel $assetModel,
         private EntityManagerInterface $entityManager,
@@ -29,7 +32,8 @@ final readonly class AssetImportExportSubscriber
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityExportEvent::class,
         priority: 0
     )]
@@ -41,7 +45,7 @@ final readonly class AssetImportExportSubscriber
 
         $assetId = $event->getEntityId();
         $asset   = $this->assetModel->getEntity($assetId);
-        if (!$asset) {
+        if (!$asset instanceof Asset) {
             return;
         }
 
@@ -56,8 +60,8 @@ final readonly class AssetImportExportSubscriber
             'remote_path'            => $asset->getRemotePath(),
             'original_file_name'     => $asset->getOriginalFileName(),
             'lang'                   => $asset->getLanguage(),
-            'publish_up'             => $asset->getPublishUp() ? $asset->getPublishUp()->format(DATE_ATOM) : null,
-            'publish_down'           => $asset->getPublishDown() ? $asset->getPublishDown()->format(DATE_ATOM) : null,
+            'publish_up'             => $asset->getPublishUp() instanceof DateTimeInterface ? $asset->getPublishUp()->format(DATE_ATOM) : null,
+            'publish_down'           => $asset->getPublishDown() instanceof DateTimeInterface ? $asset->getPublishDown()->format(DATE_ATOM) : null,
             'extension'              => $asset->getExtension(),
             'mime'                   => $asset->getMime(),
             'size'                   => (int) $asset->getSize(),
@@ -76,7 +80,8 @@ final readonly class AssetImportExportSubscriber
         ];
         $this->auditLogModel->writeToLog($log);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportEvent::class,
         priority: 0
     )]
@@ -122,7 +127,8 @@ final readonly class AssetImportExportSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportUndoEvent::class,
         priority: 0
     )]
@@ -140,7 +146,7 @@ final readonly class AssetImportExportSubscriber
         foreach ($summary['ids'] as $id) {
             $entity = $this->assetRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof Asset) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Asset::class]);
             }
@@ -148,7 +154,8 @@ final readonly class AssetImportExportSubscriber
 
         $this->entityManager->flush();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
         priority: 0
     )]
@@ -162,6 +169,7 @@ final readonly class AssetImportExportSubscriber
             $this->entityManager
         );
     }
+
     /**
      * @param array<string, mixed> $details
      */

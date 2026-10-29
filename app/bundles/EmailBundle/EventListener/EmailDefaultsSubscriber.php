@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class EmailDefaultsSubscriber
 {
@@ -14,7 +15,8 @@ final readonly class EmailDefaultsSubscriber
         private EmailDefaultsHelper $defaultsHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EmailPreSaveEvent::class,
         priority: 0
     )]

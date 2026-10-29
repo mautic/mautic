@@ -2,6 +2,8 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\NonUniqueResultException;
@@ -20,6 +22,7 @@ use Mautic\CampaignBundle\Model\Exceptions\CampaignAlreadyUnpublishedException;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class CampaignEventSubscriber
@@ -27,6 +30,7 @@ final readonly class CampaignEventSubscriber
     public const int LOOPS_TO_FAIL = 100;
     private const int MINIMUM_CONTACTS_FOR_DISABLE = 100;
     private const float DISABLE_CAMPAIGN_THRESHOLD   = 0.35;
+
     public function __construct(
         private EventRepository $eventRepository,
         private CampaignModel $campaignModel,
@@ -35,11 +39,12 @@ final readonly class CampaignEventSubscriber
         private DateHelper $dateHelper,
     ) {
     }
+
     /**
      * Reset all campaign event failed_count's
      * to 0 when the campaign is published.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CampaignPreSaveEvent::class,
         priority: 0
     )]
@@ -55,7 +60,7 @@ final readonly class CampaignEventSubscriber
             && !$campaign->getPublishUp()
         ) {
             // Publish up date should be in format 'yyyy-MM-dd HH:mm'
-            $publishUp = new \DateTime();
+            $publishUp = new DateTime();
             $publishUp->setTime((int) $publishUp->format('H'), (int) $publishUp->format('i'));
             $campaign->setPublishUp($publishUp);
         }
@@ -69,6 +74,7 @@ final readonly class CampaignEventSubscriber
             }
         }
     }
+
     /**
      * Process the FailedEvent event. Notifies users and checks
      * failed thresholds to notify CS and/or disable the campaign.
@@ -78,7 +84,7 @@ final readonly class CampaignEventSubscriber
      * @throws OptimisticLockException
      * @throws TransactionRequiredException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FailedEvent::class,
         priority: 0
     )]
@@ -125,13 +131,14 @@ final readonly class CampaignEventSubscriber
             }
         }
     }
+
     /**
      * Check the fail log if the lead is recorded there. If yes it decrease the failed count. It prevents counting
      * the same failure twice.
      *
      * @throws NonUniqueResultException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ExecutedEvent::class,
         priority: 0
     )]
@@ -153,7 +160,8 @@ final readonly class CampaignEventSubscriber
         // Decrease if last failed and over the LOOPS_TO_FAIL
         $this->eventRepository->decreaseFailedCount($executedEvent);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EventPreview::class,
         priority: 0
     )]
@@ -161,7 +169,7 @@ final readonly class CampaignEventSubscriber
     {
         $logStats = $this->leadEventLogRepository->getEventLogStats($eventPreview->event->getId());
 
-        if ($logStats->firstExecutionDate && $logStats->lastExecutionDate) {
+        if ($logStats->firstExecutionDate instanceof DateTimeImmutable && $logStats->lastExecutionDate instanceof DateTimeImmutable) {
             $firstExecutionDate = new DateTimeHelper($logStats->firstExecutionDate);
             $lastExecutionDate  = new DateTimeHelper($logStats->lastExecutionDate);
 

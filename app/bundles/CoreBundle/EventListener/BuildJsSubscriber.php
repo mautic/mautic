@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class BuildJsSubscriber
 {
@@ -14,7 +15,7 @@ final class BuildJsSubscriber
      * JS functions for use in Bundles. This
      * must retain top priority of 1000.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: BuildJsEvent::class,
         priority: 1000
     )]

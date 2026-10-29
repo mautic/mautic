@@ -9,6 +9,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use ZipArchive;
 
 final class InstallNewFilesStep implements StepInterface
 {
@@ -46,7 +47,7 @@ final class InstallNewFilesStep implements StepInterface
         $progressBar->setMessage($this->translator->trans('mautic.core.command.update.step.validate_update_package'));
         $progressBar->advance();
 
-        $zipper = new \ZipArchive();
+        $zipper = new ZipArchive();
         $opened = $zipper->open($zipFile);
 
         $this->validateArchive($opened);
@@ -112,10 +113,10 @@ final class InstallNewFilesStep implements StepInterface
 
         // Get the exact error
         $error = match ($opened) {
-            \ZipArchive::ER_EXISTS => 'mautic.core.update.archive_file_exists',
-            \ZipArchive::ER_INCONS, \ZipArchive::ER_INVAL, \ZipArchive::ER_MEMORY => 'mautic.core.update.archive_zip_corrupt',
-            \ZipArchive::ER_NOENT => 'mautic.core.update.archive_no_such_file',
-            \ZipArchive::ER_NOZIP => 'mautic.core.update.archive_not_valid_zip',
+            ZipArchive::ER_EXISTS => 'mautic.core.update.archive_file_exists',
+            ZipArchive::ER_INCONS, ZipArchive::ER_INVAL, ZipArchive::ER_MEMORY => 'mautic.core.update.archive_zip_corrupt',
+            ZipArchive::ER_NOENT => 'mautic.core.update.archive_no_such_file',
+            ZipArchive::ER_NOZIP => 'mautic.core.update.archive_not_valid_zip',
             default => 'mautic.core.update.archive_could_not_open',
         };
 

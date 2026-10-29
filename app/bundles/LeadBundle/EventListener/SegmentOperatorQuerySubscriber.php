@@ -8,10 +8,11 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\Query\Expr\Func;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class SegmentOperatorQuerySubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: SegmentOperatorQueryBuilderEvent::class,
         priority: 0
     )]
@@ -34,7 +35,8 @@ final class SegmentOperatorQuerySubscriber
         $event->addExpression(CompositeExpression::or(...$parts));
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: SegmentOperatorQueryBuilderEvent::class,
         priority: 0
     )]
@@ -57,7 +59,8 @@ final class SegmentOperatorQuerySubscriber
         $event->addExpression(CompositeExpression::and(...$parts));
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: SegmentOperatorQueryBuilderEvent::class,
         priority: 0
     )]
@@ -105,7 +108,8 @@ final class SegmentOperatorQuerySubscriber
 
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: SegmentOperatorQueryBuilderEvent::class,
         priority: 0
     )]
@@ -165,7 +169,8 @@ final class SegmentOperatorQuerySubscriber
         $event->addExpression($queryBuilder->expr()->{$filterGlue}(...$expressions));
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: SegmentOperatorQueryBuilderEvent::class,
         priority: 0
     )]

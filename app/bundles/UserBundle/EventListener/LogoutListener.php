@@ -5,12 +5,12 @@ namespace Mautic\UserBundle\EventListener;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LogoutEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final readonly class LogoutListener
 {
     private ?User $user;
-
 
     public function __construct(
         private EventDispatcherInterface $dispatcher,
@@ -18,7 +18,8 @@ final readonly class LogoutListener
     ) {
         $this->user       = $userHelper->getUser();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: \Symfony\Component\Security\Http\Event\LogoutEvent::class)]
+
+    #[AsEventListener(event: \Symfony\Component\Security\Http\Event\LogoutEvent::class)]
     public function onLogout(\Symfony\Component\Security\Http\Event\LogoutEvent $logoutEvent): void
     {
         $request = $logoutEvent->getRequest();
@@ -37,6 +38,7 @@ final readonly class LogoutListener
         // Note that a logout occurred
         $session->set('post_logout', true);
     }
+
     public function onSymfonyComponentSecurityHttpEventLogoutEvent(\Symfony\Component\Security\Http\Event\LogoutEvent $logoutEvent): void
     {
         $this->onLogout($logoutEvent);

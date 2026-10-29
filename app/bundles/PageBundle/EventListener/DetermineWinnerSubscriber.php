@@ -5,6 +5,7 @@ namespace Mautic\PageBundle\EventListener;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class DetermineWinnerSubscriber
@@ -14,10 +15,11 @@ final readonly class DetermineWinnerSubscriber
         private TranslatorInterface $translator,
     ) {
     }
+
     /**
      * Determines the winner of A/B test based on bounce rates.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER,
         priority: 0
     )]
@@ -103,10 +105,11 @@ final readonly class DetermineWinnerSubscriber
             'basedOn' => 'page.bouncerate',
         ]);
     }
+
     /**
      * Determines the winner of A/B test based on dwell time rates.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PageEvents::ON_DETERMINE_DWELL_TIME_WINNER,
         priority: 0
     )]

@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class CampaignActionDeleteContactSubscriber
 {
@@ -15,7 +16,8 @@ final readonly class CampaignActionDeleteContactSubscriber
         private RemovedContactTracker $removedContactTracker,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -37,7 +39,8 @@ final readonly class CampaignActionDeleteContactSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_ACTION_DELETE_CONTACT,
         priority: 0
     )]

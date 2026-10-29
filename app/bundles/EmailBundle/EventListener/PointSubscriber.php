@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PointSubscriber
 {
@@ -24,7 +25,8 @@ final readonly class PointSubscriber
         private PointEventHelper $pointEventHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PointBuilderEvent::class,
         priority: 0
     )]
@@ -48,7 +50,8 @@ final readonly class PointSubscriber
 
         $event->addAction('email.send', $action);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: TriggerBuilderEvent::class,
         priority: 0
     )]
@@ -76,10 +79,11 @@ final readonly class PointSubscriber
 
         $event->addEvent('email.send_to_user', $sendToOwnerEvent);
     }
+
     /**
      * Trigger point actions for email open.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailOpenEvent::class,
         priority: 0
     )]
@@ -87,10 +91,11 @@ final readonly class PointSubscriber
     {
         $this->pointModel->triggerAction('email.open', $event->getEmail());
     }
+
     /**
      * Trigger point actions for email send.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: EmailSendEvent::class,
         priority: 0
     )]

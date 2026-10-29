@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
@@ -12,12 +13,14 @@ use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\VideoHitRepository;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class LeadSubscriber
 {
     use ChannelTrait;
+
     /**
      * @param ModelFactory<object> $modelFactory
      */
@@ -31,10 +34,11 @@ final class LeadSubscriber
     ) {
         $this->setModelFactory($modelFactory);
     }
+
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadTimelineEvent::class,
         priority: 0
     )]
@@ -65,7 +69,7 @@ final class LeadSubscriber
                 $icon     = 'ri-link';
 
                 if (!empty($hit['source'])) {
-                    if ($channelModel = $this->getChannelModel($hit['source'])) {
+                    if (($channelModel = $this->getChannelModel($hit['source'])) instanceof AbstractCommonModel) {
                         if ($channelModel instanceof ChannelTimelineInterface) {
                             if ($overrideTemplate = $channelModel->getChannelTimelineTemplate($eventTypeKey, $hit)) {
                                 $template = $overrideTemplate;
@@ -124,10 +128,11 @@ final class LeadSubscriber
             }
         }
     }
+
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadTimelineEvent::class,
         priority: 0
     )]
@@ -172,7 +177,8 @@ final class LeadSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadChangeEvent::class,
         priority: 0
     )]
@@ -184,7 +190,8 @@ final class LeadSubscriber
             $event->getOldTrackingId()
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadPostMergeEvent::class,
         priority: 0
     )]

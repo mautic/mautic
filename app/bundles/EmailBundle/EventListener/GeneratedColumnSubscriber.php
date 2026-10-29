@@ -6,10 +6,11 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class GeneratedColumnSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: GeneratedColumnsEvent::class,
         priority: 0
     )]

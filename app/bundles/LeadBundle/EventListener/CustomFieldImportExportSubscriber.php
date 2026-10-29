@@ -16,10 +16,12 @@ use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class CustomFieldImportExportSubscriber
 {
     use ImportExportTrait;
+
     public function __construct(
         private FieldModel $fieldModel,
         private EntityManagerInterface $entityManager,
@@ -29,7 +31,8 @@ final readonly class CustomFieldImportExportSubscriber
         private ImportEntityDenormalizer $serializer,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityExportEvent::class,
         priority: 0
     )]
@@ -42,7 +45,7 @@ final readonly class CustomFieldImportExportSubscriber
         $leadFieldId = $event->getEntityId();
         $leadField   = $this->fieldModel->getEntity($leadFieldId);
 
-        if (!$leadField) {
+        if (!$leadField instanceof LeadField) {
             return;
         }
 
@@ -73,7 +76,8 @@ final readonly class CustomFieldImportExportSubscriber
         $event->addEntity(LeadField::ENTITY_NAME, $leadFieldData);
         $this->logAction('export', $leadField->getId(), $leadFieldData);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportEvent::class,
         priority: 0
     )]
@@ -126,7 +130,8 @@ final readonly class CustomFieldImportExportSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportUndoEvent::class,
         priority: 0
     )]
@@ -144,7 +149,7 @@ final readonly class CustomFieldImportExportSubscriber
         foreach ($summary['ids'] as $id) {
             $entity = $this->leadFieldRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof LeadField) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => LeadField::class]);
             }
@@ -152,7 +157,8 @@ final readonly class CustomFieldImportExportSubscriber
 
         $this->entityManager->flush();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: EntityImportAnalyzeEvent::class,
         priority: 0
     )]
@@ -166,6 +172,7 @@ final readonly class CustomFieldImportExportSubscriber
             $this->entityManager
         );
     }
+
     /**
      * @param array<string, mixed> $details
      */

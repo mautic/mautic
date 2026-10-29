@@ -7,6 +7,7 @@ namespace Mautic\AssetBundle\EventListener;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class AssetExportListEventSubscriber
 {
@@ -14,7 +15,8 @@ final readonly class AssetExportListEventSubscriber
         private PathsHelper $pathsHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: AssetExportListEvent::class,
         priority: 0
     )]

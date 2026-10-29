@@ -2,6 +2,10 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateInterval;
+use DateTime;
+use DateTimeInterface;
+use DateTimeZone;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
@@ -55,11 +59,13 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\PointBundle\Model\PointGroupModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class CampaignSubscriber
 {
     public const string ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
     private ?array $fields = null;
+
     public function __construct(
         private readonly IpLookupHelper $ipLookupHelper,
         private readonly LeadModel $leadModel,
@@ -81,10 +87,11 @@ final class CampaignSubscriber
         private readonly CompanyLeadRepository $companyLeadRepository,
     ) {
     }
+
     /**
      * Add event triggers and actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -257,7 +264,8 @@ final class CampaignSubscriber
 
         $event->addCondition('lead.points', $trigger);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 0
     )]
@@ -293,8 +301,8 @@ final class CampaignSubscriber
                 $pointsChangeLog->setEventName($pointsLogEventName);
                 $pointsChangeLog->setActionName($pointsLogActionName);
                 $pointsChangeLog->setIpAddress($this->ipLookupHelper->getIpAddress());
-                $pointsChangeLog->setDateAdded(new \DateTime());
-                if ($pointGroup) {
+                $pointsChangeLog->setDateAdded(new DateTime());
+                if ($pointGroup instanceof Group) {
                     $pointsChangeLog->setGroup($pointGroup);
                 }
                 $lead->addPointsChangeLog($pointsChangeLog);
@@ -305,7 +313,8 @@ final class CampaignSubscriber
             $event->pass($log);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 1
     )]
@@ -333,7 +342,8 @@ final class CampaignSubscriber
             $event->pass($log);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 0
     )]
@@ -350,6 +360,7 @@ final class CampaignSubscriber
             $this->updateLead($log, $values, $event);
         }
     }
+
     /**
      * @param array<mixed> $values
      */
@@ -388,7 +399,8 @@ final class CampaignSubscriber
         $this->leadModel->saveEntity($lead);
         $event->pass($log);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 7
     )]
@@ -410,7 +422,8 @@ final class CampaignSubscriber
             $event->pass($log);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 3
     )]
@@ -429,7 +442,8 @@ final class CampaignSubscriber
             $event->pass($log);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 4
     )]
@@ -449,7 +463,8 @@ final class CampaignSubscriber
             $event->pass($log);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 4
     )]
@@ -471,7 +486,8 @@ final class CampaignSubscriber
             $event->pass($log);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 8
     )]
@@ -523,7 +539,8 @@ final class CampaignSubscriber
             $event->pass($log);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         priority: 0
     )]
@@ -556,17 +573,22 @@ final class CampaignSubscriber
         } elseif ($event->checkContext('lead.field_value')) {
             if ('date' === $event->getConfig()['operator']) {
                 // Set the date in system timezone since this is triggered by cron
+<<<<<<< HEAD
                 $triggerDate = new \DateTime(
                     'now',
                     new \DateTimeZone($this->coreParametersHelper->getDefaultTimezone())
                 );
+=======
+                $triggerDate = new DateTime('now',
+                    new DateTimeZone($this->coreParametersHelper->getDefaultTimezone()));
+>>>>>>> 2ba5bab660 (Import AsEventListener attribute and restore blank lines between methods)
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
                 if (str_contains($event->getConfig()['value'], '+P')) { // add date
-                    $triggerDate->add(new \DateInterval($interval)); // add the today date with interval
+                    $triggerDate->add(new DateInterval($interval)); // add the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
                 } elseif (str_contains($event->getConfig()['value'], '-P')) { // subtract date
-                    $triggerDate->sub(new \DateInterval($interval)); // subtract the today date with interval
+                    $triggerDate->sub(new DateInterval($interval)); // subtract the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
                 } elseif ('anniversary' === $event->getConfig()['value']) {
                     /**
@@ -614,7 +636,7 @@ final class CampaignSubscriber
                     );
 
                     $log = $event->getLogEntry();
-                    if (null !== $log) {
+                    if ($log instanceof LeadEventLog) {
                         $log->setMetadata([
                             'comparisonValue' => $fieldValue,
                             'operator'        => $operators[$event->getConfig()['operator']]['expr'],
@@ -659,14 +681,14 @@ final class CampaignSubscriber
 
             if ($startDate) {
                 if (!is_a($startDate, 'DateTime')) {
-                    $startDate = new \DateTime($startDate);
+                    $startDate = new DateTime($startDate);
                 }
                 $filter['dateFrom'] = $startDate;
             }
 
             if ($endDate) {
                 if (!is_a($endDate, 'DateTime')) {
-                    $endDate = new \DateTime($endDate);
+                    $endDate = new DateTime($endDate);
                 }
                 $filter['dateTo'] = $endDate->modify('+1 minutes');
             }
@@ -689,12 +711,12 @@ final class CampaignSubscriber
                         $pageUrl = html_entity_decode($pageHitUrl);
                         if (UrlMatcher::hasMatch([$url], $pageUrl)) {
                             if ($hit['dateLeft'] && $totalSpentTime) {
-                                /** @var \DateTimeInterface $dateLeft */
+                                /** @var DateTimeInterface $dateLeft */
                                 $dateLeft = $hit['dateLeft'];
-                                /** @var \DateTimeInterface $dateHit */
+                                /** @var DateTimeInterface $dateHit */
                                 $dateHit            = $hit['dateHit'];
-                                $realTotalSpentTime = new \DateTime($dateLeft->format('Y-m-d H:i'))->getTimestamp() -
-                                    new \DateTime($dateHit->format('Y-m-d H:i'))->getTimestamp();
+                                $realTotalSpentTime = new DateTime($dateLeft->format('Y-m-d H:i'))->getTimestamp() -
+                                    new DateTime($dateHit->format('Y-m-d H:i'))->getTimestamp();
                                 if ($realTotalSpentTime >= $totalSpentTime) {
                                     $event->pass();
 
@@ -710,12 +732,12 @@ final class CampaignSubscriber
 
                     if (!empty($page) && (int) $page === (int) $pageId) {
                         if ($hit['dateLeft'] && $totalSpentTime) {
-                            /** @var \DateTimeInterface $dateLeft */
+                            /** @var DateTimeInterface $dateLeft */
                             $dateLeft = $hit['dateLeft'];
-                            /** @var \DateTimeInterface $dateHit */
+                            /** @var DateTimeInterface $dateHit */
                             $dateHit            = $hit['dateHit'];
-                            $realTotalSpentTime = new \DateTime($dateLeft->format('Y-m-d H:i'))->getTimestamp() -
-                                new \DateTime($dateHit->format('Y-m-d H:i'))->getTimestamp();
+                            $realTotalSpentTime = new DateTime($dateLeft->format('Y-m-d H:i'))->getTimestamp() -
+                                new DateTime($dateHit->format('Y-m-d H:i'))->getTimestamp();
                             if ($realTotalSpentTime >= $totalSpentTime) {
                                 $event->pass();
 
@@ -758,6 +780,7 @@ final class CampaignSubscriber
             $event->fail();
         }
     }
+
     /**
      * @throws \Exception
      */
@@ -783,8 +806,8 @@ final class CampaignSubscriber
         $publishUp        = $campaign->getPublishUp();
         $dateAdded        = $campaign->getDateAdded();
 
-        $objEffectiveDate = ($publishUp instanceof \DateTime) ? $publishUp : $dateAdded;
-        if (!$objEffectiveDate instanceof \DateTime) {
+        $objEffectiveDate = ($publishUp instanceof DateTime) ? $publishUp : $dateAdded;
+        if (!$objEffectiveDate instanceof DateTime) {
             return false;
         }
 
@@ -799,18 +822,19 @@ final class CampaignSubscriber
 
         $duration = 'P'.$timeNotation.$triggerInterval.$triggerIntervalUnit;
 
-        $interval         = new \DateInterval($duration);
+        $interval         = new DateInterval($duration);
         $objEffectiveDate = clone $objEffectiveDate;
         $objEffectiveDate->add($interval);
 
-        $now    = new \DateTime();
+        $now    = new DateTime();
         if (OperatorOptions::LESS_THAN == $operator) {
             return $now < $objEffectiveDate;
         }
 
         return $now > $objEffectiveDate;
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 100
     )]
@@ -838,10 +862,11 @@ final class CampaignSubscriber
             );
         }
     }
+
     /**
      * Function to compare date value.
      */
-    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate): bool
+    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, DateTime $triggerDate): bool
     {
         return $this->leadFieldRepository->compareDateValue(
             $lead->getId(),
@@ -849,6 +874,7 @@ final class CampaignSubscriber
             $triggerDate->format('Y-m-d')
         );
     }
+
     private function getFields(Lead $lead): array
     {
         if (!$this->fields) {
@@ -859,6 +885,7 @@ final class CampaignSubscriber
 
         return $this->fields;
     }
+
     /**
      * It returns true if contact device matches
      * device specified in the

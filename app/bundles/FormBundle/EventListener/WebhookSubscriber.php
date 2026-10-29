@@ -8,6 +8,7 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class WebhookSubscriber
 {
@@ -15,10 +16,11 @@ final readonly class WebhookSubscriber
         private WebhookModel $webhookModel,
     ) {
     }
+
     /**
      * Add event triggers and actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: WebhookBuilderEvent::class,
         priority: 0
     )]
@@ -33,7 +35,8 @@ final readonly class WebhookSubscriber
         // add it to the list
         $event->addEvent(FormEvents::FORM_ON_SUBMIT, $formSubmit);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: SubmissionEvent::class,
         priority: 0
     )]

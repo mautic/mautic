@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Mautic\CoreBundle\Exception\MessageOnlyErrorHandlerException;
+use PDO;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -17,7 +18,7 @@ final class RequirementsPass implements CompilerPassInterface
             return;
         }
 
-        if (!class_exists('PDO') || !in_array('mysql', \PDO::getAvailableDrivers(), true)) {
+        if (!class_exists('PDO') || !in_array('mysql', PDO::getAvailableDrivers(), true)) {
             // We need to check this on boot, as later in the process is too late to show a message that makes the issue clear.
             throw new MessageOnlyErrorHandlerException('Mautic requires the PHP pdo_mysql extension to work. Please ensure this extension is installed and enabled');
         }

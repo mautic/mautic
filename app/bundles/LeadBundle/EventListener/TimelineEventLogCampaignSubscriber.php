@@ -12,10 +12,12 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class TimelineEventLogCampaignSubscriber
 {
     use TimelineEventLogTrait;
+
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
         private readonly UserHelper $userHelper,
@@ -24,10 +26,11 @@ final class TimelineEventLogCampaignSubscriber
         $this->eventLogRepository = $eventLogRepository;
         $this->translator         = $translator;
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignSingleLeadChangeEvent::class)]
+
+    #[AsEventListener(event: CampaignSingleLeadChangeEvent::class)]
     public function onChange(CampaignLeadChangeEvent $event): void
     {
-        if (!$contact = $event->getLead()) {
+        if (!($contact = $event->getLead()) instanceof Lead) {
             return;
         }
 
@@ -37,7 +40,8 @@ final class TimelineEventLogCampaignSubscriber
             $event->getAction()
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBatchLeadChangeEvent::class)]
+
+    #[AsEventListener(event: CampaignBatchLeadChangeEvent::class)]
     public function onBatchChange(CampaignLeadChangeEvent $event): void
     {
         if (!$contacts = $event->getLeads()) {
@@ -50,7 +54,8 @@ final class TimelineEventLogCampaignSubscriber
             $event->getAction()
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
+
+    #[AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
@@ -62,6 +67,7 @@ final class TimelineEventLogCampaignSubscriber
             'campaign'
         );
     }
+
     /**
      * @param Lead[] $contacts
      */

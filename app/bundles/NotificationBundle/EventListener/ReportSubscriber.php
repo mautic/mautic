@@ -9,22 +9,25 @@ use Mautic\NotificationBundle\Entity\StatRepository;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportSubscriber
 {
     public const string MOBILE_NOTIFICATIONS       = 'mobile_notifications';
     public const string MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
+
     public function __construct(
         private Connection $db,
         private CompanyReportData $companyReportData,
         private StatRepository $statRepository,
     ) {
     }
+
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportBuilderEvent::class,
         priority: 0
     )]
@@ -157,10 +160,11 @@ final readonly class ReportSubscriber
             $event->addGraph($context, 'table', 'mautic.mobile_notification.table.most.mobile_notifications.read.percent');
         }
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGeneratorEvent::class,
         priority: 0
     )]
@@ -228,10 +232,11 @@ final readonly class ReportSubscriber
 
         $event->setQueryBuilder($qb);
     }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportGraphEvent::class,
         priority: 0
     )]

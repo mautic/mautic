@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Model\DoNotContact;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class DoNotContactSubscriber
 {
@@ -14,7 +15,8 @@ final readonly class DoNotContactSubscriber
         private DoNotContact $doNotContact,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: DoNotContactRemoveEvent::class,
         priority: 0
     )]
@@ -26,7 +28,8 @@ final readonly class DoNotContactSubscriber
             $doNotContactRemoveEvent->getPersist()
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: DoNotContactAddEvent::class,
         priority: 0
     )]

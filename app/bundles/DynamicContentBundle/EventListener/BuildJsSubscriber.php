@@ -5,6 +5,7 @@ namespace Mautic\DynamicContentBundle\EventListener;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -19,10 +20,11 @@ final readonly class BuildJsSubscriber
         private RouterInterface $router,
     ) {
     }
+
     /**
      * Adds DWC helpers after page-event setup and before page-event delivery.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: BuildJsEvent::class,
         priority: 200
     )]

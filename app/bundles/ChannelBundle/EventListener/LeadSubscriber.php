@@ -6,6 +6,7 @@ namespace Mautic\ChannelBundle\EventListener;
 
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -17,10 +18,11 @@ final readonly class LeadSubscriber
         private MessageQueueRepository $messageQueueRepository,
     ) {
     }
+
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadTimelineEvent::class,
         priority: 0
     )]

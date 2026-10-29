@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\PointBundle\Entity\LeadPointLogRepository;
 use Mautic\PointBundle\Entity\LeadTriggerLogRepository;
 use Mautic\PointBundle\Model\TriggerModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class LeadSubscriber
@@ -24,10 +25,11 @@ final readonly class LeadSubscriber
         private LeadTriggerLogRepository $leadTriggerLogRepository,
     ) {
     }
+
     /**
      * Trigger applicable events for the lead.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PointsChangeEvent::class,
         priority: 0
     )]
@@ -35,10 +37,11 @@ final readonly class LeadSubscriber
     {
         $this->triggerModel->triggerEvents($event->getLead());
     }
+
     /**
      * Handle point triggers for new leads (including 0 point triggers).
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadPostSaveEvent::class,
         priority: -1
     )]
@@ -48,10 +51,11 @@ final readonly class LeadSubscriber
             $this->triggerModel->triggerEvents($event->getLead());
         }
     }
+
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: LeadTimelineEvent::class,
         priority: 0
     )]
@@ -97,7 +101,8 @@ final readonly class LeadSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadPostMergeEvent::class,
         priority: 0
     )]

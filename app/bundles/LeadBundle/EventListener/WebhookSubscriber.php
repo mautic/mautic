@@ -18,6 +18,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class WebhookSubscriber
 {
@@ -27,10 +28,11 @@ final readonly class WebhookSubscriber
         private LeadRepository $leadRepository,
     ) {
     }
+
     /**
      * Add event triggers and actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: WebhookBuilderEvent::class,
         priority: 0
     )]
@@ -117,7 +119,8 @@ final readonly class WebhookSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadPostSaveEvent::class,
         priority: 0
     )]
@@ -151,7 +154,8 @@ final readonly class WebhookSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PointsChangeEvent::class,
         priority: 0
     )]
@@ -176,7 +180,8 @@ final readonly class WebhookSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadPostDeleteEvent::class,
         priority: 0
     )]
@@ -198,7 +203,8 @@ final readonly class WebhookSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ChannelSubscriptionChange::class,
         priority: 0
     )]
@@ -222,7 +228,8 @@ final readonly class WebhookSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: LeadChangeCompanyEvent::class,
         priority: 0
     )]
@@ -245,7 +252,8 @@ final readonly class WebhookSubscriber
             );
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CompanyPostSaveEvent::class,
         priority: 0
     )]
@@ -258,7 +266,8 @@ final readonly class WebhookSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CompanyPostDeleteEvent::class,
         priority: 0
     )]
@@ -273,7 +282,8 @@ final readonly class WebhookSubscriber
             ]
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ListChangeEvent::class,
         priority: 0
     )]
@@ -281,7 +291,8 @@ final readonly class WebhookSubscriber
     {
         $this->doSegmentChange($changeEvent);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ListBatchChangeEvent::class,
         priority: 0
     )]
@@ -289,6 +300,7 @@ final readonly class WebhookSubscriber
     {
         $this->doSegmentChange($changeEvent);
     }
+
     private function doSegmentChange(ListChangeEvent $changeEvent): void
     {
         $contacts               = $changeEvent->getLeads() ?? [$changeEvent->getLead()];

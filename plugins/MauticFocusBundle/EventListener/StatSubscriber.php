@@ -4,8 +4,10 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final readonly class StatSubscriber
@@ -15,7 +17,8 @@ final readonly class StatSubscriber
         private RequestStack $requestStack,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageHitEvent::class,
         priority: 0
     )]
@@ -28,15 +31,16 @@ final readonly class StatSubscriber
             $sourceId = $hit->getSourceId();
             $focus    = $this->model->getEntity($sourceId);
 
-            if ($focus && $focus->isPublished()) {
+            if ($focus instanceof Focus && $focus->isPublished()) {
                 $this->model->addStat($focus, Stat::TYPE_CLICK, $hit, $hit->getLead());
             }
         }
     }
+
     /**
      * Note if this submission is from a focus submit.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: SubmissionEvent::class,
         priority: 0
     )]
@@ -49,7 +53,7 @@ final readonly class StatSubscriber
         if (!empty($id)) {
             $focus = $this->model->getEntity($id);
 
-            if ($focus && $focus->isPublished()) {
+            if ($focus instanceof Focus && $focus->isPublished()) {
                 // Make sure the form is still applicable
                 $form = $event->getSubmission()->getForm();
                 if ((int) $form->getId() === (int) $focus->getForm()) {

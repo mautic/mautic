@@ -10,6 +10,7 @@ use Mautic\ConfigBundle\Service\ConfigChangeLogger;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ConfigSubscriber
 {
@@ -20,7 +21,8 @@ final readonly class ConfigSubscriber
         private AuditLogRepository $auditLogRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ConfigPostSaveEvent::class,
         priority: 0
     )]

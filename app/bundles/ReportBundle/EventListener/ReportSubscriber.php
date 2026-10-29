@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\ReportEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ReportSubscriber
 {
@@ -16,10 +17,11 @@ final readonly class ReportSubscriber
         private AuditLogModel $auditLogModel,
     ) {
     }
+
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportEvents::REPORT_POST_SAVE,
         priority: 0
     )]
@@ -38,10 +40,11 @@ final readonly class ReportSubscriber
             $this->auditLogModel->writeToLog($log);
         }
     }
+
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: ReportEvents::REPORT_POST_DELETE,
         priority: 0
     )]

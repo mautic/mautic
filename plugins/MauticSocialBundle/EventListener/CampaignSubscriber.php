@@ -8,6 +8,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType;
 use MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class CampaignSubscriber
@@ -18,7 +19,8 @@ final readonly class CampaignSubscriber
         private TranslatorInterface $translator,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: CampaignBuilderEvent::class,
         priority: 0
     )]
@@ -39,7 +41,8 @@ final readonly class CampaignSubscriber
             $event->addAction('twitter.tweet', $action);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: SocialEvents::ON_CAMPAIGN_BATCH_ACTION,
         priority: 0
     )]

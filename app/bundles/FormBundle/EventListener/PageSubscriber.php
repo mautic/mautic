@@ -5,15 +5,18 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PageSubscriber
 {
     private string $formRegex = '{form=(.*?)}';
+
     public function __construct(
         private readonly FormModel $formModel,
         private readonly BuilderTokenHelperFactory $builderTokenHelperFactory,
@@ -21,10 +24,11 @@ final class PageSubscriber
         private readonly CorePermissions $security,
     ) {
     }
+
     /**
      * Add forms to available page tokens.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: PageBuilderEvent::class,
         priority: 0
     )]
@@ -53,7 +57,8 @@ final class PageSubscriber
             }
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PageDisplayEvent::class,
         priority: 0
     )]
@@ -68,7 +73,7 @@ final class PageSubscriber
         if (count($matches[0])) {
             foreach ($matches[1] as $id) {
                 $form = $this->formModel->getEntity($id);
-                if (null !== $form
+                if ($form instanceof Form
                     && (
                         $form->isPublished(false)
                         || $this->security->hasEntityAccess(

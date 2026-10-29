@@ -7,6 +7,7 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\CoreBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class ConfigSubscriber
 {
@@ -14,7 +15,8 @@ final readonly class ConfigSubscriber
         private LanguageHelper $languageHelper,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ConfigBuilderEvent::class,
         priority: 0
     )]
@@ -31,7 +33,8 @@ final readonly class ConfigSubscriber
             'parameters' => $coreParams,
         ]);
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ConfigPreSaveEvent::class,
         priority: 0
     )]

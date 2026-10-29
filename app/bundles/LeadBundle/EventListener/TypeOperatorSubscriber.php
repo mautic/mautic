@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Entity\StageRepository;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -33,6 +34,7 @@ final class TypeOperatorSubscriber
 {
     use OperatorListTrait;
     private const string EMAIL_ALIAS = 'email';
+
     public function __construct(
         private readonly LeadModel $leadModel,
         private readonly ListModel $listModel,
@@ -44,7 +46,8 @@ final class TypeOperatorSubscriber
         private readonly StageRepository $stageRepository,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: TypeOperatorsEvent::class,
         priority: 0
     )]
@@ -75,7 +78,8 @@ final class TypeOperatorSubscriber
             $event->setOperatorsForFieldType($textAlias, $this->typeOperators['text']);
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ListFieldChoicesEvent::class,
         priority: 0
     )]
@@ -107,7 +111,8 @@ final class TypeOperatorSubscriber
         $event->setChoicesForFieldType('region', FormFieldHelper::getRegionChoices());
         $event->setChoicesForFieldType('timezone', FormFieldHelper::getTimezonesChoices());
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormAdjustmentEvent::class,
         priority: 1000
     )]
@@ -141,10 +146,11 @@ final class TypeOperatorSubscriber
         );
         $event->stopPropagation();
     }
+
     /**
      * For fields where users search by label but we need the ID. Example: owner.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+    #[AsEventListener(
         event: FormAdjustmentEvent::class,
         priority: 800
     )]
@@ -208,7 +214,8 @@ final class TypeOperatorSubscriber
         );
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormAdjustmentEvent::class,
         priority: 600
     )]
@@ -240,7 +247,8 @@ final class TypeOperatorSubscriber
 
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormAdjustmentEvent::class,
         priority: 400
     )]
@@ -271,7 +279,8 @@ final class TypeOperatorSubscriber
 
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormAdjustmentEvent::class,
         priority: 200
     )]
@@ -318,7 +327,8 @@ final class TypeOperatorSubscriber
             $event->stopPropagation();
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormAdjustmentEvent::class,
         priority: 100
     )]
@@ -341,7 +351,8 @@ final class TypeOperatorSubscriber
 
         $event->stopPropagation();
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: FormAdjustmentEvent::class,
         priority: 0
     )]
@@ -368,6 +379,7 @@ final class TypeOperatorSubscriber
         $this->showOperatorsBasedAlertMessages($event);
         $event->stopPropagation();
     }
+
     private function showOperatorsBasedAlertMessages(FormAdjustmentEvent $event): void
     {
         switch ($event->getOperator()) {
@@ -398,6 +410,7 @@ final class TypeOperatorSubscriber
             'message_type' => 'warning',
         ]);
     }
+
     /**
      * @return mixed[]
      */
@@ -405,6 +418,7 @@ final class TypeOperatorSubscriber
     {
         return $this->makeChoices($this->campaignModel->getPublishedCampaigns(true), 'name', 'id');
     }
+
     /**
      * @return mixed[]
      */
@@ -412,6 +426,7 @@ final class TypeOperatorSubscriber
     {
         return $this->makeChoices($this->listModel->getUserLists(), 'name', 'id');
     }
+
     /**
      * @return mixed[]
      */
@@ -419,6 +434,7 @@ final class TypeOperatorSubscriber
     {
         return $this->makeChoices($this->leadModel->getTagList(), 'label', 'value');
     }
+
     /**
      * @return mixed[]
      */
@@ -426,6 +442,7 @@ final class TypeOperatorSubscriber
     {
         return $this->makeChoices($this->stageRepository->getSimpleList(), 'label', 'value');
     }
+
     /**
      * @return mixed[]
      */
@@ -433,6 +450,7 @@ final class TypeOperatorSubscriber
     {
         return $this->makeChoices($this->categoryModel->getLookupResults('global', '', 300), 'title', 'id');
     }
+
     /**
      * @return mixed[]
      */
@@ -440,6 +458,7 @@ final class TypeOperatorSubscriber
     {
         return $this->makeChoices($this->assetModel->getLookupResults('asset', $filter), 'title', 'id');
     }
+
     /**
      * @param mixed[] $items
      *

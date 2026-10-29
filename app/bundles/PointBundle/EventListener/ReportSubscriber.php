@@ -9,6 +9,7 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final class ReportSubscriber
 {
@@ -38,11 +39,13 @@ final class ReportSubscriber
     private array $reportContexts = [
         self::CONTEXT_GROUP_SCORE,
     ];
+
     public function __construct(
         private readonly FieldsBuilder $fieldsBuilder,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportBuilderEvent::class,
         priority: -10
     )]
@@ -69,7 +72,8 @@ final class ReportSubscriber
             $event->addTable(self::CONTEXT_GROUP_SCORE, $data, 'contacts');
         }
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: ReportGeneratorEvent::class,
         priority: -10
     )]

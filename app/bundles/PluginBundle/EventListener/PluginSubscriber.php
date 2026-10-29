@@ -7,6 +7,7 @@ namespace Mautic\PluginBundle\EventListener;
 use Mautic\PluginBundle\Bundle\PluginDatabase;
 use Mautic\PluginBundle\Event\PluginInstallEvent;
 use Mautic\PluginBundle\Event\PluginUpdateEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 final readonly class PluginSubscriber
 {
@@ -14,7 +15,8 @@ final readonly class PluginSubscriber
         private PluginDatabase $pluginDatabase,
     ) {
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PluginInstallEvent::class,
         priority: 0
     )]
@@ -31,7 +33,8 @@ final readonly class PluginSubscriber
             $event->getInstalledSchema()
         );
     }
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+
+    #[AsEventListener(
         event: PluginUpdateEvent::class,
         priority: 0
     )]
