@@ -48,6 +48,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -295,6 +296,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->companyRepository, // $companyRepository
+            $this->createConfiguredStub(ContactTrackingPreferenceHelper::class, ['allowsActivityTracking' => true]),
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepository);
@@ -594,6 +596,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->companyRepository, // $companyRepository
+            $this->createConfiguredStub(ContactTrackingPreferenceHelper::class, ['allowsActivityTracking' => true]),
         );
 
         $contacts = [
@@ -739,6 +742,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->companyRepository, // $companyRepository
+            $this->createConfiguredStub(ContactTrackingPreferenceHelper::class, ['allowsActivityTracking' => true]),
         );
 
         $email = new class() extends Email {
