@@ -126,6 +126,17 @@ final class RedirectClickCountFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([0, 0], $this->getRedirectCounts($redirect));
     }
 
+    public function testUntrackedClickWithABrokenClickthroughIsNotCounted(): void
+    {
+        [$redirect] = $this->createLink();
+
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_GET, '/r/'.$redirect->getRedirectId(), ['ct' => 'not-a-clickthrough'], [], ['HTTP_DNT' => '1']);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
+
+        $this->assertSame([0, 0], $this->getRedirectCounts($redirect));
+    }
+
     /**
      * @return iterable<string, array{array<string, string>}>
      */
