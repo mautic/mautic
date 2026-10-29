@@ -26,10 +26,8 @@ final class DeviceTracker
     ) {
     }
 
-    /**
-     * @return LeadDevice
-     */
-    public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent)
+    
+    public function createDeviceFromUserAgent(Lead $trackedContact, $userAgent): LeadDevice
     {
         $signature = $trackedContact->getId().$userAgent;
         if (isset($this->trackedDevice[$signature])) {

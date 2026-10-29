@@ -57,13 +57,11 @@ final readonly class MauticSyncDataExchange implements SyncDataExchangeInterface
     }
 
     /**
-     * @return ReportObjectDAO
-     *
      * @throws ObjectNotFoundException
      * @throws ObjectNotSupportedException
      * @throws ObjectDeletedException
      */
-    public function getConflictedInternalObject(MappingManualDAO $mappingManualDAO, string $internalObjectName, ReportObjectDAO $integrationObjectDAO)
+    public function getConflictedInternalObject(MappingManualDAO $mappingManualDAO, string $internalObjectName, ReportObjectDAO $integrationObjectDAO): ReportObjectDAO
     {
         // Check to see if we have a match
         $internalObjectDAO = $this->mappingHelper->findMauticObject($mappingManualDAO, $internalObjectName, $integrationObjectDAO);

@@ -87,10 +87,8 @@ final class RedirectModel extends FormModel
      * Get a Redirect entity by URL.
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
-     *
-     * @return Redirect
      */
-    public function getRedirectByUrl(string $url)
+    public function getRedirectByUrl(string $url): Redirect
     {
         // Ensure the URL saved to the database does not have encoded ampersands
         $url = UrlHelper::decodeAmpersands($url);

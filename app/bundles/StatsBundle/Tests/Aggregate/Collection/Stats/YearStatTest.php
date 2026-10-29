@@ -27,7 +27,6 @@ final class YearStatTest extends TestCase
     public function testGetMonth(): void
     {
         $month = $this->yearStat->getMonth($this->month);
-        $this->assertInstanceOf(MonthStat::class, $month);
         $this->assertSame([], $month->getStats());
         $this->assertSame(1, $this->yearStat->getCount());
 

@@ -19,11 +19,9 @@ final class YearStat implements StatInterface
     /**
      * @param int $month
      *
-     * @return MonthStat
-     *
      * @throws \Exception
      */
-    public function getMonth($month)
+    public function getMonth($month): MonthStat
     {
         $key = new \DateTime("{$this->year}-{$month}-01 00:00:00")->format('Y-m');
 

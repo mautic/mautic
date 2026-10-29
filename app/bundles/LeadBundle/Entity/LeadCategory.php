@@ -47,13 +47,10 @@ class LeadCategory
     #[Groups(['leadcategory:read'])]
     private $id;
 
-    /**
-     * @var Category
-     */
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
     #[ORM\ManyToOne(targetEntity: Category::class)]
     #[ORM\JoinColumn(name: 'category_id', nullable: false, onDelete: 'CASCADE')]
-    private $category;
+    private \Mautic\CategoryBundle\Entity\Category $category;
 
     /**
      * @var Lead
@@ -132,10 +129,8 @@ class LeadCategory
         $this->lead = $lead;
     }
 
-    /**
-     * @return Category
-     */
-    public function getCategory()
+    
+    public function getCategory(): Category
     {
         return $this->category;
     }
