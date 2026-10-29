@@ -23,6 +23,7 @@ final class AvatarExtension extends AbstractExtension
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly DefaultAvatarHelper $defaultAvatarHelper,
         private readonly LoggerInterface $logger,
+        private readonly ?string $styleFile = null,
     ) {
     }
 
@@ -56,7 +57,7 @@ final class AvatarExtension extends AbstractExtension
 
         try {
             $installPath = InstalledVersions::getInstallPath('dicebear/styles');
-            $file        = null === $installPath ? null : $installPath.'/src/line-face.json';
+            $file        = $this->styleFile ?? (null === $installPath ? null : $installPath.'/src/line-face.json');
             $definition  = null !== $file && is_readable($file) ? file_get_contents($file) : false;
 
             if (false === $definition) {

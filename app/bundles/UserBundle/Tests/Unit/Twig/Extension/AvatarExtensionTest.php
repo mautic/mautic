@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Tests\Unit\Twig\Extension;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
 use Mautic\UserBundle\Twig\Extension\AvatarExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Asset\Packages;
 
 final class AvatarExtensionTest extends TestCase
 {
@@ -70,6 +72,47 @@ final class AvatarExtensionTest extends TestCase
         $this->assertSame($extension->getImage(1), ($functions[0]->getCallable())(1));
     }
 
+    public function testMissingStyleFileFallsBackToDefaultAvatarAndLogsOnce(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('error')->with('Line Face avatar style file not found.');
+
+        $extension = $this->createFallbackExtension($logger, sys_get_temp_dir().'/missing-line-face.json');
+
+        $this->assertSame('http://localhost/images/avatar.png', $extension->getImage(1), 'Default avatar should be used.');
+        $this->assertSame('http://localhost/images/avatar.png', $extension->getImage(2), 'Default avatar should be used.');
+    }
+
+    public function testInvalidStyleFileFallsBackToDefaultAvatarAndLogsOnce(): void
+    {
+        $file = tempnam(sys_get_temp_dir(), 'line-face');
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('error')->with('Unable to load the Line Face avatar style.');
+
+        try {
+            file_put_contents($file, '{not json');
+            $extension = $this->createFallbackExtension($logger, $file);
+
+            $this->assertSame('http://localhost/images/avatar.png', $extension->getImage(1), 'Default avatar should be used.');
+            $this->assertSame('http://localhost/images/avatar.png', $extension->getImage(2), 'Default avatar should be used.');
+        } finally {
+            unlink($file);
+        }
+    }
+
+    private function createFallbackExtension(LoggerInterface $logger, string $styleFile): AvatarExtension
+    {
+        $paths = $this->createStub(PathsHelper::class);
+        $paths->method('getSystemPath')->willReturn('http://localhost');
+        $paths->method('getAssetsPath')->willReturn(dirname(__DIR__, 7).'/app/assets');
+        $paths->method('getMediaPath')->willReturn(dirname(__DIR__, 7).'/media');
+
+        $assets = new AssetsHelper($this->createStub(Packages::class));
+        $assets->setPathsHelper($paths);
+        return new AvatarExtension($this->createStub(CoreParametersHelper::class), new DefaultAvatarHelper($assets), $logger, $styleFile);
+    }
+
     private function createExtension(string $siteUrl = 'https://mautic.example'): AvatarExtension
     {
         $parameters = $this->createMock(CoreParametersHelper::class);
@@ -77,6 +120,6 @@ final class AvatarExtensionTest extends TestCase
 
         $assets = (new \ReflectionClass(AssetsHelper::class))->newInstanceWithoutConstructor();
 
-        return new AvatarExtension($parameters, new DefaultAvatarHelper($assets), $this->createStub(LoggerInterface::class));
+        return new AvatarExtension($parameters, new DefaultAvatarHelper($assets), $logger ?? $this->createStub(LoggerInterface::class));
     }
 }
