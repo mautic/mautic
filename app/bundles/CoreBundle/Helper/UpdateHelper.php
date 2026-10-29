@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\RequestOptions;
@@ -15,6 +14,7 @@ use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckError;
 use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckResult;
 use Mautic\CoreBundle\Release\Metadata;
 use Monolog\Logger;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Helper class for fetching update data.

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Tests\Functional;
 
-use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
@@ -14,6 +13,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
+use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Model;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\Stub;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -35,6 +33,8 @@ use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;

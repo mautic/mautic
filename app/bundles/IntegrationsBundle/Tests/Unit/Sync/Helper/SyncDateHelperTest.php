@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Helper;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]

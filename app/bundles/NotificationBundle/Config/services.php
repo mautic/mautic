@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Mautic\NotificationBundle\EventListener\CampaignSubscriber;
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Mautic\NotificationBundle\Api\OneSignalApi;
+use Mautic\NotificationBundle\EventListener\CampaignSubscriber;
 use Mautic\NotificationBundle\Integration\OneSignalIntegration;
 use Mautic\NotificationBundle\Security\Permissions\NotificationPermissions;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 

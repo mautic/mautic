@@ -2,11 +2,11 @@
 
 namespace Mautic\ApiBundle\Controller\oAuth2;
 
-use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 final class SecurityController extends CommonController

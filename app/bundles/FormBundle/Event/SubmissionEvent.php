@@ -2,13 +2,13 @@
 
 namespace Mautic\FormBundle\Event;
 
-use Symfony\Component\HttpFoundation\Response;
-use Mautic\FormBundle\Entity\Form;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ServerBag;
 
 final class SubmissionEvent extends CommonEvent

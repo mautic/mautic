@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class FormFieldHelperTest extends TestCase

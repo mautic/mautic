@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class LeadListModelTest extends TestCase

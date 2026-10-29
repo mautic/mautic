@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\Validator\Constraints;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -15,6 +13,8 @@ use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

@@ -2,12 +2,11 @@
 
 namespace Mautic\EmailBundle\Controller;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -32,6 +31,7 @@ use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -33,6 +32,7 @@ use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 #[AllowMockObjectsWithoutExpectations]

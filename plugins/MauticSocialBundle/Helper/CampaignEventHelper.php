@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
-use MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\LeadBundle\Entity\Lead;
@@ -11,6 +10,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration;
 use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 
 final class CampaignEventHelper

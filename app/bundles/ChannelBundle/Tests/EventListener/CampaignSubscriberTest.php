@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -31,6 +30,7 @@ use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\SmsEvents;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 

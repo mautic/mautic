@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\Notification;
 
-use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\UserBundle\Entity\User;

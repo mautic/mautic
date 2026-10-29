@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Twig\Helper\ContentHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 

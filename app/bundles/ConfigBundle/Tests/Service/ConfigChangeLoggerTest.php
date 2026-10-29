@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Service;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use PHPUnit\Framework\TestCase;
 
 final class ConfigChangeLoggerTest extends TestCase
 {

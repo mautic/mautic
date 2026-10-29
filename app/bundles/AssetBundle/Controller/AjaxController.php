@@ -2,13 +2,13 @@
 
 namespace Mautic\AssetBundle\Controller;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Gaufrette\Filesystem;
 use Mautic\AssetBundle\Event\RemoteAssetBrowseEvent;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;

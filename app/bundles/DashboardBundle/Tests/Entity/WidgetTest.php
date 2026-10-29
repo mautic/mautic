@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\DashboardBundle\Tests\Entity;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\DashboardBundle\Entity\Widget;
+use PHPUnit\Framework\TestCase;
 
 final class WidgetTest extends TestCase
 {

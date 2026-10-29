@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\SubmissionRepository;
@@ -12,6 +11,7 @@ use Mautic\FormBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]

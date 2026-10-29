@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\BodyParser;
@@ -12,6 +11,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(BodyParser::class)]
 final class BodyParserTest extends TestCase

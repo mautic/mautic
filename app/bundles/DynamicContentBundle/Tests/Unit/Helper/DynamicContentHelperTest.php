@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\DynamicContentBundle\Tests\Unit\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -15,6 +14,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[AllowMockObjectsWithoutExpectations]

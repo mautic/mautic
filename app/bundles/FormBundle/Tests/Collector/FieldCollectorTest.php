@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Collector;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Collector\FieldCollector;
 use Mautic\FormBundle\Event\FieldCollectEvent;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 final class FieldCollectorTest extends TestCase

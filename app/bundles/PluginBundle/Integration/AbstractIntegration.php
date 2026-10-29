@@ -2,11 +2,10 @@
 
 namespace Mautic\PluginBundle\Integration;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use GuzzleHttp\Exception\RequestException;
-use Monolog\Logger;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
@@ -42,6 +41,7 @@ use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;

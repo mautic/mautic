@@ -2,9 +2,9 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
-use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Types\Type;

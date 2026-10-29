@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\ReflectionHelper;
@@ -16,6 +15,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(AbstractFormFieldHelper::class)]
 #[AllowMockObjectsWithoutExpectations]

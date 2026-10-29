@@ -2,12 +2,12 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Symfony\Component\Finder\SplFileInfo;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\Language\Installer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**

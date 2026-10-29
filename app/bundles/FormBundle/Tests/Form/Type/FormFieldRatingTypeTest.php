@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Form\Type;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Mautic\FormBundle\Form\Type\FormFieldRatingType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;

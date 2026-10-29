@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\DashboardBundle\Tests\Event;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
@@ -13,6 +12,7 @@ use Mautic\DashboardBundle\Event\GenerateWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class WidgetDetailEventTest extends TestCase

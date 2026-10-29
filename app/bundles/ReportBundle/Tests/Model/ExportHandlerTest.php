@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Model;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\ReportBundle\Exception\FileIOException;
 use Mautic\ReportBundle\Model\ExportHandler;
+use PHPUnit\Framework\TestCase;
 
 final class ExportHandlerTest extends TestCase
 {

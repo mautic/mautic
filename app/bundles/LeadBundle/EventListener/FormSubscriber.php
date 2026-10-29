@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\PointBundle\Entity\Group;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
@@ -29,6 +28,7 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Form\Type;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use MauticPlugin\MauticFocusBundle\Form\Type\ContentType;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 

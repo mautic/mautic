@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Entity;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 final class PageTest extends TestCase
 {

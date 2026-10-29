@@ -2,12 +2,12 @@
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final class CheckStep implements StepInterface

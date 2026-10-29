@@ -2,8 +2,8 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;

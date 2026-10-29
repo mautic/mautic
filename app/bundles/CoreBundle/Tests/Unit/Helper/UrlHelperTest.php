@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 final class UrlHelperTest extends TestCase
 {

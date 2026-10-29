@@ -2,9 +2,9 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;

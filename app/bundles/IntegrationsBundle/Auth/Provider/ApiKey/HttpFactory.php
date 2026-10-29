@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Auth\Provider\ApiKey;
 
-use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\CurlHandler;
@@ -19,6 +18,7 @@ use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use Mautic\IntegrationsBundle\Exception\InvalidCredentialsException;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * Factory for building HTTP clients using basic auth.

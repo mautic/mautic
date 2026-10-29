@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field\Dispatcher;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnDispatcher;
 use Mautic\LeadBundle\Field\Event\AddColumnEvent;
@@ -13,6 +12,7 @@ use Mautic\LeadBundle\Field\Event\UpdateColumnEvent;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class FieldColumnDispatcherTest extends TestCase

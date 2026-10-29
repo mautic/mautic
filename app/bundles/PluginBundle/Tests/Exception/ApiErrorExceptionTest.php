@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Tests\Exception;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use PHPUnit\Framework\TestCase;
 
 final class ApiErrorExceptionTest extends TestCase
 {

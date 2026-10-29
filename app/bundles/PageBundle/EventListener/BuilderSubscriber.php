@@ -2,10 +2,10 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;

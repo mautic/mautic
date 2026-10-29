@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Form\Type\DynamicListType;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;

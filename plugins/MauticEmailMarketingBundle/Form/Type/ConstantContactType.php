@@ -2,12 +2,12 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
-use MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
+use MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;

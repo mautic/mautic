@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field\DTO;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Exception\InvalidObjectTypeException;
 use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
+use PHPUnit\Framework\TestCase;
 
 final class CustomFieldObjectTest extends TestCase
 {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\LeadField;
+use PHPUnit\Framework\TestCase;
 
 final class LeadFieldTest extends TestCase
 {

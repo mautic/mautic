@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
-use MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager;
-use MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager;
+use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
+use MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
@@ -14,6 +13,7 @@ use Mautic\LeadBundle\Event\LeadUtmTagsEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 final class LeadChangeEventDispatcherTest extends TestCase

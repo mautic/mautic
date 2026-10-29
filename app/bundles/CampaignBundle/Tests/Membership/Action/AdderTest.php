@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Membership\Action;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -15,6 +13,8 @@ use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignExc
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class AdderTest extends TestCase

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 

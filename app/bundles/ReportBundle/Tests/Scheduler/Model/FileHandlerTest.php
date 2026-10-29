@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\FileProperties;
@@ -13,6 +12,7 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class FileHandlerTest extends TestCase

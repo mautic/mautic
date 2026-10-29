@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\Tests\Model;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
@@ -20,6 +19,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Form\Type;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\UserBundle\Entity\Role;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;

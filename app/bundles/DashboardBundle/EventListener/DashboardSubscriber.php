@@ -2,12 +2,12 @@
 
 namespace Mautic\DashboardBundle\EventListener;
 
-use Psr\Cache\InvalidArgumentException;
 use Mautic\DashboardBundle\Event\GenerateWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\PreLoadWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DashboardSubscriber implements EventSubscriberInterface

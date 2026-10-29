@@ -2,7 +2,6 @@
 
 namespace Mautic\NotificationBundle\Model;
 
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -22,6 +21,7 @@ use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 

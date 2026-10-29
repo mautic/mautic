@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Helper;
 
-use Mautic\PageBundle\Entity\Redirect;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
@@ -28,6 +27,7 @@ use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Psr\Log\LoggerInterface;

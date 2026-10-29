@@ -2,13 +2,13 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Mautic\LeadBundle\Entity\Lead;
-use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * @extends CommonRepository<Lead>

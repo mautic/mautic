@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\EventListener\PointSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -15,6 +14,7 @@ use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

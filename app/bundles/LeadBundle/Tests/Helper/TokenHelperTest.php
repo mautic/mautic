@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class TokenHelperTest extends TestCase

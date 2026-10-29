@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\EventListener;
 
-use PHPUnit\Framework\MockObject\Stub;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Event\IconEvent;
@@ -19,6 +18,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Route;

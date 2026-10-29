@@ -2,27 +2,27 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\EmailBundle\DependencyInjection\EnvProcessor\MailerDsnEnvVarProcessor;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
+use Mautic\EmailBundle\EventListener\WebhookSubscriber;
+use Mautic\EmailBundle\Mailer\Transport\TransportFactory;
+use Mautic\EmailBundle\Model\SendEmailToContact;
+use Mautic\EmailBundle\Model\SendEmailToUser;
+use Mautic\EmailBundle\Model\TransportCallback;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
-use Mautic\EmailBundle\Stats\StatHelperContainer;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
+use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
+use Mautic\EmailBundle\Security\Permissions\EmailPermissions;
 use Mautic\EmailBundle\Stats\Helper\BouncedHelper;
 use Mautic\EmailBundle\Stats\Helper\ClickedHelper;
 use Mautic\EmailBundle\Stats\Helper\FailedHelper;
 use Mautic\EmailBundle\Stats\Helper\OpenedHelper;
 use Mautic\EmailBundle\Stats\Helper\SentHelper;
 use Mautic\EmailBundle\Stats\Helper\UnsubscribedHelper;
-use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
-use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider;
-use Mautic\EmailBundle\Mailer\Transport\TransportFactory;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
-use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
-use Mautic\EmailBundle\Model\SendEmailToUser;
-use Mautic\EmailBundle\Model\SendEmailToContact;
-use Mautic\EmailBundle\Model\TransportCallback;
-use Mautic\EmailBundle\EventListener\WebhookSubscriber;
-use Mautic\EmailBundle\Security\Permissions\EmailPermissions;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\EmailBundle\Stats\StatHelperContainer;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

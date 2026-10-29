@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Unit\Security\Permissions;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use MauticPlugin\MauticTagManagerBundle\Security\Permissions\TagManagerPermissions;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Tracker\Service\ContactTrackingService;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
@@ -13,6 +12,7 @@ use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingService;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

@@ -3,17 +3,17 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
-use Mautic\CoreBundle\IpLookup\IpstackLookup;
 use Mautic\CoreBundle\IpLookup\GeobytesLookup;
 use Mautic\CoreBundle\IpLookup\GeoipsLookup;
+use Mautic\CoreBundle\IpLookup\IP2LocationAPILookup;
+use Mautic\CoreBundle\IpLookup\IP2LocationBinLookup;
 use Mautic\CoreBundle\IpLookup\IpinfodbLookup;
+use Mautic\CoreBundle\IpLookup\IpstackLookup;
 use Mautic\CoreBundle\IpLookup\MaxmindCountryLookup;
+use Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup;
 use Mautic\CoreBundle\IpLookup\MaxmindOmniLookup;
 use Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup;
-use Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup;
 use Mautic\CoreBundle\IpLookup\TelizeLookup;
-use Mautic\CoreBundle\IpLookup\IP2LocationBinLookup;
-use Mautic\CoreBundle\IpLookup\IP2LocationAPILookup;
 use Mautic\CoreBundle\Shortener\Shortener;
 
 return [

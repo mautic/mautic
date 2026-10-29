@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\EventListener;
 
-use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
-use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -14,6 +12,8 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Form\Type\MessageSendType;

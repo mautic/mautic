@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
@@ -21,6 +19,8 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[AllowMockObjectsWithoutExpectations]

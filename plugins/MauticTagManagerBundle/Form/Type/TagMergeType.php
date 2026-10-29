@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticTagManagerBundle\Form\Type;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\LeadBundle\Entity\Tag;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;

@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner\Helper;
 
-use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
@@ -11,6 +10,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 

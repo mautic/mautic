@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
-use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
-use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
-use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
-use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
-use Mautic\ReportBundle\Scheduler\Model\FileHandler;
-use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Mautic\ReportBundle\Adapter\ReportDataAdapter;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Model\ExcelExporter;
+use Mautic\ReportBundle\Model\ExportHandler;
 use Mautic\ReportBundle\Model\ReportExporter;
-use Mautic\ReportBundle\Model\ScheduleModel;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportFileWriter;
-use Mautic\ReportBundle\Model\ExportHandler;
-use Mautic\ReportBundle\Helper\ReportHelper;
+use Mautic\ReportBundle\Model\ScheduleModel;
+use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
+use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
+use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
+use Mautic\ReportBundle\Scheduler\Model\FileHandler;
+use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
+use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
+use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 use Mautic\ReportBundle\Security\Permissions\ReportPermissions;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

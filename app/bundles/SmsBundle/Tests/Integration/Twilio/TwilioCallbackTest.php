@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\SmsBundle\Helper\ContactHelper;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use Mautic\SmsBundle\Integration\Twilio\TwilioCallback;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 

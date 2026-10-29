@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Event;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
+use PHPUnit\Framework\TestCase;
 
 final class CustomTemplateEventTest extends TestCase
 {

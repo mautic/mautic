@@ -2,11 +2,11 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\UserBundle\Entity\Role;
-use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\UserBundle\Entity\PermissionRepository;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Helper\RoleSearchScopeProvider;
 use Mautic\UserBundle\Model\RoleModel;

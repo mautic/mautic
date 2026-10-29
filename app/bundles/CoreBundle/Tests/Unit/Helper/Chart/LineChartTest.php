@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Chart;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(LineChart::class)]
 final class LineChartTest extends TestCase

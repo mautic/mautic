@@ -2,8 +2,8 @@
 
 namespace Mautic\PointBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Collections\Order;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 

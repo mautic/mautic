@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DateTimeHelper::class)]
 final class DateTimeHelperTest extends TestCase

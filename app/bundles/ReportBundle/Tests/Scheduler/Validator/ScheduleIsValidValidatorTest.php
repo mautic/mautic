@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Scheduler\Validator;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;

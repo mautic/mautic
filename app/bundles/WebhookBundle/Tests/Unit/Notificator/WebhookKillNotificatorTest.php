@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Tests\Unit\Notificator;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -18,6 +17,7 @@ use Mautic\WebhookBundle\Notificator\WebhookNotificationSender;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;

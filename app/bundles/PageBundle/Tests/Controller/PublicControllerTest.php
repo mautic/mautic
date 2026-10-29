@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
-use PHPUnit\Framework\MockObject\Stub;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -41,6 +40,7 @@ use Mautic\PageBundle\Model\Tracking404Model;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Asset\Packages;

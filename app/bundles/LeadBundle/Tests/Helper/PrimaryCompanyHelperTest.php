@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 final class PrimaryCompanyHelperTest extends TestCase
 {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\StatsEvent;
@@ -15,6 +14,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 #[AllowMockObjectsWithoutExpectations]

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\ValidationEvent;
@@ -12,6 +11,7 @@ use Mautic\FormBundle\EventListener\FormValidationSubscriber;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[CoversClass(FormValidationSubscriber::class)]

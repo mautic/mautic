@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Language;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\Language\Installer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class InstallerTest extends TestCase

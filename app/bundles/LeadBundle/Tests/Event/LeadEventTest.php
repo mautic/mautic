@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadEvent;
+use PHPUnit\Framework\TestCase;
 
 final class LeadEventTest extends TestCase
 {

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Membership\Action;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
@@ -14,6 +12,8 @@ use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaign
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]

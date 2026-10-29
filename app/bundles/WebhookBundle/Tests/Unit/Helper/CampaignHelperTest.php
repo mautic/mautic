@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Tests\Unit\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
@@ -15,6 +14,7 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class CampaignHelperTest extends TestCase

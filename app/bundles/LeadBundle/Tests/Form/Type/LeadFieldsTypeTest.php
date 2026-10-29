@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Form\Type\LeadFieldsType;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class LeadFieldsTypeTest extends TestCase

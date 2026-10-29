@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Model;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
@@ -25,6 +24,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;

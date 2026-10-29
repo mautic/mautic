@@ -2,7 +2,6 @@
 
 namespace Mautic\ConfigBundle\Controller;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigPostSaveEvent;
 use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
@@ -17,6 +16,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

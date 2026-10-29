@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use MauticPlugin\MauticOutlookBundle\Integration\OutlookIntegration;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

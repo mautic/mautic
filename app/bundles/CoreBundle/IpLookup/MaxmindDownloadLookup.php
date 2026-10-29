@@ -2,8 +2,8 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
-use GeoIp2\Record\Subdivision;
 use GeoIp2\Database\Reader;
+use GeoIp2\Record\Subdivision;
 
 final class MaxmindDownloadLookup extends AbstractLocalDataLookup
 {

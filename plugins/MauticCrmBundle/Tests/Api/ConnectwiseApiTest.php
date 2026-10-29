@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Integration\DataGeneratorTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ConnectwiseApi::class)]
 final class ConnectwiseApiTest extends TestCase

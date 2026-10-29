@@ -2,12 +2,12 @@
 
 namespace Mautic\DashboardBundle\Event;
 
-use Psr\Cache\InvalidArgumentException;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Exception\CouldNotFormatDateTimeException;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class WidgetDetailEvent extends CommonEvent

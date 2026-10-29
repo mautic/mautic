@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Command;
 
-use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CoreBundle\Command\RemoveAnonymousContactsCommand;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;

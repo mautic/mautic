@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Model;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\Stub;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -26,6 +24,8 @@ use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;

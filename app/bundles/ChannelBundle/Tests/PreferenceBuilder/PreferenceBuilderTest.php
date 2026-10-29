@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\Tests\PreferenceBuilder;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -15,6 +14,7 @@ use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 #[AllowMockObjectsWithoutExpectations]

@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
-use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
-use Doctrine\ORM\Exception\ORMException;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\StatRepository;
@@ -23,6 +21,8 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]

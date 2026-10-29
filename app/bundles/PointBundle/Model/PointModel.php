@@ -2,7 +2,6 @@
 
 namespace Mautic\PointBundle\Model;
 
-use Mautic\PointBundle\Helper\EventHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -23,6 +22,7 @@ use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\Form\Type\PointType;
+use Mautic\PointBundle\Helper\EventHelper;
 use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

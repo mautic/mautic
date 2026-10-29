@@ -2,9 +2,6 @@
 
 namespace Mautic\ReportBundle\Controller;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\EventListener\ReportSubscriber;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -19,9 +16,12 @@ use Mautic\ReportBundle\Model\ExportResponse;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 

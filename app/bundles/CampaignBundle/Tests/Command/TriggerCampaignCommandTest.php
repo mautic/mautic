@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
-use Psr\Cache\InvalidArgumentException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
@@ -21,6 +20,7 @@ use Mautic\LeadBundle\Entity\Lead as Contact;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
 
 final class TriggerCampaignCommandTest extends AbstractCampaignCommand

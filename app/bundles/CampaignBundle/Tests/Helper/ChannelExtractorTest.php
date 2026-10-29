@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
+use PHPUnit\Framework\TestCase;
 
 final class ChannelExtractorTest extends TestCase
 {

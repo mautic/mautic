@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\EventListener\ReportSubscriber;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -18,6 +16,8 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

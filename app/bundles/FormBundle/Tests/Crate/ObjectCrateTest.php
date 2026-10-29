@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Crate;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Crate\ObjectCrate;
+use PHPUnit\Framework\TestCase;
 
 final class ObjectCrateTest extends TestCase
 {

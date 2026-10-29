@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Form\Type;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\FormBundle\Form\Type\FormFieldCheckboxGroupType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormExtensionInterface;

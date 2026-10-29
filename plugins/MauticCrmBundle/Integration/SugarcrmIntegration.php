@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Mautic\UserBundle\Entity\User;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
@@ -11,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use MauticPlugin\MauticCrmBundle\Api\SugarcrmApi;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

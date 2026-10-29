@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
-use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -13,6 +12,7 @@ use Mautic\CoreBundle\IpLookup\MaxmindOmniLookup;
 use Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Maxmind requires API key and thus cannot test actual lookup so just make API endpoint works and

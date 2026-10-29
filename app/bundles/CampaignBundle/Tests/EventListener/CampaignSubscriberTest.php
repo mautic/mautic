@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignPostDeleteEvent;
 use Mautic\CampaignBundle\Event\CampaignPostSaveEvent;
@@ -13,6 +12,7 @@ use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]

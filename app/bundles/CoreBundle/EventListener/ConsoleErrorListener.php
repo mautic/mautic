@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Symfony\Component\Console\Command\Command;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 
 final readonly class ConsoleErrorListener

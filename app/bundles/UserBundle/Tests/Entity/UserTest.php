@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Entity;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
 final class UserTest extends TestCase
 {

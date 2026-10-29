@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Validator;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Validator\ScheduleDateRange;
 use Mautic\EmailBundle\Validator\ScheduleDateRangeValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;

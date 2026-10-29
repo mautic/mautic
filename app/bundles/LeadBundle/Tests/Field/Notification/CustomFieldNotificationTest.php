@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field\Notification;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CustomFieldNotificationTest extends TestCase

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Model;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Event\JobExtendTimeEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\ReportBundle\Adapter\ReportDataAdapter;
@@ -20,6 +19,7 @@ use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Mautic\ReportBundle\Tests\Fixtures;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ReportExporterTest extends TestCase

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\Helper;
 
-use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
-use Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
-use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\InternalIdNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 
 final class RelationsHelper
 {

@@ -2,12 +2,12 @@
 
 namespace Mautic\FormBundle\Entity;
 
-use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\DBAL\Exception;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Doctrine\ReservedWords;

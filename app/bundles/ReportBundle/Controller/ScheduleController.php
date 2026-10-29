@@ -2,9 +2,9 @@
 
 namespace Mautic\ReportBundle\Controller;
 
-use Mautic\ReportBundle\Entity\Report;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;

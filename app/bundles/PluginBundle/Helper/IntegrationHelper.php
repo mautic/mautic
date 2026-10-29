@@ -2,9 +2,8 @@
 
 namespace Mautic\PluginBundle\Helper;
 
-use Doctrine\ORM\Exception\ORMException;
-use MauticPlugin\MauticSocialBundle\Integration\SocialIntegration;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,6 +17,7 @@ use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\PluginBundle\Model\PluginModel;
+use MauticPlugin\MauticSocialBundle\Integration\SocialIntegration;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Twig\Environment;

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Unsubscription;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\UnsubscribedEmail;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Parser::class)]
 #[CoversClass(UnsubscribedEmail::class)]

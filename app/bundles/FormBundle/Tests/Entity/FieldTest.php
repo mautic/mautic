@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Entity;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\Field;
@@ -12,6 +11,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 final class FieldTest extends TestCase
 {

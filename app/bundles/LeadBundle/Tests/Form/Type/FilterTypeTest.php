@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Form\Type\FilterType;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;

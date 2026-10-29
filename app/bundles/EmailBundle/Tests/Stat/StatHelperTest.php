@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Stat;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -14,6 +13,7 @@ use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
 use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class StatHelperTest extends TestCase

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\EventListener\DoNotContactSubscriber;
 use Mautic\LeadBundle\Model\DoNotContact;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class DoNotContactSubscriberTest extends TestCase

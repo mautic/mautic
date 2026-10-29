@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
-use FOS\OAuthServerBundle\Model\ClientInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
+use FOS\OAuthServerBundle\Model\ClientInterface;
 use FOS\OAuthServerBundle\Model\RefreshToken as BaseRefreshToken;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'oauth2_refreshtokens')]

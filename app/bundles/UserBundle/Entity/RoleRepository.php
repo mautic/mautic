@@ -2,8 +2,8 @@
 
 namespace Mautic\UserBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\BackgroundService;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
@@ -20,6 +19,7 @@ use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class BackgroundServiceTest extends TestCase

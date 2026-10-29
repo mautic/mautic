@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper\RandomHelper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelper;
+use PHPUnit\Framework\TestCase;
 
 final class RandomHelperTest extends TestCase
 {

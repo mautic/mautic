@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Provider\Oauth1aTwoLegged;
 
-use Psr\Http\Message\UriInterface;
 use GuzzleHttp\HandlerStack;
 use Mautic\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\CredentialsInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\UriInterface;
 
 final class HttpFactoryTest extends TestCase
 {

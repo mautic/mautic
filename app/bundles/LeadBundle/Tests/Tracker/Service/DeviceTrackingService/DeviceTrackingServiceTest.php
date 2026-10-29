@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Tracker\Service\DeviceTrackingService;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
@@ -15,7 +13,9 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 

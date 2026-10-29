@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncProcess;
 
-use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
-use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Event\IntegrationToMauticSyncCompletedEvent;
 use Mautic\IntegrationsBundle\Event\MauticToIntegrationSyncCompletedEvent;
 use Mautic\IntegrationsBundle\Event\SyncEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
+use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectMappingsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderResultsDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;

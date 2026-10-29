@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Fixtures\Model;
 
-use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\LeadBundle\Model\LeadModel;
 
 class LeadModelStub extends LeadModel
 {

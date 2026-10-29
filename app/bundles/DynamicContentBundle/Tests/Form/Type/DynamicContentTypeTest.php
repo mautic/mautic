@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\DynamicContentBundle\Tests\Form\Type;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManager;
@@ -18,6 +17,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\RelativeDate;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;

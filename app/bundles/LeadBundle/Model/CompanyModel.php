@@ -2,9 +2,9 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\ORM\Exception\ORMException;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

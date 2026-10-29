@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
@@ -14,6 +12,8 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\EventListener\DoctrineGeneratedColumnsListener;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 #[AllowMockObjectsWithoutExpectations]

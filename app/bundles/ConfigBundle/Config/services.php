@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Mautic\ConfigBundle\Form\Type\EscapeTransformer;
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
+use Mautic\ConfigBundle\Form\Type\EscapeTransformer;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 

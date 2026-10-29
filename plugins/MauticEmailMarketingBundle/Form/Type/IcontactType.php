@@ -2,11 +2,11 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
-use MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
+use MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;

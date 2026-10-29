@@ -2,11 +2,11 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;

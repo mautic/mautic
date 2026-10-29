@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Security\Permissions;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\ApiBundle\Security\Permissions\ApiPermissions;
 use Mautic\AssetBundle\Security\Permissions\AssetPermissions;
 use Mautic\CampaignBundle\Security\Permissions\CampaignPermissions;
@@ -13,6 +12,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CorePermissionsTest extends TestCase

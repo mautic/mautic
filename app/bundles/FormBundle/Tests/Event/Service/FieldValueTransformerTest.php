@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Event\Service;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 

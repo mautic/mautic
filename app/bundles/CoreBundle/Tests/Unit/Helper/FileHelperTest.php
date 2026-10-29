@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\FileHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(FileHelper::class)]
 final class FileHelperTest extends TestCase

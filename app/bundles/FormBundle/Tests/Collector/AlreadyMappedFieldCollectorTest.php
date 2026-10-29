@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Collector;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollector;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 
 final class AlreadyMappedFieldCollectorTest extends TestCase

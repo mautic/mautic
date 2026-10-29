@@ -2,8 +2,8 @@
 
 namespace Mautic\WebhookBundle\Http;
 
-use Http\Client\Exception;
 use GuzzleHttp\Psr7\Request;
+use Http\Client\Exception;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PrivateAddressChecker;
 use Mautic\WebhookBundle\Exception\PrivateAddressException;

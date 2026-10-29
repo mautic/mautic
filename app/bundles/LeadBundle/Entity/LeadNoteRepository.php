@@ -2,9 +2,9 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**

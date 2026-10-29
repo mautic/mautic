@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner\Dispatcher;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ConditionDispatcherTest extends TestCase

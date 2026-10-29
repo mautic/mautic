@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\ProjectBundle\Form\Type;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Security\Permissions\ProjectPermissions;

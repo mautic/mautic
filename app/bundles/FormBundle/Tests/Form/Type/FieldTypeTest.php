@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Form\Type;
 
-use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Collection\ObjectCollection;
@@ -17,6 +15,8 @@ use Mautic\FormBundle\Crate\ObjectCrate;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\Form\Type\FormFieldRatingType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;

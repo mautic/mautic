@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\AssetBundle\EventListener\DashboardSubscriber;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
@@ -13,6 +12,7 @@ use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\GenerateWidgetDetailEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;

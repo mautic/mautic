@@ -2,12 +2,12 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Mautic\FormBundle\Entity\Form;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
 use Mautic\FormBundle\Crate\FieldCrate;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

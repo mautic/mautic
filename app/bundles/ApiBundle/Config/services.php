@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Mautic\ApiBundle\Security\Voter\ApiPermissionVoter;
-use Mautic\ApiBundle\Controller\oAuth2\AuthorizeController;
-use Mautic\ApiBundle\State\PutProcessor;
-use Mautic\ApiBundle\Security\Permissions\ApiPermissions;
 use FOS\OAuthServerBundle\Form\Handler\AuthorizeFormHandler;
+use Mautic\ApiBundle\Controller\oAuth2\AuthorizeController;
+use Mautic\ApiBundle\Security\Permissions\ApiPermissions;
+use Mautic\ApiBundle\Security\Voter\ApiPermissionVoter;
+use Mautic\ApiBundle\State\PutProcessor;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\EventListener\ConsoleErrorListener;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Input\InputInterface;

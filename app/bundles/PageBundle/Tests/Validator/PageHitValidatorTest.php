@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Validator;
 
-use PHPUnit\Framework\MockObject\Stub;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Validator\PageHitValidator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContext;

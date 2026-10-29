@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Command;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\IntegrationsBundle\Command\SyncCommand;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
@@ -13,6 +12,7 @@ use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;

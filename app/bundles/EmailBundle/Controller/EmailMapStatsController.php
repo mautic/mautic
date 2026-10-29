@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Controller;
 
-use Mautic\CoreBundle\Entity\VariantEntityInterface;
-use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Doctrine\DBAL\Exception;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\MapHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;

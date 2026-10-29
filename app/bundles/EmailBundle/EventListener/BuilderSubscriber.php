@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\LeadBundle\Helper\TokenHelper;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -14,6 +13,7 @@ use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Entity\Trackable;

@@ -2,11 +2,11 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Symfony\Contracts\Service\Attribute\Required;

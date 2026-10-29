@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\UserBundle\Entity\User;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Event\ImportInitEvent;
@@ -13,6 +12,7 @@ use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;

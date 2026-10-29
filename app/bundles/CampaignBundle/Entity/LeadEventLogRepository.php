@@ -2,20 +2,20 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
-use Mautic\CoreBundle\Entity\IpAddress;
-use Doctrine\DBAL\Cache\CacheException;
-use Doctrine\ORM\Query\QueryException;
-use Doctrine\DBAL\Exception;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Cache\CacheException;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Query\QueryException;
 use Mautic\CampaignBundle\DTO\EventLogStatsDto;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;

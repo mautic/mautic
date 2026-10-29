@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Controller;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -26,6 +25,7 @@ use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

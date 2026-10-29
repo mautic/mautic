@@ -2,12 +2,6 @@
 
 namespace Mautic\CoreBundle\Entity;
 
-use Doctrine\ORM\Query\Expr\Orx;
-use Doctrine\ORM\Query\Expr;
-use Doctrine\ORM\Query\Expr\Func;
-use Doctrine\ORM\Mapping\MappingException;
-use Doctrine\ORM\Query\Expr\Comparison;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
@@ -17,10 +11,16 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Proxy\DefaultProxyClassNameResolver;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Expr\Andx;
+use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Expr\Composite;
+use Doctrine\ORM\Query\Expr\Func;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\Expr\Orx;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;

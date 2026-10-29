@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -10,6 +9,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;

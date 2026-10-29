@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Form\Type;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\FormBundle\Form\Type\FormFieldConditionType;
 use Mautic\FormBundle\Helper\PropertiesAccessor;
@@ -12,6 +11,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 

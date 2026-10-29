@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
-use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Copy;
 use Mautic\EmailBundle\Entity\CopyRepository;

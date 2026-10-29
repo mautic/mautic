@@ -2,9 +2,9 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class CoreParametersHelper
 {

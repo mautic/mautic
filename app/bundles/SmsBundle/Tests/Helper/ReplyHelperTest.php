@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Helper;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Callback\CallbackInterface;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\Helper\ReplyHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;

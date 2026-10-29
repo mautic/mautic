@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
@@ -13,6 +12,7 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DsnParser::class)]
 final class DsnParserTest extends TestCase

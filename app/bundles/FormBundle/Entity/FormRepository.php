@@ -2,11 +2,11 @@
 
 namespace Mautic\FormBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\DBAL\Exception;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;

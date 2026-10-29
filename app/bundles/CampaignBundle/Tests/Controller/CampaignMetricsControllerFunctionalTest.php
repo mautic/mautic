@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Controller;
 
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
 use Mautic\LeadBundle\Entity\Lead;

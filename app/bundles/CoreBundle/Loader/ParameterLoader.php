@@ -2,8 +2,8 @@
 
 namespace Mautic\CoreBundle\Loader;
 
-use Mautic\CoreBundle\Loader\EnvVars\ConfigEnvVars;
 use Mautic\CoreBundle\Loader\EnvVars\ApiEnvVars;
+use Mautic\CoreBundle\Loader\EnvVars\ConfigEnvVars;
 use Mautic\CoreBundle\Loader\EnvVars\ElFinderEnvVars;
 use Mautic\CoreBundle\Loader\EnvVars\MigrationsEnvVars;
 use Mautic\CoreBundle\Loader\EnvVars\SAMLEnvVars;

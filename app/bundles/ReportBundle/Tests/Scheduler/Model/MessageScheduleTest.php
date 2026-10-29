@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Scheduler\Model;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\Model;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,6 +17,7 @@ use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;

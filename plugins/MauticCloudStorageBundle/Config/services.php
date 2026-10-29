@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
+use PHPUnit\Framework\TestCase;
 
 final class IdentifyCompanyHelperTest extends TestCase
 {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMember;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Fetcher;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer;
@@ -12,6 +11,7 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\TestCase;
 
 final class FetcherTest extends TestCase
 {

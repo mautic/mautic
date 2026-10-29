@@ -2,8 +2,8 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Doctrine\DBAL\Schema\Column;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;

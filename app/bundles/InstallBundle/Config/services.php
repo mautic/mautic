@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader;
-use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\UserStep;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 

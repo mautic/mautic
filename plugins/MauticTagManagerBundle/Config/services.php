@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration;
-use MauticPlugin\MauticTagManagerBundle\Integration\Support\ConfigSupport;
-use MauticPlugin\MauticTagManagerBundle\Security\Permissions\TagManagerPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use MauticPlugin\MauticTagManagerBundle\Integration\Support\ConfigSupport;
+use MauticPlugin\MauticTagManagerBundle\Integration\TagManagerIntegration;
+use MauticPlugin\MauticTagManagerBundle\Security\Permissions\TagManagerPermissions;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

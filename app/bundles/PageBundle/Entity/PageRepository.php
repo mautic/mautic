@@ -2,8 +2,8 @@
 
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;

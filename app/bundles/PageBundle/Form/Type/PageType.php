@@ -2,7 +2,6 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
-use Mautic\UserBundle\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
@@ -20,6 +19,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Helper\PageConfigInterface;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;

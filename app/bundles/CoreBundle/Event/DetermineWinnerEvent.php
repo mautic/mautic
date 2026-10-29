@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
-use Mautic\PageBundle\Entity\Page;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\PageBundle\Entity\Page;
 use Symfony\Contracts\EventDispatcher\Event;
 
 final class DetermineWinnerEvent extends Event

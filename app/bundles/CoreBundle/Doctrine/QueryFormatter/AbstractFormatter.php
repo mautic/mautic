@@ -2,8 +2,8 @@
 
 namespace Mautic\CoreBundle\Doctrine\QueryFormatter;
 
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 /**

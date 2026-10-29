@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
@@ -12,6 +11,7 @@ use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class CompanyDeduperTest extends TestCase

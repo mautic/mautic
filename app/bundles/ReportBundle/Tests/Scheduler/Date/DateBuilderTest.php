@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Scheduler\Date;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\Entity\SchedulerEntity;
@@ -15,6 +14,7 @@ use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class DateBuilderTest extends TestCase

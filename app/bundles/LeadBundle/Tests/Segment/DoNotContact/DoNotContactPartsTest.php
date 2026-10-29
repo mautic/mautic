@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\DoNotContact;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 final class DoNotContactPartsTest extends TestCase
 {

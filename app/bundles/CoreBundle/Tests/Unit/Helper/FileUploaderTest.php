@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\FilePathResolver;
@@ -12,6 +11,7 @@ use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Translation\Translator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 

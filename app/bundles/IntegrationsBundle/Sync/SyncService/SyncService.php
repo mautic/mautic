@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncService;
 
-use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use GuzzleHttp\Exception\ClientException;
+use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\SyncIntegrationsHelper;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;

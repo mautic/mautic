@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
@@ -14,6 +12,8 @@ use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\EventListener\TrackingSubscriber;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class TrackingSubscriberTest extends TestCase

@@ -2,8 +2,8 @@
 
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
-use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Mautic\CoreBundle\Doctrine\Schema\AssetName;

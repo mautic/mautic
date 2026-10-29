@@ -2,13 +2,13 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Mautic\CoreBundle\Helper\Serializer;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 use Mautic\UserBundle\Entity\User;
 

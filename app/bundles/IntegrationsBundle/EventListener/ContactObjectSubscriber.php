@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\EventListener;
 
-use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent;
@@ -12,6 +11,7 @@ use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
+use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Mautic\LeadBundle\Exception\ImportFailedException;

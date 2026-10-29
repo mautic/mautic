@@ -2,10 +2,10 @@
 
 namespace Mautic\AssetBundle\Entity;
 
-use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;

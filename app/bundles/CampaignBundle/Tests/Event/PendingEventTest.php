@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Event;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\TestCase;
 
 final class PendingEventTest extends TestCase
 {

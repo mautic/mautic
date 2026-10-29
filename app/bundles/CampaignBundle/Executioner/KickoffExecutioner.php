@@ -2,15 +2,14 @@
 
 namespace Mautic\CampaignBundle\Executioner;
 
-use Symfony\Component\Console\Helper\ProgressBar;
 use Doctrine\Common\Collections\Collection;
-use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
-use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
 use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
@@ -22,6 +21,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;

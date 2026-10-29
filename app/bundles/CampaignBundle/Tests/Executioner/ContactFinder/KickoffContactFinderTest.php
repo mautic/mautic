@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\KickoffContactFinder;
@@ -14,6 +12,8 @@ use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 #[AllowMockObjectsWithoutExpectations]

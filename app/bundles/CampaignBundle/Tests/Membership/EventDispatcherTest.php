@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Membership;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignBatchLeadChangeEvent;
 use Mautic\CampaignBundle\Event\CampaignSingleLeadChangeEvent;
@@ -12,6 +11,7 @@ use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\EventDispatcher;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class EventDispatcherTest extends TestCase

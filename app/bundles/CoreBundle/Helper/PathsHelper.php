@@ -2,9 +2,9 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\UserBundle\Entity\User;
 use Composer\Autoload\ClassLoader;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\UserBundle\Entity\User;
 
 class PathsHelper
 {

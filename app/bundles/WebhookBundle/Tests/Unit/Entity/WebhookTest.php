@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Tests\Unit\Entity;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\WebhookBundle\Entity\Webhook;
+use PHPUnit\Framework\TestCase;
 
 final class WebhookTest extends TestCase
 {

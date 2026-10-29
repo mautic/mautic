@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\EventListener\StopSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 final class StopSubscriberTest extends TestCase
 {

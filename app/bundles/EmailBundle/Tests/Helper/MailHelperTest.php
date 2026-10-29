@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
-use PHPUnit\Framework\MockObject\Stub;
-use Symfony\Component\Mime\Header\AbstractHeader;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -33,12 +31,14 @@ use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\LogicException;
+use Symfony\Component\Mime\Header\AbstractHeader;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use Symfony\Component\Mime\Header\MailboxListHeader;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;

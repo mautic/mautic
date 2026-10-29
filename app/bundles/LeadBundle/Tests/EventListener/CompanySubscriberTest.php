@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -19,6 +18,7 @@ use Mautic\LeadBundle\Event\CompanyPreSaveEvent;
 use Mautic\LeadBundle\Event\CompanySoftDeleteEvent;
 use Mautic\LeadBundle\EventListener\CompanySubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
+use PHPUnit\Framework\TestCase;
 
 final class CompanySubscriberTest extends TestCase
 {

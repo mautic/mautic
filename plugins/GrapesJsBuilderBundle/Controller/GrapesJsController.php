@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Controller;
 
-use Mautic\CoreBundle\Helper\Serializer;
-use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\PageBundle\Model\PageModel;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Model\PageModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

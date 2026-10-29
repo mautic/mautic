@@ -2,9 +2,9 @@
 
 namespace Mautic\AssetBundle\Model;
 
-use Doctrine\ORM\Exception\ORMException;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;

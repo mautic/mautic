@@ -2,9 +2,9 @@
 
 namespace Mautic\NotificationBundle\Entity;
 
-use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;

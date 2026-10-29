@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -13,6 +11,8 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CompanyReportData::class)]
 #[AllowMockObjectsWithoutExpectations]

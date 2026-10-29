@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use Mautic\WebhookBundle\Security\Permissions\WebhookPermissions;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 

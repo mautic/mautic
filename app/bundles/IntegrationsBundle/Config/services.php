@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-use Mautic\IntegrationsBundle\Sync\SyncService\SyncService;
-use Mautic\IntegrationsBundle\EventListener\ControllerSubscriber;
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory;
 use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistenceFactory;
+use Mautic\IntegrationsBundle\EventListener\ControllerSubscriber;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\Notification\Handler\CompanyNotificationHandler;
 use Mautic\IntegrationsBundle\Sync\Notification\Handler\ContactNotificationHandler;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\IntegrationsBundle\Sync\SyncService\SyncService;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()

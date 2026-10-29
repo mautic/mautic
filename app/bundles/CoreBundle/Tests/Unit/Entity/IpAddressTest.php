@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Entity;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Entity\IpAddress;
+use PHPUnit\Framework\TestCase;
 
 final class IpAddressTest extends TestCase
 {

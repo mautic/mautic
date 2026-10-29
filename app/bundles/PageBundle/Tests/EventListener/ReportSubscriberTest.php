@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
@@ -18,6 +17,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

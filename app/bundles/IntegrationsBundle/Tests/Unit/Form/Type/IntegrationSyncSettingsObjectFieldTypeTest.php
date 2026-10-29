@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Form\Type;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\IntegrationsBundle\Exception\InvalidFormOptionException;
 use Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 

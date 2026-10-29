@@ -2,9 +2,6 @@
 
 namespace Mautic\DynamicContentBundle\Entity;
 
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
-use Symfony\Component\Validator\Exception\InvalidOptionsException;
-use Symfony\Component\Validator\Exception\MissingOptionsException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -37,6 +34,9 @@ use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidOptionsException;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: DynamicContentRepository::class)]

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\Helper;
 
-use PHPUnit\Framework\TestCase;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Helper\StateValidationHelper;
+use PHPUnit\Framework\TestCase;
 
 final class StateValidationHelperTest extends TestCase
 {

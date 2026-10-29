@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Mautic\UserBundle\Controller\Api\UserApiController;
 use Mautic\UserBundle\Controller\Api\RoleApiController;
+use Mautic\UserBundle\Controller\Api\UserApiController;
 
 return [
     'menu' => [

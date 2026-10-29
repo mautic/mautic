@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Model;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileUploader;
@@ -16,6 +15,7 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormUploader;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class FormUploaderTest extends TestCase

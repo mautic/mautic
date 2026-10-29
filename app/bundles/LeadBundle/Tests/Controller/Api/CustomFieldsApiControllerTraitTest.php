@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\LeadBundle\Controller\Api\CustomFieldsApiControllerTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RequestStack;
 

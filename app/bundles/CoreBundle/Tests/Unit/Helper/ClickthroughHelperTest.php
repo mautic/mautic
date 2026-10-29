@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Tests\Unit\Helper\TestResources\WakeupCall;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Serializer::class)]
 final class ClickthroughHelperTest extends TestCase

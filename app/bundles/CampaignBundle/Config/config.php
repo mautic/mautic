@@ -5,8 +5,8 @@ declare(strict_types=1);
 use Mautic\CampaignBundle\Controller\Api\CampaignApiController;
 use Mautic\CampaignBundle\Controller\Api\EventApiController;
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\LeadBundle\Services\PeakInteractionTimer;
 use Mautic\CampaignBundle\Enum\RepublishBehavior;
+use Mautic\LeadBundle\Services\PeakInteractionTimer;
 
 return [
     'routes' => [

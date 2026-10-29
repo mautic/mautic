@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\ListPostSaveEvent;
+use PHPUnit\Framework\TestCase;
 
 final class LeadListEventTest extends TestCase
 {

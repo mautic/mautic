@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration;
 use MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration;
 use MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

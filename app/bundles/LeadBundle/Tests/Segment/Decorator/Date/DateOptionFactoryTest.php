@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayToday;
@@ -29,6 +28,7 @@ use Mautic\LeadBundle\Segment\RelativeDate;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DateOptionFactory::class)]
 #[AllowMockObjectsWithoutExpectations]

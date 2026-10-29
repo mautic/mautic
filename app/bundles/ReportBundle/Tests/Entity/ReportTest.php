@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Entity;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\ScheduleNotValidException;
+use PHPUnit\Framework\TestCase;
 
 final class ReportTest extends TestCase
 {

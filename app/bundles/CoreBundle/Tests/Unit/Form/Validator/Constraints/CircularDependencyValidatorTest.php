@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Form\Validator\Constraints;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
 use Mautic\CoreBundle\Test\ReflectionHelper;
@@ -13,6 +12,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Context\ExecutionContext;

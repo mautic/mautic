@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-use Composer\InstalledVersions;
 use Composer\Console\Application;
+use Composer\InstalledVersions;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\ArrayInput;

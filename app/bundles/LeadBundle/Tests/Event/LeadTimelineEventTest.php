@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(LeadTimelineEvent::class)]
 final class LeadTimelineEventTest extends TestCase

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Validator;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FileUploadValidatorTest extends TestCase

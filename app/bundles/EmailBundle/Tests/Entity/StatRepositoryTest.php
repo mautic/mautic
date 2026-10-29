@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Entity;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -12,6 +11,7 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class StatRepositoryTest extends TestCase

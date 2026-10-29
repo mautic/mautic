@@ -2,12 +2,12 @@
 
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\DBAL\Schema\Table;
-use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Index\IndexedColumn;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\TextType;
 use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Exception\SchemaException;

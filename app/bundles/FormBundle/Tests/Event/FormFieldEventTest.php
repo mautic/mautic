@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Event;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormFieldEvent;
+use PHPUnit\Framework\TestCase;
 
 final class FormFieldEventTest extends TestCase
 {

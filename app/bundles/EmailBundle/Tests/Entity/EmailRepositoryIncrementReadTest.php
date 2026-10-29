@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Entity;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Exception\DbalException as DBALException;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class EmailRepositoryIncrementReadTest extends TestCase

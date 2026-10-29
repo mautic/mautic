@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType;
 use Mautic\UserBundle\Form\Type\UserListType;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 

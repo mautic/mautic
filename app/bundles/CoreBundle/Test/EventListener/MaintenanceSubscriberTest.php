@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Test\EventListener;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -13,6 +11,8 @@ use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\EventListener\MaintenanceSubscriber;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class MaintenanceSubscriberTest extends TestCase

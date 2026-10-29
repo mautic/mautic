@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
@@ -23,6 +22,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\Contac
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 

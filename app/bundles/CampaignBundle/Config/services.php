@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Executioner\TestInactiveExecutioner;
-use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\TestScheduledExecutioner;
 use Mautic\CampaignBundle\Security\Permissions\CampaignPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;

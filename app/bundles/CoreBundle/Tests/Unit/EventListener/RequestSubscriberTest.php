@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\EventListener\RequestSubscriber;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;

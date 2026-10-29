@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Form;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Form\RequestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

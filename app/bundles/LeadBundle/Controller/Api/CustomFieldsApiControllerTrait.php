@@ -2,9 +2,9 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
-use Mautic\CoreBundle\Helper\Serializer;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\Lead;

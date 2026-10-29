@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Tests\Model;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\Stub;
 use Doctrine\ORM\EntityManager;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
@@ -33,6 +31,8 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Mautic\AssetBundle\Controller\UploadController;
 use Mautic\AssetBundle\Security\Permissions\AssetPermissions;
-use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

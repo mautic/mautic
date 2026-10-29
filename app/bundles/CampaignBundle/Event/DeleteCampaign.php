@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Event;
 
-use Symfony\Contracts\EventDispatcher\Event;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class DeleteCampaign extends Event
 {

@@ -2,7 +2,6 @@
 
 namespace Mautic\InstallBundle\Controller;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Configurator\Configurator;
@@ -12,6 +11,7 @@ use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;

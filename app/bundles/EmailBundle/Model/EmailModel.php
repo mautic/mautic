@@ -2,11 +2,9 @@
 
 namespace Mautic\EmailBundle\Model;
 
-use Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException;
-use Doctrine\ORM\Exception\ORMException;
-use Psr\SimpleCache\InvalidArgumentException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ApiBundle\Model\ApiEntityLockTrait;
@@ -58,6 +56,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
+use Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\EmailBundle\Stats\Helper\FilterTrait;
 use Mautic\LeadBundle\Entity\CompanyRepository;
@@ -77,6 +76,7 @@ use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

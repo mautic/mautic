@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
 use Mautic\CoreBundle\Helper\BundleHelper;
@@ -18,6 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
 

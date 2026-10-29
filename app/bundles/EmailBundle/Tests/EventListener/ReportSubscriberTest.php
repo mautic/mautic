@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -28,6 +27,7 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

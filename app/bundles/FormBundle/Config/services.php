@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Mautic\FormBundle\Event\Service\FieldValueTransformer;
-use Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator;
-use Mautic\FormBundle\Security\Permissions\FormPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\FormBundle\Event\Service\FieldValueTransformer;
+use Mautic\FormBundle\Security\Permissions\FormPermissions;
+use Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

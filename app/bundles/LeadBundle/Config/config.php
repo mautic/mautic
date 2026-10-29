@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\LeadBundle\Controller\Api\CompanyApiController;
+use Mautic\LeadBundle\Controller\Api\DeviceApiController;
+use Mautic\LeadBundle\Controller\Api\FieldApiController;
 use Mautic\LeadBundle\Controller\Api\LeadApiController;
 use Mautic\LeadBundle\Controller\Api\ListApiController;
-use Mautic\LeadBundle\Controller\Api\CompanyApiController;
-use Mautic\LeadBundle\Controller\Api\FieldApiController;
 use Mautic\LeadBundle\Controller\Api\NoteApiController;
-use Mautic\LeadBundle\Controller\Api\DeviceApiController;
 use Mautic\LeadBundle\Controller\Api\TagApiController;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
-use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 return [
     'routes' => [

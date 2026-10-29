@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\FindReplaceType;
@@ -25,6 +24,7 @@ use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 

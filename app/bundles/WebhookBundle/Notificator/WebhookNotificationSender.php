@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Notificator;
 
-use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\MissingIdentifierField;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\EmailBundle\Helper\MailHelper;

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Controller\Api\DynamicContentApiController;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
 
 return [
     'menu' => [

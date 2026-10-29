@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Scheduler\Builder;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerMonthBuilder;
 use Mautic\ReportBundle\Scheduler\Entity\SchedulerEntity;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
+use PHPUnit\Framework\TestCase;
 use Recurr\Exception\InvalidArgument;
 use Recurr\Rule;
 

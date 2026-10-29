@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Tests\Helper\EventListener\EmailValidationSubscriber;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;

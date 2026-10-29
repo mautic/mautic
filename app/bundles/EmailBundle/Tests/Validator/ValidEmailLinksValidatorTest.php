@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Validator;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Validator\ValidEmailLinks;
 use Mautic\EmailBundle\Validator\ValidEmailLinksValidator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;

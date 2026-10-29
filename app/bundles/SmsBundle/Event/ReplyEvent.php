@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Event;
 
-use Symfony\Contracts\EventDispatcher\Event;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\Event;
 
 final class ReplyEvent extends Event
 {

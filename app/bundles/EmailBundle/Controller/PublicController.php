@@ -2,9 +2,8 @@
 
 namespace Mautic\EmailBundle\Controller;
 
-use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\FormBundle\Entity\Form;
 use Mautic\CoreBundle\Controller\AbstractFormController as CommonFormController;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
@@ -18,6 +17,7 @@ use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;

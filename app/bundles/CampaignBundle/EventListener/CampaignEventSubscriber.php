@@ -2,9 +2,9 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\TransactionRequiredException;
 use Mautic\CampaignBundle\Entity\EventRepository;

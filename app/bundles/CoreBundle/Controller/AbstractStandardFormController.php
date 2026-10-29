@@ -2,9 +2,8 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -25,6 +24,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;

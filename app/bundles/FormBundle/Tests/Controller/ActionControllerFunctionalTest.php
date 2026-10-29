@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller;
 
-use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\DomCrawler\Crawler;

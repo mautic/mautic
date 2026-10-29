@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Helper\ListParser\ArrayListParser;
 use Mautic\CoreBundle\Helper\ListParser\BarListParser;
@@ -13,6 +12,7 @@ use Mautic\CoreBundle\Helper\ListParser\ValueListParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(AbstractFormFieldHelper::class)]
 #[CoversClass(BarListParser::class)]

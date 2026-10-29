@@ -2,7 +2,6 @@
 
 namespace Mautic\ChannelBundle\Model;
 
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
@@ -14,6 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 

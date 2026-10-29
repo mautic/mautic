@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Entity;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 final class FormTest extends TestCase
 {

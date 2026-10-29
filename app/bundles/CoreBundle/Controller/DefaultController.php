@@ -2,11 +2,11 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Mautic\PageBundle\Entity\Page;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;

@@ -2,13 +2,13 @@
 
 namespace Mautic\ReportBundle\Scheduler\Builder;
 
-use Recurr\Recurrence;
-use Recurr\RecurrenceCollection;
 use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Recurr\Exception\InvalidWeekday;
+use Recurr\Recurrence;
+use Recurr\RecurrenceCollection;
 use Recurr\Rule;
 use Recurr\Transformer\ArrayTransformer;
 

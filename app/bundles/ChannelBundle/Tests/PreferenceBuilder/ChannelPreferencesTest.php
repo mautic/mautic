@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\Tests\PreferenceBuilder;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\ChannelBundle\PreferenceBuilder\ChannelPreferences;
+use PHPUnit\Framework\TestCase;
 
 final class ChannelPreferencesTest extends TestCase
 {

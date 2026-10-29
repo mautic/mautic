@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use Doctrine\Common\Collections\Order;
 use Mautic\WebhookBundle\Controller\Api\WebhookApiController;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use Doctrine\Common\Collections\Order;
 
 return [
     'routes' => [

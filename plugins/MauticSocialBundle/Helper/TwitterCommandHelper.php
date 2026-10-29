@@ -2,12 +2,12 @@
 
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
-use MauticPlugin\MauticSocialBundle\Entity\LeadRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\LeadModel;
+use MauticPlugin\MauticSocialBundle\Entity\LeadRepository;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Exception\ExitMonitorException;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;

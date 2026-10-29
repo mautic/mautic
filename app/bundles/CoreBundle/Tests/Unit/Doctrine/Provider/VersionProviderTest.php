@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Provider;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 final class VersionProviderTest extends TestCase
 {

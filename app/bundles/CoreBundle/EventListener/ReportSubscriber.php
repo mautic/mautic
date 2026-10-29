@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ReportBundle\Event\AbstractReportEvent;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\DashboardBundle\Tests\Controller;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -19,6 +18,7 @@ use Mautic\DashboardBundle\Model\DashboardModel;
 use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;

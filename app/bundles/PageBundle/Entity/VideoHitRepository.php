@@ -2,9 +2,9 @@
 
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;

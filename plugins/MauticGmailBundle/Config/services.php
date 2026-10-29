@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use MauticPlugin\MauticGmailBundle\Integration\GmailIntegration;
 use MauticPlugin\MauticGmailBundle\Integration\Support\ConfigSupport;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

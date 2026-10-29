@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Address;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Address::class)]
 final class AddressTest extends TestCase

@@ -2,13 +2,13 @@
 
 namespace Mautic\PluginBundle\Controller;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\PluginBundle\Form\Type\CompanyFieldsType;
 use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Form\Type\IntegrationCampaignsType;
 use Mautic\PluginBundle\Form\Type\IntegrationConfigType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

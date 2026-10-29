@@ -2,10 +2,10 @@
 
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
-use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;

@@ -2,8 +2,8 @@
 
 namespace Mautic\CoreBundle\Entity;
 
-use Doctrine\DBAL\Exception\InvalidArgumentException;
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\Exception\InvalidArgumentException;
 
 /**
  * @extends CommonRepository<Notification>

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManager;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -13,6 +12,7 @@ use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

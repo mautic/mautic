@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Provider\Oauth2TwoLegged;
 
-use kamermans\OAuth2\Utils\Collection;
 use GuzzleHttp\ClientInterface;
 use kamermans\OAuth2\GrantType\ClientCredentials;
 use kamermans\OAuth2\GrantType\PasswordCredentials;
@@ -12,6 +11,7 @@ use kamermans\OAuth2\OAuth2Middleware;
 use kamermans\OAuth2\Persistence\TokenPersistenceInterface as KamermansTokenPersistenceInterface;
 use kamermans\OAuth2\Signer\AccessToken\SignerInterface as AccessTokenSigner;
 use kamermans\OAuth2\Signer\ClientCredentials\SignerInterface;
+use kamermans\OAuth2\Utils\Collection;
 use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CredentialsInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\ClientCredentialsGrantInterface;

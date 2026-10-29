@@ -2,14 +2,14 @@
 
 namespace Mautic\CampaignBundle\Executioner\Event;
 
-use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
-use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;

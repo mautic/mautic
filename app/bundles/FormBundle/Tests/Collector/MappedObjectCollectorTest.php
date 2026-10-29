@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Collector;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
 use Mautic\FormBundle\Collector\MappedObjectCollector;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
 final class MappedObjectCollectorTest extends TestCase
 {

@@ -2,10 +2,10 @@
 
 namespace Mautic\PluginBundle\Controller;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;

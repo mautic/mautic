@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\PointBundle\Entity\Group;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
@@ -53,6 +52,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

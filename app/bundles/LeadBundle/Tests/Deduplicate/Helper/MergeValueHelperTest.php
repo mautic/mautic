@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Deduplicate\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;
 use Mautic\LeadBundle\Deduplicate\Helper\MergeValueHelper;
+use PHPUnit\Framework\TestCase;
 
 final class MergeValueHelperTest extends TestCase
 {

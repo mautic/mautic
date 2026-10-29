@@ -2,18 +2,18 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use Mautic\CoreBundle\Entity\VariantEntityInterface;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;

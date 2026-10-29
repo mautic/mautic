@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\ConfigBundle\Mapper\Helper\ConfigHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ConfigHelper::class)]
 final class ConfigHelperTest extends TestCase

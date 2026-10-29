@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Mautic\StageBundle\Security\Permissions\StagePermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\StageBundle\Security\Permissions\StagePermissions;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Tests\Functional\Command;
 
-use PHPUnit\Framework\MockObject\Stub;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\RemoveCommand;
@@ -15,6 +14,7 @@ use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Psr\Log\LoggerInterface;
 
 #[AllowMockObjectsWithoutExpectations]

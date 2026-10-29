@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\OptionsAccessor;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\OptionsAccessor\EmailToUserAccessor;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
 final class EmailToUserAccessorTest extends TestCase
 {

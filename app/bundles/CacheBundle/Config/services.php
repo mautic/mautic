@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter;
 use Mautic\CacheBundle\Cache\Adapter\MemcachedTagAwareAdapter;
-use Mautic\CacheBundle\EventListener\CacheClearSubscriber;
-use Mautic\CacheBundle\Cache\CacheProviderInterface;
-use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CacheBundle\Cache\Adapter\RedisAdapter;
 use Mautic\CacheBundle\Cache\Adapter\RedisTagAwareAdapter;
+use Mautic\CacheBundle\Cache\CacheProvider;
+use Mautic\CacheBundle\Cache\CacheProviderInterface;
+use Mautic\CacheBundle\EventListener\CacheClearSubscriber;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;

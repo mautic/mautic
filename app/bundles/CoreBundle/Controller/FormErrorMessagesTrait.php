@@ -2,8 +2,8 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 trait FormErrorMessagesTrait
 {

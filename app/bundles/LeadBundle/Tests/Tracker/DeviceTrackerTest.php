@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Tracker;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -16,6 +14,8 @@ use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactor
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;

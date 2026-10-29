@@ -2,8 +2,8 @@
 
 namespace Mautic\SmsBundle\Integration\Twilio;
 
-use Mautic\LeadBundle\Entity\Lead;
 use Doctrine\Common\Collections\Collection;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Callback\CallbackInterface;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\Helper\ContactHelper;

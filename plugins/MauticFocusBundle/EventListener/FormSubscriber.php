@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
-use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

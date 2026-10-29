@@ -2,15 +2,15 @@
 
 namespace Mautic\CoreBundle;
 
-use Mautic\CoreBundle\DependencyInjection\Compiler\RequirementsPass;
 use Mautic\CoreBundle\DependencyInjection\Compiler\ConfiguratorPass;
 use Mautic\CoreBundle\DependencyInjection\Compiler\DbalPass;
 use Mautic\CoreBundle\DependencyInjection\Compiler\DoctrineMappingDriverPass;
-use Mautic\CoreBundle\DependencyInjection\Compiler\TranslationsPass;
-use Mautic\CoreBundle\DependencyInjection\Compiler\TranslationLoaderPass;
 use Mautic\CoreBundle\DependencyInjection\Compiler\ORMPurgerPass;
+use Mautic\CoreBundle\DependencyInjection\Compiler\RequirementsPass;
 use Mautic\CoreBundle\DependencyInjection\Compiler\SystemThemeTemplatePathPass;
 use Mautic\CoreBundle\DependencyInjection\Compiler\TestPass;
+use Mautic\CoreBundle\DependencyInjection\Compiler\TranslationLoaderPass;
+use Mautic\CoreBundle\DependencyInjection\Compiler\TranslationsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;

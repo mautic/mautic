@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Mautic\MarketplaceBundle\Api\Connection;
+use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
+use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\PluginCollector;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
-use Mautic\MarketplaceBundle\Service\Config;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 
 return function (ContainerConfigurator $configurator): void {
     $services = $configurator->services()

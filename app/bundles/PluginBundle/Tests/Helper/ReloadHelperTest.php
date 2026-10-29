@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Tests\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\PluginBundle\Entity\Plugin;
@@ -13,6 +12,7 @@ use Mautic\PluginBundle\Event\PluginUpdateEvent;
 use Mautic\PluginBundle\Helper\ReloadHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]

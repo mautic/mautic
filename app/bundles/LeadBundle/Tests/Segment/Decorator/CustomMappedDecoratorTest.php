@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[CoversClass(CustomMappedDecorator::class)]

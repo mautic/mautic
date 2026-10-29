@@ -2,9 +2,9 @@
 
 namespace Mautic\EmailBundle\Controller;
 
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

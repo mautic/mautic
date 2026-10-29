@@ -3,11 +3,11 @@
 namespace Mautic\PluginBundle\Integration;
 
 use Doctrine\ORM\Exception\ORMException;
-use Symfony\Component\Form\FormBuilder;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Form\Type\RoleListType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 

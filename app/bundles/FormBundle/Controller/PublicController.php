@@ -2,8 +2,8 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Controller\AbstractFormController as CommonFormController;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\NotificationModel;

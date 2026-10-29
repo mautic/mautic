@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
+use PHPUnit\Framework\TestCase;
 
 final class SearchStringHelperTest extends TestCase
 {

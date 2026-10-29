@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Scheduler\Option;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
+use PHPUnit\Framework\TestCase;
 
 final class ExportOptionTest extends TestCase
 {

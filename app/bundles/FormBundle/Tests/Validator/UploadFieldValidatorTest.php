@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Validator;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
 use Mautic\FormBundle\Entity\Field;
@@ -13,6 +12,7 @@ use Mautic\FormBundle\Exception\NoFileGivenException;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\Request;

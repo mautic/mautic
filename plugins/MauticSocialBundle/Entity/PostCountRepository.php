@@ -2,8 +2,8 @@
 
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 

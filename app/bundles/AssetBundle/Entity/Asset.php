@@ -2,7 +2,6 @@
 
 namespace Mautic\AssetBundle\Entity;
 
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -25,6 +24,7 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Sequentially;

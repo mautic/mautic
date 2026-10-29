@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Adapter;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\ReportBundle\Adapter\ReportDataAdapter;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Tests\Fixtures;
+use PHPUnit\Framework\TestCase;
 
 final class ReportDataAdapterTest extends TestCase
 {

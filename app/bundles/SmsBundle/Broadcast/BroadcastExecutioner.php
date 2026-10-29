@@ -2,8 +2,8 @@
 
 namespace Mautic\SmsBundle\Broadcast;
 
-use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\SmsBundle\Entity\Sms;

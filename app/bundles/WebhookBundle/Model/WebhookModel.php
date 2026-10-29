@@ -2,10 +2,9 @@
 
 namespace Mautic\WebhookBundle\Model;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
@@ -32,6 +31,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 

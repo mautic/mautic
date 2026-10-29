@@ -2,10 +2,10 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;

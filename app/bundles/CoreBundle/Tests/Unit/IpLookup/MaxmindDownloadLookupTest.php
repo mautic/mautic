@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup;
+use PHPUnit\Framework\TestCase;
 
 final class MaxmindDownloadLookupTest extends TestCase
 {

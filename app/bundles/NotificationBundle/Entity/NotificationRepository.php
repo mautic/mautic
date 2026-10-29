@@ -2,8 +2,8 @@
 
 namespace Mautic\NotificationBundle\Entity;
 
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**

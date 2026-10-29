@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -10,6 +9,7 @@ use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;

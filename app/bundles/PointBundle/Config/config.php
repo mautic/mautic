@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Mautic\PointBundle\Controller\Api\PointApiController;
-use Mautic\PointBundle\Controller\Api\TriggerApiController;
 use Mautic\PointBundle\Controller\Api\PointGroupsApiController;
 use Mautic\PointBundle\Controller\Api\PointInsightApiController;
+use Mautic\PointBundle\Controller\Api\TriggerApiController;
 use Mautic\PointBundle\Entity\Point;
 
 return [

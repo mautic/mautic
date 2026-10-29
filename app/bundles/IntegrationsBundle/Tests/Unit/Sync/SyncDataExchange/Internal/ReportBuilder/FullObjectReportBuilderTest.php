@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ReportBuilder;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\IntegrationsBundle\Event\InternalCompanyEvent;
 use Mautic\IntegrationsBundle\Event\InternalCompanyFullReportBuildEvent;
 use Mautic\IntegrationsBundle\Event\InternalContactEvent;
@@ -26,6 +25,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullO
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company as CompanyEntity;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

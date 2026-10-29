@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use MauticPlugin\MauticSocialBundle\Integration\FacebookIntegration;
 use MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration;
 use MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration;
 use MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration;
 use MauticPlugin\MauticSocialBundle\Security\Permissions\MauticSocialPermissions;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Functional\Controller;
 
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\Exception\NotSupported;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;

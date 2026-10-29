@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Mautic\SmsBundle\Helper\SmsHelper;
-use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\Integration\Twilio\TwilioCallback;
+use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;
 use Mautic\SmsBundle\Integration\TwilioIntegration;
 use Mautic\SmsBundle\Security\Permissions\SmsPermissions;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\SmsBundle\Sms\TransportChain;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Mautic\PointBundle\Security\Permissions\PointPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\PointBundle\Security\Permissions\PointPermissions;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

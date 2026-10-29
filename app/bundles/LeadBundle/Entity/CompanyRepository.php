@@ -2,11 +2,11 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Event\CompanyBuildSearchEvent;

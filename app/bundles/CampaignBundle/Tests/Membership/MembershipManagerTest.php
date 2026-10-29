@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Membership;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
@@ -16,6 +14,8 @@ use Mautic\CampaignBundle\Membership\EventDispatcher;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 #[AllowMockObjectsWithoutExpectations]

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Mapper;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\ConfigBundle\Exception\BadFormConfigException;
 use Mautic\ConfigBundle\Mapper\ConfigMapper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(BadFormConfigException::class)]
 #[CoversClass(ConfigMapper::class)]

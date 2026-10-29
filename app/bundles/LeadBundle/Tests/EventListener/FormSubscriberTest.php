@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Entity\Action;
@@ -23,6 +22,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 #[AllowMockObjectsWithoutExpectations]

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Form\Type;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\ReportBundle\Form\Type\FilterSelectorType;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Validator;
 
-use PHPUnit\Framework\MockObject\Stub;
 use Mautic\CoreBundle\Event\EntityValidateEvent;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\CoreBundle\Validator\EntityEventValidator;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

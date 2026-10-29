@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\UserBundle\Entity\UserRepository;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @method ContainerInterface getContainer()

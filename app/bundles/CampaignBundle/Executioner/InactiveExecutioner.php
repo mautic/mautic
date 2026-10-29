@@ -2,10 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner;
 
-use Symfony\Component\Console\Helper\ProgressBar;
-use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
-use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
-use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -13,16 +9,20 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
 use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;

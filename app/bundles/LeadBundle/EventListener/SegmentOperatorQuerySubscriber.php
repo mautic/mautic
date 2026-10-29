@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\ORM\Query\Expr\Func;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

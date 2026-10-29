@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {

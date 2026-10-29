@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twilio\Exceptions\ConfigurationException;
 
 #[AllowMockObjectsWithoutExpectations]

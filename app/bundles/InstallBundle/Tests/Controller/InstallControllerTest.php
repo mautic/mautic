@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Tests\Controller;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Configurator\Configurator;
@@ -19,6 +17,8 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\InstallBundle\Install\InstallService;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;

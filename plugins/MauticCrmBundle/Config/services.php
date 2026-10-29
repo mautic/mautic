@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use MauticPlugin\MauticCrmBundle\Services\Transport;
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
+use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\SugarcrmIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\VtigerIntegration;
 use MauticPlugin\MauticCrmBundle\Integration\ZohoIntegration;
-use MauticPlugin\MauticCrmBundle\Integration\DynamicsIntegration;
-use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use MauticPlugin\MauticCrmBundle\Services\Transport;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Validator\Constraints;
 
-use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Validator\Constraints\Length;
 use Mautic\LeadBundle\Validator\Constraints\LengthValidator;
+use PHPUnit\Framework\TestCase;
 
 final class LengthTest extends TestCase
 {
