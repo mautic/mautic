@@ -16,21 +16,15 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Lead
 {
-    /**
-     * @var Campaign
-     */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Campaign::class, inversedBy: 'leads')]
     #[ORM\JoinColumn(name: 'campaign_id', nullable: false, onDelete: 'CASCADE')]
-    private $campaign;
+    private \Mautic\CampaignBundle\Entity\Campaign $campaign;
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead
-     */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
-    private $lead;
+    private \Mautic\LeadBundle\Entity\Lead $lead;
 
     /**
      * @var \DateTimeInterface

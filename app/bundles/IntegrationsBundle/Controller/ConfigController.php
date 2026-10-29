@@ -37,7 +37,7 @@ final class ConfigController extends AbstractFormController
     /**
      * @var BasicIntegration|ConfigFormInterface
      */
-    private $integrationObject;
+    private ?\Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface $integrationObject = null;
 
     private ?Integration $integrationConfiguration = null;
 

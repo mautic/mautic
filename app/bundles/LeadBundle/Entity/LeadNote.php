@@ -20,12 +20,9 @@ class LeadNote extends FormEntity
      */
     private $id;
 
-    /**
-     * @var Lead
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'notes')]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
-    private $lead;
+    private \Mautic\LeadBundle\Entity\Lead $lead;
 
     /**
      * @var string
