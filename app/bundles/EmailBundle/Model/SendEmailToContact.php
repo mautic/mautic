@@ -305,7 +305,7 @@ final class SendEmailToContact
     /**
      * Down sent counter for the given email ID.
      */
-    private function downEmailSentCount($emailId): void
+    private function downEmailSentCount(?int $emailId): void
     {
         --$this->emailSentCounts[$emailId];
     }
