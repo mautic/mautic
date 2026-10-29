@@ -632,7 +632,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
                     ['exception' => $exception]
                 );
             }
-        } elseif ($page instanceof Redirect) {
+        } elseif ($page instanceof Redirect && $this->aggregateAnalyticsHelper->isEnabled()) {
+            // Click totals are aggregate analytics, the contact-linked hit above is recorded either way
             try {
                 $this->redirectRepository->upHitCount($page->getId(), 1, $isUnique);
 

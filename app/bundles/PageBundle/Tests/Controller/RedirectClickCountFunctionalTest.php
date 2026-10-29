@@ -72,6 +72,26 @@ final class RedirectClickCountFunctionalTest extends MauticMysqlTestCase
         $this->assertCount(1, $this->em->getRepository(Hit::class)->findBy(['redirect' => $redirect->getId()]));
     }
 
+    public function testTrackedClickIsCounted(): void
+    {
+        [$redirect, $contact] = $this->createLink();
+
+        $this->click($redirect, $contact, []);
+
+        $this->assertSame([1, 1], $this->getRedirectCounts($redirect));
+    }
+
+    public function testTrackedClickIsNotCountedWhileAggregateAnalyticsOff(): void
+    {
+        [$redirect, $contact] = $this->createLink();
+
+        $this->click($redirect, $contact, []);
+
+        $this->assertSame([0, 0], $this->getRedirectCounts($redirect));
+        $this->assertSame([0, 0], $this->getTrackableCounts($redirect));
+        $this->assertCount(1, $this->em->getRepository(Hit::class)->findBy(['redirect' => $redirect->getId()]), 'the click is still recorded on the contact');
+    }
+
     public function testClickFromABotIsNotCounted(): void
     {
         [$redirect, $contact] = $this->createLink();
