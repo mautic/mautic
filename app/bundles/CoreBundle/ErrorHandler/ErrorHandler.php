@@ -91,10 +91,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
         }
 
-        /**
-         * @return LoggerInterface
-         */
-        public function getDebugLogger()
+        public function getDebugLogger(): LoggerInterface
         {
             return $this->debugLogger;
         }
