@@ -58,6 +58,12 @@ return RectorConfig::configure()
         // prefer implicit compare on object|null
         Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector::class,
 
+        // importing Lead/Exception short names here shadows the local Entity\Lead and Executioner\Exception sub-namespaces
+        Rector\PostRector\Rector\NameImportingPostRector::class => [
+            __DIR__.'/app/bundles/CampaignBundle/Entity/LeadRepository.php',
+            __DIR__.'/app/bundles/CampaignBundle/Executioner/EventExecutioner.php',
+        ],
+
         // createFromFormat() leaks a \DateTime|bool|null union that breaks the getDateTime() return contract
         Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class => [
             __DIR__.'/app/bundles/CoreBundle/Helper/DateTimeHelper.php',
