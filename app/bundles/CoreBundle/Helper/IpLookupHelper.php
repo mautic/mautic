@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
+use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -306,8 +307,15 @@ class IpLookupHelper
             return false;
         }
 
+        try {
+            $address = $this->getVisitorAddress($request);
+        } catch (ConflictingHeadersException) {
+            // A trusted proxy sent forwarded headers that disagree, so the visitor can't be told apart
+            return false;
+        }
+
         // Checked on an unsaved entity, so nothing about the visitor is stored
-        $ipAddress = new IpAddress($this->getVisitorAddress($request));
+        $ipAddress = new IpAddress($address);
         $ipAddress->setDoNotTrackList(array_merge((array) $this->doNotTrackIps, (array) $this->doNotTrackInternalIps));
 
         return $ipAddress->isTrackable() && !$this->isBot($request);
