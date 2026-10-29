@@ -2431,12 +2431,6 @@ parameters:
 			path: app/bundles/EmailBundle/Model/SendEmailToContact.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\SendEmailToContact\:\:downEmailSentCount\(\) has parameter \$emailId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Model/SendEmailToContact.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Model\\SendEmailToContact\:\:upEmailSentCount\(\) has parameter \$emailId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
