@@ -85,6 +85,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
         $this->coreParametersHelper->method('get')
             ->willReturnMap([
                 ['max_size', null, '2MB'],
+                ['track_asset_downloads', true, true],
                 ['aggregate_analytics', true, true],
             ]);
         $cacheProvider               = new CacheProvider($this->coreParametersHelper, $this->createStub(ContainerInterface::class));
