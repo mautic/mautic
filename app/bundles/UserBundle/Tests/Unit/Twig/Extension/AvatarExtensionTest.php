@@ -110,6 +110,7 @@ final class AvatarExtensionTest extends TestCase
 
         $assets = new AssetsHelper($this->createStub(Packages::class));
         $assets->setPathsHelper($paths);
+
         return new AvatarExtension($this->createStub(CoreParametersHelper::class), new DefaultAvatarHelper($assets), $logger, $styleFile);
     }
 
@@ -120,6 +121,6 @@ final class AvatarExtensionTest extends TestCase
 
         $assets = (new \ReflectionClass(AssetsHelper::class))->newInstanceWithoutConstructor();
 
-        return new AvatarExtension($parameters, new DefaultAvatarHelper($assets), $logger ?? $this->createStub(LoggerInterface::class));
+        return new AvatarExtension($parameters, new DefaultAvatarHelper($assets), $this->createStub(LoggerInterface::class));
     }
 }
