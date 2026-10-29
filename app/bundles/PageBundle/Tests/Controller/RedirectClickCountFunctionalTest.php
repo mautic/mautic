@@ -95,6 +95,41 @@ final class RedirectClickCountFunctionalTest extends MauticMysqlTestCase
         $this->assertSame([0, 0], $this->getTrackableCounts($redirect));
     }
 
+    public function testUntrackedClickWithoutClickthroughIsNotCounted(): void
+    {
+        [$redirect] = $this->createLink();
+
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_GET, '/r/'.$redirect->getRedirectId(), [], [], ['HTTP_DNT' => '1']);
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
+
+        $this->assertSame([0, 0], $this->getRedirectCounts($redirect));
+    }
+
+    /**
+     * @return iterable<string, array{array<string, string>}>
+     */
+    public static function visitorProvider(): iterable
+    {
+        yield 'tracked visitor' => [[]];
+        yield 'Do Not Track' => [['HTTP_DNT' => '1']];
+    }
+
+    /**
+     * @param array<string, string> $server
+     */
+    #[DataProvider('visitorProvider')]
+    public function testClickthroughWithAStringChannelStillRedirects(array $server): void
+    {
+        [$redirect, $contact] = $this->createLink();
+        $ct                   = ClickthroughHelper::encodeArrayForUrl(['channel' => 'email', 'lead' => $contact->getId()]);
+
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_GET, '/r/'.$redirect->getRedirectId(), ['ct' => $ct], [], $server);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
+    }
+
     /**
      * @param array<string, string> $server
      */

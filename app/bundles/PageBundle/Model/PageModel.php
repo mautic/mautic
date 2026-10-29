@@ -95,6 +95,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     protected DateTimeHelper $dateTimeHelper;
 
+    private readonly AggregateAnalyticsHelper $aggregateAnalyticsHelper;
+
     public function __construct(
         protected CookieHelper $cookieHelper,
         protected IpLookupHelper $ipLookupHelper,
@@ -126,8 +128,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
         private readonly RedirectRepository $redirectRepository,
         private readonly TrackableRepository $trackableRepository,
         private readonly LeadRepository $leadRepository,
+        // Optional, so existing constructor calls keep working. The container always passes it.
+        ?AggregateAnalyticsHelper $aggregateAnalyticsHelper = null, // @phpstan-ignore mautic.noNullableServiceInConstructor
     ) {
-        $this->dateTimeHelper = new DateTimeHelper();
+        $this->dateTimeHelper           = new DateTimeHelper();
+        $this->aggregateAnalyticsHelper = $aggregateAnalyticsHelper ?? new AggregateAnalyticsHelper($coreParametersHelper);
 
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
@@ -739,7 +744,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             return;
         }
 
-        if (!(new AggregateAnalyticsHelper($this->coreParametersHelper))->isEnabled()) {
+        if (!$this->aggregateAnalyticsHelper->isEnabled()) {
             return;
         }
 
@@ -758,18 +763,21 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     private function getClickthroughChannel(array $clickthrough): array
     {
-        if (!empty($clickthrough['channel'])) {
-            if (1 === count($clickthrough['channel'])) {
-                $channelId = reset($clickthrough['channel']);
+        // The clickthrough comes from the URL, so anything that isn't the expected shape is ignored
+        $channel = $clickthrough['channel'] ?? null;
+        if (is_array($channel) && [] !== $channel) {
+            if (1 === count($channel)) {
+                $channelId = reset($channel);
 
-                return [(string) key($clickthrough['channel']), $channelId];
+                return [(string) key($channel), $channelId];
             }
 
-            return [$clickthrough['channel'][0], (int) $clickthrough['channel'][1]];
+            return [$channel[0] ?? null, (int) ($channel[1] ?? 0)];
         }
 
-        if (!empty($clickthrough['source'])) {
-            return [$clickthrough['source'][0], $clickthrough['source'][1]];
+        $source = $clickthrough['source'] ?? null;
+        if (is_array($source) && [] !== $source) {
+            return [$source[0] ?? null, $source[1] ?? null];
         }
 
         return [null, null];

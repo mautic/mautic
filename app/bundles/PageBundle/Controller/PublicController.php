@@ -530,8 +530,8 @@ final class PublicController extends AbstractFormController
             }
         }
 
-        // Still counted, with nothing that links it to the visitor
-        if (!$isRequestTrackable) {
+        // A click from an email is still counted, with nothing that links it to the visitor
+        if (!$isRequestTrackable && null !== $ct && '' !== $ct) {
             $pageModel->countUntrackedClick($redirect, $this->decodeClickthrough($ct));
         }
 
