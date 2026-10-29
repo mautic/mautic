@@ -45,7 +45,7 @@ final readonly class MauticWriteSubscriber
 
         if ($entity->isNew()) {
             $entity->setDateAdded($now->getUtcDateTime());
-            if ($user instanceof User) {
+            if ($user) {
                 $entity->setCreatedBy($user);
                 $entity->setCreatedByUser($user->getName());
             }

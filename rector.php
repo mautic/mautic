@@ -21,7 +21,6 @@ return RectorConfig::configure()
         phpunitMockToStub: true,
         phpunitNarrowAsserts: true,
     )
-    ->withImportNames()
     ->withPhpSets(php84: true)
     // ->withImportNames(importShortClasses: false)
     ->withCache(__DIR__.'/var/cache/rector')
