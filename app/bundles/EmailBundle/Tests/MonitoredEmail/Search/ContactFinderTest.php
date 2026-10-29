@@ -15,11 +15,12 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ContactFinder::class)]
 #[CoversClass(Result::class)]
 #[CoversClass(Address::class)]
-final class ContactFinderTest extends \PHPUnit\Framework\TestCase
+final class ContactFinderTest extends TestCase
 {
     #[TestDox('Contact should be found via contact email address')]
     public function testContactFoundByDelegationForAddress(): void

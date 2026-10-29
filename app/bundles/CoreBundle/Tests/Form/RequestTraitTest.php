@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Form;
 
 use Mautic\CoreBundle\Form\RequestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -14,7 +15,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
 use Symfony\Component\Form\FormFactoryBuilder;
 
-final class RequestTraitTest extends \PHPUnit\Framework\TestCase
+final class RequestTraitTest extends TestCase
 {
     use RequestTrait;
 

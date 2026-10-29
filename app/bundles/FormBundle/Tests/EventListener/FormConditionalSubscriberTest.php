@@ -13,9 +13,10 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
+final class FormConditionalSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&FormModel

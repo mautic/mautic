@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\Functional\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
-use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 

@@ -12,22 +12,24 @@ use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactor
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[CoversClass(IpLookupHelper::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
+final class IpLookupHelperTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&DeviceDetector
+     * @var MockObject&DeviceDetector
      */
-    private \PHPUnit\Framework\MockObject\MockObject $deviceDetector;
+    private MockObject $deviceDetector;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&DeviceDetectorFactoryInterface
+     * @var MockObject&DeviceDetectorFactoryInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $deviceDetectorFactory;
+    private MockObject $deviceDetectorFactory;
 
     protected function setUp(): void
     {
@@ -208,7 +210,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->deviceDetectorFactory
             ->method('create')
             ->willReturnCallback(
-                fn (): \PHPUnit\Framework\MockObject\MockObject => $this->deviceDetector
+                fn (): MockObject => $this->deviceDetector
             );
 
         $helper = new IpLookupHelper($requestStack, $mockRepository, $mockCoreParametersHelper, $this->deviceDetectorFactory);

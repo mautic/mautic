@@ -25,6 +25,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullO
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company as CompanyEntity;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -35,19 +36,19 @@ final class FullObjectReportBuilderTest extends TestCase
     private const string TEST_EMAIL = 'test@test.com';
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ObjectProvider
+     * @var MockObject&ObjectProvider
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
+    private MockObject $objectProvider;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&FieldBuilder
+     * @var MockObject&FieldBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldBuilder;
+    private MockObject $fieldBuilder;
 
     private FullObjectReportBuilder $reportBuilder;
 

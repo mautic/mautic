@@ -19,9 +19,10 @@ use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Mautic\ReportBundle\Tests\Fixtures;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class ReportExporterTest extends \PHPUnit\Framework\TestCase
+final class ReportExporterTest extends TestCase
 {
     public function testProcessExport(): void
     {

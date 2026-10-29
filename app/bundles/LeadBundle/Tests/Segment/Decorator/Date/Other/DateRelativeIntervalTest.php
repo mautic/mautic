@@ -12,9 +12,10 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DateRelativeInterval::class)]
-final class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
+final class DateRelativeIntervalTest extends TestCase
 {
     public function testGetOperatorEqual(): void
     {

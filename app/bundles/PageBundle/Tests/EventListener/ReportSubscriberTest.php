@@ -17,6 +17,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -24,19 +25,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class ReportSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CompanyReportData
+     * @var MockObject&CompanyReportData
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
+    private MockObject $companyReportData;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&HitRepository
+     * @var MockObject&HitRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $hitRepository;
+    private MockObject $hitRepository;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     private ReportSubscriber $subscriber;
 

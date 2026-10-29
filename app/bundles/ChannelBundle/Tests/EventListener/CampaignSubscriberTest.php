@@ -30,11 +30,12 @@ use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\SmsEvents;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSubscriberTest extends TestCase
 {
     private EventDispatcher $dispatcher;
 

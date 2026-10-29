@@ -52,6 +52,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -296,7 +297,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             $lead = $log->getLead();
 
             if (null !== $lead && !empty($points)) {
-                if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
+                if ($pointGroup instanceof Group) {
                     $this->groupModel->adjustPoints($lead, $pointGroup, $points);
                 } else {
                     $lead->adjustPoints($points);

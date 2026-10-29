@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Entity;
 
+use Doctrine\ORM\NonUniqueResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -14,7 +15,7 @@ final class PluginRepository extends CommonRepository
     /**
      * Find an addon record by bundle name.
      *
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NonUniqueResultException
      */
     public function findByBundle(string $bundle): ?Plugin
     {

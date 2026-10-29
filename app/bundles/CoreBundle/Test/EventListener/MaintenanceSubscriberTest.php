@@ -11,9 +11,11 @@ use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\EventListener\MaintenanceSubscriber;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
+final class MaintenanceSubscriberTest extends TestCase
 {
     private MaintenanceSubscriber $subscriber;
 
@@ -92,7 +94,7 @@ final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
         $qb
             ->expects($this->exactly(4))
             ->method('executeQuery')
-            ->willReturnCallback(function (): \PHPUnit\Framework\MockObject\MockObject {
+            ->willReturnCallback(function (): MockObject {
                 static $callCount = 0;
                 ++$callCount;
                 $result = $this->createMock(Result::class);

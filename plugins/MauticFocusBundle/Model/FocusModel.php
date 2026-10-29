@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticFocusBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
-use MatthiasMullie\Minify;
+use MatthiasMullie\Minify\JS;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -14,11 +14,13 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
@@ -147,7 +149,7 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
 
         $content = $this->getContent($focusArray, $isPreview, $url);
         $data    = [
-            'js'    => new Minify\JS($javascript)->minify(),
+            'js'    => new JS($javascript)->minify(),
             'focus' => InputHelper::minifyHTML($content['focus']),
             'form'  => InputHelper::minifyHTML($content['form']),
         ];
@@ -210,7 +212,7 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
             $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
             $displayManager = new DisplayManager($form, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         }
-        $formContent        = ($form instanceof \Mautic\FormBundle\Entity\Form) ? $this->twig->render(
+        $formContent        = ($form instanceof Form) ? $this->twig->render(
             '@MauticFocus/Builder/form.html.twig',
             [
                 'form'           => $form,
@@ -289,7 +291,7 @@ final class FocusModel extends FormModel implements GlobalSearchInterface
         switch ($type) {
             case Stat::TYPE_FORM:
             case Stat::TYPE_CLICK:
-                /** @var \Mautic\PageBundle\Entity\Hit|Submission $data */
+                /** @var Hit|Submission $data */
                 $typeId = $data->getId();
                 break;
             case Stat::TYPE_NOTIFICATION:

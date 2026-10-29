@@ -8,9 +8,10 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TagRepositoryTest extends \PHPUnit\Framework\TestCase
+final class TagRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 

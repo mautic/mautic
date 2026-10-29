@@ -10,13 +10,14 @@ use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
-final class FilterTypeTest extends \PHPUnit\Framework\TestCase
+final class FilterTypeTest extends TestCase
 {
     /**
      * @var MockObject&FormAdjustmentsProviderInterface

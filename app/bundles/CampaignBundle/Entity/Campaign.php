@@ -252,7 +252,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         } elseif ('projects' === $prop) {
             // Initialize project tracking on first change
             if (!isset($this->changes['projects']['old'])) {
-                /** @var \Doctrine\Common\Collections\Collection<int, Project> $current */
+                /** @var Collection<int, Project> $current */
                 $currentProjects = array_map(fn (Project $project): ?string => $project->getName(), $current->toArray());
                 $this->changes['projects'] = [
                     'old' => $currentProjects,

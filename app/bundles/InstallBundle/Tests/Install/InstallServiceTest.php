@@ -16,6 +16,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -24,7 +25,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class InstallServiceTest extends \PHPUnit\Framework\TestCase
+final class InstallServiceTest extends TestCase
 {
     /**
      * @var MockObject&Configurator

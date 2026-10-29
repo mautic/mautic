@@ -28,10 +28,11 @@ use Mautic\LeadBundle\Segment\RelativeDate;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DateOptionFactory::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
+final class DateOptionFactoryTest extends TestCase
 {
     public function testBirthday(): void
     {

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Doctrine;
 
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Schema\ForeignKeyConstraint;
+use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
@@ -37,7 +40,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
     protected ?string $prefix = null;
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws AbortMigration
      *
      * @todo remove this method to make it absctract for Mautic 6
@@ -99,7 +102,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
             case 'fk':
                 if (!array_key_exists('fk', $tables[$table])) {
                     $keys = $schemaManager->listTableForeignKeys($table);
-                    /** @var \Doctrine\DBAL\Schema\ForeignKeyConstraint $k */
+                    /** @var ForeignKeyConstraint $k */
                     foreach ($keys as $k) {
                         $name                       = strtolower(AssetName::ofOptional($k));
                         $key                        = substr($name, -4);
@@ -120,7 +123,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
 
                     $indexes = $schemaManager->listTableIndexes($table);
 
-                    /** @var \Doctrine\DBAL\Schema\Index $i */
+                    /** @var Index $i */
                     foreach ($indexes as $i) {
                         $name   = strtolower(AssetName::of($i));
                         $isIdx  = stripos($name, 'idx');

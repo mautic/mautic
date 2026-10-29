@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\EventCollector\Accessor\Event;
 
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
+use PHPUnit\Framework\TestCase;
 
-final class ConditionAccessorTest extends \PHPUnit\Framework\TestCase
+final class ConditionAccessorTest extends TestCase
 {
     public function testEventNameIsReturned(): void
     {

@@ -8,9 +8,10 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\BaseDecorator;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(BaseDecorator::class)]
-final class BaseDecoratorTest extends \PHPUnit\Framework\TestCase
+final class BaseDecoratorTest extends TestCase
 {
     public function testGetField(): void
     {

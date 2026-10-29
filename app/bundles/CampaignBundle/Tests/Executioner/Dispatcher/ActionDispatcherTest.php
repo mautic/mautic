@@ -19,11 +19,12 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
+final class ActionDispatcherTest extends TestCase
 {
     private MockObject&EventDispatcherInterface $dispatcher;
 

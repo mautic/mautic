@@ -2,6 +2,7 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
@@ -106,7 +107,7 @@ final class PointRepository extends CommonRepository
         return $return;
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'p.name',
@@ -114,7 +115,7 @@ final class PointRepository extends CommonRepository
         ]);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'), $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(

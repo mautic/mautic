@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Validator\SafeRemoteUrl;
 use Mautic\CoreBundle\Validator\SafeRemoteUrlValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -35,7 +35,7 @@ final class SafeRemoteUrlValidatorTest extends MauticMysqlTestCase
         $this->expectExceptionMessageMatches('/Expected argument of type "Mautic\\\\CoreBundle\\\\Validator\\\\SafeRemoteUrl"/');
 
         $validator  = new SafeRemoteUrlValidator(self::getContainer()->get(CoreParametersHelper::class));
-        $validator->validateInContext('value', new Constraints\NotBlank(), $this->createStub(ExecutionContextInterface::class));
+        $validator->validateInContext('value', new NotBlank(), $this->createStub(ExecutionContextInterface::class));
     }
 
     /**

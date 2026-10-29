@@ -40,6 +40,7 @@ use Mautic\PageBundle\Model\Tracking404Model;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Asset\Packages;
@@ -56,12 +57,12 @@ final class PublicControllerTest extends TestCase
 {
     private MockObject&Container $internalContainer;
 
-    private \PHPUnit\Framework\MockObject\Stub&LoggerInterface $logger;
+    private Stub&LoggerInterface $logger;
 
     /**
-     * @var ModelFactory<object>&\PHPUnit\Framework\MockObject\Stub
+     * @var ModelFactory<object>&Stub
      */
-    private \PHPUnit\Framework\MockObject\Stub&ModelFactory $modelFactory;
+    private Stub&ModelFactory $modelFactory;
 
     private MockObject&RedirectModel $redirectModel;
 

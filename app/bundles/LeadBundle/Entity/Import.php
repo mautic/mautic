@@ -535,10 +535,8 @@ class Import extends FormEntity
 
     /**
      * Counts how long the import has run so far.
-     *
-     * @return \DateInterval|null
      */
-    public function getRunTime()
+    public function getRunTime(): ?\DateInterval
     {
         $startTime = $this->dateStarted;
         $endTime   = $this->dateEnded;

@@ -22,6 +22,7 @@ return RectorConfig::configure()
         phpunitNarrowAsserts: true,
     )
     ->withPhpSets(php84: true)
+    // ->withImportNames(importShortClasses: false)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
         // to be used next on loadMetadata()
@@ -51,8 +52,22 @@ return RectorConfig::configure()
     ->withSkip([
         '*/Fixture/*',
 
+        // handle in standalone PR
+        \Rector\Symfony\CodeQuality\Rector\Class_\EventSubscriberToAttributeRector::class,
+
         // prefer implicit compare on object|null
         Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector::class,
+
+        // importing Lead/Exception short names here shadows the local Entity\Lead and Executioner\Exception sub-namespaces
+        Rector\PostRector\Rector\NameImportingPostRector::class => [
+            __DIR__.'/app/bundles/CampaignBundle/Entity/LeadRepository.php',
+            __DIR__.'/app/bundles/CampaignBundle/Executioner/EventExecutioner.php',
+        ],
+
+        // createFromFormat() leaks a \DateTime|bool|null union that breaks the getDateTime() return contract
+        Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Helper/DateTimeHelper.php',
+        ],
 
         // adds dead "return false" after self::fail(); fixed upstream in rector-phpunit #801, drop after next tag
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\WillReturnCallbackFallbackToReturnFalseRector::class => [

@@ -17,7 +17,6 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

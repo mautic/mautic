@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Migration;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -26,7 +27,7 @@ abstract class AbstractMigration implements MigrationInterface
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function execute(): void
     {

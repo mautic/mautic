@@ -10,24 +10,26 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ChannelActionModelTest extends \PHPUnit\Framework\TestCase
+final class ChannelActionModelTest extends TestCase
 {
     private Lead $contactMock5;
 
     private Lead $contactMock6;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadModel
+     * @var MockObject&LeadModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactModelMock;
+    private MockObject $contactModelMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&DoNotContact
+     * @var MockObject&DoNotContact
      */
-    private \PHPUnit\Framework\MockObject\MockObject $doNotContactMock;
+    private MockObject $doNotContactMock;
 
     private ChannelActionModel $actionModel;
 

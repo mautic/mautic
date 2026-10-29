@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\Summary;
@@ -41,7 +42,7 @@ final class SummaryModel extends AbstractCommonModel
     /**
      * Collapse Event Log entities into insert/update queries for the campaign summary.
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function updateSummary(iterable $logs): void
     {
@@ -90,7 +91,7 @@ final class SummaryModel extends AbstractCommonModel
     /**
      * Summarize all of history.
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function summarize(OutputInterface $output, int $hoursPerBatch = 1, ?int $maxHours = null, bool $rebuild = false): void
     {
@@ -149,7 +150,7 @@ final class SummaryModel extends AbstractCommonModel
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function persistSummaries(): void
     {

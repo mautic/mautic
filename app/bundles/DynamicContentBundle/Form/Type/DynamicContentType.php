@@ -35,6 +35,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -318,7 +319,7 @@ final class DynamicContentType extends AbstractType
     }
 
     /**
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws AccessException
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

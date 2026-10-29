@@ -6,8 +6,9 @@ namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\ReportBundle\Model\ReportExportOptions;
+use PHPUnit\Framework\TestCase;
 
-final class ReportExportOptionsTest extends \PHPUnit\Framework\TestCase
+final class ReportExportOptionsTest extends TestCase
 {
     public function testBatch(): void
     {

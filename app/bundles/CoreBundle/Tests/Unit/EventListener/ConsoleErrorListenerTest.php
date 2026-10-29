@@ -6,12 +6,13 @@ namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\EventListener\ConsoleErrorListener;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-final class ConsoleErrorListenerTest extends \PHPUnit\Framework\TestCase
+final class ConsoleErrorListenerTest extends TestCase
 {
     /**
      * @var MockObject&LoggerInterface

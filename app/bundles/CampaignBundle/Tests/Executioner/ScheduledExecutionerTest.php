@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -33,7 +34,7 @@ final class ScheduledExecutionerTest extends TestCase
 {
     private MockObject&LeadEventLogRepository $repository;
 
-    private \PHPUnit\Framework\MockObject\Stub&Translator $translator;
+    private Stub&Translator $translator;
 
     private MockObject&EventExecutioner $executioner;
 
@@ -41,13 +42,13 @@ final class ScheduledExecutionerTest extends TestCase
 
     private MockObject&ScheduledContactFinder $contactFinder;
 
-    private \PHPUnit\Framework\MockObject\Stub&ProcessSignalService $processSignalService;
+    private Stub&ProcessSignalService $processSignalService;
 
     private MockObject&EventRedirectionHelper $redirectionHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface $entityManager;
+    private Stub&EntityManagerInterface $entityManager;
 
-    private \PHPUnit\Framework\MockObject\Stub&LeadRepository $leadRepository;
+    private Stub&LeadRepository $leadRepository;
 
     protected function setUp(): void
     {

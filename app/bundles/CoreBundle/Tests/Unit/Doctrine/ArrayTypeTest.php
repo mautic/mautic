@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
+use PHPUnit\Framework\TestCase;
 
 final class ExampleClassWithPrivateProperty
 {
@@ -49,7 +50,7 @@ final class ExampleClassWithoutDeclaredProperty
 {
 }
 
-final class ArrayTypeTest extends \PHPUnit\Framework\TestCase
+final class ArrayTypeTest extends TestCase
 {
     public const string MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
 

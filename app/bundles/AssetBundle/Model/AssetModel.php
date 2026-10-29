@@ -4,6 +4,7 @@ namespace Mautic\AssetBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
@@ -103,7 +104,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * @param array<string, mixed> $systemEntry
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      * @throws \Exception
      */
     public function trackDownload(Asset $asset, ?Request $request = null, int $code = 200, array $systemEntry = []): void

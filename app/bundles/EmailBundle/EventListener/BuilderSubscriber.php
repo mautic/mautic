@@ -13,6 +13,7 @@ use Mautic\EmailBundle\Helper\FromEmailHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Entity\Trackable;
@@ -179,7 +180,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
         // We will replace tokens in unsubscribe text too
         $unsubscribeLink = $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]);
-        $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
+        $unsubscribeText = TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
         $unsubscribeText = str_replace('|URL|', $unsubscribeLink, $unsubscribeText);
         $event->addToken('{unsubscribe_text}', $unsubscribeText);
         $event->addToken('{unsubscribe_url}', $unsubscribeLink);

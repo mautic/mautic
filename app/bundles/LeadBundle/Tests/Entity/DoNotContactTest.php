@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
+use PHPUnit\Framework\TestCase;
 
-final class DoNotContactTest extends \PHPUnit\Framework\TestCase
+final class DoNotContactTest extends TestCase
 {
     public function testDoNotContactComments(): void
     {

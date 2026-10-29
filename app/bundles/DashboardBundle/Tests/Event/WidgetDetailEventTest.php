@@ -12,9 +12,10 @@ use Mautic\DashboardBundle\Event\GenerateWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
+final class WidgetDetailEventTest extends TestCase
 {
     private WidgetDetailEvent $widgetDetailEvent;
 

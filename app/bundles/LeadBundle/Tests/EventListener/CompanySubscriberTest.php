@@ -18,8 +18,9 @@ use Mautic\LeadBundle\Event\CompanyPreSaveEvent;
 use Mautic\LeadBundle\Event\CompanySoftDeleteEvent;
 use Mautic\LeadBundle\EventListener\CompanySubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
+use PHPUnit\Framework\TestCase;
 
-final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
+final class CompanySubscriberTest extends TestCase
 {
     public function testGetSubscribedEvents(): void
     {

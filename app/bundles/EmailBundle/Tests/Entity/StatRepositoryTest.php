@@ -11,9 +11,10 @@ use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
+final class StatRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 

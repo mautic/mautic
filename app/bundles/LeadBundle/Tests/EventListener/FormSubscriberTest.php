@@ -22,10 +22,11 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FormSubscriberTest extends \PHPUnit\Framework\TestCase
+final class FormSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&LeadModel

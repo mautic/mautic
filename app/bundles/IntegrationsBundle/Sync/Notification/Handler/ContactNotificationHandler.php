@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Sync\Notification\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserSummaryNotificationHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
@@ -39,7 +40,7 @@ final class ContactNotificationHandler implements HandlerInterface
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName): void
     {
@@ -73,7 +74,7 @@ final class ContactNotificationHandler implements HandlerInterface
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     private function writeEventLogEntry(string $integration, int $contactId, string $message): void
     {

@@ -11,14 +11,16 @@ use Mautic\EmailBundle\EventListener\TrackingSubscriber;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
+final class TrackingSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&StatRepository
+     * @var MockObject&StatRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $statRepository;
+    private MockObject $statRepository;
 
     protected function setUp(): void
     {

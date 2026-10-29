@@ -10,11 +10,12 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldsApiControllerTraitTest extends TestCase
 {
     public function testGetEntityFormOptions(): void
     {

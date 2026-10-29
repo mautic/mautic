@@ -6,8 +6,9 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class LeadListTest extends \PHPUnit\Framework\TestCase
+final class LeadListTest extends TestCase
 {
     public function testAddLegacyParamsWithEmptyFilters(): void
     {

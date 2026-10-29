@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\Notification\Handler;
 
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\NotificationDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\CompanyHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
@@ -30,8 +32,8 @@ final readonly class CompanyNotificationHandler implements HandlerInterface
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
-     * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
+     * @throws ORMException
+     * @throws ObjectNotSupportedException
      */
     public function writeEntry(NotificationDAO $notificationDAO, string $integrationDisplayName, string $objectDisplayName): void
     {

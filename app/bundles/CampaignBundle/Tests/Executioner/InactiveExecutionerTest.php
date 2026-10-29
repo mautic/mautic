@@ -22,15 +22,17 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 #[AllowMockObjectsWithoutExpectations]
-final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
+final class InactiveExecutionerTest extends TestCase
 {
     private MockObject&InactiveContactFinder $inactiveContactFinder;
 
-    private \PHPUnit\Framework\MockObject\Stub&Translator $translator;
+    private Stub&Translator $translator;
 
     private MockObject&EventScheduler $eventScheduler;
 

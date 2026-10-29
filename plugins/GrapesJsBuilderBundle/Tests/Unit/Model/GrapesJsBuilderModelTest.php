@@ -17,13 +17,14 @@ use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
+final class GrapesJsBuilderModelTest extends TestCase
 {
     public function testAddOrEditEntityWithoutMatchingEntityAndNoRequestQuery(): void
     {

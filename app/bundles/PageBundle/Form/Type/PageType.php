@@ -19,6 +19,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Helper\PageConfigInterface;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
@@ -37,7 +38,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 final class PageType extends AbstractType
 {
-    private readonly ?\Mautic\UserBundle\Entity\User $user;
+    private readonly ?User $user;
 
     private readonly bool $canViewOther;
 

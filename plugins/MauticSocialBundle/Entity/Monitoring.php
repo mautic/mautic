@@ -65,7 +65,7 @@ class Monitoring extends FormEntity implements UuidInterface
     private $description;
 
     #[Groups(['monitoring:read', 'monitoring:write'])]
-    private ?\Mautic\CategoryBundle\Entity\Category $category = null;
+    private ?Category $category = null;
 
     /**
      * @var array

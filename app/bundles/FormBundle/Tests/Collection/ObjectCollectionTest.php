@@ -6,8 +6,9 @@ namespace Mautic\FormBundle\Tests\Collection;
 
 use Mautic\FormBundle\Collection\ObjectCollection;
 use Mautic\FormBundle\Crate\ObjectCrate;
+use PHPUnit\Framework\TestCase;
 
-final class ObjectCollectionTest extends \PHPUnit\Framework\TestCase
+final class ObjectCollectionTest extends TestCase
 {
     public function testToChoicesWithObjects(): void
     {

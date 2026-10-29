@@ -32,10 +32,11 @@ use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
+final class EventExecutionerTest extends TestCase
 {
     /**
      * @var MockObject&EventCollector

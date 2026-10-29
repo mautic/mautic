@@ -434,7 +434,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     public function isFailed(): bool
     {
-        return $this->failedLog instanceof \Mautic\CampaignBundle\Entity\FailedLeadEventLog;
+        return $this->failedLog instanceof FailedLeadEventLog;
     }
 
     public function isSuccess(): bool

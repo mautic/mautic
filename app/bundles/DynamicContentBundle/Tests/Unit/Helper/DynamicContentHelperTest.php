@@ -14,10 +14,11 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
+final class DynamicContentHelperTest extends TestCase
 {
     /**
      * @var MockObject&DynamicContentModel

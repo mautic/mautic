@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PageListType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,9 +19,9 @@ final class PageListTypeTest extends TestCase
     private PageListType $page;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&PageRepository
+     * @var MockObject&PageRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pageRepositoryMock;
+    private MockObject $pageRepositoryMock;
 
     protected function setUp(): void
     {

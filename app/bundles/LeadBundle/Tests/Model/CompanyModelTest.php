@@ -15,10 +15,11 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(AbstractFormFieldHelper::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class CompanyModelTest extends \PHPUnit\Framework\TestCase
+final class CompanyModelTest extends TestCase
 {
     #[TestDox('Ensure that an array value is flattened before saving')]
     public function testArrayValueIsFlattenedBeforeSave(): void

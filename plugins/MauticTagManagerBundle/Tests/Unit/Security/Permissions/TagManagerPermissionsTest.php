@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticTagManagerBundle\Tests\Unit\Security\Permissions;
 
 use MauticPlugin\MauticTagManagerBundle\Security\Permissions\TagManagerPermissions;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 
 final class TagManagerPermissionsTest extends TestCase
 {
-    private TagManagerPermissions&\PHPUnit\Framework\MockObject\MockObject $tagManagerPermissions;
+    private TagManagerPermissions&MockObject $tagManagerPermissions;
 
     protected function setUp(): void
     {

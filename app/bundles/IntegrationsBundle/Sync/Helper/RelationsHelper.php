@@ -9,8 +9,11 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\RelationDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
+use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\InternalIdNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
+use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 
 final class RelationsHelper
 {
@@ -45,9 +48,9 @@ final class RelationsHelper
     }
 
     /**
-     * @throws \Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException
-     * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException
-     * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
+     * @throws FieldNotFoundException
+     * @throws ObjectDeletedException
+     * @throws ObjectNotSupportedException
      */
     private function processRelation(MappingManualDAO $mappingManualDao, ReportDAO $syncReport, RelationDAO $relationObject): void
     {
@@ -81,8 +84,8 @@ final class RelationsHelper
 
     /**
      * @throws ObjectNotFoundException
-     * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectDeletedException
-     * @throws \Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException
+     * @throws ObjectDeletedException
+     * @throws ObjectNotSupportedException
      */
     private function findInternalObject(MappingManualDAO $mappingManualDao, string $relObjectName, ObjectDAO $objectDao): ObjectDAO
     {
@@ -92,7 +95,7 @@ final class RelationsHelper
     }
 
     /**
-     * @throws \Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException
+     * @throws FieldNotFoundException
      */
     private function addObjectInternalId(int $relObjectId, string $relInternalType, RelationDAO $relationObject, ReportDAO $syncReport): void
     {

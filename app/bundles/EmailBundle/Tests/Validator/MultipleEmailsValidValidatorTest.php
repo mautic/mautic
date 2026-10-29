@@ -7,11 +7,12 @@ namespace Mautic\EmailBundle\Tests\Validator;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Validator\MultipleEmailsValidValidator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-final class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
+final class MultipleEmailsValidValidatorTest extends TestCase
 {
     public function testNoEmailsProvided(): void
     {

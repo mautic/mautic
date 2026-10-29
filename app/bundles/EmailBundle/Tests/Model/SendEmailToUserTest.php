@@ -18,10 +18,11 @@ use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
+final class SendEmailToUserTest extends TestCase
 {
     /**
      * @var MockObject&EmailModel

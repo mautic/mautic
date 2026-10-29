@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -43,7 +44,7 @@ final class SegmentSubscriberTest extends TestCase
 
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private SegmentCountCacheHelper&\PHPUnit\Framework\MockObject\Stub $segmentCountCacheHelper;
+    private SegmentCountCacheHelper&Stub $segmentCountCacheHelper;
 
     protected function setUp(): void
     {

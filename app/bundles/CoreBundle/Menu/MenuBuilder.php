@@ -37,12 +37,12 @@ final readonly class MenuBuilder
      * @param string $forRouteUri
      * @param string $forRouteName
      *
-     * @return \Knp\Menu\ItemInterface|null
+     * @return ItemInterface|null
      */
     public function getCurrentMenuItem(ItemInterface $menu, $forRouteUri, $forRouteName)
     {
         try {
-            /** @var \Knp\Menu\ItemInterface $item */
+            /** @var ItemInterface $item */
             foreach ($menu as $item) {
                 if ('current' == $forRouteUri && $this->matcher->isCurrent($item)) {
                     // current match

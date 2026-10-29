@@ -4,6 +4,7 @@ namespace Mautic\UserBundle\Form\Type;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -222,7 +223,7 @@ final class UserType extends AbstractType
                         ],
                         'class'         => Role::class,
                         'choice_label'  => 'name',
-                        'query_builder' => fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er->createQueryBuilder('r')
+                        'query_builder' => fn (EntityRepository $er): QueryBuilder => $er->createQueryBuilder('r')
                             ->where('r.isPublished = true')
                             ->orderBy('r.name', Order::Ascending->value),
                     ]

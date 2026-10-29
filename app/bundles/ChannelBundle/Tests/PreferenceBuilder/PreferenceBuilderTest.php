@@ -14,10 +14,11 @@ use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 #[AllowMockObjectsWithoutExpectations]
-final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
+final class PreferenceBuilderTest extends TestCase
 {
     public function testChannelsArePrioritized(): void
     {

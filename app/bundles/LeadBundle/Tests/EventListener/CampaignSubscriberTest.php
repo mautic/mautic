@@ -35,11 +35,12 @@ use Mautic\PointBundle\Model\PointGroupModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSubscriberTest extends TestCase
 {
     /**
      * @var array<string, mixed>

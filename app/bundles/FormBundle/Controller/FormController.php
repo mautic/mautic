@@ -895,7 +895,7 @@ class FormController extends CommonFormController
 
             // Clone the forms's actions
             $actions = $entity->getActions()->toArray();
-            /** @var \Mautic\FormBundle\Entity\Action $action */
+            /** @var Action $action */
             foreach ($actions as $action) {
                 $actionClone = clone $action;
                 $actionClone->setForm($entity);

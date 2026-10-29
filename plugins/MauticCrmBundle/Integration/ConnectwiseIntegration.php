@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -522,7 +523,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param Lead|\Mautic\LeadBundle\Entity\Company $entity
+     * @param Lead|Company $entity
      */
     public function saveSyncedData(object $entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
     {

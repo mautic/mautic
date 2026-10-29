@@ -7,9 +7,10 @@ namespace Mautic\LeadBundle\Tests\Segment;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ContactSegmentFilterCrate::class)]
-final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
+final class ContactSegmentFilterCrateTest extends TestCase
 {
     public function testEmptyFilter(): void
     {

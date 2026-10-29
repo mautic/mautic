@@ -55,6 +55,7 @@ use Mautic\UserBundle\Security\Provider\UserProvider;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactory;
@@ -64,7 +65,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 #[AllowMockObjectsWithoutExpectations]
-final class LeadModelTest extends \PHPUnit\Framework\TestCase
+final class LeadModelTest extends TestCase
 {
     private MockObject|RequestStack $requestStack;
 

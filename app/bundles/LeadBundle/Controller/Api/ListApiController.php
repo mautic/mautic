@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -152,7 +153,7 @@ final class ListApiController extends CommonApiController
      *
      * @param int $id     List ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/segments/{id}/contact/{leadId}/add',
@@ -192,7 +193,7 @@ final class ListApiController extends CommonApiController
      *
      * @param int $id segement ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/segments/{id}/contacts/add',
@@ -241,7 +242,7 @@ final class ListApiController extends CommonApiController
      *
      * @param int $id     List ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/segments/{id}/contact/{leadId}/remove',

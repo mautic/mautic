@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Functional\Field\Notification;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -35,7 +37,7 @@ final class CustomFieldNotificationFunctionalTest extends MauticMysqlTestCase
         $this->notifier->customFieldCannotBeUpdated($this->leadField, -1);
         /** @var NotificationRepository $notificationRepo */
         $notificationRepo   = $this->getContainer()->get(NotificationRepository::class);
-        /** @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\CoreBundle\Entity\Notification> $notifications */
+        /** @var Paginator<Notification> $notifications */
         $notifications      = $notificationRepo->getEntities([]);
 
         $this->assertCount(0, $notifications);

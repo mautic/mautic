@@ -17,6 +17,8 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\InstallBundle\Install\InstallService;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,19 +30,19 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 
 #[AllowMockObjectsWithoutExpectations]
-final class InstallControllerTest extends \PHPUnit\Framework\TestCase
+final class InstallControllerTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Router
+     * @var MockObject&Router
      */
-    private \PHPUnit\Framework\MockObject\MockObject $routerMock;
+    private MockObject $routerMock;
 
     private InstallController $controller;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&InstallService
+     * @var MockObject&InstallService
      */
-    private \PHPUnit\Framework\MockObject\MockObject $installer;
+    private MockObject $installer;
 
     protected function setUp(): void
     {

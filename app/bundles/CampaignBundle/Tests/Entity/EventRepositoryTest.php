@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -79,7 +80,7 @@ final class EventRepositoryTest extends TestCase
 
         $eventRepository = $this->configureRepository(Event::class, $emMock);
         $this->connection->method('createQueryBuilder')
-            ->willReturnCallback(fn (): \PHPUnit\Framework\MockObject\MockObject => $queryBuilderMock);
+            ->willReturnCallback(fn (): MockObject => $queryBuilderMock);
 
         $event = new Event();
         ReflectionHelper::setEntityId($event, 42);

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller\Api;
 
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\RawMessage;
@@ -171,7 +171,7 @@ final class SMimeFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<int, mixed> $segments
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, array $segments = []): Email
     {

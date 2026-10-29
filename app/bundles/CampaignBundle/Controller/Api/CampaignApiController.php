@@ -30,6 +30,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -119,7 +120,7 @@ final class CampaignApiController extends CommonApiController
      *
      * @param int        $id     Campaign ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/campaigns/{id}/contact/{leadId}/add',
@@ -156,7 +157,7 @@ final class CampaignApiController extends CommonApiController
      *
      * @param int $id     Campaign ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/campaigns/{id}/contact/{leadId}/remove',

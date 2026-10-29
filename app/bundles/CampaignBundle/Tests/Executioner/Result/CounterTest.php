@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner\Result;
 
 use Mautic\CampaignBundle\Executioner\Result\Counter;
+use PHPUnit\Framework\TestCase;
 
-final class CounterTest extends \PHPUnit\Framework\TestCase
+final class CounterTest extends TestCase
 {
     public function testCounterIncrements(): void
     {

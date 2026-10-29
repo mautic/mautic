@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
+use MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -35,7 +36,7 @@ final class ConstantContactType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration $object */
+        /** @var ConstantContactIntegration $object */
         $object          = $this->integrationHelper->getIntegrationObject('ConstantContact');
         $integrationName = $object->getName();
         $session         = $this->requestStack->getSession();

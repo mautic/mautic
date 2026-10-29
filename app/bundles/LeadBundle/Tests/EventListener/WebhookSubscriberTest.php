@@ -20,17 +20,20 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
+final class WebhookSubscriberTest extends TestCase
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&WebhookModel
+     * @var MockObject&WebhookModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mockModel;
+    private MockObject $mockModel;
 
     protected function setUp(): void
     {

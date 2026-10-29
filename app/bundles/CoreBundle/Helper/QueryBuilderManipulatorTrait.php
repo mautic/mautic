@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 
 trait QueryBuilderManipulatorTrait

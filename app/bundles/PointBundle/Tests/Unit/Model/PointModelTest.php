@@ -24,6 +24,7 @@ use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\PointBundle\Model\PointModel;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -41,7 +42,7 @@ final class PointModelTest extends TestCase
 
     private EventDispatcherInterface&MockObject $dispatcher;
 
-    private Translator&\PHPUnit\Framework\MockObject\Stub $translator;
+    private Translator&Stub $translator;
 
     private PointRepository&MockObject $pointRepositoryMock;
 

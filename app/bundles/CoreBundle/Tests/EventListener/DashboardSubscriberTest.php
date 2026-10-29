@@ -18,6 +18,7 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Route;
@@ -228,7 +229,7 @@ final class DashboardSubscriberTest extends TestCase
         $routeCollection = $this->createMock(RouteCollection::class);
         $matcher         = $this->exactly(5);
         $routeCollection->expects($matcher) // no null object and  exception object
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $route): ?\PHPUnit\Framework\MockObject\Stub {
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $route): ?Stub {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_model_action', $parameters[0]);
 

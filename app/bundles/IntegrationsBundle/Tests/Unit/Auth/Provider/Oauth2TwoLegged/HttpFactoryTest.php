@@ -11,6 +11,7 @@ use kamermans\OAuth2\OAuth2Middleware;
 use kamermans\OAuth2\Persistence\TokenPersistenceInterface as KamermansTokenPersistenceInterface;
 use kamermans\OAuth2\Signer\AccessToken\SignerInterface as AccessTokenSigner;
 use kamermans\OAuth2\Signer\ClientCredentials\SignerInterface;
+use kamermans\OAuth2\Utils\Collection;
 use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\Credentials\CredentialsInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\Oauth2TwoLegged\Credentials\ClientCredentialsGrantInterface;
@@ -240,7 +241,7 @@ final class HttpFactoryTest extends TestCase
         $grantType           = $this->getProperty($reflectedMiddleware, $middleware, 'grantType');
 
         $reflectedGrantType = new \ReflectionClass($grantType);
-        /** @var \kamermans\OAuth2\Utils\Collection $reauthConfig */
+        /** @var Collection $reauthConfig */
         $reauthConfig       = $this->getProperty($reflectedGrantType, $grantType, 'config');
 
         $expectedConfig = [

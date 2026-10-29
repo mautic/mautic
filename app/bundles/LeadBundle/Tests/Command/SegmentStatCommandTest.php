@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Command;
 
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -21,8 +23,8 @@ final class SegmentStatCommandTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function testSegmentStatCommandWithSegment(): void
     {

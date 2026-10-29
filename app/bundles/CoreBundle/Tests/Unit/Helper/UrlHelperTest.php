@@ -6,8 +6,9 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class UrlHelperTest extends \PHPUnit\Framework\TestCase
+final class UrlHelperTest extends TestCase
 {
     public function testAppendQueryToUrl(): void
     {

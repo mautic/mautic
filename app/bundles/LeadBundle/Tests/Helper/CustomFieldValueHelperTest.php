@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
+use PHPUnit\Framework\TestCase;
 
-final class CustomFieldValueHelperTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldValueHelperTest extends TestCase
 {
     /**
      * @param array<int|string> $fieldParams

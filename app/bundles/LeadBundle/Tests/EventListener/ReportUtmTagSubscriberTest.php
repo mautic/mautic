@@ -15,10 +15,11 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportUtmTagSubscriberTest extends TestCase
 {
     public function testNotRelevantContextBuilder(): void
     {

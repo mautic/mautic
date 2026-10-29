@@ -15,15 +15,16 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class ObjectChangeGeneratorTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ValueHelper
+     * @var MockObject&ValueHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
+    private MockObject $valueHelper;
 
     protected function setUp(): void
     {

@@ -34,6 +34,9 @@ use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidOptionsException;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: DynamicContentRepository::class)]
@@ -215,9 +218,9 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @throws \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @throws \Symfony\Component\Validator\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\Validator\Exception\MissingOptionsException
+     * @throws ConstraintDefinitionException
+     * @throws InvalidOptionsException
+     * @throws MissingOptionsException
      */
     public static function loadValidatorMetaData(ClassMetadata $metadata): void
     {

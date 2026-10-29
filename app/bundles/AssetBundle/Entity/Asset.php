@@ -24,6 +24,7 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Sequentially;
@@ -503,7 +504,7 @@ class Asset extends FormEntity implements UuidInterface
     {
         if (null !== $this->getFile()) {
             // set the asset title as original file name if title is missing
-            if (null === $this->title && $this->file instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
+            if (null === $this->title && $this->file instanceof UploadedFile) {
                 $this->setTitle($this->file->getClientOriginalName());
             }
 

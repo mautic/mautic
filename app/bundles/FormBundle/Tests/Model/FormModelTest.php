@@ -31,6 +31,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -38,7 +39,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FormModelTest extends \PHPUnit\Framework\TestCase
+final class FormModelTest extends TestCase
 {
     /**
      * @var MockObject&FormRepository

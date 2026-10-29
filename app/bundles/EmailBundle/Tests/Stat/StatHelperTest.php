@@ -13,9 +13,10 @@ use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
 use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class StatHelperTest extends \PHPUnit\Framework\TestCase
+final class StatHelperTest extends TestCase
 {
     public function testStatsAreCreatedAndDeleted(): void
     {

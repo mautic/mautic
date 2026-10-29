@@ -3,7 +3,9 @@
 namespace Mautic\PluginBundle\Integration;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
@@ -39,6 +41,7 @@ use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -86,9 +89,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Used for notifications.
      *
-     * @var \Doctrine\ORM\Tools\Pagination\Paginator<User>
+     * @var Paginator<User>
      */
-    protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
+    protected ?Paginator $adminUsers = null;
 
     protected array $notifications              = [];
 
@@ -797,7 +800,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     ]);
                     break;
             }
-        } catch (\GuzzleHttp\Exception\RequestException $exception) {
+        } catch (RequestException $exception) {
             if (!empty($settings['return_raw'])) {
                 return $exception->getResponse();
             }
@@ -2153,7 +2156,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @return \Monolog\Logger|LoggerInterface
+     * @return Logger|LoggerInterface
      */
     public function getLogger()
     {

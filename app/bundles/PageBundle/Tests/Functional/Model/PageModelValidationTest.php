@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Functional\Model;
 
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -74,7 +75,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     private function createPage(DynamicContent $dynamicContent): Page
     {
@@ -111,7 +112,7 @@ final class PageModelValidationTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     private function createLead(string $companyEmail): Lead
     {

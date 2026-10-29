@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class EventRepositoryFunctionalTest extends MauticMysqlTestCase

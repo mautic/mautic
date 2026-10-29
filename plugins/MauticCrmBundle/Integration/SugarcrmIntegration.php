@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use MauticPlugin\MauticCrmBundle\Api\SugarcrmApi;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -1410,7 +1411,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     private function getOwnerEmail(array $lead)
     {
         if (isset($lead['owner_id']) && !empty($lead['owner_id'])) {
-            /** @var \Mautic\UserBundle\Entity\User $user */
+            /** @var User $user */
             $user = $this->userModel->getEntity($lead['owner_id']);
 
             return $user->getEmail();

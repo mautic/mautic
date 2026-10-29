@@ -7,6 +7,7 @@ use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\Language\Installer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -312,7 +313,7 @@ final class LanguageHelper
                 $finder = new Finder();
                 $finder->files()->in($translationsDir)->name('*.ini');
 
-                /** @var \Symfony\Component\Finder\SplFileInfo $file */
+                /** @var SplFileInfo $file */
                 foreach ($finder as $file) {
                     $files[$bundle['bundle']][] = $file->getPathname();
                 }

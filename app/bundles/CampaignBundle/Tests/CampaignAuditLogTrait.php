@@ -8,9 +8,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\UserBundle\Entity\UserRepository;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * @method \Symfony\Component\DependencyInjection\ContainerInterface getContainer()
+ * @method ContainerInterface getContainer()
  */
 trait CampaignAuditLogTrait
 {

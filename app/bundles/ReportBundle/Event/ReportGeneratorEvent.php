@@ -3,7 +3,6 @@
 namespace Mautic\ReportBundle\Event;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;

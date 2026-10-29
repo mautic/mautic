@@ -33,6 +33,8 @@ use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -44,7 +46,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
+final class SendEmailToContactTest extends TestCase
 {
     /**
      * @var array<array<string,int|string>>
@@ -84,13 +86,13 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
     private MockObject&CoreParametersHelper $coreParametersHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&Mailbox $mailbox;
+    private Stub&Mailbox $mailbox;
 
-    private \PHPUnit\Framework\MockObject\Stub&LoggerInterface $loggerMock;
+    private Stub&LoggerInterface $loggerMock;
 
     private MailHashHelper $mailHashHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&TranslatorInterface $translator;
+    private Stub&TranslatorInterface $translator;
 
     private MockObject&MailHelper $mailHelper;
 
@@ -98,19 +100,19 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
     private MockObject&EmailStatModel $emailStatModel;
 
-    private \PHPUnit\Framework\MockObject\Stub&Environment $twig;
+    private Stub&Environment $twig;
 
     private MockObject&SMimeHelper $sMimeHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&EventDispatcherInterface $dispatcher;
+    private Stub&EventDispatcherInterface $dispatcher;
 
-    private \PHPUnit\Framework\MockObject\Stub&PathsHelper $pathsHelper;
+    private Stub&PathsHelper $pathsHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&AssetModel $assetModel;
+    private Stub&AssetModel $assetModel;
 
-    private \PHPUnit\Framework\MockObject\Stub&TrackableModel $trackableModel;
+    private Stub&TrackableModel $trackableModel;
 
-    private \PHPUnit\Framework\MockObject\Stub&RedirectModel $redirectModel;
+    private Stub&RedirectModel $redirectModel;
 
     private StatHelper $statHelper;
 

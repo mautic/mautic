@@ -14,12 +14,13 @@ use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Psr\Log\LoggerInterface;
 
 #[AllowMockObjectsWithoutExpectations]
 final class RemoveCommandTest extends AbstractMauticTestCase
 {
-    private \PHPUnit\Framework\MockObject\Stub&LoggerInterface $logger;
+    private Stub&LoggerInterface $logger;
 
     private MockObject&PackageModel $packageModel;
 

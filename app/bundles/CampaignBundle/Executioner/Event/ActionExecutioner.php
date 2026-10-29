@@ -8,6 +8,8 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
@@ -30,8 +32,8 @@ final readonly class ActionExecutioner implements EventInterface
 
     /**
      * @throws CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @param Collection<int, LeadEventLog> $logs
      */
     public function execute(AbstractEventAccessor $config, Collection $logs): EvaluatedContacts

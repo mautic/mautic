@@ -12,10 +12,11 @@ use Mautic\PluginBundle\Event\PluginUpdateEvent;
 use Mautic\PluginBundle\Helper\ReloadHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReloadHelperTest extends \PHPUnit\Framework\TestCase
+final class ReloadHelperTest extends TestCase
 {
     private ReloadHelper $helper;
 

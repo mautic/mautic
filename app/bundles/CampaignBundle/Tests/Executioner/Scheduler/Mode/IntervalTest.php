@@ -15,10 +15,11 @@ use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 #[AllowMockObjectsWithoutExpectations]
-final class IntervalTest extends \PHPUnit\Framework\TestCase
+final class IntervalTest extends TestCase
 {
     /**
      * @param array<int> $restrictedDays

@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\Exception\DecisionNotApplicableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
@@ -48,7 +49,7 @@ final class InactiveHelper
      * @param Collection<int, Lead> $contacts
      * @param Collection<int, Event> $negativeChildren
      *
-     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      */
     public function removeContactsThatAreNotApplicable(
         \DateTime $now,
@@ -124,7 +125,7 @@ final class InactiveHelper
     }
 
     /**
-     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      * @param Collection<int, Event> $negativeChildren
      */
     public function getEarliestInactiveDate(Collection $negativeChildren, \DateTimeInterface $lastActiveDate): ?\DateTimeInterface

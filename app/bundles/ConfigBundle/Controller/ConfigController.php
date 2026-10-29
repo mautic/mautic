@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -47,7 +48,7 @@ final class ConfigController extends AbstractFormController
     /**
      * Controller action for editing the application configuration.
      */
-    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function editAction(Request $request, BundleHelper $bundleHelper, Configurator $configurator, CacheHelper $cacheHelper, PathsHelper $pathsHelper, ConfigMapper $configMapper): JsonResponse|RedirectResponse|Response
     {
         // admin only allowed
         if (!$this->user->isAdmin()) {

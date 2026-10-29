@@ -12,9 +12,10 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DsnParser::class)]
-final class DsnParserTest extends \PHPUnit\Framework\TestCase
+final class DsnParserTest extends TestCase
 {
     #[TestDox('Test that a BouncedEmail is returned from a dsn report')]
     #[DataProvider('bouncedEmailProvider')]

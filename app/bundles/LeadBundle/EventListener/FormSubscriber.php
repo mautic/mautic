@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -191,7 +192,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $pointGroup   = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
         $points       = $properties['points'];
 
-        if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
+        if ($pointGroup instanceof Group) {
             $this->groupModel->adjustPoints($contact, $pointGroup, $points, $operator);
         } else {
             $contact->adjustPoints($points, $operator);

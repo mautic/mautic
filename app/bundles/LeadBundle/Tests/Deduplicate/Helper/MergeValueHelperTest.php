@@ -6,8 +6,9 @@ namespace Mautic\LeadBundle\Tests\Deduplicate\Helper;
 
 use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;
 use Mautic\LeadBundle\Deduplicate\Helper\MergeValueHelper;
+use PHPUnit\Framework\TestCase;
 
-final class MergeValueHelperTest extends \PHPUnit\Framework\TestCase
+final class MergeValueHelperTest extends TestCase
 {
     public function testGetMergeValueWhenNewAndOldValuesAreIdentical(): void
     {

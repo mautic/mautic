@@ -15,9 +15,10 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormUploader;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-final class FormUploaderTest extends \PHPUnit\Framework\TestCase
+final class FormUploaderTest extends TestCase
 {
     private int $formId1   = 1;
 

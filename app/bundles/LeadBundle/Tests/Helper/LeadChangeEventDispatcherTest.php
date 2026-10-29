@@ -13,9 +13,10 @@ use Mautic\LeadBundle\Event\LeadUtmTagsEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-final class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
+final class LeadChangeEventDispatcherTest extends TestCase
 {
     #[TestDox('Test that date identified change dispatches correct event')]
     public function testDateIdentifiedEventIsDispatched(): void

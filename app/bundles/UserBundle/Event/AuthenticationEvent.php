@@ -16,7 +16,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class AuthenticationEvent extends Event
 {
-    private ?\Symfony\Component\HttpFoundation\Response $response = null;
+    private ?Response $response = null;
 
     private bool $isAuthenticated = false;
 

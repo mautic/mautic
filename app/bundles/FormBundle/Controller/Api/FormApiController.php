@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Action;
-use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\ActionModel;

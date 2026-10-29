@@ -12,14 +12,16 @@ use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\EventListener\TrackingSubscriber;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
+final class TrackingSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&StatRepository
+     * @var MockObject&StatRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $statRepository;
+    private MockObject $statRepository;
 
     protected function setUp(): void
     {

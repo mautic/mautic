@@ -17,11 +17,12 @@ use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(FeedbackLoop::class)]
 #[CoversClass(Result::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
+final class FeedbackLoopTest extends TestCase
 {
     #[TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessage(): void

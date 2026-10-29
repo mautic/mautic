@@ -9,6 +9,7 @@ use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -74,7 +75,7 @@ abstract class AbstractFormController extends CommonController
      * Returns view to index with a locked out message.
      *
      * @param bool   $batch          Flag if a batch action is being performed
-     * @return ($batch is true ? array : \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse)
+     * @return ($batch is true ? array : JsonResponse|RedirectResponse)
      */
     protected function isLocked(array $postActionVars, object $entity, string $modelName, bool $batch = false)
     {

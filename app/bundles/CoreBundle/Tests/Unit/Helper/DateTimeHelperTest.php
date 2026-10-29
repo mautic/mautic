@@ -9,9 +9,10 @@ use Mautic\CoreBundle\Loader\ParameterLoader;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DateTimeHelper::class)]
-final class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
+final class DateTimeHelperTest extends TestCase
 {
     #[TestDox('The guessTimezoneFromOffset returns correct values')]
     public function testGuessTimezoneFromOffset(): void

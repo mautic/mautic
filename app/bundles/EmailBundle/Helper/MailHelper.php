@@ -27,6 +27,7 @@ use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Psr\Log\LoggerInterface;
@@ -111,7 +112,7 @@ final class MailHelper
 
     private array $source = [];
 
-    private ?\Mautic\EmailBundle\Entity\Email $email = null;
+    private ?Email $email = null;
 
     private array $globalTokens = [];
 
@@ -1553,7 +1554,7 @@ final class MailHelper
     }
 
     /**
-     * @return \Mautic\PageBundle\Entity\Redirect|object|null
+     * @return Redirect|object|null
      */
     public function getTrackableLink($url)
     {
@@ -1814,14 +1815,14 @@ final class MailHelper
         return [
             'name'        => $name,
             'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
-            'emailId'     => ($this->email instanceof \Mautic\EmailBundle\Entity\Email) ? $this->email->getId() : null,
-            'emailName'   => ($this->email instanceof \Mautic\EmailBundle\Entity\Email) ? $this->email->getName() : null,
+            'emailId'     => ($this->email instanceof Email) ? $this->email->getId() : null,
+            'emailName'   => ($this->email instanceof Email) ? $this->email->getName() : null,
             'hashId'      => $this->idHash,
             'hashIdState' => $this->idHashState,
             'source'      => $this->source,
             'tokens'      => $tokens,
-            'utmTags'     => ($this->email instanceof \Mautic\EmailBundle\Entity\Email) ? $this->email->getUtmTags() : [],
-            'includeDnc'  => $this->email instanceof \Mautic\EmailBundle\Entity\Email && $this->email->getSendToDnc(),
+            'utmTags'     => ($this->email instanceof Email) ? $this->email->getUtmTags() : [],
+            'includeDnc'  => $this->email instanceof Email && $this->email->getSendToDnc(),
         ];
     }
 

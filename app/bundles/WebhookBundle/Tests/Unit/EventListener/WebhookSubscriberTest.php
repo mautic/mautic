@@ -15,9 +15,10 @@ use Mautic\WebhookBundle\EventListener\WebhookSubscriber;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
+final class WebhookSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&WebhookKillNotificator

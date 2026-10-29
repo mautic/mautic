@@ -10,8 +10,9 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\TestCase;
 
-final class PendingEventTest extends \PHPUnit\Framework\TestCase
+final class PendingEventTest extends TestCase
 {
     public function testFailAndPassRemainingWithError(): void
     {

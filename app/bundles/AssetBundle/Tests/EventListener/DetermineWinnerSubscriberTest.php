@@ -11,10 +11,11 @@ use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DetermineWinnerSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&DownloadRepository

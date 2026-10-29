@@ -27,6 +27,7 @@ use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -36,7 +37,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
+final class TokenSubscriberTest extends TestCase
 {
     public function testDynamicContentCustomTokens(): void
     {

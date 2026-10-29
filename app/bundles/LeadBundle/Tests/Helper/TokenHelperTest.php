@@ -10,9 +10,10 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TokenHelperTest extends \PHPUnit\Framework\TestCase
+final class TokenHelperTest extends TestCase
 {
     /**
      * @var array<string, mixed>

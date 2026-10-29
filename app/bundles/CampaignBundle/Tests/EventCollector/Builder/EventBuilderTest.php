@@ -8,8 +8,9 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\Builder\EventBuilder;
+use PHPUnit\Framework\TestCase;
 
-final class EventBuilderTest extends \PHPUnit\Framework\TestCase
+final class EventBuilderTest extends TestCase
 {
     public function testActionsAreConvertedToAccessor(): void
     {

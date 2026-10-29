@@ -10,8 +10,9 @@ use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\EventListener\SecuritySubscriber;
+use PHPUnit\Framework\TestCase;
 
-final class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
+final class SecuritySubscriberTest extends TestCase
 {
     public function testGetSubscribedEvents(): void
     {

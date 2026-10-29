@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
@@ -116,7 +117,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * @param LeadList $entity
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function saveEntity(object $entity, bool $unlock = true): void
     {

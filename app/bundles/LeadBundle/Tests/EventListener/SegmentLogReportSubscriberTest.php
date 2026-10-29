@@ -12,15 +12,16 @@ use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class SegmentLogReportSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&FieldsBuilder
+     * @var MockObject&FieldsBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldsBuilder;
+    private MockObject $fieldsBuilder;
 
     private SegmentLogReportSubscriber $subscriber;
 

@@ -6,9 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -140,7 +140,7 @@ final class LeadFieldRepository extends CommonRepository
     /**
      * @param array<mixed> $args
      *
-     * @return array<int, LeadField>|\Doctrine\ORM\Tools\Pagination\Paginator<LeadField>
+     * @return array<int, LeadField>|Paginator<LeadField>
      */
     public function getEntities(array $args = []): iterable
     {

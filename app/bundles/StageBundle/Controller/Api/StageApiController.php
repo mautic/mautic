@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -58,7 +59,7 @@ final class StageApiController extends CommonApiController
      * @param int $id        Stage ID
      * @param int|string $contactId Lead ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/stages/{id}/contact/{contactId}/add',
@@ -101,7 +102,7 @@ final class StageApiController extends CommonApiController
      * @param int $id        Stage ID
      * @param int|string $contactId Lead ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/stages/{id}/contact/{contactId}/remove',

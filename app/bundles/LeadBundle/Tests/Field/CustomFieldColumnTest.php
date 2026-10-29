@@ -19,10 +19,11 @@ use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldColumnTest extends TestCase
 {
     /**
      * @var MockObject&ColumnSchemaHelper

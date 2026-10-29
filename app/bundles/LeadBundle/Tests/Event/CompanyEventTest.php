@@ -6,8 +6,9 @@ namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
+use PHPUnit\Framework\TestCase;
 
-final class CompanyEventTest extends \PHPUnit\Framework\TestCase
+final class CompanyEventTest extends TestCase
 {
     public function testConstructGettersSetters(): void
     {

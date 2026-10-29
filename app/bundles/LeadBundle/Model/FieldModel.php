@@ -6,6 +6,7 @@ use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
@@ -511,7 +512,7 @@ class FieldModel extends FormModel
     /**
      * @param array<mixed> $args
      *
-     * @return array<int, LeadField>|\Doctrine\ORM\Tools\Pagination\Paginator<LeadField>
+     * @return array<int, LeadField>|Paginator<LeadField>
      */
     public function getEntities(array $args = []): iterable
     {

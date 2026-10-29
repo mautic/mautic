@@ -19,7 +19,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -148,7 +149,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
      */
     private function handleValidateOwner(array &$matchedFields): ?int
     {
-        /** @var \Mautic\UserBundle\Entity\User|null $owner */
+        /** @var User|null $owner */
         $owner = ArrayHelper::pickValue('owner', $matchedFields);
 
         return $owner ? $owner->getId() : null;

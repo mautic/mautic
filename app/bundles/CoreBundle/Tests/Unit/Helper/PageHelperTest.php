@@ -8,10 +8,11 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PageHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-final class PageHelperTest extends \PHPUnit\Framework\TestCase
+final class PageHelperTest extends TestCase
 {
     private MockObject&SessionInterface $session;
 

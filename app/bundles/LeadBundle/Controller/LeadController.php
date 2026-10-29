@@ -66,6 +66,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -2307,7 +2308,7 @@ final class LeadController extends AbstractFormController
         name: 'mautic_contact_export_action',
         requirements: ['contactId' => '\d+'],
     )]
-    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, int|string $contactId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, int|string $contactId): Response|StreamedResponse
     {
         // set some permissions
         $permissions = $this->security->isGranted(

@@ -751,7 +751,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<int, mixed> $segments
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, array $segments = []): Email
     {
@@ -772,7 +772,7 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
      *
      * @throws OptimisticLockException
      * @throws ORMException
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     #[DataProvider('getDataForUpdatingTranslatedEmailDoesNotRemoveParentRelation')]
     public function testUpdatingTranslatedEmailDoesNotRemoveParentRelation(array $payload): void

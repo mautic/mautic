@@ -12,13 +12,14 @@ use Mautic\CoreBundle\Helper\ListParser\ValueListParser;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(AbstractFormFieldHelper::class)]
 #[CoversClass(BarListParser::class)]
 #[CoversClass(JsonListParser::class)]
 #[CoversClass(ValueListParser::class)]
 #[CoversClass(ArrayListParser::class)]
-final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
+final class AbstractFormFieldHelperTest extends TestCase
 {
     #[TestDox('The string is parsed correctly into a choice array')]
     public function testBarFormatConvertedToArray(): void

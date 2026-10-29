@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -371,7 +372,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<int, mixed> $segments
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     private function createEmailWithParams(string $name, string $subject, string $emailType, string $template, string $customHtml, array $segments = []): Email
     {

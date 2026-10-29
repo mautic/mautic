@@ -47,6 +47,7 @@ use Mautic\UserBundle\Entity\UserRepository;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,7 +57,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
+final class SubmissionModelTest extends TestCase
 {
     /**
      * @var MockObject&IpLookupHelper
@@ -179,7 +180,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $userRepository                   = $this->createMock(UserRepository::class);
 
         $entityManager->method('getRepository')
-            ->willReturnCallback(fn (string $class): ?\PHPUnit\Framework\MockObject\MockObject => match ($class) {
+            ->willReturnCallback(fn (string $class): ?MockObject => match ($class) {
                 Submission::class => $this->submissioRepository,
                 Lead::class       => $this->leadRepository,
                 User::class       => $userRepository,

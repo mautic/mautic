@@ -9,13 +9,14 @@ use Mautic\ReportBundle\Form\Type\ReportType;
 use Mautic\ReportBundle\Model\ReportModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReportTypeTest extends \PHPUnit\Framework\TestCase
+final class ReportTypeTest extends TestCase
 {
     /**
      * @var MockObject&ReportModel

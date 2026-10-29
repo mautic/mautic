@@ -12,12 +12,13 @@ use Mautic\FormBundle\Exception\NoFileGivenException;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\FileBag;
 use Symfony\Component\HttpFoundation\Request;
 
 #[CoversClass(UploadFieldValidator::class)]
-final class UploadFieldValidatorTest extends \PHPUnit\Framework\TestCase
+final class UploadFieldValidatorTest extends TestCase
 {
     #[TestDox('No Files given')]
     public function testNoFilesGiven(): void

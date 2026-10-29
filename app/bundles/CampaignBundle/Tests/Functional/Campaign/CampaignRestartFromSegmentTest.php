@@ -10,7 +10,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\ListLead;
-use PHPUnit\Framework\Assert;
 
 /**
  * @see https://github.com/mautic/mautic/issues/16026
@@ -60,7 +59,8 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
         // Assert: contact is in the campaign at rotation 1
         $this->em->clear();
 
-        $campaignLead = $this->getContainer()->get(LeadRepository::class)->findOneBy([
+        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $campaignLead = $leadRepository->findOneBy([
             'lead'     => $contact->getId(),
             'campaign' => $campaign->getId(),
         ]);
@@ -90,7 +90,7 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $campaignLead = $this->getContainer()->get(LeadRepository::class)->findOneBy([
+        $campaignLead = $leadRepository->findOneBy([
             'lead'     => $contact->getId(),
             'campaign' => $campaign->getId(),
         ]);
@@ -111,7 +111,7 @@ final class CampaignRestartFromSegmentTest extends MauticMysqlTestCase
 
         $this->em->clear();
 
-        $campaignLead = $this->getContainer()->get(LeadRepository::class)->findOneBy([
+        $campaignLead = $leadRepository->findOneBy([
             'lead'     => $contact->getId(),
             'campaign' => $campaign->getId(),
         ]);

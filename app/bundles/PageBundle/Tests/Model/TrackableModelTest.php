@@ -15,7 +15,6 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

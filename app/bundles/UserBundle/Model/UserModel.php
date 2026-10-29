@@ -2,6 +2,7 @@
 
 namespace Mautic\UserBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -273,7 +274,7 @@ final class UserModel extends FormModel implements GlobalSearchInterface
         $this->em->persist($resetToken);
         try {
             $this->em->flush();
-        } catch (\Doctrine\DBAL\Exception $exception) {
+        } catch (Exception $exception) {
             $this->logger->error($this->translator->trans('mautic.user.password.reset.token.creation.database.error', [], 'messages').': '.$exception->getMessage());
             throw new PasswordResetTokenCreationFailedException($this->translator->trans('mautic.user.password.reset.token.creation.failed'), 0, $exception);
         }

@@ -10,10 +10,11 @@ use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(MailboxOrganizer::class)]
 #[CoversClass(PreFetchEmailEvent::class)]
-final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
+final class MailboxOrganizerTest extends TestCase
 {
     /**
      * @var array<string, array<string, int|string>>

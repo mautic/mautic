@@ -21,6 +21,7 @@ use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -94,7 +95,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
      * @param string|null       $action
      * @param array             $options
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface

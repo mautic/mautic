@@ -7,6 +7,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
 use MauticPlugin\MauticCrmBundle\Api\ZohoApi;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -1088,7 +1089,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @throws \MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
+     * @throws MatchingKeyNotFoundException
      */
     private function consumeResponse(array $response, string $zObject, bool $createIntegrationEntity = false, ?Mapper $mapper = null): int
     {

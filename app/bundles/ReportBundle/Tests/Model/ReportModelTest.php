@@ -19,6 +19,7 @@ use Mautic\ReportBundle\Model\ExcelExporter;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Tests\Fixtures;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -27,7 +28,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReportModelTest extends \PHPUnit\Framework\TestCase
+final class ReportModelTest extends TestCase
 {
     private ReportModel $reportModel;
 

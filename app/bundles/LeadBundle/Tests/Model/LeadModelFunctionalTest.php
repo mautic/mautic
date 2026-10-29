@@ -7,6 +7,8 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
@@ -90,8 +92,8 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
      * @return array<int,array<int|string>>
      *
      * @throws DBALException
-     * @throws \Doctrine\ORM\Exception\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     protected function getContactWithAssignTwoCompanies(): array
     {

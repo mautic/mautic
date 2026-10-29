@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class AuditlogController extends CommonController
@@ -76,7 +77,7 @@ final class AuditlogController extends CommonController
         name: 'mautic_contact_auditlog_export_action',
         requirements: ['leadId' => '\d+'],
     )]
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, int|string $leadId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, int|string $leadId): Response|StreamedResponse
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();

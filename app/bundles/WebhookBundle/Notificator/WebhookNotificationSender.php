@@ -6,6 +6,7 @@ namespace Mautic\WebhookBundle\Notificator;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\MissingIdentifierField;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\EmailBundle\Helper\MailHelper;
@@ -63,7 +64,7 @@ final readonly class WebhookNotificationSender
     /**
      * @return array{toUsers: list<User>, ccUser: User|null}
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     private function getToAndCCUsers(Webhook $webhook): array
     {

@@ -22,6 +22,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\Contac
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 
@@ -29,14 +30,14 @@ use Symfony\Component\Routing\Router;
 final class ContactObjectSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ContactObjectHelper
+     * @var MockObject&ContactObjectHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactObjectHelper;
+    private MockObject $contactObjectHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Router
+     * @var MockObject&Router
      */
-    private \PHPUnit\Framework\MockObject\MockObject $router;
+    private MockObject $router;
 
     private ContactObjectSubscriber $subscriber;
 

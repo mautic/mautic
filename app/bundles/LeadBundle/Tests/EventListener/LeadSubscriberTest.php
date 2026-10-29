@@ -28,6 +28,7 @@ use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
@@ -53,13 +54,13 @@ final class LeadSubscriberTest extends TestCase
      */
     private MockObject $translator;
 
-    private LeadListRepository&\PHPUnit\Framework\MockObject\Stub $leadListRepository;
+    private LeadListRepository&Stub $leadListRepository;
 
-    private SegmentCountCacheHelper&\PHPUnit\Framework\MockObject\Stub $segmentCountCacheHelper;
+    private SegmentCountCacheHelper&Stub $segmentCountCacheHelper;
 
-    private CoreParametersHelper&\PHPUnit\Framework\MockObject\Stub $coreParametersHelper;
+    private CoreParametersHelper&Stub $coreParametersHelper;
 
-    private CompanyLeadRepository&\PHPUnit\Framework\MockObject\Stub $companyLeadRepository;
+    private CompanyLeadRepository&Stub $companyLeadRepository;
 
     protected function setUp(): void
     {

@@ -26,10 +26,8 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\RoleModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
-use function Symfony\Component\Clock\now;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -922,7 +920,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<mixed> $emails
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     private function addContactsToSegment(LeadList $segment, array $emails, ?callable $contactCallback = null): void
     {
@@ -1362,7 +1360,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      * @throws OptimisticLockException
      * @throws TransactionRequiredException
      */

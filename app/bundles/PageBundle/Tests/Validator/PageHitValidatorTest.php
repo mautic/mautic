@@ -10,6 +10,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Validator\PageHitValidator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContext;
@@ -21,7 +22,7 @@ final class PageHitValidatorTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelperMock;
 
-    private \PHPUnit\Framework\MockObject\Stub&Constraint $constraintMock;
+    private Stub&Constraint $constraintMock;
 
     protected function setUp(): void
     {

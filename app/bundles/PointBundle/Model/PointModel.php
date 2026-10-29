@@ -22,6 +22,7 @@ use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\Form\Type\PointType;
+use Mautic\PointBundle\Helper\EventHelper;
 use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -241,7 +242,7 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
                 'eventDetails' => $eventDetails,
             ];
 
-            $callback = $settings['callback'] ?? \Mautic\PointBundle\Helper\EventHelper::engagePointAction(...);
+            $callback = $settings['callback'] ?? EventHelper::engagePointAction(...);
 
             if (is_callable($callback)) {
                 $object = null;

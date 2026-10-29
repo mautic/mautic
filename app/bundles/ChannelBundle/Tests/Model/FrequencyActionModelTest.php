@@ -11,9 +11,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
+final class FrequencyActionModelTest extends TestCase
 {
     private Lead $contact;
 

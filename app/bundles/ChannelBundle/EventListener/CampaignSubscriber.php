@@ -12,6 +12,8 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Form\Type\MessageSendType;
@@ -83,8 +85,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws \ReflectionException
      */
     public function onCampaignTriggerAction(PendingEvent $pendingEvent): void
@@ -144,8 +146,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
      *
      * @return bool|Collection<int, LeadEventLog>
      *
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws \ReflectionException
      * @param Collection<int, LeadEventLog> $logs
      */

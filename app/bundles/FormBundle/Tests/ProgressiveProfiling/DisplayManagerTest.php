@@ -7,8 +7,9 @@ namespace Mautic\FormBundle\Tests\ProgressiveProfiling;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
+use PHPUnit\Framework\TestCase;
 
-final class DisplayManagerTest extends \PHPUnit\Framework\TestCase
+final class DisplayManagerTest extends TestCase
 {
     public function testShowForField(): void
     {

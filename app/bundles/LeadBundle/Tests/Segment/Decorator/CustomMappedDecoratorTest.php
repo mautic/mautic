@@ -9,10 +9,11 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[CoversClass(CustomMappedDecorator::class)]
-final class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
+final class CustomMappedDecoratorTest extends TestCase
 {
     public function testGetField(): void
     {

@@ -31,10 +31,11 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&FieldModel

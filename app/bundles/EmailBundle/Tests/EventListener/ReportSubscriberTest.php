@@ -27,11 +27,12 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportSubscriberTest extends TestCase
 {
     use MockedConnectionTrait;
 

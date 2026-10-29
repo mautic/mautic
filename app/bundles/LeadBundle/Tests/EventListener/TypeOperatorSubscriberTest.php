@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\StageBundle\Entity\StageRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -27,7 +28,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
+final class TypeOperatorSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&LeadModel

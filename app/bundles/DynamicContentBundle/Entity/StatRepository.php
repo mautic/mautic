@@ -3,6 +3,8 @@
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -101,8 +103,8 @@ final class StatRepository extends CommonRepository
      * @param int|null             $leadId
      * @param array<string, mixed> $options
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getLeadStats($leadId = null, array $options = []): array
     {

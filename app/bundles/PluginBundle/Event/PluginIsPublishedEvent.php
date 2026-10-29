@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Event;
 
-final class PluginIsPublishedEvent extends \Symfony\Contracts\EventDispatcher\Event
+use Symfony\Contracts\EventDispatcher\Event;
+
+final class PluginIsPublishedEvent extends Event
 {
     private string $message  = '';
 

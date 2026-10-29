@@ -8,8 +8,9 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
+use PHPUnit\Framework\TestCase;
 
-final class ChannelExtractorTest extends \PHPUnit\Framework\TestCase
+final class ChannelExtractorTest extends TestCase
 {
     public function testChannelIsSet(): void
     {

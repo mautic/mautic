@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -2374,7 +2375,7 @@ class LeadModel extends FormModel
                 }
                 $allowedValues = is_array($field['properties'])
                     ? $field['properties']
-                    : \Mautic\CoreBundle\Helper\Serializer::decode($field['properties']);
+                    : Serializer::decode($field['properties']);
 
                 $flattenedAllowedValues = array_map(fn (array $item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
 

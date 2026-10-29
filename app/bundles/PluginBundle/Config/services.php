@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\PluginBundle\Security\Permissions\PluginPermissions;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {
@@ -23,5 +24,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\PluginBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->set(Mautic\PluginBundle\Security\Permissions\PluginPermissions::class);
+    $services->set(PluginPermissions::class);
 };

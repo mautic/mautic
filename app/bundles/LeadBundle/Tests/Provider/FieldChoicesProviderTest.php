@@ -8,9 +8,10 @@ use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Provider\FieldChoicesProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
+final class FieldChoicesProviderTest extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface

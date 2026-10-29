@@ -12,25 +12,26 @@ use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class CampaignSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&IpLookupHelper
+     * @var MockObject&IpLookupHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&AuditLogModel
+     * @var MockObject&AuditLogModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
+    private MockObject $auditLogModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CampaignAuditService
+     * @var MockObject&CampaignAuditService
      */
-    private \PHPUnit\Framework\MockObject\MockObject $campaignAuditService;
+    private MockObject $campaignAuditService;
 
     private CampaignSubscriber $subscriber;
 

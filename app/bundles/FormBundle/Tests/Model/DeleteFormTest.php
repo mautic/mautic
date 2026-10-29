@@ -24,13 +24,14 @@ use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-final class DeleteFormTest extends \PHPUnit\Framework\TestCase
+final class DeleteFormTest extends TestCase
 {
     public function testDelete(): void
     {

@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -20,7 +21,7 @@ final class ReportRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $queryBuilder,
@@ -31,7 +32,7 @@ final class ReportRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();

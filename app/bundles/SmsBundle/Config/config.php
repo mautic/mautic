@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\SmsBundle\Controller\Api\SmsApiController;
+use Mautic\SmsBundle\Form\Type\ConfigType;
+
 return [
     'routes' => [
         'api' => [
@@ -9,7 +12,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'smses',
                 'path'            => '/smses',
-                'controller'      => Mautic\SmsBundle\Controller\Api\SmsApiController::class,
+                'controller'      => SmsApiController::class,
             ],
         ],
     ],
@@ -43,6 +46,6 @@ return [
         'sms_frequency_number'                                             => 0,
         'sms_frequency_time'                                               => 'DAY',
         'sms_transport'                                                    => 'mautic.sms.twilio.transport',
-        Mautic\SmsBundle\Form\Type\ConfigType::SMS_DISABLE_TRACKABLE_URLS  => false,
+        ConfigType::SMS_DISABLE_TRACKABLE_URLS  => false,
     ],
 ];

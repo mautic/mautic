@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Functional;
 
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
@@ -39,7 +40,7 @@ final class BotRatioHelperFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     #[DataProvider('hitBotScenariosProvider')]
     public function testIsHitByBotFunctional(string $trackingHash, string $sentBefore, string $userAgent, string $ipAddress, bool $isRead): void

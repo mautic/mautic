@@ -10,16 +10,18 @@ use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\EventListener\DoNotContactSubscriber;
 use Mautic\LeadBundle\Model\DoNotContact;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DoNotContactSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DoNotContactSubscriberTest extends TestCase
 {
     private DoNotContactSubscriber $doNotContactSubscriber;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&DoNotContact
+     * @var MockObject&DoNotContact
      */
-    private \PHPUnit\Framework\MockObject\MockObject $doNotContact;
+    private MockObject $doNotContact;
 
     protected function setUp(): void
     {

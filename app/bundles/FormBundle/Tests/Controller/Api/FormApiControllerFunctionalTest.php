@@ -10,7 +10,6 @@ use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;

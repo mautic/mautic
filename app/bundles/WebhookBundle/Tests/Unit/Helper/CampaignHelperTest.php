@@ -14,9 +14,10 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class CampaignHelperTest extends \PHPUnit\Framework\TestCase
+final class CampaignHelperTest extends TestCase
 {
     private Lead $contact;
 
