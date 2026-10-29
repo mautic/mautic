@@ -35,10 +35,10 @@ final class PublishStatusIconTest extends TestCase
             'status' => $status,
         ]);
 
-        self::assertStringContainsString($icon, $html);
-        self::assertStringContainsString('has-click-event', $html);
-        self::assertStringContainsString(sprintf('data-status="%s"', $status), $html);
-        self::assertStringContainsString('Mautic.togglePublishStatus', $html);
+        $this->assertStringContainsString($icon, $html);
+        $this->assertStringContainsString('has-click-event', $html);
+        $this->assertStringContainsString(sprintf('data-status="%s"', $status), $html);
+        $this->assertStringContainsString('Mautic.togglePublishStatus', $html);
     }
 
     /**
