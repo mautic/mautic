@@ -163,6 +163,30 @@ jobs:
         name: logs-${{ matrix.php-versions }}-${{ env.DB_LOG_NAME }}
         path: ./var/logs/*
 
+  static-analysis-rule-tests:
+    # Rector and PHPStan rule tests are pure unit tests: no database, no kernel. They run under a
+    # dedicated config with a bootstrap that does not enable BypassFinals (see bootstrap-static-analysis.php).
+    if: (github.event_name == 'schedule' && github.repository == 'mautic/mautic') || (github.event_name != 'schedule')
+    runs-on: ubuntu-latest
+
+    name: Static analysis rule tests
+
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+    - name: Setup PHP, with composer and extensions
+      uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+      with:
+        php-version: '8.4'
+        extensions: mbstring, xml, ctype, iconv, intl
+        coverage: none
+
+    - name: Install dependencies
+      uses: "ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda" # 4.0.0
+
+    - name: Run static analysis rule tests
+      run: php -d memory_limit=2G vendor/bin/phpunit --configuration app/phpunit.static-analysis.xml.dist
+
   e2e-tests:
     runs-on: ubuntu-latest
 
