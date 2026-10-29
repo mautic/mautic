@@ -29,9 +29,6 @@ final class SegmentStatsSubscriberTest extends MauticMysqlTestCase
         );
     }
 
-    /**
-     * Test SubscribedEvents.
-     */
     public function testGetCampaignEntryPoints(): void
     {
         $campaign = $this->createCampaignWithLeadList();
