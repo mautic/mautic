@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Controller;
 
+use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
@@ -534,7 +535,12 @@ final class PublicController extends AbstractFormController
         // that doesn't decode counts as no clickthrough.
         $clickthrough = $isRequestTrackable ? [] : $this->decodeClickthrough($ct);
         if ([] !== $clickthrough) {
-            $pageModel->countUntrackedClick($redirect, $clickthrough);
+            try {
+                $pageModel->countUntrackedClick($redirect, $clickthrough);
+            } catch (DBALException $e) {
+                // A count that couldn't be written mustn't keep the visitor from the link
+                $logger->error('Could not count an untracked click: '.$e->getMessage(), ['exception' => $e]);
+            }
         }
 
         $url = UrlHelper::sanitizeAbsoluteUrl($url);

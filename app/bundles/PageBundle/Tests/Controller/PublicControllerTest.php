@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -386,6 +388,55 @@ final class PublicControllerTest extends TestCase
         );
         $this->assertSame($targetUrl, $response->getTargetUrl());
         $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+    }
+
+    public function testRedirectStillWorksWhenCountingAnUntrackedClickFails(): void
+    {
+        $redirectId = 'dummy_redirect_id';
+
+        $this->redirectModel->method('getRedirectById')->willReturn($this->redirect);
+        $this->redirect->method('isPublished')->willReturn(true);
+        $this->redirect->method('getUrl')->willReturn('https://someurl.test/');
+        $this->ipLookupHelper->method('isRequestTrackable')->willReturn(false);
+        $this->router->method('generate')->willReturn('/asset');
+        $this->internalContainer->expects($this->atLeast(1))->method('get')->willReturnMap([
+            ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->router],
+        ]);
+
+        $this->pageModel->expects($this->once())
+            ->method('countUntrackedClick')
+            ->willThrowException(new DBALException('Deadlock found when trying to get lock'));
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('error');
+
+        $this->request->query->set('ct', ClickthroughHelper::encodeArrayForUrl(['source' => ['email', 5], 'lead' => 1]));
+
+        $controller = new PublicController(
+            $this->createStub(ManagerRegistry::class),
+            $this->modelFactory,
+            $this->createStub(UserHelper::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(FlashBag::class),
+            new RequestStack(),
+            $this->createStub(CorePermissions::class)
+        );
+        $controller->setContainer($this->internalContainer);
+
+        $response = $controller->redirectAction(
+            $this->request,
+            $this->contactRequestHelper,
+            $this->ipLookupHelper,
+            $logger,
+            $this->redirectModel,
+            $this->pageModel,
+            $redirectId
+        );
+
+        $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        $this->assertSame('https://someurl.test/', $response->getTargetUrl());
     }
 
     public static function provideRedirectUrls(): \Generator
