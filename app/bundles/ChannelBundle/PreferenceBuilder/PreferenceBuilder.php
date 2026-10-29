@@ -70,10 +70,8 @@ final class PreferenceBuilder
 
     /**
      * @param string $channel
-     *
-     * @return ChannelPreferences
      */
-    private function getChannelPreferenceObject($channel, int $priority)
+    private function getChannelPreferenceObject($channel, int $priority): ChannelPreferences
     {
         $this->channels[$channel] ??= new ChannelPreferences($this->event);
 

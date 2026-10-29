@@ -26,10 +26,8 @@ abstract class AbstractPluginIntegrationEvent extends Event
 
     /**
      * Get the integration object.
-     *
-     * @return AbstractIntegration
      */
-    public function getIntegration()
+    public function getIntegration(): AbstractIntegration
     {
         return $this->integration;
     }

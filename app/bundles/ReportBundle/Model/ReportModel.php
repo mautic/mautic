@@ -902,10 +902,15 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         return array_unique($dependents);
     }
 
+<<<<<<< HEAD
     /**
      * @return Connection
      */
     private function getConnection()
+=======
+    
+    private function getConnection(): \Doctrine\DBAL\Connection
+>>>>>>> ddae246fb0 (Promote object @return docblocks to native return types (1/4))
     {
         $connection = $this->em->getConnection();
         if ($connection instanceof PrimaryReadReplicaConnection) {

@@ -131,10 +131,6 @@ final class DashboardController extends AbstractFormController
         $widgetService->setFilter($request);
         $widget        = $widgetService->get((int) $widgetId);
 
-        if (!$widget) {
-            throw new NotFoundHttpException('Not found.');
-        }
-
         $content = $twig->render(
             '@MauticDashboard/Dashboard/widget.html.twig',
             ['widget' => $widget]
