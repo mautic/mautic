@@ -4,7 +4,6 @@ namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Exception;
 use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
@@ -429,7 +428,7 @@ class EventExecutioner
     }
 
     /**
-     * @throws Exception
+     * @throws \Doctrine\DBAL\Exception
      * @throws OptimisticLockException
      */
     public function persistSummaries(): void

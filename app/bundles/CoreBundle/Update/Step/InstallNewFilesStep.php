@@ -102,8 +102,6 @@ final class InstallNewFilesStep implements StepInterface
     }
 
     /**
-     * @param bool|string $opened
-     *
      * @throws UpdateFailedException
      */
     private function validateArchive(int|bool $opened): void

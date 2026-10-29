@@ -58,6 +58,11 @@ return RectorConfig::configure()
         // prefer implicit compare on object|null
         Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector::class,
 
+        // createFromFormat() leaks a \DateTime|bool|null union that breaks the getDateTime() return contract
+        Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Helper/DateTimeHelper.php',
+        ],
+
         // adds dead "return false" after self::fail(); fixed upstream in rector-phpunit #801, drop after next tag
         Rector\PHPUnit\CodeQuality\Rector\MethodCall\WillReturnCallbackFallbackToReturnFalseRector::class => [
             __DIR__.'/app/bundles/UserBundle/Tests/EventListener/ApiUserSubscriberTest.php',

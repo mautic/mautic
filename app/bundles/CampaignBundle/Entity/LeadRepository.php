@@ -8,7 +8,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * @extends CommonRepository<Lead>
@@ -128,7 +127,7 @@ class LeadRepository extends CommonRepository
      *
      * @param array<string, mixed> $options
      */
-    public function checkLeadInCampaigns(Lead $lead, array $options = []): bool
+    public function checkLeadInCampaigns(\Mautic\LeadBundle\Entity\Lead $lead, array $options = []): bool
     {
         if (empty($options['campaigns'])) {
             return false;
