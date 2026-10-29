@@ -178,6 +178,32 @@ final class RedirectClickCountFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function nestedClickthroughProvider(): iterable
+    {
+        yield 'nested channel id' => [['channel' => ['email', [self::EMAIL_ID]]]];
+        yield 'nested single channel' => [['channel' => ['email' => [self::EMAIL_ID]]]];
+        yield 'nested source id' => [['source' => ['email', [self::EMAIL_ID]]]];
+        yield 'nested source name' => [['source' => [['email'], self::EMAIL_ID]]];
+    }
+
+    /**
+     * @param array<string, mixed> $clickthrough
+     */
+    #[DataProvider('nestedClickthroughProvider')]
+    public function testUntrackedClickWithANestedClickthroughStillRedirects(array $clickthrough): void
+    {
+        [$redirect] = $this->createLink();
+
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_GET, '/r/'.$redirect->getRedirectId(), ['ct' => ClickthroughHelper::encodeArrayForUrl($clickthrough)], [], ['HTTP_DNT' => '1']);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        $this->assertSame([0, 0], $this->getTrackableCounts($redirect));
+    }
+
+    /**
      * @param array<string, string> $server
      */
     private function click(Redirect $redirect, Lead $contact, array $server): string

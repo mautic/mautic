@@ -760,28 +760,28 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @param array<string, mixed> $clickthrough
      *
-     * @return array{0: ?string, 1: mixed}
+     * @return array{0: ?string, 1: ?int}
      */
     private function getClickthroughChannel(array $clickthrough): array
     {
         // The clickthrough comes from the URL, so anything that isn't the expected shape is ignored
         $channel = $clickthrough['channel'] ?? null;
-        if (is_array($channel) && [] !== $channel) {
-            if (1 === count($channel)) {
-                $channelId = reset($channel);
-
-                return [(string) key($channel), $channelId];
-            }
-
-            return [$channel[0] ?? null, (int) ($channel[1] ?? 0)];
+        $source  = $clickthrough['source'] ?? null;
+        if (is_array($channel) && 1 === count($channel)) {
+            [$name, $id] = [key($channel), reset($channel)];
+        } elseif (is_array($channel) && [] !== $channel) {
+            [$name, $id] = [$channel[0] ?? null, $channel[1] ?? null];
+        } elseif (is_array($source) && [] !== $source) {
+            [$name, $id] = [$source[0] ?? null, $source[1] ?? null];
+        } else {
+            return [null, null];
         }
 
-        $source = $clickthrough['source'] ?? null;
-        if (is_array($source) && [] !== $source) {
-            return [$source[0] ?? null, $source[1] ?? null];
+        if (!is_string($name) || '' === $name || !is_numeric($id)) {
+            return [null, null];
         }
 
-        return [null, null];
+        return [$name, (int) $id];
     }
 
     public function getHitQuery(Request $request, Redirect|Page|null $page = null): array
