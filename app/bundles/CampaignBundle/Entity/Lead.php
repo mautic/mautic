@@ -16,15 +16,21 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Lead
 {
+    /**
+     * @var Campaign
+     */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Campaign::class, inversedBy: 'leads')]
     #[ORM\JoinColumn(name: 'campaign_id', nullable: false, onDelete: 'CASCADE')]
-    private \Mautic\CampaignBundle\Entity\Campaign $campaign;
+    private $campaign;
 
+    /**
+     * @var \Mautic\LeadBundle\Entity\Lead
+     */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: \Mautic\LeadBundle\Entity\Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
-    private \Mautic\LeadBundle\Entity\Lead $lead;
+    private $lead;
 
     /**
      * @var \DateTimeInterface
@@ -103,8 +109,10 @@ class Lead
         $this->dateAdded = $date;
     }
 
-    
-    public function getLead(): \Mautic\LeadBundle\Entity\Lead
+    /**
+     * @return \Mautic\LeadBundle\Entity\Lead
+     */
+    public function getLead()
     {
         return $this->lead;
     }
@@ -114,8 +122,10 @@ class Lead
         $this->lead = $lead;
     }
 
-    
-    public function getCampaign(): Campaign
+    /**
+     * @return Campaign
+     */
+    public function getCampaign()
     {
         return $this->campaign;
     }

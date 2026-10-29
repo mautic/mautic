@@ -514,8 +514,10 @@ class VideoHit
         return $this;
     }
 
-    
-    public function getRedirect(): Redirect
+    /**
+     * @return Redirect
+     */
+    public function getRedirect()
     {
         return $this->redirect;
     }

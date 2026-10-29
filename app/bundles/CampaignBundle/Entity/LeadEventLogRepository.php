@@ -632,7 +632,7 @@ SQL;
             )
             ->setParameters(
                 [
-                    'contactId'     => $contactId,
+                    'contactId'     => (int) $contactId,
                     'campaignId'    => (int) $campaignId,
                     'rotation'      => (int) $rotation,
                 ]
