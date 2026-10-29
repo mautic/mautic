@@ -24,6 +24,32 @@ final class PurifyExtensionTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public function testPurifyBuilderPreviewRemovesUnsafeMarkup(): void
+    {
+        $html = '<form title="1 > 0"><p>Keep this content.</p></form>'
+            .'<script type="application/json">{"markup":"<img src=x onerror=alert(1)>"}</script>'
+            .'<p onclick="alert(1)">Safe text</p><a href="javascript:alert(1)">Link</a>';
+
+        $result = $this->extension->purifyBuilderPreview($html);
+
+        $this->assertStringContainsString('<p>Keep this content.</p>', $result);
+        $this->assertStringContainsString('Safe text', $result);
+        $this->assertStringContainsString('Link', $result);
+        $this->assertStringNotContainsString('<form', strtolower($result));
+        $this->assertStringNotContainsString('<script', strtolower($result));
+        $this->assertStringNotContainsString('<img', strtolower($result));
+        $this->assertStringNotContainsString('onerror', strtolower($result));
+        $this->assertStringNotContainsString('javascript:', strtolower($result));
+        $this->assertStringNotContainsString('{"markup"', strtolower($result));
+
+        $reconstructedForm = $this->extension->purifyBuilderPreview(
+            '<fo<form>rm action=x><p>Keep this content.</p></form>'
+        );
+
+        $this->assertStringContainsString('<p>Keep this content.</p>', $reconstructedForm);
+        $this->assertStringNotContainsString('<form', strtolower($reconstructedForm));
+    }
+
     /**
      * @return \Iterator<string, array{input: (string|null), expected: string}>
      */

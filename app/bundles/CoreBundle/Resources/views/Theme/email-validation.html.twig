@@ -8,17 +8,17 @@
                     <h1 class="text-center">{{ header|default('mautic.email.address.validate.header'|trans) }}</h1>
                     <p>{{ message|default('mautic.email.address.validate.message'|trans) }}</p>
                     {{ form_start(form) }}
-                    {{ form_label(form.emailAddress) }}
-                    <div class="input-group {% if not form.emailAddress.vars.valid %}has-error{% endif %}">
-                        {{ form_widget(form.emailAddress) }}
+                    {{ form_label(emailAddressField) }}
+                    <div class="input-group {% if not emailAddressValid %}has-error{% endif %}">
+                        {{ form_widget(emailAddressField) }}
                         <span class="input-group-btn">
-                            {{ form_row(form.submit) }}
+                            {{ form_row(submitField) }}
                         </span>
                     </div>
-                    {% if form.emailAddress.vars.errors|length > 0 %}
+                    {% if emailAddressHasErrors %}
                         {% block validation_error %}
                             <div class="validate-alert" role="alert" aria-live="polite">
-                                {{ form_errors(form.emailAddress) }}
+                                {{ form_errors(emailAddressField) }}
                             </div>
                         {% endblock %}
                     {% endif %}
