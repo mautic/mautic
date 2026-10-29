@@ -2610,11 +2610,6 @@ parameters:
 			count: 1
 			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
 
-		-
-			message: '#^Property Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:\$imapStream has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
 
 		-
 			message: '#^Property Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:\$mailboxes has no type specified\.$#'
