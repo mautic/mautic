@@ -31,6 +31,12 @@ final class Version20261028145757 extends AbstractMauticMigration
 
     public function postUp(Schema $schema): void
     {
+        // A dry run doesn't add the column, so there's nothing to backfill yet
+        $columns = $this->connection->createSchemaManager()->listTableColumns($this->getPrefixedTableName());
+        if (!array_key_exists(self::COLUMN_NAME, $columns)) {
+            return;
+        }
+
         // Existing assets start from the global setting, so turning it off before the upgrade still holds
         if ($this->isDownloadTrackingOffGlobally()) {
             $this->connection->executeStatement(
