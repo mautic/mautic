@@ -12,6 +12,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class IpLookupHelper
 {
     /**
+     * Server keys that can carry the visitor's address, most specific first.
+     */
+    private const IP_HOLDERS = [
+        'HTTP_CLIENT_IP',
+        'HTTP_X_FORWARDED_FOR',
+        'HTTP_X_FORWARDED',
+        'HTTP_X_CLUSTER_CLIENT_IP',
+        'HTTP_FORWARDED_FOR',
+        'HTTP_FORWARDED',
+        'REMOTE_ADDR',
+    ];
+
+    /**
      * @var array
      */
     protected $doNotTrackIps;
@@ -67,17 +80,7 @@ class IpLookupHelper
         $request = $this->getRequest();
 
         if (null !== $request) {
-            $ipHolders = [
-                'HTTP_CLIENT_IP',
-                'HTTP_X_FORWARDED_FOR',
-                'HTTP_X_FORWARDED',
-                'HTTP_X_CLUSTER_CLIENT_IP',
-                'HTTP_FORWARDED_FOR',
-                'HTTP_FORWARDED',
-                'REMOTE_ADDR',
-            ];
-
-            foreach ($ipHolders as $key) {
+            foreach (self::IP_HOLDERS as $key) {
                 if ($request->server->get($key)) {
                     $ip = trim($request->server->get($key));
 
@@ -306,26 +309,45 @@ class IpLookupHelper
             return false;
         }
 
-        // Also the visitor's own address, which a private range replaces with 127.0.0.1 in getIpAddressFromRequest()
-        $addresses  = array_unique(array_filter([$request->getClientIp(), $this->getIpAddressFromRequest()]));
-        $doNotTrack = array_merge((array) $this->doNotTrackIps, (array) $this->doNotTrackInternalIps);
-        foreach ($addresses as $address) {
-            // Checked on an unsaved entity, so nothing about the visitor is stored
-            $ipAddress = new IpAddress($address);
-            $ipAddress->setDoNotTrackList($doNotTrack);
-            if (!$ipAddress->isTrackable()) {
-                return false;
+        // Checked on an unsaved entity, so nothing about the visitor is stored
+        $ipAddress = new IpAddress($this->getVisitorAddress($request));
+        $ipAddress->setDoNotTrackList(array_merge((array) $this->doNotTrackIps, (array) $this->doNotTrackInternalIps));
+
+        return $ipAddress->isTrackable() && !$this->isBot($request);
+    }
+
+    /**
+     * The address that identifies the visitor, found like getIpAddressFromRequest() does, but without
+     * replacing a private address with 127.0.0.1, so an excluded private address is still recognised.
+     */
+    private function getVisitorAddress(Request $request): string
+    {
+        foreach (self::IP_HOLDERS as $key) {
+            $value = trim((string) $request->server->get($key));
+            if ('' === $value) {
+                continue;
+            }
+
+            // X-Forwarded-For: client, proxy1, proxy2
+            $address = trim(explode(',', $value)[0]);
+            if (false !== filter_var($address, FILTER_VALIDATE_IP)) {
+                return $address;
             }
         }
 
-        return !$this->isBot($request);
+        return '127.0.0.1';
     }
 
     private function isPrefetch(Request $request): bool
     {
-        $purpose = $request->headers->get('Purpose') ?? $request->headers->get('Sec-Purpose');
+        // Either header can say it, and neither takes precedence
+        foreach ([$request->headers->get('Purpose'), $request->headers->get('Sec-Purpose')] as $purpose) {
+            if (null !== $purpose && [] !== array_intersect(array_map(trim(...), explode(';', strtolower($purpose))), ['prefetch', 'prerender'])) {
+                return true;
+            }
+        }
 
-        return $purpose && [] !== array_intersect(array_map(trim(...), explode(';', strtolower($purpose))), ['prefetch', 'prerender']);
+        return false;
     }
 
     private function isBot(Request $request): bool
