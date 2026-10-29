@@ -2,13 +2,13 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Model\EmailModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class BroadcastSubscriber
@@ -21,7 +21,7 @@ final readonly class BroadcastSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ChannelBroadcastEvent::class)]
+    #[AsEventListener(event: ChannelBroadcastEvent::class)]
     public function onBroadcast(ChannelBroadcastEvent $event): void
     {
         if (!$event->checkContext('email')) {

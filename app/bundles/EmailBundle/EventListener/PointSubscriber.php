@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\EmailBundle\EmailEvents;
@@ -15,7 +16,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class PointSubscriber
 {
@@ -26,7 +26,7 @@ final readonly class PointSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointBuilderEvent::class)]
+    #[AsEventListener(event: PointBuilderEvent::class)]
     public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
@@ -48,7 +48,7 @@ final readonly class PointSubscriber
         $event->addAction('email.send', $action);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: TriggerBuilderEvent::class)]
+    #[AsEventListener(event: TriggerBuilderEvent::class)]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $sendEvent = [
@@ -77,7 +77,7 @@ final readonly class PointSubscriber
     /**
      * Trigger point actions for email open.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailOpenEvent::class)]
+    #[AsEventListener(event: EmailOpenEvent::class)]
     public function onEmailOpen(EmailOpenEvent $event): void
     {
         $this->pointModel->triggerAction('email.open', $event->getEmail());
@@ -86,7 +86,7 @@ final readonly class PointSubscriber
     /**
      * Trigger point actions for email send.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class)]
+    #[AsEventListener(event: EmailSendEvent::class)]
     public function onEmailSend(EmailSendEvent $event): void
     {
         $leadArray = $event->getLead();

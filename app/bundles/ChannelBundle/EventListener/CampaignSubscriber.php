@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -20,7 +21,6 @@ use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\ChannelBundle\PreferenceBuilder\PreferenceBuilder;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignSubscriber
@@ -46,7 +46,7 @@ final class CampaignSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
+    #[AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $channels  = $this->messageModel->getChannels();
@@ -82,7 +82,7 @@ final class CampaignSubscriber
      * @throws LogPassedAndFailedException
      * @throws \ReflectionException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ChannelEvents::ON_CAMPAIGN_BATCH_ACTION)]
+    #[AsEventListener(event: ChannelEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignTriggerAction(PendingEvent $pendingEvent): void
     {
         $this->pseudoEvent = clone $pendingEvent->getEvent();

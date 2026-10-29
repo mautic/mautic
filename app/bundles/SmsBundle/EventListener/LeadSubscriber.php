@@ -2,9 +2,9 @@
 
 namespace Mautic\SmsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\SmsBundle\Entity\StatRepository;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -20,7 +20,7 @@ final readonly class LeadSubscriber
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
+    #[AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addSmsEvents($event, 'sent');

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -19,7 +19,7 @@ final readonly class ControllerSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::CONTROLLER)]
+    #[AsEventListener(event: KernelEvents::CONTROLLER)]
     public function onKernelController(ControllerEvent $event): void
     {
         $request = $event->getRequest();

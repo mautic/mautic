@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\StageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\StageBundle\Entity\LeadStageLogRepository;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -26,7 +26,7 @@ final readonly class LeadSubscriber
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
+    #[AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -75,7 +75,7 @@ final readonly class LeadSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostMergeEvent::class)]
+    #[AsEventListener(event: LeadPostMergeEvent::class)]
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->leadStageLogRepository->updateLead(

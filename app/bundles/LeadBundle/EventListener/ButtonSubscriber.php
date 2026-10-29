@@ -2,10 +2,10 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -18,7 +18,7 @@ final readonly class ButtonSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomButtonEvent::class)]
+    #[AsEventListener(event: CustomButtonEvent::class)]
     public function injectViewButtons(CustomButtonEvent $event): void
     {
         $route = $event->getRoute();

@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignBatchLeadChangeEvent;
 use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
@@ -12,7 +13,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class TimelineEventLogCampaignSubscriber
 {
@@ -27,7 +27,7 @@ final class TimelineEventLogCampaignSubscriber
         $this->translator         = $translator;
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignSingleLeadChangeEvent::class)]
+    #[AsEventListener(event: CampaignSingleLeadChangeEvent::class)]
     public function onChange(CampaignLeadChangeEvent $event): void
     {
         if (!$contact = $event->getLead()) {
@@ -41,7 +41,7 @@ final class TimelineEventLogCampaignSubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBatchLeadChangeEvent::class)]
+    #[AsEventListener(event: CampaignBatchLeadChangeEvent::class)]
     public function onBatchChange(CampaignLeadChangeEvent $event): void
     {
         if (!$contacts = $event->getLeads()) {
@@ -55,7 +55,7 @@ final class TimelineEventLogCampaignSubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
+    #[AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(

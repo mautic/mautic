@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
-use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\EventListener\DoNotContactSubscriber;
 use Mautic\LeadBundle\Model\DoNotContact;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -27,17 +26,6 @@ final class DoNotContactSubscriberTest extends TestCase
     {
         $this->doNotContact               = $this->createMock(DoNotContact::class);
         $this->doNotContactSubscriber     = new DoNotContactSubscriber($this->doNotContact);
-    }
-
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertSame(
-            [
-                DoNotContactAddEvent::class       => ['addDncForLead', 0],
-                DoNotContactRemoveEvent::class => ['removeDncForLead', 0],
-            ],
-            $this->doNotContactSubscriber->getSubscribedEvents()
-        );
     }
 
     public function testAddDncForLeadForNewContacts(): void

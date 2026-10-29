@@ -2,10 +2,10 @@
 
 namespace Mautic\ApiBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ApiBundle\Helper\RequestHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -26,7 +26,7 @@ final readonly class ApiSubscriber
      *
      * @throws AccessDeniedHttpException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::REQUEST, priority: 255)]
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: 255)]
     public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMainRequest()) {
@@ -83,7 +83,7 @@ final readonly class ApiSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::RESPONSE)]
+    #[AsEventListener(event: KernelEvents::RESPONSE)]
     public function onKernelResponse(ResponseEvent $event): void
     {
         $request      = $event->getRequest();

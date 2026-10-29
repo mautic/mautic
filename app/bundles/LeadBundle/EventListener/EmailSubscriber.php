@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
@@ -9,7 +10,6 @@ use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\OnEmailAddressTokenReplacementEvent;
 use Mautic\LeadBundle\Helper\TokenHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class EmailSubscriber
@@ -22,19 +22,19 @@ final class EmailSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailOnBuildEvent::class)]
+    #[AsEventListener(event: EmailOnBuildEvent::class)]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         $this->addContactFieldTokens($event);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class)]
+    #[AsEventListener(event: EmailDisplayEvent::class)]
     public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class)]
+    #[AsEventListener(event: EmailSendEvent::class)]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         // Combine all possible content to find tokens across them
@@ -52,7 +52,7 @@ final class EmailSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: OnEmailAddressTokenReplacementEvent::class)]
+    #[AsEventListener(event: OnEmailAddressTokenReplacementEvent::class)]
     public function onEmailAddressReplacement(TokenReplacementEvent $event): void
     {
         $event->setContent(TokenHelper::findLeadTokens($event->getContent(), $event->getLead()->getProfileFields(), true));

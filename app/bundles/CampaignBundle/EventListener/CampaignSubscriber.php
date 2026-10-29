@@ -2,11 +2,11 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Event as Events;
 use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignSubscriber
 {
@@ -20,7 +20,7 @@ final readonly class CampaignSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\CampaignPostSaveEvent::class)]
+    #[AsEventListener(event: Events\CampaignPostSaveEvent::class)]
     public function onCampaignPostSave(Events\CampaignPostSaveEvent $event): void
     {
         $campaign = $event->getCampaign();
@@ -49,7 +49,7 @@ final readonly class CampaignSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\CampaignPostDeleteEvent::class)]
+    #[AsEventListener(event: Events\CampaignPostDeleteEvent::class)]
     public function onCampaignDelete(Events\CampaignPostDeleteEvent $event): void
     {
         $campaign = $event->getCampaign();

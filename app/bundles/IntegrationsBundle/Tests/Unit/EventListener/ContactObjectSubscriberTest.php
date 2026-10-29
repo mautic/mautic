@@ -53,26 +53,6 @@ final class ContactObjectSubscriberTest extends TestCase
         );
     }
 
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertSame(
-            [
-                InternalObjectEvent::class         => ['collectInternalObjects', 0],
-                InternalObjectUpdateEvent::class   => ['updateContacts', 0],
-                InternalObjectCreateEvent::class   => ['createContacts', 0],
-                InternalObjectFindEvent::class     => [
-                    ['findContactsByIds', 0],
-                    ['findContactsByDateRange', 0],
-                    ['findContactsByFieldValues', 0],
-                ],
-                InternalObjectOwnerEvent::class    => ['findOwnerIdsForContacts', 0],
-                InternalObjectRouteEvent::class    => ['buildContactRoute', 0],
-                InternalObjectFindByIdEvent::class => ['findContactById', 0],
-            ],
-            ContactObjectSubscriber::getSubscribedEvents()
-        );
-    }
-
     public function testCollectInternalObjects(): void
     {
         $event = new InternalObjectEvent();

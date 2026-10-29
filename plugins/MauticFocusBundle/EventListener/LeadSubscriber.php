@@ -2,12 +2,12 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\FocusEventTypes;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 final readonly class LeadSubscriber
@@ -22,7 +22,7 @@ final readonly class LeadSubscriber
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
+    #[AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $eventViewTypeName = $this->translator->trans('mautic.focus.event.view');

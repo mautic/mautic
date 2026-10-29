@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Mautic\PluginBundle\Helper\EventHelper;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class PointSubscriber
 {
@@ -16,7 +16,7 @@ final readonly class PointSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: TriggerBuilderEvent::class)]
+    #[AsEventListener(event: TriggerBuilderEvent::class)]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $action = [

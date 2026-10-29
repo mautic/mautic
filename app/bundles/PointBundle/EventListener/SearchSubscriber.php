@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -11,7 +12,6 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\Model\TriggerModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SearchSubscriber
 {
@@ -24,7 +24,7 @@ final readonly class SearchSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MauticEvents\GlobalSearchEvent::class)]
+    #[AsEventListener(event: MauticEvents\GlobalSearchEvent::class)]
     public function onGlobalSearchPointActions(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
@@ -39,7 +39,7 @@ final readonly class SearchSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MauticEvents\GlobalSearchEvent::class)]
+    #[AsEventListener(event: MauticEvents\GlobalSearchEvent::class)]
     public function onGlobalSearchPointGroup(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
@@ -54,7 +54,7 @@ final readonly class SearchSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MauticEvents\GlobalSearchEvent::class)]
+    #[AsEventListener(event: MauticEvents\GlobalSearchEvent::class)]
     public function onGlobalSearchPointTriggers(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
@@ -69,7 +69,7 @@ final readonly class SearchSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MauticEvents\CommandListEvent::class)]
+    #[AsEventListener(event: MauticEvents\CommandListEvent::class)]
     public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         if ($this->security->isGranted('point:points:view')) {

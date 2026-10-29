@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
@@ -11,7 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Event\DncEvent;
 use Mautic\SmsBundle\Event\FilterEvent;
 use Mautic\SmsBundle\Event\QueueEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SendSmsSubscriber
 {
@@ -21,7 +21,7 @@ final readonly class SendSmsSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DncEvent::class)]
+    #[AsEventListener(event: DncEvent::class)]
     public function dncFilter(DncEvent $event): void
     {
         $dnc = $this->dncRepo->getChannelList('sms', array_keys($event->getContacts()));
@@ -33,7 +33,7 @@ final readonly class SendSmsSubscriber
         $event->removeContacts(array_keys($dnc));
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: QueueEvent::class)]
+    #[AsEventListener(event: QueueEvent::class)]
     public function queueFilter(QueueEvent $event): void
     {
         $options         = $event->getOptions();
@@ -56,7 +56,7 @@ final readonly class SendSmsSubscriber
         $event->queueContacts($queuedContacts);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FilterEvent::class)]
+    #[AsEventListener(event: FilterEvent::class)]
     public function genericFilter(FilterEvent $event): void
     {
         $contactsWithoutNumbers = array_filter($event->getContacts(), fn (Lead $contact): bool => empty($contact->getLeadPhoneNumber()));

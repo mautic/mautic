@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
@@ -16,7 +17,6 @@ use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Model\PageModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class PageImportExportSubscriber
 {
@@ -32,7 +32,7 @@ final readonly class PageImportExportSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityExportEvent::class)]
+    #[AsEventListener(event: EntityExportEvent::class)]
     public function onPageExport(EntityExportEvent $event): void
     {
         if (Page::ENTITY_NAME !== $event->getEntityName()) {
@@ -75,7 +75,7 @@ final readonly class PageImportExportSubscriber
         $this->logAction('export', $page->getId(), $pageData);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportEvent::class)]
+    #[AsEventListener(event: EntityImportEvent::class)]
     public function onPageImport(EntityImportEvent $event): void
     {
         if (Page::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -117,7 +117,7 @@ final readonly class PageImportExportSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportUndoEvent::class)]
+    #[AsEventListener(event: EntityImportUndoEvent::class)]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Page::ENTITY_NAME !== $event->getEntityName()) {
@@ -141,7 +141,7 @@ final readonly class PageImportExportSubscriber
         $this->entityManager->flush();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportAnalyzeEvent::class)]
+    #[AsEventListener(event: EntityImportAnalyzeEvent::class)]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(

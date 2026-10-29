@@ -11,7 +11,6 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Message\ResponseInterface;
 
 #[AllowMockObjectsWithoutExpectations]

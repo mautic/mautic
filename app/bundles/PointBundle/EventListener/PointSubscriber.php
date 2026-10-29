@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\PointEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class PointSubscriber
 {
@@ -21,7 +21,7 @@ final readonly class PointSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointEvents::POINT_POST_SAVE)]
+    #[AsEventListener(event: PointEvents::POINT_POST_SAVE)]
     public function onPointPostSave(Events\PointEvent $event): void
     {
         $point = $event->getPoint();
@@ -41,7 +41,7 @@ final readonly class PointSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointEvents::POINT_POST_DELETE)]
+    #[AsEventListener(event: PointEvents::POINT_POST_DELETE)]
     public function onPointDelete(Events\PointEvent $event): void
     {
         $point = $event->getPoint();
@@ -59,7 +59,7 @@ final readonly class PointSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointEvents::TRIGGER_POST_SAVE)]
+    #[AsEventListener(event: PointEvents::TRIGGER_POST_SAVE)]
     public function onTriggerPostSave(Events\TriggerEvent $event): void
     {
         $trigger = $event->getTrigger();
@@ -79,7 +79,7 @@ final readonly class PointSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointEvents::TRIGGER_POST_DELETE)]
+    #[AsEventListener(event: PointEvents::TRIGGER_POST_DELETE)]
     public function onTriggerDelete(Events\TriggerEvent $event): void
     {
         $trigger = $event->getTrigger();

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Event\ListTypeaheadEvent;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SegmentFilterTypeaheadSubscriber
 {
@@ -19,7 +19,7 @@ final readonly class SegmentFilterTypeaheadSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListTypeaheadEvent::class, priority: 1)]
+    #[AsEventListener(event: ListTypeaheadEvent::class, priority: 1)]
     public function onSegmentFilterAliasEmpty(ListTypeaheadEvent $event): void
     {
         if (!empty($event->getFieldAlias())) {
@@ -34,7 +34,7 @@ final readonly class SegmentFilterTypeaheadSubscriber
         $event->stopPropagation();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListTypeaheadEvent::class)]
+    #[AsEventListener(event: ListTypeaheadEvent::class)]
     public function onSegmentFilterAliasUser(ListTypeaheadEvent $event): void
     {
         if ('owner_id' !== $event->getFieldAlias()) {
@@ -56,7 +56,7 @@ final readonly class SegmentFilterTypeaheadSubscriber
         $event->stopPropagation();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListTypeaheadEvent::class)]
+    #[AsEventListener(event: ListTypeaheadEvent::class)]
     public function onSegmentFilterFieldEmpty(ListTypeaheadEvent $event): void
     {
         $field      = $this->fieldModel->getEntityByAlias($event->getFieldAlias());
@@ -68,7 +68,7 @@ final readonly class SegmentFilterTypeaheadSubscriber
         $event->stopPropagation();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListTypeaheadEvent::class)]
+    #[AsEventListener(event: ListTypeaheadEvent::class)]
     public function onSegmentFilterCanProvideTypeahead(ListTypeaheadEvent $event): void
     {
         $field      = $this->fieldModel->getEntityByAlias($event->getFieldAlias());
@@ -84,7 +84,7 @@ final readonly class SegmentFilterTypeaheadSubscriber
         $event->stopPropagation();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListTypeaheadEvent::class)]
+    #[AsEventListener(event: ListTypeaheadEvent::class)]
     public function onSegmentFilterEntityByAlias(ListTypeaheadEvent $event): void
     {
         $fieldAlias = $event->getFieldAlias();

@@ -2,11 +2,11 @@
 
 namespace Mautic\UserBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\UserBundle\Form\Type\ConfigType;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class ConfigSubscriber
@@ -20,7 +20,7 @@ final class ConfigSubscriber
         'saml_idp_own_private_key',
     ];
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ConfigBuilderEvent::class)]
+    #[AsEventListener(event: ConfigBuilderEvent::class)]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addFileFields($this->fileFields)
@@ -35,7 +35,7 @@ final class ConfigSubscriber
             );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ConfigPreSaveEvent::class)]
+    #[AsEventListener(event: ConfigPreSaveEvent::class)]
     public function onConfigSave(ConfigEvent $event): void
     {
         // Preserve existing value

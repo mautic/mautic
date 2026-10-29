@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ReportSubscriber
 {
@@ -49,7 +49,7 @@ final class ReportSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportBuilderEvent::class, priority: -10)]
+    #[AsEventListener(event: ReportBuilderEvent::class, priority: -10)]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext($this->reportContexts)) {
@@ -74,7 +74,7 @@ final class ReportSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGeneratorEvent::class, priority: -10)]
+    #[AsEventListener(event: ReportGeneratorEvent::class, priority: -10)]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext($this->reportContexts)) {

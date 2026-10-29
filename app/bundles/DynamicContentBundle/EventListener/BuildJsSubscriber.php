@@ -2,10 +2,10 @@
 
 namespace Mautic\DynamicContentBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -24,7 +24,7 @@ final readonly class BuildJsSubscriber
     /**
      * Adds DWC helpers after page-event setup and before page-event delivery.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: BuildJsEvent::class, priority: 200)]
+    #[AsEventListener(event: BuildJsEvent::class, priority: 200)]
     public function onBuildJs(BuildJsEvent $event): void
     {
         $dwcUrl = $this->router->generate('mautic_api_dynamicContent_action', ['objectAlias' => 'slotNamePlaceholder'], UrlGeneratorInterface::ABSOLUTE_URL);

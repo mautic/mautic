@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\EmailBundle\Helper\EmailMediaImageHelper;
 use Mautic\PageBundle\Entity\Page;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Builder-embedded images in landing pages are referenced by absolute URL inside the page
@@ -23,7 +23,7 @@ final readonly class PageExportListEventSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: AssetExportListEvent::class)]
+    #[AsEventListener(event: AssetExportListEvent::class)]
     public function onExportList(AssetExportListEvent $event): void
     {
         foreach ($event->getEntityData() as $section) {

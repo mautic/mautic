@@ -2,6 +2,7 @@
 
 namespace Mautic\NotificationBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
@@ -20,7 +21,6 @@ use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber
@@ -45,7 +45,7 @@ class CampaignSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
+    #[AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
@@ -89,7 +89,7 @@ class CampaignSubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: NotificationEvents::ON_CAMPAIGN_BATCH_ACTION)]
+    #[AsEventListener(event: NotificationEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignBatchAction(PendingEvent $event): void
     {
         if (!$event->checkContext(self::EVENT_ACTION_SEND_NOTIFICATION) && !$event->checkContext(self::EVENT_ACTION_SEND_MOBILE_NOTIFICATION)) {

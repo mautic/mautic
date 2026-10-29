@@ -2,6 +2,7 @@
 
 namespace Mautic\SmsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
@@ -14,7 +15,6 @@ use Mautic\SmsBundle\Form\Type\CampaignReplyType;
 use Mautic\SmsBundle\Helper\ReplyHelper;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignReplySubscriber
 {
@@ -26,7 +26,7 @@ final readonly class CampaignReplySubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
+    #[AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (0 === count($this->transportChain->getEnabledTransports())) {
@@ -44,7 +44,7 @@ final readonly class CampaignReplySubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SmsEvents::ON_CAMPAIGN_REPLY)]
+    #[AsEventListener(event: SmsEvents::ON_CAMPAIGN_REPLY)]
     public function onCampaignReply(DecisionEvent $decisionEvent): void
     {
         /** @var ReplyEvent $replyEvent */
@@ -74,7 +74,7 @@ final readonly class CampaignReplySubscriber
      * @throws CannotProcessEventException
      * @throws NotSchedulableException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReplyEvent::class)]
+    #[AsEventListener(event: ReplyEvent::class)]
     public function onReply(ReplyEvent $event): void
     {
         $this->realTimeExecutioner->execute(self::TYPE, $event, 'sms');

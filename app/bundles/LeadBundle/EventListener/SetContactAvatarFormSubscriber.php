@@ -2,13 +2,13 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Form\Type\FormFieldFileType;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SetContactAvatarFormSubscriber
 {
@@ -19,7 +19,7 @@ final readonly class SetContactAvatarFormSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SubmissionEvent::class)]
+    #[AsEventListener(event: SubmissionEvent::class)]
     public function onFormSubmit(SubmissionEvent $submissionEvent): void
     {
         $fields  = $submissionEvent->getForm()->getFields();

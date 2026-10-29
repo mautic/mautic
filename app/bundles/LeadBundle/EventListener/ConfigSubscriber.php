@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\LeadBundle\Form\Type\ConfigCompanyType;
 use Mautic\LeadBundle\Form\Type\ConfigType;
 use Mautic\LeadBundle\Form\Type\SegmentConfigType;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ConfigSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ConfigBuilderEvent::class)]
+    #[AsEventListener(event: ConfigBuilderEvent::class)]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $leadParameters = $event->getParametersFromConfig('MauticLeadBundle');
@@ -46,7 +46,7 @@ final class ConfigSubscriber
         ]);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ConfigBuilderEvent::class)]
+    #[AsEventListener(event: ConfigBuilderEvent::class)]
     public function onConfigCompanyGenerate(ConfigBuilderEvent $event): void
     {
         $parameters = $event->getParametersFromConfig('MauticLeadBundle');

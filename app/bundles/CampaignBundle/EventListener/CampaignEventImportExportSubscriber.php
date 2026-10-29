@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -23,7 +24,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignEventImportExportSubscriber
 {
@@ -38,7 +38,7 @@ final readonly class CampaignEventImportExportSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityExportEvent::class)]
+    #[AsEventListener(event: EntityExportEvent::class)]
     public function onExport(EntityExportEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName()) {
@@ -215,7 +215,7 @@ final readonly class CampaignEventImportExportSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportEvent::class)]
+    #[AsEventListener(event: EntityImportEvent::class)]
     public function onImport(EntityImportEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -283,7 +283,7 @@ final readonly class CampaignEventImportExportSubscriber
         $this->updateParentEvents($event);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportAnalyzeEvent::class)]
+    #[AsEventListener(event: EntityImportAnalyzeEvent::class)]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
@@ -366,7 +366,7 @@ final readonly class CampaignEventImportExportSubscriber
         $this->entityManager->flush();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportUndoEvent::class)]
+    #[AsEventListener(event: EntityImportUndoEvent::class)]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName()) {

@@ -2,17 +2,17 @@
 
 namespace MauticPlugin\MauticCloudStorageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\AssetBundle\Event as Events;
 use MauticPlugin\MauticCloudStorageBundle\Exception\InvalidCredentialConfigurationException;
 use MauticPlugin\MauticCloudStorageBundle\Integration\CloudStorageIntegration;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class RemoteAssetBrowseSubscriber
 {
     /**
      * Fetches the connector for an event's integration.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\RemoteAssetBrowseEvent::class)]
+    #[AsEventListener(event: Events\RemoteAssetBrowseEvent::class)]
     public function onAssetRemoteBrowse(Events\RemoteAssetBrowseEvent $event): void
     {
         /** @var CloudStorageIntegration $integration */

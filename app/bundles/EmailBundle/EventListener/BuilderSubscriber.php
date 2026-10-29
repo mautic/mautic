@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -20,7 +21,6 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class BuilderSubscriber
@@ -43,7 +43,7 @@ final class BuilderSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailOnBuildEvent::class)]
+    #[AsEventListener(event: EmailOnBuildEvent::class)]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
@@ -92,8 +92,8 @@ final class BuilderSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class, priority: 10000)]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class, priority: 10000)]
+    #[AsEventListener(event: EmailSendEvent::class, priority: 10000)]
+    #[AsEventListener(event: EmailDisplayEvent::class, priority: 10000)]
     public function fixEmailAccessibility(EmailSendEvent $event): void
     {
         if ($event->isDynamicContentParsing() || !$event->getEmail() instanceof Email) {
@@ -132,8 +132,8 @@ final class BuilderSubscriber
         $event->setContent($content);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class)]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class)]
+    #[AsEventListener(event: EmailSendEvent::class)]
+    #[AsEventListener(event: EmailDisplayEvent::class)]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $idHash = $event->getIdHash();
@@ -209,8 +209,8 @@ final class BuilderSubscriber
         $event->addToken('{brand=name}', (string) $this->coreParametersHelper->get('brand_name'));
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class, priority: -9999)]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class, priority: -9999)]
+    #[AsEventListener(event: EmailSendEvent::class, priority: -9999)]
+    #[AsEventListener(event: EmailDisplayEvent::class, priority: -9999)]
     public function convertUrlsToTokens(EmailSendEvent $event): void
     {
         if ($event->isInternalSend()) {

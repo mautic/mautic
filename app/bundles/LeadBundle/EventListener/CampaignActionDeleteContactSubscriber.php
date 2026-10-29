@@ -2,12 +2,12 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignActionDeleteContactSubscriber
 {
@@ -17,7 +17,7 @@ final readonly class CampaignActionDeleteContactSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
+    #[AsEventListener(event: CampaignBuilderEvent::class)]
     public function configureAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
@@ -37,7 +37,7 @@ final readonly class CampaignActionDeleteContactSubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::ON_CAMPAIGN_ACTION_DELETE_CONTACT)]
+    #[AsEventListener(event: LeadEvents::ON_CAMPAIGN_ACTION_DELETE_CONTACT)]
     public function deleteContacts(PendingEvent $event): void
     {
         $contactIds = $event->getContactIds();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
@@ -16,7 +17,6 @@ use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupRepository;
 use Mautic\PointBundle\Model\PointGroupModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class GroupImportExportSubscriber
 {
@@ -32,7 +32,7 @@ final readonly class GroupImportExportSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityExportEvent::class)]
+    #[AsEventListener(event: EntityExportEvent::class)]
     public function onPointGroupExport(EntityExportEvent $event): void
     {
         if (Group::ENTITY_NAME !== $event->getEntityName()) {
@@ -57,7 +57,7 @@ final readonly class GroupImportExportSubscriber
         $this->logAction('export', $pointGroup->getId(), $pointGroupData);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportEvent::class)]
+    #[AsEventListener(event: EntityImportEvent::class)]
     public function onPointGroupImport(EntityImportEvent $event): void
     {
         if (Group::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -99,7 +99,7 @@ final readonly class GroupImportExportSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportUndoEvent::class)]
+    #[AsEventListener(event: EntityImportUndoEvent::class)]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Group::ENTITY_NAME !== $event->getEntityName()) {
@@ -123,7 +123,7 @@ final readonly class GroupImportExportSubscriber
         $this->entityManager->flush();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportAnalyzeEvent::class)]
+    #[AsEventListener(event: EntityImportAnalyzeEvent::class)]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(

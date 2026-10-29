@@ -2,12 +2,12 @@
 
 namespace MauticPlugin\MauticFullContactBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use MauticPlugin\MauticFullContactBundle\Helper\LookupHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class LeadSubscriber
 {
@@ -16,13 +16,13 @@ final readonly class LeadSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostSaveEvent::class)]
+    #[AsEventListener(event: LeadPostSaveEvent::class)]
     public function leadPostSave(LeadEvent $event): void
     {
         $this->lookupHelper->lookupContact($event->getLead(), true, true);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CompanyPostSaveEvent::class)]
+    #[AsEventListener(event: CompanyPostSaveEvent::class)]
     public function companyPostSave(CompanyEvent $event): void
     {
         $this->lookupHelper->lookupCompany($event->getCompany(), true, true);

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Event\ContactExportEmailSentEvent;
 use Mautic\LeadBundle\Event\ContactExportScheduledEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Notification\ContactExportAdminNotification;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ContactExportSchedulerNotificationSubscriber
@@ -22,7 +22,7 @@ final readonly class ContactExportSchedulerNotificationSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactExportScheduledEvent::class)]
+    #[AsEventListener(event: ContactExportScheduledEvent::class)]
     public function onContactExportScheduled(ContactExportSchedulerEvent $event): void
     {
         /** @var User $user */
@@ -42,7 +42,7 @@ final readonly class ContactExportSchedulerNotificationSubscriber
         $this->contactExportAdminNotification->notifyRequested($event->getContactExportScheduler());
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactExportEmailSentEvent::class)]
+    #[AsEventListener(event: ContactExportEmailSentEvent::class)]
     public function onContactExportEmailSent(ContactExportSchedulerEvent $event): void
     {
         $this->contactExportAdminNotification->notifyCompleted($event->getContactExportScheduler());

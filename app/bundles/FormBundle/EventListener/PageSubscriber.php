@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -9,7 +10,6 @@ use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class PageSubscriber
@@ -27,7 +27,7 @@ final class PageSubscriber
     /**
      * Add forms to available page tokens.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageBuilderEvent::class)]
+    #[AsEventListener(event: PageBuilderEvent::class)]
     public function onPageBuild(PageBuilderEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
@@ -54,7 +54,7 @@ final class PageSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageDisplayEvent::class)]
+    #[AsEventListener(event: PageDisplayEvent::class)]
     public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content = $event->getContent();

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportRowFailedException;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ImportDateValidationSubscriber
 {
@@ -30,7 +30,7 @@ final class ImportDateValidationSubscriber
     /**
      * @throws ImportRowFailedException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportProcessEvent::class, priority: 100)]
+    #[AsEventListener(event: ImportProcessEvent::class, priority: 100)]
     public function onImportProcess(ImportProcessEvent $event): void
     {
         if (!in_array($event->import->getObject(), ['lead', 'company'], true)) {

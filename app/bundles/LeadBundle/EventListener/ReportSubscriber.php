@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -20,7 +21,6 @@ use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\StageBundle\Model\StageModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ReportSubscriber
@@ -81,7 +81,7 @@ final class ReportSubscriber
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportBuilderEvent::class)]
+    #[AsEventListener(event: ReportBuilderEvent::class)]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
@@ -185,7 +185,7 @@ final class ReportSubscriber
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGeneratorEvent::class)]
+    #[AsEventListener(event: ReportGeneratorEvent::class)]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
@@ -370,7 +370,7 @@ final class ReportSubscriber
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGraphEvent::class)]
+    #[AsEventListener(event: ReportGraphEvent::class)]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         if (!$event->checkContext([
@@ -644,7 +644,7 @@ final class ReportSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ColumnCollectEvent::class)]
+    #[AsEventListener(event: ColumnCollectEvent::class)]
     public function onReportColumnCollect(ColumnCollectEvent $event): void
     {
         if ('company' === $event->getObject()) {
@@ -900,7 +900,7 @@ final class ReportSubscriber
         $event->addTable($context, $data, self::GROUP_CONTACTS);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportDataEvent::class)]
+    #[AsEventListener(event: ReportDataEvent::class)]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();

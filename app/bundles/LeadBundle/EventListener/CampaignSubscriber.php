@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
@@ -55,7 +56,6 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\PointBundle\Model\PointGroupModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class CampaignSubscriber
 {
@@ -88,7 +88,7 @@ final class CampaignSubscriber
     /**
      * Add event triggers and actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
+    #[AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add actions
@@ -259,7 +259,7 @@ final class CampaignSubscriber
         $event->addCondition('lead.points', $trigger);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION)]
+    #[AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignTriggerActionChangePoints(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.changepoints')) {
@@ -305,7 +305,7 @@ final class CampaignSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 1)]
+    #[AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 1)]
     public function onCampaignTriggerActionChangeLists(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.changelist')) {
@@ -331,7 +331,7 @@ final class CampaignSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION)]
+    #[AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignTriggerActionUpdateLead(PendingEvent $event): void
     {
         $values = $event->getEvent()->getProperties();
@@ -385,7 +385,7 @@ final class CampaignSubscriber
         $event->pass($log);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 7)]
+    #[AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 7)]
     public function onCampaignTriggerActionChangeOwner(PendingEvent $event): void
     {
         if (!$event->checkContext(self::ACTION_LEAD_CHANGE_OWNER)) {
@@ -405,7 +405,7 @@ final class CampaignSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 3)]
+    #[AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 3)]
     public function onCampaignTriggerActionUpdateTags(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.changetags')) {
@@ -422,7 +422,7 @@ final class CampaignSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 4)]
+    #[AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 4)]
     public function onCampaignTriggerActionAddToCompany(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.addtocompany')) {
@@ -440,7 +440,7 @@ final class CampaignSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 4)]
+    #[AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 4)]
     public function onCampaignTriggerActionChangeCompanyScore(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.scorecontactscompanies')) {
@@ -460,7 +460,7 @@ final class CampaignSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 8)]
+    #[AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 8)]
     public function onCampaignTriggerActionUpdateCompany(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.updatecompany')) {
@@ -510,7 +510,7 @@ final class CampaignSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION)]
+    #[AsEventListener(event: LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION)]
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
         /** @var Lead|null $lead */
@@ -785,7 +785,7 @@ final class CampaignSubscriber
         return $now > $objEffectiveDate;
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 100)]
+    #[AsEventListener(event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION, priority: 100)]
     public function onCampaignTriggerActionSetManipulator(PendingEvent $event): void
     {
         // Cross-cutting listener: runs first (priority 100) and only mutates the leads.

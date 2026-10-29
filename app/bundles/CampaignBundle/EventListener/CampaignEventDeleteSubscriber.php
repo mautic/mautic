@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\DeleteCampaign;
 use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CampaignBundle\Helper\CampaignConfig;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignEventDeleteSubscriber
 {
@@ -22,7 +22,7 @@ final readonly class CampaignEventDeleteSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DeleteCampaign::class)]
+    #[AsEventListener(event: DeleteCampaign::class)]
     public function onCampaignDelete(DeleteCampaign $event): void
     {
         if ($this->campaignConfig->shouldDeleteEventLogInBackground()) {
@@ -36,7 +36,7 @@ final readonly class CampaignEventDeleteSubscriber
         $this->campaignModel->deleteCampaign($event->getCampaign());
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DeleteEvent::class)]
+    #[AsEventListener(event: DeleteEvent::class)]
     public function onEventDelete(DeleteEvent $event): void
     {
         if ($this->campaignConfig->shouldDeleteEventLogInBackground()) {

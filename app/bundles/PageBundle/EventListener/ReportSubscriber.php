@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -12,7 +13,6 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportSubscriber
@@ -34,7 +34,7 @@ final readonly class ReportSubscriber
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportBuilderEvent::class)]
+    #[AsEventListener(event: ReportBuilderEvent::class)]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_PAGES, self::CONTEXT_PAGE_HITS, self::CONTEXT_VIDEO_HITS])) {
@@ -348,7 +348,7 @@ final readonly class ReportSubscriber
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGeneratorEvent::class)]
+    #[AsEventListener(event: ReportGeneratorEvent::class)]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
@@ -399,7 +399,7 @@ final readonly class ReportSubscriber
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGraphEvent::class)]
+    #[AsEventListener(event: ReportGraphEvent::class)]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Lead reports
@@ -568,7 +568,7 @@ final readonly class ReportSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportDataEvent::class)]
+    #[AsEventListener(event: ReportDataEvent::class)]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();

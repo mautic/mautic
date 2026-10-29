@@ -2,11 +2,11 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\StatsEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 abstract class CommonStatsSubscriber
@@ -32,7 +32,7 @@ abstract class CommonStatsSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: StatsEvent::class)]
+    #[AsEventListener(event: StatsEvent::class)]
     public function onStatsFetch(StatsEvent $event): void
     {
         /** @var CommonRepository<object> $repository */

@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -12,7 +13,6 @@ use Mautic\CampaignBundle\Form\Validator\Constraints\InfiniteLoopValidator;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityValidateEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignActionChangeMembershipSubscriber
 {
@@ -26,7 +26,7 @@ final readonly class CampaignActionChangeMembershipSubscriber
     /**
      * Add change membership action.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
+    #[AsEventListener(event: CampaignBuilderEvent::class)]
     public function addAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
@@ -43,7 +43,7 @@ final readonly class CampaignActionChangeMembershipSubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP)]
+    #[AsEventListener(event: CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP)]
     public function changeMembership(PendingEvent $event): void
     {
         $properties          = $event->getEvent()->getProperties();
@@ -79,7 +79,7 @@ final readonly class CampaignActionChangeMembershipSubscriber
         $event->passAll();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityValidateEvent::class)]
+    #[AsEventListener(event: EntityValidateEvent::class)]
     public function validateInfiniteLoop(EntityValidateEvent $event): void
     {
         $campaignEvent = $event->getEntity();

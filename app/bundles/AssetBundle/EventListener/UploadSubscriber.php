@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -10,7 +11,6 @@ use Oneup\UploaderBundle\Event\PostUploadEvent;
 use Oneup\UploaderBundle\Event\ValidationEvent;
 use Oneup\UploaderBundle\Uploader\Exception\ValidationException;
 use Oneup\UploaderBundle\UploadEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final readonly class UploadSubscriber
@@ -26,7 +26,7 @@ final readonly class UploadSubscriber
      * Moves upladed file to temporary directory where it can be found later
      * and all uploaded files in there cleared. Also sets file name to the response.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: UploadEvents::POST_UPLOAD)]
+    #[AsEventListener(event: UploadEvents::POST_UPLOAD)]
     public function onPostUpload(PostUploadEvent $event): void
     {
         $request   = $event->getRequest()->request;
@@ -50,7 +50,7 @@ final readonly class UploadSubscriber
      *
      * @throws ValidationException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: UploadEvents::VALIDATION)]
+    #[AsEventListener(event: UploadEvents::VALIDATION)]
     public function onUploadValidation(ValidationEvent $event): void
     {
         $file       = $event->getFile();

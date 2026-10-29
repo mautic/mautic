@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
@@ -10,7 +11,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class TokenSubscriber
 {
@@ -23,8 +23,8 @@ final readonly class TokenSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class, priority: 254)]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class, priority: 254)]
+    #[AsEventListener(event: EmailSendEvent::class, priority: 254)]
+    #[AsEventListener(event: EmailDisplayEvent::class, priority: 254)]
     public function decodeTokens(EmailSendEvent $event): void
     {
         if ($event->isDynamicContentParsing()) {
@@ -63,7 +63,7 @@ final readonly class TokenSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: TokenReplacementEvent::class, priority: -254)]
+    #[AsEventListener(event: TokenReplacementEvent::class, priority: -254)]
     public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         $clickthrough = $event->getClickthrough();

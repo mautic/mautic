@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -10,7 +11,6 @@ use Mautic\FormBundle\Form\Type\FormFieldCheckboxGroupType;
 use Mautic\FormBundle\Form\Type\FormFieldEmailType;
 use Mautic\FormBundle\Form\Type\FormFieldTelType;
 use Mautic\FormBundle\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class FormValidationSubscriber
@@ -24,7 +24,7 @@ final readonly class FormValidationSubscriber
     /**
      * Add a simple email form.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\FormBuilderEvent::class)]
+    #[AsEventListener(event: Events\FormBuilderEvent::class)]
     public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addValidator(
@@ -62,7 +62,7 @@ final readonly class FormValidationSubscriber
     /**
      * Custom validation.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_FORM_VALIDATE)]
+    #[AsEventListener(event: FormEvents::ON_FORM_VALIDATE)]
     public function onFormValidate(Events\ValidationEvent $event): void
     {
         $value = $event->getValue();

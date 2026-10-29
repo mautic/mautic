@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Tests\ApiPlatform\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
@@ -16,7 +17,6 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -47,7 +47,7 @@ final class MauticDenyAccessListenerTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new class
         {
-            #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ApiPlatformPermissionContextEvent::class)]
+            #[AsEventListener(event: ApiPlatformPermissionContextEvent::class)]
             public function onApiPlatformPermissionContext(ApiPlatformPermissionContextEvent $event): void
             {
                 $permission = $event->getPermission();

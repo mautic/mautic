@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\EventListener\RouterSubscriber;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -44,6 +43,5 @@ final class RouterSubscriberTest extends TestCase
 
         $this->assertSame('https', $context->getScheme());
         $this->assertSame('mautic.example.com', $context->getHost());
-        $this->assertSame(['setRouterRequestContext', -1], RouterSubscriber::getSubscribedEvents()[KernelEvents::FINISH_REQUEST]);
     }
 }

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigPostSaveEvent;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ConfigSubscriber
 {
@@ -22,7 +22,7 @@ final readonly class ConfigSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ConfigPostSaveEvent::class)]
+    #[AsEventListener(event: ConfigPostSaveEvent::class)]
     public function onConfigPostSave(ConfigEvent $event): void
     {
         if ($originalNormData = $event->getOriginalNormData()) {

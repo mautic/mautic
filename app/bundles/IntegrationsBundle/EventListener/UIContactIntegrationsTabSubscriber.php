@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class UIContactIntegrationsTabSubscriber
 {
@@ -17,7 +17,7 @@ final readonly class UIContactIntegrationsTabSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomTemplateEvent::class)]
+    #[AsEventListener(event: CustomTemplateEvent::class)]
     public function onTemplateRender(CustomTemplateEvent $event): void
     {
         if ('@MauticLead/Lead/lead.html.twig' === $event->getTemplate()) {

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class TimelineEventLogSubscriber
 {
@@ -21,7 +21,7 @@ final class TimelineEventLogSubscriber
         $this->eventLogRepository = $leadEventLogRepository;
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
+    #[AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(

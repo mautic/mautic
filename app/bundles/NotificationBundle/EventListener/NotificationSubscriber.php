@@ -2,6 +2,7 @@
 
 namespace Mautic\NotificationBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -12,7 +13,6 @@ use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class NotificationSubscriber
 {
@@ -27,7 +27,7 @@ final readonly class NotificationSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: NotificationEvents::NOTIFICATION_POST_SAVE)]
+    #[AsEventListener(event: NotificationEvents::NOTIFICATION_POST_SAVE)]
     public function onPostSave(NotificationEvent $event): void
     {
         $entity = $event->getNotification();
@@ -46,7 +46,7 @@ final readonly class NotificationSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: NotificationEvents::NOTIFICATION_POST_DELETE)]
+    #[AsEventListener(event: NotificationEvents::NOTIFICATION_POST_DELETE)]
     public function onDelete(NotificationEvent $event): void
     {
         $entity = $event->getNotification();
@@ -60,7 +60,7 @@ final readonly class NotificationSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: NotificationEvents::TOKEN_REPLACEMENT)]
+    #[AsEventListener(event: NotificationEvents::TOKEN_REPLACEMENT)]
     public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */

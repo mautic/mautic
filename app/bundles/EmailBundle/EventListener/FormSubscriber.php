@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\Exception\ORMException;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType;
@@ -11,7 +12,6 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class FormSubscriber
 {
@@ -24,7 +24,7 @@ final readonly class FormSubscriber
     /**
      * Add a send email actions to available form submit actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormBuilderEvent::class)]
+    #[AsEventListener(event: FormBuilderEvent::class)]
     public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('email.send.user', [
@@ -52,7 +52,7 @@ final readonly class FormSubscriber
     /**
      * @throws ORMException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
+    #[AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
     public function onFormSubmitActionSendEmail(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('email.send.user') && false === $event->checkContext('email.send.lead')) {

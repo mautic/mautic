@@ -2,6 +2,7 @@
 
 namespace Mautic\SmsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -15,7 +16,6 @@ use Mautic\SmsBundle\Event\SmsPostDeleteEvent;
 use Mautic\SmsBundle\Event\SmsPostSaveEvent;
 use Mautic\SmsBundle\Helper\SmsHelper;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SmsSubscriber
 {
@@ -32,7 +32,7 @@ final readonly class SmsSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SmsPostSaveEvent::class)]
+    #[AsEventListener(event: SmsPostSaveEvent::class)]
     public function onPostSave(SmsEvent $event): void
     {
         $entity = $event->getSms();
@@ -51,7 +51,7 @@ final readonly class SmsSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SmsPostDeleteEvent::class)]
+    #[AsEventListener(event: SmsPostDeleteEvent::class)]
     public function onDelete(SmsEvent $event): void
     {
         $entity = $event->getSms();
@@ -65,7 +65,7 @@ final readonly class SmsSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SmsEvents::TOKEN_REPLACEMENT)]
+    #[AsEventListener(event: SmsEvents::TOKEN_REPLACEMENT)]
     public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         $lead         = $event->getLead();

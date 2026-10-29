@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -70,7 +70,7 @@ final class CookieHelper
         $this->setCookie($name, '', -86400, $path, $domain, $secure, $httponly, $sameSite);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::RESPONSE)]
+    #[AsEventListener(event: KernelEvents::RESPONSE)]
     public function onResponse(ResponseEvent $event): void
     {
         foreach ($this->cookies as $cookie) {

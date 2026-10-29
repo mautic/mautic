@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Event\FieldPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CustomFieldSubscriber
 {
@@ -22,7 +22,7 @@ final readonly class CustomFieldSubscriber
      * If a custom (contact) field options change then we need to regenerate HTML cache of the forms
      * that use that field so that the new options are shown.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FieldPostSaveEvent::class)]
+    #[AsEventListener(event: FieldPostSaveEvent::class)]
     public function regenerateFormCache(LeadFieldEvent $event): void
     {
         $customField = $event->getField();

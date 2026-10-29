@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\Query\Expr\Func;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class SegmentOperatorQuerySubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SegmentOperatorQueryBuilderEvent::class)]
+    #[AsEventListener(event: SegmentOperatorQueryBuilderEvent::class)]
     public function onEmptyOperator(SegmentOperatorQueryBuilderEvent $event): void
     {
         if (!$event->operatorIsOneOf('empty')) {
@@ -33,7 +33,7 @@ final class SegmentOperatorQuerySubscriber
         $event->stopPropagation();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SegmentOperatorQueryBuilderEvent::class)]
+    #[AsEventListener(event: SegmentOperatorQueryBuilderEvent::class)]
     public function onNotEmptyOperator(SegmentOperatorQueryBuilderEvent $event): void
     {
         if (!$event->operatorIsOneOf('notEmpty')) {
@@ -54,7 +54,7 @@ final class SegmentOperatorQuerySubscriber
         $event->stopPropagation();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SegmentOperatorQueryBuilderEvent::class)]
+    #[AsEventListener(event: SegmentOperatorQueryBuilderEvent::class)]
     public function onNegativeOperators(SegmentOperatorQueryBuilderEvent $event): void
     {
         if (!$event->operatorIsOneOf(
@@ -100,7 +100,7 @@ final class SegmentOperatorQuerySubscriber
         $event->stopPropagation();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SegmentOperatorQueryBuilderEvent::class)]
+    #[AsEventListener(event: SegmentOperatorQueryBuilderEvent::class)]
     public function onMultiselectOperators(SegmentOperatorQueryBuilderEvent $event): void
     {
         if (!$event->operatorIsOneOf('multiselect', '!multiselect')) {
@@ -158,7 +158,7 @@ final class SegmentOperatorQuerySubscriber
         $event->stopPropagation();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SegmentOperatorQueryBuilderEvent::class)]
+    #[AsEventListener(event: SegmentOperatorQueryBuilderEvent::class)]
     public function onDefaultOperators(SegmentOperatorQueryBuilderEvent $event): void
     {
         if (!$event->operatorIsOneOf(

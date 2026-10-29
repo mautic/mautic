@@ -32,11 +32,6 @@ final class SegmentStatsSubscriberTest extends MauticMysqlTestCase
     /**
      * Test SubscribedEvents.
      */
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertArrayHasKey(GetStatDataEvent::class, SegmentStatsSubscriber::getSubscribedEvents());
-    }
-
     public function testGetCampaignEntryPoints(): void
     {
         $campaign = $this->createCampaignWithLeadList();

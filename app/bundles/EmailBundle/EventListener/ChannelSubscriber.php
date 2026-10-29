@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\EmailBundle\Form\Type\EmailListType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Model\ReportModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ChannelSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ChannelEvent::class, priority: 100)]
+    #[AsEventListener(event: ChannelEvent::class, priority: 100)]
     public function onAddChannel(ChannelEvent $event): void
     {
         $event->addChannel(

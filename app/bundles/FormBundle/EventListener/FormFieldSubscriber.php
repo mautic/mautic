@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FieldModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class FormFieldSubscriber
 {
@@ -16,7 +16,7 @@ final readonly class FormFieldSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::FIELD_POST_DELETE)]
+    #[AsEventListener(event: FormEvents::FIELD_POST_DELETE)]
     public function onFieldPostDelete(FormFieldEvent $event): void
     {
         $field = $event->getField();

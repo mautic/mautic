@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,7 +19,6 @@ use Mautic\LeadBundle\Event\ListPreUnpublishEvent;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class SegmentSubscriber
@@ -37,7 +37,7 @@ final readonly class SegmentSubscriber
     /**
      * Add a segment entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListPostSaveEvent::class)]
+    #[AsEventListener(event: ListPostSaveEvent::class)]
     public function onSegmentPostSave(SegmentEvent $event): void
     {
         $segment = $event->getList();
@@ -57,7 +57,7 @@ final readonly class SegmentSubscriber
     /**
      * @throws RecordCanNotUnpublishException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListPreUnpublishEvent::class)]
+    #[AsEventListener(event: ListPreUnpublishEvent::class)]
     public function onSegmentPreUnpublish(SegmentEvent $event): void
     {
         $leadList = $event->getList();
@@ -81,7 +81,7 @@ final readonly class SegmentSubscriber
     /**
      * @throws DeleteEntityDependencyException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListPreDeleteEvent::class)]
+    #[AsEventListener(event: ListPreDeleteEvent::class)]
     public function onSegmentPreDelete(SegmentEvent $event): void
     {
         $leadList = $event->getList();
@@ -103,7 +103,7 @@ final readonly class SegmentSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListDeleteEvent::class)]
+    #[AsEventListener(event: ListDeleteEvent::class)]
     public function onSegmentDelete(SegmentEvent $event): void
     {
         if ($this->coreParametersHelper->get('delete_segment_in_background', false)) {
@@ -119,7 +119,7 @@ final readonly class SegmentSubscriber
     /**
      * Add a segment delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListPostDeleteEvent::class)]
+    #[AsEventListener(event: ListPostDeleteEvent::class)]
     public function onSegmentPostDelete(SegmentEvent $event): void
     {
         $segment = $event->getList();
@@ -134,7 +134,7 @@ final readonly class SegmentSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListPostDeleteEvent::class)]
+    #[AsEventListener(event: ListPostDeleteEvent::class)]
     public function clearSegmentCountCache(SegmentEvent $event): void
     {
         $segment = $event->getList();

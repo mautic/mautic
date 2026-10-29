@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\GetStatDataEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SegmentStatsSubscriber
 {
@@ -15,7 +15,7 @@ final readonly class SegmentStatsSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: GetStatDataEvent::class)]
+    #[AsEventListener(event: GetStatDataEvent::class)]
     public function getStatsLeadEvents(GetStatDataEvent $event): void
     {
         $result = array_merge(

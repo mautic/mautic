@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -11,7 +12,6 @@ use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -30,7 +30,7 @@ final readonly class LeadSubscriber
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
+    #[AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addTimelineEvents($event, 'campaign.event', $this->translator->trans('mautic.campaign.triggered'));
@@ -40,7 +40,7 @@ final readonly class LeadSubscriber
     /**
      * Update records after lead merge.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostMergeEvent::class)]
+    #[AsEventListener(event: LeadPostMergeEvent::class)]
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->leadEventLogRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());

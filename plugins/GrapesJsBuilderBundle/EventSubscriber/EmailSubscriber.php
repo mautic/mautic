@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
@@ -14,7 +15,6 @@ use Mautic\EmailBundle\Helper\EmailConfigInterface;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class EmailSubscriber
 {
@@ -34,7 +34,7 @@ final class EmailSubscriber
     /**
      * Stores the current MJML for use when managing drafts.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPreSaveEvent::class)]
+    #[AsEventListener(event: EmailPreSaveEvent::class)]
     public function onEmailPreSave(Events\EmailEvent $event): void
     {
         if (!$this->config->isPublished() || !$this->emailConfig->isDraftEnabled()) {
@@ -53,7 +53,7 @@ final class EmailSubscriber
     /**
      * Add an entry.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPostSaveEvent::class)]
+    #[AsEventListener(event: EmailPostSaveEvent::class)]
     public function onEmailPostSave(Events\EmailEvent $event): void
     {
         if (!$this->config->isPublished()) {
@@ -66,7 +66,7 @@ final class EmailSubscriber
     /**
      * Delete an entry.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPostDeleteEvent::class)]
+    #[AsEventListener(event: EmailPostDeleteEvent::class)]
     public function onEmailDelete(Events\EmailEvent $event): void
     {
         if (!$this->config->isPublished()) {
@@ -81,7 +81,7 @@ final class EmailSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEditSubmitEvent::class)]
+    #[AsEventListener(event: EmailEditSubmitEvent::class)]
     public function manageEmailDraft(EmailEditSubmitEvent $event): void
     {
         if (!$this->config->isPublished()) {

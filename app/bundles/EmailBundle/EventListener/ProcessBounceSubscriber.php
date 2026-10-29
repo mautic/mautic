@@ -2,10 +2,10 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ProcessBounceSubscriber
 {
@@ -18,13 +18,13 @@ final readonly class ProcessBounceSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MonitoredEmailEvent::class)]
+    #[AsEventListener(event: MonitoredEmailEvent::class)]
     public function onEmailConfig(MonitoredEmailEvent $event): void
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.bounce_folder');
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ParseEmailEvent::class)]
+    #[AsEventListener(event: ParseEmailEvent::class)]
     public function onEmailParse(ParseEmailEvent $event): void
     {
         if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {

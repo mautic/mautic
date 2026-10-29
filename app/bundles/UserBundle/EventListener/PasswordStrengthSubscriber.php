@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PasswordStrengthBadge;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
  */
 final class PasswordStrengthSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CheckPassportEvent::class, priority: 100)]
+    #[AsEventListener(event: CheckPassportEvent::class, priority: 100)]
     public function checkPassport(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();

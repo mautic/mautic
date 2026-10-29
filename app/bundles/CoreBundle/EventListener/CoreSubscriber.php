@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
@@ -13,7 +14,6 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Event\LoginEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -38,7 +38,7 @@ final readonly class CoreSubscriber
     /**
      * Set vars on login.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SecurityEvents::INTERACTIVE_LOGIN)]
+    #[AsEventListener(event: SecurityEvents::INTERACTIVE_LOGIN)]
     public function onSecurityInteractiveLogin(InteractiveLoginEvent $event): void
     {
         if (defined('MAUTIC_INSTALLER')) {
@@ -83,7 +83,7 @@ final readonly class CoreSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MenuEvent::class, priority: 9999)]
+    #[AsEventListener(event: MenuEvent::class, priority: 9999)]
     public function onBuildMenu(MenuEvent $event): void
     {
         $name    = $event->getType();
@@ -101,7 +101,7 @@ final readonly class CoreSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: RouteEvent::class)]
+    #[AsEventListener(event: RouteEvent::class)]
     public function onBuildRoute(RouteEvent $event): void
     {
         $type       = $event->getType();
@@ -198,7 +198,7 @@ final readonly class CoreSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: IconEvent::class, priority: 9999)]
+    #[AsEventListener(event: IconEvent::class, priority: 9999)]
     public function onFetchIcons(IconEvent $event): void
     {
         $session = $this->requestStack->getCurrentRequest()->getSession();

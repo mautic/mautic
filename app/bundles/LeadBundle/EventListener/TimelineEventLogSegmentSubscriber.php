@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
@@ -12,7 +13,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\ListBatchChangeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class TimelineEventLogSegmentSubscriber
 {
@@ -28,7 +28,7 @@ final class TimelineEventLogSegmentSubscriber
         $this->translator         = $translator;
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListChangeEvent::class)]
+    #[AsEventListener(event: ListChangeEvent::class)]
     public function onChange(ListChangeEvent $event): void
     {
         if (!$contact = $event->getLead()) {
@@ -43,7 +43,7 @@ final class TimelineEventLogSegmentSubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
+    #[AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(
@@ -56,7 +56,7 @@ final class TimelineEventLogSegmentSubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ListBatchChangeEvent::class)]
+    #[AsEventListener(event: ListBatchChangeEvent::class)]
     public function onBatchChange(ListChangeEvent $event): void
     {
         if (!$contacts = $event->getLeads()) {

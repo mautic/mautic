@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\AssetBundle\Helper\TokenHelper;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\Event\BuilderEvent;
@@ -13,7 +14,6 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class BuilderSubscriber
 {
@@ -27,8 +27,8 @@ final class BuilderSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailOnBuildEvent::class)]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageBuilderEvent::class)]
+    #[AsEventListener(event: EmailOnBuildEvent::class)]
+    #[AsEventListener(event: PageBuilderEvent::class)]
     public function onBuilderBuild(BuilderEvent $event): void
     {
         if ($event->tokensRequested($this->assetToken)) {
@@ -46,8 +46,8 @@ final class BuilderSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class)]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class)]
+    #[AsEventListener(event: EmailSendEvent::class)]
+    #[AsEventListener(event: EmailDisplayEvent::class)]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $lead   = $event->getLead();
@@ -57,7 +57,7 @@ final class BuilderSubscriber
         $event->addTokens($tokens);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageDisplayEvent::class)]
+    #[AsEventListener(event: PageDisplayEvent::class)]
     public function onPageDisplay(PageDisplayEvent $event): void
     {
         if (!$lead = $event->getLead()) {

@@ -2,12 +2,12 @@
 
 namespace Mautic\WebhookBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType;
 use Mautic\WebhookBundle\Helper\CampaignHelper;
 use Mautic\WebhookBundle\WebhookEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignSubscriber
 {
@@ -16,7 +16,7 @@ final readonly class CampaignSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: WebhookEvents::ON_CAMPAIGN_BATCH_ACTION)]
+    #[AsEventListener(event: WebhookEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignTriggerAction(PendingEvent $event): void
     {
         if (!$event->checkContext('campaign.sendwebhook')) {
@@ -38,7 +38,7 @@ final readonly class CampaignSubscriber
     /**
      * Add event triggers and actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
+    #[AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $sendWebhookAction = [

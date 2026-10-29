@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -22,7 +23,6 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportSubscriber
@@ -178,7 +178,7 @@ final readonly class ReportSubscriber
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportBuilderEvent::class)]
+    #[AsEventListener(event: ReportBuilderEvent::class)]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_EMAILS, self::CONTEXT_EMAIL_STATS])) {
@@ -340,7 +340,7 @@ final readonly class ReportSubscriber
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGeneratorEvent::class)]
+    #[AsEventListener(event: ReportGeneratorEvent::class)]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
@@ -476,7 +476,7 @@ final readonly class ReportSubscriber
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGraphEvent::class)]
+    #[AsEventListener(event: ReportGraphEvent::class)]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         $graphs = $event->getRequestedGraphs();
@@ -795,7 +795,7 @@ final readonly class ReportSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportDataEvent::class)]
+    #[AsEventListener(event: ReportDataEvent::class)]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();

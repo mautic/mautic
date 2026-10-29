@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -19,7 +20,6 @@ use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Model\EmailDraftModel;
 use Mautic\EmailBundle\Model\EmailModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -46,7 +46,7 @@ final readonly class EmailSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPreSaveEvent::class)]
+    #[AsEventListener(event: EmailPreSaveEvent::class)]
     public function cloneParentEmailDataForVariant(EmailEvent $event): void
     {
         $email = $event->getEmail();
@@ -58,7 +58,7 @@ final readonly class EmailSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPostSaveEvent::class)]
+    #[AsEventListener(event: EmailPostSaveEvent::class)]
     public function onEmailPostSave(EmailEvent $event): void
     {
         $email = $event->getEmail();
@@ -78,8 +78,8 @@ final readonly class EmailSubscriber
     /**
      * Add preheader text to email body.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class, priority: 200)]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class, priority: 200)]
+    #[AsEventListener(event: EmailSendEvent::class, priority: 200)]
+    #[AsEventListener(event: EmailDisplayEvent::class, priority: 200)]
     public function onEmailSendAddPreheaderText(EmailSendEvent $event): void
     {
         $email = $event->getEmail();
@@ -100,7 +100,7 @@ final readonly class EmailSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPostDeleteEvent::class)]
+    #[AsEventListener(event: EmailPostDeleteEvent::class)]
     public function onEmailDelete(EmailEvent $event): void
     {
         $email = $event->getEmail();
@@ -118,7 +118,7 @@ final readonly class EmailSubscriber
     /**
      * Process if an email has failed.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEvents::EMAIL_FAILED)]
+    #[AsEventListener(event: EmailEvents::EMAIL_FAILED)]
     public function onEmailFailed(Events\QueueEmailEvent $event): void
     {
         $message    = $event->getMessage();
@@ -139,7 +139,7 @@ final readonly class EmailSubscriber
     /**
      * Process if an email is resent.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEvents::EMAIL_RESEND)]
+    #[AsEventListener(event: EmailEvents::EMAIL_RESEND)]
     public function onEmailResend(Events\QueueEmailEvent $event): void
     {
         $message = $event->getMessage();
@@ -170,7 +170,7 @@ final readonly class EmailSubscriber
         $this->emailModel->saveEmailStat($stat);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailEditSubmitEvent::class)]
+    #[AsEventListener(event: EmailEditSubmitEvent::class)]
     public function manageEmailDraft(EmailEditSubmitEvent $event): void
     {
         $liveEmail   = $event->getPreviousEmail();
@@ -215,7 +215,7 @@ final readonly class EmailSubscriber
         $this->entityManager->flush();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPreDeleteEvent::class)]
+    #[AsEventListener(event: EmailPreDeleteEvent::class)]
     public function deleteEmailDraft(EmailEvent $event): void
     {
         try {

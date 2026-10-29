@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
@@ -35,7 +36,6 @@ use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -82,7 +82,7 @@ final class LeadSubscriber
     /**
      * Add a lead entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostSaveEvent::class)]
+    #[AsEventListener(event: LeadPostSaveEvent::class)]
     public function onLeadPostSave(LeadEvent $event): void
     {
         $lead = $event->getLead();
@@ -160,7 +160,7 @@ final class LeadSubscriber
     /**
      * Add a lead delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostDeleteEvent::class)]
+    #[AsEventListener(event: LeadPostDeleteEvent::class)]
     public function onLeadDelete(LeadEvent $event): void
     {
         $lead = $event->getLead();
@@ -178,7 +178,7 @@ final class LeadSubscriber
     /**
      * Find lead linked segment ids to update post delete.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPreDeleteEvent::class)]
+    #[AsEventListener(event: LeadPreDeleteEvent::class)]
     public function onLeadPreDelete(LeadEvent $event): void
     {
         if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
@@ -195,7 +195,7 @@ final class LeadSubscriber
     /**
      * Add a field entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FieldPostSaveEvent::class)]
+    #[AsEventListener(event: FieldPostSaveEvent::class)]
     public function onFieldPostSave(Events\LeadFieldEvent $event): void
     {
         $field = $event->getField();
@@ -215,7 +215,7 @@ final class LeadSubscriber
     /**
      * Add a field delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FieldPostDeleteEvent::class)]
+    #[AsEventListener(event: FieldPostDeleteEvent::class)]
     public function onFieldDelete(Events\LeadFieldEvent $event): void
     {
         $field = $event->getField();
@@ -233,7 +233,7 @@ final class LeadSubscriber
     /**
      * Add a note entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: NotePostSaveEvent::class)]
+    #[AsEventListener(event: NotePostSaveEvent::class)]
     public function onNotePostSave(Events\LeadNoteEvent $event): void
     {
         $note = $event->getNote();
@@ -253,7 +253,7 @@ final class LeadSubscriber
     /**
      * Add a note delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: NotePostDeleteEvent::class)]
+    #[AsEventListener(event: NotePostDeleteEvent::class)]
     public function onNoteDelete(Events\LeadNoteEvent $event): void
     {
         $note = $event->getNote();
@@ -268,7 +268,7 @@ final class LeadSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPreMergeEvent::class)]
+    #[AsEventListener(event: LeadPreMergeEvent::class)]
     public function preLeadMerge(Events\LeadMergeEvent $event): void
     {
         $this->leadEventLogRepository->updateLead(
@@ -277,7 +277,7 @@ final class LeadSubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostMergeEvent::class)]
+    #[AsEventListener(event: LeadPostMergeEvent::class)]
     public function onLeadMerge(Events\LeadMergeEvent $event): void
     {
         $this->pointsChangeLogRepository->updateLead(
@@ -314,7 +314,7 @@ final class LeadSubscriber
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\LeadTimelineEvent::class)]
+    #[AsEventListener(event: Events\LeadTimelineEvent::class)]
     public function onTimelineGenerate(Events\LeadTimelineEvent $event): void
     {
         $eventTypes = [
@@ -449,7 +449,7 @@ final class LeadSubscriber
     /**
      * @throws Exception
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadChangeCompanyEvent::class)]
+    #[AsEventListener(event: LeadChangeCompanyEvent::class)]
     public function onLeadCompanyChange(LeadChangeCompanyEvent $event): void
     {
         $leadId                 = $event->getLead()->getId();

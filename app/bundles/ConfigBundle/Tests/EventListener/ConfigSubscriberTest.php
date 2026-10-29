@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\ConfigBundle\Tests\EventListener;
 
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\ConfigBundle\Event\ConfigPostSaveEvent;
 use Mautic\ConfigBundle\EventListener\ConfigSubscriber;
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -29,16 +28,6 @@ final class ConfigSubscriberTest extends TestCase
     {
         $this->logger     = $this->createMock(ConfigChangeLogger::class);
         $this->subscriber = new ConfigSubscriber($this->logger, $this->createStub(IpAddressRepository::class), $this->createStub(CoreParametersHelper::class), $this->createStub(AuditLogRepository::class));
-    }
-
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertSame(
-            [
-                ConfigPostSaveEvent::class => ['onConfigPostSave', 0],
-            ],
-            $this->subscriber->getSubscribedEvents()
-        );
     }
 
     public function testNothingToLogOnConfigPostSave(): void

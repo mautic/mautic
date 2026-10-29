@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\NotificationBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
 use Mautic\NotificationBundle\Helper\NotificationHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -21,7 +21,7 @@ final readonly class BuildJsSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: BuildJsEvent::class, priority: 254)]
+    #[AsEventListener(event: BuildJsEvent::class, priority: 254)]
     public function onBuildJs(BuildJsEvent $event): void
     {
         if (!$event->acceptsScope(BuildJsScope::TRACKING)) {

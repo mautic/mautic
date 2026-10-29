@@ -2,12 +2,12 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class TokenSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageDisplayEvent::class, priority: 254)]
+    #[AsEventListener(event: PageDisplayEvent::class, priority: 254)]
     public function decodeTokens(PageDisplayEvent $event): void
     {
         // Find and replace encoded tokens for trackable URL conversion

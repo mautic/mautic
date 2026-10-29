@@ -2,6 +2,8 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Mautic\LeadBundle\Entity\Lead;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
@@ -126,7 +128,7 @@ class LeadRepository extends CommonRepository
      *
      * @param array<string, mixed> $options
      */
-    public function checkLeadInCampaigns(\Mautic\LeadBundle\Entity\Lead $lead, array $options = []): bool
+    public function checkLeadInCampaigns(Lead $lead, array $options = []): bool
     {
         if (empty($options['campaigns'])) {
             return false;
@@ -600,7 +602,7 @@ class LeadRepository extends CommonRepository
     /**
      * @return array{}|array<int, array<string, string|null>>
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function getCampaignMembersGroupByCountry(Campaign $campaign, \DateTimeImmutable $dateFromObject, \DateTimeImmutable $dateToObject): array
     {

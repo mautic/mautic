@@ -2,13 +2,13 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ProcessUnsubscribeSubscriber
 {
@@ -23,13 +23,13 @@ final readonly class ProcessUnsubscribeSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MonitoredEmailEvent::class)]
+    #[AsEventListener(event: MonitoredEmailEvent::class)]
     public function onEmailConfig(MonitoredEmailEvent $event): void
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.unsubscribe_folder');
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ParseEmailEvent::class)]
+    #[AsEventListener(event: ParseEmailEvent::class)]
     public function onEmailParse(ParseEmailEvent $event): void
     {
         if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {
@@ -46,7 +46,7 @@ final readonly class ProcessUnsubscribeSubscriber
     /**
      * Add an unsubscribe email to the List-Unsubscribe header if applicable.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class)]
+    #[AsEventListener(event: EmailSendEvent::class)]
     public function onEmailSend(EmailSendEvent $event): void
     {
         if ($this->coreParametersHelper->get('disable_unsubscribe_link_header')) {

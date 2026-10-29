@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\SmsBundle\Event\ReplyEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class StopSubscriber
 {
@@ -16,7 +16,7 @@ final readonly class StopSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReplyEvent::class)]
+    #[AsEventListener(event: ReplyEvent::class)]
     public function onReply(ReplyEvent $event): void
     {
         $message = $event->getMessage();

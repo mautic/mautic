@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Event\EntityExportEvent;
@@ -23,7 +24,6 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class EmailImportExportSubscriber
 {
@@ -43,7 +43,7 @@ final readonly class EmailImportExportSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityExportEvent::class)]
+    #[AsEventListener(event: EntityExportEvent::class)]
     public function onEmailExport(EntityExportEvent $event): void
     {
         if (Email::ENTITY_NAME !== $event->getEntityName()) {
@@ -125,7 +125,7 @@ final readonly class EmailImportExportSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportEvent::class)]
+    #[AsEventListener(event: EntityImportEvent::class)]
     public function onEmailImport(EntityImportEvent $event): void
     {
         if (Email::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -187,7 +187,7 @@ final readonly class EmailImportExportSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportUndoEvent::class)]
+    #[AsEventListener(event: EntityImportUndoEvent::class)]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Email::ENTITY_NAME !== $event->getEntityName()) {
@@ -211,7 +211,7 @@ final readonly class EmailImportExportSubscriber
         $this->entityManager->flush();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportAnalyzeEvent::class)]
+    #[AsEventListener(event: EntityImportAnalyzeEvent::class)]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(

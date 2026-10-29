@@ -2,9 +2,9 @@
 
 namespace Mautic\ChannelBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -16,7 +16,7 @@ final readonly class ButtonSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomButtonEvent::class)]
+    #[AsEventListener(event: CustomButtonEvent::class)]
     public function injectContactBulkButtons(CustomButtonEvent $event): void
     {
         if (str_starts_with($event->getRoute(), 'mautic_contact_')) {

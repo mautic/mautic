@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\EmailMediaImageHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Builder-embedded images (uploaded through the file manager into the media images directory) are
@@ -23,7 +23,7 @@ final readonly class EmailExportListEventSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: AssetExportListEvent::class)]
+    #[AsEventListener(event: AssetExportListEvent::class)]
     public function onExportList(AssetExportListEvent $event): void
     {
         foreach ($event->getEntityData() as $section) {

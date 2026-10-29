@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use Mautic\EmailBundle\Entity\Email;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -28,7 +28,7 @@ final readonly class InjectCustomContentSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomContentEvent::class)]
+    #[AsEventListener(event: CustomContentEvent::class)]
     public function injectViewCustomContent(CustomContentEvent $customContentEvent): void
     {
         if (!$this->config->isPublished()) {

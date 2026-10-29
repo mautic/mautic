@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ProjectBundle\DTO\DetailRoute;
 use Mautic\ProjectBundle\Event\EntityTypeDetailRouteEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class EntityTypeDetailRouteSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityTypeDetailRouteEvent::class)]
+    #[AsEventListener(event: EntityTypeDetailRouteEvent::class)]
     public function onEntityTypeDetailRoute(EntityTypeDetailRouteEvent $event): void
     {
         // Point entity uses edit

@@ -2,12 +2,12 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Helper\DateTime\DateTimeToken;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class DateTimeTokenSubscriber
@@ -20,13 +20,13 @@ final readonly class DateTimeTokenSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageBuilderEvent::class)]
+    #[AsEventListener(event: PageBuilderEvent::class)]
     public function onPageBuild(PageBuilderEvent $event): void
     {
         $event->addToken('{today}', $this->translator->trans('mautic.core.token.group.other').': '.$this->translator->trans('mautic.email.token.today'));
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageDisplayEvent::class)]
+    #[AsEventListener(event: PageDisplayEvent::class)]
     public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content   = $event->getContent();

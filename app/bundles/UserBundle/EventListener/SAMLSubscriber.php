@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -21,7 +21,7 @@ final readonly class SAMLSubscriber
      * Block access to SAML URLs if SAML is disabled.
      * This listener is removed from Kernel if SAML is not enabled. See mautic.saml_enabled parameter.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::REQUEST, priority: 256)]
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: 256)]
     public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMainRequest()) {

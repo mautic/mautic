@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Tests\Security\Voter;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent;
 use Mautic\ApiBundle\Security\Voter\ApiPermissionVoter;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -11,7 +12,6 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -30,7 +30,7 @@ final class ApiPermissionVoterTest extends TestCase
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new class
         {
-            #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ApiPlatformPermissionContextEvent::class)]
+            #[AsEventListener(event: ApiPlatformPermissionContextEvent::class)]
             public function onApiPlatformPermissionContext(ApiPlatformPermissionContextEvent $event): void
             {
                 $permission = $event->getPermission();

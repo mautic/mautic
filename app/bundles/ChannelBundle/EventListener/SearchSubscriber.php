@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Service\GlobalSearch;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SearchSubscriber
 {
@@ -18,7 +18,7 @@ final readonly class SearchSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: GlobalSearchEvent::class)]
+    #[AsEventListener(event: GlobalSearchEvent::class)]
     public function onGlobalSearch(GlobalSearchEvent $event): void
     {
         $results = $this->globalSearch->performSearch(

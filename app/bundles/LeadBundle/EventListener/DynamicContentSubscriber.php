@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class DynamicContentSubscriber
 {
@@ -17,7 +17,7 @@ final readonly class DynamicContentSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactFiltersEvaluateEvent::class)]
+    #[AsEventListener(event: ContactFiltersEvaluateEvent::class)]
     public function onContactFilterEvaluate(ContactFiltersEvaluateEvent $event): void
     {
         foreach ($event->getFilters() as $filter) {

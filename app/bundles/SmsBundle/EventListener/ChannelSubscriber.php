@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -11,7 +12,6 @@ use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Form\Type\SmsListType;
 use Mautic\SmsBundle\Sms\TransportChain;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ChannelSubscriber
 {
@@ -20,7 +20,7 @@ final readonly class ChannelSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ChannelEvent::class, priority: 90)]
+    #[AsEventListener(event: ChannelEvent::class, priority: 90)]
     public function onAddChannel(ChannelEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Event\FieldPreDeleteEvent;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -23,7 +23,7 @@ final readonly class LeadFieldSubscriber
     /**
      * Check if Custom field is used in any segment before delete operation.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FieldPreDeleteEvent::class)]
+    #[AsEventListener(event: FieldPreDeleteEvent::class)]
     public function onFieldPreDelete(LeadFieldEvent $event): void
     {
         $field    = $event->getField();

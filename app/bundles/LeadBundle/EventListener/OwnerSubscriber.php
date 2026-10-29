@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
@@ -10,7 +11,6 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class OwnerSubscriber
@@ -30,32 +30,32 @@ final class OwnerSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailOnBuildEvent::class)]
+    #[AsEventListener(event: EmailOnBuildEvent::class)]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         $event->addTokens($this->getTokens());
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class)]
+    #[AsEventListener(event: EmailDisplayEvent::class)]
     public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class)]
+    #[AsEventListener(event: EmailSendEvent::class)]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $event->addTokens($this->getGeneratedTokens($event));
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: TokensBuildEvent::class)]
+    #[AsEventListener(event: TokensBuildEvent::class)]
     public function onSmsTokensBuild(TokensBuildEvent $event): void
     {
         $tokens = array_merge($event->getTokens(), $this->getTokens());
         $event->setTokens($tokens);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SmsEvents::TOKEN_REPLACEMENT)]
+    #[AsEventListener(event: SmsEvents::TOKEN_REPLACEMENT)]
     public function onSmsTokenReplacement(TokenReplacementEvent $event): void
     {
         $contact             = $event->getLead()->getProfileFields();
@@ -68,7 +68,7 @@ final class OwnerSubscriber
         $event->setContent($content);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: UrlTokenReplaceEvent::class)]
+    #[AsEventListener(event: UrlTokenReplaceEvent::class)]
     public function onUrlTokenReplace(UrlTokenReplaceEvent $event): void
     {
         $contact             = $event->getLead()->getProfileFields();

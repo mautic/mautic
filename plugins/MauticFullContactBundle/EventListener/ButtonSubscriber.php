@@ -2,13 +2,13 @@
 
 namespace MauticPlugin\MauticFullContactBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -21,7 +21,7 @@ final readonly class ButtonSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomButtonEvent::class)]
+    #[AsEventListener(event: CustomButtonEvent::class)]
     public function injectViewButtons(CustomButtonEvent $event): void
     {
         // get api_key from plugin settings

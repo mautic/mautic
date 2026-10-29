@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
@@ -17,7 +18,6 @@ use Mautic\PageBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
@@ -72,7 +72,7 @@ final class BuilderSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailOnBuildEvent::class)]
+    #[AsEventListener(event: EmailOnBuildEvent::class)]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         if ($event->tokensRequested([self::pageTokenRegex])) {
@@ -91,8 +91,8 @@ final class BuilderSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class)]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class)]
+    #[AsEventListener(event: EmailSendEvent::class)]
+    #[AsEventListener(event: EmailDisplayEvent::class)]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $content      = $event->getContent();
@@ -106,7 +106,7 @@ final class BuilderSubscriber
     /**
      * Add forms to available page tokens.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\PageBuilderEvent::class)]
+    #[AsEventListener(event: Events\PageBuilderEvent::class)]
     public function onPageBuild(Events\PageBuilderEvent $event): void
     {
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
@@ -178,7 +178,7 @@ final class BuilderSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\PageDisplayEvent::class)]
+    #[AsEventListener(event: Events\PageDisplayEvent::class)]
     public function onPageDisplay(Events\PageDisplayEvent $event): void
     {
         if (empty($content = $event->getContent())) {

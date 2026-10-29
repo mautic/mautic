@@ -2,6 +2,7 @@
 
 namespace Mautic\SmsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\SmsBundle\Entity\Sms;
@@ -9,7 +10,6 @@ use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class CampaignSendSubscriber
@@ -21,7 +21,7 @@ final readonly class CampaignSendSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
+    #[AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
@@ -41,7 +41,7 @@ final readonly class CampaignSendSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION)]
+    #[AsEventListener(event: SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION)]
     public function onCampaignTriggerBatchAction(PendingEvent $event): void
     {
         $smsId = (int) $event->getEvent()->getProperties()['sms'];

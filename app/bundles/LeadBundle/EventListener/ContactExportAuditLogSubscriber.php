@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\ContactExportEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ContactExportAuditLogSubscriber
 {
@@ -17,7 +17,7 @@ final readonly class ContactExportAuditLogSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactExportEvent::class)]
+    #[AsEventListener(event: ContactExportEvent::class)]
     public function onContactExport(ContactExportEvent $event): void
     {
         $this->auditLogModel->writeToLog(

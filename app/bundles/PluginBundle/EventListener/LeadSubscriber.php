@@ -2,6 +2,7 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\CompanyPreDeleteEvent;
@@ -11,7 +12,6 @@ use Mautic\LeadBundle\Event\LeadPreDeleteEvent;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class LeadSubscriber
 {
@@ -23,7 +23,7 @@ final readonly class LeadSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPreDeleteEvent::class)]
+    #[AsEventListener(event: LeadPreDeleteEvent::class)]
     public function onLeadDelete(LeadEvent $event): bool
     {
         $lead = $event->getLead();
@@ -32,7 +32,7 @@ final readonly class LeadSubscriber
         return false;
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CompanyPreDeleteEvent::class)]
+    #[AsEventListener(event: CompanyPreDeleteEvent::class)]
     public function onCompanyDelete(CompanyEvent $event): bool
     {
         /** @var Company $company */
@@ -45,7 +45,7 @@ final readonly class LeadSubscriber
     /*
     * Change lead event
     */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostSaveEvent::class)]
+    #[AsEventListener(event: LeadPostSaveEvent::class)]
     public function onLeadSave(LeadEvent $event): void
     {
         $lead = $event->getLead();

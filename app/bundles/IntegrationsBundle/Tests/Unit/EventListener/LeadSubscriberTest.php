@@ -19,12 +19,7 @@ use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInte
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\CompanyEvent;
-use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
-use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
-use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\Event\LeadPostDeleteEvent;
-use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -82,17 +77,6 @@ final class LeadSubscriberTest extends TestCase
             $this->syncIntegrationsHelper,
             $this->eventDispatcherInterfaceMock
         );
-    }
-
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertSame([
-            LeadPostSaveEvent::class      => ['onLeadPostSave', 0],
-            LeadPostDeleteEvent::class    => ['onLeadPostDelete', 255],
-            CompanyPostSaveEvent::class   => ['onCompanyPostSave', 0],
-            CompanyPostDeleteEvent::class => ['onCompanyPostDelete', 255],
-            LeadChangeCompanyEvent::class => ['onLeadCompanyChange', 128],
-        ], LeadSubscriber::getSubscribedEvents());
     }
 
     public function testOnLeadPostSaveAnonymousLead(): void

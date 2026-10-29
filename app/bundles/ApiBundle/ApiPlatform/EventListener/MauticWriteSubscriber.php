@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\ApiPlatform\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use ApiPlatform\Symfony\EventListener\EventPriorities;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -20,7 +20,7 @@ final readonly class MauticWriteSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::VIEW, priority: EventPriorities::PRE_WRITE)]
+    #[AsEventListener(event: KernelEvents::VIEW, priority: EventPriorities::PRE_WRITE)]
     public function addData(ViewEvent $event): void
     {
         $entity = $event->getControllerResult();

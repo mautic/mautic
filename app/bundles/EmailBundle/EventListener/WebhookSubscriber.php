@@ -2,13 +2,13 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Event\WebhookQueueEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class WebhookSubscriber
 {
@@ -21,7 +21,7 @@ final readonly class WebhookSubscriber
     /**
      * Add event triggers and actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: WebhookBuilderEvent::class)]
+    #[AsEventListener(event: WebhookBuilderEvent::class)]
     public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
@@ -39,7 +39,7 @@ final readonly class WebhookSubscriber
         $event->addEvent(EmailEvents::EMAIL_ON_OPEN, $mailOpen);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class)]
+    #[AsEventListener(event: EmailSendEvent::class)]
     public function onEmailSend(EmailSendEvent $event): void
     {
         // Ignore test email sends.
@@ -65,7 +65,7 @@ final readonly class WebhookSubscriber
         $this->webhookModel->queueWebhooksByType(EmailEvents::EMAIL_ON_SEND, $payload);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailOpenEvent::class)]
+    #[AsEventListener(event: EmailOpenEvent::class)]
     public function onEmailOpen(EmailOpenEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
@@ -81,7 +81,7 @@ final readonly class WebhookSubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: WebhookQueueEvent::class)]
+    #[AsEventListener(event: WebhookQueueEvent::class)]
     public function onWebhookQueueOnAdd(WebhookQueueEvent $event): void
     {
         if ($this->includeDetails) {

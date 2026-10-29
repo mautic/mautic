@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\CustomAssetsEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class EditorFontsSubscriber
 {
@@ -17,7 +17,7 @@ final readonly class EditorFontsSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomAssetsEvent::class)]
+    #[AsEventListener(event: CustomAssetsEvent::class)]
     public function addGlobalAssets(CustomAssetsEvent $customAssetsEvent): void
     {
         $this->addEditorFonts($customAssetsEvent);

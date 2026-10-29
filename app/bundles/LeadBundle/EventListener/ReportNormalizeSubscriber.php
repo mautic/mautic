@@ -2,10 +2,10 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
 use Mautic\ReportBundle\Event\ReportDataEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ReportNormalizeSubscriber
 {
@@ -14,7 +14,7 @@ final readonly class ReportNormalizeSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportDataEvent::class)]
+    #[AsEventListener(event: ReportDataEvent::class)]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         if (!$this->useContactOrCompanyColumn($event->getReport()->getColumns())) {

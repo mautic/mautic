@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -13,7 +14,6 @@ use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\CompanyPreSaveEvent;
 use Mautic\LeadBundle\Event\CompanySoftDeleteEvent;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CompanySubscriber
 {
@@ -30,7 +30,7 @@ final readonly class CompanySubscriber
     /**
      * Add a company entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CompanyPostSaveEvent::class)]
+    #[AsEventListener(event: CompanyPostSaveEvent::class)]
     public function onCompanyPostSave(Events\CompanyEvent $event): void
     {
         $company = $event->getCompany();
@@ -50,7 +50,7 @@ final readonly class CompanySubscriber
     /**
      * Add a company delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CompanyPostDeleteEvent::class)]
+    #[AsEventListener(event: CompanyPostDeleteEvent::class)]
     public function onCompanyDelete(Events\CompanyEvent $event): void
     {
         $company = $event->getCompany();
@@ -66,7 +66,7 @@ final readonly class CompanySubscriber
         $this->clearCompanyInLeadsCompanyFields($company->getName());
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CompanySoftDeleteEvent::class)]
+    #[AsEventListener(event: CompanySoftDeleteEvent::class)]
     public function onCompanySoftDelete(Events\CompanyEvent $event): void
     {
         if ($details = $event->getChanges()) {
@@ -89,7 +89,7 @@ final readonly class CompanySubscriber
         $this->companyModel->permanentDeleteCompany($event->getCompany());
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CompanyPreSaveEvent::class)]
+    #[AsEventListener(event: CompanyPreSaveEvent::class)]
     public function onCompanyPreSave(Events\CompanyEvent $event): void
     {
         if ($this->coreParametersHelper->get('update_company_mapping_data_in_background', false)) {

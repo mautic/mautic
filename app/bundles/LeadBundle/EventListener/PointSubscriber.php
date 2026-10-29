@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
@@ -12,7 +13,6 @@ use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Mautic\PointBundle\PointEvents;
 use Mautic\StageBundle\Model\StageModel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class PointSubscriber
@@ -25,7 +25,7 @@ final readonly class PointSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: TriggerBuilderEvent::class)]
+    #[AsEventListener(event: TriggerBuilderEvent::class)]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $event->addEvent(
@@ -68,7 +68,7 @@ final readonly class PointSubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointEvents::TRIGGER_ON_EVENT_EXECUTE)]
+    #[AsEventListener(event: PointEvents::TRIGGER_ON_EVENT_EXECUTE)]
     public function onTriggerExecute(TriggerExecutedEvent $event): void
     {
         if ('lead.changetags' === $event->getTriggerEvent()->getType()) {
@@ -134,7 +134,7 @@ final readonly class PointSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE)]
+    #[AsEventListener(event: PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE)]
     public function onLeadSegmentsChange(TriggerExecutedEvent $event): void
     {
         $lead = $event->getLead();

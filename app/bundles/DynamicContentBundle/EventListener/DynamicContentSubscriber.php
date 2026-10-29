@@ -2,6 +2,7 @@
 
 namespace Mautic\DynamicContentBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -23,7 +24,6 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class DynamicContentSubscriber
 {
@@ -47,7 +47,7 @@ final readonly class DynamicContentSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DynamicContentEvents::POST_SAVE)]
+    #[AsEventListener(event: DynamicContentEvents::POST_SAVE)]
     public function onPostSave(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
@@ -66,7 +66,7 @@ final readonly class DynamicContentSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DynamicContentEvents::POST_DELETE)]
+    #[AsEventListener(event: DynamicContentEvents::POST_DELETE)]
     public function onDelete(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
@@ -80,7 +80,7 @@ final readonly class DynamicContentSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MauticEvents\TokenReplacementEvent::class)]
+    #[AsEventListener(event: MauticEvents\TokenReplacementEvent::class)]
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
@@ -131,7 +131,7 @@ final readonly class DynamicContentSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageDisplayEvent::class, priority: 254)]
+    #[AsEventListener(event: PageDisplayEvent::class, priority: 254)]
     public function decodeTokens(PageDisplayEvent $event): void
     {
         if (!$lead = $event->getLead()) {

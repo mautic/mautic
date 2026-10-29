@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -21,7 +21,7 @@ final readonly class CampaignSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
+    #[AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $action = [
@@ -45,7 +45,7 @@ final readonly class CampaignSubscriber
         $event->addAction('focus.show', $action);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FocusEvents::ON_CAMPAIGN_BATCH_ACTION)]
+    #[AsEventListener(event: FocusEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignTriggerAction(PendingEvent $event): void
     {
         $focusId = (int) $event->getEvent()->getProperties()['focus'];

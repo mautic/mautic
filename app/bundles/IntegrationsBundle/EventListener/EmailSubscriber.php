@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
@@ -13,7 +14,6 @@ use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\MappedIntegrationObjectTokenEvent;
 use Mautic\IntegrationsBundle\Helper\TokenParser;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This class subscribes to events related to building and providing
@@ -28,7 +28,7 @@ final readonly class EmailSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailOnBuildEvent::class)]
+    #[AsEventListener(event: EmailOnBuildEvent::class)]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         $tokens = [];
@@ -57,8 +57,8 @@ final readonly class EmailSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailSendEvent::class)]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailDisplayEvent::class)]
+    #[AsEventListener(event: EmailSendEvent::class)]
+    #[AsEventListener(event: EmailDisplayEvent::class)]
     public function decodeTokens(EmailSendEvent $event): void
     {
         $tokens = $this->tokenParser->findTokens($event->getContent());

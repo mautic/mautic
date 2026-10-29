@@ -2,13 +2,13 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\Form\Type\PointActionPageHitType;
 use Mautic\PageBundle\Form\Type\PointActionUrlHitType;
 use Mautic\PageBundle\Helper\PointActionHelper;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class PointSubscriber
 {
@@ -18,7 +18,7 @@ final readonly class PointSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointBuilderEvent::class)]
+    #[AsEventListener(event: PointBuilderEvent::class)]
     public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
@@ -46,7 +46,7 @@ final readonly class PointSubscriber
     /**
      * Trigger point actions for page hits.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\PageHitEvent::class)]
+    #[AsEventListener(event: Events\PageHitEvent::class)]
     public function onPageHit(Events\PageHitEvent $event): void
     {
         if ($event->getPage()) {

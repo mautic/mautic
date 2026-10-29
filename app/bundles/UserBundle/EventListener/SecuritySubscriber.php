@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\UserBundle\Event\LoginEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SecuritySubscriber
 {
@@ -17,7 +17,7 @@ final readonly class SecuritySubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LoginEvent::class)]
+    #[AsEventListener(event: LoginEvent::class)]
     public function onSecurityInteractiveLogin(LoginEvent $event): void
     {
         $userId   = (int) $event->getUser()->getId();

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Twig\Environment;
 
 final readonly class CampaignInjectCustomContentSubscriber
@@ -18,7 +18,7 @@ final readonly class CampaignInjectCustomContentSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomContentEvent::class)]
+    #[AsEventListener(event: CustomContentEvent::class)]
     public function injectViewCustomContent(CustomContentEvent $customContentEvent): void
     {
         $parameters = $customContentEvent->getVars();

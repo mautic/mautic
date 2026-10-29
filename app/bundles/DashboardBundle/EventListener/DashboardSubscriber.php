@@ -2,13 +2,13 @@
 
 namespace Mautic\DashboardBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\DashboardBundle\Event\GenerateWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\PreLoadWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DashboardSubscriber
 {
@@ -38,7 +38,7 @@ class DashboardSubscriber
      *
      * @throws InvalidArgumentException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PreLoadWidgetDetailEvent::class)]
+    #[AsEventListener(event: PreLoadWidgetDetailEvent::class)]
     public function onWidgetDetailPreLoad(WidgetDetailEvent $event): void
     {
         $event->setTemplate('@MauticCore/Helper/chart.html.twig');
@@ -48,7 +48,7 @@ class DashboardSubscriber
     /**
      * Adds widget new widget types to the list of available widget types.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: WidgetTypeListEvent::class)]
+    #[AsEventListener(event: WidgetTypeListEvent::class)]
     public function onWidgetListGenerate(WidgetTypeListEvent $event): void
     {
         if ($this->permissions && !$event->hasPermissions($this->permissions)) {
@@ -65,7 +65,7 @@ class DashboardSubscriber
     /**
      * Set a widget edit form when needed.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: WidgetFormEvent::class)]
+    #[AsEventListener(event: WidgetFormEvent::class)]
     public function onWidgetFormGenerate(WidgetFormEvent $event): void
     {
         if (isset($this->types[$event->getType()])) {
@@ -77,7 +77,7 @@ class DashboardSubscriber
     /**
      * Set a widget detail when needed.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: GenerateWidgetDetailEvent::class)]
+    #[AsEventListener(event: GenerateWidgetDetailEvent::class)]
     public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
     }

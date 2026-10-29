@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class PageSubscriber
 {
@@ -18,7 +18,7 @@ final readonly class PageSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: UrlTokenReplaceEvent::class)]
+    #[AsEventListener(event: UrlTokenReplaceEvent::class)]
     public function onUrlTokenReplace(UrlTokenReplaceEvent $event): void
     {
         if (!preg_match(TokenHelper::REGEX, $event->getContent())) {

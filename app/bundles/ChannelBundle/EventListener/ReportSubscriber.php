@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 final readonly class ReportSubscriber
@@ -24,7 +24,7 @@ final readonly class ReportSubscriber
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportBuilderEvent::class)]
+    #[AsEventListener(event: ReportBuilderEvent::class)]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_MESSAGE_CHANNEL])) {
@@ -100,7 +100,7 @@ final readonly class ReportSubscriber
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGeneratorEvent::class)]
+    #[AsEventListener(event: ReportGeneratorEvent::class)]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_MESSAGE_CHANNEL])) {
@@ -118,7 +118,7 @@ final readonly class ReportSubscriber
         $event->setQueryBuilder($queryBuilder);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportDataEvent::class)]
+    #[AsEventListener(event: ReportDataEvent::class)]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();

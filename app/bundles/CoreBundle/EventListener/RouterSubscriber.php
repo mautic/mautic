@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -29,8 +29,8 @@ final readonly class RouterSubscriber
      * in order to prevent mismatches between cached URLs generated during web requests and URLs generated
      * via CLI/cron jobs.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::REQUEST, priority: 1)]
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::FINISH_REQUEST, priority: -1)]
+    #[AsEventListener(event: KernelEvents::REQUEST, priority: 1)]
+    #[AsEventListener(event: KernelEvents::FINISH_REQUEST, priority: -1)]
     public function setRouterRequestContext(): void
     {
         if (empty($this->host)) {

@@ -2,17 +2,17 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class FormSubscriber
 {
     use PushToIntegrationTrait;
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormBuilderEvent::class)]
+    #[AsEventListener(event: FormBuilderEvent::class)]
     public function onFormBuild(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('plugin.leadpush', [
@@ -26,7 +26,7 @@ final class FormSubscriber
         ]);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
+    #[AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
     public function onFormSubmitActionTriggered(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('plugin.leadpush')) {

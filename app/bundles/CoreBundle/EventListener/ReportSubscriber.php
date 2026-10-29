@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -11,7 +12,6 @@ use Mautic\ReportBundle\Event\AbstractReportEvent;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ReportSubscriber
 {
@@ -22,7 +22,7 @@ final readonly class ReportSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportBuilderEvent::class)]
+    #[AsEventListener(event: ReportBuilderEvent::class)]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$this->allowAuditLogReportBuild($event)) {
@@ -123,7 +123,7 @@ final readonly class ReportSubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGeneratorEvent::class)]
+    #[AsEventListener(event: ReportGeneratorEvent::class)]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$this->allowAuditLogReportBuild($event)) {
@@ -150,7 +150,7 @@ final readonly class ReportSubscriber
         $event->setQueryBuilder($queryBuilder);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportDataEvent::class)]
+    #[AsEventListener(event: ReportDataEvent::class)]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         if (!$this->security->isAdmin() || !$event->checkContext([self::CONTEXT_AUDIT_LOG])) {

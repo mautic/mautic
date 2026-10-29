@@ -2,11 +2,11 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class MaintenanceSubscriber
@@ -18,7 +18,7 @@ final readonly class MaintenanceSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MaintenanceEvent::class, priority: -50)]
+    #[AsEventListener(event: MaintenanceEvent::class, priority: -50)]
     public function onDataCleanup(MaintenanceEvent $event): void
     {
         $this->cleanupData($event, 'audit_log');

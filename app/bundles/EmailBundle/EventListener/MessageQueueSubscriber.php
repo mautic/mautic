@@ -2,11 +2,11 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class MessageQueueSubscriber
 {
@@ -18,7 +18,7 @@ final readonly class MessageQueueSubscriber
     /**
      * Sends campaign emails.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MessageQueueBatchProcessEvent::class)]
+    #[AsEventListener(event: MessageQueueBatchProcessEvent::class)]
     public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event): void
     {
         if (!$event->checkContext('email')) {

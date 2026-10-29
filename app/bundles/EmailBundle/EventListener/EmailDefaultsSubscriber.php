@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class EmailDefaultsSubscriber
 {
@@ -16,7 +16,7 @@ final readonly class EmailDefaultsSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EmailPreSaveEvent::class)]
+    #[AsEventListener(event: EmailPreSaveEvent::class)]
     public function onEmailPreSave(EmailEvent $event): void
     {
         $email = $event->getEmail();

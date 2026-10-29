@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticSocialBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetListType;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ChannelSubscriber
 {
@@ -17,7 +17,7 @@ final readonly class ChannelSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ChannelEvent::class, priority: 80)]
+    #[AsEventListener(event: ChannelEvent::class, priority: 80)]
     public function onAddChannel(ChannelEvent $event): void
     {
         $integration = $this->helper->getIntegrationObject('Twitter');

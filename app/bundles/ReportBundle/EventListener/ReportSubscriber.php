@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\ReportEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ReportSubscriber
 {
@@ -21,7 +21,7 @@ final readonly class ReportSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportEvents::REPORT_POST_SAVE)]
+    #[AsEventListener(event: ReportEvents::REPORT_POST_SAVE)]
     public function onReportPostSave(ReportEvent $event): void
     {
         $report = $event->getReport();
@@ -41,7 +41,7 @@ final readonly class ReportSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportEvents::REPORT_POST_DELETE)]
+    #[AsEventListener(event: ReportEvents::REPORT_POST_DELETE)]
     public function onReportDelete(ReportEvent $event): void
     {
         $report = $event->getReport();

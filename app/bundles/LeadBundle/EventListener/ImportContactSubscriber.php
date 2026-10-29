@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -15,7 +16,6 @@ use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -33,7 +33,7 @@ final readonly class ImportContactSubscriber
     /**
      * @throws AccessDeniedException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportInitEvent::class)]
+    #[AsEventListener(event: ImportInitEvent::class)]
     public function onImportInit(ImportInitEvent $event): void
     {
         if ($event->importIsForRouteObject('contacts')) {
@@ -49,7 +49,7 @@ final readonly class ImportContactSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportMappingEvent::class)]
+    #[AsEventListener(event: ImportMappingEvent::class)]
     public function onFieldMapping(ImportMappingEvent $event): void
     {
         if ($event->importIsForRouteObject('contacts')) {
@@ -78,7 +78,7 @@ final readonly class ImportContactSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportProcessEvent::class)]
+    #[AsEventListener(event: ImportProcessEvent::class)]
     public function onImportProcess(ImportProcessEvent $event): void
     {
         if ($event->importIsForObject('lead')) {
@@ -99,7 +99,7 @@ final readonly class ImportContactSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ImportValidateEvent::class)]
+    #[AsEventListener(event: ImportValidateEvent::class)]
     public function onValidateImport(ImportValidateEvent $event): void
     {
         if (false === $event->importIsForRouteObject('contacts')) {

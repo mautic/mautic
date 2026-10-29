@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
@@ -30,7 +31,6 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Model\PointGroupModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class FormSubscriber
 {
@@ -49,7 +49,7 @@ final readonly class FormSubscriber
     /**
      * Add a lead generation action to available form submit actions.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormBuilderEvent::class)]
+    #[AsEventListener(event: FormBuilderEvent::class)]
     public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('lead.pointschange', [
@@ -116,14 +116,14 @@ final readonly class FormSubscriber
         ]);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ObjectCollectEvent::class)]
+    #[AsEventListener(event: ObjectCollectEvent::class)]
     public function onObjectCollect(ObjectCollectEvent $event): void
     {
         $event->appendObject(new ObjectCrate('contact', 'mautic.lead.contact'));
         $event->appendObject(new ObjectCrate('company', 'mautic.core.company'));
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FieldCollectEvent::class)]
+    #[AsEventListener(event: FieldCollectEvent::class)]
     public function onFieldCollect(FieldCollectEvent $event): void
     {
         $object = 'contact' === $event->getObject() ? 'lead' : $event->getObject(); // BC conversion.
@@ -148,7 +148,7 @@ final readonly class FormSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
+    #[AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
     public function onFormSubmitActionChangePoints(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.pointschange')) {
@@ -193,7 +193,7 @@ final readonly class FormSubscriber
         $event->getSubmission()->getLead()->setPoints($contact->getPoints());
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION, priority: 1)]
+    #[AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION, priority: 1)]
     public function onFormSubmitActionChangeList(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.changelist')) {
@@ -217,7 +217,7 @@ final readonly class FormSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION, priority: 2)]
+    #[AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION, priority: 2)]
     public function onFormSubmitActionChangeTags(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.changetags')) {
@@ -235,7 +235,7 @@ final readonly class FormSubscriber
         $this->leadModel->modifyTags($contact, $addTags, $removeTags);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION, priority: 3)]
+    #[AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION, priority: 3)]
     public function onFormSubmitActionAddUtmTags(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.addutmtags')) {
@@ -276,7 +276,7 @@ final readonly class FormSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION, priority: 4)]
+    #[AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION, priority: 4)]
     public function onFormSubmitActionScoreContactsCompanies(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.scorecontactscompanies')) {
@@ -294,7 +294,7 @@ final readonly class FormSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION, priority: 5)]
+    #[AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION, priority: 5)]
     public function onFormSubmitActionRemoveFromDoNotContact(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.remove_do_not_contact')) {
@@ -306,7 +306,7 @@ final readonly class FormSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadEvents::LEAD_ON_SEGMENTS_CHANGE)]
+    #[AsEventListener(event: LeadEvents::LEAD_ON_SEGMENTS_CHANGE)]
     public function onLeadSegmentsChange(SubmissionEvent $event): void
     {
         $properties = $event->getActionConfig();
@@ -324,7 +324,7 @@ final readonly class FormSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION, priority: 5)]
+    #[AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION, priority: 5)]
     public function onFormSubmitActionUpdateLead(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.updatelead')) {

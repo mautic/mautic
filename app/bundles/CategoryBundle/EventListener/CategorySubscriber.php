@@ -2,6 +2,7 @@
 
 namespace Mautic\CategoryBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryEvent;
 use Mautic\CategoryBundle\Event\CategoryTypeEntityEvent;
@@ -10,7 +11,6 @@ use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class CategorySubscriber
@@ -27,7 +27,7 @@ final readonly class CategorySubscriber
     /**
      * Add bundle to the category.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CategoryTypesEvent::class)]
+    #[AsEventListener(event: CategoryTypesEvent::class)]
     public function onCategoryBundleListBuild(CategoryTypesEvent $event): void
     {
         $bundles = $this->bundleHelper->getMauticBundles(true);
@@ -44,7 +44,7 @@ final readonly class CategorySubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CategoryEvents::CATEGORY_POST_SAVE)]
+    #[AsEventListener(event: CategoryEvents::CATEGORY_POST_SAVE)]
     public function onCategoryPostSave(CategoryEvent $event): void
     {
         $category = $event->getCategory();
@@ -64,7 +64,7 @@ final readonly class CategorySubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CategoryEvents::CATEGORY_POST_DELETE)]
+    #[AsEventListener(event: CategoryEvents::CATEGORY_POST_DELETE)]
     public function onCategoryDelete(CategoryEvent $event): void
     {
         $category = $event->getCategory();
@@ -79,7 +79,7 @@ final readonly class CategorySubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CategoryEvents::CATEGORY_PRE_DELETE)]
+    #[AsEventListener(event: CategoryEvents::CATEGORY_PRE_DELETE)]
     public function onCategoryPreDelete(CategoryEvent $event): void
     {
         if ($usage = $this->categoryModel->getUsage($event->getCategory())) {
@@ -94,7 +94,7 @@ final readonly class CategorySubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CategoryTypeEntityEvent::class)]
+    #[AsEventListener(event: CategoryTypeEntityEvent::class)]
     public function onCategoryTypeEntity(CategoryTypeEntityEvent $event): void
     {
         $bundles = $this->bundleHelper->getMauticBundles(true);

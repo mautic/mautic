@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnInterface;
@@ -13,7 +14,6 @@ use Mautic\CoreBundle\Doctrine\Schema\ColumnIntrospector;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 final readonly class MigrationCommandSubscriber
@@ -25,7 +25,7 @@ final readonly class MigrationCommandSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ConsoleEvents::TERMINATE)]
+    #[AsEventListener(event: ConsoleEvents::TERMINATE)]
     public function addGeneratedColumns(ConsoleTerminateEvent $event): void
     {
         $command = $event->getCommand();

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Event\DoNotContactAddEvent;
 use Mautic\LeadBundle\Event\DoNotContactRemoveEvent;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class DoNotContactSubscriber
 {
@@ -16,7 +16,7 @@ final readonly class DoNotContactSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DoNotContactRemoveEvent::class)]
+    #[AsEventListener(event: DoNotContactRemoveEvent::class)]
     public function removeDncForLead(DoNotContactRemoveEvent $doNotContactRemoveEvent): void
     {
         $this->doNotContact->removeDncForContact(
@@ -26,7 +26,7 @@ final readonly class DoNotContactSubscriber
         );
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DoNotContactAddEvent::class)]
+    #[AsEventListener(event: DoNotContactAddEvent::class)]
     public function addDncForLead(DoNotContactAddEvent $doNotContactAddEvent): void
     {
         if (empty($doNotContactAddEvent->getLead()->getId())) {

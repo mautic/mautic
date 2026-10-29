@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
@@ -20,7 +21,6 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SegmentImportExportSubscriber
 {
@@ -39,7 +39,7 @@ final readonly class SegmentImportExportSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityExportEvent::class)]
+    #[AsEventListener(event: EntityExportEvent::class)]
     public function onSegmentExport(EntityExportEvent $event): void
     {
         if (LeadList::ENTITY_NAME !== $event->getEntityName()) {
@@ -90,7 +90,7 @@ final readonly class SegmentImportExportSubscriber
         $this->logAction('export', $leadListId, $segmentData);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportEvent::class)]
+    #[AsEventListener(event: EntityImportEvent::class)]
     public function onSegmentImport(EntityImportEvent $event): void
     {
         if (LeadList::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -133,7 +133,7 @@ final readonly class SegmentImportExportSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportUndoEvent::class)]
+    #[AsEventListener(event: EntityImportUndoEvent::class)]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (LeadList::ENTITY_NAME !== $event->getEntityName()) {
@@ -157,7 +157,7 @@ final readonly class SegmentImportExportSubscriber
         $this->entityManager->flush();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportAnalyzeEvent::class)]
+    #[AsEventListener(event: EntityImportAnalyzeEvent::class)]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         if (LeadList::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {

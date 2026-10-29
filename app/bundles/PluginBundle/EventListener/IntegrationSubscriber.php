@@ -2,12 +2,12 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\PluginBundle\Event\PluginIntegrationRequestEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationResponseEvent;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This class can provide useful debugging information for API requests and responses.
@@ -20,7 +20,7 @@ final readonly class IntegrationSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PluginIntegrationRequestEvent::class)]
+    #[AsEventListener(event: PluginIntegrationRequestEvent::class)]
     public function onRequest(PluginIntegrationRequestEvent $event): void
     {
         $name     = strtoupper($event->getIntegrationName());
@@ -54,7 +54,7 @@ final readonly class IntegrationSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PluginIntegrationResponseEvent::class)]
+    #[AsEventListener(event: PluginIntegrationResponseEvent::class)]
     public function onResponse(PluginIntegrationResponseEvent $event): void
     {
         $response = $event->getResponse();

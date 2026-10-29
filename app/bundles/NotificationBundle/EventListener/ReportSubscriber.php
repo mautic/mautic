@@ -2,6 +2,7 @@
 
 namespace Mautic\NotificationBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -9,7 +10,6 @@ use Mautic\NotificationBundle\Entity\StatRepository;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportSubscriber
@@ -28,7 +28,7 @@ final readonly class ReportSubscriber
     /**
      * Add available tables and columns to the report builder lookup.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportBuilderEvent::class)]
+    #[AsEventListener(event: ReportBuilderEvent::class)]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::MOBILE_NOTIFICATIONS, self::MOBILE_NOTIFICATIONS_STATS])) {
@@ -162,7 +162,7 @@ final readonly class ReportSubscriber
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGeneratorEvent::class)]
+    #[AsEventListener(event: ReportGeneratorEvent::class)]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::MOBILE_NOTIFICATIONS, self::MOBILE_NOTIFICATIONS_STATS])) {
@@ -231,7 +231,7 @@ final readonly class ReportSubscriber
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportGraphEvent::class)]
+    #[AsEventListener(event: ReportGraphEvent::class)]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Mobile Notification reports

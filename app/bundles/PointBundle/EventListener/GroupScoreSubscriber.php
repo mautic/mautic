@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\PointBundle\Event\GroupScoreChangeEvent;
 use Mautic\PointBundle\Model\TriggerModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class GroupScoreSubscriber
 {
@@ -15,7 +15,7 @@ final readonly class GroupScoreSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: GroupScoreChangeEvent::class)]
+    #[AsEventListener(event: GroupScoreChangeEvent::class)]
     public function onGroupScoreChange(GroupScoreChangeEvent $event): void
     {
         $this->triggerModel->triggerEvents($event->getContact());

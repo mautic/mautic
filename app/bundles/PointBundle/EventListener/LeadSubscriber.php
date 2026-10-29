@@ -2,6 +2,7 @@
 
 namespace Mautic\PointBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
@@ -12,7 +13,6 @@ use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\PointBundle\Entity\LeadPointLogRepository;
 use Mautic\PointBundle\Entity\LeadTriggerLogRepository;
 use Mautic\PointBundle\Model\TriggerModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class LeadSubscriber
@@ -29,7 +29,7 @@ final readonly class LeadSubscriber
     /**
      * Trigger applicable events for the lead.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PointsChangeEvent::class)]
+    #[AsEventListener(event: PointsChangeEvent::class)]
     public function onLeadPointsChange(PointsChangeEvent $event): void
     {
         $this->triggerModel->triggerEvents($event->getLead());
@@ -38,7 +38,7 @@ final readonly class LeadSubscriber
     /**
      * Handle point triggers for new leads (including 0 point triggers).
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostSaveEvent::class, priority: -1)]
+    #[AsEventListener(event: LeadPostSaveEvent::class, priority: -1)]
     public function onLeadSave(LeadEvent $event): void
     {
         if ($event->isNew()) {
@@ -49,7 +49,7 @@ final readonly class LeadSubscriber
     /**
      * Compile events for the lead timeline.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
+    #[AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -93,7 +93,7 @@ final readonly class LeadSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadPostMergeEvent::class)]
+    #[AsEventListener(event: LeadPostMergeEvent::class)]
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->leadPointLogRepository->updateLead(

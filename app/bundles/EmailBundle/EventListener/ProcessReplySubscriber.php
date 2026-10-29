@@ -2,13 +2,13 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CacheBundle\Cache\CacheProviderInterface;
 use Mautic\EmailBundle\Event\MonitoredEmailEvent;
 use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\Event\PreFetchEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ProcessReplySubscriber
 {
@@ -24,13 +24,13 @@ final readonly class ProcessReplySubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MonitoredEmailEvent::class)]
+    #[AsEventListener(event: MonitoredEmailEvent::class)]
     public function onEmailConfig(MonitoredEmailEvent $event): void
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.reply_folder');
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PreFetchEmailEvent::class)]
+    #[AsEventListener(event: PreFetchEmailEvent::class)]
     public function onEmailPreFetch(PreFetchEmailEvent $event): void
     {
         if (!$lastFetchedUID = $this->cache->getSimpleCache()->get(self::CACHE_KEY)) {
@@ -45,7 +45,7 @@ final readonly class ProcessReplySubscriber
         $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, Mailbox::CRITERIA_UID." {$startingUID}:{$endingUID}");
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ParseEmailEvent::class, priority: 1)]
+    #[AsEventListener(event: ParseEmailEvent::class, priority: 1)]
     public function onEmailParse(ParseEmailEvent $event): void
     {
         if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {

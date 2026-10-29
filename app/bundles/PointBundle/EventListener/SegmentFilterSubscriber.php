@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Query\Filter\ForeignValueFilterQueryBuilder;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupRepository;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class SegmentFilterSubscriber
@@ -22,7 +22,7 @@ final readonly class SegmentFilterSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadListFiltersChoicesEvent::class, priority: -10)]
+    #[AsEventListener(event: LeadListFiltersChoicesEvent::class, priority: -10)]
     public function onGenerateSegmentFiltersAddPointGroups(LeadListFiltersChoicesEvent $event): void
     {
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
@@ -48,7 +48,7 @@ final readonly class SegmentFilterSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SegmentDictionaryGenerationEvent::class)]
+    #[AsEventListener(event: SegmentDictionaryGenerationEvent::class)]
     public function onSegmentDictionaryGenerate(SegmentDictionaryGenerationEvent $event): void
     {
         $groups = $this->groupRepository->getEntities();

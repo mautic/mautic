@@ -44,14 +44,6 @@ final class ConfigSubscriberTest extends TestCase
             });
     }
 
-    public function testSubscribedEvents(): void
-    {
-        $subscribedEvents = ConfigSubscriber::getSubscribedEvents();
-        $this->assertArrayHasKey(ConfigBuilderEvent::class, $subscribedEvents);
-        $handlers = ConfigSubscriber::getSubscribedEvents()[ConfigBuilderEvent::class];
-        $this->assertCount(2, $handlers);
-    }
-
     public function testLeadAndSegmentFormsUseExpectedThemes(): void
     {
         $invocations = [];

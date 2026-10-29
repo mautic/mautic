@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\CustomAssetsEvent;
 use Mautic\InstallBundle\Install\InstallService;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final readonly class AssetsSubscriber
@@ -24,7 +24,7 @@ final readonly class AssetsSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CustomAssetsEvent::class)]
+    #[AsEventListener(event: CustomAssetsEvent::class)]
     public function injectAssets(CustomAssetsEvent $assetsEvent): void
     {
         if (!$this->installer->checkIfInstalled() || !$this->isMauticAdministrationPage()) {

@@ -2,13 +2,13 @@
 
 namespace MauticPlugin\MauticSocialBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType;
 use MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class CampaignSubscriber
@@ -20,7 +20,7 @@ final readonly class CampaignSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
+    #[AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('Twitter');
@@ -39,7 +39,7 @@ final readonly class CampaignSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: SocialEvents::ON_CAMPAIGN_BATCH_ACTION)]
+    #[AsEventListener(event: SocialEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignAction(PendingEvent $event): void
     {
         $event->setChannel('social.twitter');

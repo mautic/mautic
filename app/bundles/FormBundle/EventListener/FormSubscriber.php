@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
@@ -16,7 +17,6 @@ use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -40,7 +40,7 @@ final readonly class FormSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::FORM_POST_SAVE)]
+    #[AsEventListener(event: FormEvents::FORM_POST_SAVE)]
     public function onFormPostSave(Events\FormEvent $event): void
     {
         $form = $event->getForm();
@@ -63,7 +63,7 @@ final readonly class FormSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::FORM_POST_DELETE)]
+    #[AsEventListener(event: FormEvents::FORM_POST_DELETE)]
     public function onFormDelete(Events\FormEvent $event): void
     {
         $form = $event->getForm();
@@ -81,7 +81,7 @@ final readonly class FormSubscriber
     /**
      * Add a simple email form.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\FormBuilderEvent::class)]
+    #[AsEventListener(event: Events\FormBuilderEvent::class)]
     public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addSubmitAction('form.email', [
@@ -112,7 +112,7 @@ final readonly class FormSubscriber
         ]);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
+    #[AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
     public function onFormSubmitActionSendEmail(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.email')) {
@@ -179,7 +179,7 @@ final readonly class FormSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
+    #[AsEventListener(event: FormEvents::ON_EXECUTE_SUBMIT_ACTION)]
     public function onFormSubmitActionRepost(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.repost')) {

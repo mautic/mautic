@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class AssetExportListEventSubscriber
 {
@@ -16,7 +16,7 @@ final readonly class AssetExportListEventSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: AssetExportListEvent::class)]
+    #[AsEventListener(event: AssetExportListEvent::class)]
     public function onExportList(AssetExportListEvent $event): void
     {
         $data = $event->getEntityData();

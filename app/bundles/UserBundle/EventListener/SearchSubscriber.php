@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class SearchSubscriber
 {
@@ -22,7 +22,7 @@ final readonly class SearchSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MauticEvents\GlobalSearchEvent::class)]
+    #[AsEventListener(event: MauticEvents\GlobalSearchEvent::class)]
     public function onGlobalSearchUser(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
@@ -37,7 +37,7 @@ final readonly class SearchSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MauticEvents\GlobalSearchEvent::class)]
+    #[AsEventListener(event: MauticEvents\GlobalSearchEvent::class)]
     public function onGlobalSearchRoles(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
@@ -52,7 +52,7 @@ final readonly class SearchSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MauticEvents\CommandListEvent::class)]
+    #[AsEventListener(event: MauticEvents\CommandListEvent::class)]
     public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         if ($this->security->isGranted('user:users:view')) {

@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\NonUniqueResultException;
@@ -21,7 +22,6 @@ use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignEventSubscriber
 {
@@ -44,7 +44,7 @@ final readonly class CampaignEventSubscriber
      * Reset all campaign event failed_count's
      * to 0 when the campaign is published.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignPreSaveEvent::class)]
+    #[AsEventListener(event: CampaignPreSaveEvent::class)]
     public function onCampaignPreSave(CampaignPreSaveEvent $event): void
     {
         $campaign = $event->getCampaign();
@@ -81,7 +81,7 @@ final readonly class CampaignEventSubscriber
      * @throws OptimisticLockException
      * @throws TransactionRequiredException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FailedEvent::class)]
+    #[AsEventListener(event: FailedEvent::class)]
     public function onEventFailed(FailedEvent $event): void
     {
         $log                  = $event->getLog();
@@ -131,7 +131,7 @@ final readonly class CampaignEventSubscriber
      *
      * @throws NonUniqueResultException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ExecutedEvent::class)]
+    #[AsEventListener(event: ExecutedEvent::class)]
     public function onEventExecuted(ExecutedEvent $event): void
     {
         $log                  = $event->getLog();
@@ -151,7 +151,7 @@ final readonly class CampaignEventSubscriber
         $this->eventRepository->decreaseFailedCount($executedEvent);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EventPreview::class)]
+    #[AsEventListener(event: EventPreview::class)]
     public function onEventPreviewRequest(EventPreview $eventPreview): void
     {
         $logStats = $this->leadEventLogRepository->getEventLogStats($eventPreview->event->getId());

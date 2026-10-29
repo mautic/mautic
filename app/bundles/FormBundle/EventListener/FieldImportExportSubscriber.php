@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Event\EntityExportEvent;
 use Mautic\CoreBundle\Event\EntityImportAnalyzeEvent;
@@ -22,7 +23,6 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class FieldImportExportSubscriber
 {
@@ -41,7 +41,7 @@ final readonly class FieldImportExportSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityExportEvent::class)]
+    #[AsEventListener(event: EntityExportEvent::class)]
     public function onExport(EntityExportEvent $event): void
     {
         if (Field::ENTITY_NAME !== $event->getEntityName()) {
@@ -110,7 +110,7 @@ final readonly class FieldImportExportSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportEvent::class)]
+    #[AsEventListener(event: EntityImportEvent::class)]
     public function onImport(EntityImportEvent $event): void
     {
         if (Field::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -171,7 +171,7 @@ final readonly class FieldImportExportSubscriber
         }
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportUndoEvent::class)]
+    #[AsEventListener(event: EntityImportUndoEvent::class)]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Field::ENTITY_NAME !== $event->getEntityName()) {
@@ -196,7 +196,7 @@ final readonly class FieldImportExportSubscriber
         $this->entityManager->flush();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: EntityImportAnalyzeEvent::class)]
+    #[AsEventListener(event: EntityImportAnalyzeEvent::class)]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         if (Field::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {

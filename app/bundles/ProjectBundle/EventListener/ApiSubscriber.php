@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ProjectBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ApiBundle\Event\ApiInitializeEvent;
 use Mautic\ApiBundle\Serializer\Exclusion\FieldInclusionStrategy;
 use Mautic\AssetBundle\Entity\Asset;
@@ -20,11 +21,10 @@ use Mautic\PointBundle\Entity\Trigger;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\StageBundle\Entity\Stage;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ApiSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ApiInitializeEvent::class)]
+    #[AsEventListener(event: ApiInitializeEvent::class)]
     public function onApiInitializeEvent(ApiInitializeEvent $event): void
     {
         if (!in_array($event->getEntityClass(), [

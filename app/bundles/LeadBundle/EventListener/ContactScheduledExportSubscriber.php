@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\LeadBundle\Event\ContactExportEmailSentEvent;
 use Mautic\LeadBundle\Event\ContactExportPrepareFileEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Event\ContactExportSendEmailEvent;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ContactScheduledExportSubscriber
 {
@@ -18,7 +18,7 @@ final readonly class ContactScheduledExportSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactExportPrepareFileEvent::class)]
+    #[AsEventListener(event: ContactExportPrepareFileEvent::class)]
     public function onContactExportPrepareFile(ContactExportSchedulerEvent $event): void
     {
         $contactExportScheduler = $event->getContactExportScheduler();
@@ -26,14 +26,14 @@ final readonly class ContactScheduledExportSubscriber
         $event->setFilePath($filePath);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactExportSendEmailEvent::class)]
+    #[AsEventListener(event: ContactExportSendEmailEvent::class)]
     public function onContactExportSendEmail(ContactExportSchedulerEvent $event): void
     {
         $contactExportScheduler = $event->getContactExportScheduler();
         $this->contactExportSchedulerModel->sendEmail($contactExportScheduler, $event->getFilePath());
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ContactExportEmailSentEvent::class)]
+    #[AsEventListener(event: ContactExportEmailSentEvent::class)]
     public function onContactExportEmailSent(ContactExportSchedulerEvent $event): void
     {
         $contactExportScheduler = $event->getContactExportScheduler();

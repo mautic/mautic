@@ -2,16 +2,16 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\PageBundle\Form\Type\ConfigTrackingPageType;
 use Mautic\PageBundle\Form\Type\ConfigType;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ConfigSubscriber
 {
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ConfigBuilderEvent::class)]
+    #[AsEventListener(event: ConfigBuilderEvent::class)]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addForm([
@@ -29,7 +29,7 @@ final class ConfigSubscriber
         ]);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ConfigBuilderEvent::class)]
+    #[AsEventListener(event: ConfigBuilderEvent::class)]
     public function onConfigGenerateTracking(ConfigBuilderEvent $event): void
     {
         $event->addForm([
@@ -54,7 +54,7 @@ final class ConfigSubscriber
         ]);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ConfigPreSaveEvent::class)]
+    #[AsEventListener(event: ConfigPreSaveEvent::class)]
     public function onConfigSave(ConfigEvent $event): void
     {
         $values = $event->getConfig();

@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -13,7 +14,6 @@ use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Model\PageDraftModel;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final readonly class PageSubscriber
@@ -31,7 +31,7 @@ final readonly class PageSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEvents::PAGE_POST_SAVE)]
+    #[AsEventListener(event: PageEvents::PAGE_POST_SAVE)]
     public function onPagePostSave(PageEvent $event): void
     {
         $page = $event->getPage();
@@ -54,7 +54,7 @@ final readonly class PageSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEvents::PAGE_POST_DELETE)]
+    #[AsEventListener(event: PageEvents::PAGE_POST_DELETE)]
     public function onPageDelete(PageEvent $event): void
     {
         $page = $event->getPage();
@@ -75,7 +75,7 @@ final readonly class PageSubscriber
      * - <body>  : onPageDisplay_bodyOpen
      * - </body> : onPageDisplay_bodyClose.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: Events\PageDisplayEvent::class, priority: -255)]
+    #[AsEventListener(event: Events\PageDisplayEvent::class, priority: -255)]
     public function onPageDisplay(Events\PageDisplayEvent $event): void
     {
         $content = $event->getContent();
@@ -126,7 +126,7 @@ final readonly class PageSubscriber
         $event->setContent($content);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEditSubmitEvent::class)]
+    #[AsEventListener(event: PageEditSubmitEvent::class)]
     public function managePageDraft(PageEditSubmitEvent $event): void
     {
         $livePage   = $event->getPreviousPage();

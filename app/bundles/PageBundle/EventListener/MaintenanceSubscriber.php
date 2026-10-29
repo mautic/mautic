@@ -2,10 +2,10 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class MaintenanceSubscriber
@@ -16,7 +16,7 @@ final readonly class MaintenanceSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: MaintenanceEvent::class, priority: 10)]
+    #[AsEventListener(event: MaintenanceEvent::class, priority: 10)]
     public function onDataCleanup(MaintenanceEvent $event): void
     {
         $this->cleanData($event, 'page_hits');

@@ -8,9 +8,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Event\WebhookEvent;
-use Mautic\WebhookBundle\Event\WebhookKillEvent;
-use Mautic\WebhookBundle\Event\WebhookPostDeleteEvent;
-use Mautic\WebhookBundle\Event\WebhookPostSaveEvent;
 use Mautic\WebhookBundle\EventListener\WebhookSubscriber;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -28,18 +25,6 @@ final class WebhookSubscriberTest extends TestCase
     protected function setUp(): void
     {
         $this->webhookKillNotificator = $this->createMock(WebhookKillNotificator::class);
-    }
-
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertSame(
-            [
-                WebhookPostSaveEvent::class   => ['onWebhookSave', 0],
-                WebhookPostDeleteEvent::class => ['onWebhookDelete', 0],
-                WebhookKillEvent::class       => ['onWebhookKill', 0],
-            ],
-            WebhookSubscriber::getSubscribedEvents()
-        );
     }
 
     public function testOnWebhookKill(): void

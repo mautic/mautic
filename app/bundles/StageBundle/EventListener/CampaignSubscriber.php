@@ -2,6 +2,7 @@
 
 namespace Mautic\StageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
@@ -10,7 +11,6 @@ use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Form\Type\StageActionChangeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class CampaignSubscriber
@@ -22,7 +22,7 @@ final readonly class CampaignSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
+    #[AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $action = [
@@ -35,7 +35,7 @@ final readonly class CampaignSubscriber
         $event->addAction('stage.change', $action);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: StageEvents::ON_CAMPAIGN_BATCH_ACTION)]
+    #[AsEventListener(event: StageEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignTriggerStageChange(PendingEvent $event): void
     {
         $logs    = $event->getPending();

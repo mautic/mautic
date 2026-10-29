@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -16,7 +17,6 @@ use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\Event\FocusTokenReplacementEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -40,7 +40,7 @@ final readonly class FocusSubscriber
     /**
      * Check and hijack the form's generate link if the ID has mf- in it.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::REQUEST)]
+    #[AsEventListener(event: KernelEvents::REQUEST)]
     public function onKernelRequest(RequestEvent $event): void
     {
         if ($event->isMainRequest()) {
@@ -65,7 +65,7 @@ final readonly class FocusSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FocusEvents::POST_SAVE)]
+    #[AsEventListener(event: FocusEvents::POST_SAVE)]
     public function onFocusPostSave(FocusEvent $event): void
     {
         $entity = $event->getFocus();
@@ -85,7 +85,7 @@ final readonly class FocusSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FocusEvents::POST_DELETE)]
+    #[AsEventListener(event: FocusEvents::POST_DELETE)]
     public function onFocusDelete(FocusEvent $event): void
     {
         $entity = $event->getFocus();
@@ -100,7 +100,7 @@ final readonly class FocusSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReportBuilderEvent::class, priority: -10)]
+    #[AsEventListener(event: ReportBuilderEvent::class, priority: -10)]
     public function onReportBuild(ReportBuilderEvent $event): void
     {
         $tables = $event->getTables();
@@ -114,7 +114,7 @@ final readonly class FocusSubscriber
         $event->addTable('audit.log', $tables['audit.log']);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FocusTokenReplacementEvent::class)]
+    #[AsEventListener(event: FocusTokenReplacementEvent::class)]
     public function onTokenReplacement(FocusTokenReplacementEvent $event): void
     {
         /** @var Lead $lead */

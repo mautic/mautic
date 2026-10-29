@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -11,7 +12,6 @@ use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\EventListener\TimelineEventLogTrait;
 use Mautic\SmsBundle\Event\ReplyEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ReplySubscriber
 {
@@ -23,7 +23,7 @@ final class ReplySubscriber
         $this->eventLogRepository = $eventLogRepository;
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: ReplyEvent::class)]
+    #[AsEventListener(event: ReplyEvent::class)]
     public function onReply(ReplyEvent $event): void
     {
         $message = $event->getMessage();
@@ -46,7 +46,7 @@ final class ReplySubscriber
         $event->setEventLog($log);
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: LeadTimelineEvent::class)]
+    #[AsEventListener(event: LeadTimelineEvent::class)]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(

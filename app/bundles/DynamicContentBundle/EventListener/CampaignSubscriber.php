@@ -2,6 +2,7 @@
 
 namespace Mautic\DynamicContentBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\DecisionEvent;
@@ -15,7 +16,6 @@ use Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class CampaignSubscriber
 {
@@ -27,7 +27,7 @@ final readonly class CampaignSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: CampaignBuilderEvent::class)]
+    #[AsEventListener(event: CampaignBuilderEvent::class)]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addAction(
@@ -74,7 +74,7 @@ final readonly class CampaignSubscriber
     /**
      * @throws InvalidArgumentException
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION)]
+    #[AsEventListener(event: DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION)]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         $eventConfig  = $event->getConfig();
@@ -102,7 +102,7 @@ final readonly class CampaignSubscriber
         $event->setAsApplicable();
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: DynamicContentEvents::ON_CAMPAIGN_BATCH_ACTION)]
+    #[AsEventListener(event: DynamicContentEvents::ON_CAMPAIGN_BATCH_ACTION)]
     public function onCampaignTriggerAction(PendingEvent $event): void
     {
         $eventConfig = $event->getEvent()->getProperties();

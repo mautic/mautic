@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\PluginBundle\Bundle\PluginDatabase;
 use Mautic\PluginBundle\Event\PluginInstallEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class PluginSubscriber
 {
@@ -18,7 +18,7 @@ final readonly class PluginSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PluginInstallEvent::class, priority: 100)]
+    #[AsEventListener(event: PluginInstallEvent::class, priority: 100)]
     public function onInstall(PluginInstallEvent $event): void
     {
         $eventMetadata = $event->getMetadata();

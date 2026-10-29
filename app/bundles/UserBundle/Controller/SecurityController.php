@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Controller;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,7 +36,7 @@ final class SecurityController extends CommonController
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: KernelEvents::REQUEST)]
+    #[AsEventListener(event: KernelEvents::REQUEST)]
     public function onRequest(RequestEvent $event): void
     {
         $controller = $event->getRequest()->attributes->get('_controller');

@@ -2,9 +2,9 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
 use Mautic\StatsBundle\Event\AggregateStatRequestEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class GraphAggregateStatsSubscriber
 {
@@ -13,7 +13,7 @@ final readonly class GraphAggregateStatsSubscriber
     ) {
     }
 
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: AggregateStatRequestEvent::class)]
+    #[AsEventListener(event: AggregateStatRequestEvent::class)]
     public function onStatRequest(AggregateStatRequestEvent $event): void
     {
         if (!$event->checkContextPrefix(StatsCollectionHelper::GENERAL_STAT_PREFIX.'-')) {

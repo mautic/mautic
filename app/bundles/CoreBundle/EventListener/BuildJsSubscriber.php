@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class BuildJsSubscriber
 {
@@ -15,7 +15,7 @@ final class BuildJsSubscriber
      * JS functions for use in Bundles. This
      * must retain top priority of 1000.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: BuildJsEvent::class, priority: 1000)]
+    #[AsEventListener(event: BuildJsEvent::class, priority: 1000)]
     public function onBuildJs(BuildJsEvent $event): void
     {
         $js = <<<'JS_WRAP'

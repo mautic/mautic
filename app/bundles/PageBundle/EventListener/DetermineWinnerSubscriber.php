@@ -2,10 +2,10 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\PageEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class DetermineWinnerSubscriber
@@ -19,7 +19,7 @@ final readonly class DetermineWinnerSubscriber
     /**
      * Determines the winner of A/B test based on bounce rates.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER)]
+    #[AsEventListener(event: PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER)]
     public function onDetermineBounceRateWinner(DetermineWinnerEvent $event): void
     {
         // find the hits that did not go any further
@@ -106,7 +106,7 @@ final readonly class DetermineWinnerSubscriber
     /**
      * Determines the winner of A/B test based on dwell time rates.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: PageEvents::ON_DETERMINE_DWELL_TIME_WINNER)]
+    #[AsEventListener(event: PageEvents::ON_DETERMINE_DWELL_TIME_WINNER)]
     public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event): void
     {
         // find the hits that did not go any further

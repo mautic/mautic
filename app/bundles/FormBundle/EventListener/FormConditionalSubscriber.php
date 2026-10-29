@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\EventListener;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class FormConditionalSubscriber
 {
@@ -21,7 +21,7 @@ final readonly class FormConditionalSubscriber
     /**
      * Replace session field Id with field Id after save entity.
      */
-    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(event: FormEvents::FORM_POST_SAVE)]
+    #[AsEventListener(event: FormEvents::FORM_POST_SAVE)]
     public function onFormPostSave(FormEvent $event): void
     {
         $form = $event->getForm();
