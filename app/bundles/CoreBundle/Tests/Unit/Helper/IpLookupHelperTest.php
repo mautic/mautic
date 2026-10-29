@@ -293,6 +293,26 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    public function testIsRequestCountableIsFalseWhenATrustedProxySendsConflictingHeaders(): void
+    {
+        $request = new Request([], [], [], [], [], [
+            'REMOTE_ADDR'          => '10.0.0.1',
+            'HTTP_X_FORWARDED_FOR' => '73.77.245.52',
+            'HTTP_FORWARDED'       => 'for=198.51.100.7',
+        ]);
+        $request->headers->set('DNT', '1');
+
+        $trustedProxies   = Request::getTrustedProxies();
+        $trustedHeaderSet = Request::getTrustedHeaderSet();
+        Request::setTrustedProxies(['10.0.0.1'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_FORWARDED);
+
+        try {
+            $this->assertFalse($this->getIpHelper($request)->isRequestCountable());
+        } finally {
+            Request::setTrustedProxies($trustedProxies, $trustedHeaderSet);
+        }
+    }
+
     public function testIsRequestCountableIgnoresAnExcludedFallbackAddress(): void
     {
         // A private visitor isn't checked as 127.0.0.1, so excluding 127.0.0.1 doesn't stop their count
