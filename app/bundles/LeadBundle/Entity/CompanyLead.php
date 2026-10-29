@@ -14,13 +14,10 @@ class CompanyLead
 {
     public const string TABLE_NAME = 'companies_leads';
 
-    /**
-     * @var Company
-     */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Company::class)]
     #[ORM\JoinColumn(name: 'company_id', nullable: false, onDelete: 'CASCADE')]
-    private $company;
+    private \Mautic\LeadBundle\Entity\Company $company;
 
     /**
      * @var Lead

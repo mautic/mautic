@@ -68,7 +68,7 @@ final class IpLookupHelperTest extends TestCase
     {
         $ip = $this->getIpHelper()->getIpAddress();
 
-        $this->assertEquals('127.0.0.1', $ip->getIpAddress());
+        $this->assertSame('127.0.0.1', $ip->getIpAddress());
     }
 
     #[TestDox('Check that the first IP is returned when the request is a proxy')]
@@ -77,7 +77,7 @@ final class IpLookupHelperTest extends TestCase
         $request = new Request([], [], [], [], [], ['HTTP_X_FORWARDED_FOR' => '73.77.245.52,10.8.0.2,192.168.0.1']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
 
-        $this->assertEquals('73.77.245.52', $ip->getIpAddress());
+        $this->assertSame('73.77.245.52', $ip->getIpAddress());
     }
 
     #[TestDox('Check that the first IP is returned with a web proxy')]
@@ -86,7 +86,7 @@ final class IpLookupHelperTest extends TestCase
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
 
-        $this->assertEquals('73.77.245.53', $ip->getIpAddress());
+        $this->assertSame('73.77.245.53', $ip->getIpAddress());
     }
 
     #[TestDox('Check that a local IP is returned for internal IPs')]
@@ -95,7 +95,7 @@ final class IpLookupHelperTest extends TestCase
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '192.168.0.1']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
 
-        $this->assertEquals('127.0.0.1', $ip->getIpAddress());
+        $this->assertSame('127.0.0.1', $ip->getIpAddress());
     }
 
     #[TestDox('Check that internal IP is returned if track_private_ip_ranges is set to true')]
@@ -110,7 +110,7 @@ final class IpLookupHelperTest extends TestCase
             );
         $ip = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();
 
-        $this->assertEquals('192.168.0.1', $ip->getIpAddress());
+        $this->assertSame('192.168.0.1', $ip->getIpAddress());
     }
 
     #[TestDox('Check that prefetch requests are not trackable')]

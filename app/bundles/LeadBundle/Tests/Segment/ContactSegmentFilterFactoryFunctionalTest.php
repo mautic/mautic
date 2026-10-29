@@ -118,7 +118,7 @@ final class ContactSegmentFilterFactoryFunctionalTest extends MauticMysqlTestCas
 
         // Verify segment membership - get all leads in the segment
         $segmentMembers = $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment->getId()]);
-        $memberLeadIds  = array_map(fn (ListLead $member) => $member->getLead()->getId(), $segmentMembers);
+        $memberLeadIds  = array_map(fn (ListLead $member): int => $member->getLead()->getId(), $segmentMembers);
 
         // Leads matching the date filters should be in the segment
         $this->assertContains($leadToday->getId(), $memberLeadIds, 'Lead identified today should be in segment');

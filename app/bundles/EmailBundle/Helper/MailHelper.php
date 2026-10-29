@@ -27,7 +27,6 @@ use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Psr\Log\LoggerInterface;
@@ -1553,10 +1552,7 @@ final class MailHelper
         return $this->tokenizationEnabled;
     }
 
-    /**
-     * @return Redirect|object|null
-     */
-    public function getTrackableLink($url)
+    public function getTrackableLink($url): ?\Mautic\PageBundle\Entity\Redirect
     {
         // Ensure a valid URL and that it has not already been found
         if (!str_starts_with($url, 'http') && !str_starts_with($url, 'ftp')) {

@@ -356,7 +356,7 @@ final class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         $this->sortedFilters = [];
-        $filters             = (array) $this->getReport()->getFilters();
+        $filters             = $this->getReport()->getFilters();
 
         foreach ($filters as $field) {
             $this->sortedFilters[$field['column']] = true;
