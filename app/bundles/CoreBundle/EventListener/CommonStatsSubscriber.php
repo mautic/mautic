@@ -93,6 +93,7 @@ abstract class CommonStatsSubscriber
     /**
      * Restrict stats based on contact permissions.
      *
+     * @param class-string[] $repoNames
      * @return $this
      */
     protected function addContactRestrictedRepositories(array $repoNames)
@@ -101,14 +102,15 @@ abstract class CommonStatsSubscriber
     }
 
     /**
+     * @param class-string[] $repoNames
      * @param array<string, string> $permissions
      */
     protected function addRestrictedRepostories(array $repoNames, array $permissions)
     {
         foreach ($repoNames as $repoName) {
-            $repo                      = $this->entityManager->getRepository($repoName);
-            $this->repositories[]      = $repo;
-            $table                     = $repo->getTableName();
+            $repository                      = $this->entityManager->getRepository($repoName);
+            $this->repositories[]      = $repository;
+            $table                     = $repository->getTableName();
             $this->permissions[$table] = $permissions;
         }
 
