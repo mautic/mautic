@@ -82,7 +82,7 @@ Mautic.integrationOnLoad = function(container, response) {
     } else {
         Mautic.filterIntegrations();
     }
-    mQuery('[data-toggle="tooltip"]').tooltip();
+    mQuery('[data-toggle="tooltip"], [data-bs-toggle="tooltip"]').tooltip();
 };
 
 Mautic.integrationConfigOnLoad = function(container) {

@@ -57,7 +57,7 @@ final class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.lead.background.import.if.more.rows.than',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.background.import.if.more.rows.than.tooltip',
@@ -67,7 +67,7 @@ final class ConfigType extends AbstractType
 
         $builder->add('contact_export_limit', NumberType::class, [
             'label'      => 'mautic.lead.export.limit.rows',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.lead.export.limit.rows.tooltip',
@@ -91,7 +91,7 @@ final class ConfigType extends AbstractType
                 ContactColumnsType::class,
                 [
                     'label'       => 'mautic.config.tab.columns',
-                    'label_attr'  => ['class' => 'control-label'],
+                    'label_attr'  => ['class' => 'form-label'],
                     'attr'        => [
                         'class'         => 'form-control multiselect',
                         'data-sortable' => 'true',
