@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\ReflectionHelper;
@@ -18,7 +19,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(AbstractFormFieldHelper::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class CompanyModelTest extends \PHPUnit\Framework\TestCase
+final class CompanyModelTest extends TestCase
 {
     #[TestDox('Ensure that an array value is flattened before saving')]
     public function testArrayValueIsFlattenedBeforeSave(): void

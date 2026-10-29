@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
@@ -33,7 +34,7 @@ final class ThemeHelper implements ThemeHelperInterface
     private array $themesInfo = [];
 
     /**
-     * @var array<\Mautic\CoreBundle\Configurator\Step\StepInterface>
+     * @var array<StepInterface>
      */
     private array $steps = [];
 

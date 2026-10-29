@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Deduplicate;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
@@ -22,26 +24,26 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ContactMergerTest extends \PHPUnit\Framework\TestCase
+final class ContactMergerTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadModel
+     * @var MockObject&LeadModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private MockObject $leadModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&MergeRecordRepository
+     * @var MockObject&MergeRecordRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mergeRecordRepo;
+    private MockObject $mergeRecordRepo;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Logger
+     * @var MockObject&Logger
      */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private MockObject $logger;
 
-    private \PHPUnit\Framework\MockObject\MockObject&CompanyLeadRepository $companyLeadRepo;
+    private MockObject&CompanyLeadRepository $companyLeadRepo;
 
-    private \PHPUnit\Framework\MockObject\MockObject&LeadRepository $leadRepository;
+    private MockObject&LeadRepository $leadRepository;
 
     protected function setUp(): void
     {

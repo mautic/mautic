@@ -2,6 +2,20 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
+use Mautic\CoreBundle\IpLookup\IpstackLookup;
+use Mautic\CoreBundle\IpLookup\GeobytesLookup;
+use Mautic\CoreBundle\IpLookup\GeoipsLookup;
+use Mautic\CoreBundle\IpLookup\IpinfodbLookup;
+use Mautic\CoreBundle\IpLookup\MaxmindCountryLookup;
+use Mautic\CoreBundle\IpLookup\MaxmindOmniLookup;
+use Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup;
+use Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup;
+use Mautic\CoreBundle\IpLookup\TelizeLookup;
+use Mautic\CoreBundle\IpLookup\IP2LocationBinLookup;
+use Mautic\CoreBundle\IpLookup\IP2LocationAPILookup;
+use Mautic\CoreBundle\Shortener\Shortener;
+
 return [
     'routes' => [
         'public' => [
@@ -100,51 +114,51 @@ return [
     'ip_lookup_services' => [
         'extreme-ip' => [
             'display_name' => 'Extreme-IP',
-            'class'        => Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
+            'class'        => ExtremeIpLookup::class,
         ],
         'freegeoip' => [
             'display_name' => 'Ipstack.com',
-            'class'        => Mautic\CoreBundle\IpLookup\IpstackLookup::class,
+            'class'        => IpstackLookup::class,
         ],
         'geobytes' => [
             'display_name' => 'Geobytes',
-            'class'        => Mautic\CoreBundle\IpLookup\GeobytesLookup::class,
+            'class'        => GeobytesLookup::class,
         ],
         'geoips' => [
             'display_name' => 'GeoIPs',
-            'class'        => Mautic\CoreBundle\IpLookup\GeoipsLookup::class,
+            'class'        => GeoipsLookup::class,
         ],
         'ipinfodb' => [
             'display_name' => 'IPInfoDB',
-            'class'        => Mautic\CoreBundle\IpLookup\IpinfodbLookup::class,
+            'class'        => IpinfodbLookup::class,
         ],
         'maxmind_country' => [
             'display_name' => 'MaxMind - Country Geolocation',
-            'class'        => Mautic\CoreBundle\IpLookup\MaxmindCountryLookup::class,
+            'class'        => MaxmindCountryLookup::class,
         ],
         'maxmind_omni' => [
             'display_name' => 'MaxMind - Insights (formerly Omni]',
-            'class'        => Mautic\CoreBundle\IpLookup\MaxmindOmniLookup::class,
+            'class'        => MaxmindOmniLookup::class,
         ],
         'maxmind_precision' => [
             'display_name' => 'MaxMind - GeoIP2 Precision',
-            'class'        => Mautic\CoreBundle\IpLookup\MaxmindPrecisionLookup::class,
+            'class'        => MaxmindPrecisionLookup::class,
         ],
         'maxmind_download' => [
             'display_name' => 'MaxMind - GeoLite2 City Download',
-            'class'        => Mautic\CoreBundle\IpLookup\MaxmindDownloadLookup::class,
+            'class'        => MaxmindDownloadLookup::class,
         ],
         'telize' => [
             'display_name' => 'Telize',
-            'class'        => Mautic\CoreBundle\IpLookup\TelizeLookup::class,
+            'class'        => TelizeLookup::class,
         ],
         'ip2loctionlocal' => [
             'display_name' => 'IP2Location Local Bin File',
-            'class'        => Mautic\CoreBundle\IpLookup\IP2LocationBinLookup::class,
+            'class'        => IP2LocationBinLookup::class,
         ],
         'ip2loctionapi' => [
             'display_name' => 'IP2Location Web Service',
-            'class'        => Mautic\CoreBundle\IpLookup\IP2LocationAPILookup::class,
+            'class'        => IP2LocationAPILookup::class,
         ],
     ],
 
@@ -707,7 +721,7 @@ return [
         ],
         'composer_updates'                                        => false,
         'redis_primary_only'                                      => false,
-        Mautic\CoreBundle\Shortener\Shortener::SHORTENER_SERVICE  => null,
+        Shortener::SHORTENER_SERVICE  => null,
         'gdpr_user_purge_threshold'                               => 1095, // Minimum no. of days a user has to be inactive to get picked up by `mautic:maintenance:cleanup --gdpr`
         'support_mautic_enabled'                                  => true,
     ],

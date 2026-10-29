@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Controller\Api;
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
@@ -103,7 +104,7 @@ final class EmailApiController extends CommonApiController
      *
      * @param int $id Email ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/emails/{id}/send',
@@ -147,7 +148,7 @@ final class EmailApiController extends CommonApiController
      *
      * @param int $id     Email ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/emails/{id}/contact/{leadId}/send',

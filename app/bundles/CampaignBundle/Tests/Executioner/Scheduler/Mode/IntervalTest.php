@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner\Scheduler\Mode;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -18,7 +19,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\NullLogger;
 
 #[AllowMockObjectsWithoutExpectations]
-final class IntervalTest extends \PHPUnit\Framework\TestCase
+final class IntervalTest extends TestCase
 {
     /**
      * @param array<int> $restrictedDays

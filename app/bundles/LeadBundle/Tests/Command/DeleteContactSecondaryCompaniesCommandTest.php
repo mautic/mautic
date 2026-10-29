@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Command;
 
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeleteContactSecondaryCompaniesCommand;
 use Mautic\LeadBundle\Entity\Company;
@@ -37,8 +39,8 @@ final class DeleteContactSecondaryCompaniesCommandTest extends MauticMysqlTestCa
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     protected function getContactWithCompanies(): Lead
     {

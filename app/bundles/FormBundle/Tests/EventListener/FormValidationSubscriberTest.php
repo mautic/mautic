@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\ValidationEvent;
@@ -15,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[CoversClass(FormValidationSubscriber::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
+final class FormValidationSubscriberTest extends TestCase
 {
     private const string MINIMUM_TWO_OPTIONS_MESSAGE = 'You must select at least 2 options.';
 

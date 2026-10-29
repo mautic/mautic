@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\Helper\UrlMatcher;
 
-final class UrlMatcherTest extends \PHPUnit\Framework\TestCase
+final class UrlMatcherTest extends TestCase
 {
     public function testUrlIsFound(): void
     {

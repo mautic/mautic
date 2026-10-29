@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -233,7 +234,7 @@ class TagRepository extends CommonRepository
     /**
      * @return array<mixed>
      */
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb, \stdClass $filter): array
     {
         $alias = $this->getTableAlias();
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Tracker;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,16 +20,16 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-final class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
+final class DeviceTrackerTest extends TestCase
 {
     private DeviceCreatorService $deviceCreatorService;
 
     private DeviceDetectorFactory $deviceDetectorFactory;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&DeviceTrackingServiceInterface
+     * @var MockObject&DeviceTrackingServiceInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $deviceTrackingService;
+    private MockObject $deviceTrackingService;
 
     private string $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36';
 

@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\PointBundle\Entity\Group;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
@@ -296,7 +297,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             $lead = $log->getLead();
 
             if (null !== $lead && !empty($points)) {
-                if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
+                if ($pointGroup instanceof Group) {
                     $this->groupModel->adjustPoints($lead, $pointGroup, $points);
                 } else {
                     $lead->adjustPoints($points);

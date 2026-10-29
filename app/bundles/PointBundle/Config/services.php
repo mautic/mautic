@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Mautic\PointBundle\Security\Permissions\PointPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -20,5 +21,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\PointBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->set(Mautic\PointBundle\Security\Permissions\PointPermissions::class);
+    $services->set(PointPermissions::class);
 };

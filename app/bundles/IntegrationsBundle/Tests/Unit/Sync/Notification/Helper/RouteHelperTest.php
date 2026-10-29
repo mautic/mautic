@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
@@ -17,14 +18,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class RouteHelperTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ObjectProvider
+     * @var MockObject&ObjectProvider
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
+    private MockObject $objectProvider;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     private RouteHelper $routeHelper;
 

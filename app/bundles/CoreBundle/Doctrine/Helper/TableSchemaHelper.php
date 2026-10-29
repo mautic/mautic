@@ -2,6 +2,8 @@
 
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
@@ -14,11 +16,11 @@ use Mautic\CoreBundle\Exception\SchemaException;
 final class TableSchemaHelper
 {
     /**
-     * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @var AbstractSchemaManager<AbstractMySQLPlatform>
      */
     private readonly AbstractSchemaManager $sm;
 
-    private ?\Doctrine\DBAL\Schema\Schema $schema = null;
+    private ?Schema $schema = null;
 
     /**
      * @var string[]
@@ -33,7 +35,7 @@ final class TableSchemaHelper
     }
 
     /**
-     * @return AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @return AbstractSchemaManager<AbstractMySQLPlatform>
      */
     public function getSchemaManager(): AbstractSchemaManager
     {
@@ -190,7 +192,7 @@ final class TableSchemaHelper
             return $this->schema;
         }
 
-        if ($this->db instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
+        if ($this->db instanceof PrimaryReadReplicaConnection) {
             $params       = $this->db->getParams();
             $schemaConfig = new SchemaConfig();
             $schemaConfig->setName($params['master']['dbname']);

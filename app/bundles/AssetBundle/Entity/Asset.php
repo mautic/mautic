@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -503,7 +504,7 @@ class Asset extends FormEntity implements UuidInterface
     {
         if (null !== $this->getFile()) {
             // set the asset title as original file name if title is missing
-            if (null === $this->title && $this->file instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
+            if (null === $this->title && $this->file instanceof UploadedFile) {
                 $this->setTitle($this->file->getClientOriginalName());
             }
 

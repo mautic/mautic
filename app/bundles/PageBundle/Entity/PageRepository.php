@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\FormBundle\Entity\Submission;
@@ -100,7 +101,7 @@ final class PageRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $queryBuilder,
@@ -112,7 +113,7 @@ final class PageRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {

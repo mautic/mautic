@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Model;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\LeadBundle\Entity\Lead;
@@ -45,7 +46,7 @@ final class PointGroupModel extends CommonFormModel implements GlobalSearchInter
     /**
      * @param array<mixed> $args
      *
-     * @return array<int, Group>|\Doctrine\ORM\Tools\Pagination\Paginator<Group>
+     * @return array<int, Group>|Paginator<Group>
      */
     public function getEntities(array $args = []): iterable
     {

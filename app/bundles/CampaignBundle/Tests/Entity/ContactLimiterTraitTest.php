@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Entity;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,20 +18,20 @@ use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ContactLimiterTraitTest extends \PHPUnit\Framework\TestCase
+final class ContactLimiterTraitTest extends TestCase
 {
     use ContactLimiterTrait;
     use MockedConnectionTrait;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Connection
+     * @var MockObject|Connection
      */
-    private \PHPUnit\Framework\MockObject\MockObject $connection;
+    private MockObject $connection;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&EntityManagerInterface
+     * @var MockObject&EntityManagerInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManager;
+    private MockObject $entityManager;
 
     protected function setUp(): void
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\EventListener;
 
+use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent;
@@ -83,7 +84,7 @@ final readonly class CompanyObjectSubscriber implements EventSubscriberInterface
 
     public function findCompaniesByDateRange(InternalObjectFindEvent $event): void
     {
-        if (Company::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof \Mautic\IntegrationsBundle\Sync\DAO\DateRange) {
+        if (Company::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof DateRange) {
             return;
         }
 

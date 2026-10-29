@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
@@ -15,7 +16,7 @@ use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-final class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
+final class LeadChangeEventDispatcherTest extends TestCase
 {
     #[TestDox('Test that date identified change dispatches correct event')]
     public function testDateIdentifiedEventIsDispatched(): void

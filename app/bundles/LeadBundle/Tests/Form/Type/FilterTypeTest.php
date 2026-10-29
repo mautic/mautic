@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Form\Type\FilterType;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
@@ -16,7 +17,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
-final class FilterTypeTest extends \PHPUnit\Framework\TestCase
+final class FilterTypeTest extends TestCase
 {
     /**
      * @var MockObject&FormAdjustmentsProviderInterface

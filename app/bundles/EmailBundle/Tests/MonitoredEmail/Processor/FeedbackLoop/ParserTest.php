@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\FeedbackLoop;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\MonitoredEmail\Exception\FeedbackLoopNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop\Parser;
@@ -11,7 +12,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(Parser::class)]
-final class ParserTest extends \PHPUnit\Framework\TestCase
+final class ParserTest extends TestCase
 {
     #[TestDox('Test that an email is found inside a feedback report')]
     public function testEmailIsFoundInFeedbackLoopEmail(): void

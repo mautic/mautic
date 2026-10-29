@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Helper\Serializer;
 use DateTime;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -2374,7 +2375,7 @@ class LeadModel extends FormModel
                 }
                 $allowedValues = is_array($field['properties'])
                     ? $field['properties']
-                    : \Mautic\CoreBundle\Helper\Serializer::decode($field['properties']);
+                    : Serializer::decode($field['properties']);
 
                 $flattenedAllowedValues = array_map(fn (array $item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
 

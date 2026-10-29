@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Membership\Action;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
@@ -15,17 +17,17 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
 #[AllowMockObjectsWithoutExpectations]
-final class AdderTest extends \PHPUnit\Framework\TestCase
+final class AdderTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
+     * @var MockObject&LeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
+    private MockObject $leadRepository;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadEventLogRepository
+     * @var MockObject&LeadEventLogRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
+    private MockObject $leadEventLogRepository;
 
     protected function setUp(): void
     {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\EventListener;
 
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -83,8 +85,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws \ReflectionException
      */
     public function onCampaignTriggerAction(PendingEvent $pendingEvent): void
@@ -144,8 +146,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
      *
      * @return bool|Collection<int, LeadEventLog>
      *
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws \ReflectionException
      * @param Collection<int, LeadEventLog> $logs
      */

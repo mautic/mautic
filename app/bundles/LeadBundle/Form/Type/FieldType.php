@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
@@ -241,7 +242,7 @@ final class FieldType extends AbstractType
             $leadField     = $options['data'];
             $cleaningRules = [];
             $form          = $event->getForm();
-            /** @var array<string, mixed>|\Mautic\LeadBundle\Entity\LeadField $data */
+            /** @var array<string, mixed>|LeadField $data */
             $data          = $event->getData();
             $type          = (is_array($data)) ? ($data['type'] ?? $type) : $data->getType();
             $constraints   = [];
@@ -454,7 +455,7 @@ final class FieldType extends AbstractType
             ];
             // There's no need to filter list during FormEvents::PRE_SUBMIT.
             if ($object && $group) {
-                $options['query_builder'] = fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er->createQueryBuilder('f')
+                $options['query_builder'] = fn (EntityRepository $er): QueryBuilder => $er->createQueryBuilder('f')
                     ->orderBy('f.order', Order::Ascending->value)
                     ->where('f.object = :object')
                     ->setParameter('object', $object)

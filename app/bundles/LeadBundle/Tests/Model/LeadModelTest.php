@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -64,7 +65,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 #[AllowMockObjectsWithoutExpectations]
-final class LeadModelTest extends \PHPUnit\Framework\TestCase
+final class LeadModelTest extends TestCase
 {
     private MockObject|RequestStack $requestStack;
 

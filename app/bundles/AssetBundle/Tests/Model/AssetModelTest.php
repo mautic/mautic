@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\Stub;
 use Doctrine\ORM\EntityManager;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
@@ -39,13 +41,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class AssetModelTest extends \PHPUnit\Framework\TestCase
+final class AssetModelTest extends TestCase
 {
     private AssetModel $assetModel;
 
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private LeadModel&\PHPUnit\Framework\MockObject\Stub $leadModel;
+    private LeadModel&Stub $leadModel;
 
     private RequestStack&MockObject $requestStack;
 
@@ -65,13 +67,13 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
     private EventDispatcherInterface&MockObject $eventDispatcher;
 
-    private \PHPUnit\Framework\MockObject\Stub&UrlGeneratorInterface $urlGenerator;
+    private Stub&UrlGeneratorInterface $urlGenerator;
 
-    private Translator&\PHPUnit\Framework\MockObject\Stub $translator;
+    private Translator&Stub $translator;
 
-    private UserHelper&\PHPUnit\Framework\MockObject\Stub $userHelper;
+    private UserHelper&Stub $userHelper;
 
-    private LoggerInterface&\PHPUnit\Framework\MockObject\Stub $logger;
+    private LoggerInterface&Stub $logger;
 
     private AssetRepository&MockObject $assetRepository;
 

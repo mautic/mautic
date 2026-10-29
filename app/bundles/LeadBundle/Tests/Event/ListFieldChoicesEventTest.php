@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 
-final class ListFieldChoicesEventTest extends \PHPUnit\Framework\TestCase
+final class ListFieldChoicesEventTest extends TestCase
 {
     public function testConstructGettersSetters(): void
     {

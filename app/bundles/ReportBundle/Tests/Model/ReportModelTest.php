@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -27,7 +28,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReportModelTest extends \PHPUnit\Framework\TestCase
+final class ReportModelTest extends TestCase
 {
     private ReportModel $reportModel;
 

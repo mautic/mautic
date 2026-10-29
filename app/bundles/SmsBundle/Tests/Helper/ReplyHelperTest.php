@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -14,19 +16,19 @@ use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-final class ReplyHelperTest extends \PHPUnit\Framework\TestCase
+final class ReplyHelperTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
+    private MockObject $eventDispatcher;
 
     private NullLogger $logger;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ContactTracker
+     * @var MockObject&ContactTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactTracker;
+    private MockObject $contactTracker;
 
     protected function setUp(): void
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
@@ -34,7 +35,7 @@ use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&FieldModel

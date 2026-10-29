@@ -2,6 +2,7 @@
 
 namespace Mautic\PluginBundle\Controller;
 
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -122,7 +123,7 @@ final class AuthController extends AbstractFormController
         $settings['method']      = 'GET';
         $settings['integration'] = $integrationObject->getName();
 
-        /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
+        /** @var AbstractIntegration $integrationObject */
         $event = $this->dispatcher->dispatch(
             new PluginIntegrationAuthRedirectEvent(
                 $integrationObject,

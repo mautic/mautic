@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignPostDeleteEvent;
 use Mautic\CampaignBundle\Event\CampaignPostSaveEvent;
@@ -18,19 +19,19 @@ use PHPUnit\Framework\TestCase;
 final class CampaignSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&IpLookupHelper
+     * @var MockObject&IpLookupHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $ipLookupHelper;
+    private MockObject $ipLookupHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&AuditLogModel
+     * @var MockObject&AuditLogModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $auditLogModel;
+    private MockObject $auditLogModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CampaignAuditService
+     * @var MockObject&CampaignAuditService
      */
-    private \PHPUnit\Framework\MockObject\MockObject $campaignAuditService;
+    private MockObject $campaignAuditService;
 
     private CampaignSubscriber $subscriber;
 

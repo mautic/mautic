@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;
+use Mautic\SmsBundle\Helper\SmsHelper;
+use Mautic\SmsBundle\Sms\TransportChain;
+use Mautic\SmsBundle\Integration\Twilio\TwilioCallback;
+use Mautic\SmsBundle\Integration\TwilioIntegration;
+use Mautic\SmsBundle\Security\Permissions\SmsPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\param;
@@ -21,18 +27,18 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\SmsBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->set(Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class)
+    $services->set(TwilioTransport::class)
         ->arg('$logger', service('monolog.logger.mautic'))
         ->tag('mautic.sms_transport', ['integrationAlias' => 'Twilio']);
 
-    $services->alias('mautic.sms.twilio.transport', Mautic\SmsBundle\Integration\Twilio\TwilioTransport::class);
-    $services->set(Mautic\SmsBundle\Helper\SmsHelper::class)->tag('twig.helper', ['alias' => 'sms_helper']);
+    $services->alias('mautic.sms.twilio.transport', TwilioTransport::class);
+    $services->set(SmsHelper::class)->tag('twig.helper', ['alias' => 'sms_helper']);
 
-    $services->set(Mautic\SmsBundle\Sms\TransportChain::class)
+    $services->set(TransportChain::class)
         ->arg('$primaryTransport', param('mautic.sms_transport'));
 
-    $services->set(Mautic\SmsBundle\Integration\Twilio\TwilioCallback::class)->tag('mautic.sms_callback_handler');
-    $services->set('mautic.integration.twilio', Mautic\SmsBundle\Integration\TwilioIntegration::class);
+    $services->set(TwilioCallback::class)->tag('mautic.sms_callback_handler');
+    $services->set('mautic.integration.twilio', TwilioIntegration::class);
 
-    $services->set(Mautic\SmsBundle\Security\Permissions\SmsPermissions::class);
+    $services->set(SmsPermissions::class);
 };

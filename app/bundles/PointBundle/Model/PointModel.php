@@ -2,6 +2,7 @@
 
 namespace Mautic\PointBundle\Model;
 
+use Mautic\PointBundle\Helper\EventHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -241,7 +242,7 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
                 'eventDetails' => $eventDetails,
             ];
 
-            $callback = $settings['callback'] ?? \Mautic\PointBundle\Helper\EventHelper::engagePointAction(...);
+            $callback = $settings['callback'] ?? EventHelper::engagePointAction(...);
 
             if (is_callable($callback)) {
                 $object = null;

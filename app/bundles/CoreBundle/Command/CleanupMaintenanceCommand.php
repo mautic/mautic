@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
+use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -107,7 +108,7 @@ final class CleanupMaintenanceCommand extends ModeratedCommand
         }
 
         if (empty($dryRun) && empty($noInteraction)) {
-            /** @var \Symfony\Component\Console\Helper\SymfonyQuestionHelper $helper */
+            /** @var SymfonyQuestionHelper $helper */
             $helper   = $this->getHelperSet()->get('question');
             $question = new ConfirmationQuestion(
                 '<info>'.$this->translator->trans('mautic.maintenance.confirm_data_purge', ['%days%' => $daysOld]).'</info> ', false

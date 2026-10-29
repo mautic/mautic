@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(RestrictionHelper::class)]
-final class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
+final class RestrictionHelperTest extends TestCase
 {
     /**
      * @var array<int|string, mixed>

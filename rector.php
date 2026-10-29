@@ -22,7 +22,7 @@ return RectorConfig::configure()
         phpunitNarrowAsserts: true,
     )
     ->withPhpSets(php84: true)
-    ->withImportNames()
+    ->withImportNames(importShortClasses: false)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
         // to be used next on loadMetadata()
@@ -51,6 +51,9 @@ return RectorConfig::configure()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
         '*/Fixture/*',
+
+        // handle in standalone PR
+        \Rector\Symfony\CodeQuality\Rector\Class_\EventSubscriberToAttributeRector::class,
 
         // prefer implicit compare on object|null
         Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector::class,

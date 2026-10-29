@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -15,7 +16,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
+final class FormConditionalSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&FormModel

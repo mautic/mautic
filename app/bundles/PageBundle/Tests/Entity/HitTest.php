@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Entity;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\PageBundle\Entity\Hit;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-final class HitTest extends \PHPUnit\Framework\TestCase
+final class HitTest extends TestCase
 {
     #[DataProvider('setUrlTitle')]
     public function testSetUrlTitle(string $urlTitle, int $expected): void

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Doctrine\ORM\Query\Expr;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -152,7 +152,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         if ($applyIsNull) {
             if ($applyNot) {
                 $expressions = [$queryBuilder->expr()->or(
-                    (string) new Expr\Func('NOT', (string) $queryBuilder->expr()->{$filterGlue}(...$expressions)),
+                    (string) new Func('NOT', (string) $queryBuilder->expr()->{$filterGlue}(...$expressions)),
                     $queryBuilder->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
                 )];
             } else {

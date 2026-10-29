@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Tests\Functional;
 
+use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
@@ -34,7 +35,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
     /**
      * @var WebhookRepository|EntityRepository<Webhook>
      */
-    private \Mautic\WebhookBundle\Entity\WebhookRepository|EntityRepository $webhhokRepository;
+    private WebhookRepository|EntityRepository $webhhokRepository;
 
     protected function setUp(): void
     {
@@ -307,7 +308,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return Paginator<\Mautic\WebhookBundle\Entity\WebhookQueue>
+     * @return Paginator<WebhookQueue>
      */
     private function getWebhookQueue(int $webhookId): Paginator
     {

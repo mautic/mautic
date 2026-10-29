@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;

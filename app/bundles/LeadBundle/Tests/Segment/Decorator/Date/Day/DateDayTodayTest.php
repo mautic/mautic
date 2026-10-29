@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Day;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
@@ -14,7 +15,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(DateDayToday::class)]
-final class DateDayTodayTest extends \PHPUnit\Framework\TestCase
+final class DateDayTodayTest extends TestCase
 {
     public function testGetOperatorBetween(): void
     {

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\Helper;
 
+use PHPUnit\Framework\TestCase;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Helper\StateValidationHelper;
 
-final class StateValidationHelperTest extends \PHPUnit\Framework\TestCase
+final class StateValidationHelperTest extends TestCase
 {
     public function testStateIsRemovedWhenCountryIsUnknown(): void
     {

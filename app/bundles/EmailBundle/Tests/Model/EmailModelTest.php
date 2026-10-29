@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\Stub;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
@@ -68,7 +70,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class EmailModelTest extends \PHPUnit\Framework\TestCase
+final class EmailModelTest extends TestCase
 {
     public const string SEGMENT_A = 'segment A';
 
@@ -85,11 +87,11 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $ipLookupHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&ThemeHelperInterface
+     * @var Stub&ThemeHelperInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $themeHelper;
+    private Stub $themeHelper;
 
-    private Mailbox&\PHPUnit\Framework\MockObject\Stub $mailboxHelper;
+    private Mailbox&Stub $mailboxHelper;
 
     /**
      * @var MockObject&MailHelper
@@ -97,15 +99,15 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
     private MockObject $mailHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&LeadModel
+     * @var Stub&LeadModel
      */
-    private \PHPUnit\Framework\MockObject\Stub $leadModel;
+    private Stub $leadModel;
 
-    private TrackableModel&\PHPUnit\Framework\MockObject\Stub $trackableModel;
+    private TrackableModel&Stub $trackableModel;
 
-    private UserModel&\PHPUnit\Framework\MockObject\Stub $userModel;
+    private UserModel&Stub $userModel;
 
-    private UserHelper&\PHPUnit\Framework\MockObject\Stub $userHelper;
+    private UserHelper&Stub $userHelper;
 
     /**
      * @var MockObject&Translator
@@ -139,7 +141,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $frequencyRepository;
 
-    private MessageQueueModel&\PHPUnit\Framework\MockObject\Stub $messageModel;
+    private MessageQueueModel&Stub $messageModel;
 
     /**
      * @var MockObject&CompanyModel
@@ -158,7 +160,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $deviceTrackerMock;
 
-    private RedirectRepository&\PHPUnit\Framework\MockObject\Stub $redirectRepositoryMock;
+    private RedirectRepository&Stub $redirectRepositoryMock;
 
     private EmailModel $emailModel;
 

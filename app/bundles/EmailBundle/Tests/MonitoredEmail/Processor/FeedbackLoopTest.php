@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -21,7 +22,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 #[CoversClass(FeedbackLoop::class)]
 #[CoversClass(Result::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class FeedbackLoopTest extends \PHPUnit\Framework\TestCase
+final class FeedbackLoopTest extends TestCase
 {
     #[TestDox('Test that the message is processed appropriately')]
     public function testContactIsFoundFromMessage(): void

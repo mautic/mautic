@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Mautic\EmailBundle\Controller\Api\EmailApiController;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Form\Type\ConfigType;
+
 return [
     'routes' => [
         'api' => [
@@ -9,7 +13,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'emails',
                 'path'            => '/emails',
-                'controller'      => Mautic\EmailBundle\Controller\Api\EmailApiController::class,
+                'controller'      => EmailApiController::class,
             ],
         ],
     ],
@@ -27,7 +31,7 @@ return [
     ],
     'categories' => [
         'email' => [
-            'class' => Mautic\EmailBundle\Entity\Email::class,
+            'class' => Email::class,
         ],
     ],
     'parameters' => [
@@ -105,7 +109,7 @@ return [
         'email_draft_enabled'                                               => false,
         'theme_email_default'                                               => 'blank',
         'mailer_memory_msg_limit'                                           => 100,
-        Mautic\EmailBundle\Form\Type\ConfigType::MINIFY_EMAIL_HTML          => false,
+        ConfigType::MINIFY_EMAIL_HTML          => false,
         'bot_helper_bot_ratio_threshold'                                    => 0.6,
         'bot_helper_time_email_threshold'                                   => 2, // seconds
         'bot_helper_blocked_user_agents'                                    => [

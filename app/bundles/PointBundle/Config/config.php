@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+use Mautic\PointBundle\Controller\Api\PointApiController;
+use Mautic\PointBundle\Controller\Api\TriggerApiController;
+use Mautic\PointBundle\Controller\Api\PointGroupsApiController;
+use Mautic\PointBundle\Controller\Api\PointInsightApiController;
+use Mautic\PointBundle\Entity\Point;
+
 return [
     'routes' => [
         'api' => [
@@ -9,25 +15,25 @@ return [
                 'standard_entity' => true,
                 'name'            => 'points',
                 'path'            => '/points',
-                'controller'      => Mautic\PointBundle\Controller\Api\PointApiController::class,
+                'controller'      => PointApiController::class,
             ],
             'mautic_api_pointtriggersstandard' => [
                 'standard_entity' => true,
                 'name'            => 'triggers',
                 'path'            => '/points/triggers',
-                'controller'      => Mautic\PointBundle\Controller\Api\TriggerApiController::class,
+                'controller'      => TriggerApiController::class,
             ],
             'mautic_api_pointgroupsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'pointGroups',
                 'path'            => '/points/groups',
-                'controller'      => Mautic\PointBundle\Controller\Api\PointGroupsApiController::class,
+                'controller'      => PointGroupsApiController::class,
             ],
             'mautic_api_pointinsightsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'insights',
                 'path'            => '/points/insights',
-                'controller'      => Mautic\PointBundle\Controller\Api\PointInsightApiController::class,
+                'controller'      => PointInsightApiController::class,
             ],
         ],
     ],
@@ -63,7 +69,7 @@ return [
 
     'categories' => [
         'point' => [
-            'class' => Mautic\PointBundle\Entity\Point::class,
+            'class' => Point::class,
         ],
     ],
 ];

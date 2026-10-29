@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\PluginBundle\Entity\Plugin;
@@ -15,7 +16,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReloadHelperTest extends \PHPUnit\Framework\TestCase
+final class ReloadHelperTest extends TestCase
 {
     private ReloadHelper $helper;
 

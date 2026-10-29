@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner\Result;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\LeadBundle\Entity\Lead;
 
-final class EvalutatedContactsTest extends \PHPUnit\Framework\TestCase
+final class EvalutatedContactsTest extends TestCase
 {
     public function testPassFail(): void
     {

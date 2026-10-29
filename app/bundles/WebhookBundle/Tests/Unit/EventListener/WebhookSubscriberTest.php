@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Tests\Unit\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\WebhookBundle\Entity\Webhook;
@@ -17,7 +18,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
+final class WebhookSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&WebhookKillNotificator

@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
@@ -230,7 +231,7 @@ final class QueryBuilder extends BaseQueryBuilder
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function getDebugOutput(): string
     {
@@ -283,7 +284,7 @@ final class QueryBuilder extends BaseQueryBuilder
      * This function assembles correct logic for segment processing, this is to replace andWhere and orWhere (virtualy
      *  as they need to be kept). You may not use andWhere in filters!!!
      */
-    public function addLogic(string|\Doctrine\DBAL\Query\Expression\CompositeExpression $expression, $glue): void
+    public function addLogic(string|CompositeExpression $expression, $glue): void
     {
         // little setup
         $glue = strtolower($glue);

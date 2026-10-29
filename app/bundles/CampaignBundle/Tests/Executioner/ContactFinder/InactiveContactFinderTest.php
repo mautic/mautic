@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
@@ -16,17 +18,17 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Psr\Log\NullLogger;
 
 #[AllowMockObjectsWithoutExpectations]
-final class InactiveContactFinderTest extends \PHPUnit\Framework\TestCase
+final class InactiveContactFinderTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
+     * @var MockObject&LeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
+    private MockObject $leadRepository;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CampaignLeadRepository
+     * @var MockObject&CampaignLeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $campaignLeadRepository;
+    private MockObject $campaignLeadRepository;
 
     protected function setUp(): void
     {

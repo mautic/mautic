@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\Stub;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -53,13 +54,13 @@ final class LeadSubscriberTest extends TestCase
      */
     private MockObject $translator;
 
-    private LeadListRepository&\PHPUnit\Framework\MockObject\Stub $leadListRepository;
+    private LeadListRepository&Stub $leadListRepository;
 
-    private SegmentCountCacheHelper&\PHPUnit\Framework\MockObject\Stub $segmentCountCacheHelper;
+    private SegmentCountCacheHelper&Stub $segmentCountCacheHelper;
 
-    private CoreParametersHelper&\PHPUnit\Framework\MockObject\Stub $coreParametersHelper;
+    private CoreParametersHelper&Stub $coreParametersHelper;
 
-    private CompanyLeadRepository&\PHPUnit\Framework\MockObject\Stub $companyLeadRepository;
+    private CompanyLeadRepository&Stub $companyLeadRepository;
 
     protected function setUp(): void
     {

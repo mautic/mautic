@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
+use Symfony\Component\Lock\LockInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
@@ -31,7 +32,7 @@ abstract class ModeratedCommand extends Command
 
     protected $lockFile;
 
-    private ?\Symfony\Component\Lock\LockInterface $lock = null;
+    private ?LockInterface $lock = null;
 
     /**
      * @var OutputInterface

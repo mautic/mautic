@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Membership;
 
+use Symfony\Component\Console\Helper\ProgressBar;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -21,7 +22,7 @@ final class MembershipBuilder
 
     private ?OutputInterface $output = null;
 
-    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
+    private ?ProgressBar $progressBar = null;
 
     public function __construct(
         private readonly MembershipManager $manager,

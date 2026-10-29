@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\Controller;
 
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Controller\AbstractFormController as CommonFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -524,7 +525,7 @@ final class PublicController extends CommonFormController
      * Gives a preview of the form.
      *
      * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
     #[Route(
         path: '/form/{id}',

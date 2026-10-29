@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\EmailBundle\Entity\Email;
+use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -527,7 +529,7 @@ final class AjaxController extends CommonAjaxController
         $data    = ['success' => 1, 'body' => '', 'subject' => ''];
         $emailId = $request->query->get('template');
 
-        /** @var \Mautic\EmailBundle\Entity\Email $email */
+        /** @var Email $email */
         $email = $model->getEntity($emailId);
 
         if (null !== $email
@@ -556,7 +558,7 @@ final class AjaxController extends CommonAjaxController
         if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
             $leadModel->setTags($lead, $updatedTags, true);
 
-            /** @var \Doctrine\ORM\PersistentCollection $leadTags */
+            /** @var PersistentCollection $leadTags */
             $leadTags    = $lead->getTags();
             $leadTagKeys = $leadTags->getKeys();
 

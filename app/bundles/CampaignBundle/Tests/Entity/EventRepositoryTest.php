@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Entity;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -79,7 +80,7 @@ final class EventRepositoryTest extends TestCase
 
         $eventRepository = $this->configureRepository(Event::class, $emMock);
         $this->connection->method('createQueryBuilder')
-            ->willReturnCallback(fn (): \PHPUnit\Framework\MockObject\MockObject => $queryBuilderMock);
+            ->willReturnCallback(fn (): MockObject => $queryBuilderMock);
 
         $event = new Event();
         ReflectionHelper::setEntityId($event, 42);

@@ -25,7 +25,7 @@ class LeadStageLog
     private $stage;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Lead::class)]
@@ -71,7 +71,7 @@ class LeadStageLog
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\Lead|null
+     * @return Lead|null
      */
     public function getLead()
     {

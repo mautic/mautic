@@ -25,10 +25,7 @@ final class DateTimeHelper
 
     private \DateTimeZone $local;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $datetime;
+    private \DateTime|bool|null $datetime = null;
 
     /**
      * @param \DateTimeInterface|string $string

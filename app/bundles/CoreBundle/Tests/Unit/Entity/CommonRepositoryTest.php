@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Entity;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\EntityManager;
@@ -20,7 +21,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 #[CoversClass(CommonRepository::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
+final class CommonRepositoryTest extends TestCase
 {
     /**
      * @var MockObject&CommonRepository<object>

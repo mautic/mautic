@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
 use Mautic\ReportBundle\EventListener\SchedulerSubscriber;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 
-final class SchedulerSubscriberTest extends \PHPUnit\Framework\TestCase
+final class SchedulerSubscriberTest extends TestCase
 {
     public function testNoEmailsProvided(): void
     {

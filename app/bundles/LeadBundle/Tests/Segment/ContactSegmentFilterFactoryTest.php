@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
@@ -15,7 +16,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[CoversClass(ContactSegmentFilterFactory::class)]
-final class ContactSegmentFilterFactoryTest extends \PHPUnit\Framework\TestCase
+final class ContactSegmentFilterFactoryTest extends TestCase
 {
     public function testLeadFilter(): void
     {

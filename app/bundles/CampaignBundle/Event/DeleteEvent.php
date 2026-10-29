@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Event;
 
-final class DeleteEvent extends \Symfony\Contracts\EventDispatcher\Event
+use Symfony\Contracts\EventDispatcher\Event;
+
+final class DeleteEvent extends Event
 {
     /**
      * @param string[] $eventIds

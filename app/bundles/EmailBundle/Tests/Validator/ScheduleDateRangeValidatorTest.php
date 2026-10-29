@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Validator;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Validator\ScheduleDateRange;
 use Mautic\EmailBundle\Validator\ScheduleDateRangeValidator;
@@ -14,9 +15,9 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 final class ScheduleDateRangeValidatorTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ExecutionContextInterface
+     * @var MockObject&ExecutionContextInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $context;
+    private MockObject $context;
 
     private ScheduleDateRangeValidator $validator;
 

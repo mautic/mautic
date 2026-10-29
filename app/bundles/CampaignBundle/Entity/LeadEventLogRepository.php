@@ -2,6 +2,11 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Mautic\CoreBundle\Entity\IpAddress;
+use Doctrine\DBAL\Cache\CacheException;
+use Doctrine\ORM\Query\QueryException;
+use Doctrine\DBAL\Exception;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\ArrayParameterType;
@@ -178,7 +183,7 @@ final class LeadEventLogRepository extends CommonRepository
             ->andWhere('ll.trigger_date > NOW()');
 
         if (isset($options['lead'])) {
-            /** @var \Mautic\CoreBundle\Entity\IpAddress $ip */
+            /** @var IpAddress $ip */
             foreach ($options['lead']->getIpAddresses() as $ip) {
                 $leadIps[] = $ip->getId();
             }
@@ -218,7 +223,7 @@ final class LeadEventLogRepository extends CommonRepository
     /**
      * @param int $campaignId
      *
-     * @throws \Doctrine\DBAL\Cache\CacheException
+     * @throws CacheException
      */
     public function getCampaignLogCounts(
         $campaignId,
@@ -409,7 +414,7 @@ final class LeadEventLogRepository extends CommonRepository
     /**
      * @param int $eventId
      *
-     * @throws \Doctrine\ORM\Query\QueryException
+     * @throws QueryException
      *
      * @return Collection<int, LeadEventLog>
      */
@@ -455,7 +460,7 @@ final class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @throws \Doctrine\ORM\Query\QueryException
+     * @throws QueryException
      * @return Collection<int, LeadEventLog>
      */
     public function getScheduledByIds(array $ids): Collection
@@ -588,7 +593,7 @@ final class LeadEventLogRepository extends CommonRepository
     /**
      * @param string $message
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function unscheduleEvents(Lead $campaignMember, $message): void
     {
@@ -649,7 +654,7 @@ SQL;
     /**
      * Check if last lead/event failed.
      *
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NonUniqueResultException
      */
     public function isLastFailed(int|string $leadId, int $eventId): bool
     {

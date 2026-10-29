@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+use MauticPlugin\MauticSocialBundle\Integration\FacebookIntegration;
+use MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration;
+use MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration;
+use MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration;
+use MauticPlugin\MauticSocialBundle\Security\Permissions\MauticSocialPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -19,10 +24,10 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('MauticPlugin\\MauticSocialBundle\\Entity\\', '../Entity/*Repository.php');
-    $services->set('mautic.integration.facebook', MauticPlugin\MauticSocialBundle\Integration\FacebookIntegration::class);
-    $services->set('mautic.integration.foursquare', MauticPlugin\MauticSocialBundle\Integration\FoursquareIntegration::class);
-    $services->set('mautic.integration.instagram', MauticPlugin\MauticSocialBundle\Integration\InstagramIntegration::class);
-    $services->set('mautic.integration.twitter', MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration::class);
+    $services->set('mautic.integration.facebook', FacebookIntegration::class);
+    $services->set('mautic.integration.foursquare', FoursquareIntegration::class);
+    $services->set('mautic.integration.instagram', InstagramIntegration::class);
+    $services->set('mautic.integration.twitter', TwitterIntegration::class);
 
-    $services->set(MauticPlugin\MauticSocialBundle\Security\Permissions\MauticSocialPermissions::class);
+    $services->set(MauticSocialPermissions::class);
 };

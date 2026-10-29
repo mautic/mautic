@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
 interface FilterDecoratorInterface
@@ -64,7 +65,7 @@ interface FilterDecoratorInterface
      * Returns a special where condition which is needed to be added to QueryBuilder (like email_stats.is_read = 1 for 'Read emails')
      * Returns null if no special condition is needed.
      *
-     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|string|null
+     * @return CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate);
 }

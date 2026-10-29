@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\MarketplaceBundle\Tests\Functional\Command;
 
+use PHPUnit\Framework\MockObject\Stub;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\RemoveCommand;
@@ -19,7 +20,7 @@ use Psr\Log\LoggerInterface;
 #[AllowMockObjectsWithoutExpectations]
 final class RemoveCommandTest extends AbstractMauticTestCase
 {
-    private \PHPUnit\Framework\MockObject\Stub&LoggerInterface $logger;
+    private Stub&LoggerInterface $logger;
 
     private MockObject&PackageModel $packageModel;
 

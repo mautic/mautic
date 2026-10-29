@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Translation\Translator;
@@ -17,7 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportDevicesSubscriberTest extends TestCase
 {
     public function testNotRelevantContextBuilder(): void
     {

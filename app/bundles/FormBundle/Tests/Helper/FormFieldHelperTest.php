@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
+use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
+final class FormFieldHelperTest extends TestCase
 {
     private FormFieldHelper $fixture;
 
@@ -124,7 +126,7 @@ final class FormFieldHelperTest extends \PHPUnit\Framework\TestCase
         $field = self::getField('Rating', 'rating');
         $field->setProperties(['star_count' => 6]);
 
-        $this->assertSame($this->getRatingList($field), \Mautic\CoreBundle\Helper\AbstractFormFieldHelper::parseList($this->getRatingList($field)));
+        $this->assertSame($this->getRatingList($field), AbstractFormFieldHelper::parseList($this->getRatingList($field)));
     }
 
     public function testRatingTemplateUsesDescendingRadioValues(): void

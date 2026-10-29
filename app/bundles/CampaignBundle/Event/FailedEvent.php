@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Event;
 
+use Symfony\Contracts\EventDispatcher\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 
-final class FailedEvent extends \Symfony\Contracts\EventDispatcher\Event
+final class FailedEvent extends Event
 {
     public function __construct(
         private readonly AbstractEventAccessor $config,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
@@ -14,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DetermineWinnerSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&DownloadRepository

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Provider\Oauth2ThreeLegged;
 
+use kamermans\OAuth2\Utils\Collection;
 use GuzzleHttp\ClientInterface;
 use kamermans\OAuth2\OAuth2Middleware;
 use kamermans\OAuth2\Persistence\TokenPersistenceInterface as KamermansTokenPersistenceInterface;
@@ -264,7 +265,7 @@ final class HttpFactoryTest extends TestCase
         $grantType           = $this->getProperty($reflectedMiddleware, $middleware, 'grantType');
 
         $reflectedGrantType = new \ReflectionClass($grantType);
-        /** @var \kamermans\OAuth2\Utils\Collection $reauthConfig */
+        /** @var Collection $reauthConfig */
         $reauthConfig       = $this->getProperty($reflectedGrantType, $grantType, 'config');
 
         $expectedConfig = [

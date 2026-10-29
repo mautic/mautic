@@ -2,6 +2,7 @@
 
 namespace Mautic\DashboardBundle\EventListener;
 
+use Psr\Cache\InvalidArgumentException;
 use Mautic\DashboardBundle\Event\GenerateWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\PreLoadWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
@@ -45,7 +46,7 @@ class DashboardSubscriber implements EventSubscriberInterface
     /**
      * Generates widget preview without data.
      *
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function onWidgetDetailPreLoad(WidgetDetailEvent $event): void
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Entity\Action;
@@ -25,7 +26,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FormSubscriberTest extends \PHPUnit\Framework\TestCase
+final class FormSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&LeadModel

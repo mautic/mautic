@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PageHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -11,7 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-final class PageHelperTest extends \PHPUnit\Framework\TestCase
+final class PageHelperTest extends TestCase
 {
     private MockObject&SessionInterface $session;
 

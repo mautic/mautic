@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Command;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\IntegrationsBundle\Command\SyncCommand;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
@@ -23,9 +24,9 @@ final class SyncCommandTest extends TestCase
     private const string INTEGRATION_NAME = 'Test';
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&SyncServiceInterface
+     * @var MockObject&SyncServiceInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $syncService;
+    private MockObject $syncService;
 
     private CommandTester $commandTester;
 

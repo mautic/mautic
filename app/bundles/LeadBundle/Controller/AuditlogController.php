@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -76,7 +77,7 @@ final class AuditlogController extends CommonController
         name: 'mautic_contact_auditlog_export_action',
         requirements: ['leadId' => '\d+'],
     )]
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, int|string $leadId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, int|string $leadId): Response|StreamedResponse
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();

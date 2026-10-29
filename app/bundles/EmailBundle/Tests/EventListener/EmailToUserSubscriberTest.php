@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\EventListener\EmailToUserSubscriber;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Model\SendEmailToUser;
@@ -11,7 +12,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
 
-final class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
+final class EmailToUserSubscriberTest extends TestCase
 {
     /**
      * @var array<string, mixed>

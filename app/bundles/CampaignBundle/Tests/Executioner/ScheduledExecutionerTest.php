@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
+use PHPUnit\Framework\MockObject\Stub;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -33,7 +34,7 @@ final class ScheduledExecutionerTest extends TestCase
 {
     private MockObject&LeadEventLogRepository $repository;
 
-    private \PHPUnit\Framework\MockObject\Stub&Translator $translator;
+    private Stub&Translator $translator;
 
     private MockObject&EventExecutioner $executioner;
 
@@ -41,13 +42,13 @@ final class ScheduledExecutionerTest extends TestCase
 
     private MockObject&ScheduledContactFinder $contactFinder;
 
-    private \PHPUnit\Framework\MockObject\Stub&ProcessSignalService $processSignalService;
+    private Stub&ProcessSignalService $processSignalService;
 
     private MockObject&EventRedirectionHelper $redirectionHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface $entityManager;
+    private Stub&EntityManagerInterface $entityManager;
 
-    private \PHPUnit\Framework\MockObject\Stub&LeadRepository $leadRepository;
+    private Stub&LeadRepository $leadRepository;
 
     protected function setUp(): void
     {

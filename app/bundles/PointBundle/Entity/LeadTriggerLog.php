@@ -25,7 +25,7 @@ class LeadTriggerLog
     private $event;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Lead::class)]
@@ -77,7 +77,7 @@ class LeadTriggerLog
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\Lead|null
+     * @return Lead|null
      */
     public function getLead()
     {

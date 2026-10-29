@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Provider;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\Stub;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -11,7 +13,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 
-final class FormAdjustmentsProviderTest extends \PHPUnit\Framework\TestCase
+final class FormAdjustmentsProviderTest extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface
@@ -19,9 +21,9 @@ final class FormAdjustmentsProviderTest extends \PHPUnit\Framework\TestCase
     private MockObject $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&FormInterface<mixed>
+     * @var Stub&FormInterface<mixed>
      */
-    private \PHPUnit\Framework\MockObject\Stub $form;
+    private Stub $form;
 
     private FormAdjustmentsProvider $provider;
 

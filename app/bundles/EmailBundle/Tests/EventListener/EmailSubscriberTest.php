@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -42,7 +43,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class EmailSubscriberTest extends \PHPUnit\Framework\TestCase
+final class EmailSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&EmailModel

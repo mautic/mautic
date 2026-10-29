@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Form\Type;
 
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Mautic\FormBundle\Form\Type\FormFieldRatingType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -20,9 +22,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class FormFieldRatingTypeTest extends TypeTestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     protected function setUp(): void
     {
@@ -78,7 +80,7 @@ final class FormFieldRatingTypeTest extends TypeTestCase
         $this->assertSame('★', $symbol->getData());
         $this->assertFalse($symbol->isRequired());
 
-        /** @var \Symfony\Component\Form\ChoiceList\View\ChoiceView[] $choices */
+        /** @var ChoiceView[] $choices */
         $choices = $symbol->createView()->vars['choices'];
         $this->assertCount(8, $choices);
         $this->assertSame('★', $choices[0]->value);

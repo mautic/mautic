@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -11,7 +12,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class SegmentOperatorQueryBuilderEventTest extends \PHPUnit\Framework\TestCase
+final class SegmentOperatorQueryBuilderEventTest extends TestCase
 {
     /**
      * @var MockObject&QueryBuilder

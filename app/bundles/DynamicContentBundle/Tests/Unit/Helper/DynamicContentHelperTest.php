@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\DynamicContentBundle\Tests\Unit\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -17,7 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
+final class DynamicContentHelperTest extends TestCase
 {
     /**
      * @var MockObject&DynamicContentModel

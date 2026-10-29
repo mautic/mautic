@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Tests\Unit\Model;
 
+use PHPUnit\Framework\MockObject\Stub;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -41,7 +42,7 @@ final class PointModelTest extends TestCase
 
     private EventDispatcherInterface&MockObject $dispatcher;
 
-    private Translator&\PHPUnit\Framework\MockObject\Stub $translator;
+    private Translator&Stub $translator;
 
     private PointRepository&MockObject $pointRepositoryMock;
 

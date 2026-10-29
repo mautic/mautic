@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\Validator\Constraints;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -17,17 +19,17 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
+final class FieldAliasKeywordValidatorTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ExecutionContextInterface
+     * @var MockObject&ExecutionContextInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $executionContextMock;
+    private MockObject $executionContextMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&UnitOfWork
+     * @var MockObject&UnitOfWork
      */
-    private \PHPUnit\Framework\MockObject\MockObject $unitOfWorkMock;
+    private MockObject $unitOfWorkMock;
 
     private FieldAliasKeywordValidator $validator;
 

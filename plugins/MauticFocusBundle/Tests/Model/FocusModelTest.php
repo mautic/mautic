@@ -18,7 +18,6 @@ use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount as InvokedCountMatcher;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -40,7 +39,7 @@ final class FocusModelTest extends TestCase
     }
 
     #[DataProvider('focusTypeProvider')]
-    public function testGetContentWithForm(string $type, InvokedCount $count): void
+    public function testGetContentWithForm(string $type, InvokedCountMatcher $count): void
     {
         $this->formModel->expects($this->once())->method('getPages')->willReturn(['', '']);
 

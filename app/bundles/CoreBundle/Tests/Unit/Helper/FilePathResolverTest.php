@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -16,7 +17,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
+final class FilePathResolverTest extends TestCase
 {
     /**
      * @var MockObject&Filesystem

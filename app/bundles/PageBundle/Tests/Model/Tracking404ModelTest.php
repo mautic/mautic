@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -12,17 +14,17 @@ use Mautic\PageBundle\Model\Tracking404Model;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
 #[AllowMockObjectsWithoutExpectations]
-final class Tracking404ModelTest extends \PHPUnit\Framework\TestCase
+final class Tracking404ModelTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ContactTracker
+     * @var MockObject&ContactTracker
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mockContactTracker;
+    private MockObject $mockContactTracker;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mockCoreParametersHelper;
+    private MockObject $mockCoreParametersHelper;
 
     private Lead $lead;
 

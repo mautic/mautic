@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Scheduler\Validator;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
@@ -14,7 +15,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-final class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
+final class ScheduleIsValidValidatorTest extends TestCase
 {
     public function testNoSchedule(): void
     {

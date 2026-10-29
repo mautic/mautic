@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -12,7 +13,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -85,7 +85,7 @@ final class CompanyApiController extends CommonApiController
     /**
      * Adds a contact to a company.
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/companies/{companyId}/contact/{contactId}/add',
@@ -119,7 +119,7 @@ final class CompanyApiController extends CommonApiController
      * @param int        $companyId List ID
      * @param int|string $contactId Lead ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/companies/{companyId}/contact/{contactId}/remove',

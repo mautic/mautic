@@ -2,6 +2,7 @@
 
 namespace Mautic\WebhookBundle\Http;
 
+use Http\Client\Exception;
 use GuzzleHttp\Psr7\Request;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PrivateAddressChecker;
@@ -18,7 +19,7 @@ final readonly class Client
     }
 
     /**
-     * @throws \Http\Client\Exception
+     * @throws Exception
      */
     public function post($url, array $payload, ?string $secret = null): ResponseInterface
     {

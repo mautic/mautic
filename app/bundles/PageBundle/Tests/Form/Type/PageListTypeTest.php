@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Form\Type;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PageListType;
@@ -18,9 +19,9 @@ final class PageListTypeTest extends TestCase
     private PageListType $page;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&PageRepository
+     * @var MockObject&PageRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $pageRepositoryMock;
+    private MockObject $pageRepositoryMock;
 
     protected function setUp(): void
     {

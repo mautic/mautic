@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
+use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\IpLookup\GeoipsLookup;
 
-final class GeoipsLookupTest extends \PHPUnit\Framework\TestCase
+final class GeoipsLookupTest extends TestCase
 {
     private string $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Mautic\DashboardBundle\Entity\Widget;
 
 final class WidgetFormEvent extends CommonEvent
 {

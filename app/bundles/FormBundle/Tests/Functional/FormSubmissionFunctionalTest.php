@@ -9,7 +9,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Tests\Model\FormSubmissionTrait;
 use Mautic\LeadBundle\Entity\Lead;

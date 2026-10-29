@@ -2,6 +2,10 @@
 
 namespace Mautic\FormBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -78,7 +82,7 @@ final class FormRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'f.name',
@@ -86,7 +90,7 @@ final class FormRepository extends CommonRepository
         ]);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         [$expr, $standardSearchParameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
@@ -173,8 +177,8 @@ final class FormRepository extends CommonRepository
      *
      * @param array<string, mixed> $options
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getFormResults(Form $form, array $options = []): array
     {
@@ -206,7 +210,7 @@ final class FormRepository extends CommonRepository
     /**
      * @return array<int, array<string,string>>
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function getValidFormResultsTable(): array
     {

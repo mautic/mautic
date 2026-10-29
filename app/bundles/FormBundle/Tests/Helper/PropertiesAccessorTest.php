@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Helper\PropertiesAccessor;
 use Mautic\FormBundle\Model\FormModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
+final class PropertiesAccessorTest extends TestCase
 {
     /**
      * @var MockObject&FormModel

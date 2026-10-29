@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\DoNotContact;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Segment\DoNotContact\DoNotContactParts;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-final class DoNotContactPartsTest extends \PHPUnit\Framework\TestCase
+final class DoNotContactPartsTest extends TestCase
 {
     #[DataProvider('dataProvider')]
     public function testParts(string $field, string $channel, int $type): void

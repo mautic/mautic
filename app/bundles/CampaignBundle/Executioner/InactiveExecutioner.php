@@ -2,6 +2,10 @@
 
 namespace Mautic\CampaignBundle\Executioner;
 
+use Symfony\Component\Console\Helper\ProgressBar;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -34,7 +38,7 @@ class InactiveExecutioner implements ExecutionerInterface
 
     private ?OutputInterface $output = null;
 
-    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
+    private ?ProgressBar $progressBar = null;
 
     private ?Counter $counter = null;
 
@@ -59,10 +63,10 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      */
     public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
@@ -92,10 +96,10 @@ class InactiveExecutioner implements ExecutionerInterface
     /**
      * @param int $decisionId
      *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      */
     public function validate($decisionId, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
@@ -182,10 +186,10 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      */
     private function executeEvents(): void
     {
@@ -263,10 +267,10 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      * @param Collection<int, Lead> $contacts
      * @param Collection<int, Event> $events
      */

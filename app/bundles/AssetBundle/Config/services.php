@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
+use Mautic\AssetBundle\Controller\UploadController;
+use Mautic\AssetBundle\Security\Permissions\AssetPermissions;
+use Oneup\UploaderBundle\Templating\Helper\UploaderHelper;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {
     $parameters = $configurator->parameters();
-    $parameters->set('oneup_uploader.controller.dropzone.class', Mautic\AssetBundle\Controller\UploadController::class);
+    $parameters->set('oneup_uploader.controller.dropzone.class', UploadController::class);
 
     $services = $configurator->services()
         ->defaults()
@@ -24,6 +27,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\AssetBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->set(Mautic\AssetBundle\Security\Permissions\AssetPermissions::class)->tag('mautic.permissions');
-    $services->alias(Oneup\UploaderBundle\Templating\Helper\UploaderHelper::class, 'oneup_uploader.templating.uploader_helper');
+    $services->set(AssetPermissions::class)->tag('mautic.permissions');
+    $services->alias(UploaderHelper::class, 'oneup_uploader.templating.uploader_helper');
 };

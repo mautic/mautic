@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -16,7 +17,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class EmailValidatorTest extends \PHPUnit\Framework\TestCase
+final class EmailValidatorTest extends TestCase
 {
     /**
      * @var MockObject&TranslatorInterface

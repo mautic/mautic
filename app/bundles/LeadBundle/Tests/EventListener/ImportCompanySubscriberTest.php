@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -21,7 +22,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
+final class ImportCompanySubscriberTest extends TestCase
 {
     public function testOnImportInitForUknownObject(): void
     {

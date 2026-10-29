@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\DashboardBundle\Tests\Controller;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -30,7 +31,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
+final class DashboardControllerTest extends TestCase
 {
     private Request $request;
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Unsubscription;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscription\Parser;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(Parser::class)]
 #[CoversClass(UnsubscribedEmail::class)]
-final class ParserTest extends \PHPUnit\Framework\TestCase
+final class ParserTest extends TestCase
 {
     #[TestDox('Test that an email is found inside a feedback report')]
     public function testThatReplyIsDetectedThroughTrackingPixel(): void

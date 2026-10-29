@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(LeadTimelineEvent::class)]
-final class LeadTimelineEventTest extends \PHPUnit\Framework\TestCase
+final class LeadTimelineEventTest extends TestCase
 {
     #[TestDox('Every event in the timeline should have a unique eventId so test that one is generated if the subscriber forgets')]
     public function testEventIdIsGeneratedIfNotSetBySubscriber(): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use JMS\Serializer\SerializerInterface;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -546,7 +547,7 @@ final class UserController extends AbstractFormController
      *
      * @param int $objectId
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, IpLookupHelper $ipLookupHelper, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
+    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, IpLookupHelper $ipLookupHelper, $objectId): Response|RedirectResponse
     {
         $user  = $this->userModel->getEntity($objectId);
 

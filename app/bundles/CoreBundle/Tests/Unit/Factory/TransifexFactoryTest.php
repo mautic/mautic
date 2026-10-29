@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Factory;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Factory\TransifexFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\Transifex\Connector\Resources;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Client\ClientInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
+final class TransifexFactoryTest extends TestCase
 {
     /**
      * @var MockObject&CoreParametersHelper

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -12,7 +13,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TokenHelperTest extends \PHPUnit\Framework\TestCase
+final class TokenHelperTest extends TestCase
 {
     /**
      * @var array<string, mixed>

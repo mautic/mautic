@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Validator\Constraints;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Validator\Constraints\Length;
 use Mautic\LeadBundle\Validator\Constraints\LengthValidator;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 
-final class LengthValidatorTest extends \PHPUnit\Framework\TestCase
+final class LengthValidatorTest extends TestCase
 {
     #[DoesNotPerformAssertions]
     public function testValidate(): void

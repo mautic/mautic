@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
@@ -13,12 +15,12 @@ use PHPUnit\Framework\Exception;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FormatterHelperTest extends \PHPUnit\Framework\TestCase
+final class FormatterHelperTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     private FormatterHelper $formatterHelper;
 

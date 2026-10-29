@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Mapping;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -11,7 +12,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ClassMetadataBuilderTest extends \PHPUnit\Framework\TestCase
+final class ClassMetadataBuilderTest extends TestCase
 {
     private MockObject&ClassMetadata $classMetadata;
 

@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -41,7 +42,7 @@ final class TagType extends AbstractType
             [
                 'label'           => 'mautic.lead.tags',
                 'class'           => Tag::class,
-                'query_builder'   => fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er->createQueryBuilder('t')->orderBy('t.tag', Order::Ascending->value),
+                'query_builder'   => fn (EntityRepository $er): QueryBuilder => $er->createQueryBuilder('t')->orderBy('t.tag', Order::Ascending->value),
                 'choice_label'    => 'tag',
                 'multiple'        => true,
                 'required'        => false,

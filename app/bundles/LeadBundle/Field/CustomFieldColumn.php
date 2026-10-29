@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Exception\SchemaException;
@@ -33,7 +34,7 @@ final readonly class CustomFieldColumn
      * @throws AbortColumnCreateException
      * @throws AbortColumnUpdateException
      * @throws CustomFieldLimitException
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws SchemaException
@@ -178,7 +179,7 @@ final readonly class CustomFieldColumn
     /**
      * Register a lead field to be deleted.
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */

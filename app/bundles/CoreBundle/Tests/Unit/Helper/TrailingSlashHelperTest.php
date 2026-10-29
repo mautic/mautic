@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-final class TrailingSlashHelperTest extends \PHPUnit\Framework\TestCase
+final class TrailingSlashHelperTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+    private MockObject $coreParametersHelper;
 
     protected function setUp(): void
     {

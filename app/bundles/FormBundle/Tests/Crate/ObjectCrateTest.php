@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Crate;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Crate\ObjectCrate;
 
-final class ObjectCrateTest extends \PHPUnit\Framework\TestCase
+final class ObjectCrateTest extends TestCase
 {
     public function testGetters(): void
     {

@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
@@ -15,7 +16,7 @@ use Mautic\LeadBundle\Entity\LeadField;
 final class ColumnSchemaHelper
 {
     /**
-     * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @var AbstractSchemaManager<AbstractMySQLPlatform>
      */
     private readonly AbstractSchemaManager $sm;
 
@@ -24,9 +25,9 @@ final class ColumnSchemaHelper
      */
     private $tableName;
 
-    private ?\Doctrine\DBAL\Schema\Table $fromTable = null;
+    private ?Table $fromTable = null;
 
-    private ?\Doctrine\DBAL\Schema\Table $toTable = null;
+    private ?Table $toTable = null;
 
     private $columns;
 
@@ -57,7 +58,7 @@ final class ColumnSchemaHelper
     }
 
     /**
-     * @return AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @return AbstractSchemaManager<AbstractMySQLPlatform>
      */
     public function getSchemaManager(): AbstractSchemaManager
     {

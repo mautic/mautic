@@ -2,6 +2,10 @@
 
 namespace Mautic\CampaignBundle\Executioner;
 
+use Symfony\Component\Console\Helper\ProgressBar;
+use Doctrine\Common\Collections\Collection;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -31,12 +35,12 @@ final class KickoffExecutioner implements ExecutionerInterface
 
     private ?OutputInterface $output = null;
 
-    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
+    private ?ProgressBar $progressBar = null;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<int, Event>|null
+     * @var Collection<int, Event>|null
      */
-    private ?\Doctrine\Common\Collections\Collection $rootEvents = null;
+    private ?Collection $rootEvents = null;
 
     private ?Counter $counter = null;
 
@@ -55,8 +59,8 @@ final class KickoffExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws NotSchedulableException
      */
@@ -124,8 +128,8 @@ final class KickoffExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws NoContactsFoundException
      * @throws NotSchedulableException

@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\FileHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(FileHelper::class)]
-final class FileHelperTest extends \PHPUnit\Framework\TestCase
+final class FileHelperTest extends TestCase
 {
     #[DataProvider('bytesToMegabytesProvider')]
     #[TestDox('Conversion of Bytes to Megebytes')]

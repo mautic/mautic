@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -152,7 +153,7 @@ final class ListApiController extends CommonApiController
      *
      * @param int $id     List ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/segments/{id}/contact/{leadId}/add',
@@ -192,7 +193,7 @@ final class ListApiController extends CommonApiController
      *
      * @param int $id segement ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/segments/{id}/contacts/add',
@@ -241,7 +242,7 @@ final class ListApiController extends CommonApiController
      *
      * @param int $id     List ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/segments/{id}/contact/{leadId}/remove',

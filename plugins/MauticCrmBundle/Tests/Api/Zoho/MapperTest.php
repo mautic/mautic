@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api\Zoho;
 
+use PHPUnit\Framework\TestCase;
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(Mapper::class)]
-final class MapperTest extends \PHPUnit\Framework\TestCase
+final class MapperTest extends TestCase
 {
     /**
      * @var array<string, array<string, array<string, mixed>>>

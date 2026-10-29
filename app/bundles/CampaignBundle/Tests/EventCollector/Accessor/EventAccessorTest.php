@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\EventCollector\Accessor;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
@@ -13,7 +14,7 @@ use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType;
 use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 
-final class EventAccessorTest extends \PHPUnit\Framework\TestCase
+final class EventAccessorTest extends TestCase
 {
     /**
      * @var array<string, array<string, array<string, mixed>>>

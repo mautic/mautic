@@ -5,7 +5,6 @@ namespace Mautic\SmsBundle\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\DoNotContact as DoNotContactEntity;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\SmsBundle\Form\Type\ConfigType;

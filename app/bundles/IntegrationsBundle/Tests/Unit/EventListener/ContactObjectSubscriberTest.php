@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
@@ -29,14 +30,14 @@ use Symfony\Component\Routing\Router;
 final class ContactObjectSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ContactObjectHelper
+     * @var MockObject&ContactObjectHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactObjectHelper;
+    private MockObject $contactObjectHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Router
+     * @var MockObject&Router
      */
-    private \PHPUnit\Framework\MockObject\MockObject $router;
+    private MockObject $router;
 
     private ContactObjectSubscriber $subscriber;
 

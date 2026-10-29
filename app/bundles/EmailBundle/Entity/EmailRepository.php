@@ -2,13 +2,14 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
@@ -710,7 +711,7 @@ class EmailRepository extends CommonRepository
     {
         /** @var Email $parent */
         $parent    = $entity->getVariantParent() ?: $entity;
-        $hasParent = $entity->getVariantParent() instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface;
+        $hasParent = $entity->getVariantParent() instanceof VariantEntityInterface;
 
         if ($hasParent) {
             $entity->setPublishUp($parent->getPublishUp());
@@ -933,7 +934,7 @@ class EmailRepository extends CommonRepository
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateOrmExpression($qb, $this->getTableAlias());
 
-        $qb->innerJoin(Email::class, 'v', Expr\Join::WITH, $qb->expr()->andX(
+        $qb->innerJoin(Email::class, 'v', Join::WITH, $qb->expr()->andX(
                 $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
                 $qb->expr()->eq('v.isPublished', true)
             ))

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -11,12 +13,12 @@ use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
 #[AllowMockObjectsWithoutExpectations]
-final class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
+final class MaxMindDoNotSellListTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParamsHelperMock;
+    private MockObject $coreParamsHelperMock;
 
     private string $badFilePath = 'bad_list.json';
 

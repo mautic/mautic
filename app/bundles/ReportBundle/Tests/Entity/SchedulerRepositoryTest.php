@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Entity;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
+final class SchedulerRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 

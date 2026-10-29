@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncProcess\Direction\Integration;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\ObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
@@ -21,9 +22,9 @@ use PHPUnit\Framework\TestCase;
 final class ObjectChangeGeneratorTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ValueHelper
+     * @var MockObject&ValueHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
+    private MockObject $valueHelper;
 
     protected function setUp(): void
     {

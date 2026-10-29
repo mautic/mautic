@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Entity;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\Field;
@@ -12,7 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-final class FieldTest extends \PHPUnit\Framework\TestCase
+final class FieldTest extends TestCase
 {
     public function testShowForConditionalFieldWithNoParent(): void
     {

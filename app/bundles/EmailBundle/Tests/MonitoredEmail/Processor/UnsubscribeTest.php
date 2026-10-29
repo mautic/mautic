@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
@@ -20,7 +21,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
 #[AllowMockObjectsWithoutExpectations]
-final class UnsubscribeTest extends \PHPUnit\Framework\TestCase
+final class UnsubscribeTest extends TestCase
 {
     #[TestDox('Test that the transport interface processes the message appropriately')]
     public function testProcessorInterfaceProcessesMessage(): void

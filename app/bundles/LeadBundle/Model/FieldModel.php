@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
@@ -511,7 +512,7 @@ class FieldModel extends FormModel
     /**
      * @param array<mixed> $args
      *
-     * @return array<int, LeadField>|\Doctrine\ORM\Tools\Pagination\Paginator<LeadField>
+     * @return array<int, LeadField>|Paginator<LeadField>
      */
     public function getEntities(array $args = []): iterable
     {

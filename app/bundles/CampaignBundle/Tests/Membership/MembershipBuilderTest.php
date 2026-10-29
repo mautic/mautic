@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Membership;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignMemberRepository;
@@ -18,7 +19,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
+final class MembershipBuilderTest extends TestCase
 {
     /**
      * @var MockObject&MembershipManager

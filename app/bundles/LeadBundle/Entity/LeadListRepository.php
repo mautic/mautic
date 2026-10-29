@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Mautic\CoreBundle\Helper\Serializer;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -712,7 +713,7 @@ SQL;
 
         $segmentIds = [];
         foreach ($query->getResult() as $property) {
-            $property       = \Mautic\CoreBundle\Helper\Serializer::decode($property['properties']);
+            $property       = Serializer::decode($property['properties']);
             $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
         }
 
@@ -735,7 +736,7 @@ SQL;
 
         foreach ($query->getResult() as $rowFilters) {
             $segmentMembershipFilters = array_filter(
-                \Mautic\CoreBundle\Helper\Serializer::decode($rowFilters['filters']),
+                Serializer::decode($rowFilters['filters']),
                 fn (array $filter): bool => 'leadlist' === $filter['type']
             );
 
@@ -814,7 +815,7 @@ SQL;
 
         $segmentIds = [];
         foreach ($query->getResult() as $property) {
-            $property       = \Mautic\CoreBundle\Helper\Serializer::decode($property['properties']);
+            $property       = Serializer::decode($property['properties']);
             $segmentIds     = array_merge($property['addToLists'], $property['removeFromLists'], $segmentIds);
         }
 

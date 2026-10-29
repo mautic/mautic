@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\Stub;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -43,7 +44,7 @@ final class SegmentSubscriberTest extends TestCase
 
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private SegmentCountCacheHelper&\PHPUnit\Framework\MockObject\Stub $segmentCountCacheHelper;
+    private SegmentCountCacheHelper&Stub $segmentCountCacheHelper;
 
     protected function setUp(): void
     {

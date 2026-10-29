@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Controller\Api;
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -119,7 +120,7 @@ final class CampaignApiController extends CommonApiController
      *
      * @param int        $id     Campaign ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/campaigns/{id}/contact/{leadId}/add',
@@ -156,7 +157,7 @@ final class CampaignApiController extends CommonApiController
      *
      * @param int $id     Campaign ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/campaigns/{id}/contact/{leadId}/remove',

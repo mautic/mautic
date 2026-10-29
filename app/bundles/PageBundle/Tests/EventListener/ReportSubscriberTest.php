@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
@@ -24,19 +25,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class ReportSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CompanyReportData
+     * @var MockObject&CompanyReportData
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
+    private MockObject $companyReportData;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&HitRepository
+     * @var MockObject&HitRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $hitRepository;
+    private MockObject $hitRepository;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     private ReportSubscriber $subscriber;
 

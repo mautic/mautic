@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Scheduler\Builder;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
 use Mautic\ReportBundle\Scheduler\Entity\SchedulerEntity;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
@@ -11,7 +12,7 @@ use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 use Recurr\Recurrence;
 
-final class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
+final class SchedulerBuilderTest extends TestCase
 {
     public function testGetNextEvent(): void
     {

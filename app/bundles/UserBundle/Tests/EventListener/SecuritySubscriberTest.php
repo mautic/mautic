@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Test\ReflectionHelper;
@@ -11,7 +12,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\EventListener\SecuritySubscriber;
 
-final class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
+final class SecuritySubscriberTest extends TestCase
 {
     public function testGetSubscribedEvents(): void
     {

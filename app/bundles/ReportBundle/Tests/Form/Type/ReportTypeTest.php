@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Form\Type;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\ReportType;
 use Mautic\ReportBundle\Model\ReportModel;
@@ -15,7 +16,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReportTypeTest extends \PHPUnit\Framework\TestCase
+final class ReportTypeTest extends TestCase
 {
     /**
      * @var MockObject&ReportModel

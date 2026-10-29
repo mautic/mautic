@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\ORM\EntityManager;
@@ -56,7 +57,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
+final class SubmissionModelTest extends TestCase
 {
     /**
      * @var MockObject&IpLookupHelper
@@ -179,7 +180,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $userRepository                   = $this->createMock(UserRepository::class);
 
         $entityManager->method('getRepository')
-            ->willReturnCallback(fn (string $class): ?\PHPUnit\Framework\MockObject\MockObject => match ($class) {
+            ->willReturnCallback(fn (string $class): ?MockObject => match ($class) {
                 Submission::class => $this->submissioRepository,
                 Lead::class       => $this->leadRepository,
                 User::class       => $userRepository,

@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Tests\Event;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\PluginBundle\Event\PluginIsPublishedEvent;
 
-final class PluginIsPublishedEventTest extends \PHPUnit\Framework\TestCase
+final class PluginIsPublishedEventTest extends TestCase
 {
     public function testSettersGetters(): void
     {

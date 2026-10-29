@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Tests\Install;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
@@ -24,7 +25,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class InstallServiceTest extends \PHPUnit\Framework\TestCase
+final class InstallServiceTest extends TestCase
 {
     /**
      * @var MockObject&Configurator

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Helper\ListParser\ArrayListParser;
 use Mautic\CoreBundle\Helper\ListParser\BarListParser;
@@ -18,7 +19,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 #[CoversClass(JsonListParser::class)]
 #[CoversClass(ValueListParser::class)]
 #[CoversClass(ArrayListParser::class)]
-final class AbstractFormFieldHelperTest extends \PHPUnit\Framework\TestCase
+final class AbstractFormFieldHelperTest extends TestCase
 {
     #[TestDox('The string is parsed correctly into a choice array')]
     public function testBarFormatConvertedToArray(): void

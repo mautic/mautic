@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Doctrine\DBAL\Schema\Column;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\StringType;
@@ -66,7 +67,7 @@ final readonly class DoctrineSubscriber
 
                 // Only allow indexes for string types
                 $columns = $table->getColumns();
-                /** @var \Doctrine\DBAL\Schema\Column $column */
+                /** @var Column $column */
                 foreach ($columns as $column) {
                     $type = $column->getType();
                     $name = AssetName::of($column);

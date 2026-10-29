@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\CustomFieldIndex;
@@ -12,7 +13,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 
-final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldIndexTest extends TestCase
 {
     private MockObject&IndexSchemaHelper $indexSchemaHelperMock;
 

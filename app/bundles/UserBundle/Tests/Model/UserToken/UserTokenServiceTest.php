@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Model\UserToken;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
+final class UserTokenServiceTest extends TestCase
 {
     /**
      * @var MockObject&RandomHelperInterface

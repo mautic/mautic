@@ -2,6 +2,8 @@
 
 namespace Mautic\FormBundle\Event;
 
+use Symfony\Component\HttpFoundation\Response;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Submission;
@@ -54,7 +56,7 @@ final class SubmissionEvent extends CommonEvent
 
     private ?string $context = null;
 
-    private \Symfony\Component\HttpFoundation\Response|array|null $postSubmitResponse = null;
+    private Response|array|null $postSubmitResponse = null;
 
     /**
      * @var array<mixed>|null
@@ -98,7 +100,7 @@ final class SubmissionEvent extends CommonEvent
     }
 
     /**
-     * @return \Mautic\FormBundle\Entity\Form
+     * @return Form
      */
     public function getForm()
     {
@@ -245,12 +247,12 @@ final class SubmissionEvent extends CommonEvent
         return null !== $this->postSubmitResponse;
     }
 
-    public function getPostSubmitResponse(): \Symfony\Component\HttpFoundation\Response|array|null
+    public function getPostSubmitResponse(): Response|array|null
     {
         return $this->postSubmitResponse;
     }
 
-    public function setPostSubmitResponse(array|\Symfony\Component\HttpFoundation\Response $response): void
+    public function setPostSubmitResponse(array|Response $response): void
     {
         $this->postSubmitResponse = $response;
     }

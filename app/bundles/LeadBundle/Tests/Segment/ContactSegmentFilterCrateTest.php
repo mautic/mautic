@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(ContactSegmentFilterCrate::class)]
-final class ContactSegmentFilterCrateTest extends \PHPUnit\Framework\TestCase
+final class ContactSegmentFilterCrateTest extends TestCase
 {
     public function testEmptyFilter(): void
     {

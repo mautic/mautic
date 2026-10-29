@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Translation\Translator;
@@ -16,7 +18,7 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class SegmentReportSubscriberTest extends TestCase
 {
     public function testNotRelevantContext(): void
     {
@@ -165,7 +167,7 @@ final class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $queryBuilder->expects($matcher)
-            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilder): \PHPUnit\Framework\MockObject\MockObject {
+            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('lll', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'leads', $parameters[1]);

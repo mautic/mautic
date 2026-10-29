@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
+use MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager;
+use MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -22,13 +25,13 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('MauticPlugin\\GrapesJsBuilderBundle\\Entity\\', '../Entity/*Repository.php');
-    $services->set('grapesjsbuilder.config', MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class);
-    $services->alias(MauticPlugin\GrapesJsBuilderBundle\Integration\Config::class, 'grapesjsbuilder.config');
-    $services->set('grapesjsbuilder.helper.filemanager', MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class);
-    $services->alias(MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager::class, 'grapesjsbuilder.helper.filemanager');
+    $services->set('grapesjsbuilder.config', Config::class);
+    $services->alias(Config::class, 'grapesjsbuilder.config');
+    $services->set('grapesjsbuilder.helper.filemanager', FileManager::class);
+    $services->alias(FileManager::class, 'grapesjsbuilder.helper.filemanager');
 
     // Basic definitions with name, display name and icon
-    $services->alias('mautic.integration.grapesjsbuilder', MauticPlugin\GrapesJsBuilderBundle\Integration\GrapesJsBuilderIntegration::class);
+    $services->alias('mautic.integration.grapesjsbuilder', GrapesJsBuilderIntegration::class);
     // Provides the form types to use for the configuration UI
     // Tells Mautic what themes it should support when enabled
 };

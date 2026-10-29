@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Tests\Unit\Entity;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\WebhookBundle\Entity\Log;
 
-final class LogTest extends \PHPUnit\Framework\TestCase
+final class LogTest extends TestCase
 {
     public function testSetNote(): void
     {

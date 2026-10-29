@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Other;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -14,7 +15,7 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(DateAnniversary::class)]
-final class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
+final class DateAnniversaryTest extends TestCase
 {
     public function testGetOperator(): void
     {

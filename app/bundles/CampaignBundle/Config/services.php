@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
+use Mautic\CampaignBundle\Executioner\TestInactiveExecutioner;
+use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
+use Mautic\CampaignBundle\Executioner\TestScheduledExecutioner;
+use Mautic\CampaignBundle\Security\Permissions\CampaignPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -25,16 +30,16 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\CampaignBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->set(Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class)->tag('kernel.reset', ['method' => 'reset']);
+    $services->set(ScheduledExecutioner::class)->tag('kernel.reset', ['method' => 'reset']);
 
     if ('test' === ($_ENV['APP_ENV'] ?? $_SERVER['APP_ENV'] ?? 'prod')) {
-        $services->set(Mautic\CampaignBundle\Executioner\TestInactiveExecutioner::class)
-            ->decorate(Mautic\CampaignBundle\Executioner\InactiveExecutioner::class)
+        $services->set(TestInactiveExecutioner::class)
+            ->decorate(InactiveExecutioner::class)
             ->tag('kernel.reset', ['method' => 'reset']);
 
-        $services->set(Mautic\CampaignBundle\Executioner\TestScheduledExecutioner::class)
-            ->decorate(Mautic\CampaignBundle\Executioner\ScheduledExecutioner::class)
+        $services->set(TestScheduledExecutioner::class)
+            ->decorate(ScheduledExecutioner::class)
             ->tag('kernel.reset', ['method' => 'reset']);
     }
-    $services->set(Mautic\CampaignBundle\Security\Permissions\CampaignPermissions::class);
+    $services->set(CampaignPermissions::class);
 };

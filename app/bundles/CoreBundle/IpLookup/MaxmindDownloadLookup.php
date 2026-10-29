@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\IpLookup;
 
+use GeoIp2\Record\Subdivision;
 use GeoIp2\Database\Reader;
 
 final class MaxmindDownloadLookup extends AbstractLocalDataLookup
@@ -56,7 +57,7 @@ final class MaxmindDownloadLookup extends AbstractLocalDataLookup
             $reader = new Reader($this->getLocalDataStoreFilepath());
             $record = $reader->city($this->ip);
 
-            /** @var \GeoIp2\Record\Subdivision[] $subdivisions */
+            /** @var Subdivision[] $subdivisions */
             $subdivisions = $record->subdivisions;
             if (isset($subdivisions[0])) {
                 if (count($subdivisions) > 1) {

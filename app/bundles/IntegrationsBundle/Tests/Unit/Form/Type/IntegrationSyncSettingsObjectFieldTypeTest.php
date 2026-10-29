@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Form\Type;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\IntegrationsBundle\Exception\InvalidFormOptionException;
 use Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType;
 use Mautic\IntegrationsBundle\Mapping\MappedFieldInfoInterface;
@@ -14,7 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class IntegrationSyncSettingsObjectFieldTypeTest extends \PHPUnit\Framework\TestCase
+final class IntegrationSyncSettingsObjectFieldTypeTest extends TestCase
 {
     /**
      * @var MockObject&FormBuilderInterface

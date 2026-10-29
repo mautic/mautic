@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
@@ -23,14 +26,14 @@ use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[AllowMockObjectsWithoutExpectations]
-final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
+final class WebhookSubscriberTest extends TestCase
 {
-    private \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&WebhookModel
+     * @var MockObject&WebhookModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mockModel;
+    private MockObject $mockModel;
 
     protected function setUp(): void
     {

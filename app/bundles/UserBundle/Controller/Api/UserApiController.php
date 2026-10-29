@@ -2,6 +2,7 @@
 
 namespace Mautic\UserBundle\Controller\Api;
 
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
@@ -173,7 +174,7 @@ final class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      */
     #[Route(

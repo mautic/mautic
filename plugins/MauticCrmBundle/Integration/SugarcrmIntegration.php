@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Mautic\UserBundle\Entity\User;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
@@ -1410,7 +1411,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     private function getOwnerEmail(array $lead)
     {
         if (isset($lead['owner_id']) && !empty($lead['owner_id'])) {
-            /** @var \Mautic\UserBundle\Entity\User $user */
+            /** @var User $user */
             $user = $this->userModel->getEntity($lead['owner_id']);
 
             return $user->getEmail();

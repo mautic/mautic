@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Mautic\StageBundle\Security\Permissions\StagePermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -20,5 +21,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\StageBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->set(Mautic\StageBundle\Security\Permissions\StagePermissions::class);
+    $services->set(StagePermissions::class);
 };

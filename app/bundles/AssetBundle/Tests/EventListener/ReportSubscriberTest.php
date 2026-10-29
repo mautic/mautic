@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\EventListener\ReportSubscriber;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -20,14 +22,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportSubscriberTest extends TestCase
 {
     private ChannelListHelper $channelListHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&QueryBuilder
+     * @var MockObject&QueryBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $queryBuilder;
+    private MockObject $queryBuilder;
 
     private ReportHelper $reportHelper;
 

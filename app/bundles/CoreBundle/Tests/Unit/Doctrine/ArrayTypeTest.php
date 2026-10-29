@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
@@ -49,7 +50,7 @@ final class ExampleClassWithoutDeclaredProperty
 {
 }
 
-final class ArrayTypeTest extends \PHPUnit\Framework\TestCase
+final class ArrayTypeTest extends TestCase
 {
     public const string MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
 

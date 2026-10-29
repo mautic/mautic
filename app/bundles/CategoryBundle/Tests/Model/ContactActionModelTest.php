@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\CategoryBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 
-final class ContactActionModelTest extends \PHPUnit\Framework\TestCase
+final class ContactActionModelTest extends TestCase
 {
     private Lead $contactMock5;
 

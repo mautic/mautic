@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Collection;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Collection\ObjectCollection;
 use Mautic\FormBundle\Crate\ObjectCrate;
 
-final class ObjectCollectionTest extends \PHPUnit\Framework\TestCase
+final class ObjectCollectionTest extends TestCase
 {
     public function testToChoicesWithObjects(): void
     {

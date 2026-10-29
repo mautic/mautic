@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter;
+
 return [
     'routes'   => [
         'main'   => [],
@@ -11,8 +13,8 @@ return [
     'menu'     => [],
 
     'parameters' => [
-        'cache_adapter'           => Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter::class,
-        'cache_adapter_tag_aware' => Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter::class,
+        'cache_adapter'           => FilesystemTagAwareAdapter::class,
+        'cache_adapter_tag_aware' => FilesystemTagAwareAdapter::class,
         'cache_prefix'            => '',
         'cache_lifetime'          => 86400,
         'cache_adapter_memcached' => [

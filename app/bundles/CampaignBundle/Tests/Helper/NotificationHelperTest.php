@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
@@ -19,7 +20,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Router;
 
 #[AllowMockObjectsWithoutExpectations]
-final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
+final class NotificationHelperTest extends TestCase
 {
     /**
      * @var MockObject&UserModel

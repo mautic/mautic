@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -20,5 +21,5 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('MauticPlugin\\MauticFocusBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->set(MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions::class);
+    $services->set(FocusPermissions::class);
 };

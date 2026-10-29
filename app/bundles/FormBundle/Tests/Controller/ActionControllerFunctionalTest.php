@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller;
 
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\DomCrawler\Crawler;
@@ -12,8 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 final class ActionControllerFunctionalTest extends MauticMysqlTestCase
 {
     /**
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws OptimisticLockException
+     * @throws ORMException
      */
     public function testNewActionWithJapanese(): void
     {

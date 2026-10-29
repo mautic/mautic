@@ -2,6 +2,8 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
@@ -1102,7 +1104,7 @@ final class EmailController extends AbstractStandardFormController
     /**
      * Clone an email and its translation/variant family.
      */
-    public function cloneWithTranslationsAction(Request $request, EmailModel $model, int $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function cloneWithTranslationsAction(Request $request, EmailModel $model, int $objectId): JsonResponse|RedirectResponse|Response
     {
         $page = $request->getSession()->get('mautic.email.page', 1);
 
@@ -1258,7 +1260,7 @@ final class EmailController extends AbstractStandardFormController
      * Activate the builder.
      *
      * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function builderAction(Request $request, ThemeHelper $themeHelper, $objectId): Response
     {
@@ -1420,7 +1422,7 @@ final class EmailController extends AbstractStandardFormController
     /**
      * Manually sends emails.
      */
-    public function sendAction(Request $request, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
+    public function sendAction(Request $request, $objectId): Response|RedirectResponse
     {
         $entity  = $this->emailModel->getEntity($objectId);
         $session = $request->getSession();

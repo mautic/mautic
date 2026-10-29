@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManager;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -17,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[CoversClass(SalesforceApi::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
+final class SalesforceApiTest extends TestCase
 {
     #[TestDox('Test that a locked record request is retried up to 3 times')]
     public function testRecordLockedErrorIsRetriedThreeTimes(): void

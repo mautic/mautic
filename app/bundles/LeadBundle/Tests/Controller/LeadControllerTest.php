@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller;
 
+use Doctrine\ORM\Exception\ORMException;
 use Illuminate\Support\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
@@ -33,7 +34,6 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\StageBundle\Entity\Stage;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\TestDox;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
@@ -62,7 +62,7 @@ final class LeadControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     protected function createLeadCompany(Lead $contactA, Company $company): CompanyLead
     {

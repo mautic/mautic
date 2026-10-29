@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Event;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 
-final class EmailSendEventTest extends \PHPUnit\Framework\TestCase
+final class EmailSendEventTest extends TestCase
 {
     private EmailSendEvent $emailSendEvent;
 

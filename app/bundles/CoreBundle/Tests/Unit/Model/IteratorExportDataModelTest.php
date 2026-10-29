@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Model;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use PHPUnit\Framework\MockObject\MockObject;
 
-final class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
+final class IteratorExportDataModelTest extends TestCase
 {
     /**
      * @var MockObject&AbstractCommonModel

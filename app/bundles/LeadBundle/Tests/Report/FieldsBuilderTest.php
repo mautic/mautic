@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Report;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -12,7 +13,7 @@ use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\UserBundle\Model\UserModel;
 
-final class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
+final class FieldsBuilderTest extends TestCase
 {
     public function testGetLeadColumns(): void
     {

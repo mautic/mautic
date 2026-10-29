@@ -2,6 +2,7 @@
 
 namespace Mautic\InstallBundle\Configurator\Step;
 
+use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\FileHelper;
@@ -57,7 +58,7 @@ final class CheckStep implements StepInterface
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
-        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
+        if ($request instanceof Request) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
     }

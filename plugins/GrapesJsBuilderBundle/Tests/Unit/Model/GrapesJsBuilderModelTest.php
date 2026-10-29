@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\Model;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -23,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
+final class GrapesJsBuilderModelTest extends TestCase
 {
     public function testAddOrEditEntityWithoutMatchingEntityAndNoRequestQuery(): void
     {

@@ -2,6 +2,10 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
+use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
@@ -62,10 +66,10 @@ final readonly class CampaignActionJumpToEventSubscriber implements EventSubscri
     /**
      * Process campaign.jump_to_event actions.
      *
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws CannotProcessEventException
+     * @throws NotSchedulableException
      */
     public function onJumpToEvent(PendingEvent $campaignEvent): void
     {

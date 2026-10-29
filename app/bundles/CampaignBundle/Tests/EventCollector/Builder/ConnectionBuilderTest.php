@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\EventCollector\Builder;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventCollector\Builder\ConnectionBuilder;
 
-final class ConnectionBuilderTest extends \PHPUnit\Framework\TestCase
+final class ConnectionBuilderTest extends TestCase
 {
     public function testArrayIsBuiltAsItsUsedInJsPlumb(): void
     {

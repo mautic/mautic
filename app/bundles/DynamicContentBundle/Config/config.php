@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\DynamicContentBundle\Controller\Api\DynamicContentApiController;
+
 return [
     'menu' => [
         'main' => [
@@ -17,7 +20,7 @@ return [
     ],
     'categories' => [
         'dynamicContent' => [
-            'class' => Mautic\DynamicContentBundle\Entity\DynamicContent::class,
+            'class' => DynamicContent::class,
         ],
     ],
     'routes' => [
@@ -26,7 +29,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'dynamicContents',
                 'path'            => '/dynamiccontents',
-                'controller'      => Mautic\DynamicContentBundle\Controller\Api\DynamicContentApiController::class,
+                'controller'      => DynamicContentApiController::class,
             ],
         ],
     ],

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\ChannelBundle\Model\FrequencyActionModel;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\FrequencyRuleRepository;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FrequencyActionModelTest extends \PHPUnit\Framework\TestCase
+final class FrequencyActionModelTest extends TestCase
 {
     private Lead $contact;
 

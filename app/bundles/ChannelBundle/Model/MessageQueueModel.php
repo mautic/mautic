@@ -2,6 +2,7 @@
 
 namespace Mautic\ChannelBundle\Model;
 
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
@@ -139,7 +140,7 @@ final class MessageQueueModel extends FormModel
         /** @var Lead|array<string, mixed> $lead */
         foreach ($leads as $lead) {
             $leadId = (is_array($lead)) ? $lead['id'] : $lead->getId();
-            if ($this->messageQueueRepository->findMessage($channel, $channelId, $leadId) instanceof \Mautic\ChannelBundle\Entity\MessageQueue) {
+            if ($this->messageQueueRepository->findMessage($channel, $channelId, $leadId) instanceof MessageQueue) {
                 continue;
             }
 
@@ -310,7 +311,7 @@ final class MessageQueueModel extends FormModel
     /**
      * @param MessageQueue|null $entity
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
     protected function dispatchEvent($action, ?object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {

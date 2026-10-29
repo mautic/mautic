@@ -2,6 +2,11 @@
 
 namespace Mautic\CampaignBundle\Executioner;
 
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
+use Doctrine\DBAL\Exception;
+use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
@@ -45,10 +50,10 @@ class EventExecutioner
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      */
     public function executeForContact(Event $event, Lead $contact, ?Responses $responses = null, ?Counter $counter = null): void
     {
@@ -62,10 +67,10 @@ class EventExecutioner
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      * @param Collection<int, Event> $events
      */
     public function executeEventsForContact(Collection $events, Lead $contact, ?Responses $responses = null, ?Counter $counter = null): void
@@ -82,10 +87,10 @@ class EventExecutioner
     /**
      * @param ArrayCollection<int,Lead> $contacts
      *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      */
     public function executeForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null, bool $isInactiveEvent = false): void
     {
@@ -104,10 +109,10 @@ class EventExecutioner
     /**
      * @param Collection<int, LeadEventLog> $logs
      *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      */
     public function executeLogs(Event $event, Collection $logs, ?Counter $counter = null): void
     {
@@ -150,10 +155,10 @@ class EventExecutioner
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      * @param Collection<int, Lead> $contacts
      * @param Collection<int, Event> $events
      */
@@ -236,7 +241,7 @@ class EventExecutioner
     /**
      * @return Collection<int, Event>
      *
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      * @param Collection<int, Lead> $contacts
      * @param Collection<int, Event> $events
      */
@@ -318,10 +323,10 @@ class EventExecutioner
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      * @param Collection<int, Lead> $contacts
      */
     private function executeActionEventsForContacts(Event $event, Collection $contacts, ?Counter $counter = null): void
@@ -341,10 +346,10 @@ class EventExecutioner
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      * @param Collection<int, Lead> $contacts
      */
     private function executeConditionEventsForContacts(Event $event, Collection $contacts, ?Counter $counter = null): void
@@ -364,10 +369,10 @@ class EventExecutioner
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      */
     private function executeBranchedEventsForContacts(Event $event, EvaluatedContacts $contacts, ?Counter $counter = null): void
     {
@@ -382,10 +387,10 @@ class EventExecutioner
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      * @param Collection<int, Lead> $contacts
      */
     private function executePositivePathEventsForContacts(Event $event, Collection $contacts, Counter $counter): void
@@ -403,10 +408,10 @@ class EventExecutioner
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      * @param Collection<int, Lead> $contacts
      */
     private function executeNegativePathEventsForContacts(Event $event, Collection $contacts, Counter $counter): void
@@ -424,8 +429,8 @@ class EventExecutioner
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws Exception
+     * @throws OptimisticLockException
      */
     public function persistSummaries(): void
     {

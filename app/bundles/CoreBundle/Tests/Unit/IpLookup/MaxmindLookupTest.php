@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\IpLookup;
 
+use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,7 +19,7 @@ use PHPUnit\Framework\MockObject\MockObject;
  * classes are initiated.
  */
 #[AllowMockObjectsWithoutExpectations]
-final class MaxmindLookupTest extends \PHPUnit\Framework\TestCase
+final class MaxmindLookupTest extends TestCase
 {
     private string $cacheDir = __DIR__.'/../../../../../../var/cache/test';
 

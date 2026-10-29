@@ -2,6 +2,8 @@
 
 namespace Mautic\WebhookBundle\Model;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
@@ -150,7 +152,7 @@ final class WebhookModel extends FormModel
      * @param Webhook|array<string, mixed>      $entity
      * @param array<mixed> $options
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
@@ -266,7 +268,7 @@ final class WebhookModel extends FormModel
     /**
      * Execute a list of webhooks to their specified endpoints.
      */
-    public function processWebhooks(array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks): void
+    public function processWebhooks(array|Paginator $webhooks): void
     {
         $this->startTime = microtime(true);
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Membership\Action;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
@@ -15,12 +17,12 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class RemoverTest extends \PHPUnit\Framework\TestCase
+final class RemoverTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadEventLogRepository
+     * @var MockObject&LeadEventLogRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
+    private MockObject $leadEventLogRepository;
 
     protected function setUp(): void
     {

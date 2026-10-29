@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Year;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
@@ -13,7 +14,7 @@ use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(DateYearThis::class)]
-final class DateYearThisTest extends \PHPUnit\Framework\TestCase
+final class DateYearThisTest extends TestCase
 {
     public function testGetOperatorBetween(): void
     {

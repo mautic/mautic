@@ -2,6 +2,7 @@
 
 namespace Mautic\InstallBundle\InstallFixtures\ORM;
 
+use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
@@ -23,7 +24,7 @@ final class LeadFieldData extends Fixture implements OrderedFixtureInterface, Fi
     }
 
     /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      */
     public function load(ObjectManager $manager): void
     {

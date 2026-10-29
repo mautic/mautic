@@ -2,6 +2,8 @@
 
 namespace Mautic\ReportBundle\Scheduler\Builder;
 
+use Recurr\Recurrence;
+use Recurr\RecurrenceCollection;
 use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
@@ -18,7 +20,7 @@ final readonly class SchedulerBuilder
     }
 
     /**
-     * @return \Recurr\Recurrence[]|\Recurr\RecurrenceCollection
+     * @return Recurrence[]|RecurrenceCollection
      *
      * @throws InvalidSchedulerException
      * @throws NotSupportedScheduleTypeException
@@ -29,7 +31,7 @@ final readonly class SchedulerBuilder
     }
 
     /**
-     * @return \Recurr\RecurrenceCollection
+     * @return RecurrenceCollection
      *
      * @throws InvalidSchedulerException
      * @throws NotSupportedScheduleTypeException

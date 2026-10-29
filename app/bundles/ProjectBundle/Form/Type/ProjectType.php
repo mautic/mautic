@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ProjectBundle\Form\Type;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ProjectBundle\Entity\Project;
@@ -36,7 +37,7 @@ final class ProjectType extends AbstractType
             [
                 'label'                => 'project.menu.index',
                 'class'                => Project::class,
-                'query_builder'        => fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er->createQueryBuilder('p')->orderBy('p.name', 'ASC'),
+                'query_builder'        => fn (EntityRepository $er): QueryBuilder => $er->createQueryBuilder('p')->orderBy('p.name', 'ASC'),
                 'choice_label'         => 'name',
                 'multiple'             => true,
                 'required'             => false,

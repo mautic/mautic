@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Tests\Entity;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\PluginBundle\Entity\Plugin;
 
-final class PluginTest extends \PHPUnit\Framework\TestCase
+final class PluginTest extends TestCase
 {
     public function testEmptyDescription(): void
     {

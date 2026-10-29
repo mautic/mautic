@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Api;
 
+use PHPUnit\Framework\TestCase;
+use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\ConnectwiseApi;
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Integration\DataGeneratorTrait;
@@ -11,12 +13,12 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(ConnectwiseApi::class)]
-final class ConnectwiseApiTest extends \PHPUnit\Framework\TestCase
+final class ConnectwiseApiTest extends TestCase
 {
     use DataGeneratorTrait;
 
     /**
-     * @throws \Mautic\PluginBundle\Exception\ApiErrorException
+     * @throws ApiErrorException
      */
     #[TestDox('Tests that fetchAllRecords loops until all records are obtained')]
     public function testResultPagination(): void

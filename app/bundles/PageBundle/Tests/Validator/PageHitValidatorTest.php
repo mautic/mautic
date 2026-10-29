@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Validator;
 
+use PHPUnit\Framework\MockObject\Stub;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
@@ -21,7 +22,7 @@ final class PageHitValidatorTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelperMock;
 
-    private \PHPUnit\Framework\MockObject\Stub&Constraint $constraintMock;
+    private Stub&Constraint $constraintMock;
 
     protected function setUp(): void
     {

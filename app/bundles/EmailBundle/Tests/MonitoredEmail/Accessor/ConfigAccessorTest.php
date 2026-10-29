@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Accessor;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use PHPUnit\Framework\Attributes\TestDox;
 
-final class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
+final class ConfigAccessorTest extends TestCase
 {
     /**
      * @var array<string, string>

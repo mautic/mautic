@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Helper;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\RelationsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
@@ -20,21 +21,21 @@ use PHPUnit\Framework\TestCase;
 final class RelationsHelperTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&MappingHelper
+     * @var MockObject&MappingHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
+    private MockObject $mappingHelper;
 
     private RelationsHelper $relationsHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ReportDAO
+     * @var MockObject&ReportDAO
      */
-    private \PHPUnit\Framework\MockObject\MockObject $syncReport;
+    private MockObject $syncReport;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&MappingManualDAO
+     * @var MockObject&MappingManualDAO
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mappingManual;
+    private MockObject $mappingManual;
 
     protected function setUp(): void
     {

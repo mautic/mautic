@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\StatsEvent;
@@ -17,7 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CommonStatsSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&CorePermissions

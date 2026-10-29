@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMember;
 
+use PHPUnit\Framework\TestCase;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer;
 
-final class OrganizerTest extends \PHPUnit\Framework\TestCase
+final class OrganizerTest extends TestCase
 {
     public function testRecordsAreOrganizedIntoLeadsAndContacts(): void
     {

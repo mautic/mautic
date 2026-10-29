@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Validator\Constraints;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Validator\Constraints\Length;
 use Mautic\LeadBundle\Validator\Constraints\LengthValidator;
 
-final class LengthTest extends \PHPUnit\Framework\TestCase
+final class LengthTest extends TestCase
 {
     public function testValidateBy(): void
     {

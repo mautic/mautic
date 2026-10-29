@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\LeadBundle\Controller\Api\CustomFieldsApiControllerTrait;
 use Mautic\LeadBundle\Entity\Lead;
@@ -14,7 +15,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldsApiControllerTraitTest extends TestCase
 {
     public function testGetEntityFormOptions(): void
     {

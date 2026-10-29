@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -74,7 +75,7 @@ abstract class AbstractFormController extends CommonController
      * Returns view to index with a locked out message.
      *
      * @param bool   $batch          Flag if a batch action is being performed
-     * @return ($batch is true ? array : \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse)
+     * @return ($batch is true ? array : JsonResponse|RedirectResponse)
      */
     protected function isLocked(array $postActionVars, object $entity, string $modelName, bool $batch = false)
     {

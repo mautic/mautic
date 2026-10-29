@@ -2,6 +2,9 @@
 
 namespace Mautic\ReportBundle\Controller;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\EventListener\ReportSubscriber;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -15,7 +18,6 @@ use Mautic\ReportBundle\Helper\ReportSearchScopeProvider;
 use Mautic\ReportBundle\Model\ExportResponse;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
-use Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -746,7 +748,7 @@ final class ReportController extends AbstractFormController
      * @param array<mixed> $postActionVars
      * @param array<mixed> $permissions
      */
-    private function checkEntityAccess(array $postActionVars, ?Report $entity, int $objectId, array $permissions, string $modelName): bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
+    private function checkEntityAccess(array $postActionVars, ?Report $entity, int $objectId, array $permissions, string $modelName): bool|JsonResponse|RedirectResponse|Response
     {
         if (null === $entity) {
             return $this->postActionRedirect(
@@ -830,7 +832,7 @@ final class ReportController extends AbstractFormController
         $options['dynamicFilters'] = $dynamicFilters;
 
         if ('csv' === $format) {
-            $response = new HttpFoundation\StreamedResponse(
+            $response = new StreamedResponse(
                 function () use ($entity, $format, $options): void {
                     $options['paginate']        = true;
                     $options['ignoreGraphData'] = true;

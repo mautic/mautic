@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -35,7 +36,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
+final class EventExecutionerTest extends TestCase
 {
     /**
      * @var MockObject&EventCollector

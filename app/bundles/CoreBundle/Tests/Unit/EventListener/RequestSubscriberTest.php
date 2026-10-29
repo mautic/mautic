@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\EventListener\RequestSubscriber;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -16,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
+final class RequestSubscriberTest extends TestCase
 {
     private RequestSubscriber $subscriber;
 

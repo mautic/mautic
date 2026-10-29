@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Event;
 
+use Symfony\Contracts\EventDispatcher\Event;
 use Mautic\CampaignBundle\Entity\Campaign;
 
-final class DeleteCampaign extends \Symfony\Contracts\EventDispatcher\Event
+final class DeleteCampaign extends Event
 {
     public function __construct(
         private readonly Campaign $campaign,

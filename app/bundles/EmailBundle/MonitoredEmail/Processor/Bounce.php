@@ -21,7 +21,7 @@ final class Bounce implements ProcessorInterface
 {
     private const int RETRY_COUNT = 5;
 
-    private ?\Mautic\EmailBundle\MonitoredEmail\Message $message = null;
+    private ?Message $message = null;
 
     public function __construct(
         private readonly TransportInterface $transport,

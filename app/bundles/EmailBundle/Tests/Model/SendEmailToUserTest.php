@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Exception\RecordNotPublishedException;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -21,7 +22,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
+final class SendEmailToUserTest extends TestCase
 {
     /**
      * @var MockObject&EmailModel

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Tests\Helper;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\ApiBundle\Helper\RequestHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
@@ -13,9 +14,9 @@ use Symfony\Component\HttpFoundation\Request;
 final class RequestHelperTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Request
+     * @var MockObject&Request
      */
-    private \PHPUnit\Framework\MockObject\MockObject $request;
+    private MockObject $request;
 
     protected function setUp(): void
     {

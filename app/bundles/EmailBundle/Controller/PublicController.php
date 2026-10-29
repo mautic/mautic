@@ -2,6 +2,8 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use Mautic\CoreBundle\Exception\FileNotFoundException;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\CoreBundle\Controller\AbstractFormController as CommonFormController;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
@@ -73,7 +75,7 @@ final class PublicController extends CommonFormController
     {
         $stat  = $this->emailModel->getEmailStatus($idHash);
 
-        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat) {
+        if ($stat instanceof Stat) {
             if ($this->security->isAnonymous()) {
                 $this->emailModel->hitEmail($stat, $request, true);
             }
@@ -138,7 +140,7 @@ final class PublicController extends CommonFormController
 
     /**
      * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
     #[Route(
         path: '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
@@ -162,13 +164,13 @@ final class PublicController extends CommonFormController
             return $this->oneClickUnsubscribe($model, $stat);
         }
 
-        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat && $email = $stat->getEmail()) {
+        if ($stat instanceof Stat && $email = $stat->getEmail()) {
             $template = $email->getTemplate();
             if ('mautic_code_mode' === $template) {
                 $template = null; // Use system default
             }
 
-            /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
+            /** @var Form $unsubscribeForm */
             $unsubscribeForm = $email->getUnsubscribeForm();
             if (null != $unsubscribeForm && $unsubscribeForm->isPublished()) {
                 $formTemplate = $unsubscribeForm->getTemplate();
@@ -192,9 +194,9 @@ final class PublicController extends CommonFormController
         }
         $contentTemplate = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
         $isCorrectHash   = $secretHash && $urlEmail && $mailHash->getEmailHash($urlEmail) === $secretHash;
-        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat || $isCorrectHash) {
+        if ($stat instanceof Stat || $isCorrectHash) {
             $successSessionName = 'mautic.email.prefscenter.success';
-            if ($stat instanceof \Mautic\EmailBundle\Entity\Stat && $lead = $stat->getLead()) {
+            if ($stat instanceof Stat && $lead = $stat->getLead()) {
                 // Set the lead as current lead
                 $contactTracker->setTrackedContact($lead);
 
@@ -206,7 +208,7 @@ final class PublicController extends CommonFormController
                 // Add contact ID to the session name in case more contacts
                 // share the same session/device and the contact is known.
                 $successSessionName .= ".{$lead->getId()}";
-            } elseif (!$stat instanceof \Mautic\EmailBundle\Entity\Stat) {
+            } elseif (!$stat instanceof Stat) {
                 $contacts = $this->leadRepository->getContactsByEmail($urlEmail);
                 $lead     = null;
                 if (count($contacts) > 0) {
@@ -217,7 +219,7 @@ final class PublicController extends CommonFormController
             }
 
             if (!$isHeadRequest && (!$showContactPreferences || $isUnsubscribeAll)) {
-                if ($stat instanceof \Mautic\EmailBundle\Entity\Stat) {
+                if ($stat instanceof Stat) {
                     $message = $this->getUnsubscribeMessage($idHash, $model, $stat);
                 } elseif ($lead && $lead instanceof Lead) {
                     $message = $this->getUnsubscribeMessageLead($idHash, $model, $lead, $urlEmail);
@@ -359,7 +361,7 @@ final class PublicController extends CommonFormController
 
     /**
      * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
     #[Route(
         path: '/email/resubscribe/{idHash}',
@@ -369,7 +371,7 @@ final class PublicController extends CommonFormController
     {
         $stat = $model->getEmailStatus($idHash);
 
-        if ($stat instanceof \Mautic\EmailBundle\Entity\Stat) {
+        if ($stat instanceof Stat) {
             $email = $stat->getEmail();
             $lead  = $stat->getLead();
 

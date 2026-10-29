@@ -2,6 +2,9 @@
 
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Index\IndexedColumn;
@@ -13,11 +16,11 @@ use Mautic\LeadBundle\Entity\LeadField;
 final class IndexSchemaHelper
 {
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @var AbstractSchemaManager<AbstractMySQLPlatform>
      */
-    private readonly \Doctrine\DBAL\Schema\AbstractSchemaManager $sm;
+    private readonly AbstractSchemaManager $sm;
 
-    private ?\Doctrine\DBAL\Schema\Table $table = null;
+    private ?Table $table = null;
 
     /**
      * @var string[]

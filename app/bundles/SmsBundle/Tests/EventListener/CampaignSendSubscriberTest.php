@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\Stub;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -21,11 +23,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSendSubscriberTest extends TestCase
 {
     private MockObject&SmsModel $smsModel;
 
-    private \PHPUnit\Framework\MockObject\Stub&TransportChain $transportChain;
+    private Stub&TransportChain $transportChain;
 
     private MockObject&TranslatorInterface $translator;
 

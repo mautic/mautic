@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Tracker\Service\ContactTrackingService;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
@@ -16,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
+final class ContactTrackingServiceTest extends TestCase
 {
     /**
      * @var MockObject&CookieHelper

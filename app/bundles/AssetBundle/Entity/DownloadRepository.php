@@ -2,6 +2,8 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -71,8 +73,8 @@ class DownloadRepository extends CommonRepository
     /**
      * Get list of assets ordered by it's download count.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getMostDownloaded(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
@@ -88,8 +90,8 @@ class DownloadRepository extends CommonRepository
     /**
      * Get list of asset referrals ordered by it's count.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getTopReferrers(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
@@ -105,8 +107,8 @@ class DownloadRepository extends CommonRepository
     /**
      * Get pie graph data for http statuses.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getHttpStatuses(QueryBuilder $query): array
     {

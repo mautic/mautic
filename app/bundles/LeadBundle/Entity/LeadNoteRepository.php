@@ -2,6 +2,9 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\NonUniqueResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -22,8 +25,8 @@ final class LeadNoteRepository extends CommonRepository
     /**
      * @param array<int, string>|null $noteTypes
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getNoteCount(int $leadId, ?string $filter = null, ?array $noteTypes = null, ?int $createdBy = null): int
     {
@@ -60,7 +63,7 @@ final class LeadNoteRepository extends CommonRepository
         return 'n';
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $queryBuilder,
@@ -71,7 +74,7 @@ final class LeadNoteRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command                 = $filter->command;
         $string                  = $filter->string;

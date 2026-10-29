@@ -2,6 +2,8 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\UserBundle\Entity\User;
+use Mautic\PageBundle\Entity\Page;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -37,7 +39,7 @@ class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
-    protected ?\Mautic\UserBundle\Entity\User $user;
+    protected ?User $user;
 
     private PageModel $pageModel;
 
@@ -470,7 +472,7 @@ class CommonController extends AbstractController implements MauticController
         $page404 = $this->coreParametersHelper->get('404_page');
         if (!empty($page404)) {
             $page = $this->pageModel->getEntity($page404);
-            if ($page instanceof \Mautic\PageBundle\Entity\Page && $page->getIsPublished() && !empty($page->getCustomHtml())) {
+            if ($page instanceof Page && $page->getIsPublished() && !empty($page->getCustomHtml())) {
                 $slug     = $this->pageModel->generateSlug($page);
                 $response = $this->forward(
                     'Mautic\PageBundle\Controller\PublicController::indexAction',

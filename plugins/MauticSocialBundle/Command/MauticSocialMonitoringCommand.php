@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -70,7 +72,7 @@ final class MauticSocialMonitoringCommand extends Command
     }
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return Paginator
      */
     private function getMonitors($id = null): iterable
     {
@@ -97,7 +99,7 @@ final class MauticSocialMonitoringCommand extends Command
     /**
      * @throws \Exception
      */
-    private function processMonitorListItem(\MauticPlugin\MauticSocialBundle\Entity\Monitoring $listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int
+    private function processMonitorListItem(Monitoring $listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output): int
     {
         // @todo set this up to use the command type per-monitor record.
         $networkType = $listItem->getNetworkType();

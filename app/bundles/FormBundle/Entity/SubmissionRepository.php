@@ -2,6 +2,9 @@
 
 namespace Mautic\FormBundle\Entity;
 
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\DBAL\Exception;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
@@ -281,8 +284,8 @@ final class SubmissionRepository extends CommonRepository
      *
      * @param array<string, mixed> $options
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getSubmissions(array $options = []): array
     {
@@ -313,8 +316,8 @@ final class SubmissionRepository extends CommonRepository
     /**
      * Get list of forms ordered by it's count.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getTopReferrers(DbalQueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
@@ -330,8 +333,8 @@ final class SubmissionRepository extends CommonRepository
     /**
      * Get list of forms ordered by it's count.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getMostSubmitted(DbalQueryBuilder $query, int $limit = 10, int $offset = 0, $column = 'fs.id', $as = 'submissions'): array
     {
@@ -531,7 +534,7 @@ final class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function deleteFormResultsTableRecord(Submission $submission): void
     {
@@ -549,7 +552,7 @@ final class SubmissionRepository extends CommonRepository
     /**
      * @param array<int,string> $submissionIds
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function batchDeleteFormResultsTableRecord(array $submissionIds): void
     {
@@ -580,7 +583,7 @@ final class SubmissionRepository extends CommonRepository
     /**
      * @param array<int,string> $inValidSubmissionIds
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function deleteOrphanSubmissionRecords(string $tableName, array $inValidSubmissionIds): void
     {

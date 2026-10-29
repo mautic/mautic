@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor\Bounce;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Message;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
@@ -14,7 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(DsnParser::class)]
-final class DsnParserTest extends \PHPUnit\Framework\TestCase
+final class DsnParserTest extends TestCase
 {
     #[TestDox('Test that a BouncedEmail is returned from a dsn report')]
     #[DataProvider('bouncedEmailProvider')]

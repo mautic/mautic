@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\RequestOptions;
@@ -112,7 +113,7 @@ final class UpdateHelper
                 'message' => 'mautic.core.updater.error.fetching.updates',
             ];
         } catch (RequestException $exception) {
-            if ($exception->getResponse() instanceof \Psr\Http\Message\ResponseInterface) {
+            if ($exception->getResponse() instanceof ResponseInterface) {
                 $this->logger->error(
                     sprintf(
                         'UPDATE CHECK: Could not fetch a release list: %s (%s)',
@@ -237,7 +238,7 @@ final class UpdateHelper
 
             $this->client->request('POST', $statUrl, $options);
         } catch (RequestException $exception) {
-            if ($exception->getResponse() instanceof \Psr\Http\Message\ResponseInterface) {
+            if ($exception->getResponse() instanceof ResponseInterface) {
                 $this->logger->error(
                     sprintf(
                         'STAT UPDATE: Error communicating with the stat server: %s (%s)',

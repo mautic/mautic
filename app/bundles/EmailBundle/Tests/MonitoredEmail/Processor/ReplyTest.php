@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\CoreBundle\Helper\EmailAddressHelper;
 use Mautic\EmailBundle\Entity\Email;
@@ -25,7 +26,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReplyTest extends \PHPUnit\Framework\TestCase
+final class ReplyTest extends TestCase
 {
     /**
      * @var MockObject&StatRepository

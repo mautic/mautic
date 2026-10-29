@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
 use Mautic\CoreBundle\Helper\BundleHelper;
@@ -21,7 +22,7 @@ use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class AvatarHelperTest extends \PHPUnit\Framework\TestCase
+final class AvatarHelperTest extends TestCase
 {
     private Lead $leadMock;
 

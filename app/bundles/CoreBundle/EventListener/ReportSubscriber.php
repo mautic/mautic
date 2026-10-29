@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ReportBundle\Event\AbstractReportEvent;
@@ -169,7 +170,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $data[$key]['details'] = json_encode(\Mautic\CoreBundle\Helper\Serializer::decode($auditLog['details']));
+            $data[$key]['details'] = json_encode(Serializer::decode($auditLog['details']));
         }
 
         $event->setData($data);

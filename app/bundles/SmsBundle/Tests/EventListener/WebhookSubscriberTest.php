@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\EventListener\WebhookSubscriber;
@@ -14,7 +15,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
+final class WebhookSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&WebhookModel

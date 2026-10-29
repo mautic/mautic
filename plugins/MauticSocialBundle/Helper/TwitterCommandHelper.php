@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
+use MauticPlugin\MauticSocialBundle\Entity\LeadRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
@@ -33,7 +34,7 @@ final class TwitterCommandHelper
         private readonly MonitoringModel $monitoringModel,
         private readonly PostCountModel $postCountModel,
         private readonly Translator $translator,
-        private readonly \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorLeadRepository,
+        private readonly LeadRepository $monitorLeadRepository,
         CoreParametersHelper $coreParametersHelper,
         private readonly LeadFieldRepository $leadFieldRepository,
         private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,

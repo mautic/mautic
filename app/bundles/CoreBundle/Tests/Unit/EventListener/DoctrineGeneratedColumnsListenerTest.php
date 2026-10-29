@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
@@ -15,22 +17,22 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Psr\Log\LoggerInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DoctrineGeneratedColumnsListenerTest extends \PHPUnit\Framework\TestCase
+final class DoctrineGeneratedColumnsListenerTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&GenerateSchemaEventArgs
+     * @var MockObject&GenerateSchemaEventArgs
      */
-    private \PHPUnit\Framework\MockObject\MockObject $event;
+    private MockObject $event;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Schema
+     * @var MockObject&Schema
      */
-    private \PHPUnit\Framework\MockObject\MockObject $schema;
+    private MockObject $schema;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Table
+     * @var MockObject&Table
      */
-    private \PHPUnit\Framework\MockObject\MockObject $table;
+    private MockObject $table;
 
     private DoctrineGeneratedColumnsListener $listener;
 

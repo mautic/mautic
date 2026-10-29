@@ -2,6 +2,7 @@
 
 namespace Mautic\PluginBundle\Controller;
 
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\PluginBundle\Form\Type\CompanyFieldsType;
 use Mautic\PluginBundle\Form\Type\FieldsType;
@@ -49,7 +50,7 @@ final class AjaxController extends CommonAjaxController
         $dataArray = ['success' => 0];
 
         if (!empty($integration) && [] !== $settings) {
-            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
+            /** @var AbstractIntegration $integrationObject */
             $integrationObject = $helper->getIntegrationObject($integration);
 
             if ($integrationObject) {
@@ -127,7 +128,7 @@ final class AjaxController extends CommonAjaxController
         $dataArray   = ['success' => 0];
 
         if (!empty($integration) && !empty($settings)) {
-            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
+            /** @var AbstractIntegration $object */
             $object = $integrationHelper->getIntegrationObject($integration);
 
             if ($object) {
@@ -182,7 +183,7 @@ final class AjaxController extends CommonAjaxController
         $dataArray   = ['success' => 0];
         $statusData  = [];
         if (!empty($integration) && !empty($campaign)) {
-            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
+            /** @var AbstractIntegration $object */
             $object = $integrationHelper->getIntegrationObject($integration);
 
             if ($object) {

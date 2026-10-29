@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -2307,7 +2308,7 @@ final class LeadController extends AbstractFormController
         name: 'mautic_contact_export_action',
         requirements: ['contactId' => '\d+'],
     )]
-    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, int|string $contactId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function contactExportAction(Request $request, ExportHelper $exportHelper, EventDispatcherInterface $dispatcher, int|string $contactId): Response|StreamedResponse
     {
         // set some permissions
         $permissions = $this->security->isGranted(

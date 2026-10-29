@@ -2,6 +2,9 @@
 
 namespace Mautic\CampaignBundle\Executioner;
 
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
@@ -45,10 +48,10 @@ final class RealTimeExecutioner
     /**
      * @param mixed $passthrough
      *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      */
     public function execute(string $type, $passthrough = null, ?string $channel = null, ?int $channelId = null): ?Responses
     {
@@ -107,10 +110,10 @@ final class RealTimeExecutioner
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      * @param Collection<int, Event> $children
      */
     private function executeAssociatedEvents(Collection $children, \DateTime $now): void

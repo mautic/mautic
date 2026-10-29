@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\DataTransformer;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Form\DataTransformer\FieldFilterTransformer;
 use Mautic\LeadBundle\Segment\RelativeDate;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -11,7 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FieldFilterTransformerTest extends \PHPUnit\Framework\TestCase
+final class FieldFilterTransformerTest extends TestCase
 {
     private FieldFilterTransformer $transformer;
 

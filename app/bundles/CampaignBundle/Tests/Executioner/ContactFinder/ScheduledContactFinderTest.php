@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -14,7 +15,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\NullLogger;
 
-final class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
+final class ScheduledContactFinderTest extends TestCase
 {
     private MockObject&LeadRepository $leadRepository;
 

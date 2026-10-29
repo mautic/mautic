@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Event;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormFieldEvent;
 
-final class FormFieldEventTest extends \PHPUnit\Framework\TestCase
+final class FormFieldEventTest extends TestCase
 {
     public function testWorkflow(): void
     {

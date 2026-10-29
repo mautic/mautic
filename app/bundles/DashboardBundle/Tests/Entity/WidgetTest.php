@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\DashboardBundle\Tests\Entity;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\DashboardBundle\Entity\Widget;
 
-final class WidgetTest extends \PHPUnit\Framework\TestCase
+final class WidgetTest extends TestCase
 {
     public function testWidgetNameXssAttempt(): void
     {

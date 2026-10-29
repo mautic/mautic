@@ -2,7 +2,7 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\CompanyPreDeleteEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
@@ -42,7 +42,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
 
     public function onCompanyDelete(CompanyEvent $event): bool
     {
-        /** @var \Mautic\LeadBundle\Entity\Company $company */
+        /** @var Company $company */
         $company = $event->getCompany();
         $this->integrationEntityRepository->findLeadsToDelete('company%', $company->getId());
 

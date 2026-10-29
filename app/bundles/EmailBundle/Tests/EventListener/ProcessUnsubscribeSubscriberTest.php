@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
@@ -11,7 +12,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
 
-final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ProcessUnsubscribeSubscriberTest extends TestCase
 {
     private ProcessUnsubscribeSubscriber $subscriber;
 

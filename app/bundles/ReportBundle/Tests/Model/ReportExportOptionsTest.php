@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 
-final class ReportExportOptionsTest extends \PHPUnit\Framework\TestCase
+final class ReportExportOptionsTest extends TestCase
 {
     public function testBatch(): void
     {

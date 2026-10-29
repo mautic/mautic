@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
+use FOS\OAuthServerBundle\Model\ClientInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\AccessToken as BaseAccessToken;
 use Mautic\UserBundle\Entity\User;
@@ -16,10 +18,10 @@ class AccessToken extends BaseAccessToken
 {
     #[ORM\ManyToOne(targetEntity: Client::class)]
     #[ORM\JoinColumn(name: 'client_id', nullable: false, onDelete: 'CASCADE')]
-    protected \FOS\OAuthServerBundle\Model\ClientInterface $client;
+    protected ClientInterface $client;
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', onDelete: 'CASCADE')]
-    protected ?\Symfony\Component\Security\Core\User\UserInterface $user = null;
+    protected ?UserInterface $user = null;
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue]

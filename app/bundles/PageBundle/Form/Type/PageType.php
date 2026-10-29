@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Form\Type;
 
+use Mautic\UserBundle\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
@@ -37,7 +38,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 final class PageType extends AbstractType
 {
-    private readonly ?\Mautic\UserBundle\Entity\User $user;
+    private readonly ?User $user;
 
     private readonly bool $canViewOther;
 

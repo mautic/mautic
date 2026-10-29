@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\PhpVersionHelper;
 
-final class PhpVersionHelperTest extends \PHPUnit\Framework\TestCase
+final class PhpVersionHelperTest extends TestCase
 {
     public function testGetCurrentSemver(): void
     {

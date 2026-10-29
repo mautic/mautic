@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\UserBundle\Controller\Api\UserApiController;
+use Mautic\UserBundle\Controller\Api\RoleApiController;
+
 return [
     'menu' => [
         'admin' => [
@@ -48,13 +51,13 @@ return [
                 'standard_entity' => true,
                 'name'            => 'users',
                 'path'            => '/users',
-                'controller'      => Mautic\UserBundle\Controller\Api\UserApiController::class,
+                'controller'      => UserApiController::class,
             ],
             'mautic_api_rolesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'roles',
                 'path'            => '/roles',
-                'controller'      => Mautic\UserBundle\Controller\Api\RoleApiController::class,
+                'controller'      => RoleApiController::class,
             ],
         ],
         'public' => [

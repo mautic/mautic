@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Auth\Provider\Oauth1aTwoLegged;
 
+use Psr\Http\Message\UriInterface;
+use GuzzleHttp\HandlerStack;
 use Mautic\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\CredentialsInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\Oauth1aTwoLegged\HttpFactory;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
@@ -36,10 +38,10 @@ final class HttpFactoryTest extends TestCase
         $client      = $httpFactory->getClient($credentials);
         $config      = $client->getConfig(); /** @phpstan-ignore-line Deprecated. Must be refactored for Guzzle 8 */
         $this->assertSame('oauth', $config['auth']);
-        /** @var \Psr\Http\Message\UriInterface $baseUri */
+        /** @var UriInterface $baseUri */
         $baseUri = $config['base_uri'];
         $this->assertSame('AuthUrlValue', $baseUri->getPath());
-        /** @var \GuzzleHttp\HandlerStack $handler */
+        /** @var HandlerStack $handler */
         $handler = $config['handler'];
         $this->assertTrue($handler->hasHandler());
     }

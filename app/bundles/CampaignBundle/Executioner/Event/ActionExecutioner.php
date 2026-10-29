@@ -2,6 +2,8 @@
 
 namespace Mautic\CampaignBundle\Executioner\Event;
 
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -30,8 +32,8 @@ final readonly class ActionExecutioner implements EventInterface
 
     /**
      * @throws CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @param Collection<int, LeadEventLog> $logs
      */
     public function execute(AbstractEventAccessor $config, Collection $logs): EvaluatedContacts

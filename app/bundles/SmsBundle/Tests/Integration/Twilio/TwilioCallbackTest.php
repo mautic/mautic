@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Tests\Integration\Twilio;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\SmsBundle\Helper\ContactHelper;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use Mautic\SmsBundle\Integration\Twilio\TwilioCallback;
@@ -12,12 +14,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
+final class TwilioCallbackTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Configuration
+     * @var MockObject&Configuration
      */
-    private \PHPUnit\Framework\MockObject\MockObject $configuration;
+    private MockObject $configuration;
 
     protected function setUp(): void
     {

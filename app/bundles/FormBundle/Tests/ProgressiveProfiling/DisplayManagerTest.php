@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\ProgressiveProfiling;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 
-final class DisplayManagerTest extends \PHPUnit\Framework\TestCase
+final class DisplayManagerTest extends TestCase
 {
     public function testShowForField(): void
     {

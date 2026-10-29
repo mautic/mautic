@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\AssetBundle\EventListener\DashboardSubscriber;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
@@ -17,7 +18,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DashboardSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DashboardSubscriberTest extends TestCase
 {
     private AssetModel&MockObject $assetModel;
 

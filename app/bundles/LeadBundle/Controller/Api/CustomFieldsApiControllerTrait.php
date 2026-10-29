@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller\Api;
 
+use Mautic\CoreBundle\Helper\Serializer;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Entity\Company;
@@ -112,7 +113,7 @@ trait CustomFieldsApiControllerTrait
 
                 // Some requests don't seem to have properties unserialized by default (even in M2)
                 $fieldDefinition['properties'] ??= [];
-                $properties = is_string($fieldDefinition['properties']) ? \Mautic\CoreBundle\Helper\Serializer::decode($fieldDefinition['properties']) : $fieldDefinition['properties'];
+                $properties = is_string($fieldDefinition['properties']) ? Serializer::decode($fieldDefinition['properties']) : $fieldDefinition['properties'];
 
                 $fields[$group][$field]['value']           = empty($properties['scale']) ? (int) $fields[$group][$field]['value']
                     : (float) $fields[$group][$field]['value'];

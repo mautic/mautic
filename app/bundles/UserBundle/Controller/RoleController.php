@@ -2,9 +2,10 @@
 
 namespace Mautic\UserBundle\Controller;
 
+use Mautic\UserBundle\Entity\Role;
+use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
-use Mautic\UserBundle\Entity;
 use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Helper\RoleSearchScopeProvider;
@@ -165,7 +166,7 @@ final class RoleController extends AbstractFormController
         }
 
         // retrieve the entity
-        $entity = new Entity\Role();
+        $entity = new Role();
 
         // set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_role_index');
@@ -292,7 +293,7 @@ final class RoleController extends AbstractFormController
     /**
      * @param array<string, mixed> $postActionVars
      */
-    private function handleRoleClone(Request $request, int $objectId, Entity\Role $source, RoleModel $model, array $postActionVars): Response
+    private function handleRoleClone(Request $request, int $objectId, Role $source, RoleModel $model, array $postActionVars): Response
     {
         $entity            = $model->cloneEntity($source);
         $permissionsConfig = $this->getPermissionsConfig($source);
@@ -310,7 +311,7 @@ final class RoleController extends AbstractFormController
     /**
      * @param array<string, mixed> $postActionVars
      */
-    private function handleRoleClonePost(Request $request, Entity\Role $entity, RoleModel $model, FormInterface $form, array $postActionVars): ?Response
+    private function handleRoleClonePost(Request $request, Role $entity, RoleModel $model, FormInterface $form, array $postActionVars): ?Response
     {
         $cancelled = $this->isFormCancelled($form);
         $valid     = !$cancelled && $this->isFormValid($form);
@@ -473,9 +474,9 @@ final class RoleController extends AbstractFormController
     }
 
     /**
-     * @return array{config: array<string, array{label: string, permissionObject: \Mautic\CoreBundle\Security\Permissions\AbstractPermissions, ratio: array{int, int}, data: mixed}>, list: array<string, array<string, list<int|string>>>}
+     * @return array{config: array<string, array{label: string, permissionObject: AbstractPermissions, ratio: array{int, int}, data: mixed}>, list: array<string, array<string, list<int|string>>>}
      */
-    private function getPermissionsConfig(Entity\Role $role): array
+    private function getPermissionsConfig(Role $role): array
     {
         $permissionObjects = $this->security->getPermissionObjects();
 
@@ -483,7 +484,7 @@ final class RoleController extends AbstractFormController
 
         $permissions     = [];
         $permissionsList = [];
-        /** @var \Mautic\CoreBundle\Security\Permissions\AbstractPermissions $object */
+        /** @var AbstractPermissions $object */
         foreach ($permissionObjects as $object) {
             if (!is_object($object)) {
                 continue;

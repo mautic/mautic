@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Form\Type;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\FormBundle\Form\Type\FormFieldCheckboxGroupType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -18,9 +19,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class FormFieldCheckboxGroupTypeTest extends TypeTestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     protected function setUp(): void
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Helper\FieldAliasHelper;
@@ -11,7 +12,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FieldAliasHelperTest extends \PHPUnit\Framework\TestCase
+final class FieldAliasHelperTest extends TestCase
 {
     private FieldAliasHelper $helper;
 

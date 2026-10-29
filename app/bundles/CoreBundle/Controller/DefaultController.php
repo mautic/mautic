@@ -2,6 +2,8 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\PageBundle\Model\PageModel;
@@ -32,7 +34,7 @@ final class DefaultController extends CommonController
         path: '/',
         name: 'mautic_base_index',
     )]
-    public function indexAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function indexAction(Request $request): RedirectResponse|Response
     {
         $root = $this->coreParametersHelper->get('webroot');
 
@@ -41,7 +43,7 @@ final class DefaultController extends CommonController
         }
         $page      = $this->pageModel->getEntity($root);
 
-        if (!$page instanceof \Mautic\PageBundle\Entity\Page) {
+        if (!$page instanceof Page) {
             return $this->notFound();
         }
 

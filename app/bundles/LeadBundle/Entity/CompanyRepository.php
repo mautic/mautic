@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
@@ -374,8 +376,8 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
     /**
      * Get companies grouped by column.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getCompaniesByGroup(\Doctrine\DBAL\Query\QueryBuilder $query, string $column): array
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\EventListener;
 
+use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent;
@@ -84,7 +85,7 @@ final readonly class ContactObjectSubscriber implements EventSubscriberInterface
 
     public function findContactsByDateRange(InternalObjectFindEvent $event): void
     {
-        if (Contact::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof \Mautic\IntegrationsBundle\Sync\DAO\DateRange) {
+        if (Contact::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof DateRange) {
             return;
         }
 

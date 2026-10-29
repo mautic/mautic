@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Search;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
@@ -19,7 +20,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 #[CoversClass(ContactFinder::class)]
 #[CoversClass(Result::class)]
 #[CoversClass(Address::class)]
-final class ContactFinderTest extends \PHPUnit\Framework\TestCase
+final class ContactFinderTest extends TestCase
 {
     #[TestDox('Contact should be found via contact email address')]
     public function testContactFoundByDelegationForAddress(): void

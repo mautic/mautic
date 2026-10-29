@@ -2,6 +2,9 @@
 
 namespace Mautic\EmailBundle\Model;
 
+use Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException;
+use Doctrine\ORM\Exception\ORMException;
+use Psr\SimpleCache\InvalidArgumentException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
@@ -646,7 +649,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * Search for an email stat by email and lead IDs.
      *
-     * @return array<int, \Mautic\EmailBundle\Entity\Stat>
+     * @return array<int, Stat>
      */
     public function getEmailStati($emailId, $leadId): array
     {
@@ -871,7 +874,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     /**
      * @param bool $includeVariants
      *
-     * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
+     * @throws InvalidStatHelperException
      */
     public function getEmailGeneralStats($email, $includeVariants, $unit, \DateTime $dateFrom, \DateTime $dateTo): array
     {
@@ -1539,7 +1542,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *
      * @return false|string[]
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     public function sendEmailToUser(
         Email $email,
@@ -1854,7 +1857,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string|null $dateFormat
      *
-     * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
+     * @throws InvalidStatHelperException
      */
     public function getEmailsLineChartData(
         $unit,
@@ -2145,7 +2148,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      * @param array<string>|Lead|null $leadFields
      *
      * @return false|mixed[]
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     public function sendSampleEmailToUser(
         Email $email,
@@ -2323,7 +2326,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function invalidatePendingCountCache(int $emailId): void
     {
@@ -2331,7 +2334,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function invalidatePendingCountCacheForList(int $listId): void
     {
@@ -2341,7 +2344,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
     }
 
     /**
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function setCachedCount(Email $entity): void
     {

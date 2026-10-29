@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
@@ -39,7 +40,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
 
         // Rebuild each focus
-        /** @var \MauticPlugin\MauticFocusBundle\Entity\Focus $focus */
+        /** @var Focus $focus */
         foreach ($foci as $focus) {
             $focus->setForm(null);
         }

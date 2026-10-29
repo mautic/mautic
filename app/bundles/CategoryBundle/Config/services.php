@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Mautic\CategoryBundle\Security\Permissions\CategoryPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -19,5 +20,5 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CategoryBundle\\Entity\\', '../Entity/*Repository.php');
-    $services->set(Mautic\CategoryBundle\Security\Permissions\CategoryPermissions::class);
+    $services->set(CategoryPermissions::class);
 };

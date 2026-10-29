@@ -2,6 +2,11 @@
 
 namespace Mautic\CampaignBundle\Command;
 
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
+use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
+use Doctrine\ORM\Query\QueryException;
 use Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
@@ -259,7 +264,7 @@ final class TriggerCampaignCommand extends ModeratedCommand
                 ];
             }
 
-            /** @var iterable<\Mautic\CampaignBundle\Entity\Campaign> $campaigns */
+            /** @var iterable<Campaign> $campaigns */
             $campaigns = $this->campaignRepository->getEntities($filter);
 
             foreach ($campaigns as $campaign) {
@@ -357,10 +362,10 @@ final class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws CannotProcessEventException
+     * @throws NotSchedulableException
      */
     private function executeKickoff(): void
     {
@@ -373,11 +378,11 @@ final class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws \Doctrine\ORM\Query\QueryException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @throws QueryException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws CannotProcessEventException
+     * @throws NotSchedulableException
      */
     private function executeScheduled(): void
     {
@@ -389,10 +394,10 @@ final class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws CannotProcessEventException
+     * @throws NotSchedulableException
      */
     private function executeInactive(): void
     {

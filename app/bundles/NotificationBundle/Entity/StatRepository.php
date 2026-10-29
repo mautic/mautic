@@ -2,6 +2,8 @@
 
 namespace Mautic\NotificationBundle\Entity;
 
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -13,8 +15,8 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 final class StatRepository extends CommonRepository
 {
     /**
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getNotificationStatus(string $trackingHash): ?Stat
     {
@@ -129,8 +131,8 @@ final class StatRepository extends CommonRepository
     /**
      * Get pie graph data for Sent, Read and Failed notifications count.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getMostNotifications(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\UserBundle\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -148,7 +149,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
      */
     private function handleValidateOwner(array &$matchedFields): ?int
     {
-        /** @var \Mautic\UserBundle\Entity\User|null $owner */
+        /** @var User|null $owner */
         $owner = ArrayHelper::pickValue('owner', $matchedFields);
 
         return $owner ? $owner->getId() : null;

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\Stub;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -26,11 +28,11 @@ use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 #[AllowMockObjectsWithoutExpectations]
-final class InactiveExecutionerTest extends \PHPUnit\Framework\TestCase
+final class InactiveExecutionerTest extends TestCase
 {
     private MockObject&InactiveContactFinder $inactiveContactFinder;
 
-    private \PHPUnit\Framework\MockObject\Stub&Translator $translator;
+    private Stub&Translator $translator;
 
     private MockObject&EventScheduler $eventScheduler;
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\DynamicContentBundle\Tests\Unit\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -24,7 +25,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DynamicContentSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&TrackableModel

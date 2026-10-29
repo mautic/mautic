@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 
 #[AllowMockObjectsWithoutExpectations]
-final class MailboxTest extends \PHPUnit\Framework\TestCase
+final class MailboxTest extends TestCase
 {
     public function testConstructWithDefaultConfig(): void
     {

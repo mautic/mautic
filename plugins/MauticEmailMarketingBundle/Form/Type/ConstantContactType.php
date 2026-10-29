@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
+use MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Form\Type\FieldsType;
@@ -35,7 +36,7 @@ final class ConstantContactType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\ConstantContactIntegration $object */
+        /** @var ConstantContactIntegration $object */
         $object          = $this->integrationHelper->getIntegrationObject('ConstantContact');
         $integrationName = $object->getName();
         $session         = $this->requestStack->getSession();

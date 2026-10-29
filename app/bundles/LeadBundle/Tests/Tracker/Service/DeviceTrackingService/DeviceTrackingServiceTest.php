@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Tracker\Service\DeviceTrackingService;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
@@ -18,37 +20,37 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
+final class DeviceTrackingServiceTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CookieHelper
+     * @var MockObject&CookieHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $cookieHelperMock;
+    private MockObject $cookieHelperMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&EntityManagerInterface
+     * @var MockObject&EntityManagerInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
+    private MockObject $entityManagerMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&RandomHelperInterface
+     * @var MockObject&RandomHelperInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $randomHelperMock;
+    private MockObject $randomHelperMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadDeviceRepository
+     * @var MockObject&LeadDeviceRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadDeviceRepositoryMock;
+    private MockObject $leadDeviceRepositoryMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&RequestStack
+     * @var MockObject&RequestStack
      */
-    private \PHPUnit\Framework\MockObject\MockObject $requestStackMock;
+    private MockObject $requestStackMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CorePermissions
+     * @var MockObject&CorePermissions
      */
-    private \PHPUnit\Framework\MockObject\MockObject $security;
+    private MockObject $security;
 
     protected function setUp(): void
     {

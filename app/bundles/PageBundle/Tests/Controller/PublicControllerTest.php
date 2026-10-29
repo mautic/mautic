@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\Controller;
 
+use PHPUnit\Framework\MockObject\Stub;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -56,12 +57,12 @@ final class PublicControllerTest extends TestCase
 {
     private MockObject&Container $internalContainer;
 
-    private \PHPUnit\Framework\MockObject\Stub&LoggerInterface $logger;
+    private Stub&LoggerInterface $logger;
 
     /**
-     * @var ModelFactory<object>&\PHPUnit\Framework\MockObject\Stub
+     * @var ModelFactory<object>&Stub
      */
-    private \PHPUnit\Framework\MockObject\Stub&ModelFactory $modelFactory;
+    private Stub&ModelFactory $modelFactory;
 
     private MockObject&RedirectModel $redirectModel;
 

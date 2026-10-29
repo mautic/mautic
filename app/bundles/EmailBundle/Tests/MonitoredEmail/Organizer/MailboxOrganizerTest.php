@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail\Organizer;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\Event\PreFetchEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(MailboxOrganizer::class)]
 #[CoversClass(PreFetchEmailEvent::class)]
-final class MailboxOrganizerTest extends \PHPUnit\Framework\TestCase
+final class MailboxOrganizerTest extends TestCase
 {
     /**
      * @var array<string, array<string, int|string>>

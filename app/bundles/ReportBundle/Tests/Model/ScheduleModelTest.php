@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManager;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
@@ -14,7 +15,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ScheduleModelTest extends \PHPUnit\Framework\TestCase
+final class ScheduleModelTest extends TestCase
 {
     /**
      * @var MockObject&SchedulerRepository

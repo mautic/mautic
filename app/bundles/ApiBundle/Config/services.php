@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Mautic\ApiBundle\Security\Voter\ApiPermissionVoter;
+use Mautic\ApiBundle\Controller\oAuth2\AuthorizeController;
+use Mautic\ApiBundle\State\PutProcessor;
+use Mautic\ApiBundle\Security\Permissions\ApiPermissions;
 use FOS\OAuthServerBundle\Form\Handler\AuthorizeFormHandler;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -24,11 +28,11 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\ApiBundle\\Entity\\oAuth2\\', '../Entity/oAuth2/*Repository.php');
 
-    $services->set(Mautic\ApiBundle\Security\Voter\ApiPermissionVoter::class);
+    $services->set(ApiPermissionVoter::class);
 
     $services->alias(AuthorizeFormHandler::class, 'fos_oauth_server.authorize.form.handler.default');
 
-    $services->get(Mautic\ApiBundle\Controller\oAuth2\AuthorizeController::class)
+    $services->get(AuthorizeController::class)
         ->arg('$authorizeForm', service('fos_oauth_server.authorize.form'))
         ->arg('$oAuth2Server', service('fos_oauth_server.server'))
         ->arg('$clientManager', service('fos_oauth_server.client_manager.default'))
@@ -37,11 +41,11 @@ return function (ContainerConfigurator $configurator): void {
     // Register custom PUT processor to fix PUT operations globally
     // This ensures PUT requests update existing entities instead of creating new ones
     // This decorates the default persist processor so it applies to all entities automatically
-    $services->set(Mautic\ApiBundle\State\PutProcessor::class)
+    $services->set(PutProcessor::class)
         ->decorate('api_platform.doctrine.orm.state.persist_processor')
         ->args([
             service('.inner'),
             service('doctrine.orm.entity_manager'),
         ]);
-    $services->set(Mautic\ApiBundle\Security\Permissions\ApiPermissions::class);
+    $services->set(ApiPermissions::class);
 };

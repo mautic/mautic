@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Tests\Unit\Model;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -22,13 +23,12 @@ use Mautic\PointBundle\Entity\TriggerRepository;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-final class TriggerModelTest extends \PHPUnit\Framework\TestCase
+final class TriggerModelTest extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\Tests\Unit\Notificator;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -22,7 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
+final class WebhookKillNotificatorTest extends TestCase
 {
     /**
      * @var MockObject&TranslatorInterface

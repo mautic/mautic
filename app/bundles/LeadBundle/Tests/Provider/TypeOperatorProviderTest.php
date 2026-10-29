@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Provider;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Event\FieldOperatorsEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
@@ -14,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
+final class TypeOperatorProviderTest extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface

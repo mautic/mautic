@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -34,7 +35,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSubscriberTest extends TestCase
 {
     private EventDispatcher $dispatcher;
 

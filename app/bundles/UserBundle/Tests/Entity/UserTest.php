@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Entity;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\UserBundle\Entity\User;
 
-final class UserTest extends \PHPUnit\Framework\TestCase
+final class UserTest extends TestCase
 {
     public function testEraseCredentials(): void
     {

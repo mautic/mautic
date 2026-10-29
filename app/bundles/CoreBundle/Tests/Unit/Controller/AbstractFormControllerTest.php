@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Controller;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -19,14 +21,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
+final class AbstractFormControllerTest extends TestCase
 {
     private AbstractFormController $classFromAbstractFormController;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Form
+     * @var MockObject&Form
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formMock;
+    private MockObject $formMock;
 
     private RequestStack $requestStack;
 

@@ -2,6 +2,7 @@
 
 namespace Mautic\UserBundle\Controller;
 
+use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
@@ -207,7 +208,7 @@ final class PublicController extends AbstractFormController
                         $this->addFlashMessage('mautic.user.invite.account_created', [], 'notice', 'flashes');
 
                         $response = $this->redirectToRoute('login');
-                    } catch (\Doctrine\DBAL\Exception $e) {
+                    } catch (Exception $e) {
                         $logger->error($this->translator->trans('mautic.user.invite.registration.database.error', [], 'messages').': '.$e->getMessage());
                         $this->addFlashMessage('mautic.user.invite.error.database', [], 'error', 'flashes');
                     }

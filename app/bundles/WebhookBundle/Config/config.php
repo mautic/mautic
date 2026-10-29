@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Mautic\WebhookBundle\Controller\Api\WebhookApiController;
+use Mautic\WebhookBundle\Model\WebhookModel;
+use Doctrine\Common\Collections\Order;
+
 return [
     'routes' => [
         'api' => [
@@ -9,7 +13,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'hooks',
                 'path'            => '/hooks',
-                'controller'      => Mautic\WebhookBundle\Controller\Api\WebhookApiController::class,
+                'controller'      => WebhookApiController::class,
             ],
         ],
     ],
@@ -37,8 +41,8 @@ return [
         'clean_webhook_logs_in_background'         => false,
         'webhook_disable_limit'                    => 100, // How many times the webhook response can fail until the webhook will be unpublished
         'webhook_timeout'                          => 15, // How long the CURL request can wait for response before Mautic hangs up. In seconds
-        'queue_mode'                               => Mautic\WebhookBundle\Model\WebhookModel::IMMEDIATE_PROCESS, // Trigger the webhook immediately or queue it for faster response times
-        'events_orderby_dir'                       => Doctrine\Common\Collections\Order::Ascending->value, // Order the queued events chronologically or the other way around
+        'queue_mode'                               => WebhookModel::IMMEDIATE_PROCESS, // Trigger the webhook immediately or queue it for faster response times
+        'events_orderby_dir'                       => Order::Ascending->value, // Order the queued events chronologically or the other way around
         'webhook_email_details'                    => true, // If enabled, email related webhooks send detailed data
         'disable_auto_unpublish'                   => false, // If enabled, webhooks will not be automatically unpublished on errors
         'first_webhook_failure_notification_time'  => 3600, // 1 hour

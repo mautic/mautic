@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\UserBundle\Entity\UserRepository;
 
 /**
- * @method \Symfony\Component\DependencyInjection\ContainerInterface getContainer()
+ * @method ContainerInterface getContainer()
  */
 trait CampaignAuditLogTrait
 {

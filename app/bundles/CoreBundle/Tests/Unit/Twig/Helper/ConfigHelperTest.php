@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\ConfigHelper;
 use PHPUnit\Framework\Assert;
 
-final class ConfigHelperTest extends \PHPUnit\Framework\TestCase
+final class ConfigHelperTest extends TestCase
 {
     public function testGet(): void
     {

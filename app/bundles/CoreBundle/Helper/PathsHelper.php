@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\UserBundle\Entity\User;
 use Composer\Autoload\ClassLoader;
 use Mautic\CoreBundle\Loader\ParameterLoader;
 
@@ -31,7 +32,7 @@ class PathsHelper
 
     private readonly string $temporaryDir;
 
-    private readonly ?\Mautic\UserBundle\Entity\User $user;
+    private readonly ?User $user;
 
     private readonly string $importLeadsDir;
 

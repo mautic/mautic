@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
@@ -141,7 +142,7 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
      * Check the fail log if the lead is recorded there. If yes it decrease the failed count. It prevents counting
      * the same failure twice.
      *
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NonUniqueResultException
      */
     public function onEventExecuted(ExecutedEvent $event): void
     {

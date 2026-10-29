@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\PointEventHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -12,7 +13,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class PointEventHelperTest extends \PHPUnit\Framework\TestCase
+final class PointEventHelperTest extends TestCase
 {
     public function testSendEmail(): void
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\Notification;
 
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -19,7 +20,7 @@ final readonly class Writer
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     public function writeUserNotification(string $header, string $message, int $userId, ?string $deduplicateValue = null, ?\DateTime $deduplicateDateTimeFrom = null): void
     {

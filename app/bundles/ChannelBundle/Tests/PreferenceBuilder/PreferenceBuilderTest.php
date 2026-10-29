@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\Tests\PreferenceBuilder;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -17,7 +18,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Psr\Log\NullLogger;
 
 #[AllowMockObjectsWithoutExpectations]
-final class PreferenceBuilderTest extends \PHPUnit\Framework\TestCase
+final class PreferenceBuilderTest extends TestCase
 {
     public function testChannelsArePrioritized(): void
     {

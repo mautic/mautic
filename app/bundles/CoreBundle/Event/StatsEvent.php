@@ -43,7 +43,7 @@ final class StatsEvent extends Event
      *
      * @var CommonRepository<object>
      */
-    private ?\Mautic\CoreBundle\Entity\CommonRepository $repository = null;
+    private ?CommonRepository $repository = null;
 
     public function __construct(
         $table,

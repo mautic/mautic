@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Form\Type;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use MauticPlugin\MauticFocusBundle\Form\Type\ContentType;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -11,9 +12,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 final class ContentTypeTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&FormBuilderInterface
+     * @var MockObject&FormBuilderInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formBuilder;
+    private MockObject $formBuilder;
 
     protected function setUp(): void
     {

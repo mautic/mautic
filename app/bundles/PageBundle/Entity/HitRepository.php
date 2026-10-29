@@ -2,6 +2,8 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -445,8 +447,8 @@ final class HitRepository extends CommonRepository
     /**
      * Get list of referers ordered by it's count.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getReferers(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
@@ -462,8 +464,8 @@ final class HitRepository extends CommonRepository
     /**
      * Get list of referers ordered by it's count.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getMostVisited(QueryBuilder $query, int $limit = 10, int $offset = 0, string $column = 'p.hits', string $as = ''): array
     {

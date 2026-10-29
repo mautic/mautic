@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ReportBuilder;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
@@ -19,19 +20,19 @@ use Symfony\Component\Routing\Router;
 final class FieldBuilderTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Router
+     * @var MockObject&Router
      */
-    private \PHPUnit\Framework\MockObject\MockObject $router;
+    private MockObject $router;
 
     /**
-     * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var FieldHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
+    private MockObject $fieldHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ContactObjectHelper
+     * @var MockObject&ContactObjectHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactObjectHelper;
+    private MockObject $contactObjectHelper;
 
     protected function setUp(): void
     {

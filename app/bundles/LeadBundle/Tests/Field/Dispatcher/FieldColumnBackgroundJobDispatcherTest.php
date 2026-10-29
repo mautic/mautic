@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field\Dispatcher;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldColumnBackgroundJobDispatcher;
@@ -15,7 +16,7 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
+final class FieldColumnBackgroundJobDispatcherTest extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -36,7 +37,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
+final class TokenSubscriberTest extends TestCase
 {
     public function testDynamicContentCustomTokens(): void
     {

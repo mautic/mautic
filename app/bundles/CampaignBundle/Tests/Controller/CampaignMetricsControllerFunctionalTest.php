@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -28,7 +30,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array{campaign: \Mautic\CampaignBundle\Entity\Campaign, email: \Mautic\EmailBundle\Entity\Email}
+     * @return array{campaign: Campaign, email: Email}
      */
     private function setupEmailCampaignTestData(): array
     {

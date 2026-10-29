@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -27,7 +28,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TypeOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
+final class TypeOperatorSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&LeadModel

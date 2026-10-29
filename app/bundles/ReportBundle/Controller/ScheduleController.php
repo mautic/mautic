@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Controller;
 
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\ReportBundle\Model\ReportModel;
@@ -55,7 +56,7 @@ final class ScheduleController extends CommonAjaxController
     )]
     public function nowAction($reportId): JsonResponse
     {
-        /** @var \Mautic\ReportBundle\Entity\Report $report */
+        /** @var Report $report */
         $report = $this->reportModel->getEntity($reportId);
 
         if (empty($report)) {

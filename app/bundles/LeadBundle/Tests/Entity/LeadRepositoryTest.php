@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\Query;
@@ -16,7 +17,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 #[AllowMockObjectsWithoutExpectations]
-final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
+final class LeadRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 

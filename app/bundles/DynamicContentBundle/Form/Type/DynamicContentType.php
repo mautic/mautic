@@ -2,6 +2,7 @@
 
 namespace Mautic\DynamicContentBundle\Form\Type;
 
+use Symfony\Component\OptionsResolver\Exception\AccessException;
 use DeviceDetector\Parser\Device\AbstractDeviceParser as DeviceParser;
 use DeviceDetector\Parser\OperatingSystem;
 use Doctrine\ORM\EntityManagerInterface;
@@ -318,7 +319,7 @@ final class DynamicContentType extends AbstractType
     }
 
     /**
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws AccessException
      */
     public function configureOptions(OptionsResolver $resolver): void
     {

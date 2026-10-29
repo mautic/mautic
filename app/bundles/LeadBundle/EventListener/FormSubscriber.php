@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\PointBundle\Entity\Group;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
@@ -191,7 +192,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $pointGroup   = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
         $points       = $properties['points'];
 
-        if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
+        if ($pointGroup instanceof Group) {
             $this->groupModel->adjustPoints($contact, $pointGroup, $points, $operator);
         } else {
             $contact->adjustPoints($points, $operator);

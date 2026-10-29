@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\FormBundle\Event\Service\FieldValueTransformer;
+use Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator;
+use Mautic\FormBundle\Security\Permissions\FormPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -17,15 +20,15 @@ return function (ContainerConfigurator $configurator): void {
         'ProgressiveProfiling/DisplayManager.php',
     ];
 
-    $services->set(Mautic\FormBundle\Event\Service\FieldValueTransformer::class);
+    $services->set(FieldValueTransformer::class);
 
     $services->load('Mautic\\FormBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\FormBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->set(Mautic\FormBundle\Validator\Constraint\FileExtensionConstraintValidator::class)
+    $services->set(FileExtensionConstraintValidator::class)
         ->tag('validator.constraint_validator', ['alias' => 'file_extension_constraint_validator']);
 
-    $services->set(Mautic\FormBundle\Security\Permissions\FormPermissions::class);
+    $services->set(FormPermissions::class);
 };

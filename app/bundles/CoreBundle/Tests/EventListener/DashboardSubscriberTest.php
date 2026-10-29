@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\Stub;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Event\IconEvent;
@@ -228,7 +229,7 @@ final class DashboardSubscriberTest extends TestCase
         $routeCollection = $this->createMock(RouteCollection::class);
         $matcher         = $this->exactly(5);
         $routeCollection->expects($matcher) // no null object and  exception object
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $route): ?\PHPUnit\Framework\MockObject\Stub {
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher, $route): ?Stub {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('mautic_model_action', $parameters[0]);
 

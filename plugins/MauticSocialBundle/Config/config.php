@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use MauticPlugin\MauticSocialBundle\Controller\Api\TweetApiController;
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
+
 return [
     'name'        => 'Social Media',
     'description' => 'Enables integrations with Mautic supported social media services.',
@@ -36,7 +39,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'tweets',
                 'path'            => '/tweets',
-                'controller'      => MauticPlugin\MauticSocialBundle\Controller\Api\TweetApiController::class,
+                'controller'      => TweetApiController::class,
             ],
         ],
         'public' => [
@@ -80,7 +83,7 @@ return [
     'categories' => [
         'plugin:mauticSocial' => [
             'label' => 'mautic.social.monitoring',
-            'class' => MauticPlugin\MauticSocialBundle\Entity\Monitoring::class,
+            'class' => Monitoring::class,
         ],
     ],
 

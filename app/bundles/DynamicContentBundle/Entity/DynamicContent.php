@@ -2,6 +2,9 @@
 
 namespace Mautic\DynamicContentBundle\Entity;
 
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidOptionsException;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -215,9 +218,9 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @throws \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @throws \Symfony\Component\Validator\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\Validator\Exception\MissingOptionsException
+     * @throws ConstraintDefinitionException
+     * @throws InvalidOptionsException
+     * @throws MissingOptionsException
      */
     public static function loadValidatorMetaData(ClassMetadata $metadata): void
     {

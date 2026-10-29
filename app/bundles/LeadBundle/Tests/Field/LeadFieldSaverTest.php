@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Event\FieldPostSaveEvent;
@@ -11,7 +12,7 @@ use Mautic\LeadBundle\Event\FieldPreSaveEvent;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 
-final class LeadFieldSaverTest extends \PHPUnit\Framework\TestCase
+final class LeadFieldSaverTest extends TestCase
 {
     public function testSave(): void
     {

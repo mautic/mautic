@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionFactory;
 use Mautic\LeadBundle\Segment\Decorator\Date\Day\DateDayToday;
@@ -31,7 +32,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(DateOptionFactory::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class DateOptionFactoryTest extends \PHPUnit\Framework\TestCase
+final class DateOptionFactoryTest extends TestCase
 {
     public function testBirthday(): void
     {

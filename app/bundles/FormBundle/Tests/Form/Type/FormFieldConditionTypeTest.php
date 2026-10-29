@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Form\Type;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\FormBundle\Form\Type\FormFieldConditionType;
 use Mautic\FormBundle\Helper\PropertiesAccessor;
@@ -15,7 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
+final class FormFieldConditionTypeTest extends TestCase
 {
     /**
      * @var MockObject&FieldModel

@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\ConfigBundle\Mapper\Helper\ConfigHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(ConfigHelper::class)]
-final class ConfigHelperTest extends \PHPUnit\Framework\TestCase
+final class ConfigHelperTest extends TestCase
 {
     #[TestDox('Ensure a mixed numeric/string keyed array is formatted to all string based keys')]
     public function testNestedLocalParametersAreBoundCorrectly(): void

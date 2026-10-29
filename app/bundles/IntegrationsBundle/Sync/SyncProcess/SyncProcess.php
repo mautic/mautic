@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncProcess;
 
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
+use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Event\IntegrationToMauticSyncCompletedEvent;
 use Mautic\IntegrationsBundle\Event\MauticToIntegrationSyncCompletedEvent;
 use Mautic\IntegrationsBundle\Event\SyncEvent;
@@ -230,9 +232,9 @@ final class SyncProcess
     }
 
     /**
-     * @param \Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO[] $objectsToSynchronize
+     * @param ObjectDAO[] $objectsToSynchronize
      *
-     * @throws \Mautic\IntegrationsBundle\Exception\InvalidValueException
+     * @throws InvalidValueException
      */
     private function getInputOptionsForObjects(array $objectsToSynchronize): InputOptionsDAO
     {

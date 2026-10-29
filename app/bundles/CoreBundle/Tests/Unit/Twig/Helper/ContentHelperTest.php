@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Twig\Helper\ContentHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
-final class ContentHelperTest extends \PHPUnit\Framework\TestCase
+final class ContentHelperTest extends TestCase
 {
     private ContentHelper $contentHelper;
 

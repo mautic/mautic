@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -1088,7 +1089,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @throws \MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
+     * @throws MatchingKeyNotFoundException
      */
     private function consumeResponse(array $response, string $zObject, bool $createIntegrationEntity = false, ?Mapper $mapper = null): int
     {

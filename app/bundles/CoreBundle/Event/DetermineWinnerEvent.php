@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Event;
 
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\PageBundle\Entity\Page;
+use Mautic\EmailBundle\Entity\Email;
 use Symfony\Contracts\EventDispatcher\Event;
 
 final class DetermineWinnerEvent extends Event
@@ -20,10 +23,10 @@ final class DetermineWinnerEvent extends Event
 
     /**
      * @param array{
-     *   parent?: \Mautic\CoreBundle\Entity\VariantEntityInterface|mixed,
+     *   parent?: VariantEntityInterface|mixed,
      *   children?: array<mixed>,
-     *   page?: \Mautic\PageBundle\Entity\Page,
-     *   email?: \Mautic\EmailBundle\Entity\Email|\Mautic\CoreBundle\Entity\VariantEntityInterface
+     *   page?: Page,
+     *   email?: Email|VariantEntityInterface
      * } $parameters
      */
     public function __construct(
@@ -33,10 +36,10 @@ final class DetermineWinnerEvent extends Event
 
     /**
      * @return array{
-     *                parent?: \Mautic\CoreBundle\Entity\VariantEntityInterface|mixed,
+     *                parent?: VariantEntityInterface|mixed,
      *                children?: array<mixed>,
-     *                page?: \Mautic\PageBundle\Entity\Page,
-     *                email?: \Mautic\EmailBundle\Entity\Email|\Mautic\CoreBundle\Entity\VariantEntityInterface
+     *                page?: Page,
+     *                email?: Email|VariantEntityInterface
      *                }
      */
     public function getParameters(): array

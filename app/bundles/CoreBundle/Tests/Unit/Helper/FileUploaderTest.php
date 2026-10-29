@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\FilePathResolver;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[CoversClass(FileUploader::class)]
-final class FileUploaderTest extends \PHPUnit\Framework\TestCase
+final class FileUploaderTest extends TestCase
 {
     #[TestDox('Uploader uploads files correctly')]
     public function testSuccessfulUpload(): void

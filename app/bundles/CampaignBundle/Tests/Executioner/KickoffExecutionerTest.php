@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\Stub;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,23 +30,23 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
+final class KickoffExecutionerTest extends TestCase
 {
     private MockObject&KickoffContactFinder $kickoffContactFinder;
 
-    private \PHPUnit\Framework\MockObject\Stub&Translator $translator;
+    private Stub&Translator $translator;
 
     private MockObject&EventExecutioner $executioner;
 
     private MockObject&EventScheduler $scheduler;
 
-    private \PHPUnit\Framework\MockObject\Stub&CoreParametersHelper $coreParametersHelper;
+    private Stub&CoreParametersHelper $coreParametersHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&EventRedirectionHelper $redirectionHelper;
+    private Stub&EventRedirectionHelper $redirectionHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface $entityManager;
+    private Stub&EntityManagerInterface $entityManager;
 
-    private \PHPUnit\Framework\MockObject\Stub&EventDispatcherInterface $eventDispatcher;
+    private Stub&EventDispatcherInterface $eventDispatcher;
 
     protected function setUp(): void
     {

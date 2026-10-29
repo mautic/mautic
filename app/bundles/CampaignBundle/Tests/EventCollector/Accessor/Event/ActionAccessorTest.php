@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\EventCollector\Accessor\Event;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 
-final class ActionAccessorTest extends \PHPUnit\Framework\TestCase
+final class ActionAccessorTest extends TestCase
 {
     public function testBatchEventNameIsNotExtra(): void
     {

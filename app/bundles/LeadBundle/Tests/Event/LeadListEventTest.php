@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\ListPostSaveEvent;
 
-final class LeadListEventTest extends \PHPUnit\Framework\TestCase
+final class LeadListEventTest extends TestCase
 {
     public function testConstructGettersSetters(): void
     {

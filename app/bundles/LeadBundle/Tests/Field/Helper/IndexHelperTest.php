@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
@@ -12,7 +13,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Field\Helper\IndexHelper;
 
-final class IndexHelperTest extends \PHPUnit\Framework\TestCase
+final class IndexHelperTest extends TestCase
 {
     public const string COLUMN_NAME_KEY = 'Column_name';
 

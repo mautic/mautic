@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Gaufrette\Filesystem;
 use Mautic\AssetBundle\Event\RemoteAssetBrowseEvent;
 use Mautic\AssetBundle\Model\AssetModel;
@@ -49,7 +50,7 @@ final class AjaxController extends CommonAjaxController
             return $this->sendJsonResponse(['success' => 0]);
         }
 
-        /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integration */
+        /** @var AbstractIntegration $integration */
         $integration = $integrationHelper->getIntegrationObject($provider);
 
         $event = new RemoteAssetBrowseEvent($integration);

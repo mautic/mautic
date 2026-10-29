@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
@@ -14,7 +15,7 @@ use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Tests\Fixtures;
 
-final class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
+final class ReportFileWriterTest extends TestCase
 {
     public function testWriteReportData(): void
     {

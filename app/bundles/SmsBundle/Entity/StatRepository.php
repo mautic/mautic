@@ -2,6 +2,8 @@
 
 namespace Mautic\SmsBundle\Entity;
 
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -15,8 +17,8 @@ final class StatRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getSmsStatus(string $trackingHash): ?Stat
     {
@@ -99,8 +101,8 @@ final class StatRepository extends CommonRepository
      * @param int                  $leadId
      * @param array<string, mixed> $options
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getLeadStats($leadId, array $options = []): array
     {

@@ -2,6 +2,8 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Doctrine\ORM\Exception\ORMException;
+use Symfony\Component\Form\FormBuilder;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Form\Type\RoleListType;
@@ -29,7 +31,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
      *
      * @return bool|\Doctrine\Common\Proxy\Proxy|object|null
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     public function getUserRole()
     {
@@ -122,7 +124,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     }
 
     /**
-     * @param Form|\Symfony\Component\Form\FormBuilder $builder
+     * @param Form|FormBuilder $builder
      * @param string                                   $formArea
      */
     public function appendToForm($builder, array $data, $formArea): void

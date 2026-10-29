@@ -4,21 +4,23 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\SegmentActionModel;
 use PHPUnit\Framework\Exception;
 
-final class SegmentActionModelTest extends \PHPUnit\Framework\TestCase
+final class SegmentActionModelTest extends TestCase
 {
     private Lead $contactMock5;
 
     private Lead $contactMock6;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadModel
+     * @var MockObject&LeadModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactModelMock;
+    private MockObject $contactModelMock;
 
     private SegmentActionModel $actionModel;
 

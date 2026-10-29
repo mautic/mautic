@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use Mautic\NotificationBundle\EventListener\CampaignSubscriber;
+use Mautic\NotificationBundle\Api\OneSignalApi;
+use Mautic\NotificationBundle\Integration\OneSignalIntegration;
+use Mautic\NotificationBundle\Security\Permissions\NotificationPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
@@ -20,11 +24,11 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\NotificationBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->set(Mautic\NotificationBundle\EventListener\CampaignSubscriber::class)
-        ->arg('$notificationApi', service(Mautic\NotificationBundle\Api\OneSignalApi::class));
+    $services->set(CampaignSubscriber::class)
+        ->arg('$notificationApi', service(OneSignalApi::class));
 
     // resolved dynamically by Mautic\PluginBundle\Helper\IntegrationHelper via "mautic.integration.{name}" service id
-    $services->alias('mautic.integration.onesignal', Mautic\NotificationBundle\Integration\OneSignalIntegration::class);
+    $services->alias('mautic.integration.onesignal', OneSignalIntegration::class);
 
-    $services->set(Mautic\NotificationBundle\Security\Permissions\NotificationPermissions::class);
+    $services->set(NotificationPermissions::class);
 };

@@ -2,6 +2,7 @@
 
 namespace Mautic\NotificationBundle\Model;
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -94,7 +95,7 @@ final class NotificationModel extends FormModel implements AjaxLookupModelInterf
      * @param string|null       $action
      * @param array             $options
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface

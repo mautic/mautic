@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
@@ -18,9 +19,9 @@ use PHPUnit\Framework\TestCase;
 final class SegmentLogReportSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&FieldsBuilder
+     * @var MockObject&FieldsBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldsBuilder;
+    private MockObject $fieldsBuilder;
 
     private SegmentLogReportSubscriber $subscriber;
 

@@ -2,6 +2,8 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
@@ -102,7 +104,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Deletes a group of entities.
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     protected function batchDeleteStandard(Request $request)
     {
@@ -238,7 +240,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Clone an entity.
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|JsonResponse|RedirectResponse
      */
     protected function cloneStandard(Request $request, $objectId)
     {
@@ -269,7 +271,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     protected function deleteStandard(Request $request, $objectId)
     {
@@ -329,7 +331,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      *
      * @throws \Exception
      */
@@ -561,7 +563,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Get items for index list.
      *
-     * @return array<int, iterable<object>|\Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator<mixed>|int>
+     * @return array<int, iterable<object>|SimplePaginator<mixed>|int>
      */
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
@@ -911,7 +913,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|RedirectResponse|Response
      *
      * @throws \Exception
      */
@@ -1049,7 +1051,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * @param string|null $listPage
      * @param string      $itemName
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|RedirectResponse|Response
      */
     protected function viewStandard(Request $request, $objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item')
     {

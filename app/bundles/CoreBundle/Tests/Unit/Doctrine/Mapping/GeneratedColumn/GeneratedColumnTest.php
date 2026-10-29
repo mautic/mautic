@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Mapping\GeneratedColumn;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 
-final class GeneratedColumnTest extends \PHPUnit\Framework\TestCase
+final class GeneratedColumnTest extends TestCase
 {
     public function testAllGettersAndSeters(): void
     {

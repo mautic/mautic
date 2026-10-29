@@ -10,7 +10,6 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\ListLead;
-use PHPUnit\Framework\Assert;
 
 /**
  * @see https://github.com/mautic/mautic/issues/16026

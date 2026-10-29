@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ReportBuilder;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\IntegrationsBundle\Event\InternalCompanyEvent;
 use Mautic\IntegrationsBundle\Event\InternalCompanyFullReportBuildEvent;
 use Mautic\IntegrationsBundle\Event\InternalContactEvent;
@@ -35,19 +36,19 @@ final class FullObjectReportBuilderTest extends TestCase
     private const string TEST_EMAIL = 'test@test.com';
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ObjectProvider
+     * @var MockObject&ObjectProvider
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
+    private MockObject $objectProvider;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&FieldBuilder
+     * @var MockObject&FieldBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldBuilder;
+    private MockObject $fieldBuilder;
 
     private FullObjectReportBuilder $reportBuilder;
 

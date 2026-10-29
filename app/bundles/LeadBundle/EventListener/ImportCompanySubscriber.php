@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\UserBundle\Entity\User;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Event\ImportInitEvent;
@@ -125,7 +126,7 @@ final readonly class ImportCompanySubscriber implements EventSubscriberInterface
      */
     private function handleValidateOwner(array &$matchedFields): ?int
     {
-        /** @var \Mautic\UserBundle\Entity\User|null $owner */
+        /** @var User|null $owner */
         $owner = ArrayHelper::pickValue('owner', $matchedFields);
 
         return $owner?->getId();

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
+use PHPUnit\Framework\MockObject\Stub;
+use Symfony\Component\Mime\Header\AbstractHeader;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -69,17 +71,17 @@ final class MailHelperTest extends TestCase
 
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private Mailbox&\PHPUnit\Framework\MockObject\Stub $mailbox;
+    private Mailbox&Stub $mailbox;
 
     private LeadRepository&MockObject $contactRepository;
 
-    private LoggerInterface&\PHPUnit\Framework\MockObject\Stub $logger;
+    private LoggerInterface&Stub $logger;
 
     private RouterInterface&MockObject $router;
 
-    private Environment&\PHPUnit\Framework\MockObject\Stub $twig;
+    private Environment&Stub $twig;
 
-    private ThemeHelper&\PHPUnit\Framework\MockObject\Stub $themeHelper;
+    private ThemeHelper&Stub $themeHelper;
 
     private EventDispatcherInterface&MockObject $dispatcher;
 
@@ -87,19 +89,19 @@ final class MailHelperTest extends TestCase
 
     private MailHashHelper $mailHashHelper;
 
-    private RequestStack&\PHPUnit\Framework\MockObject\Stub $requestStack;
+    private RequestStack&Stub $requestStack;
 
     private EntityManagerInterface&MockObject $entityManager;
 
     private SMimeHelper&MockObject $sMimeHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&AssetModel $assetModel;
+    private Stub&AssetModel $assetModel;
 
-    private \PHPUnit\Framework\MockObject\Stub&TrackableModel $trackableModel;
+    private Stub&TrackableModel $trackableModel;
 
-    private \PHPUnit\Framework\MockObject\Stub&RedirectModel $redirectModel;
+    private Stub&RedirectModel $redirectModel;
 
-    private \PHPUnit\Framework\MockObject\Stub&EmailStatModel $emailStatModel;
+    private Stub&EmailStatModel $emailStatModel;
 
     /**
      * @var array<array<string,string|int>>
@@ -704,7 +706,7 @@ final class MailHelperTest extends TestCase
 
         $customHeadersFounds = [];
 
-        /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
+        /** @var array<AbstractHeader> $headers */
         $headers = $mailer->message->getHeaders()->all();
         foreach ($headers as $header) {
             if (str_contains($header->getName(), 'X-Mautic-Test')) {
@@ -768,7 +770,7 @@ final class MailHelperTest extends TestCase
 
         $customHeadersFounds = [];
 
-        /** @var array<\Symfony\Component\Mime\Header\AbstractHeader> $headers */
+        /** @var array<AbstractHeader> $headers */
         $headers = $mailer->message->getHeaders()->all();
 
         foreach ($headers as $header) {

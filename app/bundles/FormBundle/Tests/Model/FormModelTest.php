@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Model;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
@@ -38,7 +39,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FormModelTest extends \PHPUnit\Framework\TestCase
+final class FormModelTest extends TestCase
 {
     /**
      * @var MockObject&FormRepository

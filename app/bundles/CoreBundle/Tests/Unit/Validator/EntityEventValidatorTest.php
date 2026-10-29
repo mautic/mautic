@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Validator;
 
+use PHPUnit\Framework\MockObject\Stub;
 use Mautic\CoreBundle\Event\EntityValidateEvent;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\CoreBundle\Validator\EntityEventValidator;
@@ -20,9 +21,9 @@ final class EntityEventValidatorTest extends TestCase
     private EventDispatcherInterface $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&ExecutionContextInterface
+     * @var Stub&ExecutionContextInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $context;
+    private Stub $context;
 
     private ConstraintValidatorInterface $validator;
 

@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
+use MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -34,7 +35,7 @@ final class IcontactType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\IcontactIntegration $object */
+        /** @var IcontactIntegration $object */
         $object          = $this->integrationHelper->getIntegrationObject('Icontact');
         $integrationName = $object->getName();
         $session         = $this->requestStack->getSession();

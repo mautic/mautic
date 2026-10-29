@@ -2,6 +2,17 @@
 
 declare(strict_types=1);
 
+use Mautic\LeadBundle\Controller\Api\LeadApiController;
+use Mautic\LeadBundle\Controller\Api\ListApiController;
+use Mautic\LeadBundle\Controller\Api\CompanyApiController;
+use Mautic\LeadBundle\Controller\Api\FieldApiController;
+use Mautic\LeadBundle\Controller\Api\NoteApiController;
+use Mautic\LeadBundle\Controller\Api\DeviceApiController;
+use Mautic\LeadBundle\Controller\Api\TagApiController;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
+
 return [
     'routes' => [
         'api' => [
@@ -9,25 +20,25 @@ return [
                 'standard_entity' => true,
                 'name'            => 'contacts',
                 'path'            => '/contacts',
-                'controller'      => Mautic\LeadBundle\Controller\Api\LeadApiController::class,
+                'controller'      => LeadApiController::class,
             ],
             'mautic_api_segmentsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'lists',
                 'path'            => '/segments',
-                'controller'      => Mautic\LeadBundle\Controller\Api\ListApiController::class,
+                'controller'      => ListApiController::class,
             ],
             'mautic_api_companiesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'companies',
                 'path'            => '/companies',
-                'controller'      => Mautic\LeadBundle\Controller\Api\CompanyApiController::class,
+                'controller'      => CompanyApiController::class,
             ],
             'mautic_api_fieldsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'fields',
                 'path'            => '/fields/{object}',
-                'controller'      => Mautic\LeadBundle\Controller\Api\FieldApiController::class,
+                'controller'      => FieldApiController::class,
                 'defaults'        => [
                     'object' => 'contact',
                 ],
@@ -36,19 +47,19 @@ return [
                 'standard_entity' => true,
                 'name'            => 'notes',
                 'path'            => '/notes',
-                'controller'      => Mautic\LeadBundle\Controller\Api\NoteApiController::class,
+                'controller'      => NoteApiController::class,
             ],
             'mautic_api_devicesstandard' => [
                 'standard_entity' => true,
                 'name'            => 'devices',
                 'path'            => '/devices',
-                'controller'      => Mautic\LeadBundle\Controller\Api\DeviceApiController::class,
+                'controller'      => DeviceApiController::class,
             ],
             'mautic_api_tagsstandard' => [
                 'standard_entity' => true,
                 'name'            => 'tags',
                 'path'            => '/tags',
-                'controller'      => Mautic\LeadBundle\Controller\Api\TagApiController::class,
+                'controller'      => TagApiController::class,
             ],
         ],
     ],
@@ -90,7 +101,7 @@ return [
     ],
     'categories' => [
         'segment' => [
-            'class' => Mautic\LeadBundle\Entity\LeadList::class,
+            'class' => LeadList::class,
         ],
     ],
     'parameters' => [
@@ -116,9 +127,9 @@ return [
             '4' => 'leadcount',
             '5' => 'id',
         ],
-        Mautic\LeadBundle\Field\Settings\BackgroundSettings::CREATE_CUSTOM_FIELD_IN_BACKGROUND  => false,
-        'company_unique_identifiers_operator'                                                   => Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
-        'contact_unique_identifiers_operator'                                                   => Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
+        BackgroundSettings::CREATE_CUSTOM_FIELD_IN_BACKGROUND  => false,
+        'company_unique_identifiers_operator'                                                   => CompositeExpression::TYPE_OR,
+        'contact_unique_identifiers_operator'                                                   => CompositeExpression::TYPE_OR,
         'segment_rebuild_time_warning'                                                          => 30,
         'segment_build_time_warning'                                                            => 30,
         'contact_export_in_background'                                                          => true,

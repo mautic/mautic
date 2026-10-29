@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\GrapesJsBuilderBundle\Controller;
 
+use Mautic\CoreBundle\Helper\Serializer;
+use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
@@ -58,7 +61,7 @@ class GrapesJsController extends CommonController
         });
 
         try {
-            $unserialized = \Mautic\CoreBundle\Helper\Serializer::decode($content);
+            $unserialized = Serializer::decode($content);
         } catch (\Throwable) {
             return [];
         } finally {
@@ -111,7 +114,7 @@ class GrapesJsController extends CommonController
             throw new ConflictHttpException('Object not authorized to load custom builder');
         }
 
-        /** @var \Mautic\EmailBundle\Model\EmailModel|\Mautic\PageBundle\Model\PageModel $model */
+        /** @var EmailModel|PageModel $model */
         $model      = $this->getModel($objectType);
         $aclToCheck = $this->getAclPrefix($objectType);
 

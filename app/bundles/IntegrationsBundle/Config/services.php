@@ -2,6 +2,14 @@
 
 declare(strict_types=1);
 
+use Mautic\IntegrationsBundle\Sync\SyncService\SyncService;
+use Mautic\IntegrationsBundle\EventListener\ControllerSubscriber;
+use Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory;
+use Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistenceFactory;
+use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
+use Mautic\IntegrationsBundle\Sync\Notification\Handler\CompanyNotificationHandler;
+use Mautic\IntegrationsBundle\Sync\Notification\Handler\ContactNotificationHandler;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -23,20 +31,20 @@ return function (ContainerConfigurator $configurator): void {
         'Integration/IntegrationObject.php',
     ];
 
-    $services->set(Mautic\IntegrationsBundle\Sync\SyncService\SyncService::class)
-        ->call('initiateDebugLogger', [\Symfony\Component\DependencyInjection\Loader\Configurator\service('mautic.sync.logger')]);
+    $services->set(SyncService::class)
+        ->call('initiateDebugLogger', [service('mautic.sync.logger')]);
 
     $services->load('Mautic\\IntegrationsBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\IntegrationsBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->set(Mautic\IntegrationsBundle\EventListener\ControllerSubscriber::class)
-        ->arg('$resolver', \Symfony\Component\DependencyInjection\Loader\Configurator\service('controller_resolver'));
+    $services->set(ControllerSubscriber::class)
+        ->arg('$resolver', service('controller_resolver'));
 
-    $services->set('mautic.integrations.auth_provider.oauth2threelegged', Mautic\IntegrationsBundle\Auth\Provider\Oauth2ThreeLegged\HttpFactory::class);
-    $services->set(Mautic\IntegrationsBundle\Auth\Support\Oauth2\Token\TokenPersistenceFactory::class);
-    $services->set('mautic.sync.logger', Mautic\IntegrationsBundle\Sync\Logger\DebugLogger::class);
-    $services->set(Mautic\IntegrationsBundle\Sync\Notification\Handler\CompanyNotificationHandler::class)->tag('mautic.sync.notification_handler');
-    $services->set(Mautic\IntegrationsBundle\Sync\Notification\Handler\ContactNotificationHandler::class)->tag('mautic.sync.notification_handler');
+    $services->set('mautic.integrations.auth_provider.oauth2threelegged', HttpFactory::class);
+    $services->set(TokenPersistenceFactory::class);
+    $services->set('mautic.sync.logger', DebugLogger::class);
+    $services->set(CompanyNotificationHandler::class)->tag('mautic.sync.notification_handler');
+    $services->set(ContactNotificationHandler::class)->tag('mautic.sync.notification_handler');
 };

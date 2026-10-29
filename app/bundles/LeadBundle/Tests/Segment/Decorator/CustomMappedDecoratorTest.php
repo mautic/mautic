@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment\Decorator;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterOperator;
 use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
@@ -12,7 +13,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[CoversClass(CustomMappedDecorator::class)]
-final class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
+final class CustomMappedDecoratorTest extends TestCase
 {
     public function testGetField(): void
     {

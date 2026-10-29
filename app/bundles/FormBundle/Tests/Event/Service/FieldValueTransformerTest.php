@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Event\Service;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 
-final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
+final class FieldValueTransformerTest extends TestCase
 {
     public function testTransformValuesAfterSubmitWithNoFieldsNoMatchesAndNoTokens(): void
     {

@@ -2,6 +2,8 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -111,7 +113,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * @param Report|array<string, mixed> $entity
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
@@ -901,7 +903,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @return \Doctrine\DBAL\Connection
+     * @return Connection
      */
     private function getConnection()
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Field;
 
+use PHPUnit\Framework\TestCase;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -22,7 +23,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CustomFieldColumnTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldColumnTest extends TestCase
 {
     /**
      * @var MockObject&ColumnSchemaHelper

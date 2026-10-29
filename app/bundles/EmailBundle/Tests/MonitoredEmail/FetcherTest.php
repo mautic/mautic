@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\MonitoredEmail;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Event\PreFetchEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Fetcher;
@@ -16,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[CoversClass(Fetcher::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class FetcherTest extends \PHPUnit\Framework\TestCase
+final class FetcherTest extends TestCase
 {
     /**
      * @var array<string, array<string, int|string>>

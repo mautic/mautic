@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Auth\Provider\ApiKey;
 
+use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Handler\CurlHandler;
@@ -98,7 +99,7 @@ final class HttpFactory implements AuthProviderInterface
 
         $handler->unshift(
             Middleware::mapRequest(
-                fn (Request $request): \Psr\Http\Message\RequestInterface => $request->withUri(
+                fn (Request $request): RequestInterface => $request->withUri(
                     Uri::withQueryValue($request->getUri(), $this->credentials->getKeyName(), $this->credentials->getApiKey())
                 )
             )

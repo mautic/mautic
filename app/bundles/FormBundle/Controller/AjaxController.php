@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\Controller;
 
+use Mautic\FormBundle\Entity\Form;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
@@ -87,7 +88,7 @@ final class AjaxController extends CommonAjaxController
         $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
         $entity     = $this->formModel->getEntity($formId);
-        $formFields = $entity instanceof \Mautic\FormBundle\Entity\Form ? $entity->getFields() : [];
+        $formFields = $entity instanceof Form ? $entity->getFields() : [];
         $fields     = [];
 
         foreach ($formFields as $field) {

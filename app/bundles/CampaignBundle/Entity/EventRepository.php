@@ -2,9 +2,11 @@
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\EmailBundle\Entity\Email;
@@ -19,7 +21,7 @@ class EventRepository extends CommonRepository
      *
      * @param mixed[] $args
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator<object>|object[]|mixed[]
+     * @return Paginator<object>|object[]|mixed[]
      */
     public function getEntities(array $args = []): iterable
     {
@@ -146,7 +148,7 @@ class EventRepository extends CommonRepository
             ->innerJoin(
                 Email::class,
                 'em',
-                Expr\Join::WITH,
+                Join::WITH,
                 $qb->expr()->eq('em.id', 'e.channelId')
             )
             ->where(
@@ -409,7 +411,7 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $queryBuilder,
@@ -425,7 +427,7 @@ class EventRepository extends CommonRepository
      *
      * For the API
      */
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
     }

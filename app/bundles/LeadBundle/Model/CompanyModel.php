@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
@@ -264,7 +265,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      * @param array|int|Company $companies
      * @param array|Lead    $lead
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     public function addLeadToCompany($companies, $lead): bool
     {
@@ -385,7 +386,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     public function removeLeadFromCompany($companies, $lead): void
     {

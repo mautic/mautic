@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Mautic\ConfigBundle\Form\Type\EscapeTransformer;
+use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -19,7 +21,7 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('Mautic\\ConfigBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->get(Mautic\ConfigBundle\Form\Type\EscapeTransformer::class)->arg('$allowedParameters', '%mautic.config_allowed_parameters%');
-    $services->get(Mautic\ConfigBundle\Form\Helper\RestrictionHelper::class)->arg('$restrictedFields', '%mautic.security.restrictedConfigFields%');
-    $services->get(Mautic\ConfigBundle\Form\Helper\RestrictionHelper::class)->arg('$displayMode', '%mautic.security.restrictedConfigFields.displayMode%');
+    $services->get(EscapeTransformer::class)->arg('$allowedParameters', '%mautic.config_allowed_parameters%');
+    $services->get(RestrictionHelper::class)->arg('$restrictedFields', '%mautic.security.restrictedConfigFields%');
+    $services->get(RestrictionHelper::class)->arg('$displayMode', '%mautic.security.restrictedConfigFields.displayMode%');
 };

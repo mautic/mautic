@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Controller;
 
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Helper\MapHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -47,7 +49,7 @@ final class EmailMapStatsController extends AbstractController
         // get translation parent
         $translationParent = $entity->getTranslationParent();
 
-        $includeVariants = (($entity->isVariant() && !$parent instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface) || ($entity->isTranslation() && !$translationParent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface));
+        $includeVariants = (($entity->isVariant() && !$parent instanceof VariantEntityInterface) || ($entity->isTranslation() && !$translationParent instanceof TranslationEntityInterface));
 
         return $this->model->getCountryStats(
             $entity,

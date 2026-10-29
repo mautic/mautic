@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Collection;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Exception\FieldNotFoundException;
 
-final class FieldCollectionTest extends \PHPUnit\Framework\TestCase
+final class FieldCollectionTest extends TestCase
 {
     public function testToChoicesWithObjects(): void
     {

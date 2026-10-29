@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Event;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\FormInterface;
 
-final class FormAdjustmentEventTest extends \PHPUnit\Framework\TestCase
+final class FormAdjustmentEventTest extends TestCase
 {
     public function testConstructGettersSetters(): void
     {

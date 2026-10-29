@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use PHPUnit\Framework\TestCase;
 use Mautic\CoreBundle\Helper\ColorHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[CoversClass(ColorHelper::class)]
-final class ColorHelperTest extends \PHPUnit\Framework\TestCase
+final class ColorHelperTest extends TestCase
 {
     #[TestDox('The helper is instantiated correctly')]
     public function testTheHelperIsInstantiatedWithoutAttributeCorrectly(): void

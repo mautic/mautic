@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -38,7 +39,7 @@ final class EmailGraphStatsController extends AbstractController
         $dateFrom = null,
         $dateTo = null,
     ): Response {
-        /** @var \Mautic\EmailBundle\Entity\Email $email */
+        /** @var Email $email */
         $email = $model->getEntity($objectId);
 
         // Init the date range filter form

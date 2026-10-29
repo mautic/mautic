@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Security\Authenticator;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\TimingSafeFormLoginAuthenticator;
 use PHPUnit\Framework\TestCase;
@@ -35,18 +36,18 @@ final class TimingSafeFormLoginAuthenticatorTest extends TestCase
         $user    = new User();
         $user->setUsername('testuser');
 
-        /** @var UserProviderInterface|\PHPUnit\Framework\MockObject\MockObject $userProvider */
+        /** @var UserProviderInterface|MockObject $userProvider */
         $userProvider = $this->createMock(UserProviderInterface::class);
         $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with('testuser')
             ->willReturn($user);
-        /** @var PasswordHasherFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $passwordHasherFactory */
+        /** @var PasswordHasherFactoryInterface|MockObject $passwordHasherFactory */
         $passwordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
         $passwordHasherFactory->expects($this->never())
             ->method('getPasswordHasher');
 
-        /** @var FormLoginAuthenticator|\PHPUnit\Framework\MockObject\MockObject $formLoginAuthenticator */
+        /** @var FormLoginAuthenticator|MockObject $formLoginAuthenticator */
         $formLoginAuthenticator = $this->createStub(FormLoginAuthenticator::class);
 
         $authenticator = new TimingSafeFormLoginAuthenticator(
@@ -77,26 +78,26 @@ final class TimingSafeFormLoginAuthenticatorTest extends TestCase
         $request = new Request([], ['username' => 'testuser', 'password' => 'password']);
         $request->setSession(new Session(new MockArraySessionStorage()));
 
-        /** @var UserProviderInterface|\PHPUnit\Framework\MockObject\MockObject $userProvider */
+        /** @var UserProviderInterface|MockObject $userProvider */
         $userProvider = $this->createMock(UserProviderInterface::class);
         $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with('testuser')
             ->willThrowException(new UserNotFoundException());
 
-        /** @var PasswordHasherInterface|\PHPUnit\Framework\MockObject\MockObject $passwordHasher */
+        /** @var PasswordHasherInterface|MockObject $passwordHasher */
         $passwordHasher = $this->createMock(PasswordHasherInterface::class);
         $passwordHasher->expects($this->once())
             ->method('verify')
             ->with('$2y$13$aAwXNyqA87lcXQQuk8Cp6eo2amRywLct29oG2uWZ8lYBeamFZ8UhK', 'password');
 
-        /** @var PasswordHasherFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $passwordHasherFactory */
+        /** @var PasswordHasherFactoryInterface|MockObject $passwordHasherFactory */
         $passwordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
         $passwordHasherFactory->expects($this->once())
             ->method('getPasswordHasher')
             ->willReturn($passwordHasher);
 
-        /** @var FormLoginAuthenticator|\PHPUnit\Framework\MockObject\MockObject $formLoginAuthenticator */
+        /** @var FormLoginAuthenticator|MockObject $formLoginAuthenticator */
         $formLoginAuthenticator = $this->createStub(FormLoginAuthenticator::class);
 
         $authenticator = new TimingSafeFormLoginAuthenticator(

@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Form\Type;
 
+use MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Form\Type\FieldsType;
@@ -36,7 +37,7 @@ final class MailchimpType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration $mailchimp */
+        /** @var MailchimpIntegration $mailchimp */
         $mailchimp = $this->integrationHelper->getIntegrationObject('Mailchimp');
 
         $api = $mailchimp->getApiHelper();
