@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event\NotifyOfUnpublishEvent;
 use Mautic\CampaignBundle\EventListener\NotifyOfUnpublishSubscriber;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
-use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -41,17 +40,4 @@ final class NotifyOfUnpublishSubscriberTest extends TestCase
 
         $this->subscriber->notifyOfUnpublish($notifyEvent);
     }
-<<<<<<< HEAD
-=======
-
-    public function testGetSubscribedEvents(): void
-    {
-        $expected = [
-            [NotifyOfUnpublishEvent::class, 'notifyOfUnpublish', 0],
-        ];
-        sort($expected);
-
-        $this->assertSame($expected, ReflectionHelper::getAttributeListeners(NotifyOfUnpublishSubscriber::class));
-    }
->>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
 }

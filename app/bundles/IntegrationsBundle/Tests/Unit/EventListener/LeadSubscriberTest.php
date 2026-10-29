@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
-use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\InternalCompanyFieldChangesEvent;
@@ -80,23 +79,6 @@ final class LeadSubscriberTest extends TestCase
         );
     }
 
-<<<<<<< HEAD
-=======
-    public function testGetSubscribedEvents(): void
-    {
-        $expected = [
-            [LeadPostSaveEvent::class, 'onLeadPostSave', 0],
-            [LeadPostDeleteEvent::class, 'onLeadPostDelete', 255],
-            [CompanyPostSaveEvent::class, 'onCompanyPostSave', 0],
-            [CompanyPostDeleteEvent::class, 'onCompanyPostDelete', 255],
-            [LeadChangeCompanyEvent::class, 'onLeadCompanyChange', 128],
-        ];
-        sort($expected);
-
-        $this->assertSame($expected, ReflectionHelper::getAttributeListeners(LeadSubscriber::class));
-    }
-
->>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testOnLeadPostSaveAnonymousLead(): void
     {
         $lead = new Lead();

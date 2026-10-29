@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PageBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
@@ -19,20 +18,6 @@ use PHPUnit\Framework\TestCase;
 
 final class PointSubscriberTest extends TestCase
 {
-<<<<<<< HEAD
-=======
-    public function testSubscribedEvents(): void
-    {
-        $expected = [
-            [PointBuilderEvent::class, 'onPointBuild', 0],
-            [PageHitEvent::class, 'onPageHit', 0],
-        ];
-        sort($expected);
-
-        $this->assertSame($expected, ReflectionHelper::getAttributeListeners(PointSubscriber::class));
-    }
-
->>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testPointBuildAddsActions(): void
     {
         $pointModel        = $this->createStub(PointModel::class);

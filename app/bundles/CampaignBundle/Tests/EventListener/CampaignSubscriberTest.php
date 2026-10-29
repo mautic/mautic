@@ -11,7 +11,6 @@ use Mautic\CampaignBundle\EventListener\CampaignSubscriber;
 use Mautic\CampaignBundle\Service\CampaignAuditService;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -51,20 +50,6 @@ final class CampaignSubscriberTest extends TestCase
         );
     }
 
-<<<<<<< HEAD
-=======
-    public function testGetSubscribedEvents(): void
-    {
-        $expected = [
-            [CampaignPostSaveEvent::class, 'onCampaignPostSave', 0],
-            [CampaignPostDeleteEvent::class, 'onCampaignDelete', 0],
-        ];
-        sort($expected);
-
-        $this->assertSame($expected, ReflectionHelper::getAttributeListeners(CampaignSubscriber::class));
-    }
-
->>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testOnCampaignPostSaveNothingHappened(): void
     {
         $campaign            = new Campaign();

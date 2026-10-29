@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Segment;
 use DateTime;
 use Exception;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -26,7 +27,7 @@ final readonly class ContactSegmentService
      *
      * @return array<int,mixed[]>
      *
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
     public function getNewLeadListLeadsCount(LeadList $segment, array $batchLimiters): array
@@ -100,7 +101,7 @@ final readonly class ContactSegmentService
      * @return array<int,mixed[]>
      *
      * @throws \Doctrine\DBAL\Exception
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      */
     public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, int $limit = 1000): array
     {
@@ -115,7 +116,7 @@ final readonly class ContactSegmentService
     /**
      * @param array<string, mixed> $batchLimiters
      *
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
     public function hasNewLeadListLeads(LeadList $segment, array $batchLimiters): bool
@@ -129,7 +130,7 @@ final readonly class ContactSegmentService
     /**
      * @param array<string, mixed> $batchLimiters
      *
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
     public function hasOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = []): bool
@@ -188,7 +189,7 @@ final readonly class ContactSegmentService
     }
 
     /**
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
     public function getOrphanedLeadListLeadsCount(LeadList $segment, array $batchLimiters = []): array
@@ -204,7 +205,7 @@ final readonly class ContactSegmentService
     }
 
     /**
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
     public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], ?int $limit = null): array
@@ -221,7 +222,7 @@ final readonly class ContactSegmentService
     /**
      * @param array<string, mixed> $batchLimiters
      *
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws Exception
      */
     private function getNewSegmentContactsQuery(LeadList $segment, array $batchLimiters = [], bool $addNewContactsRestrictions = true): QueryBuilder
@@ -241,7 +242,7 @@ final readonly class ContactSegmentService
     }
 
     /**
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws Exception
      */
     private function getTotalSegmentContactsQuery(LeadList $segment): QueryBuilder

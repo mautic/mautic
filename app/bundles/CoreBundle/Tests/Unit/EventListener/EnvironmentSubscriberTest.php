@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\EventListener\EnvironmentSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -30,20 +29,6 @@ final class EnvironmentSubscriberTest extends TestCase
         $this->environmentSubscriber    = new EnvironmentSubscriber($this->coreParametersHelperMock);
     }
 
-<<<<<<< HEAD
-=======
-    public function testGetSubscribedEvents(): void
-    {
-        $expected = [
-            [KernelEvents::REQUEST, 'onKernelRequestSetTimezone', 128],
-            [KernelEvents::REQUEST, 'onKernelRequestSetLocale', 101],
-        ];
-        sort($expected);
-
-        $this->assertSame($expected, ReflectionHelper::getAttributeListeners(EnvironmentSubscriber::class));
-    }
-
->>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testSetLocaleThatDoesNotHavePreviousSession(): void
     {
         $requestEventMock = $this->createMock(RequestEvent::class);

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\EventListener\RouterSubscriber;
-use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
@@ -44,9 +43,5 @@ final class RouterSubscriberTest extends TestCase
 
         $this->assertSame('https', $context->getScheme());
         $this->assertSame('mautic.example.com', $context->getHost());
-<<<<<<< HEAD
-=======
-        $this->assertContains([KernelEvents::FINISH_REQUEST, 'setRouterRequestContext', -1], ReflectionHelper::getAttributeListeners(RouterSubscriber::class));
->>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     }
 }

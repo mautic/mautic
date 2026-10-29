@@ -6,7 +6,6 @@ namespace Mautic\WebhookBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\EventListener\WebhookSubscriber;

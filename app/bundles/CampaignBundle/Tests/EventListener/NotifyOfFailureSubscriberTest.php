@@ -8,7 +8,6 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event\NotifyOfFailureEvent;
 use Mautic\CampaignBundle\EventListener\NotifyOfFailureSubscriber;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
-use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -44,17 +43,4 @@ final class NotifyOfFailureSubscriberTest extends TestCase
 
         $this->subscriber->notifyOfFailure($notifyEvent);
     }
-<<<<<<< HEAD
-=======
-
-    public function testGetSubscribedEvents(): void
-    {
-        $expected = [
-            [NotifyOfFailureEvent::class, 'notifyOfFailure', 0],
-        ];
-        sort($expected);
-
-        $this->assertSame($expected, ReflectionHelper::getAttributeListeners(NotifyOfFailureSubscriber::class));
-    }
->>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
 }

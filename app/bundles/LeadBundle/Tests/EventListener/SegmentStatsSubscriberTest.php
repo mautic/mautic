@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -30,18 +29,6 @@ final class SegmentStatsSubscriberTest extends MauticMysqlTestCase
         );
     }
 
-<<<<<<< HEAD
-=======
-    /**
-     * Test SubscribedEvents.
-     */
-    public function testGetSubscribedEvents(): void
-    {
-        $listeners = ReflectionHelper::getAttributeListeners(SegmentStatsSubscriber::class);
-        $this->assertContains(GetStatDataEvent::class, array_column($listeners, 0));
-    }
-
->>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testGetCampaignEntryPoints(): void
     {
         $campaign = $this->createCampaignWithLeadList();

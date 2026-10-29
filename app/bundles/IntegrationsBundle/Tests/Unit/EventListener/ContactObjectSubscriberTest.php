@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
-use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
@@ -54,27 +53,6 @@ final class ContactObjectSubscriberTest extends TestCase
         );
     }
 
-<<<<<<< HEAD
-=======
-    public function testGetSubscribedEvents(): void
-    {
-        $expected = [
-            [InternalObjectEvent::class, 'collectInternalObjects', 0],
-            [InternalObjectUpdateEvent::class, 'updateContacts', 0],
-            [InternalObjectCreateEvent::class, 'createContacts', 0],
-            [InternalObjectFindEvent::class, 'findContactsByIds', 0],
-            [InternalObjectFindEvent::class, 'findContactsByDateRange', 0],
-            [InternalObjectFindEvent::class, 'findContactsByFieldValues', 0],
-            [InternalObjectOwnerEvent::class, 'findOwnerIdsForContacts', 0],
-            [InternalObjectRouteEvent::class, 'buildContactRoute', 0],
-            [InternalObjectFindByIdEvent::class, 'findContactById', 0],
-        ];
-        sort($expected);
-
-        $this->assertSame($expected, ReflectionHelper::getAttributeListeners(ContactObjectSubscriber::class));
-    }
-
->>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testCollectInternalObjects(): void
     {
         $event = new InternalObjectEvent();

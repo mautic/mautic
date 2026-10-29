@@ -48,19 +48,6 @@ final class MauticWriteSubscriberTest extends TestCase
         );
     }
 
-<<<<<<< HEAD
-=======
-    public function testGetSubscribedEvents(): void
-    {
-        $expected = [
-            ['kernel.view', 'addData', EventPriorities::PRE_WRITE],
-        ];
-        sort($expected);
-
-        $this->assertSame($expected, ReflectionHelper::getAttributeListeners(MauticWriteSubscriber::class));
-    }
-
->>>>>>> 75f52d21d9 (Keep form subscribers on EventSubscriberInterface and fix tests after attribute migration)
     public function testAddDataWithWrongMethod(): void
     {
         $this->requestMock
