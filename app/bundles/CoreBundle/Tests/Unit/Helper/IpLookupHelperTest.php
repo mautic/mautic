@@ -140,6 +140,15 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->getIpHelper($request)->isRequestTrackable());
     }
 
+    public function testIsRequestTrackableWithSecPurposeNextToAnotherPurpose(): void
+    {
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.52']);
+        $request->headers->set('Purpose', 'something-else');
+        $request->headers->set('Sec-Purpose', 'prefetch');
+
+        $this->assertFalse($this->getIpHelper($request)->isRequestTrackable());
+    }
+
     #[TestDox('Check that GPC requests are not trackable')]
     public function testIsRequestTrackableWithGpcHeader(): void
     {
@@ -204,6 +213,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         yield 'prerender' => [['Sec-Purpose' => 'prerender'], 'GET', false];
         yield 'combined prefetch and prerender' => [['Sec-Purpose' => 'prefetch;prerender'], 'GET', false];
         yield 'prefetch with a parameter' => [['Sec-Purpose' => 'prefetch; anonymous-client-ip'], 'GET', false];
+        yield 'prefetch next to another Purpose value' => [['Purpose' => 'something-else', 'Sec-Purpose' => 'prefetch'], 'GET', false];
         yield 'HEAD request' => [[], 'HEAD', false];
     }
 
@@ -249,6 +259,30 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $request->headers->set('DNT', '1');
 
         $this->assertFalse($this->getIpHelper($request, $coreParametersHelper)->isRequestCountable());
+    }
+
+    public function testIsRequestCountableChecksTheVisitorBehindAProxy(): void
+    {
+        // The proxy is excluded, the visitor it forwards for isn't
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')
+            ->willReturnCallback(static fn (string $name): ?array => 'do_not_track_internal_ips' === $name ? ['10.0.0.1'] : null);
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '10.0.0.1', 'HTTP_X_FORWARDED_FOR' => '73.77.245.52, 10.0.0.1']);
+        $request->headers->set('DNT', '1');
+
+        $this->assertTrue($this->getIpHelper($request, $coreParametersHelper)->isRequestCountable());
+    }
+
+    public function testIsRequestCountableIgnoresAnExcludedFallbackAddress(): void
+    {
+        // A private visitor isn't checked as 127.0.0.1, so excluding 127.0.0.1 doesn't stop their count
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $coreParametersHelper->method('get')
+            ->willReturnCallback(static fn (string $name): ?array => 'do_not_track_ips' === $name ? ['127.0.0.1'] : null);
+        $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '10.0.0.5']);
+        $request->headers->set('DNT', '1');
+
+        $this->assertTrue($this->getIpHelper($request, $coreParametersHelper)->isRequestCountable());
     }
 
     public function testIsRequestCountableDoesNotStoreTheIpAddress(): void
