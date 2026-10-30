@@ -194,15 +194,16 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
 
         // Depending on the libxml version, DOMDocument may URL-encode { -> %7B and } -> %7D inside href, src and action values.
         // Replace tokens (encoded or plain) inside those attributes with HTML-stripped, attribute-escaped content.
+        $attributeReplacementIndex = 0;
         $content = preg_replace_callback(
             '/(\b(?:href|src|action)\s*=\s*")([^"]*)(")/i',
-            static function (array $matches) use ($result): string {
+            static function (array $matches) use ($result, &$attributeReplacementIndex): string {
                 $value = $matches[2];
                 $placeholders = [];
                 foreach ($result as $token => $replacement) {
                     $encodedToken = str_replace(['{', '}'], ['%7B', '%7D'], $token);
                     $safe         = htmlspecialchars(strip_tags($replacement), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
-                    $placeholder  = '__MAUTIC_DWC_ATTRIBUTE_'.md5($token).'__';
+                    $placeholder  = '__MAUTIC_DWC_ATTRIBUTE_'.$attributeReplacementIndex++.'__';
                     $updatedValue = str_ireplace([$encodedToken, $token], $placeholder, $value);
                     if ($updatedValue !== $value) {
                         $placeholders[$placeholder] = $safe;
