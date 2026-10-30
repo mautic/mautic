@@ -32,11 +32,19 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
         $this->extractContacts();
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5ee4ad9a14 (Apply NoWhitespaceInBlankLineFixer (3 files))
     public function getConfig(): AbstractEventAccessor
     {
         return $this->config;
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5ee4ad9a14 (Apply NoWhitespaceInBlankLineFixer (3 files))
     public function getEvent(): Event
     {
         return $this->event;

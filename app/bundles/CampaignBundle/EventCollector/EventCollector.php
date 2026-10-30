@@ -35,6 +35,10 @@ final class EventCollector
         return $this->events;
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 5ee4ad9a14 (Apply NoWhitespaceInBlankLineFixer (3 files))
     public function getEventConfig(Event $event): AbstractEventAccessor
     {
         return $this->getEvents()->getEvent($event->getEventType(), $event->getType());
