@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0011bb3daad4966a8b12f6bd112e2ab3",
+    "content-hash": "4a14b7bc9f684fdbf20796a3fd6e6aa2",
     "packages": [
         {
             "name": "api-platform/core",
@@ -18209,16 +18209,16 @@
         },
         {
             "name": "symplify/easy-coding-standard",
-            "version": "13.3.9",
+            "version": "13.3.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ecsphp/ecs.git",
-                "reference": "c4c68c81775e8227dd01c064776edd46975d9d86"
+                "reference": "712df94dba55ddda2a8f360a65c13fa3160f24b2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ecsphp/ecs/zipball/c4c68c81775e8227dd01c064776edd46975d9d86",
-                "reference": "c4c68c81775e8227dd01c064776edd46975d9d86",
+                "url": "https://api.github.com/repos/ecsphp/ecs/zipball/712df94dba55ddda2a8f360a65c13fa3160f24b2",
+                "reference": "712df94dba55ddda2a8f360a65c13fa3160f24b2",
                 "shasum": ""
             },
             "require": {
@@ -18251,9 +18251,9 @@
             ],
             "support": {
                 "issues": "https://github.com/ecsphp/ecs/issues",
-                "source": "https://github.com/ecsphp/ecs/tree/13.3.9"
+                "source": "https://github.com/ecsphp/ecs/tree/13.3.12"
             },
-            "time": "2026-10-23T12:59:45+00:00"
+            "time": "2026-10-29T14:53:28+00:00"
         },
         {
             "name": "symplify/phpstan-rules",

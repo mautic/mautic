@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class IntegrationsHelper
 {
     /**
-     * @var IntegrationInterface[]
+     * @var array<string, IntegrationInterface>
      */
     private array $integrations = [];
 
@@ -44,11 +44,9 @@ final class IntegrationsHelper
     }
 
     /**
-     * @return IntegrationInterface
-     *
      * @throws IntegrationNotFoundException
      */
-    public function getIntegration(string $integration)
+    public function getIntegration(string $integration): IntegrationInterface
     {
         if (!isset($this->integrations[$integration])) {
             throw new IntegrationNotFoundException("{$integration} either doesn't exist or has not been tagged with mautic.basic_integration");

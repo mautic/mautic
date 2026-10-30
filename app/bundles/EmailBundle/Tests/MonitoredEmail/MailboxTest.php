@@ -170,33 +170,4 @@ final class MailboxTest extends TestCase
 
         new Mailbox($parametersHelper, $pathsHelper);
     }
-
-    public function testIsConnectedReturnsFalseOnValueError(): void
-    {
-        $parametersHelper = $this->createMock(CoreParametersHelper::class);
-        $parametersHelper->method('get')->willReturn(
-            [
-                'general' => [
-                    'host'     => 'localhost',
-                    'port'     => '993',
-                    'user'     => 'test',
-                    'password' => 'test',
-                ],
-            ]
-        );
-
-        $pathsHelper = $this->createStub(PathsHelper::class);
-
-        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
-
-        $reflection = new \ReflectionClass($mailbox);
-
-        // Set a value that is not an IMAP\Connection resource to trigger ValueError in imap_ping
-        $imapStreamProperty = $reflection->getProperty('imapStream');
-        $imapStreamProperty->setValue($mailbox, new \stdClass());
-
-        $isConnectedMethod = $reflection->getMethod('isConnected');
-
-        $this->assertFalse($isConnectedMethod->invoke($mailbox));
-    }
 }

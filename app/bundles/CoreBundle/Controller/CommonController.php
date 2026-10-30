@@ -463,10 +463,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * Generate 404 not found message.
-     *
-     * @return Response
      */
-    protected function notFound(string $msg = 'mautic.core.url.error.404')
+    protected function notFound(string $msg = 'mautic.core.url.error.404'): Response
     {
         $request = $this->getCurrentRequest();
         $page404 = $this->coreParametersHelper->get('404_page');
