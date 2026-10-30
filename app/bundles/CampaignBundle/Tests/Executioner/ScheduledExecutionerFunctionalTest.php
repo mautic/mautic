@@ -442,8 +442,11 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
 
         $this->em->refresh($campaignMember);
 
-        $this->assertEquals($initialRotation + 1, $campaignMember->getRotation(),
-            'Campaign member rotation should be incremented during redirection.');
+        $this->assertEquals(
+            $initialRotation + 1,
+            $campaignMember->getRotation(),
+            'Campaign member rotation should be incremented during redirection.'
+        );
 
         $updatedLog = $this->getContainer()->get(LeadEventLogRepository::class)->findOneBy([
             'lead'     => $contact,
@@ -451,8 +454,11 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $this->assertInstanceOf(LeadEventLog::class, $updatedLog, 'Log should exist after redirection');
-        $this->assertEquals($redirectEvent->getId(), $updatedLog->getEvent()->getId(),
-            'Log should be updated to reference the redirect event');
+        $this->assertEquals(
+            $redirectEvent->getId(),
+            $updatedLog->getEvent()->getId(),
+            'Log should be updated to reference the redirect event'
+        );
     }
 
     private function createCampaign(bool $published = true): Campaign
@@ -499,8 +505,12 @@ final class ScheduledExecutionerFunctionalTest extends MauticMysqlTestCase
         return $contact;
     }
 
-    private function createScheduledLog(Event $event, Lead $contact, ?\DateTime $triggerDate = null,
-        int $rotation = 1): LeadEventLog
+    private function createScheduledLog(
+        Event $event,
+        Lead $contact,
+        ?\DateTime $triggerDate = null,
+        int $rotation = 1
+    ): LeadEventLog
     {
         $log = new LeadEventLog();
         $log->setEvent($event);

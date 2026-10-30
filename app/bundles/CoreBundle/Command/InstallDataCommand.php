@@ -41,7 +41,10 @@ final class InstallDataCommand extends Command
         $this
             ->setDefinition([
                 new InputOption(
-                    'force', null, InputOption::VALUE_NONE, 'Bypasses the verification check.'
+                    'force',
+                    null,
+                    InputOption::VALUE_NONE,
+                    'Bypasses the verification check.'
                 ),
             ]);
     }

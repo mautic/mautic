@@ -2431,7 +2431,8 @@ final class LeadController extends AbstractFormController
         LeadModel $model,
         PointGroupModel $pointGroupModel,
         IpLookupHelper $ipLookupHelper,
-        int $objectId): Response
+        int $objectId
+    ): Response
     {
         $lead  = $model->getEntity($objectId);
         if (null === $lead
