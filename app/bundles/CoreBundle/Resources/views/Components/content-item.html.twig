@@ -9,8 +9,8 @@
 
 {# === IMAGE TYPE === #}
 {% if type == 'image' %}
-    <div class="d-flex fd-column row-gap-xs mb-32">
-        <img src="{{ asset(image.src) }}" alt="{{ image.alt|trans }}" title="{{ image.alt|trans }}" class="mb-sm mt-xs fs-0">
+    <div class="d-flex flex-column row-gap-xs mb-32">
+        <img src="{{ asset(image.src) }}" alt="{{ image.alt|trans }}" title="{{ image.alt|trans }}" class="mb-sm mt-xs flex-shrink-0">
         <div>{{ common_header_content }}</div>
     </div>
 
@@ -23,7 +23,7 @@
 
 {# === PICTOGRAM TYPE === #}
 {% elseif type == 'pictogram' %}
-    <div class="d-flex {% if orientation is defined and orientation == 'horizontal' %}fd-row-sm column-gap-lg {% endif %}fd-column row-gap-xs mb-32">
+    <div class="d-flex {% if orientation is defined and orientation == 'horizontal' %}flex-md-row column-gap-lg {% endif %}flex-column row-gap-xs mb-32">
         {% include '@MauticCore/Components/pictogram.html.twig' with {'pictogram': pictogram, 'size': 48} %}
         <div>{{ common_header_content }}</div>
     </div>

@@ -119,7 +119,7 @@
 
 {% block content %}
 <div class="col-md-9">
-    <div class="marketplace-header {{ packageDetail.packageBase.type|default('')|purify }} bg-picture col-xs-12 jc-center pt-lg pb-lg">
+    <div class="marketplace-header {{ packageDetail.packageBase.type|default('')|purify }} bg-picture col-xs-12 justify-content-center pt-lg pb-lg">
 
         <h1 class="fw-b fs-46">{{ latestVersion.displayName|default(packageDetail.packageBase.getHumanPackageName()) }}</h1>
         {% if latestVersion.extra.mautic.headline|default('') %}<p class="lead">{{ latestVersion.extra.mautic.headline }}</p>{% endif %}

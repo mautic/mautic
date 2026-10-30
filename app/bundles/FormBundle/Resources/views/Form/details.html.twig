@@ -187,7 +187,7 @@
                                     {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                 </div>
                             </div>
-                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                            <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats['submissionsInTime'], 'chartType': 'line', 'chartHeight': 300}) }}
                             </div>
                         </div>
@@ -316,7 +316,7 @@
                             attributes: {
                                 'data-toggle': 'modal',
                                 'data-target': '#modal-manual-copy',
-                                'class': 'ml-0'
+                                'class': 'ms-0'
                             }
                         }
                     ]
@@ -332,7 +332,7 @@
         <!--/ form HTML -->
 
         <!-- preview URL -->
-        <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel shd-none rounded-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
                 <div class="panel-title">{{ 'mautic.form.form.preview'|trans }}</div>
             </div>
@@ -372,7 +372,7 @@
         <hr class="hr-w-2" style="width:50%">
 
         {# we can leverage data from audit_log table and build activity feed from it #}
-        <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
+        <div class="panel shd-none rounded-0 bdr-w-0 mb-0">
             <!-- recent activity -->
             {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
         </div>

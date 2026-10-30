@@ -12,7 +12,7 @@
                     <h2 class="modal-header__heading type-heading-03">{{ modalHeading|trans }}</h2>
                 {% endif %}
             </div>
-            <div class="modal-body{% if isFullWidth is defined and isFullWidth and (type is not defined or type != 'expressive') %} pa-0{% endif %}{% if type is defined and type == 'expressive' %} pr-32 pl-32{% endif %}{% if hasScrollingContent is defined and hasScrollingContent %} modal-scroll-content{% endif %}"{% if modalLabel is defined %} aria-label="{{ modalLabel|trans }}"{% else %} aria-label="{{ modalAriaLabel|default(modalHeading|default(''))|trans }}"{% endif %}>
+            <div class="modal-body{% if isFullWidth is defined and isFullWidth and (type is not defined or type != 'expressive') %} p-0{% endif %}{% if type is defined and type == 'expressive' %} pr-32 pl-32{% endif %}{% if hasScrollingContent is defined and hasScrollingContent %} modal-scroll-content{% endif %}"{% if modalLabel is defined %} aria-label="{{ modalLabel|trans }}"{% else %} aria-label="{{ modalAriaLabel|default(modalHeading|default(''))|trans }}"{% endif %}>
                 <div class="modal-body-content">
                     {{ modalContent|raw }}
                 </div>

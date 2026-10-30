@@ -72,7 +72,7 @@
                   {% if fields[group] is defined %}
                       {% set groupFields = fields[group] %}
                       {% if groupFields is not empty %}
-                          <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-rds-0 bdr-w-0" id="{{ group }}">
+                          <div class="tab-pane fade {% if loop.first %}in active{% endif %} rounded-0 bdr-w-0" id="{{ group }}">
                               <div class="col-lg-8 pa-md bg-light-xs bdr-b">
                                 {% if not lead.id %}
                                     {{ include('@MauticCore/Notification/inline_notification.html.twig', {
