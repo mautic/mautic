@@ -1,0 +1,70 @@
+{% set id = id|default(name|default('input')|replace({'[': '-', ']': '', ' ': '-', '.': '-'})) %}
+{% set variant = variant|default('default') %}
+{% set labelText = labelText|default(null) %}
+{% set wrapperClass = wrapperClass|default(null) %}
+{% set invalid = invalid|default(false) %}
+{% set invalidText = invalidText|default(null) %}
+{% set warnText = warnText|default(null) %}
+{% set helpText = helpText|default(null) %}
+{% set link = link|default(null) %}
+{% set describedby = describedby|default([]) %}
+{% set attributes = attributes|default({}) %}
+{% if invalid and invalidText %}{% set describedby = describedby|merge([id ~ '-invalid']) %}{% endif %}
+{% if warnText and not invalid %}{% set describedby = describedby|merge([id ~ '-warn']) %}{% endif %}
+{% if helpText and not invalid %}{% set describedby = describedby|merge([id ~ '-help']) %}{% endif %}
+{% set control %}
+    {% include '@MauticCore/Components/form-control.html.twig' with {
+        id: id,
+        name: name|default('input'),
+        type: 'text',
+        label: null,
+        value: value|default(''),
+        placeholder: placeholder|default(null),
+        disabled: disabled|default(false),
+        readonly: readonly|default(false),
+        required: required|default(false),
+        describedby: describedby,
+        render_feedback: false,
+        wrapperClass: '',
+        attributes: invalid ? attributes|merge({'aria-invalid': 'true', class: (attributes.class|default('') ~ ' is-invalid')|trim}) : attributes,
+    } only %}
+{% endset %}
+{% set feedback %}
+    {% if invalid and invalidText %}
+    <div id="{{ id }}-invalid" class="invalid-feedback d-flex justify-content-between align-items-center">
+        <span class="text-danger">{{ invalidText|trans }}</span>
+        <i class="ri-error-warning-fill text-danger" aria-hidden="true"></i>
+    </div>
+    {% endif %}
+    {% if warnText and not invalid %}
+    <div id="{{ id }}-warn" class="form-text d-flex justify-content-between align-items-center">
+        <span class="text-body">{{ warnText|trans }}</span>
+        <i class="ri-alert-fill text-warning" aria-hidden="true"></i>
+    </div>
+    {% endif %}
+    {% if helpText and not invalid %}
+    <div id="{{ id }}-help" class="form-text">{{ helpText|trans }}</div>
+    {% endif %}
+    {% if link %}
+    <a href="{{ link.href }}">{{ link.label|trans }}</a>
+    {% endif %}
+{% endset %}
+{% if variant == 'fluid' %}
+<div class="form-fluid{{ wrapperClass ? ' ' ~ wrapperClass : '' }}">
+    {% if labelText %}
+    <div class="form-fluid__label text-helper">
+        <label for="{{ id }}" class="form-label type-label-01 mb-0">{{ labelText|trans }}</label>
+    </div>
+    {% endif %}
+    {{ control|raw }}
+    {{ feedback|raw }}
+</div>
+{% else %}
+<div{% if wrapperClass %} class="{{ wrapperClass }}"{% endif %}>
+    {% if labelText %}
+    <label for="{{ id }}" class="form-label type-label-01">{{ labelText|trans }}</label>
+    {% endif %}
+    {{ control|raw }}
+    {{ feedback|raw }}
+</div>
+{% endif %}
