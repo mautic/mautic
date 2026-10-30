@@ -487,9 +487,8 @@ HTML;
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('opaqueReplacementProvider')]
-    public function testDecodeTokensPreservesOpaqueReplacements(array $tokens, array $expected): void
+    public function testDecodeTokensPreservesOpaqueReplacements(array $tokens, array $expected, string $content): void
     {
-        $content = '<html><body>{dwc=first} {dwc=second}</body></html>';
         $contact = new Lead();
         $event   = $this->createMock(PageDisplayEvent::class);
 
@@ -509,7 +508,7 @@ HTML;
     }
 
     /**
-     * @return iterable<string, array{array<string, array{content: string, filters: array<mixed>}>, list<string>}>
+     * @return iterable<string, array{array<string, array{content: string, filters: array<mixed>}>, list<string>, string}>
      */
     public static function opaqueReplacementProvider(): iterable
     {
@@ -519,6 +518,7 @@ HTML;
                 '{dwc=second}' => ['content' => '<p>second</p>', 'filters' => []],
             ],
             ['Привет, José'],
+            '<html><body>{dwc=first} {dwc=second}</body></html>',
         ];
         yield 'script body' => [
             [
@@ -526,6 +526,15 @@ HTML;
                 '{dwc=second}' => ['content' => '<p>second</p>', 'filters' => []],
             ],
             ['document.write("<div>visible</div>");', '<p>second</p>'],
+            '<html><body>{dwc=first} {dwc=second}</body></html>',
+        ];
+        yield 'placeholder-looking text is preserved' => [
+            [
+                '{dwc=first}'  => ['content' => '<p>__MAUTIC_DWC_REPLACEMENT_0__</p>', 'filters' => []],
+                '{dwc=second}' => ['content' => '<p>second</p>', 'filters' => []],
+            ],
+            ['__MAUTIC_DWC_REPLACEMENT_0__'],
+            '<html><body>{dwc=first} {dwc=second}</body></html>',
         ];
     }
 

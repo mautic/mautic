@@ -239,7 +239,7 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
             $textDom = new \DOMDocument('1.0', 'utf-8');
             $textDom->loadHTML(mb_encode_numericentity($contentForTextDom, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
             $textXpath = new \DOMXPath($textDom);
-            $placeholder = '__MAUTIC_DWC_TEXT_'.count($opaqueReplacements).'__';
+            $placeholder = $this->getOpaquePlaceholder('text', $content, $replacement, count($opaqueReplacements));
             $textNodes = $textXpath->query('//text()');
             if (false === $textNodes) {
                 continue;
@@ -259,14 +259,25 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $replacementPlaceholder = '__MAUTIC_DWC_REPLACEMENT_'.count($opaqueReplacements).'__';
+            $serializedContent = $textDom->saveHTML();
+            $replacementPlaceholder = $this->getOpaquePlaceholder('replacement', $serializedContent, $replacement, count($opaqueReplacements));
             $opaqueReplacements[$replacementPlaceholder] = $replacement;
-            $content = str_replace($placeholder, $replacementPlaceholder, $textDom->saveHTML());
+            $content = str_replace($placeholder, $replacementPlaceholder, $serializedContent);
             foreach ($protectedAttributes as $attributePlaceholder => $attributeValue) {
                 $content = str_replace($attributePlaceholder, $attributeValue, $content);
             }
         }
 
         $event->setContent(strtr($content, $opaqueReplacements));
+    }
+
+    private function getOpaquePlaceholder(string $type, string $content, string $replacement, int $index): string
+    {
+        do {
+            $placeholder = "__MAUTIC_DWC_OPAQUE_{$type}_{$index}__";
+            ++$index;
+        } while (str_contains($content, $placeholder) || str_contains($replacement, $placeholder));
+
+        return $placeholder;
     }
 }
