@@ -3,14 +3,17 @@
 namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FieldModel;
@@ -31,6 +34,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class ResultController extends CommonFormController
 {
+    private const FORM_RESULT_PAGE_SUFFIX = '.page';
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -189,6 +194,7 @@ final class ResultController extends CommonFormController
                         'form:forms:editother',
                         $form->getCreatedBy()
                     ),
+                    'canBlockDomains'       => $this->security->isAdmin(),
                     'enableExportPermission'=> $this->security->isAdmin() || $this->security->isGranted('form:export:enable', 'MATCH_ONE'),
                 ],
                 'contentTemplate' => '@MauticForm/Result/list.html.twig',
@@ -346,8 +352,7 @@ final class ResultController extends CommonFormController
     {
         $formId   = $request->get('formId', 0);
         $objectId = $request->get('objectId', 0);
-        $session  = $request->getSession();
-        $page     = $session->get('mautic.formresult.'.$formId.'.page', 1);
+        $page     = $this->getFormResultPage($request, $formId);
         $flashes  = [];
 
         if (Request::METHOD_POST === $request->getMethod()) {
@@ -394,6 +399,190 @@ final class ResultController extends CommonFormController
         );
     }
 
+    public function markSpamAction(Request $request, Configurator $configurator, CacheHelper $cacheHelper, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    {
+        if (!$this->security->isAdmin()) {
+            $this->throwAccessDenied();
+        }
+
+        $formId   = $request->get('formId', 0);
+        $objectId = $request->get('objectId', 0);
+        $page     = $this->getFormResultPage($request, $formId);
+        $flashes  = [];
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            /** @var Submission|null $submission */
+            $submission = $model->getEntity($objectId);
+
+            if (null === $submission) {
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.form.error.notfound',
+                    'msgVars' => ['%id%' => $objectId],
+                ];
+            } elseif (!$this->security->hasEntityAccess('form:forms:editown', 'form:forms:editother', $submission->getCreatedBy())) {
+                $this->throwAccessDenied();
+            } else {
+                $domain = $submission->getEmailDomain();
+
+                if ($domain) {
+                    if ($this->saveNewBlockedDomains($configurator, $cacheHelper, [$domain])) {
+                        $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
+
+                        $flashes[] = [
+                            'type'    => 'notice',
+                            'msg'     => 'mautic.form.result.markspam.success',
+                            'msgVars' => ['%domain%' => $domain],
+                        ];
+                    } else {
+                        $flashes[] = [
+                            'type'   => 'error',
+                            'msg'    => 'mautic.config.notwritable',
+                            'domain' => 'messages',
+                        ];
+                    }
+                } else {
+                    $flashes[] = [
+                        'type' => 'error',
+                        'msg'  => 'mautic.form.result.markspam.error',
+                    ];
+                }
+            }
+        }
+
+        return $this->getFormResultRedirectResponse($formId, $page, $flashes);
+    }
+
+    public function batchMarkSpamAction(Request $request, Configurator $configurator, CacheHelper $cacheHelper, SubmissionModel $model, FormModel $formModel): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    {
+        if (!$this->security->isAdmin()) {
+            $this->throwAccessDenied();
+        }
+
+        $formId  = $this->getFormIdFromRequest();
+        $page    = $this->getFormResultPage($request, $formId);
+        $flashes = [];
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            [$domainsToSave, $flashes] = $this->getBlockedDomainsFromSubmissionIds(
+                $model,
+                json_decode($request->query->get('ids', '[]'), true)
+            );
+
+            if ([] === $domainsToSave) {
+                $flashes[] = [
+                    'type' => 'notice',
+                    'msg'  => 'mautic.form.result.markspam.batch.none',
+                ];
+            } elseif ($this->saveNewBlockedDomains($configurator, $cacheHelper, array_keys($domainsToSave))) {
+                $this->enableDonotSubmitValidationOnUnconfiguredForms($formModel);
+
+                $flashes[] = [
+                    'type' => 'notice',
+                    'msg'  => 'mautic.form.result.markspam.batch.success',
+                ];
+            } else {
+                $flashes[] = [
+                    'type'   => 'error',
+                    'msg'    => 'mautic.config.notwritable',
+                    'domain' => 'messages',
+                ];
+            }
+        }
+
+        return $this->getFormResultRedirectResponse($formId, $page, $flashes);
+    }
+
+    /**
+     * @return array{0: array<string, true>, 1: array<int, mixed>}
+     */
+    private function getBlockedDomainsFromSubmissionIds(SubmissionModel $model, mixed $ids): array
+    {
+        $domainsToSave = [];
+        $flashes       = [];
+
+        if (!is_array($ids)) {
+            return [$domainsToSave, $flashes];
+        }
+
+        foreach ($ids as $id) {
+            /** @var Submission|null $submission */
+            $submission = $model->getEntity($id);
+            if (null === $submission) {
+                continue;
+            }
+
+            if (!$this->security->hasEntityAccess('form:forms:editown', 'form:forms:editother', $submission->getCreatedBy())) {
+                $flashes[] = $this->getAccessDeniedFlash();
+                continue;
+            }
+
+            $domain = $submission->getEmailDomain();
+            if ($domain) {
+                $domainsToSave[$domain] = true;
+            }
+        }
+
+        return [$domainsToSave, $flashes];
+    }
+
+    /**
+     * @param array<string> $domains
+     */
+    private function saveNewBlockedDomains(Configurator $configurator, CacheHelper $cacheHelper, array $domains): bool
+    {
+        $existingDomains = (array) ($configurator->getParameters()['do_not_submit_emails'] ?? []);
+        $mergedDomains   = array_values(array_unique(array_merge($existingDomains, $domains)));
+
+        if ($existingDomains === $mergedDomains) {
+            return true;
+        }
+
+        if (!$configurator->isFileWritable()) {
+            return false;
+        }
+
+        $configurator->mergeParameters(['do_not_submit_emails' => $mergedDomains]);
+        $configurator->write();
+        $cacheHelper->refreshConfig();
+
+        return true;
+    }
+
+    private function enableDonotSubmitValidationOnUnconfiguredForms(FormModel $formModel): void
+    {
+        $fieldsToUpdate = $formModel->findEmailFieldsWithMissingDonotSubmitValidation();
+        $formModel->enableDonotSubmitValidationOnEmailFields($fieldsToUpdate);
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $flashes
+     */
+    private function getFormResultRedirectResponse(int|string $formId, int $page, array $flashes): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    {
+        $viewParameters = [
+            'objectId' => $formId,
+            'page'     => $page,
+        ];
+
+        return $this->postActionRedirect(
+            [
+                'returnUrl'       => $this->generateUrl('mautic_form_results', $viewParameters),
+                'viewParameters'  => $viewParameters,
+                'contentTemplate' => 'Mautic\\FormBundle\\Controller\\ResultController::indexAction',
+                'passthroughVars' => [
+                    'mauticContent' => 'formresult',
+                ],
+                'flashes' => $flashes,
+            ]
+        );
+    }
+
+    private function getFormResultPage(Request $request, int|string $formId): int
+    {
+        return (int) $request->getSession()->get('mautic.formresult.'.$formId.self::FORM_RESULT_PAGE_SUFFIX, 1);
+    }
+
     public function batchDeleteAction(Request $request): Response
     {
         return $this->batchDeleteStandard($request);
@@ -434,9 +623,12 @@ final class ResultController extends CommonFormController
 
     public function getPostActionRedirectArguments(array $args, $action): array
     {
-        if ('batchDelete' === $action) {
-            $formId                             = $this->getFormIdFromRequest();
-            $args['viewParameters']['objectId'] = $formId;
+        switch ($action) {
+            case 'batchDelete':
+            case 'batchMarkSpam':
+                $formId                             = $this->getFormIdFromRequest();
+                $args['viewParameters']['objectId'] = $formId;
+                break;
         }
 
         return $args;
