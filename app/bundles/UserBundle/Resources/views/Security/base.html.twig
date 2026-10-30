@@ -16,29 +16,28 @@
 </head>
 <body>
 <section id="main" role="main">
-    <div class="container ml-a mr-a" style="margin-top:100px;">
-        <div class="row">
-            <div class="col-lg-4 col-lg-offset-4">
-                <div class="panel" name="form-login">
-                    <div class="panel-body">
-                        <div class="mautic-logo img-circle mb-md text-center">
-                            {{ source('@MauticCore/Assets/images/logo--minimized.svg') }}
-                        </div>
+    <div class="container ml-a mr-a" style="min-height:100vh;justify-content:center;">
+        <div class="d-flex jc-center">
+            <div class="layer-two w-100" style="max-width:450px;">
+                <div name="form-login">
+                    <div class="tile p-0 w-100">
+
                         <div id="main-panel-flash-msgs">
                             {{- include('@MauticCore/Notification/flashes.html.twig') -}}
                         </div>
                         {% block content %}{% endblock %}
                     </div>
+                    <div class="row mx-0">
+                        <div class="pt-8 ps-16 pe-16 type-helper-text-01 text-secondary">
+                            {{ 'mautic.core.copyright'|trans({'%date%' : date('Y').format('Y') }) }}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-         <div class="row">
-            <div class="col-lg-4 col-lg-offset-4 text-center text-secondary">
-                {{ 'mautic.core.copyright'|trans({'%date%' : date('Y').format('Y') }) }}
             </div>
         </div>
     </div>
 </section>
+{% include '@MauticUser/Security/login-background.html.twig' %}
 {{ securityGetAuthenticationContext() }}
 </body>
 </html>

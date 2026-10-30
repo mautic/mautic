@@ -826,21 +826,23 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $segment = $this->createSegment($filters);
+        $now     = new \DateTime();
+        $inLast  = OperatorOptions::IN_LAST === $operator;
 
         $contactA = new Lead();
-        $contactA->setDateModified(new \DateTime('-1 hour'));
+        $contactA->setDateModified((clone $now)->modify($inLast ? '-1 hour' : '+1 hour'));
 
         $contactB = new Lead();
-        $contactB->setDateModified((new \DateTime())->modify('+1 day'));
+        $contactB->setDateModified((clone $now)->modify($inLast ? '+2 days' : '+1 day'));
 
         $contactC = new Lead();
-        $contactC->setDateModified((new \DateTime())->modify('-1 day'));
+        $contactC->setDateModified((clone $now)->modify('-1 day'));
 
         $contactD = new Lead();
-        $contactD->setDateModified((new \DateTime())->modify('-2 day'));
+        $contactD->setDateModified((clone $now)->modify('-2 days'));
 
         $contactE = new Lead();
-        $contactE->setDateModified((new \DateTime())->modify('+2 day'));
+        $contactE->setDateModified((clone $now)->modify('+3 days'));
 
         $this->em->persist($contactA);
         $this->em->persist($contactB);

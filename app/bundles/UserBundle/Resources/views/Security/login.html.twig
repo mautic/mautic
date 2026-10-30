@@ -15,27 +15,35 @@
 {% endblock %}
 
 {% block mainContent %}
-	{% if oidcSettings is defined and oidcSettings.isEnabled and oidcSettings.isRequired %}
-		{% include '@MauticUser/Security/oidc_login_top.html.twig' with {parameters: oidcSettings} %}
-	{% endif %}
-	<form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="{{ path('mautic_user_logincheck') }}" method="post">
-		<div class="input-group mb-md">
-
-			<span class="input-group-addon">
-				<i class="ri-user-6-fill"></i>
-			</span>
-			<label for="username" class="sr-only">{% trans %}mautic.user.auth.form.loginusername{% endtrans %}</label>
-			<input type="text" id="username" name="_username" class="form-control input-lg" value="{{ last_username|escape }}" required autofocus placeholder="{% trans %}mautic.user.auth.form.loginusername{% endtrans %}"/>
+		{% if not app.request.xmlHttpRequest %}
+		<div class="mb-24 ps-16 pe-16 pt-16">
+			<h1 class="type-fluid-paragraph-01">{% trans %}mautic.user.auth.header{% endtrans %}</h1>
+			<span class="text-secondary type-helper-text-01">{{ 'mautic.user.auth.help'|trans }}</span>
 		</div>
-		<div class="input-group mb-md">
-			<span class="input-group-addon">
-				<i class="ri-key-2-line"></i>
-			</span>
-			<label for="password" class="sr-only">{% trans %}mautic.core.password{% endtrans %}:</label>
-			<input type="password" id="password" name="_password" class="form-control input-lg" required placeholder="{% trans %}mautic.core.password{% endtrans %}"/>
-		</div>
-
-		<div class="pull-left mb-md">
+		{% endif %}
+		{% if oidcSettings is defined and oidcSettings.isEnabled and oidcSettings.isRequired %}
+			{% include '@MauticUser/Security/oidc_login_top.html.twig' with {parameters: oidcSettings} %}
+		{% endif %}
+		<form class="login-form bdr-t" name="login" data-toggle="ajax" role="form" action="{{ path('mautic_user_logincheck') }}" method="post">
+		{% include '@MauticCore/Components/text-input.html.twig' with {
+			variant: 'fluid',
+			id: 'username',
+			name: '_username',
+			labelText: 'mautic.user.auth.form.loginusername',
+			value: last_username|default(''),
+			wrapperClass: 'form-group',
+			attributes: {required: 'required', autofocus: 'autofocus'}
+		} only %}
+		{% include '@MauticCore/Components/password-input.html.twig' with {
+			variant: 'fluid',
+			id: 'password',
+			name: '_password',
+			labelText: 'mautic.core.password',
+			wrapperClass: 'form-group mb-16',
+			link: {href: path('mautic_user_passwordreset'), label: 'mautic.user.user.passwordreset.link'},
+			attributes: {required: 'required'}
+		} only %}
+		<div class="mb-md ps-16">
 			{% include '@MauticCore/Components/checkbox.html.twig' with {
 				inline: true,
 				items: [{ id: 'remember_me', name: '_remember_me', value: 'on', label: 'mautic.user.auth.form.rememberme' }]
@@ -43,19 +51,19 @@
 		</div>
 
 		<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate')|escape }}"/>
-		{% include '@MauticCore/Helper/button.html.twig' with {
-			buttons: [
-				{
-					label: 'mautic.user.auth.form.loginbtn',
-					variant: 'primary',
-					size: 'lg',
-					wide: true
-				}
-			]
-		} %}
-
-		<div class="mt-sm text-right">
-			<a href="{{ path('mautic_user_passwordreset') }}">{% trans %}mautic.user.user.passwordreset.link{% endtrans %}</a>
+		<div class="mt-24 ps-16 pe-16 row-no-gutters justify-content-end">
+			<div class="col-xs-6">
+				{% include '@MauticCore/Helper/button.html.twig' with {
+					buttons: [{
+						label: 'mautic.user.auth.form.loginbtn',
+						variant: 'primary',
+						size: 'xl',
+						wide: true,
+						icon: 'ri-arrow-right-line',
+						attributes: {type: 'submit', id: 'form-loginbtn'}
+					}]
+				} only %}
+			</div>
 		</div>
 	</form>
 	{% if integrations is not empty %}
