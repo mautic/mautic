@@ -30,6 +30,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Services\ContactColumnsDictionary;
@@ -824,6 +825,20 @@ final class AjaxController extends CommonAjaxController
 
         if (!$segment) {
             return new JsonResponse(['message' => "Segment {$id} could not be found."], Response::HTTP_NOT_FOUND);
+        }
+
+        if (!$this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN)
+            && !$this->security->isGranted(LeadPermissions::LISTS_VIEW_OTHER)
+        ) {
+            $this->throwAccessDenied();
+        }
+
+        if (!$this->security->hasEntityAccess(
+            LeadPermissions::LISTS_VIEW_OWN,
+            LeadPermissions::LISTS_VIEW_OTHER,
+            $segment->getCreatedBy()
+        )) {
+            $this->throwAccessDenied();
         }
 
         $parentNode = $segmentDependencyTreeFactory->buildTree($segment);
