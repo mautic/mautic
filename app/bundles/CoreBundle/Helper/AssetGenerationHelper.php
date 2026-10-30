@@ -24,7 +24,7 @@ final readonly class AssetGenerationHelper
         '@claviska/jquery-minicolors/jquery.minicolors.js', // Needed for the color picker.
         'dropzone/dist/dropzone.js', // Needed for the file upload in the asset detail page.
         'multiselect/js/jquery.multi-select.js', // Needed for the multiselect UI component.
-        'chart.js/dist/Chart.js', // Needed for the charts.
+        'chart.js/dist/chart.umd.js', // Needed for the charts.
         'chosen-js/chosen.jquery.js',
         'at.js/dist/js/jquery.atwho.js',
         'jvectormap-next/jquery-jvectormap.js',

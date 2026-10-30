@@ -1,15 +1,41 @@
 //set global Chart defaults
 if (typeof Chart != 'undefined') {
     // configure global Chart options
-    Chart.defaults.global.elements.line.borderWidth = 2;
-    Chart.defaults.global.elements.point.radius = 0;
-    Chart.defaults.global.legend.labels.boxWidth = 12;
-    Chart.defaults.global.maintainAspectRatio = false;
+    Chart.defaults.elements.line.borderWidth = 2.5;
+    Chart.defaults.elements.line.fill = true;
+    Chart.defaults.elements.line.cubicInterpolationMode = 'monotone';
+    Chart.defaults.elements.bar.borderRadius = 4;
+    Chart.defaults.elements.bar.borderSkipped = false;
+    Chart.defaults.elements.point.radius = 0;
+    Chart.defaults.elements.point.hoverRadius = 6;
+    Chart.defaults.elements.point.hitRadius = 20;
+    Chart.defaults.elements.point.hoverBorderWidth = 3;
+    Chart.defaults.plugins.tooltip.backgroundColor = '#161616';
+    Chart.defaults.plugins.tooltip.padding = 12;
+    Chart.defaults.plugins.tooltip.cornerRadius = 4;
+    Chart.defaults.plugins.tooltip.boxPadding = 4;
+    Chart.defaults.plugins.tooltip.usePointStyle = true;
+    Chart.defaults.plugins.legend.labels.font = {size: 11};
+    Chart.defaults.plugins.legend.labels.boxWidth = 8;
+    Chart.defaults.plugins.legend.labels.boxHeight = 8;
+    Chart.defaults.plugins.legend.labels.usePointStyle = true;
+    Chart.defaults.plugins.legend.labels.pointStyle = 'circle';
+    const flatLegendLabels = (generateLabels) => function(chart) {
+        return generateLabels.call(this, chart).map((label) => {
+            if (chart.config.type === 'line') {
+                label.fillStyle = label.strokeStyle;
+            }
+            label.lineWidth = 0;
+            return label;
+        });
+    };
+    Chart.defaults.plugins.legend.labels.generateLabels = flatLegendLabels(Chart.defaults.plugins.legend.labels.generateLabels);
+    ['doughnut', 'pie'].forEach((type) => {
+        const {labels} = Chart.overrides[type].plugins.legend;
+        labels.generateLabels = flatLegendLabels(labels.generateLabels);
+    });
+    Chart.defaults.maintainAspectRatio = false;
     Chart.defaults.scale.ticks.padding = 10;
-    Chart.defaults.global.elements.point.hoverRadius = 6;
-    Chart.defaults.global.elements.point.hitRadius = 20;
-    Chart.defaults.global.legend.labels.usePointStyle = true;
-    Chart.defaults.global.legend.labels.pointStyle = 'circle';
 }
 
 /**
@@ -54,6 +80,49 @@ Mautic.renderCharts = function(scope) {
     }
 };
 
+Mautic.chartGridStyle = {color: 'rgba(0, 0, 0, 0.06)', drawTicks: false};
+
+Mautic.chartAxisBorder = {display: false, dash: [3, 3]};
+
+Mautic.chartGradientFill = (datasets) => {
+  datasets.forEach((dataset) => {
+    const color = String(dataset.borderColor);
+    if (!/^rgba\(/.test(color)) {
+      return;
+    }
+    dataset.pointBackgroundColor = color;
+    dataset.backgroundColor = ({chart}) => {
+      const area = chart.chartArea;
+      if (!area) {
+        return;
+      }
+      const gradient = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
+      gradient.addColorStop(0, color.replace(/[\d.]+\)$/, '0.35)'));
+      gradient.addColorStop(1, color.replace(/[\d.]+\)$/, '0)'));
+      return gradient;
+    };
+  });
+};
+
+Mautic.chartTickLabel = (scale, value) => scale.getLabelForValue(value);
+
+Mautic.chartYAxisTicks = (scale) => {
+  scale.ticks = [scale.min, (scale.max - scale.min) / 2, scale.max].map((value) => ({value}));
+};
+
+Mautic.chartYAxisTickLabel = (value, index, values) => {
+  if (index === 0 || index === values.length - 1) {
+    return value;
+  }
+  if (/^\d+\.5$/.test(value.toString())) {
+    return '';
+  }
+  if (index === Math.floor(values.length / 2)) {
+    return value !== 0.5 ? value : '';
+  }
+  return '';
+};
+
 /**
  * Render the chart.js line chart
  *
@@ -62,58 +131,40 @@ Mautic.renderCharts = function(scope) {
 Mautic.renderLineChart = function(canvas) {
     var data = JSON.parse(canvas.text());
     if (!data.labels.length || !data.datasets.length) return;
+    Mautic.chartGradientFill(data.datasets);
     var chart = new Chart(canvas, {
         type: 'line',
         data: data,
         options: {
-            lineTension : 0.2,
-            borderWidth: 1,
-            tooltips: {
+            interaction: {
                 mode: 'index',
                 intersect: false
             },
+            layout: {padding: {top: 8}},
             scales: {
-                xAxes: [{
-                    gridLines: {
+                x: {
+                    grid: {
                         display: false
                     },
                     ticks: {
                         maxRotation: 0,
                         callback: function(value, index, values) {
                             if (index === 0 || index === values.length - 1) {
-                                return value;
+                                return Mautic.chartTickLabel(this, value);
                             }
                             return '';
                         }
                     }
-                }],
-                yAxes: [{
-                    afterBuildTicks: function(scale) {
-                        scale.ticks = [];
-                        scale.ticks.push(scale.min);
-                        scale.ticks.push((scale.max - scale.min) / 2);
-                        scale.ticks.push(scale.max);
-                    },
-                    gridLines: {
-                        drawBorder: false,
-                    },
+                },
+                y: {
+                    beginAtZero: true,
+                    afterBuildTicks: Mautic.chartYAxisTicks,
+                    border: Mautic.chartAxisBorder,
+                    grid: Mautic.chartGridStyle,
                     ticks: {
-                        beginAtZero: true,
-                        callback: function(value, index, values) {
-                            if (index === 0 || index === values.length - 1) {
-                                return value;
-                            }
-                            if (/^\d+\.5$/.test(value.toString())) {
-                                return '';
-                            }
-                            if (index === Math.floor(values.length / 2)) {
-                                return value !== 0.5 ? value : '';
-                            }
-                            return '';
-                        }
-                        
+                        callback: Mautic.chartYAxisTickLabel
                     }
-                }]
+                }
             }
         }
     });
@@ -122,36 +173,34 @@ Mautic.renderLineChart = function(canvas) {
 
 Mautic.renderHourChart = function(canvas) {
     const data = JSON.parse(canvas.text());
+    Mautic.chartGradientFill(data.datasets);
     const chart = new Chart(canvas, {
         type: 'line',
         data,
         options: {
-            tooltips: { mode: 'index', intersect: false },
+            interaction: {mode: 'index', intersect: false},
+            layout: {padding: {top: 8}},
             scales: {
-                xAxes: [{
-                    gridLines: { display: false },
+                x: {
+                    grid: {display: false},
                     ticks: {
                         autoSkip: true,
                         maxTicksLimit: 6,
                         maxRotation: 0,
-                        callback: value => value.split(' - ')[0]
-                    }
-                }],
-                yAxes: [{
-                    afterBuildTicks: scale => {
-                        scale.ticks = [scale.min, (scale.max - scale.min) / 2, scale.max];
-                    },
-                    gridLines: { drawBorder: false },
-                    ticks: {
-                        beginAtZero: true,
-                        callback: (value, index, values) => {
-                            if (index === 0 || index === values.length - 1) return value;
-                            if (/^\d+\.5$/.test(value.toString())) return '';
-                            if (index === Math.floor(values.length / 2)) return value !== 0.5 ? value : '';
-                            return '';
+                        callback: function(value) {
+                            return Mautic.chartTickLabel(this, value).split(' - ')[0];
                         }
                     }
-                }]
+                },
+                y: {
+                    beginAtZero: true,
+                    afterBuildTicks: Mautic.chartYAxisTicks,
+                    border: Mautic.chartAxisBorder,
+                    grid: Mautic.chartGridStyle,
+                    ticks: {
+                        callback: Mautic.chartYAxisTickLabel
+                    }
+                }
             }
         }
     });
@@ -166,14 +215,11 @@ Mautic.renderHourChart = function(canvas) {
  */
 Mautic.renderPieChart = function(canvas) {
     var data = JSON.parse(canvas.text());
-    var options = {borderWidth: 1};
+    const options = {};
     var disableLegend = canvas.attr('data-disable-legend');
     if (typeof disableLegend !== 'undefined' && disableLegend !== false) {
-        options.legend = {
-            display: false
-        }
+        options.plugins = {legend: {display: false}};
     }
-    // data = Mautic.emulateNoDataForPieChart(data);
     var chart = new Chart(canvas, {
         type: 'pie',
         data: data,
@@ -193,10 +239,16 @@ Mautic.renderBarChart = function(canvas) {
         type: 'bar',
         data: data,
         options: {
+            interaction: {
+                mode: 'index',
+                intersect: true
+            },
+            datasets: {
+                bar: {barPercentage: 0.9}
+            },
             scales: {
-                xAxes: [{
-                    barPercentage: 0.9,
-                }]
+                x: {border: {display: false}, grid: {display: false}},
+                y: {border: Mautic.chartAxisBorder, grid: Mautic.chartGridStyle, ticks: {maxTicksLimit: 4}}
             }
         }
     });
@@ -216,12 +268,12 @@ Mautic.renderLifechartBarChart = function(canvas) {
         type: 'bar',
         data: data,
         options: {
-            scales: {
-                xAxes: [
-                    {
-                        barThickness: barWidth,
-                    }
-                ]
+            interaction: {
+                mode: 'index',
+                intersect: true
+            },
+            datasets: {
+                bar: {barThickness: barWidth}
             }
         }
     });
@@ -240,21 +292,21 @@ Mautic.renderSimpleBarChart = function(canvas) {
         data: data,
         options: {
             scales: {
-                xAxes: [{
+                x: {
                     stacked: false,
-                    ticks: {fontSize: 9},
-                    gridLines: {display:false},
-                }],
-                yAxes: [{
+                    ticks: {font: {size: 9}},
+                    grid: {display: false}
+                },
+                y: {
                     display: false,
                     stacked: false,
-                    ticks: {beginAtZero: true, display: false},
-                    gridLines: {display:false}
-                }],
-                display: false
+                    beginAtZero: true,
+                    ticks: {display: false},
+                    grid: {display: false}
+                }
             },
-            legend: {
-                display: false
+            plugins: {
+                legend: {display: false}
             }
         }
     });
@@ -262,49 +314,44 @@ Mautic.renderSimpleBarChart = function(canvas) {
 };
 
 /**
- * Render the chart.js simple bar chart
+ * Render the chart.js horizontal bar chart
  *
  * @param mQuery element canvas
  */
 Mautic.renderHorizontalBarChart = function(canvas) {
     var data = JSON.parse(canvas.text());
     var chart = new Chart(canvas, {
-        type: 'horizontalBar',
+        type: 'bar',
         data: data,
         options: {
+            indexAxis: 'y',
+            datasets: {
+                bar: {barPercentage: 0.5}
+            },
             scales: {
-                xAxes: [{
+                x: {
                     display: true,
                     stacked: false,
-                    gridLines: {display:false},
-                    ticks: {beginAtZero: true,display: true, fontSize: 8, stepSize: 5}
-                }],
-                yAxes: [{
+                    beginAtZero: true,
+                    grid: {display: false},
+                    ticks: {font: {size: 8}, stepSize: 5}
+                },
+                y: {
                     stacked: false,
-                    ticks: {beginAtZero: true, display: true, fontSize: 9},
-                    gridLines: {display:false},
-                    barPercentage: 0.5,
-                    categorySpacing: 1
-                }],
-                display: false
+                    grid: {display: false},
+                    ticks: {font: {size: 9}}
+                }
             },
-            legend: {
-                display: false
-            },
-            tooltips: {
-                mode: 'single',
-                bodyFontSize: 9,
-                bodySpacing: 0,
-                callbacks: {
-                    title: function(tooltipItems, data) {
-                        // Title doesn't make sense for scatter since we format the data as a point
-                        return '';
-                    },
-                    label: function(tooltipItem, data) {
-                        return  tooltipItem.xLabel + ': ' + tooltipItem.yLabel;
+            plugins: {
+                legend: {display: false},
+                tooltip: {
+                    bodyFont: {size: 9},
+                    bodySpacing: 0,
+                    callbacks: {
+                        title: () => '',
+                        label: (context) => `${context.parsed.x}: ${context.label}`
                     }
                 }
-
             }
         }
     });
