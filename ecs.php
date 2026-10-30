@@ -52,6 +52,5 @@ return ECSConfig::configure()
         cleanup: true,
         controlStructures: true,
         standaloneLine: true,
-        // @todo enable next
-        // spaces: true,
+        spaces: true,
     );
