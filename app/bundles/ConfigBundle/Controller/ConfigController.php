@@ -62,7 +62,14 @@ final class ConfigController extends FormController
             ]
         );
 
-        $originalModelData = $form->getData();
+        $originalModelData = [];
+        foreach ($formConfigs as $config) {
+            $formAlias = $config['formAlias'];
+
+            if ($form->has($formAlias)) {
+                $originalModelData[$formAlias] = $form->get($formAlias)->getData();
+            }
+        }
         $originalNormData = $form->getNormData();
 
         $isWritable = $configurator->isFileWritable();

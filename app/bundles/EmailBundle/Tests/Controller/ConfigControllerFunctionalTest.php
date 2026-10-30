@@ -11,6 +11,54 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 {
+    public function testMonitoredEmailPasswordIsPreservedWhenLeftBlank(): void
+    {
+        if (!function_exists('imap_open')) {
+            $this->markTestSkipped('The IMAP extension is required for monitored email configuration.');
+        }
+
+        $password = 'abc%def%ghi';
+        $expectedStoredPassword = $this->escape($password);
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('config[buttons][save]')->form();
+        $values = $form->getPhpValues();
+
+        $values['config']['leadconfig']['contact_columns'] = ['name', 'email', 'id'];
+        $values['config']['companyconfig']['company_columns'] = ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'];
+        $values['config']['emailconfig']['monitored_email']['general']['password'] = $password;
+
+        $this->client->request($form->getMethod(), $form->getUri(), $values);
+        $this->assertResponseIsSuccessful();
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertSame(
+            $expectedStoredPassword,
+            $configParameters['monitored_email']['general']['password']
+        );
+
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('config[buttons][save]')->form();
+        $values = $form->getPhpValues();
+
+        $values['config']['leadconfig']['contact_columns'] = ['name', 'email', 'id'];
+        $values['config']['companyconfig']['company_columns'] = ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'];
+        $values['config']['emailconfig']['monitored_email']['general']['password'] = '';
+
+        $this->client->request($form->getMethod(), $form->getUri(), $values);
+        $this->assertResponseIsSuccessful();
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertSame(
+            $expectedStoredPassword,
+            $configParameters['monitored_email']['general']['password']
+        );
+    }
+
     public function testValuesAreEscapedProperly(): void
     {
         $data = [

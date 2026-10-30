@@ -92,9 +92,6 @@ final class ConfigSubscriberTest extends TestCase
         $subscriber = new ConfigSubscriber();
         $subscriber->onConfigBeforeSave($event);
 
-        self::assertSame(
-            $expectedPassword,
-            $event->getConfig('emailconfig')['monitored_email'][$mailbox]['password']
-        );
+        $this->assertSame($expectedPassword, $event->getConfig('emailconfig')['monitored_email'][$mailbox]['password']);
     }
 }
