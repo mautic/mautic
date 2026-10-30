@@ -188,6 +188,7 @@ class TriggerEvent implements UuidInterface
     {
         return $this->order;
     }
+
     public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
@@ -216,6 +217,7 @@ class TriggerEvent implements UuidInterface
     {
         return $this->trigger;
     }
+
     public function setType(string $type): static
     {
         $this->isChanged('type', $type);
@@ -255,6 +257,7 @@ class TriggerEvent implements UuidInterface
     {
         return $this->description;
     }
+
     public function setName(string $name): static
     {
         $this->isChanged('name', $name);

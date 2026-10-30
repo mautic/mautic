@@ -442,6 +442,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         $this->id = null;
     }
+
     public function setOrder(int $order): static
     {
         $this->isChanged('order', $order);
@@ -458,6 +459,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return $this->order;
     }
+
     public function setProperties(array|null $properties): static
     {
         $this->isChanged('properties', $properties);
@@ -483,6 +485,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return $this->campaign;
     }
+
     public function setType(string $type): static
     {
         $this->isChanged('type', $type);
@@ -516,6 +519,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return $this->description;
     }
+
     public function setName(string $name): static
     {
         $this->isChanged('name', $name);
@@ -686,6 +690,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         return $this->triggerInterval;
     }
+
     public function setTriggerInterval(int $triggerInterval): void
     {
         $this->isChanged('triggerInterval', $triggerInterval);

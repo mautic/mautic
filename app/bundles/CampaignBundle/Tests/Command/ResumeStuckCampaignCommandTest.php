@@ -1299,6 +1299,7 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
 
         return $this->getContainer()->get(LeadEventLogRepository::class)->findBy($criteria);
     }
+
     /**
      * The command prints a table, and matching a contact id anywhere in it also matches
      * the digits of another id or of a timestamp. The first column is read instead.
