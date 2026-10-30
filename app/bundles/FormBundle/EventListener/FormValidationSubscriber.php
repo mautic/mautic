@@ -75,7 +75,7 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
     {
         $value = $event->getValue();
 
-        if (!empty($value)) {
+        if (null !== $value && '' !== $value && [] !== $value) {
             $this->fieldEmailValidation($event);
         }
 
