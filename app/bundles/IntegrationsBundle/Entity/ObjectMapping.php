@@ -6,7 +6,6 @@ namespace Mautic\IntegrationsBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: ObjectMappingRepository::class)]
 #[ORM\Table(name: 'sync_object_mapping')]
@@ -21,106 +20,64 @@ class ObjectMapping
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
+    #[ORM\Column(name: 'date_created', type: Types::DATETIME_MUTABLE)]
     private readonly ?\DateTimeInterface $dateCreated;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $integration;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'internal_object_name', type: Types::STRING, length: 191)]
     private $internalObjectName;
 
     /**
      * @var int|string
      */
+    #[ORM\Column(name: 'internal_object_id', type: 'bigint', options: ['unsigned' => true])]
     private $internalObjectId;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'integration_object_name', type: Types::STRING, length: 191)]
     private $integrationObjectName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'integration_object_id', type: Types::STRING, length: 191)]
     private $integrationObjectId;
 
+    #[ORM\Column(name: 'last_sync_date', type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $lastSyncDate;
 
     /**
      * @var array
      */
+    #[ORM\Column(name: 'internal_storage', type: Types::JSON)]
     private $internalStorage = [];
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_deleted', type: Types::BOOLEAN)]
     private $isDeleted = false;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'integration_reference_id', type: Types::STRING, length: 191, nullable: true)]
     private $integrationReferenceId;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder
-            ->createField('dateCreated', Types::DATETIME_MUTABLE)
-            ->columnName('date_created')
-            ->build();
-
-        $builder
-            ->createField('integration', Types::STRING)
-            ->build();
-
-        $builder
-            ->createField('internalObjectName', Types::STRING)
-            ->columnName('internal_object_name')
-            ->build();
-
-        $builder->addBigIntIdField('internalObjectId', 'internal_object_id', false);
-
-        $builder
-            ->createField('integrationObjectName', Types::STRING)
-            ->columnName('integration_object_name')
-            ->build();
-
-        // Must be a string as not all IDs are integer based
-        $builder
-            ->createField('integrationObjectId', Types::STRING)
-            ->columnName('integration_object_id')
-            ->build();
-
-        $builder
-            ->createField('lastSyncDate', Types::DATETIME_MUTABLE)
-            ->columnName('last_sync_date')
-            ->build();
-
-        $builder
-            ->createField('internalStorage', Types::JSON)
-            ->columnName('internal_storage')
-            ->build();
-
-        $builder
-            ->createField('isDeleted', Types::BOOLEAN)
-            ->columnName('is_deleted')
-            ->build();
-
-        $builder
-            ->createField('integrationReferenceId', Types::STRING)
-            ->columnName('integration_reference_id')
-            ->nullable()
-            ->build();
-    }
 
     public function __construct(?\DateTime $dateCreated = null)
     {

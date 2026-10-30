@@ -79,6 +79,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      * @var int
      */
     #[Groups(['page:read', 'download:read', 'email:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -100,6 +103,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $template;
 
     /**
@@ -117,9 +121,11 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $content = [];
 
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $publishUp = null;
 
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $publishDown = null;
 
     /**
@@ -186,6 +192,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $redirectUrl;
 
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
     /**
@@ -215,6 +223,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private ?int $cloneObjectId = null;
 
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'public_preview', type: Types::BOOLEAN, nullable: true)]
     private ?bool $publicPreview = true;
 
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
@@ -243,16 +252,6 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->addNullableField('template', 'string');
-
-        $builder->addPublishDates();
-
-        $builder->addCategory();
-
-        $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
 
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);

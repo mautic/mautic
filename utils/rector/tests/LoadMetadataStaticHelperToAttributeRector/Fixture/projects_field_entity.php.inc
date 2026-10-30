@@ -36,7 +36,7 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 class ProjEntity
 {
     use ProjectTrait;
-    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
+    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
     #[ORM\JoinTable(name: 'proj_entity_projects_xref')]
     #[ORM\JoinColumn(name: 'proj_entity_id', nullable: false, onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'project_id', nullable: false, onDelete: 'CASCADE')]

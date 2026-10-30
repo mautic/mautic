@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\Client as BaseClient;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
@@ -21,12 +20,16 @@ class Client extends BaseClient
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     protected $id;
 
     /**
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     protected $name;
 
     /**
@@ -77,13 +80,6 @@ class Client extends BaseClient
 
         $this->users     = new ArrayCollection();
         $this->authCodes = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns('name', false);
     }
 
     /**

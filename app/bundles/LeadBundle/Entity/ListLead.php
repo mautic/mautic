@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: ListLeadRepository::class)]
 #[ORM\Table(name: 'lead_lists_leads')]
@@ -35,6 +34,7 @@ class ListLead
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
@@ -48,13 +48,6 @@ class ListLead
      */
     #[ORM\Column(name: 'manually_added', type: 'boolean')]
     private $manuallyAdded = false;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addDateAdded();
-    }
 
     /**
      * @return \DateTimeInterface
