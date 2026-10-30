@@ -32,6 +32,10 @@ final class Version20260915000000 extends PreUpAssertionMigration
     private function hasEmailFirstIndex(Schema $schema): bool
     {
         foreach ($schema->getTable($this->getTableName())->getIndexes() as $index) {
+            if ($this->prefix.'email_search' === $index->getName()) {
+                continue;
+            }
+
             if ('email' === ($index->getColumns()[0] ?? null) && !$this->isFullText($index->getFlags())) {
                 return true;
             }
