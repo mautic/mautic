@@ -41,12 +41,7 @@ use Mautic\EmailBundle\Entity\StatDeviceRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
-use Mautic\EmailBundle\Event\EmailOnTogglePublishEvent;
 use Mautic\EmailBundle\Event\EmailOpenEvent;
-use Mautic\EmailBundle\Event\EmailPostDeleteEvent;
-use Mautic\EmailBundle\Event\EmailPostSaveEvent;
-use Mautic\EmailBundle\Event\EmailPreDeleteEvent;
-use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
@@ -84,7 +79,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * @extends FormModel<Email>
@@ -366,43 +360,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         }
 
         return $entities;
-    }
-
-    /**
-     * @param Email $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Email) {
-            throw new MethodNotAllowedHttpException(['Email']);
-        }
-
-        $eventClass = match ($action) {
-            'pre_save'          => EmailPreSaveEvent::class,
-            'post_save'         => EmailPostSaveEvent::class,
-            'pre_delete'        => EmailPreDeleteEvent::class,
-            'post_delete'       => EmailPostDeleteEvent::class,
-            'on_toggle_publish' => EmailOnTogglePublishEvent::class,
-            default             => null,
-        };
-
-        if (null === $eventClass) {
-            return null;
-        }
-
-        if ($this->dispatcher->hasListeners($eventClass)) {
-            if (!$event instanceof $eventClass) {
-                $event = new $eventClass($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event);
-
-            return $event;
-        }
-
-        return null;
     }
 
     /**

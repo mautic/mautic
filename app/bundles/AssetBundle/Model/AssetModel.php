@@ -11,10 +11,6 @@ use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Event\AssetLoadEvent;
-use Mautic\AssetBundle\Event\AssetPostDeleteEvent;
-use Mautic\AssetBundle\Event\AssetPostSaveEvent;
-use Mautic\AssetBundle\Event\AssetPreDeleteEvent;
-use Mautic\AssetBundle\Event\AssetPreSaveEvent;
 use Mautic\AssetBundle\Form\Type\AssetType;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -343,42 +339,6 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
         }
 
         return parent::getEntity($id);
-    }
-
-    /**
-     * @param Asset $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Asset) {
-            throw new MethodNotAllowedHttpException(['Asset']);
-        }
-
-        $eventClass = match ($action) {
-            'pre_save'    => AssetPreSaveEvent::class,
-            'post_save'   => AssetPostSaveEvent::class,
-            'pre_delete'  => AssetPreDeleteEvent::class,
-            'post_delete' => AssetPostDeleteEvent::class,
-            default       => null,
-        };
-
-        if (null === $eventClass) {
-            return null;
-        }
-
-        if ($this->dispatcher->hasListeners($eventClass)) {
-            if (!$event instanceof $eventClass) {
-                $event = new $eventClass($entity, $isNew);
-            }
-
-            $this->dispatcher->dispatch($event);
-
-            return $event;
-        }
-
-        return null;
     }
 
     /**

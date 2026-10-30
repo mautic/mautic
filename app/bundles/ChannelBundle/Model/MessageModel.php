@@ -3,18 +3,14 @@
 namespace Mautic\ChannelBundle\Model;
 
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Entity\MessageRepository;
-use Mautic\ChannelBundle\Event\MessageEvent;
 use Mautic\ChannelBundle\Form\Type\MessageType;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -222,43 +218,4 @@ final class MessageModel extends FormModel implements AjaxLookupModelInterface, 
         return $result[$nameColumn] ?? null;
     }
 
-    /**
-     * @param Message $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof Message) {
-            throw new MethodNotAllowedHttpException(['Message']);
-        }
-
-        switch ($action) {
-            case 'pre_save':
-                $name = ChannelEvents::MESSAGE_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = ChannelEvents::MESSAGE_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = ChannelEvents::MESSAGE_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = ChannelEvents::MESSAGE_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new MessageEvent($entity, $isNew);
-            }
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
-    }
 }

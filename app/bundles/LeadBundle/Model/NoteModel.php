@@ -6,15 +6,10 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Entity\LeadNoteRepository;
-use Mautic\LeadBundle\Event\NotePostDeleteEvent;
-use Mautic\LeadBundle\Event\NotePostSaveEvent;
-use Mautic\LeadBundle\Event\NotePreDeleteEvent;
-use Mautic\LeadBundle\Event\NotePreSaveEvent;
 use Mautic\LeadBundle\Form\Type\NoteType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -78,34 +73,6 @@ final class NoteModel extends FormModel
         }
 
         return $this->formFactory->create(NoteType::class, $entity, $options);
-    }
-
-    /**
-     * @param LeadNote $entity
-     *
-     * @throws MethodNotAllowedHttpException
-     */
-    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
-    {
-        if (!$entity instanceof LeadNote) {
-            throw new MethodNotAllowedHttpException(['LeadNote']);
-        }
-
-        $event = match ($action) {
-            'pre_save'    => new NotePreSaveEvent($entity, $isNew),
-            'post_save'   => new NotePostSaveEvent($entity, $isNew),
-            'pre_delete'  => new NotePreDeleteEvent($entity, $isNew),
-            'post_delete' => new NotePostDeleteEvent($entity, $isNew),
-            default       => null,
-        };
-
-        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
-            return null;
-        }
-
-        $this->dispatcher->dispatch($event);
-
-        return $event;
     }
 
     public function getNoteCount(Lead $lead, bool $useFilters = false): int

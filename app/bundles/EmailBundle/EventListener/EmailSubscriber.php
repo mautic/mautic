@@ -3,6 +3,10 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
+use Mautic\CoreBundle\Event\EntityPreDelete;
+use Mautic\CoreBundle\Event\EntityPreSave;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\EmailEvents;
@@ -11,11 +15,6 @@ use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
-use Mautic\EmailBundle\Event\EmailEvent;
-use Mautic\EmailBundle\Event\EmailPostDeleteEvent;
-use Mautic\EmailBundle\Event\EmailPostSaveEvent;
-use Mautic\EmailBundle\Event\EmailPreDeleteEvent;
-use Mautic\EmailBundle\Event\EmailPreSaveEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Model\EmailDraftModel;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -49,21 +48,25 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            EmailPreSaveEvent::class    => ['cloneParentEmailDataForVariant', 0],
-            EmailPostSaveEvent::class   => ['onEmailPostSave', 0],
+            EntityPreSave::class        => ['cloneParentEmailDataForVariant', 0],
+            EntityPostSave::class       => ['onEmailPostSave', 0],
             EmailSendEvent::class       => ['onEmailSendAddPreheaderText', 200],
             EmailDisplayEvent::class    => ['onEmailSendAddPreheaderText', 200],
-            EmailPostDeleteEvent::class => ['onEmailDelete', 0],
+            EntityPostDelete::class     => ['onEmailDelete', 0],
             EmailEvents::EMAIL_FAILED   => ['onEmailFailed', 0],
             EmailEvents::EMAIL_RESEND   => ['onEmailResend', 0],
             EmailEditSubmitEvent::class => ['manageEmailDraft'],
-            EmailPreDeleteEvent::class  => ['deleteEmailDraft'],
+            EntityPreDelete::class      => ['deleteEmailDraft'],
         ];
     }
 
-    public function cloneParentEmailDataForVariant(EmailEvent $event): void
+    public function cloneParentEmailDataForVariant(EntityPreSave $event): void
     {
-        $email = $event->getEmail();
+        $email = $event->getEntity();
+        if (!$email instanceof Email) {
+            return;
+        }
+
         if ($email->isVariant()) {
             $this->emailRepository->cloneFromParentToVariant($email);
         }
@@ -72,9 +75,13 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
-    public function onEmailPostSave(EmailEvent $event): void
+    public function onEmailPostSave(EntityPostSave $event): void
     {
-        $email = $event->getEmail();
+        $email = $event->getEntity();
+        if (!$email instanceof Email) {
+            return;
+        }
+
         if ($details = $event->getChanges()) {
             $log = [
                 'bundle'    => 'email',
@@ -111,10 +118,14 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
-    public function onEmailDelete(EmailEvent $event): void
+    public function onEmailDelete(EntityPostDelete $event): void
     {
-        $email = $event->getEmail();
-        $log   = [
+        $email = $event->getEntity();
+        if (!$email instanceof Email) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'email',
             'object'    => 'email',
             'objectId'  => $email->deletedId,
@@ -222,10 +233,15 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         $this->entityManager->flush();
     }
 
-    public function deleteEmailDraft(EmailEvent $event): void
+    public function deleteEmailDraft(EntityPreDelete $event): void
     {
+        $email = $event->getEntity();
+        if (!$email instanceof Email) {
+            return;
+        }
+
         try {
-            $this->emailDraftModel->deleteDraft($event->getEmail());
+            $this->emailDraftModel->deleteDraft($email);
         } catch (NotFoundHttpException) {
             // No associated draft found for deletion. We have nothing to do here. Return.
             return;
