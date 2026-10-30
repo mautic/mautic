@@ -22,6 +22,8 @@ class TrackingPreference
 
     public const SOURCE_PREFERENCE_CENTRE = 'preference_centre';
 
+    public const SOURCE_CONTACT_MERGE = 'contact_merge';
+
     private ?int $id = null;
 
     private \DateTimeInterface $dateModified;
@@ -40,6 +42,7 @@ class TrackingPreference
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass(TrackingPreferenceRepository::class)
             ->addUniqueConstraint(['lead_id', 'purpose'], 'unique_lead_purpose');
 
         $builder->addId();

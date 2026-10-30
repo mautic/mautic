@@ -104,8 +104,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      */
     protected $emailSettings = [];
 
-    private readonly ContactTrackingPreferenceHelper $contactTrackingPreferenceHelper;
-
     public function __construct(
         protected IpLookupHelper $ipLookupHelper,
         protected ThemeHelperInterface $themeHelper,
@@ -145,10 +143,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         private readonly LeadRepository $leadRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
         private readonly CompanyRepository $companyRepository,
-        ?ContactTrackingPreferenceHelper $contactTrackingPreferenceHelper = null, // @phpstan-ignore mautic.noNullableServiceInConstructor
+        private readonly ContactTrackingPreferenceHelper $contactTrackingPreferenceHelper,
     ) {
-        $this->contactTrackingPreferenceHelper = $contactTrackingPreferenceHelper ?? new ContactTrackingPreferenceHelper($em);
-        $this->connection                      = $em->getConnection(); // Necessary for FilterTrait
+        $this->connection = $em->getConnection(); // Necessary for FilterTrait
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
