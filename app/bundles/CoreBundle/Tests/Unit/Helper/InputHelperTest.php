@@ -58,6 +58,27 @@ final class InputHelperTest extends TestCase
         }
     }
 
+    #[DataProvider('unicodeUrlProvider')]
+    public function testHtmlFilterPreservesPercentEncodedUrlComponentsWithUnicode(string $url): void
+    {
+        $html = sprintf('<p>Café</p><a href="%s">link</a>', $url);
+
+        $cleaned = InputHelper::html($html);
+
+        $this->assertStringContainsString($url, $cleaned);
+        $this->assertStringNotContainsString(rawurldecode($url), $cleaned);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function unicodeUrlProvider(): iterable
+    {
+        yield 'query string' => ['https://example.com/?q=a%20b'];
+        yield 'fragment' => ['https://example.com/#color=grey%20melange&size=M'];
+        yield 'path' => ['https://example.com/a%20b'];
+    }
+
     #[TestDox('The email returns value without double period')]
     public function testEmailFilterRemovesDoublePeriods(): void
     {
