@@ -60,6 +60,7 @@ use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -142,6 +143,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         private readonly LeadRepository $leadRepository,
         private readonly LeadEventLogRepository $leadEventLogRepository,
         private readonly CompanyRepository $companyRepository,
+        private readonly ContactTrackingPreferenceHelper $contactTrackingPreferenceHelper,
     ) {
         $this->connection = $em->getConnection(); // Necessary for FilterTrait
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
@@ -436,6 +438,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         if (!$stat) {
             trigger_deprecation('mautic/mautic', '5.0', 'Calls to hitEmail without a stat are deprecated');
 
+            return;
+        }
+
+        // A contact who turned tracking off still gets the image, but the open isn't recorded on them. This goes first,
+        // since the trackability check stores the visitor's IP address.
+        $contact = $stat->getLead();
+        if (null !== $contact && !$this->contactTrackingPreferenceHelper->allowsActivityTracking($contact)) {
             return;
         }
 

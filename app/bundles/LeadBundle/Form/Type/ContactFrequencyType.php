@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -73,6 +74,18 @@ final class ContactFrequencyType extends AbstractType
                     'multiple'   => true,
                     'expanded'   => $options['public_view'],
                     'required'   => false,
+                ]
+            );
+        }
+
+        if ($options['public_view']) {
+            // Left out of the submitted form when the page doesn't show it, which keeps the contact's choice as it is
+            $builder->add(
+                'allow_activity_tracking',
+                YesNoButtonGroupType::class,
+                [
+                    'label'    => 'mautic.lead.preference.allow_activity_tracking',
+                    'required' => false,
                 ]
             );
         }
