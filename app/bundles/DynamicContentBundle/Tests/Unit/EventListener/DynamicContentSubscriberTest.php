@@ -448,6 +448,45 @@ HTML;
         $this->subscriber->decodeTokens($event);
     }
 
+    public function testDecodeTokensDoesNotExpandNestedTokensInsideHrefAttributes(): void
+    {
+        $content = '<html><body><a href="{dwc=outer}">{dwc=inner}</a></body></html>';
+        $contact = new Lead();
+        $event   = $this->createMock(PageDisplayEvent::class);
+
+        $event->method('getLead')->willReturn($contact);
+        $event->method('getContent')->willReturn($content);
+
+        $this->dynamicContentHelper->expects($this->once())
+            ->method('findDwcTokens')
+            ->with($content, $contact)
+            ->willReturn([
+                '{dwc=outer}' => [
+                    'content' => '<p>{dwc=inner}</p>',
+                    'filters'  => [],
+                ],
+                '{dwc=inner}' => [
+                    'content' => '<img src=x onerror=alert(1)>',
+                    'filters'  => [],
+                ],
+            ]);
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->willReturnCallback(function (string $output): void {
+                $dom = new \DOMDocument();
+                $dom->loadHTML($output, LIBXML_NOERROR | LIBXML_NOWARNING);
+                $link = $dom->getElementsByTagName('a')->item(0);
+
+                $this->assertInstanceOf(\DOMElement::class, $link);
+                $this->assertFalse($link->hasAttribute('onerror'));
+                $this->assertSame('%7Bdwc=inner%7D', trim($link->getAttribute('href')));
+                $this->assertStringNotContainsString('onerror=alert(1)', $output);
+            });
+
+        $this->subscriber->decodeTokens($event);
+    }
+
     public function testOnTokenReplacement(): void
     {
         $content = <<< HTML
