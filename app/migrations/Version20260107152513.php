@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 final class Version20260107152513 extends PreUpAssertionMigration
 {
     private const string COLUMN_NAME  = 'version';
+
     protected const string TABLE_NAME = 'emails';
 
     protected function preUpAssertions(): void

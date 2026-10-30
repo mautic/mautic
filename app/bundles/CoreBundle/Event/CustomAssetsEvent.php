@@ -11,6 +11,7 @@ final class CustomAssetsEvent extends Event
         private readonly AssetsHelper $assetsHelper,
     ) {
     }
+
     public function addCustomDeclaration($declaration, string $location = 'head', string $context = AssetsHelper::CONTEXT_APP): static
     {
         $this->assetsHelper->setContext($context)
@@ -19,6 +20,7 @@ final class CustomAssetsEvent extends Event
 
         return $this;
     }
+
     public function addScript($script, string $location = 'head', bool $async = false, $name = null, string $context = AssetsHelper::CONTEXT_APP): static
     {
         $this->assetsHelper->setContext($context)
@@ -27,6 +29,7 @@ final class CustomAssetsEvent extends Event
 
         return $this;
     }
+
     public function addScriptDeclaration($script, string $location = 'head', string $context = AssetsHelper::CONTEXT_APP): static
     {
         $this->assetsHelper->setContext($context)

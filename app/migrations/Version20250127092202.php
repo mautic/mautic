@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 final class Version20250127092202 extends PreUpAssertionMigration
 {
     protected const string TABLE_NAME  = 'dynamic_content';
+
     private const string COLUMN_NAME   = 'type';
 
     protected function preUpAssertions(): void

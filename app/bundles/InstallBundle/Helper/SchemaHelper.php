@@ -387,5 +387,4 @@ final class SchemaHelper
             $index->getIndexedColumns()
         );
     }
-
 }
