@@ -258,7 +258,7 @@ final readonly class ContactSegmentService
     /**
      * @param int|null $limit
      *
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
     public function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [], $limit = null): QueryBuilder

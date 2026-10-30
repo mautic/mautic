@@ -5,6 +5,7 @@ namespace Mautic\PluginBundle\Integration;
 use Closure;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
