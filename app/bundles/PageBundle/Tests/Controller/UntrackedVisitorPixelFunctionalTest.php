@@ -189,8 +189,8 @@ final class UntrackedVisitorPixelFunctionalTest extends MauticMysqlTestCase
     {
         $set = [];
         foreach ($this->client->getResponse()->headers->getCookies() as $cookie) {
-            // Deleting a cookie is fine, writing one is not
-            if ('' !== (string) $cookie->getValue() && $cookie->getExpiresTime() >= time()) {
+            // Deleting a cookie is fine, writing one is not. A deleted cookie comes with an empty value.
+            if ('' !== (string) $cookie->getValue()) {
                 $set[] = $cookie->getName();
             }
         }
