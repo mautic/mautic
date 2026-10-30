@@ -439,6 +439,12 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
             return;
         }
 
+        // An email with tracking off records no opens, also when it's viewed in the browser. This goes first, since the
+        // trackability check stores the visitor's IP address.
+        if ($stat->getEmail() instanceof Email && !$stat->getEmail()->getTrackingEnabled()) {
+            return;
+        }
+
         if (!$this->ipLookupHelper->isRequestTrackable()) {
             return;
         }

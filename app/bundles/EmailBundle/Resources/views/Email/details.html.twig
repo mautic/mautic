@@ -298,6 +298,14 @@
                                       <td>{{ email.headers|formatter_simple_array_to_html }}</td>
                                   </tr>
                               {% endif %}
+                              {% if not email.trackingEnabled %}
+                                  <tr>
+                                      <td width="20%">
+                                          <span class="fw-b">{{ 'mautic.email.tracking_enabled'|trans }}</span>
+                                      </td>
+                                      <td>{{ 'mautic.email.tracking_enabled.off'|trans }}</td>
+                                  </tr>
+                              {% endif %}
                               <tr>
                                   <td width="20%">
                                       <span class="fw-b" data-toggle="tooltip" data-placement="right" title="{{ 'mautic.email.stat.sent.details'|trans }}">{{ 'mautic.email.stat.sent'|trans }} <i class="ri-question-line"></i></span>
