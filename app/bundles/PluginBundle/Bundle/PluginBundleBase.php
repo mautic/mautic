@@ -4,7 +4,6 @@ namespace Mautic\PluginBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PluginBundle\Entity\Plugin;
@@ -44,9 +43,9 @@ abstract class PluginBundleBase extends Bundle
         $schema     = $schemaTool->getSchemaFromMetadata($metadata);
 
         // Schema listeners (e.g. Symfony Messenger) add their own tables, which may already exist
-        $pluginTables = self::getPluginTableNames($metadata);
+        $existingTables = array_map('strtolower', $db->createSchemaManager()->listTableNames());
         foreach ($schema->getTables() as $table) {
-            if (!in_array(strtolower($table->getName()), $pluginTables, true)) {
+            if (in_array(strtolower($table->getName()), $existingTables, true)) {
                 $schema->dropTable($table->getName());
             }
         }
@@ -73,28 +72,6 @@ abstract class PluginBundleBase extends Bundle
                 }
             }
         }
-    }
-
-    /**
-     * @param ClassMetadata[] $metadata
-     *
-     * @return string[]
-     */
-    private static function getPluginTableNames(array $metadata): array
-    {
-        $tables = [];
-
-        foreach ($metadata as $classMetadata) {
-            $tables[] = strtolower($classMetadata->getTableName());
-
-            foreach ($classMetadata->getAssociationMappings() as $mapping) {
-                if (isset($mapping['joinTable']['name'])) {
-                    $tables[] = strtolower($mapping['joinTable']['name']);
-                }
-            }
-        }
-
-        return $tables;
     }
 
     private static function isDDLStatement(string $query): bool|int

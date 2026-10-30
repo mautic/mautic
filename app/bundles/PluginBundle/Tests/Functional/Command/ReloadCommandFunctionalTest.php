@@ -32,7 +32,7 @@ final class ReloadCommandFunctionalTest extends MauticMysqlTestCase
      * Case: a queue uses the Doctrine transport, and a plugin with entities has no row in plugins
      * and no tables yet. Symfony's messenger listener adds messenger_messages to the plugin schema.
      * Before the fix, the install failed with "table already exists" and left the plugin tables
-     * without foreign keys. PluginBundleBase now creates only the plugin's own tables.
+     * without foreign keys. PluginBundleBase now skips tables that already exist.
      */
     public function testFirstReloadInstallsPluginWhenMessengerTableExists(): void
     {
