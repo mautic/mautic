@@ -6,7 +6,7 @@
         {{ form_row(form.identifier) }}
         {{ form_widget(form.submit) }}
         {{ form_end(form) }}
-<div class="mt-sm">
-    {% include '@MauticCore/Helper/button.html.twig' with {buttons: [{label: 'mautic.user.user.passwordreset.back', href: path('login'), variant: 'link'}]} only %}
-</div>
+    <div class="mt-sm">
+        {% include '@MauticCore/Helper/button.html.twig' with {buttons: [{label: 'mautic.user.user.passwordreset.back', href: path('login'), variant: 'link'}]} only %}
+    </div>
 {% endblock %}
