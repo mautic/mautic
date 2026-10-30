@@ -6,17 +6,13 @@ namespace Mautic\FormBundle\EventListener;
 
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\FormBundle\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class EmailSubscriber implements EventSubscriberInterface
+final class EmailSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailOnBuildEvent::class => ['onEmailBuild', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EmailOnBuildEvent::class,
+    )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {

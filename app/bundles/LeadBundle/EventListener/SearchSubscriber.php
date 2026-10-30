@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use InvalidArgumentException;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event\CommandListEvent;
@@ -17,11 +18,11 @@ use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-final readonly class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber
 {
     use QueryBuilderManipulatorTrait;
 
@@ -38,19 +39,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            GlobalSearchEvent::class               => [
-                ['onGlobalSearchForContacts', 0],
-                ['onGlobalSearchForCompanies', 0],
-                ['onGlobalSearchForSegments', 0],
-            ],
-            CommandListEvent::class                => ['onBuildCommandList', 0],
-            LeadBuildSearchEvent::class => ['onBuildSearchCommands', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: GlobalSearchEvent::class,
+    )]
     public function onGlobalSearchForContacts(GlobalSearchEvent $event): void
     {
         $str = $event->getSearchString();
@@ -95,6 +86,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: GlobalSearchEvent::class,
+    )]
     public function onGlobalSearchForSegments(GlobalSearchEvent $event): void
     {
         $results = $this->globalSearch->performSearch(
@@ -108,6 +102,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: GlobalSearchEvent::class,
+    )]
     public function onGlobalSearchForCompanies(GlobalSearchEvent $event): void
     {
         $str = $event->getSearchString();
@@ -140,6 +137,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: CommandListEvent::class,
+    )]
     public function onBuildCommandList(CommandListEvent $event): void
     {
         if ($this->security->isGranted(['lead:leads:viewown', 'lead:leads:viewother'], 'MATCH_ONE')) {
@@ -151,8 +151,11 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
+    #[AsEventListener(
+        event: LeadBuildSearchEvent::class,
+    )]
     public function onBuildSearchCommands(LeadBuildSearchEvent $event): void
     {
         switch ($event->getCommand()) {

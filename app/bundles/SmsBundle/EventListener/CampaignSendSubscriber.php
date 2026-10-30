@@ -9,10 +9,10 @@ use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class CampaignSendSubscriber implements EventSubscriberInterface
+final readonly class CampaignSendSubscriber
 {
     public function __construct(
         private SmsModel $smsModel,
@@ -21,14 +21,9 @@ final readonly class CampaignSendSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION => ['onCampaignTriggerBatchAction', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (count($this->transportChain->getEnabledTransports()) > 0) {
@@ -48,12 +43,15 @@ final readonly class CampaignSendSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION,
+    )]
     public function onCampaignTriggerBatchAction(PendingEvent $event): void
     {
         $smsId = (int) $event->getEvent()->getProperties()['sms'];
         $sms   = $smsId ? $this->smsModel->getEntity($smsId) : null;
 
-        if (!$sms) {
+        if (!$sms instanceof Sms) {
             $event->passAllWithError($this->translator->trans('mautic.sms.campaign.failed.missing_entity'));
 
             return;

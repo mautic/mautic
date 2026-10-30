@@ -2,6 +2,9 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use DateInterval;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -122,9 +125,9 @@ class Import extends FormEntity
      */
     private $status = self::QUEUED;
 
-    private ?\DateTimeInterface $dateStarted = null;
+    private ?DateTimeInterface $dateStarted = null;
 
-    private ?\DateTimeInterface $dateEnded = null;
+    private ?DateTimeInterface $dateEnded = null;
 
     private string $object = 'lead';
 
@@ -473,7 +476,7 @@ class Import extends FormEntity
         };
     }
 
-    public function setDateStarted(?\DateTimeInterface $dateStarted): self
+    public function setDateStarted(?DateTimeInterface $dateStarted): self
     {
         $this->isChanged('dateStarted', $dateStarted);
         $this->dateStarted = $dateStarted;
@@ -481,7 +484,7 @@ class Import extends FormEntity
         return $this;
     }
 
-    public function getDateStarted(): ?\DateTimeInterface
+    public function getDateStarted(): ?DateTimeInterface
     {
         return $this->dateStarted;
     }
@@ -491,8 +494,8 @@ class Import extends FormEntity
      */
     public function start(): self
     {
-        if (!$this->dateStarted instanceof \DateTimeInterface) {
-            $this->setDateStarted(new \DateTime());
+        if (!$this->dateStarted instanceof DateTimeInterface) {
+            $this->setDateStarted(new DateTime());
         }
 
         $this->setStatus(self::IN_PROGRESS);
@@ -507,7 +510,7 @@ class Import extends FormEntity
      */
     public function end(bool $removeFile = true): self
     {
-        $this->setDateEnded(new \DateTime());
+        $this->setDateEnded(new DateTime());
 
         if (self::IN_PROGRESS === $this->status) {
             $this->setStatus(self::IMPORTED);
@@ -520,7 +523,7 @@ class Import extends FormEntity
         return $this;
     }
 
-    public function setDateEnded(?\DateTimeInterface $dateEnded): self
+    public function setDateEnded(?DateTimeInterface $dateEnded): self
     {
         $this->isChanged('dateEnded', $dateEnded);
         $this->dateEnded = $dateEnded;
@@ -528,7 +531,7 @@ class Import extends FormEntity
         return $this;
     }
 
-    public function getDateEnded(): ?\DateTimeInterface
+    public function getDateEnded(): ?DateTimeInterface
     {
         return $this->dateEnded;
     }
@@ -536,7 +539,7 @@ class Import extends FormEntity
     /**
      * Counts how long the import has run so far.
      */
-    public function getRunTime(): ?\DateInterval
+    public function getRunTime(): ?DateInterval
     {
         $startTime = $this->dateStarted;
         $endTime   = $this->dateEnded;
@@ -545,7 +548,7 @@ class Import extends FormEntity
             $endTime = $this->getDateModified();
         }
 
-        if ($startTime instanceof \DateTimeInterface && $endTime instanceof \DateTimeInterface) {
+        if ($startTime instanceof DateTimeInterface && $endTime instanceof DateTimeInterface) {
             return $endTime->diff($startTime);
         }
 
@@ -566,7 +569,7 @@ class Import extends FormEntity
             $endTime = $this->getDateModified();
         }
 
-        if ($startTime instanceof \DateTime && $endTime instanceof \DateTime) {
+        if ($startTime instanceof DateTime && $endTime instanceof DateTime) {
             return $endTime->format('U') - $startTime->format('U');
         }
 

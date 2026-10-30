@@ -141,7 +141,7 @@ final class CampaignSubscriberTest extends TestCase
             $this->createStub(Translator::class)
         );
 
-        $this->dispatcher->addSubscriber($campaignSubscriber);
+        ReflectionHelper::registerAttributeListeners($this->dispatcher, $campaignSubscriber);
         $this->dispatcher->addListener(EmailEvents::ON_CAMPAIGN_BATCH_ACTION, $this->sendMarketingMessageEmail(...));
         $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION, $this->sendMarketingMessageSms(...));
     }

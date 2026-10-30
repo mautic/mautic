@@ -6,17 +6,13 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class GeneratedColumnSubscriber implements EventSubscriberInterface
+final class GeneratedColumnSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            GeneratedColumnsEvent::class => ['onGeneratedColumnsBuild', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: GeneratedColumnsEvent::class,
+    )]
     public function onGeneratedColumnsBuild(GeneratedColumnsEvent $event): void
     {
         $sentDate = new GeneratedColumn('email_stats', 'generated_sent_date', 'DATE', "CONCAT(YEAR(date_sent), '-', LPAD(MONTH(date_sent), 2, '0'), '-', LPAD(DAY(date_sent), 2, '0'))");

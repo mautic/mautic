@@ -4,12 +4,13 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final readonly class StatSubscriber implements EventSubscriberInterface
+final readonly class StatSubscriber
 {
     public function __construct(
         private FocusModel $model,
@@ -17,14 +18,9 @@ final readonly class StatSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PageHitEvent::class    => ['onPageHit', 0],
-            SubmissionEvent::class => ['onFormSubmit', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: PageHitEvent::class,
+    )]
     public function onPageHit(PageHitEvent $event): void
     {
         $hit    = $event->getHit();
@@ -34,7 +30,7 @@ final readonly class StatSubscriber implements EventSubscriberInterface
             $sourceId = $hit->getSourceId();
             $focus    = $this->model->getEntity($sourceId);
 
-            if ($focus && $focus->isPublished()) {
+            if ($focus instanceof Focus && $focus->isPublished()) {
                 $this->model->addStat($focus, Stat::TYPE_CLICK, $hit, $hit->getLead());
             }
         }
@@ -43,6 +39,9 @@ final readonly class StatSubscriber implements EventSubscriberInterface
     /**
      * Note if this submission is from a focus submit.
      */
+    #[AsEventListener(
+        event: SubmissionEvent::class,
+    )]
     public function onFormSubmit(SubmissionEvent $event): void
     {
         // Check the request for a focus field
@@ -52,7 +51,7 @@ final readonly class StatSubscriber implements EventSubscriberInterface
         if (!empty($id)) {
             $focus = $this->model->getEntity($id);
 
-            if ($focus && $focus->isPublished()) {
+            if ($focus instanceof Focus && $focus->isPublished()) {
                 // Make sure the form is still applicable
                 $form = $event->getSubmission()->getForm();
                 if ((int) $form->getId() === (int) $focus->getForm()) {

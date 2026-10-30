@@ -8,11 +8,11 @@ use Mautic\DynamicContentBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber
 {
     public function __construct(
         private TranslatorInterface $translator,
@@ -21,17 +21,12 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
-        ];
-    }
-
     /**
      * Compile events for the lead timeline.
      */
+    #[AsEventListener(
+        event: LeadTimelineEvent::class,
+    )]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -82,6 +77,9 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadPostMergeEvent::class,
+    )]
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->statRepository->updateLead(

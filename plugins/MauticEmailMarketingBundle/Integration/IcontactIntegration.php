@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
+use Exception;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
 
@@ -207,7 +208,7 @@ final class IcontactIntegration extends EmailAbstractIntegration
 
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 

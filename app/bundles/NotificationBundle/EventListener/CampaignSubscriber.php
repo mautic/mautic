@@ -19,16 +19,14 @@ use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+class CampaignSubscriber
 {
     public const string EVENT_ACTION_SEND_MOBILE_NOTIFICATION = 'notification.send_mobile_notification';
-
     public const string EVENT_ACTION_SEND_NOTIFICATION = 'notification.send_notification';
-
     /**
      * The maximum number of `include_player_ids` that can be sent within a single request.
      */
@@ -45,14 +43,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            NotificationEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignBatchAction', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
@@ -96,6 +89,9 @@ class CampaignSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: NotificationEvents::ON_CAMPAIGN_BATCH_ACTION,
+    )]
     public function onCampaignBatchAction(PendingEvent $event): void
     {
         if (!$event->checkContext(self::EVENT_ACTION_SEND_NOTIFICATION) && !$event->checkContext(self::EVENT_ACTION_SEND_MOBILE_NOTIFICATION)) {
@@ -105,7 +101,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $notificationId = $event->getEvent()->getProperties()['notification'] ?? null;
         $notification   = $notificationId ? $this->notificationModel->getEntity((int) $notificationId) : null;
 
-        if (!$notification) {
+        if (!$notification instanceof Notification) {
             $event->passAllWithError($this->translator->trans('mautic.notification.campaign.failed.missing_entity'));
 
             return;

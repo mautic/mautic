@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\EventListener;
 
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
@@ -16,9 +17,9 @@ use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class AssetImportExportSubscriber implements EventSubscriberInterface
+final readonly class AssetImportExportSubscriber
 {
     use ImportExportTrait;
 
@@ -32,16 +33,9 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onAssetExport', 0],
-            EntityImportEvent::class        => ['onAssetImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EntityExportEvent::class,
+    )]
     public function onAssetExport(EntityExportEvent $event): void
     {
         if (Asset::ENTITY_NAME !== $event->getEntityName()) {
@@ -50,7 +44,7 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
 
         $assetId = $event->getEntityId();
         $asset   = $this->assetModel->getEntity($assetId);
-        if (!$asset) {
+        if (!$asset instanceof Asset) {
             return;
         }
 
@@ -65,8 +59,8 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
             'remote_path'            => $asset->getRemotePath(),
             'original_file_name'     => $asset->getOriginalFileName(),
             'lang'                   => $asset->getLanguage(),
-            'publish_up'             => $asset->getPublishUp() ? $asset->getPublishUp()->format(DATE_ATOM) : null,
-            'publish_down'           => $asset->getPublishDown() ? $asset->getPublishDown()->format(DATE_ATOM) : null,
+            'publish_up'             => $asset->getPublishUp() instanceof DateTimeInterface ? $asset->getPublishUp()->format(DATE_ATOM) : null,
+            'publish_down'           => $asset->getPublishDown() instanceof DateTimeInterface ? $asset->getPublishDown()->format(DATE_ATOM) : null,
             'extension'              => $asset->getExtension(),
             'mime'                   => $asset->getMime(),
             'size'                   => (int) $asset->getSize(),
@@ -86,6 +80,9 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
         $this->auditLogModel->writeToLog($log);
     }
 
+    #[AsEventListener(
+        event: EntityImportEvent::class,
+    )]
     public function onAssetImport(EntityImportEvent $event): void
     {
         if (Asset::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -129,6 +126,9 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportUndoEvent::class,
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Asset::ENTITY_NAME !== $event->getEntityName()) {
@@ -143,7 +143,7 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
         foreach ($summary['ids'] as $id) {
             $entity = $this->assetRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof Asset) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Asset::class]);
             }
@@ -152,6 +152,9 @@ final readonly class AssetImportExportSubscriber implements EventSubscriberInter
         $this->entityManager->flush();
     }
 
+    #[AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(

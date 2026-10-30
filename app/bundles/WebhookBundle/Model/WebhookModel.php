@@ -2,9 +2,13 @@
 
 namespace Mautic\WebhookBundle\Model;
 
+use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use ErrorException;
+use Exception;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
@@ -252,7 +256,7 @@ final class WebhookModel extends FormModel
 
         $queue = new WebhookQueue();
         $queue->setWebhook($webhook);
-        $queue->setDateAdded(new \DateTime());
+        $queue->setDateAdded(new DateTime());
         $queue->setEvent($event);
         $queue->setPayload($serializedPayload);
 
@@ -323,9 +327,9 @@ final class WebhookModel extends FormModel
                     $this->killWebhook($webhook, 'mautic.webhook.stopped.reason.410');
                 }
 
-                throw new \ErrorException($webhook->getWebhookUrl().' returned '.$responseStatusCode.' with payload: '.json_encode($payload));
+                throw new ErrorException($webhook->getWebhookUrl().' returned '.$responseStatusCode.' with payload: '.json_encode($payload));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $message = $e->getMessage();
             if ($this->isSick($webhook)) {
                 if (!$this->disableAutoUnpublish && !$webhook->wasModifiedRecently()) {
@@ -400,17 +404,17 @@ final class WebhookModel extends FormModel
 
     public function markWebhookUnHealthy(Webhook $webhook, string $reason): void
     {
-        $webhook->setMarkedUnhealthyAt(new \DateTimeImmutable());
-        $webhook->getUnHealthySince() ?: $webhook->setUnHealthySince(new \DateTimeImmutable());
+        $webhook->setMarkedUnhealthyAt(new DateTimeImmutable());
+        $webhook->getUnHealthySince() ?: $webhook->setUnHealthySince(new DateTimeImmutable());
         if ($this->webhookService->sendWebhookFailureNotification($webhook, $reason)) {
-            $webhook->setLastNotificationSentAt(new \DateTimeImmutable());
+            $webhook->setLastNotificationSentAt(new DateTimeImmutable());
         }
         $this->saveEntity($webhook);
     }
 
     public function markWebhookHealthy(Webhook $webhook): void
     {
-        if (null === $webhook->getMarkedUnhealthyAt()) {
+        if (!$webhook->getMarkedUnhealthyAt() instanceof DateTimeImmutable) {
             return;
         }
         $webhook->setMarkedUnhealthyAt(null);
@@ -442,7 +446,7 @@ final class WebhookModel extends FormModel
         $log->setNote($note);
         $log->setRuntime($runtime);
         $log->setStatusCode($statusCode);
-        $log->setDateAdded(new \DateTime());
+        $log->setDateAdded(new DateTime());
         $webhook->addLog($log);
         $this->saveEntity($webhook);
     }
@@ -461,7 +465,7 @@ final class WebhookModel extends FormModel
         if (self::COMMAND_PROCESS === $this->queueMode) {
             $queuesArray = $this->getWebhookQueues($webhook);
         } else {
-            $queuesArray = null !== $queue ? [$queue] : [];
+            $queuesArray = $queue instanceof WebhookQueue ? [$queue] : [];
         }
         $this->webhookQueueIdList = [];
         /** @var WebhookQueue $queueItem */
@@ -499,7 +503,7 @@ final class WebhookModel extends FormModel
      */
     public function getWebhookQueues(Webhook $webhook): iterable
     {
-        $webhookRetryTime = new \DateTimeImmutable()
+        $webhookRetryTime = new DateTimeImmutable()
             ->modify(sprintf('-%d seconds', $this->webhookRetryDelay))
             ->format(DateTimeHelper::FORMAT_DB);
         $parameters = [

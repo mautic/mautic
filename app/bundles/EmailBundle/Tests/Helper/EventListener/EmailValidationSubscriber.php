@@ -5,17 +5,12 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Helper\EventListener;
 
 use Mautic\EmailBundle\Event\EmailValidationEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final class EmailValidationSubscriber implements EventSubscriberInterface
+final class EmailValidationSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailValidationEvent::class => ['onEmailValidation', 0],
-        ];
-    }
-
+    #[\Symfony\Component\EventDispatcher\Attribute\AsEventListener(
+        event: EmailValidationEvent::class,
+    )]
     public function onEmailValidation(EmailValidationEvent $event): void
     {
         if ('bad@gmail.com' === $event->getAddress()) {

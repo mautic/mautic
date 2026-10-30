@@ -2,8 +2,10 @@
 
 namespace Mautic\DashboardBundle\Model;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Exception;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
@@ -25,6 +27,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Throwable;
 
 /**
  * @extends FormModel<Widget>
@@ -139,7 +142,7 @@ final class DashboardModel extends FormModel
             'mautic.dashboard.generated_by',
             [
                 '%name%' => $this->userHelper->getUser()->getName(),
-                '%date%' => new \DateTime()->format('Y-m-d H:i:s'),
+                '%date%' => new DateTime()->format('Y-m-d H:i:s'),
             ]
         );
     }
@@ -238,7 +241,7 @@ final class DashboardModel extends FormModel
             $this->dispatcher->dispatch(
                 $this->widgetEventFactory->createGenerate($widget)
             );
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->logger->error(
                 'Dashboard widget "{type}" failed to load: {message}',
                 ['type' => $widget->getType(), 'message' => $e->getMessage(), 'exception' => $e]
@@ -281,7 +284,7 @@ final class DashboardModel extends FormModel
      * Create/edit entity.
      * @param Widget $entity
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function saveEntity(object $entity, bool $unlock = true): void
     {
@@ -290,7 +293,7 @@ final class DashboardModel extends FormModel
             $entity->setName($this->translator->trans('mautic.widget.'.$entity->getType()));
         }
 
-        $entity->setDateModified(new \DateTime());
+        $entity->setDateModified(new DateTime());
 
         parent::saveEntity($entity, $unlock);
     }
@@ -298,18 +301,18 @@ final class DashboardModel extends FormModel
     /**
      * Generate default date range filter and time unit.
      *
-     * @return array{dateFrom: \DateTime, dateTo: \DateTime}
+     * @return array{dateFrom: DateTime, dateTo: DateTime}
      */
     public function getDefaultFilter(): array
     {
         $dateRangeDefault = $this->coreParametersHelper->get('default_daterange_filter', '-1 month');
-        $dateRangeStart   = new \DateTime();
+        $dateRangeStart   = new DateTime();
         $dateRangeStart->modify($dateRangeDefault);
 
         $session  = $this->requestStack->getSession();
-        $today    = new \DateTime();
-        $dateFrom = new \DateTime($session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00')));
-        $dateTo   = new \DateTime($session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
+        $today    = new DateTime();
+        $dateFrom = new DateTime($session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00')));
+        $dateTo   = new DateTime($session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
 
         return [
             'dateFrom' => $dateFrom,

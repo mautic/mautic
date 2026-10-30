@@ -4,26 +4,23 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use InvalidArgumentException;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Segment\OperatorOptions;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class DynamicContentSubscriber implements EventSubscriberInterface
+final readonly class DynamicContentSubscriber
 {
     public function __construct(
         private LeadListRepository $segmentRepository,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ContactFiltersEvaluateEvent::class => ['onContactFilterEvaluate', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: ContactFiltersEvaluateEvent::class,
+    )]
     public function onContactFilterEvaluate(ContactFiltersEvaluateEvent $event): void
     {
         foreach ($event->getFilters() as $filter) {
@@ -54,7 +51,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
             OperatorOptions::EXCLUDING_ANY => $this->segmentRepository->isNotContactInSegments($contactId, $segmentIds), // Contact is not in some segments provided in $segmentsIds
             OperatorOptions::INCLUDING_ALL => $this->segmentRepository->isContactInAllSegments($contactId, $segmentIds), // Contact is in all segments provided in $segmentsIds
             OperatorOptions::EXCLUDING_ALL => $this->segmentRepository->isNotContactInAllSegments($contactId, $segmentIds), // Contact is not in all segments provided in $segmentsIds
-            default                        => throw new \InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
+            default                        => throw new InvalidArgumentException(sprintf("Unexpected operator '%s'", $operator)),
         };
     }
 }

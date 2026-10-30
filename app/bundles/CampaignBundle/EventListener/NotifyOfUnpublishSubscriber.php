@@ -6,22 +6,16 @@ namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Event\NotifyOfUnpublishEvent;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class NotifyOfUnpublishSubscriber implements EventSubscriberInterface
+final readonly class NotifyOfUnpublishSubscriber
 {
     public function __construct(
         private NotificationHelper $notificationHelper,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            NotifyOfUnpublishEvent::class => 'notifyOfUnpublish',
-        ];
-    }
-
+    #[AsEventListener(event: NotifyOfUnpublishEvent::class)]
     public function notifyOfUnpublish(NotifyOfUnpublishEvent $event): void
     {
         $this->notificationHelper->notifyOfUnpublish($event->getFailedEvent());

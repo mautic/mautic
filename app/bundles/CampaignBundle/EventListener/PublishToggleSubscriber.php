@@ -7,10 +7,10 @@ namespace Mautic\CampaignBundle\EventListener;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class PublishToggleSubscriber implements EventSubscriberInterface
+final readonly class PublishToggleSubscriber
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
@@ -18,13 +18,9 @@ final readonly class PublishToggleSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomTemplateEvent::class => ['onTemplateRender', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CustomTemplateEvent::class,
+    )]
     public function onTemplateRender(CustomTemplateEvent $event): void
     {
         if ('@MauticCore/Helper/publishstatus_icon.html.twig' !== $event->getTemplate()) {

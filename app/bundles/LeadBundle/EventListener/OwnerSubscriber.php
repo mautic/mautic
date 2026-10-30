@@ -10,15 +10,14 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Event\UrlTokenReplaceEvent;
 use Mautic\SmsBundle\Event\TokensBuildEvent;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class OwnerSubscriber implements EventSubscriberInterface
+final class OwnerSubscriber
 {
     private const array OWNER_COLUMNS = ['email', 'firstname', 'lastname', 'position', 'signature'];
-
     private string $ownerFieldSprintf = '{ownerfield=%s}';
-
     /**
      * @var array<int, mixed>|null
      */
@@ -30,43 +29,46 @@ final class OwnerSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailOnBuildEvent::class     => ['onEmailBuild', 0],
-            EmailSendEvent::class        => ['onEmailGenerate', 0],
-            EmailDisplayEvent::class     => ['onEmailDisplay', 0],
-            TokensBuildEvent::class      => ['onSmsTokensBuild', 0],
-            SmsEvents::TOKEN_REPLACEMENT => ['onSmsTokenReplacement', 0],
-            UrlTokenReplaceEvent::class  => ['onUrlTokenReplace', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EmailOnBuildEvent::class,
+    )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         $event->addTokens($this->getTokens());
     }
 
+    #[AsEventListener(
+        event: EmailDisplayEvent::class,
+    )]
     public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
 
+    #[AsEventListener(
+        event: EmailSendEvent::class,
+    )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $event->addTokens($this->getGeneratedTokens($event));
     }
 
+    #[AsEventListener(
+        event: TokensBuildEvent::class,
+    )]
     public function onSmsTokensBuild(TokensBuildEvent $event): void
     {
         $tokens = array_merge($event->getTokens(), $this->getTokens());
         $event->setTokens($tokens);
     }
 
+    #[AsEventListener(
+        event: SmsEvents::TOKEN_REPLACEMENT,
+    )]
     public function onSmsTokenReplacement(TokenReplacementEvent $event): void
     {
         $contact             = $event->getLead()->getProfileFields();
-        $contact['owner_id'] = $event->getLead()->getOwner() ? $event->getLead()->getOwner()->getId() : null;
+        $contact['owner_id'] = $event->getLead()->getOwner() instanceof User ? $event->getLead()->getOwner()->getId() : null;
         if (empty($contact['id']) && $event->getEntity()) {
             return;
         }
@@ -75,6 +77,9 @@ final class OwnerSubscriber implements EventSubscriberInterface
         $event->setContent($content);
     }
 
+    #[AsEventListener(
+        event: UrlTokenReplaceEvent::class,
+    )]
     public function onUrlTokenReplace(UrlTokenReplaceEvent $event): void
     {
         $contact             = $event->getLead()->getProfileFields();

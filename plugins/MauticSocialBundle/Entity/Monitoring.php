@@ -9,6 +9,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -99,13 +101,13 @@ class Monitoring extends FormEntity implements UuidInterface
     private $properties = [];
 
     /**
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
     private $publishDown;
 
     /**
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
     private $publishUp;
@@ -199,7 +201,7 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -207,7 +209,7 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -299,7 +301,7 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * @param \DateTime $publishDown
+     * @param DateTime $publishDown
      */
     public function setPublishDown($publishDown): static
     {
@@ -310,7 +312,7 @@ class Monitoring extends FormEntity implements UuidInterface
     }
 
     /**
-     * @param \DateTime $publishUp
+     * @param DateTime $publishUp
      */
     public function setPublishUp($publishUp): static
     {

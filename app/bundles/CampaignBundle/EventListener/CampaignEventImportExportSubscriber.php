@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -22,10 +23,10 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignEventImportExportSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventImportExportSubscriber
 {
     public function __construct(
         private CampaignModel $campaignModel,
@@ -38,16 +39,9 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onExport', 0],
-            EntityImportEvent::class        => ['onImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EntityExportEvent::class,
+    )]
     public function onExport(EntityExportEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName()) {
@@ -224,6 +218,9 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportEvent::class,
+    )]
     public function onImport(EntityImportEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -255,7 +252,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
             $campaignEvent->setTriggerInterval($element['trigger_interval'] ?? 0);
             $campaignEvent->setTriggerIntervalUnit($element['trigger_interval_unit'] ?? '');
             $campaignEvent->setTriggerMode($element['trigger_mode'] ?? '');
-            $campaignEvent->setTriggerDate(isset($element['trigger_date']) ? new \DateTime($element['triggerDate']) : null);
+            $campaignEvent->setTriggerDate(isset($element['trigger_date']) ? new DateTime($element['triggerDate']) : null);
             $campaignEvent->setTriggerHour($element['trigger_hour'] ?? null);
             $campaignEvent->setDecisionPath($element['decisionPath'] ?? '');
             $campaignEvent->setTriggerWindow($element['triggerWindow'] ?? null);
@@ -291,6 +288,9 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         $this->updateParentEvents($event);
     }
 
+    #[AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
@@ -311,7 +311,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
 
             $existing = $this->eventRepository->findOneBy(['uuid' => $element['uuid'] ?? null]);
 
-            if ($existing) {
+            if ($existing instanceof Event) {
                 $summary[EntityImportEvent::UPDATE]['names'][]   = $existing->getName();
                 $summary[EntityImportEvent::UPDATE]['uuids'][]   = $existing->getUuid();
             } else {
@@ -362,7 +362,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
                     $campaignEvent   = $this->eventRepository->find($campaignEventId);
 
                     $element['properties']['jumpToEvent'] = $newJumpToEventId;
-                    if ($campaignEvent) {
+                    if ($campaignEvent instanceof Event) {
                         $campaignEvent->setProperties($element['properties'] ?? []);
                         $this->entityManager->persist($campaignEvent);
                     }
@@ -373,6 +373,9 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         $this->entityManager->flush();
     }
 
+    #[AsEventListener(
+        event: EntityImportUndoEvent::class,
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Event::ENTITY_NAME !== $event->getEntityName()) {
@@ -387,7 +390,7 @@ final readonly class CampaignEventImportExportSubscriber implements EventSubscri
         foreach ($summary['ids'] as $id) {
             $entity = $this->eventRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof Event) {
                 $dependentEvents = $this->eventRepository->findBy(['parent' => $id]);
 
                 foreach ($dependentEvents as $dependentEvent) {

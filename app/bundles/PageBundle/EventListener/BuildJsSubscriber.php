@@ -4,12 +4,13 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\Event\BuildJsEvent;
 use Mautic\CoreBundle\Event\BuildJsScope;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Helper\TrackingHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-final readonly class BuildJsSubscriber implements EventSubscriberInterface
+final readonly class BuildJsSubscriber
 {
     public function __construct(
         private TrackingHelper $trackingHelper,
@@ -17,17 +18,10 @@ final readonly class BuildJsSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            BuildJsEvent::class => [
-                // onBuildJs must always needs to be last to ensure setup before delivering the event
-                ['onBuildJs', -255],
-                ['onBuildJsForTrackingEvent', 256],
-            ],
-        ];
-    }
-
+    #[AsEventListener(
+        event: BuildJsEvent::class,
+        priority: -255
+    )]
     public function onBuildJs(BuildJsEvent $event): void
     {
         if (!$event->acceptsScope(BuildJsScope::TRACKING)) {
@@ -192,6 +186,10 @@ JS;
         $event->appendJsForScope($js, BuildJsScope::TRACKING, 'Mautic Tracking Pixel');
     }
 
+    #[AsEventListener(
+        event: BuildJsEvent::class,
+        priority: 256
+    )]
     public function onBuildJsForTrackingEvent(BuildJsEvent $event): void
     {
         if (!$event->acceptsScope(BuildJsScope::TRACKING)) {
@@ -211,7 +209,7 @@ JS_WRAP;
                 $gtagSettings['anonymize_ip'] = true;
             }
 
-            if ($lead && $lead->getId()) {
+            if ($lead instanceof Lead && $lead->getId()) {
                 $gtagSettings['user_id'] = $lead->getId();
             }
 
@@ -236,7 +234,7 @@ JS;
 
         if ($id = $this->trackingHelper->displayInitCode('facebook_pixel')) {
             $customMatch = [];
-            if ($lead && $lead->getId()) {
+            if ($lead instanceof Lead && $lead->getId()) {
                 $fieldsToMatch = [
                     'fn' => 'firstname',
                     'ln' => 'lastname',

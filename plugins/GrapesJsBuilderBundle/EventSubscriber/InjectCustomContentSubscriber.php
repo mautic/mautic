@@ -10,13 +10,13 @@ use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
-final readonly class InjectCustomContentSubscriber implements EventSubscriberInterface
+final readonly class InjectCustomContentSubscriber
 {
     public function __construct(
         private Config $config,
@@ -28,13 +28,9 @@ final readonly class InjectCustomContentSubscriber implements EventSubscriberInt
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomContentEvent::class => ['injectViewCustomContent', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CustomContentEvent::class,
+    )]
     public function injectViewCustomContent(CustomContentEvent $customContentEvent): void
     {
         if (!$this->config->isPublished()) {

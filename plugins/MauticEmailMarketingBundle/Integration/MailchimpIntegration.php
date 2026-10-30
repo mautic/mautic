@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
+use Exception;
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
 
 final class MailchimpIntegration extends EmailAbstractIntegration
@@ -141,7 +142,7 @@ final class MailchimpIntegration extends EmailAbstractIntegration
 
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 

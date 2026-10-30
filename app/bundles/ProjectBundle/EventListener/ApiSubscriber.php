@@ -20,17 +20,13 @@ use Mautic\PointBundle\Entity\Trigger;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\StageBundle\Entity\Stage;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class ApiSubscriber implements EventSubscriberInterface
+final class ApiSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ApiInitializeEvent::class=> ['onApiInitializeEvent', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: ApiInitializeEvent::class,
+    )]
     public function onApiInitializeEvent(ApiInitializeEvent $event): void
     {
         if (!in_array($event->getEntityClass(), [

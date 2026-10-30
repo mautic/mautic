@@ -10,12 +10,13 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber
 {
     private string $assetToken = '{assetlink=(.*?)}';
 
@@ -27,17 +28,12 @@ final class BuilderSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailOnBuildEvent::class      => ['onBuilderBuild', 0],
-            EmailSendEvent::class         => ['onEmailGenerate', 0],
-            EmailDisplayEvent::class      => ['onEmailGenerate', 0],
-            PageBuilderEvent::class       => ['onBuilderBuild', 0],
-            PageDisplayEvent::class   => ['onPageDisplay', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EmailOnBuildEvent::class,
+    )]
+    #[AsEventListener(
+        event: PageBuilderEvent::class,
+    )]
     public function onBuilderBuild(BuilderEvent $event): void
     {
         if ($event->tokensRequested($this->assetToken)) {
@@ -55,6 +51,12 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: EmailSendEvent::class,
+    )]
+    #[AsEventListener(
+        event: EmailDisplayEvent::class,
+    )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $lead   = $event->getLead();
@@ -64,13 +66,16 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $event->addTokens($tokens);
     }
 
+    #[AsEventListener(
+        event: PageDisplayEvent::class,
+    )]
     public function onPageDisplay(PageDisplayEvent $event): void
     {
-        if (!$lead = $event->getLead()) {
+        if (!($lead = $event->getLead()) instanceof Lead) {
             $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
         }
 
-        $leadId  = $lead ? $lead->getId() : null;
+        $leadId  = $lead instanceof Lead ? $lead->getId() : null;
         $page    = $event->getPage();
         $tokens  = $this->generateTokensFromContent($event, $leadId, ['page', $page->getId()]);
         $content = $event->getContent();

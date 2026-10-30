@@ -6,25 +6,18 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\GetStatDataEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class SegmentStatsSubscriber implements EventSubscriberInterface
+final readonly class SegmentStatsSubscriber
 {
     public function __construct(
         private LeadListRepository $leadListRepository,
     ) {
     }
 
-    /**
-     * @return mixed[]
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            GetStatDataEvent::class => ['getStatsLeadEvents', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: GetStatDataEvent::class,
+    )]
     public function getStatsLeadEvents(GetStatDataEvent $event): void
     {
         $result = array_merge(

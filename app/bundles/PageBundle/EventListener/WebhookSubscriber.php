@@ -8,26 +8,21 @@ use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\PageEvents;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class WebhookSubscriber implements EventSubscriberInterface
+final readonly class WebhookSubscriber
 {
     public function __construct(
         private WebhookModel $webhookModel,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            WebhookBuilderEvent::class => ['onWebhookBuild', 0],
-            PageHitEvent::class    => ['onPageHit', 0],
-        ];
-    }
-
     /**
      * Add event triggers and actions.
      */
+    #[AsEventListener(
+        event: WebhookBuilderEvent::class,
+    )]
     public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
@@ -40,6 +35,9 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         $event->addEvent(PageEvents::PAGE_ON_HIT, $pageHit);
     }
 
+    #[AsEventListener(
+        event: PageHitEvent::class,
+    )]
     public function onPageHit(PageHitEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(

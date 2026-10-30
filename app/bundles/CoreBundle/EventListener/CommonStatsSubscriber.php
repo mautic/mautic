@@ -6,21 +6,19 @@ use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\StatsEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-abstract class CommonStatsSubscriber implements EventSubscriberInterface
+abstract class CommonStatsSubscriber
 {
     /**
      * @var mixed[]
      */
     protected $repositories = [];
-
     /**
      * @var array<string, mixed>
      */
     protected array $selects = [];
-
     /**
      * @var array
      */
@@ -32,13 +30,9 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            StatsEvent::class => ['onStatsFetch', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: StatsEvent::class,
+    )]
     public function onStatsFetch(StatsEvent $event): void
     {
         /** @var CommonRepository<object> $repository */
@@ -99,6 +93,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
     /**
      * Restrict stats based on contact permissions.
      *
+     * @param class-string[] $repoNames
      * @return $this
      */
     protected function addContactRestrictedRepositories(array $repoNames)
@@ -107,14 +102,15 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
     }
 
     /**
+     * @param class-string[] $repoNames
      * @param array<string, string> $permissions
      */
     protected function addRestrictedRepostories(array $repoNames, array $permissions)
     {
         foreach ($repoNames as $repoName) {
-            $repo                      = $this->entityManager->getRepository($repoName);
-            $this->repositories[]      = $repo;
-            $table                     = $repo->getTableName();
+            $repository                      = $this->entityManager->getRepository($repoName);
+            $this->repositories[]      = $repository;
+            $table                     = $repository->getTableName();
             $this->permissions[$table] = $permissions;
         }
 

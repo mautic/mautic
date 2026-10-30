@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\EventListener;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use LogicException;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -22,31 +23,21 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber
 {
     public const string CONTEXT_EMAILS       = 'emails';
-
     public const string CONTEXT_EMAIL_STATS  = 'email.stats';
-
     public const string EMAILS_PREFIX        = 'e';
-
     public const string EMAIL_STATS_PREFIX   = 'es';
-
     public const string EMAIL_VARIANT_PREFIX = 'vp';
-
     public const string DNC_PREFIX           = 'dnc';
-
     public const string CLICK_PREFIX         = 'cut';
-
     public const string TRACKABLE_PREFIX     = 'tr';
-
     public const string REDIRECT_PREFIX      = 'pr';
-
     public const string CLICK_THROUGH_PREFIX = 'ct';
-
     public const array DNC_COLUMNS = [
         'unsubscribed' => [
             'alias'   => 'unsubscribed',
@@ -82,7 +73,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             'suffix'  => '%',
         ],
     ];
-
     public const array EMAIL_STATS_COLUMNS = [
         self::EMAIL_STATS_PREFIX.'.email_address' => [
             'label' => 'mautic.email.report.stat.email_address',
@@ -123,7 +113,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             'type'  => 'int',
         ],
     ];
-
     public const array EMAIL_VARIANT_COLUMNS = [
         self::EMAIL_VARIANT_PREFIX.'.id' => [
             'label' => 'mautic.email.report.variant_parent_id',
@@ -134,7 +123,6 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             'type'  => 'string',
         ],
     ];
-
     public const array CLICK_COLUMNS = [
         'hits' => [
             'alias'   => 'hits',
@@ -175,19 +163,12 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-            ReportGraphEvent::class     => ['onReportGraphGenerate', 0],
-            ReportDataEvent::class      => ['onReportDisplay', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[AsEventListener(
+        event: ReportBuilderEvent::class,
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_EMAILS, self::CONTEXT_EMAIL_STATS])) {
@@ -349,6 +330,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGeneratorEvent::class,
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
@@ -484,6 +468,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGraphEvent::class,
+    )]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         $graphs = $event->getRequestedGraphs();
@@ -804,6 +791,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: ReportDataEvent::class,
+    )]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();
@@ -910,7 +900,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     private function trackingBuilder(QueryBuilder $queryBuilder): TrackingQueryBuilder
     {
         if (!$queryBuilder instanceof TrackingQueryBuilder) {
-            throw new \LogicException(sprintf('%s needs a query builder that records its parts, got %s.', self::class, $queryBuilder::class));
+            throw new LogicException(sprintf('%s needs a query builder that records its parts, got %s.', self::class, $queryBuilder::class));
         }
 
         return $queryBuilder;

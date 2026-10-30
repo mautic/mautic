@@ -6,20 +6,16 @@ namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\PageBundle\Event\PageBuilderEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class PageSubscriber implements EventSubscriberInterface
+final class PageSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PageBuilderEvent::class => ['OnPageBuild', 0],
-        ];
-    }
-
     /**
      * Add forms to available page tokens.
      */
+    #[AsEventListener(
+        event: PageBuilderEvent::class,
+    )]
     public function onPageBuild(PageBuilderEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {

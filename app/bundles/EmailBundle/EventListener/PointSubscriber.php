@@ -15,9 +15,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Model\PointModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber
 {
     public function __construct(
         private PointModel $pointModel,
@@ -26,16 +26,9 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PointBuilderEvent::class   => ['onPointBuild', 0],
-            TriggerBuilderEvent::class => ['onTriggerBuild', 0],
-            EmailOpenEvent::class         => ['onEmailOpen', 0],
-            EmailSendEvent::class         => ['onEmailSend', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: PointBuilderEvent::class,
+    )]
     public function onPointBuild(PointBuilderEvent $event): void
     {
         $action = [
@@ -57,6 +50,9 @@ final readonly class PointSubscriber implements EventSubscriberInterface
         $event->addAction('email.send', $action);
     }
 
+    #[AsEventListener(
+        event: TriggerBuilderEvent::class,
+    )]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $sendEvent = [
@@ -85,6 +81,9 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for email open.
      */
+    #[AsEventListener(
+        event: EmailOpenEvent::class,
+    )]
     public function onEmailOpen(EmailOpenEvent $event): void
     {
         $this->pointModel->triggerAction('email.open', $event->getEmail());
@@ -93,6 +92,9 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for email send.
      */
+    #[AsEventListener(
+        event: EmailSendEvent::class,
+    )]
     public function onEmailSend(EmailSendEvent $event): void
     {
         $leadArray = $event->getLead();

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
@@ -35,19 +36,17 @@ use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber
 {
     use ChannelTrait;
-
     /**
      * @var string[]
      */
     private array $preventLoop = [];
-
     private ?int $lastContactId = null;
 
     /**
@@ -79,26 +78,12 @@ final class LeadSubscriber implements EventSubscriberInterface
         $this->setModelFactory($modelFactory);
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadPostSaveEvent::class       => ['onLeadPostSave', 0],
-            LeadPreDeleteEvent::class      => ['onLeadPreDelete', 0],
-            LeadPostDeleteEvent::class     => ['onLeadDelete', 0],
-            LeadPreMergeEvent::class       => ['preLeadMerge', 0],
-            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
-            FieldPostSaveEvent::class      => ['onFieldPostSave', 0],
-            FieldPostDeleteEvent::class    => ['onFieldDelete', 0],
-            NotePostSaveEvent::class       => ['onNotePostSave', 0],
-            NotePostDeleteEvent::class     => ['onNoteDelete', 0],
-            Events\LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadChangeCompanyEvent::class  => ['onLeadCompanyChange', 0],
-        ];
-    }
-
     /**
      * Add a lead entry to the audit log.
      */
+    #[AsEventListener(
+        event: LeadPostSaveEvent::class,
+    )]
     public function onLeadPostSave(LeadEvent $event): void
     {
         $lead = $event->getLead();
@@ -176,6 +161,9 @@ final class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a lead delete entry to the audit log.
      */
+    #[AsEventListener(
+        event: LeadPostDeleteEvent::class,
+    )]
     public function onLeadDelete(LeadEvent $event): void
     {
         $lead = $event->getLead();
@@ -193,6 +181,9 @@ final class LeadSubscriber implements EventSubscriberInterface
     /**
      * Find lead linked segment ids to update post delete.
      */
+    #[AsEventListener(
+        event: LeadPreDeleteEvent::class,
+    )]
     public function onLeadPreDelete(LeadEvent $event): void
     {
         if ($this->coreParametersHelper->get('update_segment_contact_count_in_background', false)) {
@@ -209,6 +200,9 @@ final class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a field entry to the audit log.
      */
+    #[AsEventListener(
+        event: FieldPostSaveEvent::class,
+    )]
     public function onFieldPostSave(Events\LeadFieldEvent $event): void
     {
         $field = $event->getField();
@@ -228,6 +222,9 @@ final class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a field delete entry to the audit log.
      */
+    #[AsEventListener(
+        event: FieldPostDeleteEvent::class,
+    )]
     public function onFieldDelete(Events\LeadFieldEvent $event): void
     {
         $field = $event->getField();
@@ -245,6 +242,9 @@ final class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a note entry to the audit log.
      */
+    #[AsEventListener(
+        event: NotePostSaveEvent::class,
+    )]
     public function onNotePostSave(Events\LeadNoteEvent $event): void
     {
         $note = $event->getNote();
@@ -264,6 +264,9 @@ final class LeadSubscriber implements EventSubscriberInterface
     /**
      * Add a note delete entry to the audit log.
      */
+    #[AsEventListener(
+        event: NotePostDeleteEvent::class,
+    )]
     public function onNoteDelete(Events\LeadNoteEvent $event): void
     {
         $note = $event->getNote();
@@ -278,6 +281,9 @@ final class LeadSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
+    #[AsEventListener(
+        event: LeadPreMergeEvent::class,
+    )]
     public function preLeadMerge(Events\LeadMergeEvent $event): void
     {
         $this->leadEventLogRepository->updateLead(
@@ -286,6 +292,9 @@ final class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: LeadPostMergeEvent::class,
+    )]
     public function onLeadMerge(Events\LeadMergeEvent $event): void
     {
         $this->pointsChangeLogRepository->updateLead(
@@ -322,6 +331,9 @@ final class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
+    #[AsEventListener(
+        event: Events\LeadTimelineEvent::class,
+    )]
     public function onTimelineGenerate(Events\LeadTimelineEvent $event): void
     {
         $eventTypes = [
@@ -456,6 +468,9 @@ final class LeadSubscriber implements EventSubscriberInterface
     /**
      * @throws Exception
      */
+    #[AsEventListener(
+        event: LeadChangeCompanyEvent::class,
+    )]
     public function onLeadCompanyChange(LeadChangeCompanyEvent $event): void
     {
         $leadId                 = $event->getLead()->getId();
@@ -566,7 +581,7 @@ final class LeadSubscriber implements EventSubscriberInterface
                 $icon     = 'ri-prohibited-line';
 
                 if (!empty($row['channel'])) {
-                    if ($channelModel = $this->getChannelModel($row['channel'])) {
+                    if (($channelModel = $this->getChannelModel($row['channel'])) instanceof AbstractCommonModel) {
                         if ($channelModel instanceof ChannelTimelineInterface) {
                             if ($overrideTemplate = $channelModel->getChannelTimelineTemplate($eventTypeKey, $row)) {
                                 $template = $overrideTemplate;

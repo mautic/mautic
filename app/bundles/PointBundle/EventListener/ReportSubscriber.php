@@ -9,16 +9,13 @@ use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class ReportSubscriber implements EventSubscriberInterface
+final class ReportSubscriber
 {
     public const string CONTEXT_GROUP_SCORE = 'group.score';
-
     public const string GROUP_PREFIX        = 'pl';
-
     public const string GROUP_SCORE_PREFIX  = 'ls';
-
     public const array GROUP_COLUMNS = [
         self::GROUP_PREFIX.'.id' => [
             'alias' => 'group_id',
@@ -36,7 +33,6 @@ final class ReportSubscriber implements EventSubscriberInterface
             'type'  => 'int',
         ],
     ];
-
     /**
      * @var string[]
      */
@@ -49,14 +45,10 @@ final class ReportSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', -10],
-            ReportGeneratorEvent::class => ['onReportGenerate', -10],
-        ];
-    }
-
+    #[AsEventListener(
+        event: ReportBuilderEvent::class,
+        priority: -10
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext($this->reportContexts)) {
@@ -81,6 +73,10 @@ final class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: ReportGeneratorEvent::class,
+        priority: -10
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext($this->reportContexts)) {

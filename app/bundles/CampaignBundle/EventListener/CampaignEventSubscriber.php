@@ -2,6 +2,8 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\NonUniqueResultException;
@@ -20,15 +22,13 @@ use Mautic\CampaignBundle\Model\Exceptions\CampaignAlreadyUnpublishedException;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignEventSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventSubscriber
 {
     public const int LOOPS_TO_FAIL = 100;
-
     private const int MINIMUM_CONTACTS_FOR_DISABLE = 100;
-
     private const float DISABLE_CAMPAIGN_THRESHOLD   = 0.35;
 
     public function __construct(
@@ -41,24 +41,12 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Get the subscribed events for this listener.
-     *
-     * @return array<string,mixed>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignPreSaveEvent::class              => ['onCampaignPreSave', 0],
-            FailedEvent::class                       => ['onEventFailed', 0],
-            ExecutedEvent::class                     => ['onEventExecuted', 0],
-            EventPreview::class                      => ['onEventPreviewRequest', 0],
-        ];
-    }
-
-    /**
      * Reset all campaign event failed_count's
      * to 0 when the campaign is published.
      */
+    #[AsEventListener(
+        event: CampaignPreSaveEvent::class,
+    )]
     public function onCampaignPreSave(CampaignPreSaveEvent $event): void
     {
         $campaign = $event->getCampaign();
@@ -71,7 +59,7 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
             && !$campaign->getPublishUp()
         ) {
             // Publish up date should be in format 'yyyy-MM-dd HH:mm'
-            $publishUp = new \DateTime();
+            $publishUp = new DateTime();
             $publishUp->setTime((int) $publishUp->format('H'), (int) $publishUp->format('i'));
             $campaign->setPublishUp($publishUp);
         }
@@ -95,6 +83,9 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
      * @throws OptimisticLockException
      * @throws TransactionRequiredException
      */
+    #[AsEventListener(
+        event: FailedEvent::class,
+    )]
     public function onEventFailed(FailedEvent $event): void
     {
         $log                  = $event->getLog();
@@ -145,6 +136,9 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
      *
      * @throws NonUniqueResultException
      */
+    #[AsEventListener(
+        event: ExecutedEvent::class,
+    )]
     public function onEventExecuted(ExecutedEvent $event): void
     {
         $log                  = $event->getLog();
@@ -164,11 +158,14 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
         $this->eventRepository->decreaseFailedCount($executedEvent);
     }
 
+    #[AsEventListener(
+        event: EventPreview::class,
+    )]
     public function onEventPreviewRequest(EventPreview $eventPreview): void
     {
         $logStats = $this->leadEventLogRepository->getEventLogStats($eventPreview->event->getId());
 
-        if ($logStats->firstExecutionDate && $logStats->lastExecutionDate) {
+        if ($logStats->firstExecutionDate instanceof DateTimeImmutable && $logStats->lastExecutionDate instanceof DateTimeImmutable) {
             $firstExecutionDate = new DateTimeHelper($logStats->firstExecutionDate);
             $lastExecutionDate  = new DateTimeHelper($logStats->lastExecutionDate);
 

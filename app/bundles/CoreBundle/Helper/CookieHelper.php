@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final class CookieHelper implements EventSubscriberInterface
+final class CookieHelper
 {
     private ?Request $request = null;
-
     /**
      * @var array<string, Cookie>
      */
@@ -31,7 +30,7 @@ final class CookieHelper implements EventSubscriberInterface
 
     public function getCookie(string $key, mixed $default = null): mixed
     {
-        if (null === $this->getRequest()) {
+        if (!$this->getRequest() instanceof Request) {
             return $default;
         }
 
@@ -70,6 +69,7 @@ final class CookieHelper implements EventSubscriberInterface
         $this->setCookie($name, '', -86400, $path, $domain, $secure, $httponly, $sameSite);
     }
 
+    #[AsEventListener(event: KernelEvents::RESPONSE)]
     public function onResponse(ResponseEvent $event): void
     {
         foreach ($this->cookies as $cookie) {
@@ -77,16 +77,9 @@ final class CookieHelper implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::RESPONSE => 'onResponse',
-        ];
-    }
-
     private function getRequest(): ?Request
     {
-        if (null !== $this->request) {
+        if ($this->request instanceof Request) {
             return $this->request;
         }
 

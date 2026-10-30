@@ -6,10 +6,10 @@ use Mautic\CoreBundle\Helper\DateTime\DateTimeToken;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
 use Mautic\EmailBundle\Event\EmailOnBuildEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class DateTimeTokenSubscriber implements EventSubscriberInterface
+final readonly class DateTimeTokenSubscriber
 {
     public function __construct(
         private TranslatorInterface $translator,
@@ -17,25 +17,25 @@ final readonly class DateTimeTokenSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailOnBuildEvent::class => ['onEmailBuild', 0],
-            EmailSendEvent::class    => ['onEmailGenerate', 0],
-            EmailDisplayEvent::class => ['onEmailDisplay', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EmailOnBuildEvent::class,
+    )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         $event->addToken('{today}', $this->translator->trans('mautic.core.token.group.other').': '.$this->translator->trans('mautic.email.token.today'));
     }
 
+    #[AsEventListener(
+        event: EmailDisplayEvent::class,
+    )]
     public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
 
+    #[AsEventListener(
+        event: EmailSendEvent::class,
+    )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $content = $event->getSubject();

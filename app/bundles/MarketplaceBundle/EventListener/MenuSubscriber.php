@@ -8,22 +8,19 @@ use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
 use Mautic\MarketplaceBundle\Service\RouteProvider;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class MenuSubscriber implements EventSubscriberInterface
+final readonly class MenuSubscriber
 {
     public function __construct(
         private Config $config,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MenuEvent::class => ['onBuildMenu', 9999],
-        ];
-    }
-
+    #[AsEventListener(
+        event: MenuEvent::class,
+        priority: 9999
+    )]
     public function onBuildMenu(MenuEvent $event): void
     {
         if ('admin' !== $event->getType() || !$this->config->marketplaceIsEnabled()) {

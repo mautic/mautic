@@ -7,22 +7,18 @@ namespace MauticPlugin\MauticSocialBundle\EventListener;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use MauticPlugin\MauticSocialBundle\Form\Type\SocialLoginType;
 use MauticPlugin\MauticSocialBundle\Integration\Config;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber
 {
     public function __construct(
         private Config $config,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormBuilderEvent::class => ['onFormBuild', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: FormBuilderEvent::class,
+    )]
     public function onFormBuild(FormBuilderEvent $event): void
     {
         if (!$this->config->isPublished()) {

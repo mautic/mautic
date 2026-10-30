@@ -7,12 +7,13 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-final class PageSubscriber implements EventSubscriberInterface
+final class PageSubscriber
 {
     private string $regex = '{focus=(.*?)}';
 
@@ -24,17 +25,12 @@ final class PageSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PageDisplayEvent::class => ['onPageDisplay', 0],
-            PageBuilderEvent::class   => ['onPageBuild', 0],
-        ];
-    }
-
     /**
      * Add forms to available page tokens.
      */
+    #[AsEventListener(
+        event: PageBuilderEvent::class,
+    )]
     public function onPageBuild(PageBuilderEvent $event): void
     {
         if ($event->tokensRequested($this->regex)) {
@@ -51,6 +47,9 @@ final class PageSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: PageDisplayEvent::class,
+    )]
     public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content = $event->getContent();
@@ -61,7 +60,7 @@ final class PageSubscriber implements EventSubscriberInterface
         if (count($matches[0])) {
             foreach ($matches[1] as $id) {
                 $focus = $this->model->getEntity((int) $id);
-                if (null !== $focus
+                if ($focus instanceof Focus
                     && (
                         $focus->isPublished()
                         || $this->security->hasEntityAccess(

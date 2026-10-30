@@ -2,6 +2,10 @@
 
 namespace Mautic\DynamicContentBundle\EventListener;
 
+use DOMDocument;
+use DOMElement;
+use DOMNode;
+use DOMXPath;
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -23,9 +27,9 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class DynamicContentSubscriber implements EventSubscriberInterface
+final readonly class DynamicContentSubscriber
 {
     use MatchFilterForLeadTrait;
 
@@ -44,19 +48,12 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            DynamicContentEvents::POST_SAVE         => ['onPostSave', 0],
-            DynamicContentEvents::POST_DELETE       => ['onDelete', 0],
-            MauticEvents\TokenReplacementEvent::class => ['onTokenReplacement', 0],
-            PageDisplayEvent::class             => ['decodeTokens', 254],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[AsEventListener(
+        event: DynamicContentEvents::POST_SAVE,
+    )]
     public function onPostSave(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
@@ -75,6 +72,9 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
     /**
      * Add a delete entry to the audit log.
      */
+    #[AsEventListener(
+        event: DynamicContentEvents::POST_DELETE,
+    )]
     public function onDelete(Events\DynamicContentEvent $event): void
     {
         $entity = $event->getDynamicContent();
@@ -88,6 +88,9 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
         $this->auditLogModel->writeToLog($log);
     }
 
+    #[AsEventListener(
+        event: MauticEvents\TokenReplacementEvent::class,
+    )]
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
@@ -138,13 +141,17 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
         }
     }
 
+    #[AsEventListener(
+        event: PageDisplayEvent::class,
+        priority: 254
+    )]
     public function decodeTokens(PageDisplayEvent $event): void
     {
-        if (!$lead = $event->getLead()) {
+        if (!($lead = $event->getLead()) instanceof Lead) {
             $lead = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
         }
 
-        if (!$lead) {
+        if (!$lead instanceof Lead) {
             return;
         }
 
@@ -156,15 +163,15 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
         $tokens = $this->dynamicContentHelper->findDwcTokens($content, $lead);
 
         // replace slots
-        $dom = new \DOMDocument('1.0', 'utf-8');
+        $dom = new DOMDocument('1.0', 'utf-8');
         $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
-        $xpath = new \DOMXPath($dom);
+        $xpath = new DOMXPath($dom);
 
         $contentSlots = $xpath->query('//*[@data-slot="dwc"]');
 
         for ($i = 0; $i < $contentSlots->length; ++$i) {
             $slot = $contentSlots->item($i);
-            if (!$slot instanceof \DOMElement) {
+            if (!$slot instanceof DOMElement) {
                 continue;
             }
             if (!$slotName = $slot->getAttribute('data-param-slot-name')) {
@@ -177,7 +184,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
 
             $newnode = $dom->createDocumentFragment();
             $newnode->appendXML('<![CDATA['.mb_encode_numericentity($slotContent, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8').']]>');
-            if ($slot->parentNode instanceof \DOMNode) {
+            if ($slot->parentNode instanceof DOMNode) {
                 $slot->parentNode->replaceChild($newnode, $slot);
             }
         }

@@ -4,27 +4,24 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class MessageQueueSubscriber implements EventSubscriberInterface
+final readonly class MessageQueueSubscriber
 {
     public function __construct(
         private EmailModel $emailModel,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MessageQueueBatchProcessEvent::class => ['onProcessMessageQueueBatch', 0],
-        ];
-    }
-
     /**
      * Sends campaign emails.
      */
+    #[AsEventListener(
+        event: MessageQueueBatchProcessEvent::class,
+    )]
     public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event): void
     {
         if (!$event->checkContext('email')) {
@@ -43,7 +40,7 @@ final readonly class MessageQueueSubscriber implements EventSubscriberInterface
 
         /** @var MessageQueue $message */
         foreach ($messages as $message) {
-            if (!($email && $message->getLead() && $email->isPublished())) {
+            if (!($email instanceof Email && $message->getLead() && $email->isPublished())) {
                 $message->setFailed();
                 continue;
             }

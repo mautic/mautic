@@ -10,9 +10,9 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber
 {
     public function __construct(
         private UserModel $userModel,
@@ -22,17 +22,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MauticEvents\GlobalSearchEvent::class => [
-                ['onGlobalSearchUser', 0],
-                ['onGlobalSearchRoles', 0],
-            ],
-            MauticEvents\CommandListEvent::class  => ['onBuildCommandList', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: MauticEvents\GlobalSearchEvent::class,
+    )]
     public function onGlobalSearchUser(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
@@ -47,6 +39,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: MauticEvents\GlobalSearchEvent::class,
+    )]
     public function onGlobalSearchRoles(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
@@ -61,6 +56,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: MauticEvents\CommandListEvent::class,
+    )]
     public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         if ($this->security->isGranted('user:users:view')) {

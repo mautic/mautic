@@ -6,20 +6,15 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\PluginBundle\Form\Type\IntegrationsListType;
 use Mautic\PluginBundle\PluginEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class CampaignSubscriber implements EventSubscriberInterface
+final class CampaignSubscriber
 {
     use PushToIntegrationTrait;
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            PluginEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $action = [
@@ -33,6 +28,9 @@ final class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('plugin.leadpush', $action);
     }
 
+    #[AsEventListener(
+        event: PluginEvents::ON_CAMPAIGN_BATCH_ACTION,
+    )]
     public function onCampaignTriggerAction(PendingEvent $event): void
     {
         $campaignEvent = $event->getEvent();

@@ -19,10 +19,10 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Model\PluginModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class SegmentImportExportSubscriber implements EventSubscriberInterface
+final readonly class SegmentImportExportSubscriber
 {
     use ImportExportTrait;
 
@@ -39,16 +39,9 @@ final readonly class SegmentImportExportSubscriber implements EventSubscriberInt
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onSegmentExport', 0],
-            EntityImportEvent::class        => ['onSegmentImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EntityExportEvent::class,
+    )]
     public function onSegmentExport(EntityExportEvent $event): void
     {
         if (LeadList::ENTITY_NAME !== $event->getEntityName()) {
@@ -57,7 +50,7 @@ final readonly class SegmentImportExportSubscriber implements EventSubscriberInt
 
         $leadListId = $event->getEntityId();
         $leadList   = $this->leadListModel->getEntity($leadListId);
-        if (!$leadList) {
+        if (!$leadList instanceof LeadList) {
             return;
         }
         $segmentData = [
@@ -99,6 +92,9 @@ final readonly class SegmentImportExportSubscriber implements EventSubscriberInt
         $this->logAction('export', $leadListId, $segmentData);
     }
 
+    #[AsEventListener(
+        event: EntityImportEvent::class,
+    )]
     public function onSegmentImport(EntityImportEvent $event): void
     {
         if (LeadList::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -141,6 +137,9 @@ final readonly class SegmentImportExportSubscriber implements EventSubscriberInt
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportUndoEvent::class,
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (LeadList::ENTITY_NAME !== $event->getEntityName()) {
@@ -155,7 +154,7 @@ final readonly class SegmentImportExportSubscriber implements EventSubscriberInt
         foreach ($summary['ids'] as $id) {
             $entity = $this->leadListRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof LeadList) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => LeadList::class]);
             }
@@ -164,6 +163,9 @@ final readonly class SegmentImportExportSubscriber implements EventSubscriberInt
         $this->entityManager->flush();
     }
 
+    #[AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         if (LeadList::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {

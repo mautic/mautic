@@ -7,9 +7,9 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class TimelineEventLogSubscriber implements EventSubscriberInterface
+final class TimelineEventLogSubscriber
 {
     use TimelineEventLogTrait;
 
@@ -21,13 +21,9 @@ final class TimelineEventLogSubscriber implements EventSubscriberInterface
         $this->eventLogRepository = $leadEventLogRepository;
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: LeadTimelineEvent::class,
+    )]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $this->addEvents(

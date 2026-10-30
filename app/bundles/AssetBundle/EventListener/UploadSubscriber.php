@@ -10,10 +10,10 @@ use Oneup\UploaderBundle\Event\PostUploadEvent;
 use Oneup\UploaderBundle\Event\ValidationEvent;
 use Oneup\UploaderBundle\Uploader\Exception\ValidationException;
 use Oneup\UploaderBundle\UploadEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-final readonly class UploadSubscriber implements EventSubscriberInterface
+final readonly class UploadSubscriber
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
@@ -22,18 +22,13 @@ final readonly class UploadSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            UploadEvents::POST_UPLOAD => ['onPostUpload', 0],
-            UploadEvents::VALIDATION  => ['onUploadValidation', 0],
-        ];
-    }
-
     /**
      * Moves upladed file to temporary directory where it can be found later
      * and all uploaded files in there cleared. Also sets file name to the response.
      */
+    #[AsEventListener(
+        event: UploadEvents::POST_UPLOAD,
+    )]
     public function onPostUpload(PostUploadEvent $event): void
     {
         $request   = $event->getRequest()->request;
@@ -57,6 +52,9 @@ final readonly class UploadSubscriber implements EventSubscriberInterface
      *
      * @throws ValidationException
      */
+    #[AsEventListener(
+        event: UploadEvents::VALIDATION,
+    )]
     public function onUploadValidation(ValidationEvent $event): void
     {
         $file       = $event->getFile();

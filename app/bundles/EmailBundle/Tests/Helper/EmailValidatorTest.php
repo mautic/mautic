@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -175,7 +176,7 @@ final class EmailValidatorTest extends TestCase
     public function testIntegrationInvalidatesEmail(): void
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new EmailValidationSubscriber());
+        ReflectionHelper::registerAttributeListeners($dispatcher, new EmailValidationSubscriber());
 
         $emailValidator = new EmailValidator($this->translator, $dispatcher);
 

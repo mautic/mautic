@@ -6,18 +6,13 @@ use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\NotificationBundle\NotificationEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class CampaignConditionSubscriber implements EventSubscriberInterface
+final class CampaignConditionSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            NotificationEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerHasActiveCondition', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addCondition(
@@ -30,6 +25,9 @@ final class CampaignConditionSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: NotificationEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+    )]
     public function onCampaignTriggerHasActiveCondition(ConditionEvent $event): void
     {
         if (!$event->checkContext('notification.has.active')) {

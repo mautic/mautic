@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +15,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-final readonly class RequestSubscriber implements EventSubscriberInterface
+final readonly class RequestSubscriber
 {
     public function __construct(
         private CsrfTokenManagerInterface $tokenManager,
@@ -24,13 +24,9 @@ final readonly class RequestSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::REQUEST => ['validateCsrfTokenForAjaxPost', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: KernelEvents::REQUEST,
+    )]
     public function validateCsrfTokenForAjaxPost(RequestEvent $event): void
     {
         $request = $event->getRequest();
