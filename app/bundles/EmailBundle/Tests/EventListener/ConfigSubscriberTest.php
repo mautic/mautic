@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EventListener\ConfigSubscriber;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -89,7 +90,7 @@ final class ConfigSubscriberTest extends TestCase
             ],
         ]);
 
-        $subscriber = new ConfigSubscriber();
+        $subscriber = new ConfigSubscriber($this->createMock(CoreParametersHelper::class));
         $subscriber->onConfigBeforeSave($event);
 
         $this->assertSame($expectedPassword, $event->getConfig('emailconfig')['monitored_email'][$mailbox]['password']);
