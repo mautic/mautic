@@ -20,7 +20,16 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
+    private const ANALYTICS_CODE = '<script>/* analytics-code */</script>';
+
     protected $useCleanupRollback = false;
+
+    protected function setUp(): void
+    {
+        $this->configParams['google_analytics'] = self::ANALYTICS_CODE;
+
+        parent::setUp();
+    }
 
     /**
      * @return iterable<string, array{bool}>
@@ -85,6 +94,7 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, sprintf($uri, $stat->getTrackingHash()), [], [], ['REMOTE_ADDR' => '203.0.113.90']);
         $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('analytics-code', (string) $this->client->getResponse()->getContent());
 
         $this->em->clear();
         $stat = $this->em->find(Stat::class, $stat->getId());
@@ -103,6 +113,31 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         $stat = $this->em->find(Stat::class, $stat->getId());
         $this->assertInstanceOf(Stat::class, $stat);
         $this->assertTrue($stat->getIsRead());
+    }
+
+    #[DataProvider('trackingProvider')]
+    public function testPublicPreviewGetsTheAnalyticsCodeOnlyWithTrackingOn(bool $trackingEnabled): void
+    {
+        $email = $this->createEmail('Preview');
+        $email->setSubject('Preview');
+        $email->setEmailType('template');
+        $email->setTemplate('blank');
+        $email->setCustomHtml('<html><head></head><body>Hi</body></html>');
+        $email->setPublicPreview(true);
+        $email->setTrackingEnabled($trackingEnabled);
+        $this->em->persist($email);
+        $this->em->flush();
+        $this->logoutUser();
+
+        $this->client->request(Request::METHOD_GET, '/email/preview/'.$email->getId());
+        $this->assertResponseIsSuccessful();
+
+        $content = (string) $this->client->getResponse()->getContent();
+        if ($trackingEnabled) {
+            $this->assertStringContainsString('analytics-code', $content);
+        } else {
+            $this->assertStringNotContainsString('analytics-code', $content);
+        }
     }
 
     public function testCloneKeepsTheTrackingOption(): void

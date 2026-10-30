@@ -604,7 +604,8 @@ final class PublicController extends CommonFormController
         $company = $previewHelper->getCompanyEntity($companyId);
         $content = $previewHelper->generatePreviewContent($emailEntity, $contact, $company, $content);
 
-        if ($this->security->isAnonymous()) {
+        // Same as in the browser view, an email with tracking off doesn't get the analytics code
+        if ($this->security->isAnonymous() && $emailEntity->getTrackingEnabled()) {
             $content = $analyticsHelper->addCode($content);
         }
 
