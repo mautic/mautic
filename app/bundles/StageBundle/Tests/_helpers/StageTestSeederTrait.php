@@ -12,7 +12,10 @@ use Mautic\StageBundle\Entity\Stage;
  */
 trait StageTestSeederTrait
 {
-    protected function seedStagesWithLeads(): void
+    /**
+     * @return array{Stage, Stage}
+     */
+    private function seedStagesWithLeads(): array
     {
         $stageA = (new Stage())
             ->setName('Stage A')
@@ -39,5 +42,7 @@ trait StageTestSeederTrait
         $this->em->persist($lead1);
         $this->em->persist($lead2);
         $this->em->flush();
+
+        return [$stageA, $stageB];
     }
 }

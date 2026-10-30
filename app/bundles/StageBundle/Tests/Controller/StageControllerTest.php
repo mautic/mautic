@@ -13,14 +13,20 @@ final class StageControllerTest extends MauticMysqlTestCase
 
     public function testIndexDisplaysContactCounts(): void
     {
-        $this->seedStagesWithLeads();
+        [$stageWithContacts, $stageWithoutContacts] = $this->seedStagesWithLeads();
 
         $this->client->request('GET', '/s/stages');
-        $response = $this->client->getResponse();
 
-        self::assertResponseIsSuccessful();
-        $content = $response->getContent();
-        $this->assertStringContainsString('View 2 Contacts', (string) $content);
-        $this->assertStringContainsString('No Contacts', (string) $content);
+        $this->assertResponseIsSuccessful();
+
+        $crawler = $this->client->getCrawler();
+        $stageWithContactsCount = $crawler->filter('#stage-contacts-count-'.$stageWithContacts->getId());
+        $this->assertSame('a', $stageWithContactsCount->nodeName());
+        $this->assertStringContainsString('2', $stageWithContactsCount->text());
+        $this->assertStringContainsString('/s/contacts', (string) $stageWithContactsCount->attr('href'));
+
+        $stageWithoutContactsCount = $crawler->filter('#stage-contacts-count-'.$stageWithoutContacts->getId());
+        $this->assertSame('div', $stageWithoutContactsCount->nodeName());
+        $this->assertNull($stageWithoutContactsCount->attr('href'));
     }
 }
