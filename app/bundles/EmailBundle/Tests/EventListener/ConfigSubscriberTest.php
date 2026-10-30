@@ -78,7 +78,17 @@ final class ConfigSubscriberTest extends TestCase
             ],
         ], new ParameterBag());
 
+        // The form model may contain a resolved value, not its persisted representation.
         $event->setOriginalModelData([
+            'emailconfig' => [
+                'monitored_email' => [
+                    $mailbox => ['password' => $storedPassword],
+                ],
+            ],
+        ]);
+
+        // The persisted value must win when the submitted password is blank.
+        $event->setOriginalPersistedConfig([
             'emailconfig' => [
                 'monitored_email' => [
                     $mailbox => [
@@ -90,7 +100,7 @@ final class ConfigSubscriberTest extends TestCase
             ],
         ]);
 
-        $subscriber = new ConfigSubscriber($this->createMock(CoreParametersHelper::class));
+        $subscriber = new ConfigSubscriber($this->createStub(CoreParametersHelper::class));
         $subscriber->onConfigBeforeSave($event);
 
         $this->assertSame($expectedPassword, $event->getConfig('emailconfig')['monitored_email'][$mailbox]['password']);

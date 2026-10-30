@@ -54,6 +54,11 @@ return RectorConfig::configure()
     ->reportUnusedSkips()
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
+        // Preserve the public constructor argument for Mautic 7.x compatibility.
+        Rector\DeadCode\Rector\ClassMethod\RemoveUnusedConstructorParamRector::class => [
+            __DIR__.'/app/bundles/EmailBundle/EventListener/ConfigSubscriber.php',
+        ],
+
         // @todo move to "twig" group
         Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector::class,
         Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector::class,

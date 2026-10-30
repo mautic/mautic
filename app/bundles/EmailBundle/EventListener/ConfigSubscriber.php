@@ -15,6 +15,7 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
      * @deprecated since 7.x; the CoreParametersHelper argument is retained
      *             for backward compatibility and will be removed in 8.0.
      */
+    // @phpstan-ignore-next-line constructor.unusedParameter (Preserved for 7.x backward compatibility; remove in 8.0.)
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
     }
@@ -43,7 +44,7 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
         $data = $event->getConfig('emailconfig');
 
         // Get the original data so that passwords aren't lost
-        $monitoredEmail = $event->getOriginalModelData()['emailconfig']['monitored_email'] ?? [];
+        $monitoredEmail = $event->getOriginalPersistedConfig()['emailconfig']['monitored_email'] ?? [];
         if (isset($data['monitored_email'])) {
             foreach ($data['monitored_email'] as $key => $monitor) {
                 if (empty($monitor['password']) && !empty($monitoredEmail[$key]['password'])) {
