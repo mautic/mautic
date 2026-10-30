@@ -223,7 +223,8 @@ final class EmailSubscriberTest extends TestCase
             </center>
         </div>
 </body></html>
-CONTENT,
+CONTENT
+,
             function (string $content): void {
                 $preheaderTextHtml = EmailSubscriber::PREHEADER_HTML_ELEMENT_BEFORE.'this is a nice preheader text'.EmailSubscriber::PREHEADER_HTML_ELEMENT_AFTER;
                 $this->assertStringContainsString($preheaderTextHtml, $content);
@@ -257,7 +258,8 @@ CONTENT,
             </center>
         </div>
 </body></html>
-CONTENT,
+CONTENT
+,
             function (string $content): void {
                 $preheaderTextHtml = EmailSubscriber::PREHEADER_HTML_ELEMENT_BEFORE.'this is a nice preheader text'.EmailSubscriber::PREHEADER_HTML_ELEMENT_AFTER;
                 $this->assertStringContainsString($preheaderTextHtml, $content);
