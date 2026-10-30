@@ -11,6 +11,10 @@ use Mautic\UserBundle\Entity\User;
 
 final class UserNotificationBuilderTest extends MauticMysqlTestCase
 {
+    private const ADMIN_USER = 'admin';
+
+    private const SALES_USER = 'sales';
+
     private UserNotificationBuilder $notificationBuilder;
 
     protected function setUp(): void
@@ -22,16 +26,19 @@ final class UserNotificationBuilderTest extends MauticMysqlTestCase
 
     public function testGetUserIdsWithNonExistentObject(): void
     {
+        $user    = $this->getUser(self::ADMIN_USER);
+        $this->assertInstanceOf(User::class, $user);
         $userIds = $this->notificationBuilder->getUserIds('lead', 253);
 
-        $this->assertSame([1], $userIds);
+        $this->assertSame([$user->getId()], $userIds);
     }
 
     public function testGetUserIdsWithExistentObject(): void
     {
-        $user = $this->em->find(User::class, 2);
-        $lead = new Lead();
+        $user = $this->getUser(self::SALES_USER);
         $this->assertInstanceOf(User::class, $user);
+
+        $lead = new Lead();
         $lead->setOwner($user);
         $this->em->persist($lead);
         $this->em->flush();

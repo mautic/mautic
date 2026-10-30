@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -320,10 +321,18 @@ trait FilterTrait
                         function ($regex, ExecutionContextInterface $context): void {
                             // Let's test the regex's syntax by making a fake query
                             try {
-                                $qb = $this->connection->createQueryBuilder();
+                                $qb             = $this->connection->createQueryBuilder();
+                                $platform       = $this->connection->getDatabasePlatform();
+
+                                $whereCondition = DatabasePlatform::getRegexpExpression(
+                                    $platform,
+                                    DatabasePlatform::castIfStrict($platform, 'l.id'),
+                                    ':regex'
+                                );
+
                                 $qb->select('l.id')
                                     ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-                                    ->where('l.id REGEXP :regex')
+                                    ->where($whereCondition)
                                     ->setParameter('regex', $this->prepareRegex($regex))
                                     ->setMaxResults(1);
                                 $qb->executeQuery()->fetchAllAssociative();

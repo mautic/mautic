@@ -576,6 +576,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
         // Allow plugin to manipulate the query
         $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
+
         $this->dispatcher->dispatch($event, ReportEvents::REPORT_QUERY_PRE_EXECUTE);
         $query = $event->getQuery();
 
@@ -787,6 +788,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     private function getTotalCount(QueryBuilder $qb, array &$debugData): int
     {
         $countQb = clone $qb;
+
         $countQb->resetQueryParts();
 
         $countQb->select('count(*)')

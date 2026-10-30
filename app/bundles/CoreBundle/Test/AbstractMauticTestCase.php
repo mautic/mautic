@@ -138,6 +138,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->client->getCookieJar()->clear();
     }
 
+    public function getUser(string $username): ?User
+    {
+        $repository = $this->em->getRepository(User::class);
+
+        return $repository->findOneBy(['username' => $username]);
+    }
+
     /**
      * Make `$append = true` default so we can avoid unnecessary purges.
      */
@@ -164,9 +171,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->run($input, $output);
     }
 
-    protected function installDatabaseFixtures(array $classNames = []): void
+    protected function installDatabaseFixtures(array $classNames = [], bool $append = true): void
     {
-        $this->loadFixtures($classNames);
+        $this->loadFixtures($classNames, $append);
     }
 
     public function setCsrfHeader(string $intention = 'mautic_ajax_post'): void

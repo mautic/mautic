@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ParameterType;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -240,7 +241,10 @@ class LeadFieldRepository extends CommonRepository
      */
     public function compareValue($lead, $field, $value, $operatorExpr, ?string $fieldType = null)
     {
-        $q = $this->_em->getConnection()->createQueryBuilder();
+        $connection = $this->_em->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+
+        $q = $connection->createQueryBuilder();
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
@@ -289,23 +293,19 @@ class LeadFieldRepository extends CommonRepository
             )
               ->setParameter('lead', (int) $lead);
         } elseif ('regexp' === $operatorExpr || 'notRegexp' === $operatorExpr) {
-            if ('regexp' === $operatorExpr) {
-                $where = $property.' REGEXP  :value';
-            } else {
-                $where = $property.' NOT REGEXP  :value';
-            }
+            $fieldExpr = DatabasePlatform::castIfStrict($platform, $property);
+            $regexExpr = DatabasePlatform::getRegexpExpression($platform, $fieldExpr, ':value', 'notRegexp' === $operatorExpr);
 
             $q->where(
                 $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead'),
-                    $q->expr()->and($where)
+                    $regexExpr
                 )
             )
               ->setParameter('lead', (int) $lead)
               ->setParameter('value', $value);
         } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
             $values   = (!is_array($value)) ? [$value] : $value;
-            $operator = str_starts_with($operatorExpr, 'not') ? 'NOT REGEXP' : 'REGEXP';
             $expr     = $q->expr()->and(
                 $q->expr()->eq('l.id', ':lead')
             );
@@ -316,8 +316,16 @@ class LeadFieldRepository extends CommonRepository
                 // Don't use InputHelper::clean() to avoid converting special characters to HTML entities
                 $paramName   = 'value'.$paramCount++;
                 $v           = trim((string) $v, "'");
-                $innerExpr[] = $property." {$operator} :".$paramName;
-                $q->setParameter($paramName, "\\|?{$v}\\|?");
+
+                $pattern   = DatabasePlatform::getDelimitedRegexPattern($platform, $v);
+                $fieldExpr = DatabasePlatform::castIfStrict($platform, $property);
+
+                $regexExpr = ('in' === $operatorExpr)
+                    ? DatabasePlatform::getRegexpExpression($platform, $fieldExpr, ':'.$paramName, false)
+                    : DatabasePlatform::getRegexpExpression($platform, $fieldExpr, ':'.$paramName, true);
+
+                $innerExpr[] = $regexExpr;
+                $q->setParameter($paramName, $pattern);
             }
 
             if (str_starts_with($operatorExpr, 'not')) {
@@ -330,7 +338,7 @@ class LeadFieldRepository extends CommonRepository
             }
 
             $q->where($expr)
-                ->setParameter('lead', (int) $lead);
+                ->setParameter('lead', (int) $lead, ParameterType::INTEGER);
         } else {
             $expr = $q->expr()->and(
                 $q->expr()->eq('l.id', ':lead')
@@ -358,10 +366,23 @@ class LeadFieldRepository extends CommonRepository
                         $operatorExpr   = 'like';
                         $value          = '%'.$value.'%';
                         break;
+                    default:
+                        $isStringPatternOperator = in_array($operatorExpr, [
+                            'like', 'notLike', 'regexp', 'notRegexp',
+                            'startsWith', 'endsWith', 'contains', 'in', 'notIn',
+                        ], true);
+
+                        $value = DatabasePlatform::normalizeComparisonValue(
+                            $platform,
+                            $value,
+                            $fieldType ?? $this->getFieldType($field),
+                            $isStringPatternOperator
+                        );
                 }
 
-                $expr = $expr->with(
-                    $q->expr()->{$operatorExpr}($property, ':value')
+                $fieldExpr = DatabasePlatform::castIfStrict($platform, $property);
+                $expr      = $expr->with(
+                    $q->expr()->$operatorExpr($fieldExpr, ':value')
                 );
             }
 
@@ -566,5 +587,15 @@ class LeadFieldRepository extends CommonRepository
         }
 
         return [$expr, $parameters];
+    }
+
+    private function getFieldType(string $alias, string $object = 'lead'): ?string
+    {
+        $fields = $this->getFields();  // cached array by alias
+        if (isset($fields[$alias]) && $fields[$alias]['object'] === $object) {
+            return $fields[$alias]['type'];
+        }
+
+        return null;
     }
 }

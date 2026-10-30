@@ -1,0 +1,22 @@
+diff --git a/vendor/doctrine/persistence/src/Mapping/Driver/MappingDriverChain.php b/vendor/doctrine/persistence/src/Mapping/Driver/MappingDriverChain.php
+index 8563dd2318..c7d0433e30 100644
+--- a/vendor/doctrine/persistence/src/Mapping/Driver/MappingDriverChain.php
++++ b/vendor/doctrine/persistence/src/Mapping/Driver/MappingDriverChain.php
+@@ -8,7 +8,7 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
+ use Doctrine\Persistence\Mapping\MappingException;
+
+ use function array_keys;
+-use function spl_object_hash;
++use function spl_object_id;
+ use function strpos;
+
+ /**
+@@ -98,7 +98,7 @@ class MappingDriverChain implements MappingDriver
+         $driverClasses = [];
+
+         foreach ($this->drivers as $namespace => $driver) {
+-            $oid = spl_object_hash($driver);
++            $oid = spl_object_id($driver);
+
+             if (! isset($driverClasses[$oid])) {
+                 $driverClasses[$oid] = $driver->getAllClassNames();

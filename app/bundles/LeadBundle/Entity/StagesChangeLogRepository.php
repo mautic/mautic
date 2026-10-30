@@ -21,9 +21,16 @@ class StagesChangeLogRepository extends CommonRepository
      */
     public function getLeadTimelineEvents($leadId = null, array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $connection = $this->getEntityManager()->getConnection();
+
+        $query = $connection->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_stages_change_log', 'ls')
-            ->select('ls.id, ls.stage_id as reference, ls.event_name as eventName, ls.action_name as actionName, ls.date_added as dateAdded, ls.lead_id');
+            ->select('ls.id',
+                'ls.stage_id as '.$connection->quoteIdentifier('reference'),
+                'ls.event_name as '.$connection->quoteIdentifier('eventName'),
+                'ls.action_name as '.$connection->quoteIdentifier('actionName'),
+                'ls.date_added as '.$connection->quoteIdentifier('dateAdded'),
+                'ls.lead_id');
 
         if ($leadId) {
             $query->where('ls.lead_id = '.(int) $leadId);

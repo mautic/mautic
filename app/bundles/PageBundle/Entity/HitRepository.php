@@ -65,10 +65,28 @@ class HitRepository extends CommonRepository
      */
     public function getLeadHits($leadId = null, array $options = [])
     {
-        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $connection = $this->getEntityManager()->getConnection();
+        $query      = $connection->createQueryBuilder();
 
-        $query->select('h.id as hitId, h.page_id, h.user_agent as userAgent, h.date_hit as dateHit, h.date_left as dateLeft, h.referer, h.source, h.source_id as sourceId, h.url, h.url_title as urlTitle, h.query, ds.client_info as clientInfo, ds.device, ds.device_os_name as deviceOsName, ds.device_brand as deviceBrand, ds.device_model as deviceModel, h.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
+        $query->select(
+            'h.id AS '.$connection->quoteIdentifier('hitId'),
+            'h.page_id',
+            'h.user_agent AS '.$connection->quoteIdentifier('userAgent'),
+            'h.date_hit AS '.$connection->quoteIdentifier('dateHit'),
+            'h.date_left AS '.$connection->quoteIdentifier('dateLeft'),
+            'h.referer',
+            'h.source',
+            'h.source_id AS '.$connection->quoteIdentifier('sourceId'),
+            'h.url',
+            'h.url_title AS '.$connection->quoteIdentifier('urlTitle'),
+            'h.query',
+            'ds.client_info AS '.$connection->quoteIdentifier('clientInfo'),
+            'ds.device',
+            'ds.device_os_name AS '.$connection->quoteIdentifier('deviceOsName'),
+            'ds.device_brand AS '.$connection->quoteIdentifier('deviceBrand'),
+            'ds.device_model AS '.$connection->quoteIdentifier('deviceModel'),
+            'h.lead_id'
+        )->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h')
             ->leftJoin('h', MAUTIC_TABLE_PREFIX.'pages', 'p', 'h.page_id = p.id');
 
         if ($leadId) {
@@ -270,12 +288,16 @@ class HitRepository extends CommonRepository
      */
     public function getBounces($pageIds, ?\DateTime $fromDate = null, $isVariantCheck = false): array
     {
+        $connection = $this->getEntityManager()->getConnection();
         $inOrEq = (!is_array($pageIds)) ? 'eq' : 'in';
 
         $hitsColumn = ($isVariantCheck) ? 'variant_hits' : 'unique_hits';
-        $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $pages      = $q->select("p.id, p.{$hitsColumn} as totalHits, p.title")
-            ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
+        $q          = $connection->createQueryBuilder();
+        $pages      = $q->select(
+            "p.id", 
+            "p.{$hitsColumn} as ".$connection->quoteIdentifier('totalHits'),
+            "p.title"
+        )->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
             ->where($q->expr()->{$inOrEq}('p.id', $pageIds))
             ->executeQuery()
             ->fetchAllAssociative();
@@ -292,7 +314,7 @@ class HitRepository extends CommonRepository
 
         // Get the total number of bounces - simplified query for if date_left is null, it'll more than likely be a bounce or
         // else we would have recorded the date_left on a subsequent page hit
-        $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q    = $connection->createQueryBuilder();
         $expr = $q->expr()->and(
             $q->expr()->{$inOrEq}('h.page_id', $pageIds),
             $q->expr()->eq('h.code', 200),

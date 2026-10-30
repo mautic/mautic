@@ -914,13 +914,6 @@ final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
-    private function getUser(string $userName): ?User
-    {
-        $repository = $this->em->getRepository(User::class);
-
-        return $repository->findOneBy(['username' => $userName]);
-    }
-
     /**
      * @param array<string, string[]> $permissions
      */
