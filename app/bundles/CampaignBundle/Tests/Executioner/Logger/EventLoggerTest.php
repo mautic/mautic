@@ -106,6 +106,28 @@ final class EventLoggerTest extends TestCase
         $this->assertEquals(1, $log->getRotation());
     }
 
+    public function testBuildLogEntryHasNoIpAddressForAnUntrackedVisitor(): void
+    {
+        $this->ipLookupHelper->method('isVisitorUntracked')->willReturn(true);
+        $this->ipLookupHelper->expects($this->never())->method('getIpAddress');
+        $this->leadRepository->method('getContactRotations')->willReturn([1 => ['rotation' => 1, 'manually_removed' => 0]]);
+
+        /** @var MockObject&Campaign $campaign */
+        $campaign = $this->createMock(Campaign::class);
+        $campaign->method('getId')->willReturn(1);
+
+        $event = new Event();
+        $event->setCampaign($campaign);
+
+        /** @var MockObject&Lead $contact */
+        $contact = $this->createMock(Lead::class);
+        $contact->method('getId')->willReturn(1);
+
+        $log = $this->getLogger()->buildLogEntry($event, $contact, false);
+
+        $this->assertNotInstanceOf(IpAddress::class, $log->getIpAddress());
+    }
+
     private function getLogger(): EventLogger
     {
         return new EventLogger(

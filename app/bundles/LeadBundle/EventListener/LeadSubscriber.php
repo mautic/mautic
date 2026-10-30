@@ -131,7 +131,7 @@ final class LeadSubscriber implements EventSubscriberInterface
             'objectId'  => $lead->getId(),
             'action'    => ($event->isNew()) ? 'create' : 'update',
             'details'   => $details,
-            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            'ipAddress' => $this->getVisitorIpAddress(),
         ];
         $this->auditLogModel->writeToLog($log);
 
@@ -144,7 +144,7 @@ final class LeadSubscriber implements EventSubscriberInterface
                 'objectId'  => $lead->getId(),
                 'action'    => 'identified',
                 'details'   => [],
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+                'ipAddress' => $this->getVisitorIpAddress(),
             ];
             $this->auditLogModel->writeToLog($log);
         }
@@ -157,7 +157,7 @@ final class LeadSubscriber implements EventSubscriberInterface
                 'objectId'  => $lead->getId(),
                 'action'    => 'ipadded',
                 'details'   => $details['ipAddresses'],
-                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+                'ipAddress' => $this->getVisitorIpAddress(),
             ];
             $this->auditLogModel->writeToLog($log);
         }
@@ -704,5 +704,13 @@ final class LeadSubscriber implements EventSubscriberInterface
             }
         }
         // Purposively not including this
+    }
+
+    /**
+     * No IP for a form submitter Mautic doesn't track.
+     */
+    private function getVisitorIpAddress(): string
+    {
+        return $this->ipLookupHelper->isVisitorUntracked() ? '' : $this->ipLookupHelper->getIpAddressFromRequest();
     }
 }
