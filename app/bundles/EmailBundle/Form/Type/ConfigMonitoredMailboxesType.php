@@ -158,6 +158,11 @@ final class ConfigMonitoredMailboxesType extends AbstractType
 
             $settings = (empty($options['data']['override_settings'])) ? $options['general_settings'] : $options['data'];
 
+            // local.php stores escaped percent signs; Mailbox needs the resolved password for IMAP authentication.
+            if (isset($settings['password']) && is_string($settings['password'])) {
+                $settings['password'] = str_replace('%%', '%', $settings['password']);
+            }
+
             $this->imapHelper->setMailboxSettings($settings);
 
             // Check for IMAP connection and get a folder list

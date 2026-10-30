@@ -44,7 +44,8 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
         if (isset($data['monitored_email'])) {
             foreach ($data['monitored_email'] as $key => $monitor) {
                 if (empty($monitor['password']) && !empty($monitoredEmail[$key]['password'])) {
-                    $data['monitored_email'][$key]['password'] = $monitoredEmail[$key]['password'];
+                    // The resolved value is written to local.php and must escape literal percent signs.
+                    $data['monitored_email'][$key]['password'] = str_replace('%', '%%', (string) $monitoredEmail[$key]['password']);
                 }
 
                 if ('general' != $key) {
