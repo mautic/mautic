@@ -15,7 +15,7 @@ final class ConfigSubscriberTest extends TestCase
     public function testRestoredMonitoredEmailPasswordsAreEscapedBeforeSaving(): void
     {
         $coreParametersHelper = $this->createStub(CoreParametersHelper::class);
-        $coreParametersHelper->method('get')->with('monitored_email')->willReturn([
+        $coreParametersHelper->method('get')->willReturn([
             'general' => [
                 'password' => 'abc%def%ghi',
             ],
@@ -44,7 +44,7 @@ final class ConfigSubscriberTest extends TestCase
 
         $monitoredEmail = $event->getConfig('emailconfig')['monitored_email'];
 
-        self::assertSame('abc%%def%%ghi', $monitoredEmail['general']['password']);
-        self::assertSame('bounce%%password', $monitoredEmail['EmailBundle_bounces']['password']);
+        $this->assertSame('abc%%def%%ghi', $monitoredEmail['general']['password']);
+        $this->assertSame('bounce%%password', $monitoredEmail['EmailBundle_bounces']['password']);
     }
 }
