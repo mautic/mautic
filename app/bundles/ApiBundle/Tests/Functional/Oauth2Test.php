@@ -7,7 +7,10 @@ namespace Mautic\ApiBundle\Tests\Functional;
 use Mautic\ApiBundle\Entity\oAuth2\AccessToken;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Entity\Permission;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use OAuth2\OAuth2;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -118,6 +121,34 @@ final class Oauth2Test extends MauticMysqlTestCase
         $clientPublicKey = $crawler->filter('input#client_publicId')->attr('value');
         $clientSecretKey = $crawler->filter('input#client_secret')->attr('value');
 
+        $allowedRole = new Role();
+        $allowedRole->setName('OAuth API project viewer');
+        $allowedPermission = new Permission();
+        $allowedPermission->setBundle('project')
+            ->setName('projects')
+            ->setRole($allowedRole)
+            ->setBitwise(1);
+        $this->em->persist($allowedRole);
+        $this->em->persist($allowedPermission);
+
+        $allowedClient = $this->em->getRepository(Client::class)->findOneBy(['secret' => $clientSecretKey]);
+        $this->assertInstanceOf(Client::class, $allowedClient);
+        $allowedClient->setRole($allowedRole);
+
+        $deniedRole = new Role();
+        $deniedRole->setName('OAuth API project denied');
+        $deniedClient = new Client();
+        $deniedClient->setName('OAuth API denied client');
+        $deniedClient->setRedirectUris(['https://example.test/denied']);
+        $deniedClient->setAllowedGrantTypes([OAuth2::GRANT_TYPE_CLIENT_CREDENTIALS]);
+        $deniedClient->setRole($deniedRole);
+        $this->em->persist($deniedRole);
+        $this->em->persist($deniedClient);
+        $this->em->flush();
+
+        $deniedClientPublicKey = $deniedClient->getPublicId();
+        $deniedClientSecretKey = $deniedClient->getSecret();
+
         $this->logoutUser();
 
         // Get the access token.
@@ -136,6 +167,9 @@ final class Oauth2Test extends MauticMysqlTestCase
         $accessToken = $payload['access_token'];
         $this->assertNotEmpty($accessToken);
 
+        // Exercise the bearer token across independent stateless HTTP requests.
+        $this->client->enableReboot();
+
         // Test that the access token works by fetching users via API.
         $this->client->request(
             Request::METHOD_GET,
@@ -149,6 +183,48 @@ final class Oauth2Test extends MauticMysqlTestCase
 
         self::assertResponseIsSuccessful();
         $this->assertStringContainsString('"users":[', (string) $this->client->getResponse()->getContent());
+
+        // Client-credentials tokens must also authenticate API Platform v2 requests.
+        $this->client->request(
+            Request::METHOD_GET,
+            '/api/v2/projects',
+            [],
+            [],
+            [
+                'HTTP_Authorization' => "Bearer {$accessToken}",
+                'HTTP_ACCEPT'        => 'application/json',
+            ],
+        );
+
+        self::assertResponseIsSuccessful();
+
+        // A client without the project permission must authenticate but be denied by API Platform.
+        $this->client->request(
+            Request::METHOD_POST,
+            '/oauth/v2/token',
+            [
+                'grant_type'    => 'client_credentials',
+                'client_id'     => $deniedClientPublicKey,
+                'client_secret' => $deniedClientSecretKey,
+            ],
+        );
+
+        self::assertResponseIsSuccessful();
+        $deniedPayload = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $deniedToken   = $deniedPayload['access_token'];
+
+        $this->client->request(
+            Request::METHOD_GET,
+            '/api/v2/projects',
+            [],
+            [],
+            [
+                'HTTP_Authorization' => "Bearer {$deniedToken}",
+                'HTTP_ACCEPT'        => 'application/json',
+            ],
+        );
+
+        self::assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
     }
 
     public function testUserBoundBearerTokenAuthenticatesOnApiV1AndApiV2(): void
