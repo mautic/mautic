@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<TrackingPreference>
  */
-class TrackingPreferenceRepository extends CommonRepository
+final class TrackingPreferenceRepository extends CommonRepository
 {
     public function findOneByContactAndPurpose(Lead $contact, string $purpose): ?TrackingPreference
     {
