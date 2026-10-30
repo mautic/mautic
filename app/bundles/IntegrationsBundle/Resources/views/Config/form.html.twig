@@ -6,7 +6,7 @@
 <ul class="nav nav-tabs nav-tabs-contained">
     <!-- Enabled\Auth -->
     <li class="{% if 'details-container' == activeTab %} active{% endif %}" id="details-tab">
-        <a href="#details-container" role="tab" data-toggle="tab">
+        <a href="#details-container" role="tab" data-bs-toggle="tab" class="nav-link{% if 'details-container' == activeTab %} active{% endif %}" aria-selected="{{ 'details-container' == activeTab ? 'true' : 'false' }}">
             {{ 'mautic.plugin.integration.tab.details'|trans }}
             {% if (hasAuthErrors) %}
                 <i class="ri-fw ri-alert-fill text-danger"></i>
@@ -17,8 +17,8 @@
 
     <!-- Features -->
     {% if showFeaturesTab is not empty %}
-        <li class="" id="features-tab">
-            <a href="#features-container" role="tab" data-toggle="tab">
+        <li class="{% if 'features-container' == activeTab %} active{% endif %}" id="features-tab">
+            <a href="#features-container" role="tab" data-bs-toggle="tab" class="nav-link{% if 'features-container' == activeTab %} active{% endif %}" aria-selected="{{ 'features-container' == activeTab ? 'true' : 'false' }}">
                 {{ 'mautic.plugin.integration.tab.features'|trans }}
                 {% if hasFeatureErrors is not empty %}
                 <i class="ri-fw ri-alert-fill text-danger"></i>
@@ -33,7 +33,7 @@
     {% set objects = integrationObject.getSyncConfigObjects() %}
     {% for object, objectFieldMapping in form.featureSettings.sync.fieldMappings %}
         <li class="{% if activeTab == 'field-mapping-' ~ object %} active{% endif %}" id="fields-{{ object }}-tab">
-            <a href="#field-mappings-{{ object }}-container" role="tab" data-toggle="tab">
+            <a href="#field-mappings-{{ object }}-container" role="tab" data-bs-toggle="tab" class="nav-link{% if activeTab == 'field-mapping-' ~ object %} active{% endif %}" aria-selected="{{ activeTab == 'field-mapping-' ~ object ? 'true' : 'false' }}">
                 {{ 'mautic.integration.sync_field_mapping'|trans({'%object%' : objects[object]|trans }) }}
                 {% if formContainsErrors(objectFieldMapping) %}
                     <i class="ri-fw ri-alert-fill text-danger"></i>
@@ -47,7 +47,7 @@
 
 <div class="tab-content pa-md">
     <!-- Enabled\Auth -->
-    <div class="tab-pane fade{% if 'details-container' == activeTab %} in active{% endif %} bdr-w-0" id="details-container">
+    <div class="tab-pane fade{% if 'details-container' == activeTab %} show active{% endif %} bdr-w-0" id="details-container">
         {% if useConfigFormNotes and integrationObject.getAuthorizationNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
             <div class="alert alert-{{ integrationObject.getAuthorizationNote().getType() }}">
                 {{ integrationObject.getAuthorizationNote().getNote()|trans|purify  }}
@@ -93,7 +93,7 @@
 
     <!-- Features -->
     {% if showFeaturesTab %}
-    <div class="tab-pane fade{% if 'features-container' == activeTab %} in active{% endif %} bdr-w-0" id="features-container">
+    <div class="tab-pane fade{% if 'features-container' == activeTab %} show active{% endif %} bdr-w-0" id="features-container">
         {% if useConfigFormNotes and integrationObject.getFeaturesNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
             <div class="alert alert-{{ integrationObject.getFeaturesNote().getType() }}">
                 {{ integrationObject.getFeaturesNote().getNote()|trans|purify  }}
@@ -129,7 +129,7 @@
     <!-- Field Mapping -->
     {% if useSyncFeatures %}
     {% for object, objectFieldMapping in form.featureSettings.sync.fieldMappings %}
-    <div class="tab-pane fade{% if activeTab == 'field-mapping-' ~ object %} in active{% endif %} bdr-w-0" id="field-mappings-{{ object }}-container">
+    <div class="tab-pane fade{% if activeTab == 'field-mapping-' ~ object %} show active{% endif %} bdr-w-0" id="field-mappings-{{ object }}-container">
         <div class="has-error">
             {{ form_errors(objectFieldMapping) }}
         </div>

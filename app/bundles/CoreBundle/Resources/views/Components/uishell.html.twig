@@ -39,7 +39,7 @@
                        {% if item.HeaderMenu.onClick is defined %}onclick="{{ item.HeaderMenu.onClick }}"{% endif %}
                        {% if item.HeaderMenu.onKeyDown is defined %}onkeydown="{{ item.HeaderMenu.onKeyDown }}"{% endif %}
                        {% if item.HeaderMenu.onBlur is defined %}onblur="{{ item.HeaderMenu.onBlur }}"{% endif %}
-                       data-toggle="dropdown">{{ item.HeaderMenu.menuLinkName|trans }}
+                       data-bs-toggle="dropdown">{{ item.HeaderMenu.menuLinkName|trans }}
                         <svg focusable="false" preserveAspectRatio="xMidYMid meet" fill="currentColor" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" class="header__menu-arrow" xmlns="http://www.w3.org/2000/svg">
                             <path d="M8 11L3 6 3.7 5.3 8 9.6 12.3 5.3 13 6z"></path>
                         </svg>
@@ -62,7 +62,7 @@
                        class="header__menu-item header__menu-title dropdown-toggle" 
                        href="#" tabindex="{{ item.HeaderMenuDropdown.tabIndex|default(0) }}" 
                        aria-label="{{ item.HeaderMenuDropdown.menuLinkName|trans }}"
-                       data-toggle="dropdown">{{ item.HeaderMenuDropdown.menuLinkName|trans }}
+                       data-bs-toggle="dropdown">{{ item.HeaderMenuDropdown.menuLinkName|trans }}
                         <svg focusable="false" preserveAspectRatio="xMidYMid meet" fill="currentColor" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" class="header__menu-arrow" xmlns="http://www.w3.org/2000/svg">
                             <path d="M8 11L3 6 3.7 5.3 8 9.6 12.3 5.3 13 6z"></path>
                         </svg>
@@ -81,7 +81,7 @@
     <div class="header__global {{ Header.children.HeaderGlobal.className|default('') }}">
         {% for item in Header.children.HeaderGlobal.children %}
             {% if item.HeaderGlobalAction is defined %}
-            <span data-toggle="tooltip" data-placement="{{ item.HeaderGlobalAction.tooltipAlignment|default('bottom') }}" title="{{ item.HeaderGlobalAction.ariaLabel|default('')|trans }}">
+            <span data-bs-toggle="tooltip" data-bs-placement="{{ item.HeaderGlobalAction.tooltipAlignment|default('bottom') }}" title="{{ item.HeaderGlobalAction.ariaLabel|default('')|trans }}">
                 <div class="tooltip-trigger__wrapper">
                     <button aria-label="{{ item.HeaderGlobalAction.ariaLabel|default('')|trans }}"
                         class="header__action btn btn--lg layout--size-lg btn-ghost btn--icon-only {{ item.HeaderGlobalAction.className|default('') }}"
@@ -92,17 +92,17 @@
             </span>
             {% elseif item.HeaderGlobalDropdown is defined %}
             <div class="dropdown">
-                <span data-toggle="tooltip" data-placement="{{ item.HeaderGlobalDropdown.tooltipAlignment|default('bottom') }}" title="{{ item.HeaderGlobalDropdown.ariaLabel|default('')|trans }}">
+                <span data-bs-toggle="tooltip" data-bs-placement="{{ item.HeaderGlobalDropdown.tooltipAlignment|default('bottom') }}" title="{{ item.HeaderGlobalDropdown.ariaLabel|default('')|trans }}">
                     <div class="tooltip-trigger__wrapper">
                         <button aria-label="{{ item.HeaderGlobalDropdown.ariaLabel|default('')|trans }}"
                             class="header__action btn btn--lg layout--size-lg btn-ghost btn--icon-only btn-nospin {{ item.HeaderGlobalDropdown.className|default('') }} dropdown-toggle"
                             type="button" 
-                            data-toggle="dropdown" 
+                            data-bs-toggle="dropdown"
                             aria-haspopup="true" 
                             aria-expanded="false">
                             <i class="{{ item.HeaderGlobalDropdown.renderDropdownIcon }} fs-20"></i>
                         </button>
-                        <div class="dropdown-menu dropdown-menu-right">
+                        <div class="dropdown-menu dropdown-menu-end">
                             {{ item.HeaderGlobalDropdown.renderMenuContent|raw }}
                         </div>
                     </div>

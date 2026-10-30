@@ -33,7 +33,7 @@ Mautic.testMonitoredEmailServerConnection = function(mailbox) {
         var theClass = (response.success) ? 'has-success' : 'has-error';
         var theMessage = response.message;
         mQuery('#' + mailbox + 'TestButtonContainer').removeClass('has-success has-error').addClass(theClass);
-        mQuery('#' + mailbox + 'TestButtonContainer .help-block').html(theMessage);
+        mQuery('#' + mailbox + 'TestButtonContainer .form-text').html(theMessage);
         mQuery('#' + mailbox + 'TestButtonContainer .ri-loader-3-line').addClass('hide');
 
         if (response.folders) {

@@ -11,7 +11,7 @@
         <div class="box-layout">
             <div class="col-xs-4 align-middle">
                 <div class="panel-body">
-                  <span class="img-wrapper img-rounded">
+                  <span class="img-wrapper rounded">
                       <img class="img" src="{{ img }}" />
                   </span>
                 </div>
@@ -19,7 +19,7 @@
             <div class="col-xs-8 align-top">
                 <div class="panel-body">
                     {% if contact.id in noContactList|keys %}
-                        <div class="pull-right label label-danger"><i class="ri-prohibited-line"></i></div>
+                        <div class="float-end label label-danger"><i class="ri-prohibited-line"></i></div>
                     {% endif %}
                     <h4 class="fw-sb mb-xs ellipsis">
                         <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">

@@ -80,13 +80,13 @@
                 {
                     label: 'mautic.core.reset_filter',
                     variant: 'secondary',
-                    onclick: 'Mautic.resetFilters()',
+                    attributes: {'type': 'button', 'data-filter-action': 'reset'},
                     size: 'lg'
                 },
                 {
                     label: 'mautic.core.apply_filter',
                     variant: 'primary',
-                    onclick: 'Mautic.applyFilters()',
+                    attributes: {'type': 'button', 'data-filter-action': 'apply'},
                     size: 'lg'
                 }
             ]
@@ -103,11 +103,12 @@
         icon: 'ri-filter-line ri-1x',
         attributes: {
             'type': 'button',
-            'data-container': 'body',
-            'data-toggle': 'popover',
-            'data-html': 'true',
-            'data-placement': 'left',
-            'data-content': filtering|escape('html_attr')
+            'data-bs-container': 'body',
+            'data-bs-toggle': 'popover',
+            'data-quick-filter': '',
+            'data-bs-html': 'true',
+            'data-bs-placement': 'left',
+            'data-bs-content': filtering|escape('html_attr')
         },
         label: 'mautic.core.quick_filters'
     }
