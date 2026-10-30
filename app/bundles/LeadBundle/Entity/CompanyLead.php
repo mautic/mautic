@@ -14,13 +14,10 @@ class CompanyLead
 {
     public const string TABLE_NAME = 'companies_leads';
 
-    /**
-     * @var Company
-     */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Company::class)]
     #[ORM\JoinColumn(name: 'company_id', nullable: false, onDelete: 'CASCADE')]
-    private $company;
+    private \Mautic\LeadBundle\Entity\Company $company;
 
     /**
      * @var Lead
@@ -64,10 +61,8 @@ class CompanyLead
         $this->dateAdded = $date;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    
+    public function getLead(): Lead
     {
         return $this->lead;
     }
@@ -80,18 +75,14 @@ class CompanyLead
         $this->lead = $lead;
     }
 
-    /**
-     * @return Company
-     */
-    public function getCompany()
+    
+    public function getCompany(): Company
     {
         return $this->company;
     }
 
-    /**
-     * @return Company
-     */
-    public function getCompanies()
+    
+    public function getCompanies(): Company
     {
         return $this->company;
     }

@@ -149,11 +149,9 @@ final class ContactRequestHelper
     /**
      * Identify a contact through a clickthrough URL.
      *
-     * @return Lead
-     *
      * @throws ContactNotFoundException
      */
-    private function getContactFromClickthrough(array $clickthrough)
+    private function getContactFromClickthrough(array $clickthrough): Lead
     {
         $event = new ContactIdentificationEvent($clickthrough);
         $this->eventDispatcher->dispatch($event);
@@ -201,10 +199,8 @@ final class ContactRequestHelper
         }
     }
 
-    /**
-     * @return Lead
-     */
-    private function mergeWithTrackedContact(Lead $foundContact)
+    
+    private function mergeWithTrackedContact(Lead $foundContact): Lead
     {
         if ($this->trackedContact && $this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
             try {

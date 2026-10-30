@@ -237,10 +237,8 @@ final class ContactTracker
         return $lead;
     }
 
-    /**
-     * @return Lead
-     */
-    private function getContactByIpAddress()
+    
+    private function getContactByIpAddress(): Lead
     {
         $ip = $this->ipLookupHelper->getIpAddress();
         // if no trackingId cookie set the lead is not tracked yet so create a new one

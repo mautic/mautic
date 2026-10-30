@@ -20,23 +20,23 @@ final readonly class SchedulerBuilder
     }
 
     /**
-     * @return Recurrence[]|RecurrenceCollection
+     * @return RecurrenceCollection<Recurrence>
      *
      * @throws InvalidSchedulerException
      * @throws NotSupportedScheduleTypeException
      */
-    public function getNextEvent(SchedulerInterface $scheduler)
+    public function getNextEvent(SchedulerInterface $scheduler): \Recurr\RecurrenceCollection
     {
         return $this->getNextEvents($scheduler, 1);
     }
 
     /**
-     * @return RecurrenceCollection
+     * @return RecurrenceCollection<Recurrence>
      *
      * @throws InvalidSchedulerException
      * @throws NotSupportedScheduleTypeException
      */
-    public function getNextEvents(SchedulerInterface $scheduler, int $count)
+    public function getNextEvents(SchedulerInterface $scheduler, int $count): \Recurr\RecurrenceCollection
     {
         if (!$scheduler->isScheduled()) {
             throw new InvalidSchedulerException();

@@ -24,10 +24,8 @@ abstract class WebhookEvent extends CommonEvent
 
     /**
      * Returns the Webhook entity.
-     *
-     * @return Webhook
      */
-    public function getWebhook()
+    public function getWebhook(): Webhook
     {
         return $this->entity;
     }

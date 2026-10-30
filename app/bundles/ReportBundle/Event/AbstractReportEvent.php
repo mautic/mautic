@@ -18,10 +18,8 @@ abstract class AbstractReportEvent extends Event
      */
     protected $report;
 
-    /**
-     * @return Report
-     */
-    public function getReport()
+    
+    public function getReport(): Report
     {
         return $this->report;
     }
