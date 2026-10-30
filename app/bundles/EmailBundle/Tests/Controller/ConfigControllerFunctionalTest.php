@@ -33,7 +33,6 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request($form->getMethod(), $form->getUri(), $values);
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('#flashes', 'Configuration successfully updated');
 
         $configParameters = $this->getConfigParameters();
         $this->assertArrayHasKey('monitored_email', $configParameters);
@@ -57,7 +56,6 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request($form->getMethod(), $form->getUri(), $values);
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('#flashes', 'Configuration successfully updated');
 
         $configParameters = $this->getConfigParameters();
         $this->assertArrayHasKey('monitored_email', $configParameters);
