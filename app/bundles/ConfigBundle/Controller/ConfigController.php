@@ -81,6 +81,14 @@ final class ConfigController extends FormController
             ]
         );
 
+        $originalModelData = [];
+        foreach ($formConfigs as $config) {
+            $formAlias = $config['formAlias'];
+
+            if ($form->has($formAlias)) {
+                $originalModelData[$formAlias] = $form->get($formAlias)->getData();
+            }
+        }
         $originalNormData = $form->getNormData();
 
         $isWritable = $configurator->isFileWritable();
@@ -99,6 +107,12 @@ final class ConfigController extends FormController
                     // Dispatch pre-save event. Bundles may need to modify some field values like passwords before save
                     $configEvent = new ConfigEvent($formData, $post);
                     $configEvent
+                        ->setOriginalPersistedConfig([
+                            'emailconfig' => [
+                                'monitored_email' => $configurator->getParameters()['monitored_email'] ?? [],
+                            ],
+                        ])
+                        ->setOriginalModelData($originalModelData)
                         ->setOriginalNormData($originalNormData)
                         ->setNormData($form->getNormData());
                     $this->dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);

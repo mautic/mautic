@@ -29,6 +29,18 @@ class ConfigEvent extends CommonEvent
     private ?array $originalNormData = null;
 
     /**
+     * Original form model data before submission.
+     */
+    private ?array $originalModelData = null;
+
+    /**
+     * Configuration values read from persistent storage before saving.
+     *
+     * @var array<string, mixed>|null
+     */
+    private ?array $originalPersistedConfig = null;
+
+    /**
      * Data got from build form after update.
      *
      * @var array
@@ -156,6 +168,36 @@ class ConfigEvent extends CommonEvent
     public function encodeFileContents($content): string
     {
         return base64_encode($content);
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    public function getOriginalPersistedConfig(): ?array
+    {
+        return $this->originalPersistedConfig;
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    public function setOriginalPersistedConfig(array $config): static
+    {
+        $this->originalPersistedConfig = $config;
+
+        return $this;
+    }
+
+    public function getOriginalModelData(): ?array
+    {
+        return $this->originalModelData;
+    }
+
+    public function setOriginalModelData(array $modelData): static
+    {
+        $this->originalModelData = $modelData;
+
+        return $this;
     }
 
     public function getOriginalNormData(): ?array

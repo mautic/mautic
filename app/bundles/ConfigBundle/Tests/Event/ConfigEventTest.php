@@ -115,6 +115,42 @@ final class ConfigEventTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($result, $event->encodeFileContents($string));
     }
 
+    public function testOriginalPersistedConfigPreservesEscapedPassword(): void
+    {
+        $event = new ConfigEvent([], new ParameterBag());
+
+        $this->assertNull($event->getOriginalPersistedConfig());
+
+        $persisted = [
+            'emailconfig' => [
+                'monitored_email' => [
+                    'general' => ['password' => 'abc%%def%%ghi'],
+                ],
+            ],
+        ];
+
+        $this->assertSame($event, $event->setOriginalPersistedConfig($persisted));
+        $this->assertSame($persisted, $event->getOriginalPersistedConfig());
+    }
+
+    public function testOriginalModelDataPreservesEscapedPassword(): void
+    {
+        $event = new ConfigEvent([], new ParameterBag());
+
+        $this->assertNull($event->getOriginalModelData());
+
+        $originalModelData = [
+            'emailconfig' => [
+                'monitored_email' => [
+                    'general' => ['password' => 'abc%%def'],
+                ],
+            ],
+        ];
+
+        $this->assertSame($event, $event->setOriginalModelData($originalModelData));
+        $this->assertSame($originalModelData, $event->getOriginalModelData());
+    }
+
     public function testNormalizedDataGetSet(): void
     {
         $config   = [];

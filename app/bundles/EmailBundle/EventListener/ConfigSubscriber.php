@@ -11,9 +11,13 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ConfigSubscriber implements EventSubscriberInterface
 {
-    public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-    ) {
+    /**
+     * @deprecated since 7.x; the CoreParametersHelper argument is retained
+     *             for backward compatibility and will be removed in 8.0.
+     */
+    // @phpstan-ignore-next-line constructor.unusedParameter (Preserved for 7.x backward compatibility; remove in 8.0.)
+    public function __construct(CoreParametersHelper $coreParametersHelper)
+    {
     }
 
     public static function getSubscribedEvents(): array
@@ -40,7 +44,7 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
         $data = $event->getConfig('emailconfig');
 
         // Get the original data so that passwords aren't lost
-        $monitoredEmail = $this->coreParametersHelper->get('monitored_email');
+        $monitoredEmail = $event->getOriginalPersistedConfig()['emailconfig']['monitored_email'] ?? [];
         if (isset($data['monitored_email'])) {
             foreach ($data['monitored_email'] as $key => $monitor) {
                 if (empty($monitor['password']) && !empty($monitoredEmail[$key]['password'])) {
