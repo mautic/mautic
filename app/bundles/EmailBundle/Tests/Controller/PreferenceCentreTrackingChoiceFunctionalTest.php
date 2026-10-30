@@ -36,7 +36,7 @@ final class PreferenceCentreTrackingChoiceFunctionalTest extends MauticMysqlTest
 
         $crawler = $this->client->request(Request::METHOD_GET, $this->buildUnsubscribeUrl($stat));
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Allow my activity to be recorded and associated with my profile', (string) $this->client->getResponse()->getContent());
+        $this->assertSame('Allow my activity to be recorded and associated with my profile', trim($crawler->filter('fieldset.activity-tracking legend')->text()), 'the question labels its choices');
 
         $form = $crawler->filter('form')->form();
         $this->assertSame('1', $form[self::FIELD]->getValue(), 'tracking starts as allowed');
