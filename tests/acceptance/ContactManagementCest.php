@@ -17,7 +17,6 @@ final class ContactManagementCest
 
     public function createContactFromQuickAdd(
         AcceptanceTester $I,
-        ContactStep $contact,
     ): void {
         $email = sprintf('quickadd%s@example.com', time());
 
@@ -525,8 +524,7 @@ final class ContactManagementCest
         $I->click(ContactPage::$importInBrowser);
 
         // Wait for import completion message
-        $I->waitForElement(ContactPage::$importProgressComplete, AcceptanceTester::TIMEOUT);
-        $I->see('Successful import', 'h2');
+        $I->waitForText('Successful import', AcceptanceTester::TIMEOUT, '#leadImportProgressComplete h2');
 
         // Extract the number of contacts created from the progress message
         $expectedContactsAdded = (int) $I->grabTextFrom('#leadImportProgressComplete > div > div:nth-child(2) > div > div.panel-body > div:nth-child(2) > div > span');
