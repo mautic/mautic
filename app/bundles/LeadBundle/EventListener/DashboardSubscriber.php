@@ -398,7 +398,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $leads = $this->leadModel->getLeadList($limit, $params['dateFrom'], $params['dateTo'], [], []);
+                $leads = $this->leadModel->getLeadList($limit, $params['dateFrom'], $params['dateTo'], [], ['canViewOthers' => $canViewOthers]);
                 $items = [];
 
                 if ([] === $leads) {

@@ -2031,7 +2031,7 @@ class LeadModel extends FormModel
      */
     public function getLeadList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], array $options = []): array
     {
-        if (!empty($options['canViewOthers'])) {
+        if (empty($options['canViewOthers'])) {
             $filters['owner_id'] = $this->userHelper->getUser()->getId();
         }
 
