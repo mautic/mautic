@@ -61,7 +61,6 @@ class CompanyLead
         $this->dateAdded = $date;
     }
 
-    
     public function getLead(): Lead
     {
         return $this->lead;
@@ -75,13 +74,11 @@ class CompanyLead
         $this->lead = $lead;
     }
 
-    
     public function getCompany(): Company
     {
         return $this->company;
     }
 
-    
     public function getCompanies(): Company
     {
         return $this->company;

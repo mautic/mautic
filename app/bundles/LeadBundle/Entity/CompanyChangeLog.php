@@ -170,7 +170,6 @@ class CompanyChangeLog
         return $this;
     }
 
-    
     public function getLead(): Lead
     {
         return $this->lead;

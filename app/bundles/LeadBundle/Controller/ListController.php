@@ -657,7 +657,6 @@ final class ListController extends AbstractStandardFormController
         return $this->changeList($request, $objectId, 'add');
     }
 
-    
     protected function changeList(Request $request, $listId, $action): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);

@@ -61,7 +61,6 @@ class MergeRecord
         return $this->id;
     }
 
-    
     public function getContact(): Lead
     {
         return $this->contact;

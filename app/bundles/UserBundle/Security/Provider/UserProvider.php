@@ -140,7 +140,6 @@ final readonly class UserProvider implements UserProviderInterface
         return $user;
     }
 
-    
     public function findUser(User $user): User
     {
         try {

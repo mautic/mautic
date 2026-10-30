@@ -234,7 +234,6 @@ final class UserModel extends FormModel implements GlobalSearchInterface
         $this->saveEntity($user);
     }
 
-    
     private function getResetToken(User $user): UserToken
     {
         $userToken = new UserToken();

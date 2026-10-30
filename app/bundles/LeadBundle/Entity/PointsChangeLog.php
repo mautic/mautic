@@ -177,7 +177,6 @@ class PointsChangeLog
         return $this;
     }
 
-    
     public function getLead(): Lead
     {
         return $this->lead;

@@ -166,7 +166,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $this->cache;
     }
 
-    
     public function getTranslator(): TranslatorInterface
     {
         return $this->translator;
@@ -1969,7 +1968,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $this->lastIntegrationError;
     }
 
-    
     public function resetLastIntegrationError(): static
     {
         $this->lastIntegrationError = null;

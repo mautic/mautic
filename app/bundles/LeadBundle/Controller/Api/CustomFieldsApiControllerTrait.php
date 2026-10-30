@@ -141,7 +141,6 @@ trait CustomFieldsApiControllerTrait
             return $this->fieldCache[$object];
         }
 
-
         $fields = $this->customFieldsFieldModel->getEntities(
             [
                 'filter' => [

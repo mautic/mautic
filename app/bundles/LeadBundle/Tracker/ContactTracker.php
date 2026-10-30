@@ -237,7 +237,6 @@ final class ContactTracker
         return $lead;
     }
 
-    
     private function getContactByIpAddress(): Lead
     {
         $ip = $this->ipLookupHelper->getIpAddress();

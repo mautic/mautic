@@ -22,7 +22,6 @@ final class TriggerEvent extends CommonEvent
         $this->isNew = $isNew;
     }
 
-    
     public function getTrigger(): Trigger
     {
         return $this->entity;
