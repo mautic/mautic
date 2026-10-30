@@ -569,15 +569,10 @@ final class CampaignSubscriber
         } elseif ($event->checkContext('lead.field_value')) {
             if ('date' === $event->getConfig()['operator']) {
                 // Set the date in system timezone since this is triggered by cron
-<<<<<<< HEAD
-                $triggerDate = new \DateTime(
+                $triggerDate = new DateTime(
                     'now',
-                    new \DateTimeZone($this->coreParametersHelper->getDefaultTimezone())
+                    new DateTimeZone($this->coreParametersHelper->getDefaultTimezone())
                 );
-=======
-                $triggerDate = new DateTime('now',
-                    new DateTimeZone($this->coreParametersHelper->getDefaultTimezone()));
->>>>>>> 2ba5bab660 (Import AsEventListener attribute and restore blank lines between methods)
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
                 if (str_contains($event->getConfig()['value'], '+P')) { // add date
