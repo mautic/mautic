@@ -21,8 +21,10 @@ use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Cache\InvalidArgumentException;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
+#[Group('non-parallel')]
 final class TriggerCampaignCommandTest extends AbstractCampaignCommand
 {
     use CampaignAuditLogTrait;

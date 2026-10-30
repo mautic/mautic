@@ -10,10 +10,12 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 #[AllowMockObjectsWithoutExpectations]
+#[Group('non-parallel')]
 final class UpdateLeadFormActionFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
