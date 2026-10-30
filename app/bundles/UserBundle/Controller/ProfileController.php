@@ -35,8 +35,12 @@ final class ProfileController extends AbstractFormController
         path: '/s/account',
         name: 'mautic_user_account',
     )]
-    public function indexAction(Request $request, LanguageHelper $languageHelper,
-        TokenStorageInterface $tokenStorage, SAMLHelper $samlHelper): Response|RedirectResponse
+    public function indexAction(
+        Request $request,
+        LanguageHelper $languageHelper,
+        TokenStorageInterface $tokenStorage,
+        SAMLHelper $samlHelper
+    ): Response|RedirectResponse
     {
         // get current user
         $me = $tokenStorage->getToken()->getUser();

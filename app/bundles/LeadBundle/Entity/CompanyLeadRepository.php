@@ -191,8 +191,8 @@ final class CompanyLeadRepository extends CommonRepository
     {
         $qb = $this->createQueryBuilder('cl');
         $qb->where(
-                $qb->expr()->eq('cl.lead', ':lead')
-            )->setParameter('lead', $lead);
+            $qb->expr()->eq('cl.lead', ':lead')
+        )->setParameter('lead', $lead);
 
         return $qb->getQuery()->execute();
     }

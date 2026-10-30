@@ -85,7 +85,8 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
                     '%segments%'     => implode(',', $lists),
                     '%segmentNames%' => $leadList->getName(),
                 ],
-                'validators');
+                'validators'
+            );
             throw new RecordCanNotUnpublishException($message);
         }
 
@@ -109,7 +110,8 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
                     '%segments%'     => implode(',', $lists),
                     '%segmentNames%' => $leadList->getName(),
                 ],
-                'validators');
+                'validators'
+            );
             $event->addDependencyError($message);
         }
 

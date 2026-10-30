@@ -108,7 +108,10 @@ final class AjaxController extends CommonAjaxController
                         $returnTokens[$token] = $value;
                     }
                 }
-            }, array_keys($tokens), $tokens);
+            },
+            array_keys($tokens),
+            $tokens
+        );
 
         return $returnTokens;
     }

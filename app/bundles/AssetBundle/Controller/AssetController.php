@@ -478,7 +478,9 @@ final class AssetController extends AbstractStandardFormController
             );
         }
         if (!$this->security->hasEntityAccess(
-            'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
+            'asset:assets:viewown',
+            'asset:assets:viewother',
+            $entity->getCreatedBy()
         )
         ) {
             $this->throwAccessDenied();
@@ -593,7 +595,9 @@ final class AssetController extends AbstractStandardFormController
         if (null != $entity) {
             if (!$this->security->isGranted('asset:assets:create')
                 || !$this->security->hasEntityAccess(
-                    'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
+                    'asset:assets:viewown',
+                    'asset:assets:viewother',
+                    $entity->getCreatedBy()
                 )
             ) {
                 $this->throwAccessDenied();
@@ -704,7 +708,9 @@ final class AssetController extends AbstractStandardFormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    'asset:assets:deleteown', 'asset:assets:deleteother', $entity->getCreatedBy()
+                    'asset:assets:deleteown',
+                    'asset:assets:deleteother',
+                    $entity->getCreatedBy()
                 )
                 ) {
                     $flashes[] = $this->getAccessDeniedFlash();

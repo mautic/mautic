@@ -182,7 +182,8 @@ final class ListController extends AbstractStandardFormController
         ];
 
         return $this->delegateView(
-            $this->getViewArguments([
+            $this->getViewArguments(
+                [
                 'viewParameters'  => $parameters,
                 'contentTemplate' => '@MauticLead/List/list.html.twig',
                 'passthroughVars' => [
@@ -320,7 +321,9 @@ final class ListController extends AbstractStandardFormController
         }
 
         if (!$this->security->hasEntityAccess(
-            $ownPermission, $otherPermission, $segment->getCreatedBy()
+            $ownPermission,
+            $otherPermission,
+            $segment->getCreatedBy()
         )) {
             throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
         }
@@ -532,7 +535,9 @@ final class ListController extends AbstractStandardFormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->security->hasEntityAccess(
-                LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $list->getCreatedBy()
+                LeadPermissions::LISTS_DELETE_OWN,
+                LeadPermissions::LISTS_DELETE_OTHER,
+                $list->getCreatedBy()
             )
             ) {
                 $this->throwAccessDenied();
@@ -601,7 +606,9 @@ final class ListController extends AbstractStandardFormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
+                    LeadPermissions::LISTS_DELETE_OWN,
+                    LeadPermissions::LISTS_DELETE_OTHER,
+                    $entity->getCreatedBy()
                 )) {
                     $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
@@ -686,7 +693,9 @@ final class ListController extends AbstractStandardFormController
                     'msgVars' => ['%id%' => $leadId],
                 ];
             } elseif (!$this->security->hasEntityAccess(
-                LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $lead->getPermissionUser()
+                LeadPermissions::LISTS_EDIT_OWN,
+                LeadPermissions::LISTS_EDIT_OTHER,
+                $lead->getPermissionUser()
             )) {
                 $this->throwAccessDenied();
             } elseif (null === $list) {
@@ -696,7 +705,9 @@ final class ListController extends AbstractStandardFormController
                     'msgVars' => ['%id%' => $listId],
                 ];
             } elseif (!$list->isGlobal() && !$this->security->hasEntityAccess(
-                LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
+                LeadPermissions::LISTS_VIEW_OWN,
+                LeadPermissions::LISTS_VIEW_OTHER,
+                $list->getCreatedBy()
             )) {
                 $this->throwAccessDenied();
             } elseif ($this->leadModel->isLocked($lead)) {

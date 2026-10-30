@@ -322,7 +322,8 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             'l.firstname',
         ];
         $report->setColumns($coulmns);
-        $report->setFilters([
+        $report->setFilters(
+            [
             [
                 'column'    => 'l.firstname',
                 'glue'      => 'and',
@@ -351,7 +352,8 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             'utm.utm_campaign',
         ];
         $report->setColumns($coulmns);
-        $report->setFilters([
+        $report->setFilters(
+            [
             [
                 'column'    => 'utm.utm_campaign',
                 'glue'      => 'and',

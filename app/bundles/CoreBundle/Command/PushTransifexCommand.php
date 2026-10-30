@@ -62,8 +62,10 @@ final class PushTransifexCommand extends Command
         try {
             $transifex = $this->transifexFactory->getTransifex();
         } catch (InvalidConfigurationException) {
-            $output->writeln($this->translator->trans(
-                'mautic.core.command.transifex_no_credentials')
+            $output->writeln(
+                $this->translator->trans(
+                    'mautic.core.command.transifex_no_credentials'
+                )
             );
 
             return Command::FAILURE;

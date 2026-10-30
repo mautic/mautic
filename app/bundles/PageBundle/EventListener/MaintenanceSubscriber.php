@@ -47,7 +47,8 @@ final readonly class MaintenanceSubscriber implements EventSubscriberInterface
                     $qb->expr()->and(
                         $qb->expr()->lte('l.date_added', ':date2'),
                         $qb->expr()->isNull('l.last_active')
-                    ));
+                    )
+                );
                 $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
 
@@ -64,7 +65,8 @@ final readonly class MaintenanceSubscriber implements EventSubscriberInterface
                     $subQb->expr()->and(
                         $subQb->expr()->lte('l.date_added', ':date2'),
                         $subQb->expr()->isNull('l.last_active')
-                    ));
+                    )
+                );
                 $subQb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
             $rows = 0;
@@ -82,7 +84,9 @@ final readonly class MaintenanceSubscriber implements EventSubscriberInterface
                 $rows += $qb->delete(MAUTIC_TABLE_PREFIX.$table)
                   ->where(
                       $qb->expr()->in(
-                          'lead_id', ':leadsIds')
+                          'lead_id',
+                          ':leadsIds'
+                      )
                   )
                   ->setParameter('leadsIds', array_map(intval(...), $leadsIds), ArrayParameterType::INTEGER)
                     ->executeStatement();

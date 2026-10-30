@@ -551,8 +551,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
         } elseif ($event->checkContext('lead.field_value')) {
             if ('date' === $event->getConfig()['operator']) {
                 // Set the date in system timezone since this is triggered by cron
-                $triggerDate = new \DateTime('now',
-                    new \DateTimeZone($this->coreParametersHelper->getDefaultTimezone()));
+                $triggerDate = new \DateTime(
+                    'now',
+                    new \DateTimeZone($this->coreParametersHelper->getDefaultTimezone())
+                );
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
                 if (str_contains($event->getConfig()['value'], '+P')) { // add date
@@ -567,7 +569,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
                      * ( to integrate with: recursive campaign (future)).
                      */
                     $result = $this->leadFieldRepository->compareDateMonthValue(
-                        $lead->getId(), $event->getConfig()['field'], $triggerDate);
+                        $lead->getId(),
+                        $event->getConfig()['field'],
+                        $triggerDate
+                    );
                 }
             } else {
                 $operators = OperatorOptions::getFilterExpressionFunctions();
@@ -727,11 +732,17 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
             if ($group) {
                 $result = $this->groupContactScoreRepository->compareScore(
-                    $lead->getId(), $group, $score, $operatorExpr,
+                    $lead->getId(),
+                    $group,
+                    $score,
+                    $operatorExpr,
                 );
             } else {
                 $result = $this->leadFieldRepository->compareValue(
-                    $lead->getId(), 'points', $score, $operatorExpr
+                    $lead->getId(),
+                    'points',
+                    $score,
+                    $operatorExpr
                 );
             }
         }

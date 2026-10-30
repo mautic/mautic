@@ -61,7 +61,8 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
      */
     public function getAuthCallbackUrl()
     {
-        return $this->router->generate('mautic_sso_login_check',
+        return $this->router->generate(
+            'mautic_sso_login_check',
             ['integration' => $this->getName()],
             UrlGeneratorInterface::ABSOLUTE_URL // absolute
         );
@@ -130,7 +131,8 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     public function appendToForm($builder, array $data, $formArea): void
     {
         if ('features' == $formArea) {
-            $builder->add('auto_create_user',
+            $builder->add(
+                'auto_create_user',
                 YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.integration.sso.auto_create_user',

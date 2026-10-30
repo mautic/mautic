@@ -61,7 +61,9 @@ final class CampaignDecisionTest extends MauticMysqlTestCase
         $lead5    = $this->createLeadData($segment, $object, [], [], 5);
         $campaign = $this->createCampaign('c1', $segment);
 
-        $parentEvent = $this->createEvent('Field Value Condition', $campaign,
+        $parentEvent = $this->createEvent(
+            'Field Value Condition',
+            $campaign,
             'lead.field_value',
             'condition',
             [
@@ -73,7 +75,9 @@ final class CampaignDecisionTest extends MauticMysqlTestCase
             ]
         );
 
-        $yesEvent = $this->createEvent('Add 10 points', $campaign,
+        $yesEvent = $this->createEvent(
+            'Add 10 points',
+            $campaign,
             'lead.changepoints',
             'action',
             ['points' => 10],
@@ -81,7 +85,9 @@ final class CampaignDecisionTest extends MauticMysqlTestCase
             $parentEvent
         );
 
-        $noEvent = $this->createEvent('Add 5 points', $campaign,
+        $noEvent = $this->createEvent(
+            'Add 5 points',
+            $campaign,
             'lead.changepoints',
             'action',
             ['points' => 5],

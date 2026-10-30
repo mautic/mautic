@@ -1766,7 +1766,8 @@ final class EmailController extends AbstractStandardFormController
                 }
 
                 if ($previewForContactId
-                    && (!$security->isAdmin()
+                    && (
+                        !$security->isAdmin()
                         || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $user->getId())
                     )
                 ) {

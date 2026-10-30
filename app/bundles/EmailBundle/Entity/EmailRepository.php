@@ -935,9 +935,9 @@ class EmailRepository extends CommonRepository
         $expr = $this->getPublishedByDateOrmExpression($qb, $this->getTableAlias());
 
         $qb->innerJoin(Email::class, 'v', Join::WITH, $qb->expr()->andX(
-                $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
-                $qb->expr()->eq('v.isPublished', true)
-            ))
+            $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
+            $qb->expr()->eq('v.isPublished', true)
+        ))
             ->where($expr);
 
         return $qb->getQuery()->getResult();
