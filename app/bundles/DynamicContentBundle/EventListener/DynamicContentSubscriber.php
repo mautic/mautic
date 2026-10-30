@@ -193,24 +193,91 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
         }
 
         // Depending on the libxml version, DOMDocument may URL-encode { -> %7B and } -> %7D inside href, src and action values.
-        // Replace tokens (encoded or plain) inside those attributes with HTML-stripped, attribute-escaped content
-        // to avoid injecting HTML markup into attribute values, then replace the remaining tokens normally.
+        // Replace tokens (encoded or plain) inside those attributes with HTML-stripped, attribute-escaped content.
+        $attributeReplacementIndex = 0;
         $content = preg_replace_callback(
             '/(\b(?:href|src|action)\s*=\s*")([^"]*)(")/i',
-            static function (array $matches) use ($result): string {
+            static function (array $matches) use ($result, &$attributeReplacementIndex): string {
                 $value = $matches[2];
+                $placeholders = [];
                 foreach ($result as $token => $replacement) {
                     $encodedToken = str_replace(['{', '}'], ['%7B', '%7D'], $token);
                     $safe         = htmlspecialchars(strip_tags($replacement), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
-                    $value        = str_ireplace([$encodedToken, $token], $safe, $value);
+                    $placeholder  = '__MAUTIC_DWC_ATTRIBUTE_'.$attributeReplacementIndex++.'__';
+                    $updatedValue = str_ireplace([$encodedToken, $token], $placeholder, $value);
+                    if ($updatedValue !== $value) {
+                        $placeholders[$placeholder] = $safe;
+                        $value = $updatedValue;
+                    }
+                }
+
+                foreach ($placeholders as $placeholder => $replacement) {
+                    $value = str_replace($placeholder, $replacement, $value);
                 }
 
                 return $matches[1].$value.$matches[3];
             },
             $content
         ) ?? $content;
-        $content = str_replace(array_keys($result), array_values($result), $content);
 
-        $event->setContent($content);
+        // Replace remaining tokens in text nodes only. A global replacement would also process tokens
+        // introduced by an attribute replacement and could turn inert token text into markup in an attribute.
+        $opaqueReplacements = [];
+        foreach ($result as $token => $replacement) {
+            $protectedAttributes = [];
+            $attributeIndex = 0;
+            $contentForTextDom = preg_replace_callback(
+                '/(\s+[^\s=\/>]+)(\s*=\s*)(["\'])(.*?)\3/s',
+                static function (array $matches) use (&$protectedAttributes, &$attributeIndex): string {
+                    $placeholder = '__MAUTIC_DWC_ATTRIBUTE_'.$attributeIndex++.'__';
+                    $protectedAttributes[$placeholder] = $matches[4];
+
+                    return $matches[1].$matches[2].$matches[3].$placeholder.$matches[3];
+                },
+                $content
+            ) ?? $content;
+            $textDom = new \DOMDocument('1.0', 'utf-8');
+            $textDom->loadHTML(mb_encode_numericentity($contentForTextDom, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
+            $textXpath = new \DOMXPath($textDom);
+            $placeholder = $this->getOpaquePlaceholder('text', $content, $replacement, count($opaqueReplacements));
+            $textNodes = $textXpath->query('//text()');
+            if (false === $textNodes) {
+                continue;
+            }
+
+            $tokenFoundInText = false;
+            foreach ($textNodes as $textNode) {
+                if (!$textNode instanceof \DOMText || !str_contains($textNode->nodeValue, $token)) {
+                    continue;
+                }
+
+                $textNode->nodeValue = str_replace($token, $placeholder, $textNode->nodeValue);
+                $tokenFoundInText = true;
+            }
+
+            if (!$tokenFoundInText) {
+                continue;
+            }
+
+            $serializedContent = $textDom->saveHTML();
+            $replacementPlaceholder = $this->getOpaquePlaceholder('replacement', $serializedContent, $replacement, count($opaqueReplacements));
+            $opaqueReplacements[$replacementPlaceholder] = $replacement;
+            $content = str_replace($placeholder, $replacementPlaceholder, $serializedContent);
+            foreach ($protectedAttributes as $attributePlaceholder => $attributeValue) {
+                $content = str_replace($attributePlaceholder, $attributeValue, $content);
+            }
+        }
+
+        $event->setContent(strtr($content, $opaqueReplacements));
+    }
+
+    private function getOpaquePlaceholder(string $type, string $content, string $replacement, int $index): string
+    {
+        do {
+            $placeholder = "__MAUTIC_DWC_OPAQUE_{$type}_{$index}__";
+            ++$index;
+        } while (str_contains($content, $placeholder) || str_contains($replacement, $placeholder));
+
+        return $placeholder;
     }
 }
