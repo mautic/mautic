@@ -19,6 +19,7 @@ use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FieldModel;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -38,6 +39,7 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
         private LeadFieldModel $leadFieldModel,
         private EventDispatcherInterface $dispatcher,
         private ImportEntityDenormalizer $serializer,
+        private FormModel $formModel,
     ) {
     }
 
@@ -130,6 +132,8 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
             EntityImportEvent::UPDATE => ['names' => [], 'ids' => [], 'count' => 0],
         ];
 
+        $forms = [];
+
         foreach ($event->getEntityData() as $fieldData) {
             $field = $this->fieldRepository->findOneBy(['uuid' => $fieldData['uuid']]);
             $isNew = !$field;
@@ -164,12 +168,24 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
             $this->fieldModel->saveEntity($field);
             $event->addEntityIdMap((int) $fieldData['id'], $field->getId());
 
+            if ($field->getForm() instanceof Form) {
+                $forms[$field->getForm()->getId()] = $field->getForm();
+            }
+
             $status                    = $isNew ? EntityImportEvent::NEW : EntityImportEvent::UPDATE;
             $stats[$status]['names'][] = $field->getLabel() ?? $field->getAlias();
             $stats[$status]['ids'][]   = $field->getId();
             ++$stats[$status]['count'];
 
             $this->logAction('import', $field->getId(), $fieldData, 'formField');
+        }
+
+        // The form is imported before its fields, so its results table and its cached HTML have no fields yet
+        foreach ($forms as $form) {
+            // Loads the fields that were just saved
+            $this->entityManager->refresh($form);
+            $this->formModel->createTableSchema($form);
+            $this->formModel->generateHtml($form);
         }
 
         foreach ($stats as $status => $info) {

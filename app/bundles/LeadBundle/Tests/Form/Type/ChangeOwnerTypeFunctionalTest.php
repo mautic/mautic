@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -93,5 +95,58 @@ final class ChangeOwnerTypeFunctionalTest extends MauticMysqlTestCase
         $responseData = json_decode($this->client->getResponse()->getContent(), true);
         $this->assertSame($modifyTagsEventId, $responseData['eventId'], 'Should be able to edit the first event');
         $this->assertArrayHasKey('newContent', $responseData, 'Edit form content should be returned');
+    }
+
+    public function testActionWithoutOwnerAsksToChooseOneInsteadOfShowingTheFirstUser(): void
+    {
+        // A new action keeps preselecting the first user
+        $uri = '/s/campaigns/events/new?type=lead.changeowner&eventType=action&campaignId='.self::TEMP_CAMPAIGN_ID.'&anchor=leadsource&anchorEventType=source';
+        $this->client->xmlHttpRequest('GET', $uri);
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(0, $this->getOwnerSelect()->filter('option[value=""]'));
+
+        // An action with an owner keeps it
+        $this->editChangeOwnerAction(1);
+        $this->assertSame(['1'], $this->getOwnerSelect()->filter('option[selected]')->each(fn (Crawler $option): string => (string) $option->attr('value')));
+        $this->assertCount(0, $this->getOwnerSelect()->filter('option[value=""]'));
+
+        // An imported action has no owner, as users cannot be identified on another instance
+        $this->editChangeOwnerAction(null);
+        $this->assertSame([''], $this->getOwnerSelect()->filter('option[selected]')->each(fn (Crawler $option): string => (string) $option->attr('value')));
+
+        $form = (new Crawler(json_decode((string) $this->client->getResponse()->getContent(), true)['newContent'], $this->client->getInternalRequest()->getUri()))
+            ->filterXPath('//form[@name="campaignevent"]')->form();
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest($form->getMethod(), $form->getUri(), $form->getPhpValues());
+        $this->assertResponseIsSuccessful();
+        $responseData = json_decode((string) $this->client->getResponse()->getContent(), true);
+        $this->assertEmpty($responseData['success'] ?? null);
+        $this->assertStringContainsString('A value is required.', (string) $responseData['newContent']);
+    }
+
+    private function editChangeOwnerAction(?int $owner): void
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Change owner campaign');
+        $this->em->persist($campaign);
+
+        $event = new Event();
+        $event->setCampaign($campaign);
+        $event->setName('Update contact owner');
+        $event->setType('lead.changeowner');
+        $event->setEventType('action');
+        $event->setProperties(['owner' => $owner, 'properties' => ['owner' => $owner]]);
+        $this->em->persist($event);
+        $this->em->flush();
+
+        $this->client->xmlHttpRequest('GET', "/s/campaigns/events/edit/{$event->getId()}?campaignId={$campaign->getId()}");
+        $this->assertResponseIsSuccessful();
+    }
+
+    private function getOwnerSelect(): Crawler
+    {
+        $responseData = json_decode((string) $this->client->getResponse()->getContent(), true);
+
+        return (new Crawler($responseData['newContent']))->filter('select#campaignevent_properties_owner');
     }
 }
