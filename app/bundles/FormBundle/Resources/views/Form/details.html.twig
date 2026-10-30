@@ -157,6 +157,7 @@
             <!--/ form detail collapseable toggler -->
 
             <!-- stats -->
+            {% if aggregateAnalytics ?? true %}
             <div class="pa-md">
                 <div class="row">
                     <div class="col-sm-12">
@@ -194,6 +195,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
             <!--/ stats -->
 
             {{ customContent('details.stats.graph.below', _context) }}

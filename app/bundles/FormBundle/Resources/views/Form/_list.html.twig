@@ -42,7 +42,7 @@
 
                 {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'form',
-                        'orderBy': 'submission_count',
+                        'orderBy': (aggregateAnalytics ?? true) ? 'submission_count' : '',
                         'text': 'mautic.form.form.results',
                         'class': 'visible-md visible-lg col-form-submissions',
                 }) }}
@@ -135,9 +135,15 @@
                         {% endif %}
                     </td>
                     <td class="visible-md visible-lg">
-                        <a href="{{ path('mautic_form_action', {'objectAction': 'results', 'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" size="sm" class="label label-gray" {% if 0 == i.submission_count %}disabled="disabled"{% endif %}>
-                           {{- 'mautic.form.form.viewresults'|trans({'%count%': i['submission_count']}) -}}
-                        </a>
+                        {% if aggregateAnalytics ?? true %}
+                            <a href="{{ path('mautic_form_action', {'objectAction': 'results', 'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" size="sm" class="label label-gray" {% if 0 == i.submission_count %}disabled="disabled"{% endif %}>
+                               {{- 'mautic.form.form.viewresults'|trans({'%count%': i['submission_count']}) -}}
+                            </a>
+                        {% else %}
+                            <a href="{{ path('mautic_form_action', {'objectAction': 'results', 'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index" size="sm" class="label label-gray">
+                               {{- 'mautic.form.form.viewresults.nocount'|trans -}}
+                            </a>
+                        {% endif %}
                     </td>
                     <td class="visible-md visible-lg">{% if item.dateAdded %}{{ dateToFull(item.dateAdded) }}{% endif %}</td>
                     <td class="visible-md visible-lg">{% if item.dateModified %}{{ dateToFull(item.dateModified) }}{% endif %}</td>
