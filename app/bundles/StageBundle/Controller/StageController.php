@@ -45,6 +45,8 @@ final class StageController extends AbstractFormController
                 'stage:stages:edit',
                 'stage:stages:delete',
                 'stage:stages:publish',
+                'lead:leads:viewown',
+                'lead:leads:viewother',
             ],
             'RETURN_ARRAY'
         );
@@ -66,9 +68,9 @@ final class StageController extends AbstractFormController
             $filter
         );
 
-        $orderBy    = $request->getSession()->get('mautic.stage.orderby', 's.name');
-        $orderByDir = $request->getSession()->get('mautic.stage.orderbydir', 'ASC');
-        $stages = $this->stageModel->getEntities(
+        $orderBy                                 = $request->getSession()->get('mautic.stage.orderby', 's.name');
+        $orderByDir                              = $request->getSession()->get('mautic.stage.orderbydir', 'ASC');
+        [$stageEntities, $contactCounts, $count] = $this->stageModel->getEntitiesWithContactCounts(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -79,8 +81,6 @@ final class StageController extends AbstractFormController
         );
 
         $request->getSession()->set('mautic.stage.filter', $search);
-
-        $count = count($stages);
         if ($count && $count < ($start + 1)) {
             $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_stage_index', ['page' => $lastPage]);
@@ -107,15 +107,17 @@ final class StageController extends AbstractFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'searchValue'  => $search,
-                    'searchScopes' => $stageSearchScopeProvider->getScopes(),
-                    'filters'      => $categoryFilters['filters'],
-                    'items'        => $stages,
-                    'actions'     => $actions['actions'],
-                    'page'        => $page,
-                    'limit'       => $limit,
-                    'permissions' => $permissions,
-                    'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'searchValue'   => $search,
+                    'searchScopes'  => $stageSearchScopeProvider->getScopes(),
+                    'filters'       => $categoryFilters['filters'],
+                    'items'         => $stageEntities,
+                    'contactCounts' => $contactCounts,
+                    'actions'       => $actions['actions'],
+                    'page'          => $page,
+                    'limit'         => $limit,
+                    'permissions'   => $permissions,
+                    'tmpl'          => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'totalItems'    => $count,
                 ],
                 'contentTemplate' => '@MauticStage/Stage/list.html.twig',
                 'passthroughVars' => [
