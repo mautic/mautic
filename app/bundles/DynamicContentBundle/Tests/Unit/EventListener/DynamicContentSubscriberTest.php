@@ -486,7 +486,8 @@ HTML;
         $this->subscriber->decodeTokens($event);
     }
 
-    public function testDecodeTokensPreservesUtf8AcrossTextNodeReplacements(): void
+    #[\PHPUnit\Framework\Attributes\DataProvider('opaqueReplacementProvider')]
+    public function testDecodeTokensPreservesOpaqueReplacements(array $tokens, array $expected): void
     {
         $content = '<html><body>{dwc=first} {dwc=second}</body></html>';
         $contact = new Lead();
@@ -494,41 +495,38 @@ HTML;
 
         $event->method('getLead')->willReturn($contact);
         $event->method('getContent')->willReturn($content);
-        $this->dynamicContentHelper->method('findDwcTokens')->willReturn([
-            '{dwc=first}' => ['content' => '<p>Привет, José</p>', 'filters' => []],
-            '{dwc=second}' => ['content' => '<p>second</p>', 'filters' => []],
-        ]);
+        $this->dynamicContentHelper->method('findDwcTokens')->willReturn($tokens);
 
         $event->expects($this->once())
             ->method('setContent')
-            ->willReturnCallback(function (string $output): void {
-                $this->assertStringContainsString('Привет, José', $output);
+            ->willReturnCallback(function (string $output) use ($expected): void {
+                foreach ($expected as $value) {
+                    $this->assertStringContainsString($value, $output);
+                }
             });
 
         $this->subscriber->decodeTokens($event);
     }
 
-    public function testDecodeTokensKeepsEarlierScriptReplacementOpaque(): void
+    /**
+     * @return iterable<string, array{array<string, array{content: string, filters: array<mixed>}>, list<string>}>
+     */
+    public static function opaqueReplacementProvider(): iterable
     {
-        $content = '<html><body>{dwc=first}{dwc=second}</body></html>';
-        $contact = new Lead();
-        $event   = $this->createMock(PageDisplayEvent::class);
-
-        $event->method('getLead')->willReturn($contact);
-        $event->method('getContent')->willReturn($content);
-        $this->dynamicContentHelper->method('findDwcTokens')->willReturn([
-            '{dwc=first}' => ['content' => '<script>document.write("<div>visible</div>");</script>', 'filters' => []],
-            '{dwc=second}' => ['content' => '<p>second</p>', 'filters' => []],
-        ]);
-
-        $event->expects($this->once())
-            ->method('setContent')
-            ->willReturnCallback(function (string $output): void {
-                $this->assertStringContainsString('document.write("<div>visible</div>");', $output);
-                $this->assertStringContainsString('<p>second</p>', $output);
-            });
-
-        $this->subscriber->decodeTokens($event);
+        yield 'UTF-8 text' => [
+            [
+                '{dwc=first}'  => ['content' => '<p>Привет, José</p>', 'filters' => []],
+                '{dwc=second}' => ['content' => '<p>second</p>', 'filters' => []],
+            ],
+            ['Привет, José'],
+        ];
+        yield 'script body' => [
+            [
+                '{dwc=first}'  => ['content' => '<script>document.write("<div>visible</div>");</script>', 'filters' => []],
+                '{dwc=second}' => ['content' => '<p>second</p>', 'filters' => []],
+            ],
+            ['document.write("<div>visible</div>");', '<p>second</p>'],
+        ];
     }
 
     public function testOnTokenReplacement(): void
