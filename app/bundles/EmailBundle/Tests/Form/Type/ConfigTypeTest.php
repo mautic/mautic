@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Form\Type\PreferenceCenterListType;
 use Mautic\PageBundle\Model\PageModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -33,6 +34,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigTypeTest extends TypeTestCase
 {
+    private Mailbox&MockObject $mailbox;
+
     protected function getExtensions(): array
     {
         // Some local environments do not have ext-imap loaded, but Mailbox uses these
@@ -71,7 +74,8 @@ final class ConfigTypeTest extends TypeTestCase
         $configType                     = new ConfigType($translator);
         $preferenceCenterList           = new PreferenceCenterListType($pageModelMock, $permsMock);
         $configMonitoredEmail           = new ConfigMonitoredEmailType(new EventDispatcher());
-        $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType($this->createStub(Mailbox::class));
+        $this->mailbox                  = $this->createMock(Mailbox::class);
+        $configMonitoredMailboxes       = new ConfigMonitoredMailboxesType($this->mailbox);
         $dsnValidator                   = new DsnValidator($this->createStub(TransportFactory::class));
         $emailOrEmailTokenListValidator = new EmailOrEmailTokenListValidator($this->createStub(EmailValidator::class), $this->createStub(CustomFieldValidator::class));
         $validator                      = Validation::createValidatorBuilder()
@@ -136,5 +140,33 @@ final class ConfigTypeTest extends TypeTestCase
         $this->assertSame('email', $data['email_default_utm_medium']);
         $this->assertSame('spring-promo', $data['email_default_utm_campaign']);
         $this->assertSame('header-link', $data['email_default_utm_content']);
+    }
+
+    public function testEscapedPasswordIsResolvedBeforeMailboxConfiguration(): void
+    {
+        $this->mailbox
+            ->expects($this->once())
+            ->method('setMailboxSettings')
+            ->with($this->callback(
+                static fn (array $settings): bool => 'abc%def%ghi' === ($settings['password'] ?? null)
+            ));
+
+        $this->factory->create(
+            ConfigMonitoredMailboxesType::class,
+            [
+                'address'          => 'bounce@example.invalid',
+                'host'             => '',
+                'port'             => '993',
+                'user'             => 'monitor',
+                'password'         => 'abc%%def%%ghi',
+                'override_settings' => true,
+                'folder'           => 'INBOX',
+            ],
+            [
+                'mailbox'          => 'EmailBundle_bounces',
+                'default_folder'   => 'INBOX',
+                'general_settings' => [],
+            ]
+        );
     }
 }

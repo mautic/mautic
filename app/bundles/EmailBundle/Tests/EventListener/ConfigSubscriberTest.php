@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Mautic\ConfigBundleEvent\ConfigEvent;
+use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\EventListener\ConfigSubscriber;
 use PHPUnit\Framework\TestCase;
