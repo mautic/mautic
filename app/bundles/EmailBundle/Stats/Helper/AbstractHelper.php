@@ -48,9 +48,12 @@ abstract class AbstractHelper implements StatHelperInterface
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> 5ee4ad9a14 (Apply NoWhitespaceInBlankLineFixer (3 files))
+=======
+>>>>>>> 2605ff927c (Apply NoExtraBlankLinesFixer (13 files))
     protected function getQuery(\DateTime $fromDateTime, \DateTime $toDateTime): ChartQuery
     {
         $unit = $this->getTimeUnitFromDateRange($fromDateTime, $toDateTime);
