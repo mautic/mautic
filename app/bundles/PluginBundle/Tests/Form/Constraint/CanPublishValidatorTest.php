@@ -52,7 +52,6 @@ final class CanPublishValidatorTest extends TestCase
             ->method('dispatch')
             ->willReturn($this->event);
 
-
         $this->canPublishValidator->validateInContext(1, new CanPublish(integrationName: 'testIntegration'), $this->createStub(ExecutionContext::class));
     }
 
@@ -71,7 +70,6 @@ final class CanPublishValidatorTest extends TestCase
             ->with($this->isInstanceOf(PluginIsPublishedEvent::class))
             ->willReturn($this->event);
 
-
         $this->canPublishValidator->validateInContext(0, new CanPublish(integrationName: 'testIntegration'), $this->createStub(ExecutionContext::class));
     }
 
@@ -89,7 +87,6 @@ final class CanPublishValidatorTest extends TestCase
             ->method('dispatch')
             ->with($this->isInstanceOf(PluginIsPublishedEvent::class))
             ->willReturn($this->event);
-
 
         $this->expectException(UnexpectedTypeException::class);
 

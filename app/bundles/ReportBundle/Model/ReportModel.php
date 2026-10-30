@@ -2,7 +2,6 @@
 
 namespace Mautic\ReportBundle\Model;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -41,7 +40,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
@@ -113,7 +111,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * @param Report|array<string, mixed> $entity
      *
-     * @throws NotFoundHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
     public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
@@ -902,10 +900,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
         return array_unique($dependents);
     }
 
-    /**
-     * @return Connection
-     */
-    private function getConnection()
+    private function getConnection(): \Doctrine\DBAL\Connection
     {
         $connection = $this->em->getConnection();
         if ($connection instanceof PrimaryReadReplicaConnection) {

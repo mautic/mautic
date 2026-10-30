@@ -42,6 +42,8 @@ return ECSConfig::configure()
     ])
     ->withRules([
         PhpCsFixer\Fixer\Semicolon\MultilineWhitespaceBeforeSemicolonsFixer::class,
+        PhpCsFixer\Fixer\Whitespace\NoExtraBlankLinesFixer::class,
+        PhpCsFixer\Fixer\Whitespace\NoWhitespaceInBlankLineFixer::class,
     ])
     ->withPreparedSets(
         comments: true,

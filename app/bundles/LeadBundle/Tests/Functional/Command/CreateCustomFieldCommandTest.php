@@ -19,7 +19,6 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-
     public function testWithIdAndUserArgs(): void
     {
         $leadField = new LeadField();
