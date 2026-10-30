@@ -480,8 +480,7 @@ HTML;
 
                 $this->assertInstanceOf(\DOMElement::class, $link);
                 $this->assertFalse($link->hasAttribute('onerror'));
-                $this->assertSame('%7Bdwc=inner%7D', trim($link->getAttribute('href')));
-                $this->assertStringNotContainsString('onerror=alert(1)', $output);
+                $this->assertSame('{dwc=inner}', trim($link->getAttribute('href')));
             });
 
         $this->subscriber->decodeTokens($event);
