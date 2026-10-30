@@ -294,7 +294,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
     {
         $crawler = $this->getCrawler($campaign);
         $events  = [];
-        for ($eventIndex = 0;; ++$eventIndex) {
+        for ($eventIndex = 0; ; ++$eventIndex) {
             $node = $crawler->filter('.campaign-event-list')->filter('span')->eq($eventIndex * 3);
             if (1 > $node->count()) {
                 break;
