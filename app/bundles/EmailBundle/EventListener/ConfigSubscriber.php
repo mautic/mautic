@@ -5,17 +5,11 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\ConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final readonly class ConfigSubscriber implements EventSubscriberInterface
 {
-    public function __construct(
-        private CoreParametersHelper $coreParametersHelper,
-    ) {
-    }
-
     public static function getSubscribedEvents(): array
     {
         return [
@@ -40,7 +34,7 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
         $data = $event->getConfig('emailconfig');
 
         // Get the original data so that passwords aren't lost
-        $monitoredEmail = $this->coreParametersHelper->get('monitored_email');
+        $monitoredEmail = $event->getOriginalModelData()['emailconfig']['monitored_email'] ?? [];
         if (isset($data['monitored_email'])) {
             foreach ($data['monitored_email'] as $key => $monitor) {
                 if (empty($monitor['password']) && !empty($monitoredEmail[$key]['password'])) {

@@ -29,6 +29,11 @@ class ConfigEvent extends CommonEvent
     private ?array $originalNormData = null;
 
     /**
+     * Original form model data before submission.
+     */
+    private ?array $originalModelData = null;
+
+    /**
      * Data got from build form after update.
      *
      * @var array
@@ -156,6 +161,18 @@ class ConfigEvent extends CommonEvent
     public function encodeFileContents($content): string
     {
         return base64_encode($content);
+    }
+
+    public function getOriginalModelData(): ?array
+    {
+        return $this->originalModelData;
+    }
+
+    public function setOriginalModelData(array $modelData): static
+    {
+        $this->originalModelData = $modelData;
+
+        return $this;
     }
 
     public function getOriginalNormData(): ?array
