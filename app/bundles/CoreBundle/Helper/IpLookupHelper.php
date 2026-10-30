@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
+use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -149,23 +150,9 @@ class IpLookupHelper
 
             $ipAddress->setDoNotTrackList($doNotTrack);
 
-            if ($ipAddress->isTrackable() && $request = $this->getRequest()) {
-                $userAgent = $request->headers->get('User-Agent', '');
-                foreach ($this->doNotTrackBots as $bot) {
-                    if (str_contains($userAgent, $bot)) {
-                        $doNotTrack[] = $ip;
-                        $ipAddress->setDoNotTrackList($doNotTrack);
-                        break;
-                    }
-                }
-
-                // second check for bots  https://github.com/matomo-org/device-detector
-                $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
-                $deviceDetector->parse();
-                if ($deviceDetector->isBot()) {
-                    $doNotTrack[] = $ip;
-                    $ipAddress->setDoNotTrackList($doNotTrack);
-                }
+            if ($ipAddress->isTrackable() && ($request = $this->getRequest()) && $this->isBot($request)) {
+                $doNotTrack[] = $ip;
+                $ipAddress->setDoNotTrackList($doNotTrack);
             }
 
             $details = $ipAddress->getIpDetails();
@@ -287,8 +274,7 @@ class IpLookupHelper
         }
 
         // Skip prefetch requests (browser prefetching links)
-        $purpose = $request->headers->get('Purpose') ?? $request->headers->get('Sec-Purpose');
-        if ($purpose && in_array(strtolower($purpose), ['prefetch', 'prerender'], true)) {
+        if ($this->isPrefetch($request)) {
             return false;
         }
 
@@ -306,6 +292,70 @@ class IpLookupHelper
 
         // Use existing IP/User-Agent based bot filtering
         return $this->getIpAddress()->isTrackable();
+    }
+
+    /**
+     * Whether the request may count toward aggregate analytics, which aren't linked to anyone.
+     * Unlike isRequestTrackable(), Do Not Track and Global Privacy Control don't stop it,
+     * but bots, excluded IP addresses and HEAD or prefetch requests do. The IP address isn't stored.
+     */
+    public function isRequestCountable(): bool
+    {
+        $request = $this->getRequest();
+
+        if (null === $request || $request->isMethod('HEAD') || $this->isPrefetch($request)) {
+            return false;
+        }
+
+        try {
+            $address = $this->getVisitorAddress($request);
+        } catch (ConflictingHeadersException) {
+            // A trusted proxy sent forwarded headers that disagree, so the visitor can't be told apart
+            return false;
+        }
+
+        // Checked on an unsaved entity, so nothing about the visitor is stored
+        $ipAddress = new IpAddress($address);
+        $ipAddress->setDoNotTrackList(array_merge((array) $this->doNotTrackIps, (array) $this->doNotTrackInternalIps));
+
+        return $ipAddress->isTrackable() && !$this->isBot($request);
+    }
+
+    /**
+     * The address that identifies the visitor. Forwarded headers only count from a trusted proxy, so a visitor
+     * can't send one to get past the exclusion list. A private address isn't replaced with 127.0.0.1 here.
+     */
+    private function getVisitorAddress(Request $request): string
+    {
+        return $request->getClientIp() ?? '127.0.0.1';
+    }
+
+    private function isPrefetch(Request $request): bool
+    {
+        // Either header can say it, and neither takes precedence
+        foreach ([$request->headers->get('Purpose'), $request->headers->get('Sec-Purpose')] as $purpose) {
+            if (null !== $purpose && [] !== array_intersect(array_map(trim(...), explode(';', strtolower($purpose))), ['prefetch', 'prerender'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isBot(Request $request): bool
+    {
+        $userAgent = (string) $request->headers->get('User-Agent', '');
+        foreach ((array) $this->doNotTrackBots as $bot) {
+            if (str_contains($userAgent, $bot)) {
+                return true;
+            }
+        }
+
+        // second check for bots  https://github.com/matomo-org/device-detector
+        $deviceDetector = $this->deviceDetectorFactory->create($userAgent);
+        $deviceDetector->parse();
+
+        return $deviceDetector->isBot();
     }
 
     private function getRequest(): ?Request

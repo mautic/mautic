@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Controller;
 
+use Doctrine\DBAL\Exception as DBALException;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
@@ -484,13 +485,14 @@ final class PublicController extends AbstractFormController
             $url = UrlHelper::appendQueryToUrl($url, http_build_query($query));
         }
 
-        // If the IP address is not trackable, it means it came form a configured "do not track" IP or a "do not track" user agent
-        // This prevents simulated clicks from 3rd party services such as URL shorteners from simulating clicks
-        $ipAddress = $ipLookupHelper->getIpAddress();
+        // A request isn't trackable when it came from a configured "do not track" IP or user agent, which keeps
+        // simulated clicks from 3rd party services such as URL shorteners out, or carries a privacy signal.
+        // The visitor is only looked up when trackable, since the lookup stores their IP address.
+        $isRequestTrackable = $ipLookupHelper->isRequestTrackable();
 
         $isHitTrackable = false;
         if (null !== $ct && '' !== $ct) {
-            if ($ipAddress->isTrackable()) {
+            if ($isRequestTrackable) {
                 // Search replace lead fields in the URL
                 try {
                     $lead           = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
@@ -529,6 +531,18 @@ final class PublicController extends AbstractFormController
             }
         }
 
+        // A click from a message is still counted, with nothing that links it to the visitor. A clickthrough
+        // that doesn't decode counts as no clickthrough.
+        $clickthrough = $isRequestTrackable ? [] : $this->decodeClickthrough($ct);
+        if ([] !== $clickthrough) {
+            try {
+                $pageModel->countUntrackedClick($redirect, $clickthrough);
+            } catch (DBALException $e) {
+                // A count that couldn't be written mustn't keep the visitor from the link
+                $logger->error('Could not count an untracked click: '.$e->getMessage(), ['exception' => $e]);
+            }
+        }
+
         $url = UrlHelper::sanitizeAbsoluteUrl($url);
 
         if (!UrlHelper::isValidUrl($url)) {
@@ -539,6 +553,22 @@ final class PublicController extends AbstractFormController
         $response->headers->setCookie(new Cookie('Blocked-Tracking', (string) !$isHitTrackable, strtotime('now + 15 seconds')));
 
         return $response;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function decodeClickthrough(mixed $ct): array
+    {
+        if (!is_string($ct) || '' === $ct) {
+            return [];
+        }
+
+        try {
+            return ClickthroughHelper::decodeArrayFromUrl($ct);
+        } catch (InvalidDecodedStringException) {
+            return [];
+        }
     }
 
     /**
