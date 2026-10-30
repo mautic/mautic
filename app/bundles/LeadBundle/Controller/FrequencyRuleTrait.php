@@ -137,7 +137,9 @@ trait FrequencyRuleTrait
         }
 
         $data['global_categories'] = $frequencyRules['global_categories'] ?? $this->frequencyRuleLeadModel->getSubscribedAndNewCategoryIds(
-            $lead, ['global', 'email']);
+            $lead,
+            ['global', 'email']
+        );
 
         $this->leadLists    = $this->frequencyRuleLeadModel->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];

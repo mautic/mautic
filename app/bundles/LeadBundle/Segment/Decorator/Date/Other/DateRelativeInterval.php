@@ -63,9 +63,11 @@ final class DateRelativeInterval implements FilterDecoratorInterface
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): mixed
     {
         $date = $this->dateOptionParameters->getDefaultDate();
-        $date->modify($this->parseDateFilterValue(
-            $this->originalValue,
-            $contactSegmentFilterCrate->getOperator())
+        $date->modify(
+            $this->parseDateFilterValue(
+                $this->originalValue,
+                $contactSegmentFilterCrate->getOperator()
+            )
         );
 
         $operator = $this->getOperator($contactSegmentFilterCrate);

@@ -25,7 +25,8 @@ final class SortableValueLabelListTypeTest extends TestCase
         $call = 0;
         $builder->expects($this->exactly(2))
             ->method('add')
-            ->with($this->callback(function (string $name): bool {
+            ->with(
+                $this->callback(function (string $name): bool {
                 $expected = [
                     ['label', 'value'],
                 ];

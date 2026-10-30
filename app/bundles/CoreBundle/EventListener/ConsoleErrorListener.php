@@ -27,7 +27,6 @@ final readonly class ConsoleErrorListener
             $exception->getMessage(),
             $exception->getFile(),
             $exception->getLine(),
-
             $command instanceof Command ? $command->getName() : 'UNKNOWN',
             "\n[stack trace]\n".$exception->getTraceAsString()
         );

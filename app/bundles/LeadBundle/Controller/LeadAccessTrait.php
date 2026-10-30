@@ -97,7 +97,8 @@ trait LeadAccessTrait
                 'orderByDir'     => 'DESC',
                 'limit'          => $limit,
                 'hydration_mode' => 'HYDRATE_ARRAY',
-            ]);
+            ]
+        );
 
         if (count($leads) === 0) {
             return $this->notFound();

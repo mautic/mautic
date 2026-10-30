@@ -497,19 +497,28 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         ]);
 
         // The stuck condition (version=1) must appear as the next event to re-execute
-        $this->assertStringContainsString('Stuck Condition', $output,
-            'Stuck condition event (version=1) must itself be listed for re-execution');
+        $this->assertStringContainsString(
+            'Stuck Condition',
+            $output,
+            'Stuck condition event (version=1) must itself be listed for re-execution'
+        );
 
         // The yes/no children must NOT appear for the stuck contact (contactStuck) in the dry-run
         // output because the condition was never completed (version=1). The query must guard
         // against picking up children of condition/decision logs with version=1.
-        $this->assertStringNotContainsString('No Child Action', $output,
-            'No-path child must not be listed — condition was never evaluated for any contact');
+        $this->assertStringNotContainsString(
+            'No Child Action',
+            $output,
+            'No-path child must not be listed — condition was never evaluated for any contact'
+        );
 
         // contactCompleted's child (yes path, version=2) SHOULD appear only for contactCompleted.
         // We verify the stuck contact's ID is NOT paired with Yes Child Action.
-        $this->assertStringContainsString('Yes Child Action', $output,
-            'Completed condition contact should show yes path child as next event');
+        $this->assertStringContainsString(
+            'Yes Child Action',
+            $output,
+            'Completed condition contact should show yes path child as next event'
+        );
 
         // Verify that the stuck contact (contactStuck) is NOT associated with Yes Child Action.
         // The output table has one row per contact per event, so we check that the stuck contact
@@ -523,10 +532,16 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
             }
 
             if ((int) $matches[1] === $contactStuck->getId()) {
-                $this->assertStringNotContainsString('Yes Child Action', $line,
-                    'Stuck contact must NOT have Yes Child Action listed as a next event');
-                $this->assertStringNotContainsString('No Child Action', $line,
-                    'Stuck contact must NOT have No Child Action listed as a next event');
+                $this->assertStringNotContainsString(
+                    'Yes Child Action',
+                    $line,
+                    'Stuck contact must NOT have Yes Child Action listed as a next event'
+                );
+                $this->assertStringNotContainsString(
+                    'No Child Action',
+                    $line,
+                    'Stuck contact must NOT have No Child Action listed as a next event'
+                );
             }
         }
 
@@ -535,16 +550,25 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->em->clear();
 
         $stuckContactYesLogs = $this->findLeadEventLogs($campaign, $contactStuck->getId(), $yesPathAction->getId());
-        $this->assertCount(0, $stuckContactYesLogs,
-            'Stuck contact must NOT have yes path executed — condition was never evaluated');
+        $this->assertCount(
+            0,
+            $stuckContactYesLogs,
+            'Stuck contact must NOT have yes path executed — condition was never evaluated'
+        );
 
         $stuckContactNoLogs = $this->findLeadEventLogs($campaign, $contactStuck->getId(), $noPathAction->getId());
-        $this->assertCount(0, $stuckContactNoLogs,
-            'Stuck contact must NOT have no path executed — condition was never evaluated');
+        $this->assertCount(
+            0,
+            $stuckContactNoLogs,
+            'Stuck contact must NOT have no path executed — condition was never evaluated'
+        );
 
         $completedContactYesLogs = $this->findLeadEventLogs($campaign, $contactCompleted->getId(), $yesPathAction->getId());
-        $this->assertCount(1, $completedContactYesLogs,
-            'Completed condition contact must have yes path child executed');
+        $this->assertCount(
+            1,
+            $completedContactYesLogs,
+            'Completed condition contact must have yes path child executed'
+        );
     }
 
     /**
@@ -609,14 +633,23 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
             '--dry-run'   => true,
         ]);
 
-        $this->assertStringNotContainsString('Stuck Decision', $output,
-            'No Stuck decision event will be executed');
+        $this->assertStringNotContainsString(
+            'Stuck Decision',
+            $output,
+            'No Stuck decision event will be executed'
+        );
 
-        $this->assertStringNotContainsString('Decision No Child Action', $output,
-            'No-path child must not be listed — decision was never evaluated for any contact');
+        $this->assertStringNotContainsString(
+            'Decision No Child Action',
+            $output,
+            'No-path child must not be listed — decision was never evaluated for any contact'
+        );
 
-        $this->assertStringContainsString('Decision Yes Child Action', $output,
-            'Completed decision contact should show yes path child as next event');
+        $this->assertStringContainsString(
+            'Decision Yes Child Action',
+            $output,
+            'Completed decision contact should show yes path child as next event'
+        );
 
         $this->executeCommand(['campaign-id' => $campaignId]);
         $this->em->flush();
@@ -624,16 +657,25 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
 
         // contactStuck must NOT have yes/no children executed
         $stuckYesLogs = $this->findLeadEventLogs($campaign, $contactStuck->getId(), $yesPathAction->getId());
-        $this->assertCount(0, $stuckYesLogs,
-            'Stuck contact must NOT have yes path executed — decision was never evaluated');
+        $this->assertCount(
+            0,
+            $stuckYesLogs,
+            'Stuck contact must NOT have yes path executed — decision was never evaluated'
+        );
 
         $stuckNoLogs = $this->findLeadEventLogs($campaign, $contactStuck->getId(), $noPathAction->getId());
-        $this->assertCount(0, $stuckNoLogs,
-            'Stuck contact must NOT have no path executed — decision was never evaluated');
+        $this->assertCount(
+            0,
+            $stuckNoLogs,
+            'Stuck contact must NOT have no path executed — decision was never evaluated'
+        );
 
         $completedYesLogs = $this->findLeadEventLogs($campaign, $contactCompleted->getId(), $yesPathAction->getId());
-        $this->assertCount(1, $completedYesLogs,
-            'Completed decision contact must have yes path child executed');
+        $this->assertCount(
+            1,
+            $completedYesLogs,
+            'Completed decision contact must have yes path child executed'
+        );
     }
 
     public function testDecisionTypeEventsAreIgnored(): void
@@ -938,8 +980,11 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
             '--dry-run'   => true,
         ]);
 
-        $this->assertNotContains($contact->getId(), $this->getContactIdsFromOutput($output),
-            'Contacts with scheduled events should not appear in next events');
+        $this->assertNotContains(
+            $contact->getId(),
+            $this->getContactIdsFromOutput($output),
+            'Contacts with scheduled events should not appear in next events'
+        );
     }
 
     /**
@@ -996,8 +1041,11 @@ final class ResumeStuckCampaignCommandTest extends AbstractCampaignCommand
         $this->em->flush();
 
         $campaign2ContactLogs = $this->findLeadEventLogs($campaign2, $contact2->getId(), $child2->getId());
-        $this->assertCount(0, $campaign2ContactLogs,
-            'Campaign 2 events should not be processed when processing Campaign 1');
+        $this->assertCount(
+            0,
+            $campaign2ContactLogs,
+            'Campaign 2 events should not be processed when processing Campaign 1'
+        );
     }
 
     /**

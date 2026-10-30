@@ -684,7 +684,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
                     ]
                 );
             } else {
-                $listLead = $this->em->getReference(ListLead::class,
+                $listLead = $this->em->getReference(
+                    ListLead::class,
                     [
                         'lead' => $leadId,
                         'list' => $listId,
