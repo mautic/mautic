@@ -8,8 +8,9 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
+use PHPUnit\Framework\TestCase;
 
-final class ReportSchedulerSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportSchedulerSubscriberTest extends TestCase
 {
     public function testOnReportSave(): void
     {

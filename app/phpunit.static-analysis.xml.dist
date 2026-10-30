@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Rector/PHPStan rule tests, run without BypassFinals (see bootstrap-static-analysis.php) -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    colors="true"
+    bootstrap="tests/bootstrap-static-analysis.php"
+    xsi:noNamespaceSchemaLocation="../vendor/phpunit/phpunit/phpunit.xsd"
+    failOnRisky="true"
+    failOnWarning="true"
+    cacheDirectory="../var/cache/phpunit-static-analysis"
+  >
+  <testsuites>
+    <testsuite name="Static analysis rule tests">
+      <directory>./../utils/rector/tests</directory>
+      <directory>./../utils/phpstan/tests</directory>
+      <exclude>./../utils/rector/tests/*/Fixture</exclude>
+      <exclude>./../utils/phpstan/tests/Rule/Fixture</exclude>
+    </testsuite>
+  </testsuites>
+  <php>
+    <ini name="error_reporting" value="E_ALL"/>
+    <ini name="date.timezone" value="UTC"/>
+  </php>
+</phpunit>

@@ -3,6 +3,7 @@
 namespace Mautic\PluginBundle\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -16,6 +17,7 @@ use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\PluginBundle\Model\PluginModel;
+use MauticPlugin\MauticSocialBundle\Integration\SocialIntegration;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Twig\Environment;
@@ -58,15 +60,15 @@ final class IntegrationHelper
     /**
      * Get a list of integration helper classes.
      *
-     * @param array|string $specificIntegrations
-     * @param array        $withFeatures
+     * @param array|string      $specificIntegrations
+     * @param string[]|string|null $withFeatures
      * @param bool         $alphabetical
      * @param int|null     $pluginFilter
      * @param bool|false   $publishedOnly
      *
      * @return array<AbstractIntegration>
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false): array
     {
@@ -120,11 +122,14 @@ final class IntegrationHelper
                             if ($this->container->has($integrationContainerKey)) {
                                 $this->integrations[$integrationName] = $this->container->get($integrationContainerKey);
 
-                                $features = $this->integrations[$integrationName]->getSupportedFeatures();
+                                /** @var AbstractIntegration $integration */
+                                $integration = $this->integrations[$integrationName];
+
+                                $features = $integration->getSupportedFeatures();
                                 $newIntegration->setSupportedFeatures($features);
 
                                 // Go ahead and stash it since it's built already
-                                $this->integrations[$integrationName]->setIntegrationSettings($newIntegration);
+                                $integration->setIntegrationSettings($newIntegration);
 
                                 $newIntegrations[] = $newIntegration;
 
@@ -180,11 +185,15 @@ final class IntegrationHelper
                             // Initiate the class in order to get the features supported
                             if ($this->container->has($integrationContainerKey)) {
                                 $this->integrations[$integrationName] = $this->container->get($integrationContainerKey);
-                                $features                             = $this->integrations[$integrationName]->getSupportedFeatures();
+
+                                /** @var AbstractIntegration $integration */
+                                $integration = $this->integrations[$integrationName];
+
+                                $features = $integration->getSupportedFeatures();
                                 $newIntegration->setSupportedFeatures($features);
 
                                 // Go ahead and stash it since it's built already
-                                $this->integrations[$integrationName]->setIntegrationSettings($newIntegration);
+                                $integration->setIntegrationSettings($newIntegration);
 
                                 $newIntegrations[] = $newIntegration;
                             } else {
@@ -258,7 +267,10 @@ final class IntegrationHelper
 
                 if ($this->container->has($integrationContainerKey)) {
                     $this->integrations[$integrationName] = $this->container->get($integrationContainerKey);
-                    $this->integrations[$integrationName]->setIntegrationSettings($integration['settings']);
+
+                    /** @var AbstractIntegration $integrationObject */
+                    $integrationObject = $this->integrations[$integrationName];
+                    $integrationObject->setIntegrationSettings($integration['settings']);
                 }
             }
 
@@ -276,6 +288,8 @@ final class IntegrationHelper
         if (empty($alphabetical)) {
             // Sort by priority
             uasort($returnServices, function ($a, $b): int {
+                /** @var AbstractIntegration $a */
+                /** @var AbstractIntegration $b */
                 $aP = (int) $a->getPriority();
                 $bP = (int) $b->getPriority();
 
@@ -284,6 +298,8 @@ final class IntegrationHelper
         } else {
             // Sort by display name
             uasort($returnServices, function ($a, $b): int {
+                /** @var AbstractIntegration $a */
+                /** @var AbstractIntegration $b */
                 $aName = $a->getDisplayName();
                 $bName = $b->getDisplayName();
 
@@ -394,13 +410,12 @@ final class IntegrationHelper
      * Get the user's social profile data from cache or integrations if indicated.
      *
      * @param Lead   $lead
-     * @param array  $fields
      * @param bool   $refresh
      * @param string $specificIntegration
      * @param bool   $persistLead
      * @param bool   $returnSettings
      */
-    public function getUserProfiles(object $lead, $fields = [], $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false): array
+    public function getUserProfiles(object $lead, array $fields = [], $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false): array
     {
         $socialCache     = $lead->getSocialCache();
         $featureSettings = [];
@@ -411,7 +426,7 @@ final class IntegrationHelper
             // check to see if there are social profiles activated
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
 
-            /** @var \MauticPlugin\MauticSocialBundle\Integration\SocialIntegration $sn */
+            /** @var SocialIntegration $sn */
             foreach ($socialIntegrations as $integration => $sn) {
                 $settings        = $sn->getIntegrationSettings();
                 $features        = $settings->getSupportedFeatures();

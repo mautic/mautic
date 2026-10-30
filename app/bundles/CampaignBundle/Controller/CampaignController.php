@@ -771,7 +771,7 @@ final class CampaignController extends AbstractStandardFormController
      * @param Campaign $campaign
      * @param Campaign $oldCampaign
      */
-    protected function afterEntityClone($campaign, $oldCampaign): array
+    protected function afterEntityClone($campaign, object $oldCampaign): array
     {
         $tempId   = 'mautic_'.sha1(uniqid(mt_rand(), true));
         $objectId = $oldCampaign->getId();
@@ -841,11 +841,10 @@ final class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @param object    $entity
      * @param string    $action
      * @param bool|null $persistConnections
      */
-    protected function afterEntitySave($entity, FormInterface $form, $action, $persistConnections = null): void
+    protected function afterEntitySave(object $entity, FormInterface $form, $action, $persistConnections = null): void
     {
         if ($persistConnections) {
             // Update canvas settings with new event IDs then save
@@ -856,7 +855,10 @@ final class CampaignController extends AbstractStandardFormController
         }
     }
 
-    protected function afterFormProcessed($isValid, $entity, FormInterface $form, $action, bool $isClone = false): void
+    /**
+     * @param Campaign $entity
+     */
+    protected function afterFormProcessed($isValid, object $entity, FormInterface $form, $action, bool $isClone = false): void
     {
         if (!$isValid) {
             // Add the canvas settings to the entity to be able to rebuild it
@@ -868,8 +870,10 @@ final class CampaignController extends AbstractStandardFormController
 
     /**
      * This method is called before and after form is submitted.
+     *
+     * @param Campaign $entity
      */
-    protected function beforeFormProcessed($entity, FormInterface $form, $action, $isPost, $objectId = null, bool $isClone = false): void
+    protected function beforeFormProcessed(object $entity, FormInterface $form, $action, $isPost, $objectId = null, bool $isClone = false): void
     {
         $sessionId = $this->getCampaignSessionId($entity, $action, $objectId);
 
@@ -938,7 +942,7 @@ final class CampaignController extends AbstractStandardFormController
     /**
      * @param Campaign $entity
      */
-    protected function beforeEntitySave($entity, FormInterface $form, $action, $objectId = null, bool $isClone = false): bool
+    protected function beforeEntitySave(object $entity, FormInterface $form, $action, $objectId = null, bool $isClone = false): bool
     {
         if ([] === $this->campaignEvents) {
             // set the error
@@ -1270,25 +1274,29 @@ final class CampaignController extends AbstractStandardFormController
     }
 
     /**
-     * @return array{}
+     * @param Campaign $entity
+     *
+     * @return mixed[]
      */
-    protected function prepareCampaignEventsForEdit($entity, $objectId, bool $isClone = false): array
+    protected function prepareCampaignEventsForEdit(object $entity, $objectId, bool $isClone = false): array
     {
         // load existing events into session
         $campaignEvents = [];
 
+        /** @var Event[] $existingEvents */
         $existingEvents = $entity->getEvents()->toArray();
-        foreach ($existingEvents as $e) {
+
+        foreach ($existingEvents as $existingEvent) {
             // remove deleted events from existing events
-            if (!empty($e->getDeleted())) {
+            if (!empty($existingEvent->getDeleted())) {
                 continue;
             }
-            $event = $e->convertToArray();
+            $event = $existingEvent->convertToArray();
             if ($isClone) {
-                $id          = $e->getTempId();
+                $id          = $existingEvent->getTempId();
                 $event['id'] = $id;
             } else {
-                $id = $e->getId();
+                $id = $existingEvent->getId();
             }
 
             unset($event['campaign']);
@@ -1301,7 +1309,7 @@ final class CampaignController extends AbstractStandardFormController
                 $event['label'] = $label;
             }
 
-            $event['isRedirectTarget'] = $e->isRedirectTarget();
+            $event['isRedirectTarget'] = $existingEvent->isRedirectTarget();
 
             $campaignEvents[$id] = $event;
         }

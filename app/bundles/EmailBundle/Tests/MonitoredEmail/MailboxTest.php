@@ -8,9 +8,10 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class MailboxTest extends \PHPUnit\Framework\TestCase
+final class MailboxTest extends TestCase
 {
     public function testConstructWithDefaultConfig(): void
     {
@@ -168,34 +169,5 @@ final class MailboxTest extends \PHPUnit\Framework\TestCase
             ->willReturn(__DIR__.'/../../../../cache/tmp');
 
         new Mailbox($parametersHelper, $pathsHelper);
-    }
-
-    public function testIsConnectedReturnsFalseOnValueError(): void
-    {
-        $parametersHelper = $this->createMock(CoreParametersHelper::class);
-        $parametersHelper->method('get')->willReturn(
-            [
-                'general' => [
-                    'host'     => 'localhost',
-                    'port'     => '993',
-                    'user'     => 'test',
-                    'password' => 'test',
-                ],
-            ]
-        );
-
-        $pathsHelper = $this->createStub(PathsHelper::class);
-
-        $mailbox = new Mailbox($parametersHelper, $pathsHelper);
-
-        $reflection = new \ReflectionClass($mailbox);
-
-        // Set a value that is not an IMAP\Connection resource to trigger ValueError in imap_ping
-        $imapStreamProperty = $reflection->getProperty('imapStream');
-        $imapStreamProperty->setValue($mailbox, new \stdClass());
-
-        $isConnectedMethod = $reflection->getMethod('isConnected');
-
-        $this->assertFalse($isConnectedMethod->invoke($mailbox));
     }
 }

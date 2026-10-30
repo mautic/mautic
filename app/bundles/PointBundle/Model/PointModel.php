@@ -22,6 +22,7 @@ use Mautic\PointBundle\Event\PointActionEvent;
 use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\Form\Type\PointType;
+use Mautic\PointBundle\Helper\EventHelper;
 use Mautic\PointBundle\PointEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -77,9 +78,11 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
     }
 
     /**
+     * @param Point|array<string, mixed> $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -106,9 +109,11 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
     }
 
     /**
+     * @param Point $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -237,7 +242,7 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
                 'eventDetails' => $eventDetails,
             ];
 
-            $callback = $settings['callback'] ?? \Mautic\PointBundle\Helper\EventHelper::engagePointAction(...);
+            $callback = $settings['callback'] ?? EventHelper::engagePointAction(...);
 
             if (is_callable($callback)) {
                 $object = null;
@@ -316,9 +321,8 @@ final class PointModel extends CommonFormModel implements GlobalSearchInterface,
      *
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
-     * @param array  $filter
      */
-    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], bool $canViewOthers = true): array
+    public function getPointLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

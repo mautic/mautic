@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\Exception\InvalidArgumentException;
 
 /**
  * @extends CommonRepository<Notification>
@@ -30,7 +31,7 @@ final class NotificationRepository extends CommonRepository
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function clearNotificationsForUser($userId, $id = null, $limit = null): void
     {
@@ -75,7 +76,7 @@ final class NotificationRepository extends CommonRepository
         /** @var Notification $result */
         $result = $qb->getQuery()->getOneOrNullResult();
 
-        return null === $result ? null : $result->getDateAdded();
+        return $result?->getDateAdded();
     }
 
     /**

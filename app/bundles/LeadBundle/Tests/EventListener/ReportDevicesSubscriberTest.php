@@ -14,10 +14,11 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportDevicesSubscriberTest extends TestCase
 {
     public function testNotRelevantContextBuilder(): void
     {

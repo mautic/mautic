@@ -10,11 +10,12 @@ use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Validator\ScheduleIsValidValidator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-final class ScheduleIsValidValidatorTest extends \PHPUnit\Framework\TestCase
+final class ScheduleIsValidValidatorTest extends TestCase
 {
     public function testNoSchedule(): void
     {

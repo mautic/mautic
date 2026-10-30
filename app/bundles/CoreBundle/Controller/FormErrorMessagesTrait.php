@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
 
 trait FormErrorMessagesTrait
 {
@@ -66,6 +67,7 @@ trait FormErrorMessagesTrait
         $codes = [];
 
         foreach ($form->getErrors(true) as $error) {
+            /** @var ConstraintViolationInterface $cause */
             $cause              = $error->getCause();
             $code               = $cause->getCode();
             $codes[$code ?? ''] = $code;

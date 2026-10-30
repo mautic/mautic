@@ -4,6 +4,8 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Exception;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -18,8 +20,8 @@ final class StatRepository extends CommonRepository
     use TimelineTrait;
 
     /**
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getEmailStatus(string $trackingHash): ?Stat
     {
@@ -320,7 +322,7 @@ final class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int $emailIds
      */
-    public function getOpenedRates($emailIds, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
+    public function getOpenedRates($emailIds, ?\DateTimeInterface $fromDate = null, ?\DateTime $toDate = null): array
     {
         $inIds = (!is_array($emailIds)) ? [$emailIds] : $emailIds;
 
@@ -426,8 +428,8 @@ final class StatRepository extends CommonRepository
      * @param int                  $leadId
      * @param array<string, mixed> $options
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getLeadStats($leadId, array $options = []): array
     {
@@ -509,8 +511,8 @@ final class StatRepository extends CommonRepository
     /**
      * Get counts for Sent, Read and Failed emails.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getIgnoredReadFailed(QueryBuilder $query): array
     {
@@ -531,8 +533,8 @@ final class StatRepository extends CommonRepository
     /**
      * Get pie graph data for Sent, Read and Failed email count.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getMostEmails(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
@@ -545,10 +547,8 @@ final class StatRepository extends CommonRepository
 
     /**
      * Get sent counts based grouped by email Id.
-     *
-     * @param array $emailIds
      */
-    public function getSentCounts($emailIds = [], ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
+    public function getSentCounts(array $emailIds = [], ?\DateTimeInterface $fromDate = null, ?\DateTime $toDate = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('e.email_id, count(e.id) as sentcount')

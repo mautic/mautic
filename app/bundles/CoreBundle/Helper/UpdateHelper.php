@@ -14,6 +14,7 @@ use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckError;
 use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckResult;
 use Mautic\CoreBundle\Release\Metadata;
 use Monolog\Logger;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Helper class for fetching update data.
@@ -112,7 +113,7 @@ final class UpdateHelper
                 'message' => 'mautic.core.updater.error.fetching.updates',
             ];
         } catch (RequestException $exception) {
-            if ($exception->getResponse() instanceof \Psr\Http\Message\ResponseInterface) {
+            if ($exception->getResponse() instanceof ResponseInterface) {
                 $this->logger->error(
                     sprintf(
                         'UPDATE CHECK: Could not fetch a release list: %s (%s)',
@@ -237,7 +238,7 @@ final class UpdateHelper
 
             $this->client->request('POST', $statUrl, $options);
         } catch (RequestException $exception) {
-            if ($exception->getResponse() instanceof \Psr\Http\Message\ResponseInterface) {
+            if ($exception->getResponse() instanceof ResponseInterface) {
                 $this->logger->error(
                     sprintf(
                         'STAT UPDATE: Error communicating with the stat server: %s (%s)',

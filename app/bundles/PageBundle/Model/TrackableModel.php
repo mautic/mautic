@@ -71,7 +71,6 @@ final class TrackableModel extends AbstractCommonModel
 
     /**
      * @param bool|false           $shortenUrl   If true, use the configured shortener service to shorten the URLs
-     * @param array                $utmTags
      * @param array<string, mixed> $clickthrough
      *
      * @return string
@@ -80,7 +79,7 @@ final class TrackableModel extends AbstractCommonModel
         Trackable $trackable,
         array $clickthrough = [],
         bool $shortenUrl = false,
-        $utmTags = [],
+        array $utmTags = [],
     ) {
         $clickthrough['channel'] ??= [$trackable->getChannel() => $trackable->getChannelId()];
 
@@ -218,7 +217,7 @@ final class TrackableModel extends AbstractCommonModel
      *                                           This is to ensure that URLs are built correctly with ? or & for
      *                                           URLs tracked that include query parameters
      *
-     * @return array{string|string[],Redirect[]|Trackable[]}
+     * @return array{0: string|string[],1: array<string, Redirect>|array<string, Trackable>}
      */
     public function parseContentForTrackables($content, array $contentTokens = [], ?string $channel = null, int|string|null $channelId = null, bool $usingClickthrough = true): array
     {

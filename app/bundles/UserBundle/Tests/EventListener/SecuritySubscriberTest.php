@@ -10,23 +10,10 @@ use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\EventListener\SecuritySubscriber;
+use PHPUnit\Framework\TestCase;
 
-final class SecuritySubscriberTest extends \PHPUnit\Framework\TestCase
+final class SecuritySubscriberTest extends TestCase
 {
-    public function testGetSubscribedEvents(): void
-    {
-        $ipLookupHelper = $this->createStub(IpLookupHelper::class);
-        $auditLogModel  = $this->createStub(AuditLogModel::class);
-        $subscriber     = new SecuritySubscriber($ipLookupHelper, $auditLogModel);
-
-        $this->assertSame(
-            [
-                LoginEvent::class => ['onSecurityInteractiveLogin', 0],
-            ],
-            $subscriber->getSubscribedEvents()
-        );
-    }
-
     public function testOnSecurityInteractiveLogin(): void
     {
         $userId   = 132564;

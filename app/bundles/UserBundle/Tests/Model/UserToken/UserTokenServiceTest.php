@@ -11,9 +11,10 @@ use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
 use Mautic\UserBundle\Model\UserToken\UserTokenService;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class UserTokenServiceTest extends \PHPUnit\Framework\TestCase
+final class UserTokenServiceTest extends TestCase
 {
     /**
      * @var MockObject&RandomHelperInterface

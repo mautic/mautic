@@ -12,6 +12,7 @@ use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,9 +24,9 @@ final class SyncCommandTest extends TestCase
     private const string INTEGRATION_NAME = 'Test';
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&SyncServiceInterface
+     * @var MockObject&SyncServiceInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $syncService;
+    private MockObject $syncService;
 
     private CommandTester $commandTester;
 

@@ -144,7 +144,7 @@ final class Mailbox
 
     private $imapFullPath;
 
-    private $imapStream;
+    private ?\IMAP\Connection $imapStream = null;
 
     private $imapFolder     = 'INBOX';
 
@@ -346,10 +346,8 @@ final class Mailbox
 
     /**
      * Get IMAP mailbox connection stream.
-     *
-     * @return Connection
      */
-    public function getImapStream()
+    public function getImapStream(): ?\IMAP\Connection
     {
         if (!$this->isConnected()) {
             $this->imapStream = $this->initImapStream();
@@ -361,11 +359,9 @@ final class Mailbox
     }
 
     /**
-     * @return Connection
-     *
      * @throws MailboxException
      */
-    private function initImapStream()
+    private function initImapStream(): Connection
     {
         imap_timeout(IMAP_OPENTIMEOUT, 15);
         imap_timeout(IMAP_CLOSETIMEOUT, 15);

@@ -17,12 +17,13 @@ use Mautic\WebhookBundle\Notificator\WebhookNotificationSender;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
+final class WebhookKillNotificatorTest extends TestCase
 {
     /**
      * @var MockObject&TranslatorInterface

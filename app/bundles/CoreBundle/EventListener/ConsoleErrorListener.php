@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleErrorEvent;
 
 final readonly class ConsoleErrorListener
@@ -27,7 +28,7 @@ final readonly class ConsoleErrorListener
             $exception->getFile(),
             $exception->getLine(),
 
-            $command instanceof \Symfony\Component\Console\Command\Command ? $command->getName() : 'UNKNOWN',
+            $command instanceof Command ? $command->getName() : 'UNKNOWN',
             "\n[stack trace]\n".$exception->getTraceAsString()
         );
 

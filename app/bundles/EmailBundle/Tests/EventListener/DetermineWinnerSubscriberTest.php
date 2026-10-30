@@ -11,10 +11,11 @@ use Mautic\EmailBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\PageBundle\Entity\HitRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DetermineWinnerSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&StatRepository
@@ -92,7 +93,7 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $abTestResults = $event->getAbTestResults();
 
-        $this->assertEquals($abTestResults['winners'], [2]);
+        $this->assertEquals([2], $abTestResults['winners']);
         $this->assertEquals($abTestResults['support']['data'], $expectedData);
     }
 
@@ -149,7 +150,7 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $abTestResults = $event->getAbTestResults();
 
-        $this->assertEquals($abTestResults['winners'], [2]);
+        $this->assertEquals([2], $abTestResults['winners']);
         $this->assertEquals($abTestResults['support']['data'], $expectedData);
     }
 }

@@ -156,7 +156,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return array
+     * @return mixed
      */
     public function getEventDetails()
     {

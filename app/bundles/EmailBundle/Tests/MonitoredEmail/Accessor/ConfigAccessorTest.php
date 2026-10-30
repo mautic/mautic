@@ -6,8 +6,9 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Accessor;
 
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
-final class ConfigAccessorTest extends \PHPUnit\Framework\TestCase
+final class ConfigAccessorTest extends TestCase
 {
     /**
      * @var array<string, string>

@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use MauticPlugin\MauticCrmBundle\Api\SugarcrmApi;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -853,10 +854,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * @param Form|FormBuilder $builder
-     * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('keys' == $formArea) {
             $builder->add('version', ButtonGroupType::class, [
@@ -965,9 +965,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
     /**
      * @param Lead  $lead
-     * @param array $config
      */
-    public function pushLead($lead, $config = []): array|bool
+    public function pushLead($lead, array $config = []): array|bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -1082,11 +1081,10 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array                $keys
      * @param string               $object
      * @param array<string, mixed> $fields
      */
-    public function cleanSugarData(array $fields, $keys, $object): array
+    public function cleanSugarData(array $fields, array $keys, $object): array
     {
         $leadFields = [];
 
@@ -1399,10 +1397,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
         return [$checkEmailsInSugar, $deletedSugarLeads];
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function getSugarLeadId($lead): array
+    public function getSugarLeadId(Lead $lead): array
     {
         // try searching for lead as this has been changed before in updated done to the plugin
         $result = $this->integrationEntityRepository->getIntegrationsEntityId('Sugarcrm', null, 'lead', $lead->getId());
@@ -1416,7 +1411,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     private function getOwnerEmail(array $lead)
     {
         if (isset($lead['owner_id']) && !empty($lead['owner_id'])) {
-            /** @var \Mautic\UserBundle\Entity\User $user */
+            /** @var User $user */
             $user = $this->userModel->getEntity($lead['owner_id']);
 
             return $user->getEmail();
@@ -1472,11 +1467,9 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $response
-     *
      * @return array<int, int>
      */
-    private function processCompositeResponse($response): array
+    private function processCompositeResponse(?array $response): array
     {
         $created         = 0;
         $errored         = 0;

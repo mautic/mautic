@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand;
 use Mautic\WebhookBundle\Entity\Event;
 use Mautic\WebhookBundle\Entity\Webhook;
+use Mautic\WebhookBundle\Entity\WebhookQueue;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
 use Mautic\WebhookBundle\Model\WebhookModel;
@@ -34,7 +35,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
     /**
      * @var WebhookRepository|EntityRepository<Webhook>
      */
-    private \Mautic\WebhookBundle\Entity\WebhookRepository|EntityRepository $webhhokRepository;
+    private WebhookRepository|EntityRepository $webhhokRepository;
 
     protected function setUp(): void
     {
@@ -307,7 +308,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return Paginator<\Mautic\WebhookBundle\Entity\WebhookQueue>
+     * @return Paginator<WebhookQueue>
      */
     private function getWebhookQueue(int $webhookId): Paginator
     {

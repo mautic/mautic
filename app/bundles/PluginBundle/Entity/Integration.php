@@ -19,12 +19,9 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
      */
     private $id;
 
-    /**
-     * @var Plugin|null
-     */
     #[ORM\ManyToOne(targetEntity: Plugin::class, inversedBy: 'integrations')]
     #[ORM\JoinColumn(name: 'plugin_id', onDelete: 'CASCADE')]
-    private $plugin;
+    private ?Plugin $plugin = null;
 
     /**
      * @var string
@@ -42,9 +39,9 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     private $supportedFeatures = [];
 
     /**
-     * @var array
+     * @var array<array-key, mixed>
      */
-    private $apiKeys = [];
+    private array $apiKeys = [];
 
     /**
      * @var array
@@ -89,18 +86,12 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->id;
     }
 
-    /**
-     * @return Plugin|null
-     */
-    public function getPlugin()
+    public function getPlugin(): ?Plugin
     {
         return $this->plugin;
     }
 
-    /**
-     * @param mixed $plugin
-     */
-    public function setPlugin($plugin): static
+    public function setPlugin(?Plugin $plugin): static
     {
         $this->plugin = $plugin;
 
@@ -175,15 +166,15 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getApiKeys()
+    public function getApiKeys(): array
     {
         return $this->apiKeys;
     }
 
     /**
-     * @param mixed $apiKeys
+     * @param array<array-key, mixed> $apiKeys
      */
-    public function setApiKeys($apiKeys): static
+    public function setApiKeys(array $apiKeys): static
     {
         $this->apiKeys = $apiKeys;
 

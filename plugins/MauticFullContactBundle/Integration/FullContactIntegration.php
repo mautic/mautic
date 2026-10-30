@@ -41,10 +41,9 @@ final class FullContactIntegration extends AbstractIntegration
 
     /**
      * @param FormBuilder|Form $builder
-     * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('keys' === $formArea) {
             $builder->add(

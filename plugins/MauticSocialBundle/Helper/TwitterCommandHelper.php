@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\LeadModel;
+use MauticPlugin\MauticSocialBundle\Entity\LeadRepository;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Exception\ExitMonitorException;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
@@ -33,7 +34,7 @@ final class TwitterCommandHelper
         private readonly MonitoringModel $monitoringModel,
         private readonly PostCountModel $postCountModel,
         private readonly Translator $translator,
-        private readonly \MauticPlugin\MauticSocialBundle\Entity\LeadRepository $monitorLeadRepository,
+        private readonly LeadRepository $monitorLeadRepository,
         CoreParametersHelper $coreParametersHelper,
         private readonly LeadFieldRepository $leadFieldRepository,
         private readonly \Mautic\LeadBundle\Entity\LeadRepository $leadRepository,
@@ -142,7 +143,6 @@ final class TwitterCommandHelper
             // Key by twitter handle
             $twitterLeads = [];
             foreach ($leads as $lead) {
-                \assert($lead instanceof Lead);
                 $fields                       = $lead->getFields();
                 $twitterHandle                = strtolower($fields[$handleFieldGroup][$this->twitterHandleField]['value']);
                 $twitterLeads[$twitterHandle] = $lead;
@@ -282,10 +282,8 @@ final class TwitterCommandHelper
 
     /**
      * Set the monitor's stat record with the metadata.
-     *
-     * @param array $searchMeta
      */
-    public function setMonitorStats(Monitoring $monitor, $searchMeta): void
+    public function setMonitorStats(Monitoring $monitor, array $searchMeta): void
     {
         $monitor->setStats($searchMeta);
 

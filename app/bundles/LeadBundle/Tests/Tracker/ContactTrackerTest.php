@@ -19,12 +19,13 @@ use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServ
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
+final class ContactTrackerTest extends TestCase
 {
     /**
      * @var MockObject&LeadRepository

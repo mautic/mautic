@@ -12,11 +12,12 @@ use Mautic\EmailBundle\MonitoredEmail\Message;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[CoversClass(Fetcher::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class FetcherTest extends \PHPUnit\Framework\TestCase
+final class FetcherTest extends TestCase
 {
     /**
      * @var array<string, array<string, int|string>>

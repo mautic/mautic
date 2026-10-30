@@ -7,6 +7,8 @@ use Mautic\ReportBundle\Scheduler\Exception\NotSupportedScheduleTypeException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
 use Mautic\ReportBundle\Scheduler\SchedulerInterface;
 use Recurr\Exception\InvalidWeekday;
+use Recurr\Recurrence;
+use Recurr\RecurrenceCollection;
 use Recurr\Rule;
 use Recurr\Transformer\ArrayTransformer;
 
@@ -18,7 +20,7 @@ final readonly class SchedulerBuilder
     }
 
     /**
-     * @return \Recurr\Recurrence[]|\Recurr\RecurrenceCollection
+     * @return Recurrence[]|RecurrenceCollection
      *
      * @throws InvalidSchedulerException
      * @throws NotSupportedScheduleTypeException
@@ -29,14 +31,12 @@ final readonly class SchedulerBuilder
     }
 
     /**
-     * @param int $count
-     *
-     * @return \Recurr\RecurrenceCollection
+     * @return RecurrenceCollection
      *
      * @throws InvalidSchedulerException
      * @throws NotSupportedScheduleTypeException
      */
-    public function getNextEvents(SchedulerInterface $scheduler, $count)
+    public function getNextEvents(SchedulerInterface $scheduler, int $count)
     {
         if (!$scheduler->isScheduled()) {
             throw new InvalidSchedulerException();

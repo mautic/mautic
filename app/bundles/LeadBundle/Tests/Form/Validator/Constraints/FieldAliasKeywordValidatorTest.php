@@ -13,21 +13,23 @@ use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
+final class FieldAliasKeywordValidatorTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ExecutionContextInterface
+     * @var MockObject&ExecutionContextInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $executionContextMock;
+    private MockObject $executionContextMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&UnitOfWork
+     * @var MockObject&UnitOfWork
      */
-    private \PHPUnit\Framework\MockObject\MockObject $unitOfWorkMock;
+    private MockObject $unitOfWorkMock;
 
     private FieldAliasKeywordValidator $validator;
 

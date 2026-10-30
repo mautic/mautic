@@ -6,8 +6,9 @@ namespace Mautic\PageBundle\Tests\Entity;
 
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class PageTest extends \PHPUnit\Framework\TestCase
+final class PageTest extends TestCase
 {
     /**
      * @param array<string, array<int, mixed>> $changes

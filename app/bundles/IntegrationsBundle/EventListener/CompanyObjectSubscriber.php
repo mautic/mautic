@@ -11,6 +11,7 @@ use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
+use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Company;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\CompanyObjectHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -83,7 +84,7 @@ final readonly class CompanyObjectSubscriber implements EventSubscriberInterface
 
     public function findCompaniesByDateRange(InternalObjectFindEvent $event): void
     {
-        if (Company::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof \Mautic\IntegrationsBundle\Sync\DAO\DateRange) {
+        if (Company::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof DateRange) {
             return;
         }
 

@@ -15,6 +15,8 @@ use Mautic\FormBundle\Crate\ObjectCrate;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\Form\Type\FormFieldRatingType;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;
@@ -26,14 +28,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class FieldTypeTest extends TypeTestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ObjectCollectorInterface
+     * @var MockObject&ObjectCollectorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectCollector;
+    private MockObject $objectCollector;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&FieldCollectorInterface
+     * @var MockObject&FieldCollectorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldCollector;
+    private MockObject $fieldCollector;
 
     protected function setUp(): void
     {
@@ -115,7 +117,7 @@ final class FieldTypeTest extends TypeTestCase
         $choices    = $fieldWidth->vars['choices'];
 
         $this->assertCount(count($expectedChoices), $choices);
-        /** @var \Symfony\Component\Form\ChoiceList\View\ChoiceView $choice */
+        /** @var ChoiceView $choice */
         foreach ($choices as $choice) {
             $this->assertArrayHasKey($choice->value, $expectedChoices);
             $this->assertEquals($expectedChoices[$choice->value], $choice->label);

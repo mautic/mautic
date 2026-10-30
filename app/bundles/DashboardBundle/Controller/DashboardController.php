@@ -218,6 +218,10 @@ final class DashboardController extends AbstractFormController
         $widget = $this->dashboardModel->getEntity($objectId);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
 
+        if (! $widget instanceof Widget) {
+            throw new NotFoundHttpException(sprintf('Widget with id "%s" not found.', $objectId));
+        }
+
         // get the user form factory
         $form       = $this->dashboardModel->createForm($widget, $action);
         $closeModal = false;

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
+
 return [
     'routes'   => [
         'main' => [
@@ -23,7 +25,7 @@ return [
     'ip_lookup_services' => [
         'extreme-ip' => [
             'display_name' => 'Extreme-IP',
-            'class'        => Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
+            'class'        => ExtremeIpLookup::class,
         ],
     ],
 

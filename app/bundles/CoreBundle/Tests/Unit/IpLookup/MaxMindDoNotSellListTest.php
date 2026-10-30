@@ -9,14 +9,16 @@ use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class MaxMindDoNotSellListTest extends \PHPUnit\Framework\TestCase
+final class MaxMindDoNotSellListTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParamsHelperMock;
+    private MockObject $coreParamsHelperMock;
 
     private string $badFilePath = 'bad_list.json';
 

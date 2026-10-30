@@ -4,6 +4,7 @@ namespace Mautic\AssetBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\PersistentCollection;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
@@ -85,6 +86,9 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
+    /**
+     * @param Asset $entity
+     */
     public function saveEntity(object $entity, bool $unlock = true): void
     {
         if (!$entity->isNew()) {
@@ -100,7 +104,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * @param array<string, mixed> $systemEntry
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      * @throws \Exception
      */
     public function trackDownload(Asset $asset, ?Request $request = null, int $code = 200, array $systemEntry = []): void
@@ -313,7 +317,10 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
         return 'getTitle';
     }
 
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    /**
+     * @param Asset|array<string, mixed> $entity
+     */
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -339,9 +346,11 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Asset $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Asset) {
             throw new MethodNotAllowedHttpException(['Asset']);
@@ -486,9 +495,8 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
      *
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
-     * @param array       $filter
      */
-    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], bool $canViewOthers = true): array
+    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -582,10 +590,9 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of assets in a date range.
      *
-     * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getAssetList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getAssetList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], array $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title as name, t.date_added, t.date_modified')

@@ -22,9 +22,10 @@ use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Helper\TokenHelper as FocusTokenHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DynamicContentSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&TrackableModel

@@ -82,7 +82,7 @@ final class MappingHelperTest extends TestCase
 
         $this->assertSame($internalObjectName, $foundInternalObject->getObject());
         $this->assertEquals($internalObjectDAO['internal_object_id'], $foundInternalObject->getObjectId());
-        $this->assertEquals($internalObjectDAO['last_sync_date'], $foundInternalObject->getChangeDateTime()->format('Y-m-d H:i:s'));
+        $this->assertSame($internalObjectDAO['last_sync_date'], $foundInternalObject->getChangeDateTime()->format('Y-m-d H:i:s'));
     }
 
     public function testMauticObjectSearchedAndEmptyObjectReturnedIfNoIdentifierFieldsAreMapped(): void
@@ -286,7 +286,7 @@ final class MappingHelperTest extends TestCase
 
         $this->assertSame($objectName, $foundIntegrationObject->getObject());
         $this->assertEquals($objectId, $foundIntegrationObject->getObjectId());
-        $this->assertEquals($changeDateTime, $foundIntegrationObject->getChangeDateTime()->format('Y-m-d H:i:s'));
+        $this->assertSame($changeDateTime, $foundIntegrationObject->getChangeDateTime()->format('Y-m-d H:i:s'));
     }
 
     public function testEmptyIntegrationObjectReturnedIfNotMapped(): void

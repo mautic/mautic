@@ -9,10 +9,11 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category as De
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Mapper\CategoryMapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CategoryMapper::class)]
 #[CoversClass(Definition::class)]
-final class CategoryMapperTest extends \PHPUnit\Framework\TestCase
+final class CategoryMapperTest extends TestCase
 {
     #[TestDox('Test that the Category object is returned')]
     public function testCategoryIsMapped(): void

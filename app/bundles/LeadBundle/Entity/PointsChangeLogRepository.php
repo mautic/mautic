@@ -3,6 +3,8 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\PointBundle\Entity\Group;
 
@@ -45,8 +47,8 @@ final class PointsChangeLogRepository extends CommonRepository
     /**
      * Get table stat data from point log table.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getMostPoints(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
@@ -59,8 +61,8 @@ final class PointsChangeLogRepository extends CommonRepository
     /**
      * Get table stat data from lead table.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getMostLeads(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {

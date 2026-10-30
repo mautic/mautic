@@ -11,6 +11,7 @@ use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectOwnerEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectRouteEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
+use Mautic\IntegrationsBundle\Sync\DAO\DateRange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Mautic\LeadBundle\Exception\ImportFailedException;
@@ -84,7 +85,7 @@ final readonly class ContactObjectSubscriber implements EventSubscriberInterface
 
     public function findContactsByDateRange(InternalObjectFindEvent $event): void
     {
-        if (Contact::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof \Mautic\IntegrationsBundle\Sync\DAO\DateRange) {
+        if (Contact::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof DateRange) {
             return;
         }
 

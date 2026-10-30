@@ -162,9 +162,8 @@ final class DashboardModel extends FormModel
      * Fill widgets with their content.
      *
      * @param array $widgets
-     * @param array $filter
      */
-    public function populateWidgetsContent(&$widgets, $filter = []): void
+    public function populateWidgetsContent(&$widgets, array $filter = []): void
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
@@ -203,10 +202,8 @@ final class DashboardModel extends FormModel
 
     /**
      * Load widget content from the onWidgetDetailGenerate event.
-     *
-     * @param array $filter
      */
-    public function populateWidgetContent(Widget $widget, $filter = []): void
+    public function populateWidgetContent(Widget $widget, array $filter = []): void
     {
         $defaultTimeout = $this->coreParametersHelper->get('cached_data_timeout');
 
@@ -259,7 +256,7 @@ final class DashboardModel extends FormModel
     }
 
     /**
-     * @param Widget      $entity
+     * @param Widget|array<string, mixed>      $entity
      * @param string|null $action
      * @param array       $options
      *
@@ -267,7 +264,7 @@ final class DashboardModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Widget) {
             throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');
@@ -282,6 +279,7 @@ final class DashboardModel extends FormModel
 
     /**
      * Create/edit entity.
+     * @param Widget $entity
      *
      * @throws \Exception
      */

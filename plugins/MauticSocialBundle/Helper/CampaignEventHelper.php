@@ -10,6 +10,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration;
 use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 
 final class CampaignEventHelper
@@ -38,7 +39,7 @@ final class CampaignEventHelper
             return ['failed' => 1, 'response' => 'Tweet entity '.$channelId.' not found'];
         }
 
-        /** @var \MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration $twitterIntegration */
+        /** @var TwitterIntegration $twitterIntegration */
         $twitterIntegration = $this->integrationHelper->getIntegrationObject('Twitter');
 
         // Setup clickthrough for URLs in tweet

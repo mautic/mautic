@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Exception\CouldNotFormatDateTimeException;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class WidgetDetailEvent extends CommonEvent
@@ -154,7 +155,7 @@ abstract class WidgetDetailEvent extends CommonEvent
     /**
      * Set the widget template data.
      *
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function setTemplateData(array $templateData): void
     {
@@ -225,7 +226,7 @@ abstract class WidgetDetailEvent extends CommonEvent
     }
 
     /**
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      *                                             Checks the cache for the widget data.
      *                                             If cache exists, it sets the TemplateData.
      */

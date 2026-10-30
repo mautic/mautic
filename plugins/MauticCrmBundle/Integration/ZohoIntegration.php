@@ -7,6 +7,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException;
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
 use MauticPlugin\MauticCrmBundle\Api\ZohoApi;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -449,8 +450,10 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     $result   = $this->amendLeadDataBeforeMauticPopulate($data, $object);
                     $executed += count($result);
                     if (isset($params['output'])) {
-                        if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                            $params['output']->writeln($result);
+                        /** @var OutputInterface $output */
+                        $output = $params['output'];
+                        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                            $output->writeln($result);
                         } else {
                             $progress->advance();
                         }
@@ -472,10 +475,9 @@ final class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array                $result
      * @param array<string, mixed> $params
      */
-    public function getCompanies(array $params = [], $query = null, &$executed = null, &$result = []): int
+    public function getCompanies(array $params = [], $query = null, &$executed = null, array &$result = []): int
     {
         $executed = 0;
         $object   = 'company';
@@ -518,8 +520,10 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     $result   = $this->amendLeadDataBeforeMauticPopulate($data, $object);
                     $executed += count($result);
                     if (isset($params['output'])) {
-                        if ($params['output']->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
-                            $params['output']->writeln($result);
+                        /** @var OutputInterface $output */
+                        $output = $params['output'];
+                        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+                            $output->writeln($result);
                         } else {
                             $progress->advance();
                         }
@@ -542,9 +546,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $data
-     * @param array $config
      */
-    public function populateMauticLeadData($data, $config = [], $object = 'Leads'): array
+    public function populateMauticLeadData($data, array $config = [], $object = 'Leads'): array
     {
         // Match that data with mapped lead fields
         $aFields       = $this->getAvailableLeadFields($config);
@@ -603,12 +606,11 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * @param Form|FormBuilder $builder
-     * @param array            $data
      * @param string           $formArea
      *
      * @throws \InvalidArgumentException
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -998,9 +1000,8 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
     /**
      * @param Lead|array $lead
-     * @param array      $config
      */
-    public function pushLead($lead, $config = []): array|bool
+    public function pushLead($lead, array $config = []): array|bool
     {
         $config  = $this->mergeConfigToFeatureSettings($config);
         $zObject = 'Leads';
@@ -1088,11 +1089,9 @@ final class ZohoIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param array $response
-     *
-     * @throws \MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
+     * @throws MatchingKeyNotFoundException
      */
-    private function consumeResponse($response, string $zObject, bool $createIntegrationEntity = false, ?Mapper $mapper = null): int
+    private function consumeResponse(array $response, string $zObject, bool $createIntegrationEntity = false, ?Mapper $mapper = null): int
     {
         $rows = $response;
         if (isset($rows['data'][0])) {
@@ -1173,9 +1172,6 @@ final class ZohoIntegration extends CrmAbstractIntegration
         return $parsedData;
     }
 
-    /**
-     * @param int $counter
-     */
     private function updateContactInZoho(Mapper $mapper, string $object, int|float &$counter, int &$errorCounter): void
     {
         $response     = $this->getApiHelper()->updateLead($mapper->getArray(), $object);
@@ -1184,9 +1180,6 @@ final class ZohoIntegration extends CrmAbstractIntegration
         $errorCounter += $failed;
     }
 
-    /**
-     * @param int $counter
-     */
     private function createContactInZoho(Mapper $mapper, string $object, int|float &$counter, int &$errorCounter): void
     {
         $response     = $this->getApiHelper()->createLead($mapper->getArray(), $object);

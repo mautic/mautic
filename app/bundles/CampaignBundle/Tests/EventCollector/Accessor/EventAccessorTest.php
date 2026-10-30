@@ -12,8 +12,9 @@ use Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor;
 use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType;
 use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
+use PHPUnit\Framework\TestCase;
 
-final class EventAccessorTest extends \PHPUnit\Framework\TestCase
+final class EventAccessorTest extends TestCase
 {
     /**
      * @var array<string, array<string, array<string, mixed>>>

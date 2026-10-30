@@ -327,7 +327,7 @@ final class SegmentTrackingSubscriberFunctionalTest extends MauticMysqlTestCase
      */
     private function getContactSegments(Lead $lead): array
     {
-        /** @var \Mautic\LeadBundle\Entity\LeadListRepository $repository */
+        /** @var LeadListRepository $repository */
         $repository = $this->getContainer()->get(LeadListRepository::class);
 
         return $repository->getLeadLists($lead->getId(), false, true);

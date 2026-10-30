@@ -14,10 +14,7 @@ final class Cleaner
 
     public const string FIELD_TYPE_DATE     = 'date';
 
-    /**
-     * @return bool|float|string
-     */
-    public static function clean($value, $fieldType = self::FIELD_TYPE_STRING)
+    public static function clean($value, $fieldType = self::FIELD_TYPE_STRING): bool|float|string
     {
         $clean = strip_tags(html_entity_decode($value, ENT_QUOTES));
         switch ($fieldType) {

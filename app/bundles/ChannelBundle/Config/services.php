@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\ChannelBundle\Security\Permissions\ChannelPermissions;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -22,7 +24,7 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\ChannelBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->set(Mautic\ChannelBundle\Helper\ChannelListHelper::class)
+    $services->set(ChannelListHelper::class)
         ->tag('twig.helper', ['alias' => 'channel']);
-    $services->set(Mautic\ChannelBundle\Security\Permissions\ChannelPermissions::class);
+    $services->set(ChannelPermissions::class);
 };

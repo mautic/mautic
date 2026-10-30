@@ -4,6 +4,7 @@ namespace Mautic\WebhookBundle\Model;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Mautic\ApiBundle\Serializer\Exclusion\PublishDetailsExclusionStrategy;
@@ -30,6 +31,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
@@ -147,12 +149,12 @@ final class WebhookModel extends FormModel
     }
 
     /**
-     * @param Webhook      $entity
+     * @param Webhook|array<string, mixed>      $entity
      * @param array<mixed> $options
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook']);
@@ -266,7 +268,7 @@ final class WebhookModel extends FormModel
     /**
      * Execute a list of webhooks to their specified endpoints.
      */
-    public function processWebhooks(array|\Doctrine\ORM\Tools\Pagination\Paginator $webhooks): void
+    public function processWebhooks(array|Paginator $webhooks): void
     {
         $this->startTime = microtime(true);
 
@@ -586,9 +588,11 @@ final class WebhookModel extends FormModel
     }
 
     /**
+     * @param Webhook $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?SymfonyEvent $event = null): ?SymfonyEvent
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?SymfonyEvent $event = null): ?SymfonyEvent
     {
         if (!$entity instanceof Webhook) {
             throw new MethodNotAllowedHttpException(['Webhook'], 'Entity must be of class Webhook()');
@@ -611,13 +615,10 @@ final class WebhookModel extends FormModel
         return $event;
     }
 
-    /**
-     * @param array $groups
-     */
-    public function serializeData($payload, $groups = [], array $customExclusionStrategies = []): string
+    public function serializeData($payload, array $groups = [], array $customExclusionStrategies = []): string
     {
         $context = SerializationContext::create();
-        if (!empty($groups)) {
+        if ($groups !== []) {
             $context->setGroups($groups);
         }
 

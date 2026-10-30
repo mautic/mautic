@@ -96,10 +96,7 @@ class ListLead
         return $this->list;
     }
 
-    /**
-     * @param LeadList $leadList
-     */
-    public function setList($leadList): void
+    public function setList(LeadList $leadList): void
     {
         $this->list = $leadList;
     }

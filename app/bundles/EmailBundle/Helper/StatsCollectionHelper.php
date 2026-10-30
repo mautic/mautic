@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Helper;
 
+use Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\EmailBundle\Stats\Helper\BouncedHelper;
 use Mautic\EmailBundle\Stats\Helper\ClickedHelper;
@@ -28,7 +29,7 @@ final readonly class StatsCollectionHelper
      *
      * @return mixed
      *
-     * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
+     * @throws InvalidStatHelperException
      */
     public function fetchSentStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
     {
@@ -40,7 +41,7 @@ final readonly class StatsCollectionHelper
      *
      * @return mixed
      *
-     * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
+     * @throws InvalidStatHelperException
      */
     public function fetchOpenedStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
     {
@@ -52,7 +53,7 @@ final readonly class StatsCollectionHelper
      *
      * @return mixed
      *
-     * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
+     * @throws InvalidStatHelperException
      */
     public function fetchFailedStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
     {
@@ -64,7 +65,7 @@ final readonly class StatsCollectionHelper
      *
      * @return mixed
      *
-     * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
+     * @throws InvalidStatHelperException
      */
     public function fetchClickedStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
     {
@@ -76,7 +77,7 @@ final readonly class StatsCollectionHelper
      *
      * @return mixed
      *
-     * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
+     * @throws InvalidStatHelperException
      */
     public function fetchBouncedStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
     {
@@ -88,7 +89,7 @@ final readonly class StatsCollectionHelper
      *
      * @return mixed
      *
-     * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
+     * @throws InvalidStatHelperException
      */
     public function fetchUnsubscribedStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
     {
@@ -98,7 +99,7 @@ final readonly class StatsCollectionHelper
     /**
      * Generate stats from Mautic's raw data.
      *
-     * @throws \Mautic\EmailBundle\Stats\Exception\InvalidStatHelperException
+     * @throws InvalidStatHelperException
      */
     public function generateStats(
         $statName,

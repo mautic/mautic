@@ -11,8 +11,9 @@ use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-final class CustomFieldIndexTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldIndexTest extends TestCase
 {
     private MockObject&IndexSchemaHelper $indexSchemaHelperMock;
 

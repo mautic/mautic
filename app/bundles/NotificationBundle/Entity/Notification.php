@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
@@ -127,11 +128,8 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     #[Groups(['notification:read'])]
     private $sentCount = 0;
 
-    /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
-     */
     #[Groups(['notification:read', 'notification:write'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<int, LeadList>
@@ -377,15 +375,12 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->id;
     }
 
-    /**
-     * @return \Mautic\CategoryBundle\Entity\Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    public function setCategory($category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;

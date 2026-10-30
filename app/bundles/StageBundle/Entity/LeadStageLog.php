@@ -25,17 +25,14 @@ class LeadStageLog
     private $stage;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
@@ -63,10 +60,7 @@ class LeadStageLog
         $this->dateFired = $dateFired;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
@@ -77,7 +71,7 @@ class LeadStageLog
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\Lead|null
+     * @return Lead|null
      */
     public function getLead()
     {

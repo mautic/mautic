@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Model;
 
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -55,13 +56,12 @@ final class VideoModel extends FormModel
     }
 
     /**
-     * @param Request $request
-     * @param string  $code
+     * @param string $code
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      * @throws \Exception
      */
-    public function hitVideo($request, $code = '200'): void
+    public function hitVideo(Request $request, $code = '200'): void
     {
         // don't skew results with in-house hits
         if (!$this->security->isAnonymous()) {

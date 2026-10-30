@@ -26,9 +26,11 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -119,7 +121,7 @@ final class CampaignApiController extends CommonApiController
      *
      * @param int        $id     Campaign ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/campaigns/{id}/contact/{leadId}/add',
@@ -156,7 +158,7 @@ final class CampaignApiController extends CommonApiController
      *
      * @param int $id     Campaign ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/campaigns/{id}/contact/{leadId}/remove',
@@ -188,9 +190,8 @@ final class CampaignApiController extends CommonApiController
      * @param Campaign             $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, array $parameters, $action = 'edit')
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit')
     {
         $method = $this->requestStack->getCurrentRequest()->getMethod();
 
@@ -204,6 +205,12 @@ final class CampaignApiController extends CommonApiController
                 $msg = $this->translator->trans('mautic.campaign.form.sources.notempty', [], 'validators');
 
                 return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        foreach (['lists', 'forms'] as $source) {
+            if (isset($parameters[$source]) && !is_array($parameters[$source])) {
+                return $this->returnError('$campaign['.$source.'] must be an array', Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -314,18 +321,14 @@ final class CampaignApiController extends CommonApiController
 
     /**
      * Change the array structure.
-     *
-     * @param array $events
      */
-    private function modifyCampaignEventArray($events): array
+    private function modifyCampaignEventArray(array $events): array
     {
         $updatedEvents = [];
 
-        if ($events && is_array($events)) {
-            foreach ($events as $event) {
-                if (!empty($event['id'])) {
-                    $updatedEvents[$event['id']] = 'ignore';
-                }
+        foreach ($events as $event) {
+            if (!empty($event['id'])) {
+                $updatedEvents[$event['id']] = 'ignore';
             }
         }
 
@@ -487,6 +490,12 @@ final class CampaignApiController extends CommonApiController
             }
 
             $uploadedFile = array_values($files)[0];
+
+            if (!$uploadedFile instanceof UploadedFile) {
+                return $this->handleView(
+                    $this->view(['error' => $this->translator->trans('mautic.campaign.api.import.incorrect_zip_file', [], 'messages')], Response::HTTP_BAD_REQUEST)
+                );
+            }
 
             if (!$uploadedFile->isValid()) {
                 return $this->handleView(

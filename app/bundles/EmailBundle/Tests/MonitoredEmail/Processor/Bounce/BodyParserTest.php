@@ -11,9 +11,10 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Category;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition\Type;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(BodyParser::class)]
-final class BodyParserTest extends \PHPUnit\Framework\TestCase
+final class BodyParserTest extends TestCase
 {
     #[TestDox('Test that a BouncedEmail is returned from a bounce detected in the body')]
     public function testBouncedEmailIsReturnedFromParsedBody(): void

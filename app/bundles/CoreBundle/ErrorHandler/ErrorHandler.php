@@ -13,6 +13,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
     final class ErrorHandler
     {
+        /**
+         * @var self
+         */
         public static $handler;
 
         /**
@@ -35,6 +38,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private $logger;
 
+        /**
+         * @var LoggerInterface
+         */
         private $mainLogger;
 
         private static string $root;
@@ -85,10 +91,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
         }
 
-        /**
-         * @return mixed
-         */
-        public function getDebugLogger()
+        public function getDebugLogger(): LoggerInterface
         {
             return $this->debugLogger;
         }
@@ -314,7 +317,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
              */
             if (!defined('IS_PHPUNIT')) {
                 // Log PHP fatal errors
-                register_shutdown_function([self::$handler, 'handleFatal']);
+                register_shutdown_function(self::$handler->handleFatal(...));
 
                 // Log general PHP errors
                 set_exception_handler(self::$handler->handleException(...));

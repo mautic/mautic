@@ -24,6 +24,7 @@ use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -269,7 +270,7 @@ final class CompanyController extends AbstractFormController
      *
      * @param Company $entity
      */
-    public function newAction(Request $request, $entity = null): Response
+    public function newAction(Request $request, ?object $entity = null): Response
     {
         if (!$entity instanceof Company) {
             /** @var Company $entity */
@@ -1224,7 +1225,7 @@ final class CompanyController extends AbstractFormController
         name: 'mautic_company_export_action',
         requirements: ['companyId' => '\d+'],
     )]
-    public function companyExportAction(Request $request, ExportHelper $exportHelper, int $companyId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function companyExportAction(Request $request, ExportHelper $exportHelper, int $companyId): Response|StreamedResponse
     {
         // set some permissions
         $permissions = $this->security->isGranted(

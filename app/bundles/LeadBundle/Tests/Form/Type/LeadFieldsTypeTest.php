@@ -7,9 +7,10 @@ namespace Mautic\LeadBundle\Tests\Form\Type;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Form\Type\LeadFieldsType;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-final class LeadFieldsTypeTest extends \PHPUnit\Framework\TestCase
+final class LeadFieldsTypeTest extends TestCase
 {
     /**
      * @var MockObject&FieldList

@@ -10,5 +10,11 @@ parameters:
             paths:
                 - app/bundles/LeadBundle/Model/CompanyModel.php
                 - app/bundles/LeadBundle/Model/ImportModel.php
-                - app/bundles/PageBundle/Model/PageModel.php
                 - app/bundles/PluginBundle/Model/IntegrationEntityModel.php
+
+        # generic base contracts handle any entity, so "object $entity" is correct and cannot name a concrete class
+        -
+            identifier: mautic.entityParamConcreteType
+            paths:
+                - app/bundles/CoreBundle/Model/FormModel.php
+                - app/bundles/CoreBundle/Entity/CommonRepository.php

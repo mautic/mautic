@@ -5,6 +5,7 @@ namespace Mautic\PageBundle\EventListener;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
@@ -394,19 +395,19 @@ final class BuilderSubscriber implements EventSubscriberInterface
         /** @var Collection<int, Page>|null $children */
         $children = $page->getTranslationChildren();
 
-        if (!$parent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface && !$children instanceof \Doctrine\Common\Collections\Collection) {
+        if (!$parent instanceof TranslationEntityInterface && !$children instanceof Collection) {
             return $related;
         }
 
         // If this page has a parent, then fetch the children from the parent
-        if ($parent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface) {
+        if ($parent instanceof TranslationEntityInterface) {
             $children = $parent->getTranslationChildren();
         } else {
             // Otherwise this is the parent page.
             $parent = $page;
         }
 
-        if (!$children instanceof \Doctrine\Common\Collections\Collection) {
+        if (!$children instanceof Collection) {
             return $related;
         }
 
@@ -491,7 +492,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
 
     private function getFirstParentNodeThatContainsAllFormInputs(\DOMNode $node): \DOMNode
     {
-        $content = implode('', array_map([$node->ownerDocument, 'saveHTML'], iterator_to_array($node->childNodes)));
+        $content = implode('', array_map($node->ownerDocument->saveHTML(...), iterator_to_array($node->childNodes)));
 
         // Check if the save button exists in the content. If not, try again with the parentNode.
         if (!str_contains($content, self::saveButtonContainerClass)) {

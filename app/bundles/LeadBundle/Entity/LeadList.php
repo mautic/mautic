@@ -84,11 +84,8 @@ class LeadList extends FormEntity implements UuidInterface
     #[ORM\Column(name: 'public_name', type: 'string', length: 191)]
     private $publicName;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var string|null
@@ -282,10 +279,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFilters()
+    public function getFilters(): array
     {
         if (is_array($this->filters)) {
             return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters)); // @phpstan-ignore method.deprecated

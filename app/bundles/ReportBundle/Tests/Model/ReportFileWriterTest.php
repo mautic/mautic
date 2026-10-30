@@ -13,8 +13,9 @@ use Mautic\ReportBundle\Model\ExportHandler;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Tests\Fixtures;
+use PHPUnit\Framework\TestCase;
 
-final class ReportFileWriterTest extends \PHPUnit\Framework\TestCase
+final class ReportFileWriterTest extends TestCase
 {
     public function testWriteReportData(): void
     {

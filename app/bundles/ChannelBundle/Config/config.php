@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\ChannelBundle\Controller\Api\MessageApiController;
+use Mautic\ChannelBundle\Entity\Message;
+
 return [
     'routes' => [
         'api' => [
@@ -9,7 +12,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'messages',
                 'path'            => '/messages',
-                'controller'      => Mautic\ChannelBundle\Controller\Api\MessageApiController::class,
+                'controller'      => MessageApiController::class,
             ],
         ],
         'public' => [
@@ -35,7 +38,7 @@ return [
 
     'categories' => [
         'messages' => [
-            'class' => Mautic\ChannelBundle\Entity\Message::class,
+            'class' => Message::class,
         ],
     ],
 

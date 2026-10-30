@@ -10,6 +10,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final readonly class ReportSubscriber implements EventSubscriberInterface
 {
@@ -249,6 +250,8 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
+            /** @var TranslatorInterface $translator */
+            $translator = $options['translator'];
             $queryBuilder = clone $qb;
 
             $chartQuery = clone $options['chartQuery'];
@@ -268,8 +271,8 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
                     $sends = $chartQuery->loadAndBuildTimeData($sendQuery);
                     $reads = $chartQuery->loadAndBuildTimeData($readQuery);
-                    $chart->setDataset($options['translator']->trans('mautic.mobile_notification.sent.mobile_notifications'), $sends);
-                    $chart->setDataset($options['translator']->trans('mautic.mobile_notification.read.mobile_notifications'), $reads);
+                    $chart->setDataset($translator->trans('mautic.mobile_notification.sent.mobile_notifications'), $sends);
+                    $chart->setDataset($translator->trans('mautic.mobile_notification.read.mobile_notifications'), $reads);
                     $data         = $chart->render();
                     $data['name'] = $g;
 

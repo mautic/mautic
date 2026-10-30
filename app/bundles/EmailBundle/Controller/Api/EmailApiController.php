@@ -25,6 +25,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -103,7 +104,7 @@ final class EmailApiController extends CommonApiController
      *
      * @param int $id Email ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/emails/{id}/send',
@@ -147,7 +148,7 @@ final class EmailApiController extends CommonApiController
      *
      * @param int $id     Email ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
         path: '/api/emails/{id}/contact/{leadId}/send',
@@ -255,11 +256,10 @@ final class EmailApiController extends CommonApiController
      *
      * @param Email        $entity
      * @param mixed[]|null $parameters
-     * @param string       $method
      *
      * @return mixed
      */
-    protected function processForm(Request $request, $entity, ?array $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, object $entity, ?array $parameters = null, string $method = 'PUT')
     {
         if (array_key_exists('sendToDnc', $parameters)
             && !$this->security->isGranted('email:emails:sendtodnc')) {

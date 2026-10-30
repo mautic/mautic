@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CoreBundle\Command\RemoveAnonymousContactsCommand;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
@@ -35,14 +36,16 @@ final class RemoveAnonymousContactsCommandFunctionalTest extends MauticMysqlTest
         $this->em->flush();
 
         $this->assertCount(1, $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment]));
-        $this->assertCount(1, $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class)->findBy(['campaign' => $campaign]));
+
+        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+        $this->assertCount(1, $leadRepository->findBy(['campaign' => $campaign]));
         $this->assertCount(1, $this->getContainer()->get(LeadEventLogRepository::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']));
 
         $this->testSymfonyCommand(RemoveAnonymousContactsCommand::COMMAND_NAME);
 
         $this->assertCount(1, $this->getContainer()->get(\Mautic\LeadBundle\Entity\LeadRepository::class)->findAll());
         $this->assertCount(0, $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment]));
-        $this->assertCount(0, $this->getContainer()->get(\Mautic\CampaignBundle\Entity\LeadRepository::class)->findBy(['campaign' => $campaign]));
+        $this->assertCount(0, $leadRepository->findBy(['campaign' => $campaign]));
         $this->assertCount(0, $this->getContainer()->get(LeadEventLogRepository::class)->findBy(['campaign' => $campaign, 'lead' => $lead], ['event' => 'ASC']));
     }
 

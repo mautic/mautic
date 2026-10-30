@@ -243,7 +243,7 @@ trait CustomFieldRepositoryTrait
      *
      * @param array $entities
      */
-    public function saveEntities($entities): void
+    public function saveEntities(iterable $entities): void
     {
         foreach ($entities as $entity) {
             // Leads cannot be batched due to requiring the ID to update the fields
@@ -436,7 +436,7 @@ trait CustomFieldRepositoryTrait
     /**
      * Inherit and use in class if required to do something with the entity after persisting.
      */
-    protected function postSaveEntity($entity): void
+    protected function postSaveEntity(object $entity): void
     {
         // Inherit and use if required
     }

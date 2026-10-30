@@ -5,6 +5,8 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Event\CompanyBuildSearchEvent;
@@ -374,8 +376,8 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
     /**
      * Get companies grouped by column.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getCompaniesByGroup(\Doctrine\DBAL\Query\QueryBuilder $query, string $column): array
     {
@@ -472,7 +474,7 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
      *
      * @return array<array{id: string}>
      */
-    public function getCompanyIdsByUniqueFields($uniqueFieldsWithData, ?int $companyId = null, ?int $limit = null): array
+    public function getCompanyIdsByUniqueFields(iterable $uniqueFieldsWithData, ?int $companyId = null, ?int $limit = null): array
     {
         return $this->getCompanyFieldsByUniqueFields($uniqueFieldsWithData, 'c.id', $companyId, $limit);
     }
@@ -486,7 +488,7 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
      *
      * @return array<array{id: string}>
      */
-    public function getCompanyFieldsByUniqueFields($uniqueFieldsWithData, string $select, ?int $companyId = null, ?int $limit = null): array
+    public function getCompanyFieldsByUniqueFields(iterable $uniqueFieldsWithData, string $select, ?int $companyId = null, ?int $limit = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select($select)

@@ -312,7 +312,7 @@ $container->loadFromExtension('framework', [
 
 $container->setParameter(
     'jms_serializer.camel_case_naming_strategy.class',
-    'JMS\Serializer\Naming\IdenticalPropertyNamingStrategy'
+    \JMS\Serializer\Naming\IdenticalPropertyNamingStrategy::class
 );
 
 // Monolog formatter
@@ -321,12 +321,8 @@ $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\Li
     ->addMethodCall('ignoreEmptyContextAndExtra', [true]);
 
 // Register command line logging
-$container->setParameter(
-    'console_error_listener.class',
-    ConsoleErrorListener::class
-);
 $definitionConsoleErrorListener = new Definition(
-    '%console_error_listener.class%',
+    ConsoleErrorListener::class,
     [new Reference('monolog.logger.mautic')]
 );
 $definitionConsoleErrorListener->addTag(
@@ -338,12 +334,8 @@ $container->setDefinition(
     $definitionConsoleErrorListener
 );
 
-$container->setParameter(
-    'console_terminate_listener.class',
-    ConsoleTerminateListener::class
-);
 $definitionConsoleErrorListener = new Definition(
-    '%console_terminate_listener.class%',
+    ConsoleTerminateListener::class,
     [new Reference('monolog.logger.mautic')]
 );
 $definitionConsoleErrorListener->addTag(

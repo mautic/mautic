@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Controller;
 
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\EmailBundle\Entity\Email;
@@ -46,8 +47,8 @@ final class BatchEmailController extends AbstractFormController
             'flashes'     => $this->getFlashContent(),
             'affected'    => !empty($affected) ? array_map(fn (Email $affected) => $affected->getId(), $affected) : [],
             'newCategory' => [
-                'name'  => $newCategory instanceof \Mautic\CategoryBundle\Entity\Category ? $newCategory->getTitle() : null,
-                'color' => $newCategory instanceof \Mautic\CategoryBundle\Entity\Category ? $newCategory->getColor() : null,
+                'name'  => $newCategory instanceof Category ? $newCategory->getTitle() : null,
+                'color' => $newCategory instanceof Category ? $newCategory->getColor() : null,
             ],
             'callback' => 'emailBatchSubmitCallback',
         ]);

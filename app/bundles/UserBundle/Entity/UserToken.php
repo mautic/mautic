@@ -34,10 +34,7 @@ class UserToken
      */
     private $secret;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $expiration;
+    private ?\DateTimeInterface $expiration = null;
 
     /**
      * @var bool
@@ -76,10 +73,7 @@ class UserToken
         return $this->user;
     }
 
-    /**
-     * @param User $user
-     */
-    public function setUser($user): static
+    public function setUser(User $user): static
     {
         $this->user = $user;
 
@@ -124,10 +118,7 @@ class UserToken
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getExpiration()
+    public function getExpiration(): ?\DateTimeInterface
     {
         return $this->expiration;
     }
@@ -135,7 +126,7 @@ class UserToken
     /**
      * @param \DateTime|null $expiration
      */
-    public function setExpiration($expiration = null): static
+    public function setExpiration(?\DateTimeInterface $expiration = null): static
     {
         $this->expiration = $expiration;
 

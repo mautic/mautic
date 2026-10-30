@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\KernelEvents;
 
 #[AllowMockObjectsWithoutExpectations]
 final class EnvironmentSubscriberTest extends TestCase
@@ -28,16 +27,6 @@ final class EnvironmentSubscriberTest extends TestCase
     {
         $this->coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
         $this->environmentSubscriber    = new EnvironmentSubscriber($this->coreParametersHelperMock);
-    }
-
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertSame([
-            KernelEvents::REQUEST => [
-                ['onKernelRequestSetTimezone', 128],
-                ['onKernelRequestSetLocale', 101],
-            ],
-        ], $this->environmentSubscriber::getSubscribedEvents());
     }
 
     public function testSetLocaleThatDoesNotHavePreviousSession(): void

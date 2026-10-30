@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Doctrine\QueryFormatter;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 /**
@@ -10,7 +11,7 @@ use Mautic\CoreBundle\Doctrine\DatabasePlatform;
  */
 abstract class AbstractFormatter
 {
-    protected \Doctrine\DBAL\Platforms\AbstractPlatform $platform;
+    protected AbstractPlatform $platform;
 
     protected string $name;
 

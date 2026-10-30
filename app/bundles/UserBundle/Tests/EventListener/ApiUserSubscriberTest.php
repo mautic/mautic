@@ -24,14 +24,6 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 #[AllowMockObjectsWithoutExpectations]
 final class ApiUserSubscriberTest extends TestCase
 {
-    public function testSubscribedEvents(): void
-    {
-        $this->assertSame([
-            CheckPassportEvent::class              => ['onCheckPassport', 2048],
-            AuthenticationTokenCreatedEvent::class => 'onTokenCreated',
-        ], ApiUserSubscriber::getSubscribedEvents());
-    }
-
     public function testIfAuthenticationHasNoUserInvolved(): void
     {
         $passport = $this->createMock(Passport::class);

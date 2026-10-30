@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -216,7 +217,7 @@ class LeadModel extends FormModel
     }
 
     /**
-     * @param Lead        $entity
+     * @param Lead|array<string, mixed>        $entity
      * @param string|null $action
      * @param array       $options
      *
@@ -224,7 +225,7 @@ class LeadModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
@@ -294,13 +295,18 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @param Lead $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         return $this->dispatchLeadEvent($action, $entity, $isNew, false);
     }
 
+    /**
+     * @param Lead $entity
+     */
     protected function dispatchEventFromBatch(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         return $this->dispatchLeadEvent($action, $entity, $isNew, true);
@@ -341,12 +347,8 @@ class LeadModel extends FormModel
     /**
      * @throws MethodNotAllowedHttpException
      */
-    private function dispatchLeadEvent(string $action, object $entity, bool $isNew, bool $alreadyProcessedInBatch): ?LeadEvent
+    private function dispatchLeadEvent(string $action, Lead $entity, bool $isNew, bool $alreadyProcessedInBatch): ?LeadEvent
     {
-        if (!$entity instanceof Lead) {
-            throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
-        }
-
         $event = match ($action) {
             'pre_save'    => new LeadPreSaveEvent($entity, $isNew),
             'post_save'   => new LeadPostSaveEvent($entity, $isNew),
@@ -1894,10 +1896,9 @@ class LeadModel extends FormModel
     /**
      * Get pie chart data of dwell times.
      *
-     * @param string $dateFrom
-     * @param string $dateTo
+     * @param array<string, mixed> $filters
      */
-    public function getAnonymousVsIdentifiedPieChartData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
+    public function getAnonymousVsIdentifiedPieChartData(\DateTime $dateFrom, \DateTime $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         $chart = new PieChart();
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -2374,7 +2375,7 @@ class LeadModel extends FormModel
                 }
                 $allowedValues = is_array($field['properties'])
                     ? $field['properties']
-                    : \Mautic\CoreBundle\Helper\Serializer::decode($field['properties']);
+                    : Serializer::decode($field['properties']);
 
                 $flattenedAllowedValues = array_map(fn (array $item): string => html_entity_decode($item['value'], ENT_QUOTES), $allowedValues['list']);
 

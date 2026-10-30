@@ -240,7 +240,7 @@
 - Deprecated action `Mautic\LeadBundle\Controller\AjaxController::addLeadUtmTagsAction()` (ajax action `lead:addLeadUtmTags`) removed with no replacement. Its only caller, the unused JavaScript function `Mautic.createLeadUtmTag()`, was removed as well.
 - Deprecated interface `Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface` removed with no replacement. Nothing implemented it. Use the `CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE` event to change template params instead.
 - Deprecated method `Mautic\CoreBundle\Helper\AbstractFormFieldHelper::setTranslator()` removed. The translator is autowired via the `#[Required] autowireFormFieldHelper()` method, so there is nothing to pass manually.
-- Deprecated method `Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::reschedule()` removed. Use `EventScheduler::rescheduleLogs()` instead, which takes an `ArrayCollection` of logs.
+- Deprecated method `Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::reschedule()` removed. Use `EventScheduler::rescheduleLogs()` instead, which takes a `Doctrine\Common\Collections\Collection` of logs. Overrides of `rescheduleLogs()` must accept `Collection` (or a wider type), rather than narrowing the parameter to `ArrayCollection`.
 - Deprecated method `Mautic\CoreBundle\Model\VariantModelTrait::convertVariant()` removed. Use `Mautic\CoreBundle\Model\VariantConverterService` instead.
 - Deprecated method `Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns::getForOriginalDateColumnAndUnit()` removed. Use `getGeneratedColumnForDateColumn()` instead — it takes the table name as its first argument and matches on it, while the removed method ignored the table and returned the last matching column of any table:
 
@@ -964,11 +964,12 @@
 - `Mautic\CoreBundle\Entity\CommonRepository` and `Mautic\CoreBundle\Event\CommonEvent` are now `abstract`. They were only ever used as base classes; if you instantiate either directly, create your own subclass instead.
 - `Mautic\CoreBundle\Entity\CommonEntity` and `MauticPlugin\MauticFullContactBundle\Services\FullContact_Base` are now `abstract`. They were only ever used as base classes; if you instantiate either directly, create your own subclass instead.
 - All class and interface constants now declare a native type (PHP 8.3 typed class constants), e.g. `public const string NAME = ...`. If a plugin class overrides one of them, add a compatible type to the overriding constant, otherwise PHP fails with "Type of X::NAME must be compatible with Y::NAME". `AbstractMauticMigration::TABLE_NAME` is `?string`, so migrations declare `protected const string TABLE_NAME`.
-- Base entity properties now declare native types. A plugin entity that redeclares either property without a compatible type causes a PHP fatal error. Add the matching type to the overriding property:
+- Base entity properties now declare native types. A plugin entity that redeclares any of these properties without a compatible type causes a PHP fatal error. Add the matching type to the overriding property:
 
     | Class | Property | Type |
     | --- | --- | --- |
     | `CoreBundle\Entity\CommonEntity` | `$changes` | `array` |
+    | `CoreBundle\Entity\CommonEntity` | `$pastChanges` | `array` |
     | `CoreBundle\Entity\FormEntity` | `$new` | `bool` |
 
 - `Mautic\DashboardBundle\Entity\Widget::getParams()` and `::getTemplateData()` now declare a native `array` return type instead of a `@return array` docblock. If a plugin class extends `Widget` and overrides either method, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::getParams() must be compatible with Widget::getParams(): array".
@@ -1130,3 +1131,70 @@
     | `Mautic\PointBundle\Entity\TriggerEvent` | `getChanges()` | `?array` |
     | `Mautic\ReportBundle\Entity\Report` | `getSettings()` | `?array` |
     | `Mautic\UserBundle\Entity\Role` | `getRawPermissions()` | `?array` |
+
+- The following overridable methods no longer pass the listed parameters by reference. Remove `&` from the corresponding parameters in plugin overrides to avoid incompatible-declaration errors:
+
+    | Class | Methods | Parameters no longer passed by reference |
+    | --- | --- | --- |
+    | `Mautic\PluginBundle\Integration\AbstractIntegration` | `appendToForm()` | `$builder` |
+    | `Mautic\CoreBundle\Security\Permissions\AbstractPermissions` | `addCustomFormFields()`, `addStandardFormFields()`, `addManageFormFields()`, `addExtendedFormFields()` | `$builder` |
+    | `Mautic\CoreBundle\Security\Permissions\AbstractPermissions` | `parseForJavascript()` | `$perms` |
+    | `Mautic\ApiBundle\Controller\CommonApiController` | `prePopulateForm()` | `$entity` |
+    | `Mautic\CoreBundle\Entity\CommonRepository` | `getIdsExpr()` | `$queryBuilder` |
+    | `Mautic\CoreBundle\Model\FormModel`, `Mautic\LeadBundle\Model\LeadModel` | `dispatchBatchEvent()` | `$entitiesBatchParams` |
+    | `Mautic\EmailBundle\Model\EmailModel` | `limitQueryToCreator()` | `$q` |
+    | `Mautic\CoreBundle\Helper\Chart\AbstractChart` | `addOneUnitMinusOneSec()` | `$date` |
+
+    Object mutations still affect the same object, but reassigning these parameters no longer replaces the caller's variable. Changes to the arrays in `parseForJavascript()` and `dispatchBatchEvent()` no longer propagate to the caller through a reference. Use the return value of `addOneUnitMinusOneSec()`, especially when passing a `DateTimeImmutable`.
+
+- Additional extension points now declare native parameter types. Keep plugin overrides compatible by accepting the parent's type or a wider type. Update callers that pass values outside these types:
+
+    | Class or trait | Method | New parameter types |
+    | --- | --- | --- |
+    | `Mautic\CoreBundle\Entity\CommonRepository` | `buildWhereClauseFromArray()` | `?Doctrine\ORM\Query\Expr\Composite $expr = null` |
+    | `Mautic\CoreBundle\Entity\TranslationEntityTrait` | `getAccumulativeTranslationCount()` | `string $getter`, `?Mautic\CoreBundle\Entity\TranslationEntityInterface $variantParent = null` |
+    | `Mautic\CoreBundle\Controller\AbstractStandardFormController` | `getUpdateSelectParams()` | `string $updateSelect`, `object $entity`, `string $nameMethod = 'getName'`, `string $groupMethod = 'getLanguage'` |
+    | `Mautic\CoreBundle\Controller\AbstractStandardFormController` | `indexStandard()` | `?int $page = null` |
+    | `Mautic\CoreBundle\Security\Permissions\AbstractPermissions` | `isGranted()` | `array $userPermissions` |
+    | `Mautic\CoreBundle\Security\Permissions\AbstractPermissions` | `addStandardFormFields()`, `addManageFormFields()`, `addExtendedFormFields()` | `array $data` |
+    | `Mautic\CoreBundle\Security\Permissions\AbstractPermissions` | `addStandardPermissions()`, `addExtendedPermissions()`, `addStandardFormFields()`, `addExtendedFormFields()` | `bool $includePublish = true` |
+    | `Mautic\CoreBundle\Security\Permissions\AbstractPermissions` | `analyzePermissions()` | `bool $isSecondRound = false` |
+
+- Additional methods now declare native return types. Plugin overrides and interface implementations must declare a compatible return type:
+
+    | Class or trait | Method | Return type |
+    | --- | --- | --- |
+    | `Mautic\CoreBundle\Entity\TranslationEntityTrait` | `getAccumulativeTranslationCount()` | `int` |
+    | `Mautic\LeadBundle\Controller\LeadAccessTrait` | `checkLeadAccess()` | `Symfony\Component\HttpFoundation\Response\|Mautic\LeadBundle\Entity\Lead` |
+    | `Mautic\CampaignBundle\Entity\LeadEventLog` | `getLead()` | `?Mautic\LeadBundle\Entity\Lead` |
+    | `Mautic\CampaignBundle\Entity\LeadEventLog` | `getCampaign()` | `?Mautic\CampaignBundle\Entity\Campaign` |
+    | `Mautic\CampaignBundle\Entity\LeadEventLog` | `getIpAddress()` | `?Mautic\CoreBundle\Entity\IpAddress` |
+    | `Mautic\CampaignBundle\Entity\Event` | `getCampaign()` | `?Mautic\CampaignBundle\Entity\Campaign` |
+    | `Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter` | `createFormatter()` | `self` (`AbstractFormatter`) |
+
+- `Mautic\CoreBundle\Entity\VariantEntityInterface` and `VariantEntityTrait` now declare `getVariantStartDate(): ?\DateTimeInterface` and `setVariantStartDate(?\DateTimeInterface $variantStartDate): static`. The date getter's return type and setter's parameter type were previously `mixed`. Update implementations and overrides accordingly; pass a mutable `DateTimeInterface` or `null`, not a `DateTimeImmutable` or another value.
+- `Mautic\LeadBundle\Controller\FrequencyRuleTrait` now declares `protected array $leadLists = []` (previously untyped and initialized to `null`) and `protected bool $isPublicView = false`. Any class that redeclares these trait properties must use compatible types and defaults; code must no longer assign `null` to `$leadLists`.
+- `Mautic\CoreBundle\Test\AbstractMauticTestCase::$router` now has the native type `Symfony\Component\Routing\RouterInterface`. Plugin tests that redeclare this protected property must use the same type, and assigned test doubles must implement that interface.
+
+- Methods with a parameter named `$entity` now declare a native type on it instead of only a `@param` docblock: `object`, `object|array` (where an array is also accepted, e.g. `createForm()`), or `?object` (where the value may be null). A new PHPStan rule (`mautic.entityParamMustHaveType`) enforces this type on new code. If you extend one of these classes and override such a method, an untyped `$entity` override stays compatible with PHP - leaving a parameter untyped is always a valid widening, so no incompatible-declaration error occurs. Add the matching native type to satisfy the PHPStan rule and to keep the signature aligned with the parent; just do not declare a type narrower than the parent, which would break PHP compatibility:
+
+    ```diff
+    -public function createForm($entity, $action = null, $options = []): FormInterface
+    +public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+
+    -protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    +protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    ```
+
+    Affected base classes include `Mautic\CoreBundle\Model\FormModel` (`createForm()`, `dispatchEvent()`, `setTimestamps()`, `unlockEntity()`, `getUserContactSubject()`), `Mautic\ApiBundle\Controller\CommonApiController` (`createEntityForm()`, `processForm()`, `prePopulateForm()`, `preSaveEntity()`, `processBatchForm()`, `saveEntity()`, `setCategory()`), `Mautic\ApiBundle\Controller\FetchCommonApiController` (`checkEntityAccess()`, now `?object`), `Mautic\CoreBundle\Controller\AbstractStandardFormController` and `AbstractFormController` (`afterEntityClone()`, `afterEntitySave()`, `afterFormProcessed()`, `beforeEntitySave()`, `beforeFormProcessed()`, `checkActionPermission()`, `setOptimisticLockVersion()`, `checkOptimisticLockVersion()`, `isLocked()`, `canEdit()`), `Mautic\CoreBundle\Entity\CommonRepository` (`checkUniqueAlias()`) and `Mautic\CoreBundle\Model\VariantModelTrait` (`resetVariants()`).
+
+- A few `$entity` parameters that never held an entity object were renamed to describe their real value: `Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer::transform()` and `Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer::reverseTransform()` now take `$value`, and `Mautic\CampaignBundle\EventListener\CampaignImportExportSubscriber::updateFormRelatedData()` / `getSubDependencies()` now take `$entityName`. Only callers that passed these by name (named arguments) are affected.
+
+- The API controller form hooks gained native types on their remaining parameters: `$form` is now `Symfony\Component\Form\FormInterface`, and `$action` / `$method` are now `string`. This affects `Mautic\ApiBundle\Controller\CommonApiController::prePopulateForm()`, `preSaveEntity()` and `processForm()`. A subclass overriding one of these (`EmailApiController`, `FormApiController`, `CompanyApiController`, `DeviceApiController`, `FieldApiController`, `LeadApiController`, `NoteApiController`, `CampaignApiController`, `TriggerApiController`, `RoleApiController`, `UserApiController`, `WebhookApiController`, …) keeps working with untyped parameters - leaving them untyped is a valid widening, so PHP raises no incompatible-declaration error. Add the matching native types to satisfy the PHPStan rule and stay aligned with the parent:
+
+    ```diff
+    -protected function preSaveEntity(object &$entity, $form, array $parameters, $action = 'edit')
+    +protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit')
+    ```
+
+    `CommonApiController` and `FetchCommonApiController` also renamed their `@template`/`@extends` generic type parameter from `E` to `TEntity`; this only matters for static-analysis consumers that referenced the generic by name.

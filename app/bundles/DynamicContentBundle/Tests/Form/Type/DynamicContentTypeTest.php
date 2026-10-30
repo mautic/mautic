@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\RelativeDate;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -71,7 +72,7 @@ final class DynamicContentTypeTest extends TestCase
         $matcher = $this->exactly(2);
 
         $formBuilderInterfaceMock->expects($matcher)
-            ->method('create')->willReturnCallback(function (...$parameters) use ($matcher, $tagChoices, $formBuilderInterfaceMock): \PHPUnit\Framework\MockObject\MockObject {
+            ->method('create')->willReturnCallback(function (...$parameters) use ($matcher, $tagChoices, $formBuilderInterfaceMock): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('translationParent', $parameters[0]);
                     $this->assertSame(DynamicContentListType::class, $parameters[1]);
@@ -123,7 +124,7 @@ final class DynamicContentTypeTest extends TestCase
         $matcher = $this->exactly(3);
 
         $formBuilderInterfaceMock->expects($matcher)
-            ->method('addEventListener')->willReturnCallback(function (...$parameters) use ($matcher, $formBuilderInterfaceMock): \PHPUnit\Framework\MockObject\MockObject {
+            ->method('addEventListener')->willReturnCallback(function (...$parameters) use ($matcher, $formBuilderInterfaceMock): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame(FormEvents::PRE_SUBMIT, $parameters[0]);
                     $callback = function ($listener): bool {

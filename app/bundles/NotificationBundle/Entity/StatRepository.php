@@ -3,6 +3,8 @@
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -13,8 +15,8 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 final class StatRepository extends CommonRepository
 {
     /**
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getNotificationStatus(string $trackingHash): ?Stat
     {
@@ -129,8 +131,8 @@ final class StatRepository extends CommonRepository
     /**
      * Get pie graph data for Sent, Read and Failed notifications count.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getMostNotifications(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
@@ -143,10 +145,8 @@ final class StatRepository extends CommonRepository
 
     /**
      * Get sent counts based grouped by notification Id.
-     *
-     * @param array $notificationIds
      */
-    public function getSentCounts($notificationIds = [], ?\DateTime $fromDate = null): array
+    public function getSentCounts(array $notificationIds = [], ?\DateTime $fromDate = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('s.notification_id, count(n.id) as sentcount')

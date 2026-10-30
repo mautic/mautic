@@ -6,14 +6,14 @@ parameters:
     tmpDir: ./var/phpstan-cache
     level: 6
 
-    reportUnmatchedIgnoredErrors: false
+    # reportUnmatchedIgnoredErrors: false
     treatPhpDocTypesAsCertain: false
 
     # see https://github.com/tomasVotruba/type-coverage
     type_coverage:
-        return: 93.0
-        param: 83.3
-        property: 75.4
+        return: 93.4
+        param: 83.9
+        property: 77.4
         constant: 99.9
     type_perfect:
         no_param_type_removal: true
@@ -36,7 +36,7 @@ parameters:
         collections: true
         phpunit: true
         mocks: true
-        ctor: true
+        ctor: false
         symfonyReturnType: true
         laravelReturnType: true
         pathStrings: true
@@ -72,23 +72,94 @@ parameters:
                 - phpunit.noMockObjectAndRealObjectProperty
                 - method.notFound
                 - symplify.forbiddenFuncCall
-                - symplify.forbiddenArrayMethodCall
                 - symplify.forbiddenStaticClassConstFetch
-                - symplify.newOverSetters
-                - symplify.noArrayMapWithArrayCallable
-                - symfony.noListenerWithoutContract
                 - symfony.noFindTaggedServiceIdsCall
-#                - return.unusedType
-#                - property.unusedType
-#                - assign.propertyType
 
-        # type-perfect no_mixed_caller: rule enabled, violations typed incrementally; ignored wholesale for now
+        # registered manually
+        -
+            identifier: symfony.noListenerWithoutContract
+            paths:
+                - app/bundles/ApiBundle/ApiPlatform/EventListener/MauticDenyAccessListener.php
+                - app/bundles/CoreBundle/EventListener/ConsoleErrorListener.php
+                - app/bundles/CoreBundle/EventListener/ConsoleTerminateListener.php
+
+        # point action/trigger callbacks must stay array callables: PointModel/TriggerModel run str_contains($callback, '::') on them,
+        # which throws a TypeError on a first-class callable Closure, see https://github.com/mautic/mautic/pull/17852#issuecomment-6269806298
+        -
+            identifier: symplify.forbiddenArrayMethodCall
+            paths:
+                - app/bundles/EmailBundle/EventListener/PointSubscriber.php
+                - app/bundles/PageBundle/EventListener/PointSubscriber.php
+
+        # type-perfect no_mixed_caller: rule enabled, remaining violations typed incrementally per file
         -
             identifier: typePerfect.noMixedMethodCaller
             paths:
-                - app/config
-                - app/bundles
-                - plugins
+                - app/bundles/ApiBundle/Helper/BatchIdToEntityHelper.php
+                - app/bundles/ApiBundle/Tests/Helper/BatchIdToEntityHelperTest.php
+                - app/bundles/AssetBundle/EventListener/DetermineWinnerSubscriber.php
+                - app/bundles/CampaignBundle/Entity/LeadEventLogRepository.php
+                - app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
+                - app/bundles/CoreBundle/Entity/CommonEntity.php
+                - app/bundles/CoreBundle/Event/AbstractCustomRequestEvent.php
+                - app/bundles/CoreBundle/Form/DataTransformer/IdToEntityModelTransformer.php
+                - app/bundles/CoreBundle/Form/EventListener/FormExitSubscriber.php
+                - app/bundles/CoreBundle/Form/Type/IpLookupDownloadDataStoreButtonType.php
+                - app/bundles/CoreBundle/Tests/Functional/Controller/AjaxControllerTest.php
+                - app/bundles/CoreBundle/Twig/Extension/ButtonExtension.php
+                - app/bundles/DynamicContentBundle/Entity/DynamicContent.php
+                - app/bundles/DynamicContentBundle/EventListener/CampaignSubscriber.php
+                - app/bundles/EmailBundle/Entity/Email.php
+                - app/bundles/FormBundle/EventListener/DetermineWinnerSubscriber.php
+                - app/bundles/LeadBundle/Entity/Company.php
+                - app/bundles/LeadBundle/Entity/CompanyRepository.php
+                - app/bundles/LeadBundle/Entity/LeadDeviceRepository.php
+                - app/bundles/LeadBundle/Entity/Lead.php
+                - app/bundles/LeadBundle/EventListener/SegmentLogReportSubscriber.php
+                - app/bundles/LeadBundle/Field/Command/AnalyseCustomFieldCommand.php
+                - app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
+                - app/bundles/LeadBundle/Form/Type/FieldType.php
+                - app/bundles/LeadBundle/Form/Validator/Constraints/LeadListAccessValidator.php
+                - app/bundles/LeadBundle/Helper/IdentifyCompanyHelper.php
+                - app/bundles/LeadBundle/Model/LeadModel.php
+                - app/bundles/NotificationBundle/Entity/Notification.php
+                - app/bundles/NotificationBundle/EventListener/CampaignConditionSubscriber.php
+                - app/bundles/PageBundle/EventListener/DetermineWinnerSubscriber.php
+                - app/bundles/PageBundle/Form/Type/PageType.php
+                - app/bundles/PluginBundle/Form/Type/FeatureSettingsType.php
+                - app/bundles/PluginBundle/Form/Type/IntegrationConfigType.php
+                - app/bundles/PluginBundle/Form/Type/KeysType.php
+                - app/bundles/PluginBundle/Helper/IntegrationHelper.php
+                - app/bundles/PluginBundle/Model/IntegrationEntityModel.php
+                - app/bundles/ReportBundle/Form/Type/DynamicFiltersType.php
+                - app/bundles/ReportBundle/Scheduler/Date/DateBuilder.php
+                - app/bundles/ReportBundle/Tests/Event/ReportGeneratorEventTest.php
+                - app/bundles/SmsBundle/Entity/Sms.php
+                - app/bundles/UserBundle/Entity/User.php
+                - app/bundles/UserBundle/Entity/UserRepository.php
+                - app/bundles/UserBundle/Form/Type/PermissionsType.php
+                - app/bundles/UserBundle/Security/Authenticator/Oauth2Authenticator.php
+                - app/bundles/WebhookBundle/Entity/Webhook.php
+                - *.html.php
+                - app/config/
+                - plugins/MauticCrmBundle/Api/SalesforceApi.php
+                - plugins/MauticCrmBundle/Api/SugarcrmApi.php
+                - plugins/MauticCrmBundle/Form/Type/IntegrationCampaignsTaskType.php
+                - plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
+                - plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
+                - plugins/MauticCrmBundle/Integration/ZohoIntegration.php
+                - plugins/MauticFocusBundle/Controller/FocusController.php
+                - plugins/MauticSocialBundle/Command/MauticSocialMonitoringCommand.php
+                - plugins/MauticSocialBundle/Model/PostCountModel.php
+                - plugins/MauticTagManagerBundle/Form/Type/TagEntityType.php
+
+        -
+            path: utils/phpstan/src/Rule/EntityParamConcreteTypeRule.php
+            identifier: phpstanApi.method
+
+        -
+            path: utils/phpstan/src/Rule/EntityCollectionParamMustUseInterfaceRule.php
+            identifier: phpstanApi.method
 
         # final classes mocked in tests make the Class&MockObject intersection unresolvable, the mock works via dg/bypass-finals
         -
@@ -101,33 +172,18 @@ parameters:
                 - method.unresolvableReturnType
             paths:
                 - */Tests/*
-                - */Test/*
+        -
+            identifier: method.unresolvableReturnType
+            path: */Test/*
 
         -
             identifier: argument.type
             path: app/bundles/CoreBundle/Controller/AjaxController.php
 
-        # page translation entity passed where concrete Page expected in builder tokens
+        # shared variant trait is typed against the concrete entity, interface-typed callers trip covariance
         -
             identifier: argument.type
-            path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
-
-        # shared translation/variant traits are typed against the concrete entity, interface-typed callers trip covariance
-        -
-            identifiers:
-                - offsetAssign.valueType
-                - argument.type
-                - assign.propertyType
-            paths:
-                - app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
-                - app/bundles/CoreBundle/Entity/VariantEntityTrait.php
-
-        # event-log API passes a LeadEventLog where the model expects an Event, kept as-is for now
-        -
-            identifiers:
-                - argument.type
-                - method.notFound
-            path: app/bundles/CampaignBundle/Controller/Api/EventLogApiController.php
+            path: app/bundles/CoreBundle/Entity/VariantEntityTrait.php
 
         # ReportGenerator keeps a nullable form factory for its lazy build flow
         -
@@ -154,11 +210,6 @@ parameters:
                 - app/bundles/CoreBundle/Tests/Unit/Helper/SearchStringHelperTest.php
                 - app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
                 - app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-        # Loader interface, concrete routing loader provides import()
-        -
-            identifier: method.notFound
-            path: app/bundles/CoreBundle/Event/RouteEvent.php
 
         # stdClass search-filter tree built by SearchStringHelper
         -
@@ -189,7 +240,6 @@ parameters:
                 - app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
                 - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
                 - app/bundles/SmsBundle/Model/SmsModel.php
-                - plugins/MauticFocusBundle/Model/FocusModel.php
 
         - identifier: missingType.generics
         # controllers - group missing parameter types to fix later
@@ -203,25 +253,7 @@ parameters:
         - '/Variable \$\w+ might not be defined\./'
         # test on purpose
         - '#Call to method PHPUnit\\Framework\\Assert::assertIsClosedResource\(\) with resource will always evaluate to true#'
-        # handle later - ideally with custom interface
-        -
-            message: '#Call to an undefined method Mautic(.*?)Integration::getApiUrl\(\)#'
-            path: plugins/*/Api/*
         - '#Parameter \$integration of method MauticPlugin\\MauticEmailMarketingBundle\\Api\\EmailMarketingApi::__construct\(\) has typehint with deprecated class Mautic\\PluginBundle\\Integration\\AbstractIntegration#'
-        # Doctrine expects concrete types but traits use interfaces with generics
-        -
-            message: '#Property .+::\$translationParent type mapping mismatch: property can contain .+TranslationEntityInterface\|null but database expects#'
-            path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
-            identifier: doctrine.associationType
-        -
-            message: '#Property .+::\$translationChildren type mapping mismatch: property can contain .+but database expects#'
-            path: app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
-            identifier: doctrine.associationType
-
-        -
-            message: '#Property .+::\$variantParent type mapping mismatch: property can contain .+VariantEntityInterface\|null but database expects#'
-            path: app/bundles/CoreBundle/Entity/VariantEntityTrait.php
-            identifier: doctrine.associationType
         # oAuth2 entities redeclare FOS parent properties whose declared types (interfaces, int) differ from the concrete Doctrine mapping
         -
             message: '#Property .+::\$(client|user) type mapping mismatch: property can contain .+but database expects#'
@@ -230,7 +262,6 @@ parameters:
 
         # mocks
         - '#is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject#'
-        - '#Call to an undefined method PHPUnit\\Framework\\MockObject\\MockObject#'
         - '#expects (.*?) PHPUnit\\Framework\\MockObject\\MockObject given#'
 
         # on purpose type check
@@ -348,17 +379,11 @@ parameters:
         # switch statements kept as-is, typed incrementally later
         -
             identifier: symplify.forbiddenSwitch
-        # method_exists() is a legitimate runtime check for optional APIs, other forbidden funcs still flagged
-        -
-            identifier: symplify.forbiddenFuncCall
-            message: '#Function "method_exists\(\)" cannot be used#'
-
         # permission classes mirror the parent constructor signature by design
         -
             identifier: symplify.noConstructorOverride
             paths:
                 - */Permissions/*
-                - app/bundles/CampaignBundle/Tests/Entity/EventFake.php
                 - app/bundles/CoreBundle/Loader/RouteLoader.php
 
         # existing multi-arg dispatch sites, migrated to single-argument dispatch separately
@@ -385,15 +410,10 @@ parameters:
                 - app/bundles/StageBundle/Model/StageModel.php
                 - plugins/MauticFocusBundle/Model/FocusModel.php
 
-        # getRepository() used inside test helper traits to arrange fixtures, acceptable in test scope
+        # base common model fetches its repository directly by design
         -
             identifier: doctrine.noGetRepositoryOutsideService
-            paths:
-                - app/bundles/CampaignBundle/Tests/Campaign/AbstractCampaignTestCase.php
-                - app/bundles/CampaignBundle/Tests/CampaignAuditLogTrait.php
-                - app/bundles/CampaignBundle/Tests/Functional/Campaign/CampaignEntitiesTrait.php
-                - app/bundles/CoreBundle/Model/AbstractCommonModel.php
-                - app/bundles/CoreBundle/Test/MauticMysqlTestCase.php
+            path: app/bundles/CoreBundle/Model/AbstractCommonModel.php
 
     scanDirectories:
         # the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
@@ -424,6 +444,8 @@ rules:
     - Utils\PHPStan\Rule\NoUnusedControllerActionParameterRule
     - Utils\PHPStan\Rule\NoUselessReferenceParamRule
     - Utils\PHPStan\Rule\NoUselessReferenceForeachRule
+    - Utils\PHPStan\Rule\ExplicitNullableParamTypeRule
+    - Utils\PHPStan\Rule\EntityCollectionParamMustUseInterfaceRule
 
     - Symplify\PHPStanRules\Rules\Symfony\CommandMustHaveAsCommandAttributeRule
     - Symplify\PHPStanRules\Rules\Symfony\ConstraintMustHaveAttributeRule
@@ -450,9 +472,20 @@ rules:
     - Utils\PHPStan\Rule\ControllerBigIntIdParamByNameRule
     - Utils\PHPStan\Rule\NoServiceInEventConstructorRule
     - Utils\PHPStan\Rule\SingleArgumentDispatchRule
+    - Utils\PHPStan\Rule\NativeUnionParamMustHaveUnionDocblockRule
+    - Utils\PHPStan\Rule\NoDuplicateParamDocblockRule
 
 services:
     - Utils\PHPStan\ServiceNameUsageResolver
+    - Utils\PHPStan\ServiceTypeDetector
+    -
+        class: Utils\PHPStan\Rule\MoveObjectParamDocblockToNativeTypeRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Utils\PHPStan\Collector\ObjectParamDocblockCollector
+        tags:
+            - phpstan.collector
     -
         class: Utils\PHPStan\Rule\ParamTypeByVariableNameRule
         tags:
@@ -460,6 +493,19 @@ services:
         arguments:
             variableNameToType:
                 parameters: array
+    -
+        class: Utils\PHPStan\Rule\EntityParamMustHaveTypeRule
+        tags:
+            - phpstan.rules.rule
+    -
+        class: Utils\PHPStan\Rule\EntityParamConcreteTypeRule
+        tags:
+            - phpstan.rules.rule
+
+    -
+        class: Utils\PHPStan\Rule\NullableObjectPropertyMustHaveNativeTypeRule
+        tags:
+            - phpstan.rules.rule
     -
         class: Utils\PHPStan\Type\ConnectionQueryBuilderReturnTypeExtension
         tags:

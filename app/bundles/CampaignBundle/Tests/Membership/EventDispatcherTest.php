@@ -11,9 +11,10 @@ use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\EventDispatcher;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class EventDispatcherTest extends \PHPUnit\Framework\TestCase
+final class EventDispatcherTest extends TestCase
 {
     private MockObject&EventDispatcherInterface $eventDispatcher;
 

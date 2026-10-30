@@ -10,11 +10,12 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(BadFormConfigException::class)]
 #[CoversClass(ConfigMapper::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class ConfigMapperTest extends \PHPUnit\Framework\TestCase
+final class ConfigMapperTest extends TestCase
 {
     /**
      * @var array<string, array<string, mixed>>

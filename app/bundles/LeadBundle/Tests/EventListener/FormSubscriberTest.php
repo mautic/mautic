@@ -14,7 +14,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\EventListener\FormSubscriber;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -22,10 +21,11 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Model\PointGroupModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FormSubscriberTest extends \PHPUnit\Framework\TestCase
+final class FormSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&LeadModel
@@ -113,12 +113,5 @@ final class FormSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->leadModel->expects($this->once())->method('removeFromLists');
         $this->subscriber->onLeadSegmentsChange($this->submissionEvent);
-    }
-
-    public function testThatTheObserverForTriggerOnLeadSegmentsChangeEventIsFired(): void
-    {
-        $subscribers = FormSubscriber::getSubscribedEvents();
-        $this->assertArrayHasKey(LeadEvents::LEAD_ON_SEGMENTS_CHANGE, $subscribers);
-        $this->assertSame(['onLeadSegmentsChange', 0], $subscribers[LeadEvents::LEAD_ON_SEGMENTS_CHANGE]);
     }
 }

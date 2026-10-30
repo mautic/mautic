@@ -2,10 +2,12 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Form\Type\RoleListType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
@@ -29,7 +31,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
      *
      * @return bool|\Doctrine\Common\Proxy\Proxy|object|null
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     public function getUserRole()
     {
@@ -122,11 +124,10 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     }
 
     /**
-     * @param Form|\Symfony\Component\Form\FormBuilder $builder
-     * @param array                                    $data
+     * @param Form|FormBuilder $builder
      * @param string                                   $formArea
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add('auto_create_user',

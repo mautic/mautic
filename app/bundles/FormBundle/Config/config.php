@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Mautic\FormBundle\Controller\Api\FormApiController;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Helper\BlockedFreeEmailProvidersHelper;
 
 return [
@@ -11,7 +13,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'forms',
                 'path'            => '/forms',
-                'controller'      => Mautic\FormBundle\Controller\Api\FormApiController::class,
+                'controller'      => FormApiController::class,
             ],
         ],
     ],
@@ -31,7 +33,7 @@ return [
 
     'categories' => [
         'form' => [
-            'class' => Mautic\FormBundle\Entity\Form::class,
+            'class' => Form::class,
         ],
     ],
 

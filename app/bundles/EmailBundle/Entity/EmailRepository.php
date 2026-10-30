@@ -8,11 +8,12 @@ use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\QueryBuilderManipulatorTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -36,10 +37,8 @@ class EmailRepository extends CommonRepository
 
     /**
      * Get an array of do not email.
-     *
-     * @param array $leadIds
      */
-    public function getDoNotEmailList($leadIds = []): array
+    public function getDoNotEmailList(array $leadIds = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id, l.email')
@@ -48,7 +47,7 @@ class EmailRepository extends CommonRepository
             ->where($q->expr()->eq('dnc.channel', $q->expr()->literal('email')))
             ->andWhere($q->expr()->neq('l.email', $q->expr()->literal('')));
 
-        if ($leadIds) {
+        if ($leadIds !== []) {
             $q->andWhere(
                 $q->expr()->in('l.id', ':leadIds')
             )
@@ -712,7 +711,7 @@ class EmailRepository extends CommonRepository
     {
         /** @var Email $parent */
         $parent    = $entity->getVariantParent() ?: $entity;
-        $hasParent = $entity->getVariantParent() instanceof \Mautic\CoreBundle\Entity\VariantEntityInterface;
+        $hasParent = $entity->getVariantParent() instanceof VariantEntityInterface;
 
         if ($hasParent) {
             $entity->setPublishUp($parent->getPublishUp());
@@ -722,7 +721,6 @@ class EmailRepository extends CommonRepository
         } else {
             $variantsToUpdateFromParent = $entity->getVariantChildren()->toArray();
             foreach ($variantsToUpdateFromParent as $variant) {
-                \assert($variant instanceof Email);
                 $variant->setPublishUp($parent->getPublishUp());
                 $variant->setPublishDown($parent->getPublishDown());
                 $variant->setIsPublished($parent->getIsPublished());
@@ -936,7 +934,7 @@ class EmailRepository extends CommonRepository
         $qb   = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateOrmExpression($qb, $this->getTableAlias());
 
-        $qb->innerJoin(Email::class, 'v', Expr\Join::WITH, $qb->expr()->andX(
+        $qb->innerJoin(Email::class, 'v', Join::WITH, $qb->expr()->andX(
                 $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
                 $qb->expr()->eq('v.isPublished', true)
             ))

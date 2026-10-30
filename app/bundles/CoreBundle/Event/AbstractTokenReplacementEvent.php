@@ -29,7 +29,7 @@ abstract class AbstractTokenReplacementEvent extends CommonEvent
      */
     public function __construct(
         array|string|null|Lead $content,
-        protected \Mautic\LeadBundle\Entity\Lead|array|null $lead = null,
+        protected Lead|array|null $lead = null,
         protected array $clickthrough = [],
         protected $passthrough = null,
         private readonly bool $internalSend = false,
@@ -54,7 +54,7 @@ abstract class AbstractTokenReplacementEvent extends CommonEvent
     /**
      * @return Lead|mixed[]|null
      */
-    public function getLead(): \Mautic\LeadBundle\Entity\Lead|array|null
+    public function getLead(): Lead|array|null
     {
         return $this->lead;
     }

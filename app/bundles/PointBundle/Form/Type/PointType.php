@@ -35,6 +35,9 @@ final class PointType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
+        /** @var Point $point */
+        $point = $options['data'];
+
         $builder->add(
             'name',
             TextType::class,
@@ -85,11 +88,11 @@ final class PointType extends AbstractType
             ]
         );
 
-        $type = (!empty($options['actionType'])) ? $options['actionType'] : $options['data']->getType();
+        $type = (!empty($options['actionType'])) ? $options['actionType'] : $point->getType();
 
         if ($type && !empty($options['pointActions']['actions'][$type]['formType'])) {
             $formType   = $options['pointActions']['actions'][$type]['formType'];
-            $properties = ($options['data']) ? $options['data']->getProperties() : [];
+            $properties = ($options['data']) ? $point->getProperties() : [];
             $builder->add(
                 'properties',
                 $formType,
@@ -115,10 +118,10 @@ final class PointType extends AbstractType
             $readonly = !$this->security->hasEntityAccess(
                 'point:points:publishown',
                 'point:points:publishother',
-                $options['data']->getCreatedBy()
+                $point->getCreatedBy()
             );
 
-            $data = $options['data']->isPublished(false);
+            $data = $point->isPublished(false);
         } elseif (!$this->security->isGranted('point:points:publishown')) {
             $readonly = true;
             $data     = false;
@@ -143,7 +146,7 @@ final class PointType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'     => 'mautic.point.form.repeat',
-                'data'      => $options['data']->getRepeatable() ?: false,
+                'data'      => $point->getRepeatable() ?: false,
                 'attr'      => [
                     'tooltip' => 'mautic.point.form.repeat.help',
                 ],

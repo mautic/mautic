@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Model;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\LeadBundle\Entity\Lead;
@@ -45,7 +46,7 @@ final class PointGroupModel extends CommonFormModel implements GlobalSearchInter
     /**
      * @param array<mixed> $args
      *
-     * @return array<int, Group>|\Doctrine\ORM\Tools\Pagination\Paginator<Group>
+     * @return array<int, Group>|Paginator<Group>
      */
     public function getEntities(array $args = []): iterable
     {
@@ -58,13 +59,13 @@ final class PointGroupModel extends CommonFormModel implements GlobalSearchInter
     }
 
     /**
-     * @param object               $entity
-     * @param string|null          $action
-     * @param array<string,string> $options
+     * @param Group|array<string, mixed> $entity
+     * @param string|null                $action
+     * @param array<string,string>       $options
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Group) {
             throw new MethodNotAllowedHttpException(['Group']);
@@ -92,9 +93,11 @@ final class PointGroupModel extends CommonFormModel implements GlobalSearchInter
     }
 
     /**
+     * @param Group $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Group) {
             throw new MethodNotAllowedHttpException(['Group']);

@@ -331,7 +331,7 @@ abstract class AbstractPermissions
     /**
      * Adds the standard permission set of view, edit, create, delete, publish and full.
      *
-     * @param array $permissionNames
+     * @param string|array $permissionNames
      */
     protected function addStandardPermissions($permissionNames, bool $includePublish = true)
     {
@@ -358,10 +358,9 @@ abstract class AbstractPermissions
      *
      * @param string               $bundle
      * @param string               $level
-     * @param FormBuilderInterface $builder
      * @param array<string, mixed> $data
      */
-    protected function addStandardFormFields($bundle, $level, $builder, array $data, bool $includePublish = true)
+    protected function addStandardFormFields($bundle, $level, FormBuilderInterface $builder, array $data, bool $includePublish = true)
     {
         $choices = [
             'mautic.core.permissions.view'   => 'view',
@@ -404,7 +403,7 @@ abstract class AbstractPermissions
     /**
      * Add a single full permission.
      *
-     * @param array $permissionNames
+     * @param string|array $permissionNames
      */
     protected function addManagePermission($permissionNames)
     {
@@ -424,10 +423,9 @@ abstract class AbstractPermissions
      *
      * @param string               $bundle
      * @param string               $level
-     * @param FormBuilderInterface $builder
      * @param array<string, mixed> $data
      */
-    protected function addManageFormFields($bundle, $level, $builder, array $data)
+    protected function addManageFormFields($bundle, $level, FormBuilderInterface $builder, array $data)
     {
         $choices = [
             'mautic.core.permissions.manage' => 'manage',

@@ -12,9 +12,10 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ResponsesTest extends \PHPUnit\Framework\TestCase
+final class ResponsesTest extends TestCase
 {
     public function testExtractingResponsesFromLog(): void
     {

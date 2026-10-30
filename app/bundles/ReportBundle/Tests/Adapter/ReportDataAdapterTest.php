@@ -10,8 +10,9 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Tests\Fixtures;
+use PHPUnit\Framework\TestCase;
 
-final class ReportDataAdapterTest extends \PHPUnit\Framework\TestCase
+final class ReportDataAdapterTest extends TestCase
 {
     public function testNoEmailsProvided(): void
     {

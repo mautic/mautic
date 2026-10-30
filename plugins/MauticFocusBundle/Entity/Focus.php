@@ -407,7 +407,7 @@ class Focus extends FormEntity implements UuidInterface
     /**
      * @param array<mixed> $properties
      */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -421,10 +421,7 @@ class Focus extends FormEntity implements UuidInterface
         return $this->utmTags;
     }
 
-    /**
-     * @param array $utmTags
-     */
-    public function setUtmTags($utmTags): static
+    public function setUtmTags(array $utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;

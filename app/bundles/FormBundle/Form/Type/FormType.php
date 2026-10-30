@@ -39,6 +39,9 @@ final class FormType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('form.form', $options));
 
+        /** @var Form $form */
+        $form = $options['data'];
+
         // details
         $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
@@ -99,14 +102,14 @@ final class FormType extends AbstractType
             ],
         ]);
 
-        if (!empty($options['data']) && $options['data']->getId()) {
+        if (!empty($options['data']) && $form->getId()) {
             $readonly = !$this->security->hasEntityAccess(
                 'form:forms:publishown',
                 'form:forms:publishother',
-                $options['data']->getCreatedBy()
+                $form->getCreatedBy()
             );
 
-            $data = $options['data']->isPublished(false);
+            $data = $form->isPublished(false);
         } elseif (!$this->security->isGranted('form:forms:publishown')) {
             $readonly = true;
             $data     = false;
@@ -137,7 +140,7 @@ final class FormType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.form.form.no_index',
-                'data'  => $options['data']->getNoIndex(),
+                'data'  => $form->getNoIndex(),
             ]
         );
 
@@ -151,18 +154,18 @@ final class FormType extends AbstractType
                     'tooltip'     => 'mautic.form.form.progressive_profiling_limit.max_fields.tooltip',
                     'placeholder' => 'mautic.form.form.progressive_profiling_limit_unlimited',
                 ],
-                'data'  => $options['data']->getProgressiveProfilingLimit() ?: '',
+                'data'  => $form->getProgressiveProfilingLimit() ?: '',
             ]
         );
 
         // Render style for new form by default
-        if (null === $options['data']->getId()) {
-            $options['data']->setRenderStyle(true);
+        if (null === $form->getId()) {
+            $form->setRenderStyle(true);
         }
 
         $builder->add('renderStyle', YesNoButtonGroupType::class, [
             'label'      => 'mautic.form.form.renderstyle',
-            'data'       => $options['data']->getRenderStyle() ?? true,
+            'data'       => $form->getRenderStyle() ?? true,
             'attr'       => [
                 'tooltip' => 'mautic.form.form.renderstyle.tooltip',
             ],
@@ -205,7 +208,7 @@ final class FormType extends AbstractType
             'placeholder' => false,
         ]);
 
-        $postAction = (isset($options['data'])) ? $options['data']->getPostAction() : '';
+        $postAction = (isset($options['data'])) ? $form->getPostAction() : '';
         $required   = in_array($postAction, ['redirect', 'message', 'hideform']);
         $builder->add('postActionProperty', TextType::class, [
             'label'      => 'mautic.form.form.postactionproperty',

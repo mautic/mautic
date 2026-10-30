@@ -7,30 +7,32 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\MaxMindDoNotSellDownloadHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class MaxMindDoNotSellDownloadHelperTest extends \PHPUnit\Framework\TestCase
+final class MaxMindDoNotSellDownloadHelperTest extends TestCase
 {
     public const string TEMP_TEST_FILE = './DoNotSellTest.json';
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LoggerInterface
+     * @var MockObject&LoggerInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $loggerMock;
+    private MockObject $loggerMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&HttpClientInterface
+     * @var MockObject&HttpClientInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $httpClientMock;
+    private MockObject $httpClientMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $coreParametersHelperMock;
+    private MockObject $coreParametersHelperMock;
 
     protected function setUp(): void
     {

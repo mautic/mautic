@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -40,6 +41,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
@@ -109,9 +111,11 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @param Report|array<string, mixed> $entity
+     *
+     * @throws NotFoundHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -145,9 +149,11 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Report $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -456,16 +462,23 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
 
             $options['dateTo'] ??= $now;
 
+            /** @var \DateTime $dateFrom */
+            $dateFrom = $options['dateFrom'];
+            /** @var \DateTime $dateTo */
+            $dateTo = $options['dateTo'];
+
             // Set time to the last second of the "to date" date
-            if ($now->format('Y-m-d') === $options['dateTo']->format('Y-m-d')) {
-                $options['dateTo'] = $now->setTime(23, 59, 59);
+            if ($now->format('Y-m-d') === $dateTo->format('Y-m-d')) {
+                $dateTo = $now->setTime(23, 59, 59);
             } else {
-                $options['dateTo']->setTime(23, 59, 59);
+                $dateTo->setTime(23, 59, 59);
             }
 
             // Convert date ranges to UTC for fetching tabular data
-            $options['dateFrom']->setTimeZone(new \DateTimeZone('UTC'));
-            $options['dateTo']->setTimeZone(new \DateTimeZone('UTC'));
+            $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
+            $dateTo->setTimeZone(new \DateTimeZone('UTC'));
+
+            $options['dateTo'] = $dateTo;
         }
 
         $paginate        = !empty($options['paginate']);
@@ -890,7 +903,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @return \Doctrine\DBAL\Connection
+     * @return Connection
      */
     private function getConnection()
     {

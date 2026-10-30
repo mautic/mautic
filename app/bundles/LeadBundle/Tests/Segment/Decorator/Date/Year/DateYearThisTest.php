@@ -11,9 +11,10 @@ use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\Date\Year\DateYearThis;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DateYearThis::class)]
-final class DateYearThisTest extends \PHPUnit\Framework\TestCase
+final class DateYearThisTest extends TestCase
 {
     public function testGetOperatorBetween(): void
     {

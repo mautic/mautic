@@ -3,6 +3,8 @@
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -52,8 +54,8 @@ final class VideoHitRepository extends CommonRepository
      *
      * @param array<string, mixed> $options
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getLeadHits(int|string $leadId, array $options = []): array
     {
@@ -72,11 +74,9 @@ final class VideoHitRepository extends CommonRepository
     /**
      * Count stats from hit times.
      *
-     * @param array $times
-     *
      * @return array<string, mixed>
      */
-    public function countStats($times): array
+    public function countStats(array $times): array
     {
         return [
             'sum'     => array_sum($times),
@@ -90,8 +90,8 @@ final class VideoHitRepository extends CommonRepository
     /**
      * Get list of referers ordered by it's count.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getReferers(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {

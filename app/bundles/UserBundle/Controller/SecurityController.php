@@ -18,7 +18,9 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -69,17 +71,17 @@ final class SecurityController extends CommonController implements EventSubscrib
 
                 return $this->forward('Mautic\UserBundle\Controller\PublicController::passwordResetAction');
             }
-            if ($error instanceof Exception\BadCredentialsException) {
+            if ($error instanceof BadCredentialsException) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
-            } elseif ($error instanceof Exception\DisabledException) {
+            } elseif ($error instanceof DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
-            } elseif ($error instanceof Exception\AuthenticationException) {
+            } elseif ($error instanceof AuthenticationException) {
                 $msg = $error->getMessageKey();
             } else {
                 $msg = $error->getMessage();
             }
 
-            $messageVars = $error instanceof Exception\AuthenticationException ? $error->getMessageData() : [];
+            $messageVars = $error instanceof AuthenticationException ? $error->getMessageData() : [];
             $this->addFlashMessage($msg, $messageVars, FlashBag::LEVEL_ERROR, null);
         }
         $request->query->set('tmpl', 'login');

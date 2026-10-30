@@ -2,7 +2,8 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -37,14 +38,12 @@ final class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param ContactSegmentFilters $segmentFilters
-     *
      * @throws SegmentQueryException
      */
-    public function assembleContactsSegmentQueryBuilder(int $segmentId, $segmentFilters, bool $changeAlias = false): QueryBuilder
+    public function assembleContactsSegmentQueryBuilder(int $segmentId, ContactSegmentFilters $segmentFilters, bool $changeAlias = false): QueryBuilder
     {
         $connection = $this->entityManager->getConnection();
-        if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
+        if ($connection instanceof PrimaryReadReplicaConnection) {
             // Prefer a replica connection if available.
             $connection->ensureConnectedToReplica();
         }
@@ -87,12 +86,12 @@ final class ContactSegmentQueryBuilder
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function wrapInCount(QueryBuilder $qb): QueryBuilder
     {
         $connection = $this->entityManager->getConnection();
-        if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
+        if ($connection instanceof PrimaryReadReplicaConnection) {
             // Prefer a replica connection if available.
             $connection->ensureConnectedToReplica();
         }

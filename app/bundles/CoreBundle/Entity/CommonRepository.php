@@ -11,10 +11,16 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Proxy\DefaultProxyClassNameResolver;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Expr\Andx;
+use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Expr\Composite;
+use Doctrine\ORM\Query\Expr\Func;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\Expr\Orx;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
@@ -73,9 +79,8 @@ abstract class CommonRepository extends ServiceEntityRepository
 
     /**
      * @param string $alias
-     * @param object $entity
      */
-    public function checkUniqueAlias($alias, $entity = null): int
+    public function checkUniqueAlias($alias, ?object $entity = null): int
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as aliascount')
@@ -136,7 +141,7 @@ abstract class CommonRepository extends ServiceEntityRepository
     /**
      * @param class-string $className
      *
-     * @throws \Doctrine\ORM\Mapping\MappingException
+     * @throws MappingException
      * @throws \Exception
      */
     public function createFromArray(string $className, array &$data): object
@@ -171,10 +176,8 @@ abstract class CommonRepository extends ServiceEntityRepository
 
     /**
      * Delete an array of entities.
-     *
-     * @param array $entities
      */
-    public function deleteEntities($entities): void
+    public function deleteEntities(array $entities): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -348,6 +351,7 @@ abstract class CommonRepository extends ServiceEntityRepository
         $alias = $this->getTableAlias();
 
         if (isset($args['qb'])) {
+            /** @var QueryBuilder $q */
             $q = $args['qb'];
         } else {
             $q = $this->getEntityManager()
@@ -812,7 +816,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      *
      * @param TObject[]|ArrayCollection<int, TObject> $entities
      */
-    public function saveEntities($entities): void
+    public function saveEntities(iterable $entities): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -1062,7 +1066,7 @@ abstract class CommonRepository extends ServiceEntityRepository
     /**
      * Unique handling for $filter->not since dbal does not support the not() function with it's QueryBuilder.
      *
-     * @return array<int, Query\Expr\Orx|CompositeExpression|Query\Expr\Andx|non-empty-array<string, mixed>>
+     * @return array<int, Orx|CompositeExpression|Andx|non-empty-array<string, mixed>>
      */
     protected function addDbalCatchAllWhereClause(QueryBuilder|DbalQueryBuilder &$q, \stdClass $filter, array $columns): array
     {
@@ -1090,7 +1094,7 @@ abstract class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<int, Query\Expr\Func|string|mixed[]|bool>
+     * @return array<int, Func|string|mixed[]|bool>
      */
     protected function addSearchCommandWhereClause(QueryBuilder|TrackingQueryBuilder $queryBuilder, \stdClass $filter): array
     {
@@ -1111,7 +1115,7 @@ abstract class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<int, CompositeExpression|Query\Expr\Orx|Query\Expr\Andx|Query\Expr\Func|non-empty-array<string, mixed>>
+     * @return array<int, CompositeExpression|Orx|Andx|Func|non-empty-array<string, mixed>>
      */
     protected function addStandardCatchAllWhereClause(QueryBuilder|TrackingQueryBuilder $q, \stdClass $filter, array $columns): array
     {
@@ -1153,7 +1157,7 @@ abstract class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<int, Query\Expr\Func|Query\Expr\Comparison|Query\Expr\Orx|CompositeExpression|string|array<string, mixed>|bool>
+     * @return array<int, Func|Comparison|Orx|CompositeExpression|string|array<string, mixed>|bool>
      */
     protected function addStandardSearchCommandWhereClause(QueryBuilder|TrackingQueryBuilder $queryBuilder, \stdClass $filter): array
     {
@@ -1197,7 +1201,7 @@ abstract class CommonRepository extends ServiceEntityRepository
                 $joins     = $queryBuilder->getDQLPart('join');
                 $catPrefix = false;
                 foreach ($joins as $joinStatements) {
-                    /** @var Query\Expr\Join $join */
+                    /** @var Join $join */
                     foreach ($joinStatements as $join) {
                         if (str_contains($join->getJoin(), '.category')) {
                             $catPrefix = $join->getAlias();
@@ -1255,7 +1259,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      */
     protected function appendExpression(array &$parts, $expr): void
     {
-        if ($expr instanceof CompositeExpression || $expr instanceof Query\Expr\Composite) {
+        if ($expr instanceof CompositeExpression || $expr instanceof Composite) {
             if ($expr->count()) {
                 $parts[] = $expr;
             }
@@ -1272,7 +1276,7 @@ abstract class CommonRepository extends ServiceEntityRepository
      *
      * @param array<int, mixed> $parts
      */
-    protected function createCompositeExpression(QueryBuilder|DbalQueryBuilder $qb, string $type, array $parts): null|\Doctrine\ORM\Query\Expr\Orx|\Doctrine\ORM\Query\Expr\Andx|\Doctrine\DBAL\Query\Expression\CompositeExpression
+    protected function createCompositeExpression(QueryBuilder|DbalQueryBuilder $qb, string $type, array $parts): null|Orx|Andx|CompositeExpression
     {
         if ([] === $parts) {
             return null;
@@ -1280,7 +1284,7 @@ abstract class CommonRepository extends ServiceEntityRepository
 
         $expr = $qb->expr();
 
-        if ($expr instanceof Query\Expr) {
+        if ($expr instanceof Expr) {
             return 'or' === $type ? $expr->orX(...$parts) : $expr->andX(...$parts);
         }
 
@@ -1534,7 +1538,7 @@ abstract class CommonRepository extends ServiceEntityRepository
                     if (is_array($criteria)) {
                         // defined columns with keys of column, expr, value
                         foreach ($criteria as $criterion) {
-                            if ($criterion instanceof Query\Expr || $criterion instanceof CompositeExpression) {
+                            if ($criterion instanceof Expr || $criterion instanceof CompositeExpression) {
                                 $queryExpressionParts[] = $criterion;
 
                                 if (isset($criterion->parameters) && is_array($criterion->parameters)) {
@@ -1746,7 +1750,7 @@ abstract class CommonRepository extends ServiceEntityRepository
         return [];
     }
 
-    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder $queryBuilder, \stdClass $filter): Query\Expr\Func|string|false
+    protected function getIdsExpr(QueryBuilder|DbalQueryBuilder $queryBuilder, \stdClass $filter): Func|string|false
     {
         if ($ids = array_map(intval(...), explode(',', $filter->string))) {
             $parameterName = $this->generateRandomParameterName();

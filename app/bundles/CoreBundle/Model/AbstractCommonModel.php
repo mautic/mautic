@@ -83,7 +83,7 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return T[]|array<int,mixed>|iterable<T>|Paginator<T>|SimplePaginator<T>
+     * @return iterable<T>|Paginator<T>|SimplePaginator<T>
      */
     public function getEntities(array $args = []): iterable
     {
@@ -140,16 +140,14 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
     }
 
     /**
-     * @param array $clickthrough
-     *
      * @return string
      */
-    public function buildUrl(string $route, array $routeParams = [], bool $absolute = true, $clickthrough = [])
+    public function buildUrl(string $route, array $routeParams = [], bool $absolute = true, array $clickthrough = [])
     {
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate($route, $routeParams, $referenceType);
 
-        return $url.((!empty($clickthrough)) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '');
+        return $url.(($clickthrough !== []) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '');
     }
 
     /**

@@ -411,7 +411,7 @@ final class PublicController extends AbstractFormController
 
         $lead          = $contactTracker->getContact();
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
-        $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+        $trackingId    = ($trackedDevice?->getTrackingId());
 
         $sessionValue   = $trackingHelper->getCacheItem(true);
 
@@ -570,7 +570,7 @@ final class PublicController extends AbstractFormController
         if ($this->security->isAnonymous()) {
             $lead          = $contactTracker->getContact();
             $trackedDevice = $trackedDeviceService->getTrackedDevice();
-            $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+            $trackingId    = ($trackedDevice?->getTrackingId());
             $data          = [
                 'id'        => ($lead) ? $lead->getId() : null,
                 'sid'       => $trackingId,

@@ -16,10 +16,11 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 
 #[AllowMockObjectsWithoutExpectations]
-final class NotificationHelperTest extends \PHPUnit\Framework\TestCase
+final class NotificationHelperTest extends TestCase
 {
     /**
      * @var MockObject&UserModel

@@ -9,6 +9,7 @@ use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -73,13 +74,10 @@ abstract class AbstractFormController extends CommonController
     /**
      * Returns view to index with a locked out message.
      *
-     * @param array  $postActionVars
-     * @param object $entity
      * @param bool   $batch          Flag if a batch action is being performed
-     *
-     * @return ($batch is true ? array : \Symfony\Component\HttpFoundation\JsonResponse|RedirectResponse)
+     * @return ($batch is true ? array : JsonResponse|RedirectResponse)
      */
-    protected function isLocked($postActionVars, $entity, string $modelName, bool $batch = false)
+    protected function isLocked(array $postActionVars, object $entity, string $modelName, bool $batch = false)
     {
         $date                   = $entity->getCheckedOut();
         $postActionVars         = $this->refererPostActionVars($postActionVars);
@@ -185,11 +183,9 @@ abstract class AbstractFormController extends CommonController
      * Decide if current user can edit or can edit specific entity if entity is provided
      * For BC, if permissionBase property is not set, it allow to edit only to administrators.
      *
-     * @param object $entity
-     *
      * @return bool
      */
-    protected function canEdit($entity = null)
+    protected function canEdit(?object $entity = null)
     {
         if ($this->permissionBase) {
             $permissionBase = $this->permissionBase;

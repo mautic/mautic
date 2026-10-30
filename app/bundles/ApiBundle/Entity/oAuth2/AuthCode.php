@@ -6,7 +6,9 @@ namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\AuthCode as BaseAuthCode;
+use FOS\OAuthServerBundle\Model\ClientInterface;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'oauth2_authcodes')]
@@ -15,10 +17,10 @@ class AuthCode extends BaseAuthCode
 {
     #[ORM\ManyToOne(targetEntity: Client::class)]
     #[ORM\JoinColumn(name: 'client_id', nullable: false, onDelete: 'CASCADE')]
-    protected \FOS\OAuthServerBundle\Model\ClientInterface $client;
+    protected ClientInterface $client;
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', nullable: false, onDelete: 'CASCADE')]
-    protected ?\Symfony\Component\Security\Core\User\UserInterface $user = null;
+    protected ?UserInterface $user = null;
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
     #[ORM\GeneratedValue]

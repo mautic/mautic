@@ -7,9 +7,10 @@ namespace Mautic\ConfigBundle\Tests\Mapper\Helper;
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(RestrictionHelper::class)]
-final class RestrictionHelperTest extends \PHPUnit\Framework\TestCase
+final class RestrictionHelperTest extends TestCase
 {
     /**
      * @var array<int|string, mixed>

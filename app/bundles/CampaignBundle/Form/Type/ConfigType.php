@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -7,6 +9,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 use Symfony\Component\Validator\Constraints\Range;
@@ -133,6 +136,7 @@ final class ConfigType extends AbstractType
                     new Range(min: 0, max: 23),
                     new Callback(
                         function ($hourEnd, ExecutionContextInterface $context): void {
+                            /** @var FormInterface $root */
                             $root = $context->getRoot();
                             $data      = $root->getData();
                             $hourStart = $data['campaignconfig']['peak_interaction_timer_best_default_hour_start'] ?? null;

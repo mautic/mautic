@@ -8,8 +8,9 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
-final class ChannelSubscriptionChangeTest extends \PHPUnit\Framework\TestCase
+final class ChannelSubscriptionChangeTest extends TestCase
 {
     #[TestDox('Tests that getters returns same values as the contstruct')]
     public function testGetterReturnConstruct(): void

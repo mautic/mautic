@@ -493,10 +493,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param FormBuilder $builder
-     * @param array       $data
      * @param string      $formArea
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -657,9 +656,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
     /**
      * @param Lead  $lead
-     * @param array $config
      */
-    public function pushLead($lead, $config = []): array|false
+    public function pushLead($lead, array $config = []): array|false
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -753,15 +751,11 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return false;
     }
 
-    /**
-     * @param Company $company
-     * @param array   $config
-     */
-    public function pushCompany($company, $config = []): array|false
+    public function pushCompany(Company $company, array $config = []): array|false
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
-        if (empty($config['companyFields']) || !$company) {
+        if (empty($config['companyFields'])) {
             return [];
         }
         $object     = 'company';
@@ -1265,10 +1259,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         return [$totalUpdated, $totalCreated, $totalErrors, $totalIgnored];
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function getSalesforceLeadId($lead): array
+    public function getSalesforceLeadId(Lead $lead): array
     {
         $config                = $this->mergeConfigToFeatureSettings([]);
 
@@ -1704,7 +1695,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         array &$mauticData,
         array $objectFields,
         $object,
-        array &$entity,
+        object|array &$entity,
         $objectId = null,
         $sfRecord = null,
     ): array {

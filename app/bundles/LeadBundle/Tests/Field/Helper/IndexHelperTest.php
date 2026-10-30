@@ -11,8 +11,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Field\Helper\IndexHelper;
+use PHPUnit\Framework\TestCase;
 
-final class IndexHelperTest extends \PHPUnit\Framework\TestCase
+final class IndexHelperTest extends TestCase
 {
     public const string COLUMN_NAME_KEY = 'Column_name';
 

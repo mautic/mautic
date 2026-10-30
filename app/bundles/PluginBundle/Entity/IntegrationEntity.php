@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
@@ -59,15 +58,7 @@ class IntegrationEntity extends CommonEntity
      */
     private $internalEntityId;
 
-    /**
-     * @var array
-     */
-    private $internal;
-
-    public function __construct()
-    {
-        $this->internal = new ArrayCollection();
-    }
+    private ?array $internal = [];
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
@@ -238,18 +229,12 @@ class IntegrationEntity extends CommonEntity
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getInternal()
+    public function getInternal(): ?array
     {
         return $this->internal;
     }
 
-    /**
-     * @param array $internal
-     */
-    public function setInternal($internal): static
+    public function setInternal(?array $internal): static
     {
         $this->internal = $internal;
 

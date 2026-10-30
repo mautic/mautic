@@ -6,8 +6,9 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class ArrayHelperTest extends \PHPUnit\Framework\TestCase
+final class ArrayHelperTest extends TestCase
 {
     public function testGetValue(): void
     {

@@ -8,8 +8,9 @@ use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
 use Mautic\FormBundle\Collector\MappedObjectCollector;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
-final class MappedObjectCollectorTest extends \PHPUnit\Framework\TestCase
+final class MappedObjectCollectorTest extends TestCase
 {
     public function testBuildCollectionForNoObject(): void
     {

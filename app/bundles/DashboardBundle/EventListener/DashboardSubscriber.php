@@ -7,6 +7,7 @@ use Mautic\DashboardBundle\Event\PreLoadWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DashboardSubscriber implements EventSubscriberInterface
@@ -45,7 +46,7 @@ class DashboardSubscriber implements EventSubscriberInterface
     /**
      * Generates widget preview without data.
      *
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function onWidgetDetailPreLoad(WidgetDetailEvent $event): void
     {

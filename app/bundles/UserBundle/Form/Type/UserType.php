@@ -4,6 +4,7 @@ namespace Mautic\UserBundle\Form\Type;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -41,6 +42,9 @@ final class UserType extends AbstractType
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['signature' => 'html', 'email' => 'email']));
         $builder->addEventSubscriber(new FormExitSubscriber('user.user', $options));
+
+        /** @var User $user */
+        $user = $options['data'];
 
         $builder->add(
             'username',
@@ -104,7 +108,7 @@ final class UserType extends AbstractType
             ]
         );
 
-        $existing    = (!empty($options['data']) && $options['data']->getId());
+        $existing    = (!empty($options['data']) && $user->getId());
         $placeholder = ($existing) ?
             $this->translator->trans('mautic.user.user.form.passwordplaceholder') : '';
         $required = !$existing;
@@ -185,10 +189,10 @@ final class UserType extends AbstractType
         );
 
         $defaultSignature = '';
-        if (isset($options['data']) && null === $options['data']->getSignature()) {
+        if (isset($options['data']) && null === $user->getSignature()) {
             $defaultSignature = $this->translator->trans('mautic.email.default.signature', ['%from_name%' => '|FROM_NAME|']);
         } elseif (isset($options['data'])) {
-            $defaultSignature = $options['data']->getSignature();
+            $defaultSignature = $user->getSignature();
         }
 
         $builder->add(
@@ -219,7 +223,7 @@ final class UserType extends AbstractType
                         ],
                         'class'         => Role::class,
                         'choice_label'  => 'name',
-                        'query_builder' => fn (EntityRepository $er): \Doctrine\ORM\QueryBuilder => $er->createQueryBuilder('r')
+                        'query_builder' => fn (EntityRepository $er): QueryBuilder => $er->createQueryBuilder('r')
                             ->where('r.isPublished = true')
                             ->orderBy('r.name', Order::Ascending->value),
                     ]

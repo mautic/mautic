@@ -7,8 +7,9 @@ namespace Mautic\LeadBundle\Tests\Helper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
+use PHPUnit\Framework\TestCase;
 
-final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
+final class IdentifyCompanyHelperTest extends TestCase
 {
     public function testFindCompanyByName(): void
     {

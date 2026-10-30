@@ -124,6 +124,9 @@ final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
             ->method('populateMauticLeadData')
             ->willReturn($data);
 
+        $integration->method('mergeConfigToFeatureSettings')
+            ->willReturn([]);
+
         $company = $integration->getMauticCompany($data);
         $this->assertInstanceOf(Company::class, $company);
 
@@ -154,6 +157,6 @@ final class CrmAbstractIntegrationTest extends AbstractIntegrationTestCase
         $this->assertFalse($result);
 
         $result = $methodLimitString->invokeArgs($integration, [[1, 2, 3]]);
-        $this->assertSame($result, [1, 2, 3]);
+        $this->assertSame([1, 2, 3], $result);
     }
 }

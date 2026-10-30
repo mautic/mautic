@@ -27,6 +27,7 @@ use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -36,7 +37,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
+final class TokenSubscriberTest extends TestCase
 {
     public function testDynamicContentCustomTokens(): void
     {
@@ -177,11 +178,11 @@ CONTENT
 
         $eventTokens = $event->getTokens(false);
         $this->assertEquals(
-            $eventTokens,
             [
                 '{dynamiccontent="Dynamic Content 1"}' => 'Default Dynamic Content',
                 '{dynamiccontent="Dynamic Content 2"}' => 'DEC value',
-            ]
+            ],
+            $eventTokens
         );
         $mailHelper->addTokens($eventTokens);
         $mailerTokens = $mailHelper->getTokens();

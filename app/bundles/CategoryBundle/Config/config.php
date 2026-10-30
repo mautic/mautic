@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Mautic\CategoryBundle\Controller\Api\CategoryApiController;
+
 return [
     'routes' => [
         'api' => [
@@ -9,7 +11,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'categories',
                 'path'            => '/categories',
-                'controller'      => Mautic\CategoryBundle\Controller\Api\CategoryApiController::class,
+                'controller'      => CategoryApiController::class,
             ],
         ],
     ],

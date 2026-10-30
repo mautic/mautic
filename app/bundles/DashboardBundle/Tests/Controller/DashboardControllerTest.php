@@ -18,6 +18,7 @@ use Mautic\DashboardBundle\Model\DashboardModel;
 use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -30,7 +31,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
+final class DashboardControllerTest extends TestCase
 {
     private Request $request;
 

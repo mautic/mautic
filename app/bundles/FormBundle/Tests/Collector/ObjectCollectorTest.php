@@ -8,9 +8,10 @@ use Mautic\FormBundle\Collection\ObjectCollection;
 use Mautic\FormBundle\Collector\ObjectCollector;
 use Mautic\FormBundle\Event\ObjectCollectEvent;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-final class ObjectCollectorTest extends \PHPUnit\Framework\TestCase
+final class ObjectCollectorTest extends TestCase
 {
     public function testBuildCollectionForNoObject(): void
     {

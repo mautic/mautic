@@ -12,11 +12,12 @@ use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingService;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ContactTrackingServiceTest extends \PHPUnit\Framework\TestCase
+final class ContactTrackingServiceTest extends TestCase
 {
     /**
      * @var MockObject&CookieHelper

@@ -5,6 +5,8 @@ namespace Mautic\PageBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -96,7 +98,7 @@ final class HitRepository extends CommonRepository
      *
      * @param int $code
      */
-    public function getEmailClickthroughHitCount($emailIds, ?\DateTime $fromDate = null, $code = 200, ?\DateTime $toDate = null): array
+    public function getEmailClickthroughHitCount($emailIds, ?\DateTimeInterface $fromDate = null, $code = 200, ?\DateTime $toDate = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -194,7 +196,7 @@ final class HitRepository extends CommonRepository
      *     second_to_last?: int|null
      * } $options
      */
-    public function getLatestHit($options): ?\DateTime
+    public function getLatestHit(array $options): ?\DateTime
     {
         $sq = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $sq->select('h.date_hit')
@@ -413,11 +415,9 @@ final class HitRepository extends CommonRepository
     /**
      * Count stats from hit times.
      *
-     * @param array $times
-     *
      * @return array<string, mixed>
      */
-    public function countStats($times): array
+    public function countStats(array $times): array
     {
         return [
             'sum'     => array_sum($times),
@@ -447,8 +447,8 @@ final class HitRepository extends CommonRepository
     /**
      * Get list of referers ordered by it's count.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getReferers(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
@@ -464,8 +464,8 @@ final class HitRepository extends CommonRepository
     /**
      * Get list of referers ordered by it's count.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getMostVisited(QueryBuilder $query, int $limit = 10, int $offset = 0, string $column = 'p.hits', string $as = ''): array
     {

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\PageBundle\Model\PageModel;
+use Mautic\PageBundle\Security\Permissions\PagePermissions;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {
@@ -20,6 +22,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('Mautic\\PageBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->get(Mautic\PageBundle\Model\PageModel::class)->call('setCatInUrl', ['%mautic.cat_in_page_url%']);
-    $services->set(Mautic\PageBundle\Security\Permissions\PagePermissions::class);
+    $services->get(PageModel::class)->call('setCatInUrl', ['%mautic.cat_in_page_url%']);
+    $services->set(PagePermissions::class);
 };

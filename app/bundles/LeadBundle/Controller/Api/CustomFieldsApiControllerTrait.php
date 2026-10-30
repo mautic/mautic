@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\Lead;
@@ -112,7 +113,7 @@ trait CustomFieldsApiControllerTrait
 
                 // Some requests don't seem to have properties unserialized by default (even in M2)
                 $fieldDefinition['properties'] ??= [];
-                $properties = is_string($fieldDefinition['properties']) ? \Mautic\CoreBundle\Helper\Serializer::decode($fieldDefinition['properties']) : $fieldDefinition['properties'];
+                $properties = is_string($fieldDefinition['properties']) ? Serializer::decode($fieldDefinition['properties']) : $fieldDefinition['properties'];
 
                 $fields[$group][$field]['value']           = empty($properties['scale']) ? (int) $fields[$group][$field]['value']
                     : (float) $fields[$group][$field]['value'];
@@ -175,7 +176,7 @@ trait CustomFieldsApiControllerTrait
      *
      * @return bool|void
      */
-    protected function setCustomFieldValues($entity, $form, array $parameters, bool $isPostOrPatch = false)
+    protected function setCustomFieldValues(object $entity, $form, array $parameters, bool $isPostOrPatch = false)
     {
         // set the custom field values
         // pull the data from the form in order to apply the form's formatting

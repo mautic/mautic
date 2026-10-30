@@ -12,12 +12,13 @@ use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
+final class CircularDependencyValidatorTest extends TestCase
 {
     private MockObject&ListModel $mockListModel;
 

@@ -295,13 +295,10 @@ final readonly class ContactSegmentService
     }
 
     /* DEBUG */
-
     /**
      * Formatting helper.
-     *
-     * @return string
      */
-    private function formatPeriod(float $inputSeconds)
+    private function formatPeriod(float $inputSeconds): string
     {
         $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
 

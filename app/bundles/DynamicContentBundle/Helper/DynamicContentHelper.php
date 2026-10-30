@@ -2,6 +2,7 @@
 
 namespace Mautic\DynamicContentBundle\Helper;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -174,7 +175,7 @@ final readonly class DynamicContentHelper
      * @param string $slotName
      * @param bool   $publishedOnly
      *
-     * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
+     * @return array|Paginator
      */
     public function getDwcsBySlotName($slotName, $publishedOnly = false): iterable
     {
@@ -204,10 +205,7 @@ final readonly class DynamicContentHelper
         );
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function convertLeadToArray($lead): array
+    public function convertLeadToArray(Lead $lead): array
     {
         return array_merge(
             $lead->getProfileFields(),

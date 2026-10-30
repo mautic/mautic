@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -34,7 +35,7 @@ final class UserSummaryNotificationHelper
 
     /**
      * @throws ObjectNotSupportedException
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     public function writeNotifications(string $mauticObject, string $listTranslationKey): void
     {
@@ -67,7 +68,7 @@ final class UserSummaryNotificationHelper
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      * @throws ObjectNotSupportedException
      */
     private function findAndSendToUsers(array $ids): void
@@ -101,7 +102,7 @@ final class UserSummaryNotificationHelper
 
     /**
      * @throws ObjectNotSupportedException
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     private function writeNotification(array $ids, int $userId): void
     {

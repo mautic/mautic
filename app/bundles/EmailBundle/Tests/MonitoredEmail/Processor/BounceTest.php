@@ -18,10 +18,11 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
 #[AllowMockObjectsWithoutExpectations]
-final class BounceTest extends \PHPUnit\Framework\TestCase
+final class BounceTest extends TestCase
 {
     #[TestDox('Test that the transport interface processes the message appropriately')]
     public function testProcessorInterfaceProcessesMessage(): void

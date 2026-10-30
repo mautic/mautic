@@ -3,7 +3,9 @@
 namespace Mautic\PluginBundle\Integration;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
@@ -39,6 +41,7 @@ use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -86,9 +89,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Used for notifications.
      *
-     * @var \Doctrine\ORM\Tools\Pagination\Paginator<User>
+     * @var Paginator<User>
      */
-    protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
+    protected ?Paginator $adminUsers = null;
 
     protected array $notifications              = [];
 
@@ -797,7 +800,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     ]);
                     break;
             }
-        } catch (\GuzzleHttp\Exception\RequestException $exception) {
+        } catch (RequestException $exception) {
             if (!empty($settings['return_raw'])) {
                 return $exception->getResponse();
             }
@@ -1254,11 +1257,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Get request token for oauth1a authorization request.
      *
-     * @param array $settings
-     *
      * @return mixed|string
      */
-    public function getRequestToken($settings = [])
+    public function getRequestToken(array $settings = [])
     {
         // Child classes can easily pass in custom settings this way
         $settings = array_merge(
@@ -1490,7 +1491,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return mixed[]
      */
-    public function populateLeadData($lead, $config = []): array
+    public function populateLeadData($lead, array $config = []): array
     {
         if (!isset($config['leadFields'])) {
             $config = $this->mergeConfigToFeatureSettings($config);
@@ -1561,8 +1562,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     /**
      * Match Company data with integration fields.
+     *
+     * @param Lead|array $entity
      */
-    public function populateCompanyData($entity, $config = []): array
+    public function populateCompanyData(object|array $entity, $config = []): array
     {
         if (!isset($config['companyFields'])) {
             $config = $this->mergeConfigToFeatureSettings($config);
@@ -1604,10 +1607,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Takes profile data from an integration and maps it to Mautic's lead fields.
      *
-     * @param array       $config
      * @param string|null $object
      */
-    public function populateMauticLeadData($data, $config = [], $object = null): array
+    public function populateMauticLeadData($data, array $config = [], $object = null): array
     {
         // Glean supported fields from what was returned by the integration
         $gleanedData = $data;
@@ -2000,22 +2002,20 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Allows appending extra data to the config.
      *
      * @param FormBuilder|Form $builder
-     * @param array            $data
      * @param string           $formArea Section of form being built keys|features|integration
      *                                   keys can be used to store login/request related settings; keys are encrypted
      *                                   features can be used for configuring share buttons, etc
      *                                   integration is called when adding an integration to events like point triggers,
      *                                   campaigns actions, forms actions, etc
      */
-    public function appendToForm($builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array<mixed>         $options
+     * @param array<mixed> $options
      */
-    public function modifyForm($builder, $options): void
+    public function modifyForm(FormBuilderInterface $builder, array $options): void
     {
         $this->dispatcher->dispatch(
             new PluginIntegrationFormBuildEvent($this, $builder, $options)
@@ -2156,7 +2156,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @return \Monolog\Logger|LoggerInterface
+     * @return Logger|LoggerInterface
      */
     public function getLogger()
     {
@@ -2266,7 +2266,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @return bool|\DateTime|null
      */
-    protected function getLastSyncDate($entity = null, array $params = [], $ignoreEntityChanges = true)
+    protected function getLastSyncDate(?object $entity = null, array $params = [], $ignoreEntityChanges = true)
     {
         $isNew = ($entity instanceof FormEntity) && $entity->isNew();
         if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {

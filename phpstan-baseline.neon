@@ -13,7 +13,7 @@ parameters:
 			path: app/bundles/ApiBundle/Controller/CommonApiController.php
 
 		-
-			message: '#^Parameter \#1 \$key of method Mautic\\ApiBundle\\Controller\\FetchCommonApiController\<E of object\>\:\:setBatchError\(\) expects int, string given\.$#'
+			message: '#^Parameter \#1 \$key of method Mautic\\ApiBundle\\Controller\\FetchCommonApiController\<TEntity of object\>\:\:setBatchError\(\) expects int, string given\.$#'
 			identifier: argument.type
 			count: 4
 			path: app/bundles/ApiBundle/Controller/CommonApiController.php
@@ -42,12 +42,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: app/bundles/ApiBundle/EventListener/ClientSubscriber.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/ApiBundle/Security/Permissions/ApiPermissions.php
 
 		-
 			message: '#^Method Mautic\\ApiBundle\\Serializer\\Driver\\ApiMetadataDriver\:\:addGroup\(\) has parameter \$group with no type specified\.$#'
@@ -187,12 +181,6 @@ parameters:
 		-
 			message: '#^Method Mautic\\CampaignBundle\\Entity\\Event\:\:addContactLog\(\) has parameter \$contactLog with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CampaignBundle/Entity/Event.php
-
-		-
-			message: '#^Method Mautic\\CampaignBundle\\Entity\\Event\:\:getContactLog\(\) should return \(Doctrine\\Common\\Collections\\Collection&iterable\<Mautic\\CampaignBundle\\Entity\\LeadEventLog\>\)\|static\(Mautic\\CampaignBundle\\Entity\\Event\) but returns array\.$#'
-			identifier: return.type
 			count: 1
 			path: app/bundles/CampaignBundle/Entity/Event.php
 
@@ -456,12 +444,6 @@ parameters:
 			path: app/bundles/CategoryBundle/Entity/Category.php
 
 		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CategoryBundle/Security/Permissions/CategoryPermissions.php
-
-		-
 			message: '#^Property Mautic\\ChannelBundle\\Entity\\MessageQueue\:\:\$channelId has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -654,12 +636,6 @@ parameters:
 			path: app/bundles/ChannelBundle/Model/MessageQueueModel.php
 
 		-
-			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageQueueModel\:\:reschedule\(\) has parameter \$message with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/ChannelBundle/Model/MessageQueueModel.php
-
-		-
 			message: '#^Method Mautic\\ChannelBundle\\Model\\MessageQueueModel\:\:sendMessages\(\) has parameter \$channel with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -670,12 +646,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/ChannelBundle/Model/MessageQueueModel.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/ChannelBundle/Security/Permissions/ChannelPermissions.php
 
 		-
 			message: '#^Method Mautic\\ConfigBundle\\Event\\ConfigBuilderEvent\:\:addFileFields\(\) has parameter \$fields with no type specified\.$#'
@@ -1146,28 +1116,10 @@ parameters:
 			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
 
 		-
-			message: '#^Property Mautic\\CoreBundle\\ErrorHandler\\ErrorHandler\:\:\$handler has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\ErrorHandler\\ErrorHandler\:\:\$mainLogger has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/ErrorHandler/ErrorHandler.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Event\\AbstractCustomRequestEvent\:\:checkRouteContext\(\) has parameter \$route with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Event/AbstractCustomRequestEvent.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:__construct\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Event/BuilderEvent.php
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Event\\BuilderEvent\:\:addToken\(\) has parameter \$key with no type specified\.$#'
@@ -1812,12 +1764,6 @@ parameters:
 			path: app/bundles/CoreBundle/Security/Permissions/AbstractPermissions.php
 
 		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/CoreBundle/Security/Permissions/SystemPermissions.php
-
-		-
 			message: '#^Parameter \#3 \$isRead of method Mautic\\CoreBundle\\Model\\NotificationModel\:\:addNotification\(\) expects bool, int given\.$#'
 			identifier: argument.type
 			count: 1
@@ -2004,12 +1950,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Form/Type/DynamicContentType.php
 
 		-
-			message: '#^Method Mautic\\DynamicContentBundle\\Model\\DynamicContentModel\:\:resetVariants\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
-
-		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Model\\DynamicContentModel\:\:resetVariants\(\) has parameter \$relatedIds with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2020,12 +1960,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/DynamicContentBundle/Security/Permissions/DynamicContentPermissions.php
 
 		-
 			message: '#^Property Mautic\\EmailBundle\\Controller\\PublicController\:\:\$dncChannels has no type specified\.$#'
@@ -2052,12 +1986,6 @@ parameters:
 			path: app/bundles/EmailBundle/Entity/CopyRepository.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setCategory\(\) has parameter \$category with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setContent\(\) has parameter \$content with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2077,18 +2005,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setPlainText\(\) has parameter \$plainText with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setPublishDown\(\) has parameter \$publishDown with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setPublishUp\(\) has parameter \$publishUp with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Entity/Email.php
@@ -2424,12 +2340,6 @@ parameters:
 			path: app/bundles/EmailBundle/Model/EmailModel.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:resetVariants\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:resetVariants\(\) has parameter \$relatedIds with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -2491,12 +2401,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Model\\SendEmailToContact\:\:createContactStatEntry\(\) has parameter \$email with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Model/SendEmailToContact.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\SendEmailToContact\:\:downEmailSentCount\(\) has parameter \$emailId with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Model/SendEmailToContact.php
@@ -2682,12 +2586,6 @@ parameters:
 			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
 
 		-
-			message: '#^Property Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:\$imapStream has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/EmailBundle/MonitoredEmail/Mailbox.php
-
-		-
 			message: '#^Property Mautic\\EmailBundle\\MonitoredEmail\\Mailbox\:\:\$mailboxes has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -2862,10 +2760,10 @@ parameters:
 			path: app/bundles/EmailBundle/MonitoredEmail/Search/ContactFinder.php
 
 		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
+			message: '#^Property Mautic\\EmailBundle\\Stat\\Reference\:\:\$leadId \(int\|string\) is never assigned string so it can be removed from the property type\.$#'
+			identifier: property.unusedType
 			count: 1
-			path: app/bundles/EmailBundle/Security/Permissions/EmailPermissions.php
+			path: app/bundles/EmailBundle/Stat/Reference.php
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Stat\\StatHelper\:\:getStat\(\) has parameter \$emailAddress with no type specified\.$#'
@@ -3047,9 +2945,6 @@ parameters:
 			count: 1
 			path: app/bundles/FormBundle/Event/SubmissionEvent.php
 
-
-
-
 		-
 			message: '#^Parameter \#1 \$response of method Mautic\\FormBundle\\EventListener\\FormSubscriber\:\:parseResponse\(\) expects GuzzleHttp\\Psr7\\Response, Psr\\Http\\Message\\ResponseInterface given\.$#'
 			identifier: argument.type
@@ -3199,12 +3094,6 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: app/bundles/FormBundle/Model/SubmissionModel.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/FormBundle/Security/Permissions/FormPermissions.php
 
 		-
 			message: '#^Access to an undefined property Symfony\\Component\\Validator\\Constraint\:\:\$message\.$#'
@@ -3682,12 +3571,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyRepository\:\:identifyCompany\(\) has parameter \$state with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\CompanyRepository\:\:postSaveEntity\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Entity/CompanyRepository.php
@@ -4280,8 +4163,6 @@ parameters:
 			count: 1
 			path: app/bundles/LeadBundle/Event/PointsChangeEvent.php
 
-
-
 		-
 			message: '#^Method Mautic\\LeadBundle\\EventListener\\LeadSubscriber\:\:getChannelEntity\(\) has parameter \$channelId with no type specified\.$#'
 			identifier: missingType.parameter
@@ -4463,21 +4344,9 @@ parameters:
 			path: app/bundles/LeadBundle/Model/LeadModel.php
 
 		-
-			message: '#^Parameter \#2 \$dateFrom of class Mautic\\CoreBundle\\Helper\\Chart\\ChartQuery constructor expects DateTime, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/Model/LeadModel.php
-
-		-
 			message: '#^Parameter \#2 \$dateFrom of class Mautic\\CoreBundle\\Helper\\Chart\\ChartQuery constructor expects DateTime, string\|null given\.$#'
 			identifier: argument.type
 			count: 2
-			path: app/bundles/LeadBundle/Model/LeadModel.php
-
-		-
-			message: '#^Parameter \#3 \$dateTo of class Mautic\\CoreBundle\\Helper\\Chart\\ChartQuery constructor expects DateTime, string given\.$#'
-			identifier: argument.type
-			count: 1
 			path: app/bundles/LeadBundle/Model/LeadModel.php
 
 		-
@@ -4571,20 +4440,8 @@ parameters:
 			path: app/bundles/LeadBundle/Model/ListModel.php
 
 		-
-			message: '#^Parameter \#5 \$options of method Mautic\\CoreBundle\\Helper\\Chart\\ChartQuery\:\:count\(\) expects array, null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/LeadBundle/Model/ListModel.php
-
-		-
 			message: '#^Method Mautic\\LeadBundle\\Security\\Permissions\\LeadPermissions\:\:analyzePermissions\(\) has parameter \$allPermissions with no type specified\.$#'
 			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Security/Permissions/LeadPermissions.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
 			count: 1
 			path: app/bundles/LeadBundle/Security/Permissions/LeadPermissions.php
 
@@ -4751,22 +4608,10 @@ parameters:
 			path: app/bundles/LeadBundle/Tracker/Service/DeviceTrackingService/DeviceTrackingServiceInterface.php
 
 		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/MarketplaceBundle/Security/Permissions/MarketplacePermissions.php
-
-		-
 			message: '#^Method Mautic\\NotificationBundle\\Api\\AbstractNotificationApi\:\:sendNotification\(\) has parameter \$id with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/NotificationBundle/Api/AbstractNotificationApi.php
-
-		-
-			message: '#^Method Mautic\\NotificationBundle\\Entity\\Notification\:\:setCategory\(\) has parameter \$category with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/NotificationBundle/Entity/Notification.php
 
 		-
 			message: '#^Method Mautic\\NotificationBundle\\Entity\\Notification\:\:setPublishDown\(\) has parameter \$publishDown with no type specified\.$#'
@@ -4871,22 +4716,10 @@ parameters:
 			path: app/bundles/NotificationBundle/Model/NotificationModel.php
 
 		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/NotificationBundle/Security/Permissions/NotificationPermissions.php
-
-		-
 			message: '#^Parameter \#1 \$id of method Mautic\\PageBundle\\Entity\\Page\:\:setSessionId\(\) expects string, int given\.$#'
 			identifier: argument.type
 			count: 1
 			path: app/bundles/PageBundle/Controller/PageController.php
-
-		-
-			message: '#^Parameter \#5 \$query of method Mautic\\PageBundle\\Model\\PageModel\:\:hitPage\(\) expects array, string\|null given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/PageBundle/Controller/PublicController.php
 
 		-
 			message: '#^Property Mautic\\PageBundle\\Entity\\Hit\:\:\$referer has no type specified\.$#'
@@ -5165,12 +4998,6 @@ parameters:
 			path: app/bundles/PageBundle/Form/Type/AbTestPropertiesType.php
 
 		-
-			message: '#^Method Mautic\\PageBundle\\Helper\\TokenHelper\:\:findPageTokens\(\) has parameter \$clickthrough with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Helper/TokenHelper.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\Helper\\TokenHelper\:\:findPageTokens\(\) has parameter \$content with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -5189,19 +5016,7 @@ parameters:
 			path: app/bundles/PageBundle/Helper/TrackingHelper.php
 
 		-
-			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:generateSlug\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
 			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:getDeviceGranularityData\(\) has parameter \$filters with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PageBundle/Model/PageModel.php
-
-		-
-			message: '#^Method Mautic\\PageBundle\\Model\\PageModel\:\:resetVariants\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PageBundle/Model/PageModel.php
@@ -5309,12 +5124,6 @@ parameters:
 			path: app/bundles/PageBundle/Model/VideoModel.php
 
 		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/PageBundle/Security/Permissions/PagePermissions.php
-
-		-
 			message: '#^Property Mautic\\PageBundle\\Tests\\PageTestAbstract\:\:\$mockId has no type specified\.$#'
 			identifier: missingType.property
 			count: 1
@@ -5331,12 +5140,6 @@ parameters:
 			identifier: catch.neverThrown
 			count: 1
 			path: app/bundles/PluginBundle/Controller/AuthController.php
-
-		-
-			message: '#^Property Mautic\\PluginBundle\\Entity\\IntegrationEntity\:\:\$internal \(array\) does not accept Doctrine\\Common\\Collections\\ArrayCollection\<\*NEVER\*, \*NEVER\*\>\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/bundles/PluginBundle/Entity/IntegrationEntity.php
 
 		-
 			message: '#^Method Mautic\\PluginBundle\\Entity\\IntegrationEntityRepository\:\:findLeadsToCreate\(\) has parameter \$fromDate with no type specified\.$#'
@@ -5933,12 +5736,6 @@ parameters:
 			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
 
 		-
-			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:populateCompanyData\(\) has parameter \$entity with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
-
-		-
 			message: '#^Method Mautic\\PluginBundle\\Integration\\AbstractIntegration\:\:populateMauticLeadData\(\) has parameter \$data with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -6045,12 +5842,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/PluginBundle/Model/IntegrationEntityModel.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addManagePermission\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/PluginBundle/Security/Permissions/PluginPermissions.php
 
 		-
 			message: '#^Method Mautic\\PluginBundle\\Tests\\Helper\\PluginBundleBaseStub\:\:onPluginInstall\(\) has parameter \$installedSchema with no type specified\.$#'
@@ -6329,12 +6120,6 @@ parameters:
 			path: app/bundles/SmsBundle/Callback/HandlerContainer.php
 
 		-
-			message: '#^Method Mautic\\SmsBundle\\Entity\\Sms\:\:setCategory\(\) has parameter \$category with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/SmsBundle/Entity/Sms.php
-
-		-
 			message: '#^Method Mautic\\SmsBundle\\Entity\\Sms\:\:setPublishDown\(\) has parameter \$publishDown with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -6437,12 +6222,6 @@ parameters:
 			path: app/bundles/SmsBundle/Model/SmsModel.php
 
 		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/SmsBundle/Security/Permissions/SmsPermissions.php
-
-		-
 			message: '#^Method Mautic\\SmsBundle\\Sms\\TransportInterface\:\:sendSms\(\) invoked with 3 parameters, 2 required\.$#'
 			identifier: arguments.count
 			count: 1
@@ -6459,12 +6238,6 @@ parameters:
 			identifier: assign.propertyType
 			count: 1
 			path: app/bundles/StageBundle/Entity/Stage.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/StageBundle/Security/Permissions/StagePermissions.php
 
 		-
 			message: '#^Method Mautic\\StatsBundle\\Aggregate\\Collection\\DAO\\StatDAO\:\:addStat\(\) has parameter \$key with no type specified\.$#'
@@ -6725,12 +6498,6 @@ parameters:
 			path: app/bundles/UserBundle/Model/UserModel.php
 
 		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: app/bundles/UserBundle/Security/Permissions/UserPermissions.php
-
-		-
 			message: '#^Method Mautic\\UserBundle\\Security\\SAML\\User\\UserCreator\:\:__construct\(\) has parameter \$defaultRole with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -6807,12 +6574,6 @@ parameters:
 			identifier: argument.type
 			count: 1
 			path: app/bundles/WebhookBundle/Model/WebhookModel.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/WebhookBundle/Security/Permissions/WebhookPermissions.php
 
 		-
 			message: '#^Method MauticPlugin\\GrapesJsBuilderBundle\\Helper\\FileManager\:\:getFullUrl\(\) has parameter \$fileName with no type specified\.$#'
@@ -8195,12 +7956,6 @@ parameters:
 			path: plugins/MauticFocusBundle/Model/FocusModel.php
 
 		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: plugins/MauticFocusBundle/Security/Permissions/FocusPermissions.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticFullContactBundle\\Helper\\LookupHelper\:\:getCache\(\) has parameter \$notify with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8501,12 +8256,6 @@ parameters:
 			path: plugins/MauticSocialBundle/Exception/ExitMonitorException.php
 
 		-
-			message: '#^Parameter \#2 \$withFeatures of method Mautic\\PluginBundle\\Helper\\IntegrationHelper\:\:getIntegrationObjects\(\) expects array\|null, string given\.$#'
-			identifier: argument.type
-			count: 1
-			path: plugins/MauticSocialBundle/Form/Type/SocialLoginType.php
-
-		-
 			message: '#^Method MauticPlugin\\MauticSocialBundle\\Integration\\FacebookIntegration\:\:getApiUrl\(\) has parameter \$endpoint with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -8619,15 +8368,3 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: plugins/MauticSocialBundle/Integration/TwitterIntegration.php
-
-		-
-			message: '#^Method MauticPlugin\\MauticSocialBundle\\Model\\PostCountModel\:\:updatePostCount\(\) has parameter \$monitor with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: plugins/MauticSocialBundle/Model/PostCountModel.php
-
-		-
-			message: '#^Parameter \#1 \$permissionNames of method Mautic\\CoreBundle\\Security\\Permissions\\AbstractPermissions\:\:addStandardPermissions\(\) expects array, string given\.$#'
-			identifier: argument.type
-			count: 2
-			path: plugins/MauticSocialBundle/Security/Permissions/MauticSocialPermissions.php

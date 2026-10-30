@@ -12,9 +12,10 @@ use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
-final class ScheduledContactFinderTest extends \PHPUnit\Framework\TestCase
+final class ScheduledContactFinderTest extends TestCase
 {
     private MockObject&LeadRepository $leadRepository;
 

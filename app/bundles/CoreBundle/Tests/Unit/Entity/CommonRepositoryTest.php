@@ -17,10 +17,11 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CommonRepository::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
+final class CommonRepositoryTest extends TestCase
 {
     /**
      * @var MockObject&CommonRepository<object>

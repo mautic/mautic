@@ -54,9 +54,8 @@ final class DeviceApiController extends CommonApiController
      * @param LeadDevice           $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, array $parameters, $action = 'edit'): \Symfony\Component\HttpFoundation\Response|array|null
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): Response|array|null
     {
         $lead = null;
         if (!empty($parameters['lead'])) {
@@ -82,7 +81,7 @@ final class DeviceApiController extends CommonApiController
     /**
      * @param LeadDevice|FormEntity $entity
      */
-    protected function checkEntityAccess($entity, $action = 'view'): bool
+    protected function checkEntityAccess(?object $entity, $action = 'view'): bool
     {
         return parent::checkEntityAccess($entity->getLead(), $action);
     }

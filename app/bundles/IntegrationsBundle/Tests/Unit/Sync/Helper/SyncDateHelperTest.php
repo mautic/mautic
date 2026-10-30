@@ -6,15 +6,16 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Helper;
 
 use Mautic\IntegrationsBundle\Sync\Helper\SyncDateHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class SyncDateHelperTest extends TestCase
 {
     /**
-     * @var SyncDateHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var SyncDateHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $syncDateHelper;
+    private MockObject $syncDateHelper;
 
     protected function setUp(): void
     {

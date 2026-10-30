@@ -109,7 +109,7 @@ final class ApiSubscriberTest extends TestCase
         $matcher = $this->exactly(2);
 
         $this->coreParametersHelper->expects($matcher)
-            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('get')->willReturnCallback(function (...$parameters) use ($matcher): bool {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('api_enabled', $parameters[0]);
 
@@ -120,6 +120,7 @@ final class ApiSubscriberTest extends TestCase
 
                     return true;
                 }
+                return false;
             });
 
         $this->subscriber->onKernelRequest($this->event);

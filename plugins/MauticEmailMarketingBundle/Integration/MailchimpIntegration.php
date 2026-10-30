@@ -112,10 +112,7 @@ final class MailchimpIntegration extends EmailAbstractIntegration
         return [];
     }
 
-    /**
-     * @param array $config
-     */
-    public function pushLead($lead, $config = []): bool
+    public function pushLead($lead, array $config = []): bool
     {
         $config     = $this->mergeConfigToFeatureSettings($config);
         $mappedData = $this->populateLeadData($lead, $config);

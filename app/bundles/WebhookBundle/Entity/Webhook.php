@@ -85,11 +85,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     #[ORM\Column(type: Types::STRING, length: 191)]
     private $secret;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['webhook:read', 'webhook:write'])]
-    private $category;
+    private ?Category $category = null;
 
     /**
      * @var Collection<int, Event>
@@ -279,10 +276,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
@@ -298,7 +292,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * @param Collection<int, Event> $events
      */
-    public function setEvents($events): static
+    public function setEvents(Collection $events): static
     {
         $this->isChanged('events', $events);
 
@@ -425,9 +419,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @param ArrayCollection<int,Log> $logs
+     * @param Collection<int, Log> $logs
      */
-    public function addLogs($logs): static
+    public function addLogs(Collection $logs): static
     {
         $this->logs = $logs;
 

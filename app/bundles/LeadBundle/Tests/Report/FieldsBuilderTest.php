@@ -11,8 +11,9 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Report\DncReportService;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\UserBundle\Model\UserModel;
+use PHPUnit\Framework\TestCase;
 
-final class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
+final class FieldsBuilderTest extends TestCase
 {
     public function testGetLeadColumns(): void
     {

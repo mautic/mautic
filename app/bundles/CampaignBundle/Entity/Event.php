@@ -125,12 +125,9 @@ class Event implements ChannelInterface, UuidInterface
     #[ORM\Column(type: 'array')]
     private $properties = [];
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     #[ORM\Column(name: 'trigger_date', type: 'datetime', nullable: true)]
-    private $triggerDate;
+    private ?\DateTimeInterface $triggerDate = null;
 
     /**
      * @var int|null
@@ -146,26 +143,17 @@ class Event implements ChannelInterface, UuidInterface
     #[ORM\Column(name: 'trigger_interval_unit', type: 'string', length: 1, nullable: true)]
     private $triggerIntervalUnit;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     #[ORM\Column(name: 'trigger_hour', type: 'time', nullable: true)]
-    private $triggerHour;
+    private ?\DateTimeInterface $triggerHour = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     #[ORM\Column(name: 'trigger_restricted_start_hour', type: 'time', nullable: true)]
-    private $triggerRestrictedStartHour;
+    private ?\DateTimeInterface $triggerRestrictedStartHour = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     #[ORM\Column(name: 'trigger_restricted_stop_hour', type: 'time', nullable: true)]
-    private $triggerRestrictedStopHour;
+    private ?\DateTimeInterface $triggerRestrictedStopHour = null;
 
     /**
      * @var array|null
@@ -201,13 +189,10 @@ class Event implements ChannelInterface, UuidInterface
     #[ORM\OrderBy(value: ['order' => 'ASC'])]
     private $children;
 
-    /**
-     * @var Event|null
-     */
     #[Groups(['event:read', 'event:write', 'campaign:read'])]
     #[ORM\ManyToOne(targetEntity: self::class, cascade: ['persist'], inversedBy: 'children')]
     #[ORM\JoinColumn(name: 'parent_id')]
-    private $parent;
+    private ?Event $parent = null;
 
     /**
      * @var string|null
@@ -231,7 +216,7 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Used by API to house contact specific logs.
      *
-     * @var array
+     * @var LeadEventLog[]
      */
     #[Groups(['event:read', 'event:write'])]
     private $contactLog = [];
@@ -676,18 +661,12 @@ class Event implements ChannelInterface, UuidInterface
         $this->parent = null;
     }
 
-    /**
-     * @return ?Event
-     */
-    public function getParent()
+    public function getParent(): ?self
     {
         return $this->parent;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getTriggerDate()
+    public function getTriggerDate(): ?\DateTimeInterface
     {
         return $this->triggerDate;
     }
@@ -713,10 +692,7 @@ class Event implements ChannelInterface, UuidInterface
         $this->triggerInterval = $triggerInterval;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getTriggerHour()
+    public function getTriggerHour(): ?\DateTimeInterface
     {
         return $this->triggerHour;
     }
@@ -843,9 +819,9 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Used by the API.
      *
-     * @return LeadEventLog[]|Collection|static
+     * @return LeadEventLog[]|Collection<int, LeadEventLog>
      */
-    public function getContactLog(?Contact $contact = null)
+    public function getContactLog(?Contact $contact = null): iterable
     {
         if ($this->contactLog) {
             return $this->contactLog;
@@ -862,9 +838,9 @@ class Event implements ChannelInterface, UuidInterface
     /**
      * Used by the API.
      *
-     * @param array $contactLog
+     * @param LeadEventLog[] $contactLog
      */
-    public function setContactLog($contactLog): static
+    public function setContactLog(array $contactLog): static
     {
         $this->contactLog = $contactLog;
 
@@ -883,10 +859,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Get the value of triggerRestrictedStartHour.
-     *
-     * @return \DateTimeInterface|null
      */
-    public function getTriggerRestrictedStartHour()
+    public function getTriggerRestrictedStartHour(): ?\DateTimeInterface
     {
         return $this->triggerRestrictedStartHour;
     }
@@ -907,10 +881,8 @@ class Event implements ChannelInterface, UuidInterface
 
     /**
      * Get the value of triggerRestrictedStopHour.
-     *
-     * @return \DateTimeInterface|null
      */
-    public function getTriggerRestrictedStopHour()
+    public function getTriggerRestrictedStopHour(): ?\DateTimeInterface
     {
         return $this->triggerRestrictedStopHour;
     }

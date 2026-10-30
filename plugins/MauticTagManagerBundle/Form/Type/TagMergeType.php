@@ -6,6 +6,7 @@ namespace MauticPlugin\MauticTagManagerBundle\Form\Type;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\LeadBundle\Entity\Tag;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -27,7 +28,7 @@ final class TagMergeType extends AbstractType
                 'multiple'        => false,
                 'label'           => 'mautic.tagmanager.to.merge.into',
                 'required'        => true,
-                'query_builder'   => function (EntityRepository $er) use ($options): \Doctrine\ORM\QueryBuilder {
+                'query_builder'   => function (EntityRepository $er) use ($options): QueryBuilder {
                     $qb = $er->createQueryBuilder('t')->orderBy('t.tag', Order::Ascending->value);
 
                     if (!empty($options['exclude_ids'])) {

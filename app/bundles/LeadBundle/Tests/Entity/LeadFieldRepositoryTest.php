@@ -6,8 +6,9 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Result;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
@@ -341,12 +342,12 @@ final class LeadFieldRepositoryTest extends TestCase
             ->method('from')
             ->willReturnSelf();
 
-        $expr = $this->createMock(Query\Expr::class);
+        $expr = $this->createMock(Expr::class);
         $queryBuilder->expects($this->once())
             ->method('expr')
             ->willReturn($expr);
 
-        $comparison = $this->createStub(Query\Expr\Comparison::class);
+        $comparison = $this->createStub(Comparison::class);
         $expr->expects($this->once())
             ->method('eq')
             ->willReturn($comparison);

@@ -24,19 +24,21 @@ use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class SmsModelTest extends \PHPUnit\Framework\TestCase
+final class SmsModelTest extends TestCase
 {
-    private \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface $entityManger;
+    private Stub&EntityManagerInterface $entityManger;
 
-    private \PHPUnit\Framework\MockObject\Stub&LeadModel $leadModel;
+    private Stub&LeadModel $leadModel;
 
-    private \PHPUnit\Framework\MockObject\Stub&TrackableModel $pageTrackableModel;
+    private Stub&TrackableModel $pageTrackableModel;
 
     private MockObject&TransportChain $transport;
 
@@ -44,15 +46,15 @@ final class SmsModelTest extends \PHPUnit\Framework\TestCase
 
     private MockObject&EventDispatcherInterface $dispatcher;
 
-    private \PHPUnit\Framework\MockObject\Stub&UrlGeneratorInterface $urlGenerator;
+    private Stub&UrlGeneratorInterface $urlGenerator;
 
     private MockObject&TranslatorInterface $translator;
 
-    private \PHPUnit\Framework\MockObject\Stub&UserHelper $userHelper;
+    private Stub&UserHelper $userHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&LoggerInterface $logger;
+    private Stub&LoggerInterface $logger;
 
-    private \PHPUnit\Framework\MockObject\Stub&CoreParametersHelper $coreParametersHelper;
+    private Stub&CoreParametersHelper $coreParametersHelper;
 
     private MockObject&SmsRepository $smsRepository;
 

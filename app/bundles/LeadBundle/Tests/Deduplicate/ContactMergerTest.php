@@ -19,29 +19,31 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ContactMergerTest extends \PHPUnit\Framework\TestCase
+final class ContactMergerTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadModel
+     * @var MockObject&LeadModel
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadModel;
+    private MockObject $leadModel;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&MergeRecordRepository
+     * @var MockObject&MergeRecordRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mergeRecordRepo;
+    private MockObject $mergeRecordRepo;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Logger
+     * @var MockObject&Logger
      */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
+    private MockObject $logger;
 
-    private \PHPUnit\Framework\MockObject\MockObject&CompanyLeadRepository $companyLeadRepo;
+    private MockObject&CompanyLeadRepository $companyLeadRepo;
 
-    private \PHPUnit\Framework\MockObject\MockObject&LeadRepository $leadRepository;
+    private MockObject&LeadRepository $leadRepository;
 
     protected function setUp(): void
     {
@@ -347,13 +349,13 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
 
         // Should not have been merged due to winner already having one
         $this->getMerger()->mergeOwners($winner, $loser);
-        $this->assertEquals($winnerOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
+        $this->assertSame($winnerOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
 
         $winner->setOwner();
         $this->getMerger()->mergeOwners($winner, $loser);
 
         // Should be set to loser owner since winner owner was null
-        $this->assertEquals($loserOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
+        $this->assertSame($loserOwner->getUserIdentifier(), $winner->getOwner()->getUserIdentifier());
     }
 
     public function testMergePoints(): void
@@ -499,6 +501,7 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->companyLeadRepo->expects($this->once())
             ->method('saveEntities')
             ->willReturnCallback(function (array $companyLeads, bool $new) use ($winner, $company): void {
+                /** @var CompanyLead[] $companyLeads */
                 $this->assertCount(1, $companyLeads);
                 $this->assertSame($winner, $companyLeads[0]->getLead());
                 $this->assertSame($company, $companyLeads[0]->getCompany());
@@ -540,6 +543,7 @@ final class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->companyLeadRepo->expects($this->once())
             ->method('saveEntities')
             ->willReturnCallback(function (array $companyLeads, bool $isNew): void {
+                /** @var CompanyLead[] $companyLeads */
                 $this->assertCount(1, $companyLeads);
                 // The winner already has a primary company so the loser's company is added as non-primary
                 $this->assertFalse((bool) $companyLeads[0]->getPrimary());

@@ -8,6 +8,7 @@ use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Form\Type\IntegrationCampaignsType;
 use Mautic\PluginBundle\Form\Type\IntegrationConfigType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,7 +50,7 @@ final class AjaxController extends CommonAjaxController
         $dataArray = ['success' => 0];
 
         if (!empty($integration) && [] !== $settings) {
-            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
+            /** @var AbstractIntegration $integrationObject */
             $integrationObject = $helper->getIntegrationObject($integration);
 
             if ($integrationObject) {
@@ -127,7 +128,7 @@ final class AjaxController extends CommonAjaxController
         $dataArray   = ['success' => 0];
 
         if (!empty($integration) && !empty($settings)) {
-            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
+            /** @var AbstractIntegration $object */
             $object = $integrationHelper->getIntegrationObject($integration);
 
             if ($object) {
@@ -182,7 +183,7 @@ final class AjaxController extends CommonAjaxController
         $dataArray   = ['success' => 0];
         $statusData  = [];
         if (!empty($integration) && !empty($campaign)) {
-            /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $object */
+            /** @var AbstractIntegration $object */
             $object = $integrationHelper->getIntegrationObject($integration);
 
             if ($object) {

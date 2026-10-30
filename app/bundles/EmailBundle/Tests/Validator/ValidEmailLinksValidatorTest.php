@@ -9,6 +9,7 @@ use Mautic\EmailBundle\Validator\ValidEmailLinks;
 use Mautic\EmailBundle\Validator\ValidEmailLinksValidator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -18,7 +19,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 #[AllowMockObjectsWithoutExpectations]
 final class ValidEmailLinksValidatorTest extends TestCase
 {
-    private ExecutionContextInterface&\PHPUnit\Framework\MockObject\MockObject $context;
+    private ExecutionContextInterface&MockObject $context;
 
     private ValidEmailLinksValidator $validator;
 

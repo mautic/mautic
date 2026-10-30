@@ -143,13 +143,10 @@ class Field implements UuidInterface
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     private $conditions = [];
 
-    /**
-     * @var Form|null
-     */
     #[Groups(['field:read', 'field:write', 'form:read', 'campaign:read', 'email:read'])]
     #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'fields')]
     #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
-    private $form;
+    private ?Form $form = null;
 
     /**
      * @var string|null
@@ -473,10 +470,7 @@ class Field implements UuidInterface
         return $this->order;
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
@@ -489,10 +483,7 @@ class Field implements UuidInterface
         return $this->properties;
     }
 
-    /**
-     * @param array $validation
-     */
-    public function setValidation($validation): static
+    public function setValidation(array $validation): static
     {
         $this->isChanged('validation', $validation);
         $this->validation = $validation;
@@ -531,10 +522,7 @@ class Field implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return Form|null
-     */
-    public function getForm()
+    public function getForm(): ?Form
     {
         return $this->form;
     }
@@ -917,7 +905,7 @@ class Field implements UuidInterface
     /**
      * @param array<string, mixed> $conditions
      */
-    public function setConditions($conditions): static
+    public function setConditions(array $conditions): static
     {
         $this->isChanged('conditions', $conditions);
         $this->conditions = $conditions;
