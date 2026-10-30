@@ -32,7 +32,7 @@ final class Version20260915000000 extends PreUpAssertionMigration
     private function hasEmailFirstIndex(Schema $schema): bool
     {
         foreach ($schema->getTable($this->getTableName())->getIndexes() as $index) {
-            if ('email' === ($index->getColumns()[0] ?? null)) {
+            if ('email' === ($index->getColumns()[0] ?? null) && !$this->isFullText($index->getFlags())) {
                 return true;
             }
         }
@@ -47,6 +47,16 @@ final class Version20260915000000 extends PreUpAssertionMigration
 
     private function getIndexName(): string
     {
-        return "{$this->prefix}email_search";
+        return "{$this->prefix}lead_email_lookup";
+    }
+
+    /**
+     * FULLTEXT indexes cannot satisfy the equality lookup used for contacts.
+     *
+     * @param list<string> $flags
+     */
+    private function isFullText(array $flags): bool
+    {
+        return in_array('fulltext', array_map('strtolower', $flags), true);
     }
 }
