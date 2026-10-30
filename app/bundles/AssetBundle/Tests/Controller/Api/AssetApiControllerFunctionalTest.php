@@ -20,6 +20,10 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->configParams['validate_remote_domains'] = false;
         $this->configParams['site_url']                = 'https://raw.githubusercontent.com';
 
+        if ('testNewAssetLeftWithoutTrackDownloadsFollowsAGlobalNo' === $this->name()) {
+            $this->configParams['track_asset_downloads'] = false;
+        }
+
         if ('testCreateNewRemoteAssetWithValidateRemoteDomainsEnabled' === $this->name()) {
             $this->configParams['validate_remote_domains'] = true;
             $this->configParams['allowed_remote_domains']  = [
@@ -133,6 +137,86 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertNotNull($response['asset']['size']);
         $this->assertStringContainsString('txt', (string) $response['asset']['extension']);
         unlink($assetsPath.'/file.txt');
+    }
+
+    public function testDownloadTrackingCanBeSetThroughTheApi(): void
+    {
+        $assetsPath = $this->client->getKernel()->getContainer()->getParameter('mautic.upload_dir');
+        file_put_contents($assetsPath.'/tracking.txt', 'test');
+
+        $this->client->request('POST', 'api/assets/new', [
+            'file'            => 'tracking.txt',
+            'storageLocation' => 'local',
+            'title'           => 'tracking',
+            'trackDownloads'  => 0,
+        ]);
+        $this->assertResponseStatusCodeSame(201, (string) $this->client->getResponse()->getContent());
+        $asset = json_decode((string) $this->client->getResponse()->getContent(), true)['asset'];
+        $this->assertFalse($asset['trackDownloads']);
+
+        $this->client->request('PATCH', sprintf('/api/assets/%d/edit', $asset['id']), ['trackDownloads' => 1]);
+        $this->assertResponseIsSuccessful();
+        $this->assertTrue(json_decode((string) $this->client->getResponse()->getContent(), true)['asset']['trackDownloads']);
+
+        unlink($assetsPath.'/tracking.txt');
+    }
+
+    public function testPutWithoutTrackDownloadsKeepsTheAssetsOption(): void
+    {
+        $assetsPath = $this->client->getKernel()->getContainer()->getParameter('mautic.upload_dir');
+        file_put_contents($assetsPath.'/put.txt', 'test');
+
+        $this->client->request('POST', 'api/assets/new', [
+            'file'            => 'put.txt',
+            'storageLocation' => 'local',
+            'title'           => 'put',
+            'trackDownloads'  => 0,
+        ]);
+        $this->assertResponseStatusCodeSame(201, (string) $this->client->getResponse()->getContent());
+        $asset = json_decode((string) $this->client->getResponse()->getContent(), true)['asset'];
+
+        $this->client->request('PUT', sprintf('/api/assets/%d/edit', $asset['id']), [
+            'file'            => 'put.txt',
+            'storageLocation' => 'local',
+            'title'           => 'put again',
+            'language'        => 'en',
+        ]);
+        $this->assertResponseIsSuccessful((string) $this->client->getResponse()->getContent());
+        $this->assertFalse(json_decode((string) $this->client->getResponse()->getContent(), true)['asset']['trackDownloads']);
+
+        unlink($assetsPath.'/put.txt');
+    }
+
+    public function testNewAssetFollowsTheGlobalDownloadTrackingSetting(): void
+    {
+        $assetsPath = $this->client->getKernel()->getContainer()->getParameter('mautic.upload_dir');
+        file_put_contents($assetsPath.'/default.txt', 'test');
+
+        $this->client->request('POST', 'api/assets/new', [
+            'file'            => 'default.txt',
+            'storageLocation' => 'local',
+            'title'           => 'default',
+        ]);
+        $this->assertResponseStatusCodeSame(201, (string) $this->client->getResponse()->getContent());
+        $this->assertTrue(json_decode((string) $this->client->getResponse()->getContent(), true)['asset']['trackDownloads']);
+
+        unlink($assetsPath.'/default.txt');
+    }
+
+    public function testNewAssetLeftWithoutTrackDownloadsFollowsAGlobalNo(): void
+    {
+        $assetsPath = $this->client->getKernel()->getContainer()->getParameter('mautic.upload_dir');
+        file_put_contents($assetsPath.'/global-no.txt', 'test');
+
+        $this->client->request('POST', 'api/assets/new', [
+            'file'            => 'global-no.txt',
+            'storageLocation' => 'local',
+            'title'           => 'global no',
+        ]);
+        $this->assertResponseStatusCodeSame(201, (string) $this->client->getResponse()->getContent());
+        $this->assertFalse(json_decode((string) $this->client->getResponse()->getContent(), true)['asset']['trackDownloads']);
+
+        unlink($assetsPath.'/global-no.txt');
     }
 
     /**
