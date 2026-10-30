@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\ChannelBundle\Entity\MessageQueueRepository;
@@ -48,6 +49,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\TrackingPreferenceRepository;
 use Mautic\LeadBundle\Helper\ContactTrackingPreferenceHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
@@ -296,7 +298,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->companyRepository, // $companyRepository
-            $this->createConfiguredStub(ContactTrackingPreferenceHelper::class, ['allowsActivityTracking' => true]),
+            new ContactTrackingPreferenceHelper($this->createStub(TrackingPreferenceRepository::class), $this->createStub(EntityManagerInterface::class)),
         );
 
         $this->emailStatModel->method('getRepository')->willReturn($this->statRepository);
@@ -596,7 +598,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->companyRepository, // $companyRepository
-            $this->createConfiguredStub(ContactTrackingPreferenceHelper::class, ['allowsActivityTracking' => true]),
+            new ContactTrackingPreferenceHelper($this->createStub(TrackingPreferenceRepository::class), $this->createStub(EntityManagerInterface::class)),
         );
 
         $contacts = [
@@ -742,7 +744,7 @@ final class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->createStub(LeadRepository::class), // $leadRepository
             $this->createStub(LeadEventLogRepository::class), // $leadEventLogRepository
             $this->companyRepository, // $companyRepository
-            $this->createConfiguredStub(ContactTrackingPreferenceHelper::class, ['allowsActivityTracking' => true]),
+            new ContactTrackingPreferenceHelper($this->createStub(TrackingPreferenceRepository::class), $this->createStub(EntityManagerInterface::class)),
         );
 
         $email = new class() extends Email {
