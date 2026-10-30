@@ -622,7 +622,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
             }
         }
 
-        if ($filters) {
+        if ($filters !== []) {
             $expr = null;
             foreach ($filters as $column => $value) {
                 if (is_array($value)) {

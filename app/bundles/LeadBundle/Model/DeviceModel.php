@@ -58,9 +58,8 @@ final class DeviceModel extends FormModel
 
     /**
      * @param LeadDevice|array<string, mixed> $entity
-     * @param array      $options
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof LeadDevice) {
             throw new MethodNotAllowedHttpException(['LeadDevice']);

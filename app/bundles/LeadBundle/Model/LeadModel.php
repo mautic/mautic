@@ -219,13 +219,12 @@ class LeadModel extends FormModel
     /**
      * @param Lead|array<string, mixed>        $entity
      * @param string|null $action
-     * @param array       $options
      *
      * @return FormInterface<Lead>
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
@@ -1979,9 +1978,8 @@ class LeadModel extends FormModel
      *
      * @param string $dateFrom
      * @param string $dateTo
-     * @param array  $filters
      */
-    public function getTopOwners(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
+    public function getTopOwners(int $limit = 10, $dateFrom = null, $dateTo = null, array $filters = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.owner_id, u.first_name, u.last_name')
@@ -2004,9 +2002,8 @@ class LeadModel extends FormModel
      *
      * @param string $dateFrom
      * @param string $dateTo
-     * @param array  $filters
      */
-    public function getTopCreators(int $limit = 10, $dateFrom = null, $dateTo = null, $filters = []): array
+    public function getTopCreators(int $limit = 10, $dateFrom = null, $dateTo = null, array $filters = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.id) AS leads, t.created_by, t.created_by_user')

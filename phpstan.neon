@@ -487,6 +487,10 @@ services:
         tags:
             - phpstan.collector
     -
+        class: Utils\PHPStan\Rule\NativeTypeForArrayOrIterableDocblockRule
+        tags:
+            - phpstan.rules.rule
+    -
         class: Utils\PHPStan\Rule\ParamTypeByVariableNameRule
         tags:
             - phpstan.rules.rule
