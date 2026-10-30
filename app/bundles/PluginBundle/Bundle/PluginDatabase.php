@@ -43,9 +43,9 @@ final readonly class PluginDatabase
         $schema     = $schemaTool->getSchemaFromMetadata(array_values($metadata));
 
         // Schema listeners (e.g. Symfony Messenger) add their own tables, which may already exist
-        $pluginTables = $this->getPluginTableNames($metadata);
+        $existingTables = array_map('strtolower', $this->connection->createSchemaManager()->listTableNames());
         foreach ($schema->getTables() as $table) {
-            if (!in_array(strtolower($table->getName()), $pluginTables, true)) {
+            if (in_array(strtolower($table->getName()), $existingTables, true)) {
                 $schema->dropTable($table->getName());
             }
         }
@@ -110,28 +110,6 @@ final readonly class PluginDatabase
 
             throw $e;
         }
-    }
-
-    /**
-     * @param array<class-string, ClassMetadata> $metadata
-     *
-     * @return string[]
-     */
-    private function getPluginTableNames(array $metadata): array
-    {
-        $tables = [];
-
-        foreach ($metadata as $classMetadata) {
-            $tables[] = strtolower($classMetadata->getTableName());
-
-            foreach ($classMetadata->getAssociationMappings() as $mapping) {
-                if (isset($mapping['joinTable']['name'])) {
-                    $tables[] = strtolower($mapping['joinTable']['name']);
-                }
-            }
-        }
-
-        return $tables;
     }
 
     private function isDDLStatement(string $query): bool|int
