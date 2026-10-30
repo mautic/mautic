@@ -486,6 +486,51 @@ HTML;
         $this->subscriber->decodeTokens($event);
     }
 
+    public function testDecodeTokensPreservesUtf8AcrossTextNodeReplacements(): void
+    {
+        $content = '<html><body>{dwc=first} {dwc=second}</body></html>';
+        $contact = new Lead();
+        $event   = $this->createMock(PageDisplayEvent::class);
+
+        $event->method('getLead')->willReturn($contact);
+        $event->method('getContent')->willReturn($content);
+        $this->dynamicContentHelper->method('findDwcTokens')->willReturn([
+            '{dwc=first}' => ['content' => '<p>Привет, José</p>', 'filters' => []],
+            '{dwc=second}' => ['content' => '<p>second</p>', 'filters' => []],
+        ]);
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->willReturnCallback(function (string $output): void {
+                $this->assertStringContainsString('Привет, José', $output);
+            });
+
+        $this->subscriber->decodeTokens($event);
+    }
+
+    public function testDecodeTokensKeepsEarlierScriptReplacementOpaque(): void
+    {
+        $content = '<html><body>{dwc=first}{dwc=second}</body></html>';
+        $contact = new Lead();
+        $event   = $this->createMock(PageDisplayEvent::class);
+
+        $event->method('getLead')->willReturn($contact);
+        $event->method('getContent')->willReturn($content);
+        $this->dynamicContentHelper->method('findDwcTokens')->willReturn([
+            '{dwc=first}' => ['content' => '<script>document.write("<div>visible</div>");</script>', 'filters' => []],
+            '{dwc=second}' => ['content' => '<p>second</p>', 'filters' => []],
+        ]);
+
+        $event->expects($this->once())
+            ->method('setContent')
+            ->willReturnCallback(function (string $output): void {
+                $this->assertStringContainsString('document.write("<div>visible</div>");', $output);
+                $this->assertStringContainsString('<p>second</p>', $output);
+            });
+
+        $this->subscriber->decodeTokens($event);
+    }
+
     public function testOnTokenReplacement(): void
     {
         $content = <<< HTML

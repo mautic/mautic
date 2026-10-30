@@ -221,6 +221,7 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
 
         // Replace remaining tokens in text nodes only. A global replacement would also process tokens
         // introduced by an attribute replacement and could turn inert token text into markup in an attribute.
+        $opaqueReplacements = [];
         foreach ($result as $token => $replacement) {
             $protectedAttributes = [];
             $attributeIndex = 0;
@@ -235,9 +236,9 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
                 $content
             ) ?? $content;
             $textDom = new \DOMDocument('1.0', 'utf-8');
-            $textDom->loadHTML($contentForTextDom, LIBXML_NOERROR);
+            $textDom->loadHTML(mb_encode_numericentity($contentForTextDom, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
             $textXpath = new \DOMXPath($textDom);
-            $placeholder = '__MAUTIC_DWC_TEXT_'.md5($token).'__';
+            $placeholder = '__MAUTIC_DWC_TEXT_'.count($opaqueReplacements).'__';
             $textNodes = $textXpath->query('//text()');
             if (false === $textNodes) {
                 continue;
@@ -257,12 +258,14 @@ final class DynamicContentSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $content = str_replace($placeholder, $replacement, $textDom->saveHTML());
+            $replacementPlaceholder = '__MAUTIC_DWC_REPLACEMENT_'.count($opaqueReplacements).'__';
+            $opaqueReplacements[$replacementPlaceholder] = $replacement;
+            $content = str_replace($placeholder, $replacementPlaceholder, $textDom->saveHTML());
             foreach ($protectedAttributes as $attributePlaceholder => $attributeValue) {
                 $content = str_replace($attributePlaceholder, $attributeValue, $content);
             }
         }
 
-        $event->setContent($content);
+        $event->setContent(strtr($content, $opaqueReplacements));
     }
 }
