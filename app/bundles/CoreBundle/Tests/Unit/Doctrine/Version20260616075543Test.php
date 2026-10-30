@@ -41,12 +41,16 @@ final class Version20260616075543Test extends TestCase
         $migration = $this->createMigration();
         $migration->up($schema);
 
-        $this->assertCount(2, $migration->getSql());
+        $this->assertCount(3, $migration->getSql());
         $this->assertSame(
-            'ALTER TABLE `point_insights` MODIFY `category_id` INT DEFAULT NULL',
+            'UPDATE `point_insights` pi LEFT JOIN `categories` c ON c.id = pi.category_id SET pi.category_id = NULL WHERE pi.category_id IS NOT NULL AND c.id IS NULL',
             $migration->getSql()[0]->getStatement()
         );
-        $this->assertStringContainsString('ADD CONSTRAINT FK_9894AA2612469DE2', $migration->getSql()[1]->getStatement());
+        $this->assertSame(
+            'ALTER TABLE `point_insights` MODIFY `category_id` INT DEFAULT NULL',
+            $migration->getSql()[1]->getStatement()
+        );
+        $this->assertStringContainsString('ADD CONSTRAINT FK_9894AA2612469DE2', $migration->getSql()[2]->getStatement());
     }
 
     public function testSkipsWhenExistingTableAndForeignKeyExist(): void
@@ -70,7 +74,7 @@ final class Version20260616075543Test extends TestCase
         $migration->preUp($schema);
     }
 
-    public function testDownPreservesRepairedExistingTable(): void
+    public function testDownDropsExistingTableWithForeignKey(): void
     {
         $schema = new Schema();
         $categories = $schema->createTable('categories');
@@ -88,11 +92,12 @@ final class Version20260616075543Test extends TestCase
         $migration = $this->createMigration();
         $migration->down($schema);
 
-        $this->assertCount(1, $migration->getSql());
+        $this->assertCount(2, $migration->getSql());
         $this->assertSame(
             'ALTER TABLE `point_insights` DROP FOREIGN KEY FK_9894AA2612469DE2',
             $migration->getSql()[0]->getStatement()
         );
+        $this->assertSame('DROP TABLE `point_insights`', $migration->getSql()[1]->getStatement());
     }
 
     public function testDownDropsTableCreatedByMigration(): void
@@ -101,7 +106,6 @@ final class Version20260616075543Test extends TestCase
         $categories = $schema->createTable('categories');
         $categories->addColumn('id', 'integer', ['unsigned' => false]);
         $pointInsights = $schema->createTable('point_insights');
-        $pointInsights->setComment('Created by Version20260616075543');
         $pointInsights->addColumn('category_id', 'integer', ['unsigned' => false, 'notnull' => false]);
         $pointInsights->addForeignKeyConstraint(
             $categories,

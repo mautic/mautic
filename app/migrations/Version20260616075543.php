@@ -9,8 +9,6 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20260616075543 extends PreUpAssertionMigration
 {
-    private const TABLE_COMMENT = 'Created by Version20260616075543';
-
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
@@ -27,6 +25,7 @@ final class Version20260616075543 extends PreUpAssertionMigration
         $tableName           = "{$this->prefix}point_insights";
 
         if ($schema->hasTable($tableName)) {
+            $this->addSql("UPDATE `{$this->prefix}point_insights` pi LEFT JOIN `{$this->prefix}categories` c ON c.id = pi.category_id SET pi.category_id = NULL WHERE pi.category_id IS NOT NULL AND c.id IS NULL");
             $this->addSql("ALTER TABLE `{$tableName}` MODIFY `category_id` {$categoryIdType} DEFAULT NULL");
             $this->addSql("ALTER TABLE `{$tableName}` ADD CONSTRAINT FK_9894AA2612469DE2 FOREIGN KEY (`category_id`) REFERENCES `{$this->prefix}categories` (`id`) ON DELETE SET NULL");
 
@@ -54,7 +53,7 @@ final class Version20260616075543 extends PreUpAssertionMigration
             `point_groups`        LONGTEXT NOT NULL COMMENT '(DC2Type:json)',
             INDEX IDX_9894AA2612469DE2 (`category_id`),
             PRIMARY KEY(`id`)
-        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB ROW_FORMAT = DYNAMIC COMMENT = '".self::TABLE_COMMENT."'");
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB ROW_FORMAT = DYNAMIC");
 
         $this->addSql("ALTER TABLE `{$this->prefix}point_insights` ADD CONSTRAINT FK_9894AA2612469DE2 FOREIGN KEY (`category_id`) REFERENCES `{$this->prefix}categories` (`id`) ON DELETE SET NULL");
     }
@@ -72,8 +71,6 @@ final class Version20260616075543 extends PreUpAssertionMigration
             $this->addSql("ALTER TABLE `{$tableName}` DROP FOREIGN KEY FK_9894AA2612469DE2");
         }
 
-        if (self::TABLE_COMMENT === $table->getComment()) {
-            $this->addSql("DROP TABLE `{$tableName}`");
-        }
+        $this->addSql("DROP TABLE `{$tableName}`");
     }
 }
