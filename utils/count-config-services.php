@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 $rootDirectory = dirname(__DIR__);
 
 require $rootDirectory.'/vendor/autoload.php';
