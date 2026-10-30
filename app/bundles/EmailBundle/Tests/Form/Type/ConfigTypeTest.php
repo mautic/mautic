@@ -144,12 +144,14 @@ final class ConfigTypeTest extends TypeTestCase
 
     public function testEscapedPasswordIsResolvedBeforeMailboxConfiguration(): void
     {
+        $mailboxSettings = [];
+
         $this->mailbox
             ->expects($this->once())
             ->method('setMailboxSettings')
-            ->with($this->callback(
-                static fn (array $settings): bool => 'abc%def%ghi' === ($settings['password'] ?? null)
-            ));
+            ->willReturnCallback(function (array $settings) use (&$mailboxSettings): void {
+                $mailboxSettings = $settings;
+            });
 
         $this->factory->create(
             ConfigMonitoredMailboxesType::class,
@@ -168,5 +170,7 @@ final class ConfigTypeTest extends TypeTestCase
                 'general_settings' => [],
             ]
         );
+
+        $this->assertSame('abc%def%ghi', $mailboxSettings['password']);
     }
 }
