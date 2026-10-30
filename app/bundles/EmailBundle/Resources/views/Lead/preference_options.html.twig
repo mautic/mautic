@@ -23,7 +23,7 @@
         }
     }
 </script>
-<div class="row text-left">
+<div class="row text-start">
     {{ form_start(form, {'render_rest': false}) }}
     <div class="col-xs-12 col-md-8 col-md-offset-2">
         <div class="panel panel-default">
@@ -43,7 +43,7 @@
                             {% set channelName =  getChannelLabel(channel.value)|lower %}
                             <tr>
                                 <td>
-                                    <div class="text-left">
+                                    <div class="text-start">
                                         <input type="hidden" id="{{ channel.value }}-hidden"
                                                name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
                                                value="">
@@ -56,7 +56,7 @@
                             {%- do form.lead_channels.subscribed_channels.setRendered(true) %}
                             <tr>
                                 <td>
-                                    <div id="frequency_{{ channel.value }}" class="text-left row">
+                                    <div id="frequency_{{ channel.value }}" class="text-start row">
                                         {% if showContactFrequency %}
                                             <div class="col-md-6" data-contact-frequency="1">
                                                 <label class="text-secondary">{{ form.lead_channels['frequency_number_' ~ channel.value].vars.label|trans }}</label>
@@ -81,15 +81,15 @@
                 </table>
                 {% if showContactPreferredChannels %}
                     <hr />
-                    <div id="preferred_channel" class="text-left">{{ form_row(form.lead_channels.preferred_channel) }}</div>
+                    <div id="preferred_channel" class="text-start">{{ form_row(form.lead_channels.preferred_channel) }}</div>
                 {% endif %}
                 {% set segmentCount = form.lead_lists is defined ? form.lead_lists.vars.choices|length : 0 %}
                 {% if showContactSegments and segmentCount > 0 %}
                     <hr />
                     <div id="contact-segments">
-                        <div class="text-left">{{ form_label(form.lead_lists) }}</div>
+                        <div class="text-start">{{ form_label(form.lead_lists) }}</div>
                         {% for key, leadList in form.lead_lists %}
-                            <div id="segment-{{ key }}" class="text-left">
+                            <div id="segment-{{ key }}" class="text-start">
                                 {{ form_widget(leadList) }}
                                 {{ form_label(leadList) }}
                             </div>
@@ -100,9 +100,9 @@
                 {% if showContactCategories and categoryCount > 0 %}
                     <hr />
                     <div id="global-categories">
-                        <div class="text-left">{{ form_label(form.global_categories) }}</div>
+                        <div class="text-start">{{ form_label(form.global_categories) }}</div>
                         {% for key, category in form.global_categories %}
-                            <div id="category-{{ key }}" class="text-left">
+                            <div id="category-{{ key }}" class="text-start">
                                 {{ form_widget(category) }}
                                 {{ form_label(category) }}
                             </div>
@@ -121,7 +121,7 @@
                     {{ 'mautic.email.unsubscribe_all.text'|trans ({'%link%' : dncUrl})|purify }}
                 </div>
             </div>
-            <div class="panel-footer text-left">
+            <div class="panel-footer text-start">
                 {{ form_row(form.buttons.save) }}
             </div>
         </div>

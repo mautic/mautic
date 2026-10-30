@@ -1,7 +1,7 @@
 <td>
     <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
         {% if item.id in noContactList|keys %}
-            <div class="pull-right">
+            <div class="float-end">
                 {{ include('@MauticLead/Lead/dnc_small.html.twig', {
                     'dncList': noContactList[item.id],
                 }) }}

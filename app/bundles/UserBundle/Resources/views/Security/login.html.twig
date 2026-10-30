@@ -24,18 +24,18 @@
 			<span class="input-group-addon">
 				<i class="ri-user-6-fill"></i>
 			</span>
-			<label for="username" class="sr-only">{% trans %}mautic.user.auth.form.loginusername{% endtrans %}</label>
-			<input type="text" id="username" name="_username" class="form-control input-lg" value="{{ last_username|escape }}" required autofocus placeholder="{% trans %}mautic.user.auth.form.loginusername{% endtrans %}"/>
+			<label for="username" class="visually-hidden">{% trans %}mautic.user.auth.form.loginusername{% endtrans %}</label>
+			<input type="text" id="username" name="_username" class="form-control form-control-lg" value="{{ last_username|escape }}" required autofocus placeholder="{% trans %}mautic.user.auth.form.loginusername{% endtrans %}"/>
 		</div>
 		<div class="input-group mb-md">
 			<span class="input-group-addon">
 				<i class="ri-key-2-line"></i>
 			</span>
-			<label for="password" class="sr-only">{% trans %}mautic.core.password{% endtrans %}:</label>
-			<input type="password" id="password" name="_password" class="form-control input-lg" required placeholder="{% trans %}mautic.core.password{% endtrans %}"/>
+			<label for="password" class="visually-hidden">{% trans %}mautic.core.password{% endtrans %}:</label>
+			<input type="password" id="password" name="_password" class="form-control form-control-lg" required placeholder="{% trans %}mautic.core.password{% endtrans %}"/>
 		</div>
 
-		<div class="pull-left mb-md">
+		<div class="float-start mb-md">
 			{% include '@MauticCore/Components/checkbox.html.twig' with {
 				inline: true,
 				items: [{ id: 'remember_me', name: '_remember_me', value: 'on', label: 'mautic.user.auth.form.rememberme' }]
@@ -54,7 +54,7 @@
 			]
 		} %}
 
-		<div class="mt-sm text-right">
+		<div class="mt-sm text-end">
 			<a href="{{ path('mautic_user_passwordreset') }}">{% trans %}mautic.user.user.passwordreset.link{% endtrans %}</a>
 		</div>
 	</form>
@@ -62,7 +62,7 @@
 		<ul class="list-group">
 			{% for sso in integrations %}
 				<a href="{{ path('mautic_sso_login', {'integration' : sso.getName()}) }}" class="list-group-item">
-					<img class="pull-left mr-xs" style="height: 16px;" src="{{ getAssetUrl(sso.getIcon()) }}">
+					<img class="float-start mr-xs" style="height: 16px;" src="{{ getAssetUrl(sso.getIcon()) }}">
 					<p class="list-group-item-heading">{{ ('mautic.integration.sso.' ~ sso.getName())|trans }}</p>
 				</a>
 			{% endfor %}

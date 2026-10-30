@@ -58,8 +58,8 @@ final class TableHeaderTest extends TestCase
             'tooltip' => 'Tooltip',
         ]);
 
-        $this->assertStringContainsString('data-toggle="tooltip"', $html);
-        $this->assertStringContainsString('data-original-title="Tooltip"', $html);
+        $this->assertStringContainsString('data-bs-toggle="tooltip"', $html);
+        $this->assertStringContainsString('data-bs-title="Tooltip"', $html);
     }
 
     public function testNoTooltipMarkupWhenTooltipIsNotProvidedWithoutSessionVar(): void
@@ -68,7 +68,7 @@ final class TableHeaderTest extends TestCase
             'text' => 'Test Column',
         ]);
 
-        $this->assertStringNotContainsString('data-toggle="tooltip"', $html);
+        $this->assertStringNotContainsString('data-bs-toggle="tooltip"', $html);
     }
 
     public function testTooltipIsRenderedOnSortableHeader(): void
@@ -80,8 +80,8 @@ final class TableHeaderTest extends TestCase
             'tooltip'    => 'SortMe',
         ]);
 
-        $this->assertStringContainsString('class="fw-b" data-toggle="tooltip"', $html);
-        $this->assertStringContainsString('data-original-title="SortMe"', $html);
+        $this->assertStringContainsString('class="fw-b" data-bs-toggle="tooltip"', $html);
+        $this->assertStringContainsString('data-bs-title="SortMe"', $html);
     }
 
     public function testTooltipIsRenderedOnNonSortableHeaderWithSessionVar(): void
@@ -92,8 +92,8 @@ final class TableHeaderTest extends TestCase
             'tooltip'    => 'StaticColumn',
         ]);
 
-        $this->assertStringContainsString('class="pa-md" data-toggle="tooltip"', $html);
-        $this->assertStringContainsString('data-original-title="StaticColumn"', $html);
+        $this->assertStringContainsString('class="pa-md" data-bs-toggle="tooltip"', $html);
+        $this->assertStringContainsString('data-bs-title="StaticColumn"', $html);
     }
 
     public function testTooltipAttributeValueIsEscaped(): void
@@ -104,6 +104,6 @@ final class TableHeaderTest extends TestCase
         ]);
 
         $this->assertStringNotContainsString('<script>', $html);
-        $this->assertMatchesRegularExpression('/<span[^>]*data-original-title="[^"]*"[^>]*>Test Column<\/span>/', $html);
+        $this->assertMatchesRegularExpression('/<span[^>]*data-bs-title="[^"]*"[^>]*>Test Column<\/span>/', $html);
     }
 }

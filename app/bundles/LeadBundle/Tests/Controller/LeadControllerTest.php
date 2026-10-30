@@ -94,13 +94,10 @@ final class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $responseContent = json_decode($clientResponse->getContent(), true);
-        $contentDom      = new \DOMDocument();
-        $contentDom->loadHTML($responseContent['newContent']);
-
-        $xpath = new \DOMXPath($contentDom);
+        $crawler         = new Crawler($responseContent['newContent']);
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals(1, $xpath->query("//option[@value='segment']")->count());
+        $this->assertCount(1, $crawler->filter('option[value="segment"]'));
     }
 
     public function testAddCategorizedLeadList(): void
@@ -848,7 +845,7 @@ EMAIL;
         $crawler = $this->client->submit($form);
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $errorContainer = $crawler->filter('form[name="lead"] .has-error .help-block');
+        $errorContainer = $crawler->filter('form[name="lead"] .has-error .form-text');
         $this->assertCount(1, $errorContainer);
         $this->assertSame('This field must be unique.', $errorContainer->text(null, true));
     }
