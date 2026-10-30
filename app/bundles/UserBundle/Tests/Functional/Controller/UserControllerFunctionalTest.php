@@ -118,6 +118,36 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('The email entered is invalid.', (string) $this->client->getResponse()->getContent());
     }
 
+    public function testIndexUsesLocalAvatars(): void
+    {
+        $crawler = $this->client->request('GET', '/s/users');
+
+        $this->assertResponseIsSuccessful();
+        $images = $crawler->filter('#userTable tbody img');
+        $this->assertGreaterThan(0, $images->count());
+
+        foreach ($images as $image) {
+            $this->assertInstanceOf(\DOMElement::class, $image);
+            $this->assertLocalAvatarUrl($image->getAttribute('src'));
+            $this->assertSame('', $image->getAttribute('alt'));
+        }
+    }
+
+    public function testAccountPageUsesLocalAvatar(): void
+    {
+        $crawler = $this->client->request('GET', '/s/account');
+
+        $this->assertResponseIsSuccessful();
+        $image = $crawler->filter('img.media-object');
+        $this->assertGreaterThan(0, $image->count());
+        $this->assertLocalAvatarUrl((string) $image->attr('src'));
+    }
+
+    private function assertLocalAvatarUrl(string $avatarUrl): void
+    {
+        $this->assertStringStartsWith('data:image/svg+xml;', $avatarUrl);
+    }
+
     public function testIndexIncludesInviteForm(): void
     {
         $crawler = $this->client->request('GET', '/s/users');
