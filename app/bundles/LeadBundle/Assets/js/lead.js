@@ -139,7 +139,7 @@ Mautic.leadOnLoad = function (container, response) {
         leadMap = Mautic.initMap('#place-container', 'markers');
     });
 
-    mQuery('a[data-toggle="tab"]').not('a#load-lead-map').on('shown.bs.tab', function (e) {
+    mQuery('a[data-toggle="tab"], a[data-bs-toggle="tab"]').not('a#load-lead-map').on('shown.bs.tab', function (e) {
         if (leadMap.length) {
             leadMap.destroyMap();
             leadMap = undefined;
@@ -1256,7 +1256,7 @@ Mautic.reloadLeadImportProgress = function() {
                 if (response.progress[0] > 0) {
                     mQuery('.imported-count').html(response.progress[0]);
                     mQuery('.progress-bar-import').attr('aria-valuenow', response.progress[0]).css('width', response.percent + '%');
-                    mQuery('.progress-bar-import span.sr-only').html(response.percent + '%');
+                    mQuery('.progress-bar-import span.visually-hidden').html(response.percent + '%');
                 }
             }
         }, false, false, "GET");
@@ -1737,7 +1737,7 @@ Mautic.listOnLoad = function(container, response) {
     let jsPlumbData = null;
 
     if (segmentDependenciesTab.length) {
-        mQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
+        mQuery(document).on('shown.bs.tab', 'a[data-toggle="tab"], a[data-bs-toggle="tab"]', function (e) {
             if (!mQuery(e.target).attr('id') === 'segment-dependencies') {
                 return;
             }
@@ -1767,7 +1767,7 @@ Mautic.listOnLoad = function(container, response) {
             }
         });
 
-        mQuery(document).on('hide.bs.tab', 'a[data-toggle="tab"]', function (e) {
+        mQuery(document).on('hide.bs.tab', 'a[data-toggle="tab"], a[data-bs-toggle="tab"]', function (e) {
             if (!mQuery(e.target).attr('id') !== 'segment-dependencies') {
                 Mautic.cleanSegmentDependencies();
             }

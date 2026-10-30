@@ -20,7 +20,7 @@
 <div class="row">
     <div class="col-md-12">
         <div class="characters-count">
-            <span class="control-label" data-toggle="tooltip" data-container="body" data-placement="top" title="" data-original-title="{{ 'mautic.sms.form.nbcharacter.infobox'|trans }}">
+            <span class="form-label" data-bs-toggle="tooltip" data-bs-container="body" data-bs-placement="top" title="" data-bs-title="{{ 'mautic.sms.form.nbcharacter.infobox'|trans }}">
                 {{ 'mautic.sms.form.nbcharacter.counter'|trans }}
                 <span size="sm" class="label label-gray" id="sms_nb_char">0</span>
             </span>
@@ -33,7 +33,7 @@
 
 <div class="row {% if not sms.getIsMms() %}hide{% endif %}" id="media_div">
     <div class="col-md-12">
-        <div class="control-label">{{ form.media.vars.label|trans }}</div>
+        <div class="form-label">{{ form.media.vars.label|trans }}</div>
     </div>
     <div class="col-md-5">
         <button type="button" id="upload_mms_media" class="btn btn-primary" onclick="javascript:Mautic.loadNewWindow({windowUrl:'{{ path('mautic_base_index') }}elfinder?editor=media_form'})">
@@ -50,7 +50,7 @@
                 <i class="ri-file-upload-line"></i>
             </button>
         </div>
-        <p id="media_url_error" class="help-block text-danger hide"></p>
+        <p id="media_url_error" class="form-text text-danger hide"></p>
     </div>
     <div class="col-md-12">
         <ul id="media_row">

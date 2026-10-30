@@ -6,7 +6,7 @@
                 <span class="text-secondary mb-lg ellipsis">
                     {{ stat.title|trans }}
                     {% if stat.tooltip is defined %}
-                        <i class="ri-information-line ml-3" data-toggle="tooltip" title="{{ stat.tooltip|trans }}"></i>
+                        <i class="ri-information-line ml-3" data-bs-toggle="tooltip" title="{{ stat.tooltip|trans }}"></i>
                     {% endif %}
                 </span>
                 {% if stat.desc is defined %}

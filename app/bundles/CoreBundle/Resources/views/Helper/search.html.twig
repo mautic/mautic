@@ -80,13 +80,13 @@
                 {
                     label: 'mautic.core.reset_filter',
                     variant: 'secondary',
-                    onclick: 'Mautic.resetFilters()',
+                    attributes: {'type': 'button', 'data-filter-action': 'reset'},
                     size: 'lg'
                 },
                 {
                     label: 'mautic.core.apply_filter',
                     variant: 'primary',
-                    onclick: 'Mautic.applyFilters()',
+                    attributes: {'type': 'button', 'data-filter-action': 'apply'},
                     size: 'lg'
                 }
             ]
@@ -105,6 +105,7 @@
             'type': 'button',
             'data-container': 'body',
             'data-toggle': 'popover',
+            'data-quick-filter': '',
             'data-html': 'true',
             'data-placement': 'left',
             'data-content': filtering|escape('html_attr')

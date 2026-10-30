@@ -7,7 +7,7 @@
         {%- set channelName = getChannelLabel(channel.value)|lower %}
         <tr>
             <td>
-                <div class="text-left">
+                <div class="text-start">
                     <input type="hidden" id="{{ channel.value }}-hidden"
                            name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
                            value="">
@@ -19,7 +19,7 @@
         </tr>
         <tr>
             <td>
-                <div id="frequency_{{ channel.value }}" class="text-left row">
+                <div id="frequency_{{ channel.value }}" class="text-start row">
                     {%- if
                         form.lead_channels['frequency_number_' ~ channel.value] is defined
                         and form.lead_channels['frequency_time_' ~ channel.value] is defined
@@ -72,7 +72,7 @@
     <tbody>
     <tr>
         <td>
-            <div class="text-left">
+            <div class="text-start">
                 {% include '@MauticCore/Components/checkbox.html.twig' with {
                     items: [{ checked: true, label: channelfrequency['label-text']|default('mautic.lead.contact.me.label'|trans) }]
                 } only %}
@@ -81,7 +81,7 @@
     </tr>
     <tr>
         <td>
-            <div id="frequency_email" class="text-left row">
+            <div id="frequency_email" class="text-start row">
                 <div class="col-xs-6">
                     <label class="text-secondary label1">{{ channelfrequency['label-text1']|default('mautic.lead.list.frequency.number'|trans) }}</label>
                     <input type="text" class="frequency form-control">

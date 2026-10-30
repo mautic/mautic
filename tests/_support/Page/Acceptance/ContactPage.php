@@ -50,8 +50,6 @@ final class ContactPage
 
     public static $uploadButton           = '#lead_import_start';
 
-    public static $importModal            = '#app-content > div > div.row.animation--slide-in-up > div > div > div.row > div > div';
-
     public static $firstName              = '#lead_field_import_firstname_chosen';
 
     public static $lastName               = '#lead_field_import_lastname_chosen';
@@ -104,9 +102,9 @@ final class ContactPage
     public static $clearAllContactsSelection = '#form-cancel';
 
     // Do Not Contact
-    public static $firstContactDoNotContact  = '#leadTable > tbody > tr:nth-child(1) > td:nth-child(2) > a > div.pull-right > span';
+    public static $firstContactDoNotContact  = '#leadTable > tbody > tr:nth-child(1) > td:nth-child(2) > a > div.float-end > span';
 
-    public static $secondContactDoNotContact = '#leadTable > tbody > tr:nth-child(2) > td:nth-child(2) > a > div.pull-right > span';
+    public static $secondContactDoNotContact = '#leadTable > tbody > tr:nth-child(2) > td:nth-child(2) > a > div.float-end > span';
 
     public static $doNotContactSaveButton    = '//*[@id="MauticSharedModal"]/div/div/div[3]/div/button[1]';
 
@@ -117,7 +115,7 @@ final class ContactPage
      */
     public static function route($param): string
     {
-        return static::$URL.$param;
+        return self::$URL.$param;
     }
 
     /**

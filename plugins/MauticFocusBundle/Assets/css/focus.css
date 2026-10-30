@@ -38,8 +38,19 @@
 .builder-panel-focus #focusFormContent {
   min-height: 1000px;
 }
-.builder-panel-focus .panel-title a {
+.builder-panel-focus .panel-title a,
+.builder-panel-focus .panel-title > button {
   display: block;
+}
+.builder-panel-focus .panel-title > button {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
 }
 .builder-panel-focus .nav > li > a {
   padding: 8px 16px;

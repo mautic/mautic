@@ -49,14 +49,14 @@
             </div>
             {% else %}
             <div class="mautibot-image col-xs-4 col-md-3">
-                <img class="img-responsive mautibot" src="{{ src }}" />
+                <img class="img-fluid mautibot" src="{{ src }}" />
             </div>
             <div class="mautibot-content col-xs-8 col-md-9">
                 <blockquote class="np break-word">
                     <h2><i class="ri-double-quotes-l"></i> <strong>{{ status_code }}</strong> {{ status_text }}{{ exceptionMessage }} <i class="ri-double-quotes-r"></i></h2>
-                    <footer class="text-right">Mautibot</footer>
+                    <footer class="text-end">Mautibot</footer>
                 </blockquote>
-                <div class="pull-right">
+                <div class="float-end">
                     <a class="text-secondary" href="http://mau.tc/report-issue" target="_new">{{ 'mautic.core.report_issue' | trans }}</a>
                 </div>
             </div>
@@ -89,12 +89,12 @@
                         <div class="panel panel-default">
                             <div class="panel-heading" role="tab" id="previous_heading_{{ key }}">
                                 <h4 class="panel-title pa-sm">
-                                    <a data-toggle="collapse" data-parent="#previous" href="#previous_body_{{ key }}" aria-expanded="true" aria-controls="collapseOne">
+                                    <a data-bs-toggle="collapse" href="#previous_body_{{ key }}" aria-expanded="true" aria-controls="collapseOne">
                                         {{ e.message }}
                                     </a>
                                 </h4>
                             </div>
-                            <div id="previous_body_{{ key }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                            <div id="previous_body_{{ key }}" data-bs-parent="#previous" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                                 <div class="panel-body">
                                     <div class="pa-sm">
                                         {{ include ('@MauticCore/Exception/traces.html.twig', {

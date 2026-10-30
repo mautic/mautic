@@ -272,7 +272,7 @@ final class ButtonHelper
                 "{$this->wrapClosingTag}\n";
         } else {
             // Default `data-toggle` for buttons
-            if (!isset($button['attr']['data-toggle'])) {
+            if (!isset($button['attr']['data-toggle']) && !isset($button['attr']['data-bs-toggle'])) {
                 $button['attr']['data-toggle'] = 'ajax';
             }
 
@@ -432,7 +432,8 @@ final class ButtonHelper
                     if ('title' == $k) {
                         $v = $this->translator->trans($v);
                     }
-                    $tooltip .= " {$k}=".'"'.$v.'"';
+                    $attribute = 'placement' == $k ? 'data-bs-placement' : $k;
+                    $tooltip .= " {$attribute}=".'"'.$v.'"';
                 }
             } else {
                 $tooltip .= ' title="'.$this->translator->trans($button['tooltip']).'" data-bs-placement="left"';

@@ -19,12 +19,12 @@
           <div class="panel panel-default panel-{{ integrationName|lower }}">
               <div class="panel-heading pr-0">
                   <h3 class="panel-title">{{ ('mautic.integration.'~integrationName)|trans }}</h3>
-                  <div class="panel-toolbar text-right">
-                      <a href="javascript:void(0);" class="btn" data-toggle="tooltip" onclick="Mautic.refreshLeadSocialProfile('{{ integrationName }}', '{{ lead.id }}', event);"
+                  <div class="panel-toolbar text-end">
+                      <a href="javascript:void(0);" class="btn" data-bs-toggle="tooltip" onclick="Mautic.refreshLeadSocialProfile('{{ integrationName }}', '{{ lead.id }}', event);"
                          title="{{ 'mautic.lead.lead.social.lastupdate'|trans({'%datetime%': dateToFullConcat(details.lastRefresh, 'utc')}) }}">
                           <i class="text-white ri-refresh-line"></i>
                       </a>
-                      <a href="javascript:void(0);" class="btn" onclick="Mautic.clearLeadSocialProfile('{{ integrationName }}', '{{ lead.id }}', event);" data-toggle="tooltip"
+                      <a href="javascript:void(0);" class="btn" onclick="Mautic.clearLeadSocialProfile('{{ integrationName }}', '{{ lead.id }}', event);" data-bs-toggle="tooltip"
                          title="{{ 'mautic.lead.lead.social.removecache'|trans }}">
                           <i class="text-white ri-close-line"></i>
                       </a>
@@ -47,7 +47,7 @@
 {% endif %}
 {{ include('@MauticCore/Helper/modal.html.twig', {
     'id': 'socialImageModal',
-    'body': '<img class="img-responsive img-thumbnail" />',
+    'body': '<img class="img-fluid img-thumbnail" />',
     'header': false,
     'padding': 'np',
 }) }}

@@ -67,7 +67,7 @@
           <tr>
             <th class="timeline-icon np"></th>
             <th class="table-expand np">
-                <a class="table-expand-button" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
+                <a class="table-expand-button" data-activate-details="all" data-bs-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
                     <span class="ri-arrow-down-s-line"></span>
                 </a>
             </th>
@@ -121,7 +121,7 @@
                       <a href="javascript:void(0);"
                          data-activate-details="{{ counter }}"
                          class="table-expand-button {% if event.contentTemplate is not defined or hasDetails == false %}hide{% endif %}"
-                         data-toggle="tooltip"
+                         data-bs-toggle="tooltip"
                          title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
                          <span class="ri-arrow-down-s-line"></span>
                       </a>

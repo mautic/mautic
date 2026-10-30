@@ -4,13 +4,12 @@
 <ul id="formTokensAccordion" class="accordion" role="tablist" aria-multiselectable="true">
     <!-- Form specific tokens -->
     <li class="panel">
-        <a role="button" id="headingFormTokens" class="accordion-heading collapsed" data-toggle="collapse"
-            data-parent="#formTokensAccordion" href="#collapseFormTokens" aria-expanded="false"
+        <button type="button" id="headingFormTokens" class="accordion-heading collapsed" data-bs-toggle="collapse" data-bs-target="#collapseFormTokens" aria-expanded="false"
             aria-controls="collapseFormTokens">
             <i class="ri-arrow-down-s-line accordion-arrow"></i>
             <span class="accordion-title">{{ 'mautic.placeholder_tokens.form_tokens'|trans }}</span>
-        </a>
-        <div id="collapseFormTokens" class="collapse accordion-wrapper" role="tabpanel"
+        </button>
+        <div id="collapseFormTokens" data-bs-parent="#formTokensAccordion" class="collapse accordion-wrapper" role="tabpanel"
             aria-labelledby="headingFormTokens">
 
             <table class="table table-hover">

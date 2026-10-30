@@ -47,12 +47,12 @@
 <!-- tabs controls -->
 <ul class="nav nav-tabs nav-tabs-line">
     <li class="{% if 'details-container' == activeTab %}active{% endif %}" id="details-tab">
-        <a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.plugin.integration.tab.details'|trans }}</a>
+        <a href="#details-container" role="tab" data-bs-toggle="tab" class="{% if 'details-container' == activeTab %}active {% endif %}nav-link">{{ 'mautic.plugin.integration.tab.details'|trans }}</a>
     </li>
 
     {%- if hasSupportedFeatures or hasFeatureSettings -%}
         <li class="" id="features-tab">
-            <a href="#features-container" role="tab" data-toggle="tab">
+            <a href="#features-container" role="tab" data-bs-toggle="tab" class="nav-link">
                 {{- 'mautic.plugin.integration.tab.features'|trans -}}
                 {%- if (hasSupportedFeatures and formContainsErrors(form.supportedFeatures)) or (hasFeatureSettings and formContainsErrors(form.featureSettings, ['leadFields'])) -%}
                     <i class="ri-fw ri-alert-fill text-danger"></i>
@@ -63,7 +63,7 @@
 
     {%- if hasFields -%}
         <li class="{{ fieldTabClass }} {% if 'leadFieldsContainer' == activeTab %}active{% endif %}" id="fields-tab">
-            <a href="#fields-container" role="tab" data-toggle="tab">
+            <a href="#fields-container" role="tab" data-bs-toggle="tab" class="{% if 'leadFieldsContainer' == activeTab %}active {% endif %}nav-link">
                 {{- 'mautic.plugin.integration.tab.fieldmapping'|trans -}}
                 {%- if hasLeadFieldErrors -%}
                     <i class="ri-fw ri-alert-fill text-danger"></i>
@@ -74,7 +74,7 @@
 
     {%- if companyFieldHtml is not empty -%}
         <li class="{{ fieldTabClass }} {% if 'companyFieldsContainer' == activeTab %}active{% endif %}" id="company-fields-tab">
-            <a href="#company-fields-container" role="tab" data-toggle="tab">
+            <a href="#company-fields-container" role="tab" data-bs-toggle="tab" class="{% if 'companyFieldsContainer' == activeTab %}active {% endif %}nav-link">
                 {{- 'mautic.plugin.integration.tab.companyfieldmapping'|trans -}}
                 {%- if hasCompanyFieldErrors -%}
                     <i class="ri-fw ri-alert-fill text-danger"></i>
