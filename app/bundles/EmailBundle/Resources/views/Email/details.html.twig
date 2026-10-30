@@ -408,7 +408,7 @@
               </div>
 
               <div class="stats-menu__content tab-content pa-md mb-lg shd-sm">
-                  <div class="tab-pane active bdr-w-0" id="stats-container">
+                  <div class="tab-pane active border-0" id="stats-container">
                       <div id="emailGraphStats"
                            data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
                       >
@@ -418,7 +418,7 @@
                       </div>
 
                   </div>
-                  <div class="tab-pane bdr-w-0" id="reads-map-container"
+                  <div class="tab-pane border-0" id="reads-map-container"
                        data-map-url="{{ path('mautic_email_map_stats', {'objectId' : email.id, 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}"
                   >
                       <div class="spinner">
@@ -454,7 +454,7 @@
 
           <!-- start: tab-content -->
           <div class="tab-content pa-md">
-              <div class="tab-pane active bdr-w-0" id="clicks-container">
+              <div class="tab-pane active border-0" id="clicks-container">
                   {{- include('@MauticPage/Trackable/click_counts.html.twig', {
                       'trackables'  : trackables,
                       'entity'      : email,
@@ -464,13 +464,13 @@
                   }) -}}
               </div>
 
-              <div class="tab-pane bdr-w-0 page-list" id="contacts-container">
+              <div class="tab-pane border-0 page-list" id="contacts-container">
                   {{ contacts | raw }}
               </div>
 
               <!-- #translation-container -->
               {% if showTranslations %}
-                  <div class="tab-pane bdr-w-0" id="translation-container">
+                  <div class="tab-pane border-0" id="translation-container">
                       {{ translationContent|raw }}
                   </div>
               {% endif %}
@@ -487,9 +487,9 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bdr-l height-auto">
+      <div class="col-md-3 border-start height-auto">
           <!-- email preview -->
-          <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+          <div class="panel shd-none rounded-0 border-0 mt-sm mb-0">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.email.preview.url'|trans }}</div>
               </div>
@@ -564,7 +564,7 @@
           <!--/ email preview -->
 
           {% if emailType == 'list' and email.lists|length > 0 %}
-              <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0" id="email-segments-used">
+              <div class="panel shd-none rounded-0 border-0 mt-sm mb-0" id="email-segments-used">
                   <div class="panel-heading">
                       <div class="panel-title">{{ 'mautic.email.segments.used'|trans }}</div>
                   </div>
@@ -598,7 +598,7 @@
 
           <!-- Draft preview URL -->
           {% if draftPreviewUrl is defined and draftPreviewUrl is not empty %}
-          <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+          <div class="panel bg-transparent shd-none rounded-0 border-0 mt-sm mb-0">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.email.draft.preview.url'|trans }}</div>
               </div>
@@ -625,7 +625,7 @@
           {% endif %}
 
           <!-- email usages -->
-          <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0" data-fetch-email-usages="{{ email.id }}">
+          <div class="panel shd-none rounded-0 border-0 mt-sm mb-0" data-fetch-email-usages="{{ email.id }}">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.email.usages'|trans }}</div>
               </div>

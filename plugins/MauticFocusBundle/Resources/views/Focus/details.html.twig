@@ -192,13 +192,13 @@
                         ]}) }}
                           <div class="panel">
                               <div class="panel-body box-layout">
-                                  <div class="col-xs-4 va-m">
+                                  <div class="col-xs-4 align-middle">
                                       <h5 class="text-white dark-md fw-sb mb-xs">
                                           <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.focus.graph.stats'|trans }}
                                       </h5>
                                   </div>
-                                  <div class="col-xs-8 va-m">
+                                  <div class="col-xs-8 align-middle">
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
@@ -226,7 +226,7 @@
 
                   <!-- start: tab-content -->
                   <div class="tab-content pa-md">
-                      <div class="tab-pane active bdr-w-0" id="clicks-container">
+                      <div class="tab-pane active border-0" id="clicks-container">
                           {{ include('@MauticPage/Trackable/click_counts.html.twig', {
                                   'trackables': trackables,
                                   'entity': item,
@@ -242,7 +242,7 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bdr-l height-auto">
+      <div class="col-md-3 border-start height-auto">
           <!-- form HTML -->
           <div class="pa-md">
               {% set aboveFoldContent %}
@@ -273,7 +273,7 @@
           <hr class="hr-w-2" style="width:50%">
 
           {# we can leverage data from audit_log table and build activity feed from it #}
-          <div class="panel shd-none bdr-rds-0 bdr-w-0 mb-0">
+          <div class="panel shd-none rounded-0 border-0 mb-0">
               <!-- recent activity -->
               {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
           </div>

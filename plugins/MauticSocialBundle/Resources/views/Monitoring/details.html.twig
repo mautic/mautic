@@ -72,13 +72,13 @@
                       <div class="col-sm-12">
                           <div class="panel">
                               <div class="panel-body box-layout">
-                                  <div class="col-md-3 va-m">
+                                  <div class="col-md-3 align-middle">
                                       <h5 class="text-white dark-md fw-sb mb-xs">
                                           <span class="ri-twitter-x-line"></span>
                                           {{ ('mautic.social.monitoring.' ~ activeMonitoring.networkType ~ '.popularity')|trans }}
                                       </h5>
                                   </div>
-                                  <div class="col-md-9 va-m">
+                                  <div class="col-md-9 align-middle">
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
@@ -107,7 +107,7 @@
           <!-- start: tab-content -->
           <div class="tab-content pa-md">
               <!-- #events-container -->
-              <div class="tab-pane active fade in bdr-w-0 page-list" id="leads-container">
+              <div class="tab-pane active fade in border-0 page-list" id="leads-container">
                   {{ monitorLeads|raw }}
               </div>
           </div>
@@ -116,7 +116,7 @@
       <!--/ left section -->
 
       <!-- right section -->
-      <div class="col-md-3 bdr-l height-auto">
+      <div class="col-md-3 border-start height-auto">
           <!-- recent activity -->
           {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
       </div>
