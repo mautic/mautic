@@ -351,6 +351,22 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('0', $this->getConfigPageForm('formconfig')['config[formconfig][form_track_submitters]']->getValue());
     }
 
+    public function testAggregateAnalyticsDefaultsToEnabledAndCanBeDisabled(): void
+    {
+        $this->assertSame('1', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][aggregate_analytics]']->getValue());
+        $this->assertStringContainsString('Record aggregate analytics', (string) $this->client->getResponse()->getContent());
+
+        $this->submitConfigPage('trackingconfig', [
+            'config[trackingconfig][aggregate_analytics]' => '0',
+        ]);
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('aggregate_analytics', $configParameters);
+        $this->assertFalse((bool) $configParameters['aggregate_analytics']);
+
+        $this->assertSame('0', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][aggregate_analytics]']->getValue());
+    }
+
     public function testRestrictedAssetFieldIsNotRenderedInConfigForm(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/assetconfig');
