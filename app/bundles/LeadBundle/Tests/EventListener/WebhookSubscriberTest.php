@@ -135,7 +135,6 @@ final class WebhookSubscriberTest extends TestCase
                     'old_status' => 'contactable',
                     'new_status' => 'unsubscribed',
                 ],
-
                 [
                     'leadDetails',
                     'userList',

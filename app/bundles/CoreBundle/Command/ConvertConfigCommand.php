@@ -44,11 +44,15 @@ final class ConvertConfigCommand extends Command
         $this
             ->setDefinition([
                 new InputOption(
-                    'theme', null, InputOption::VALUE_REQUIRED,
+                    'theme',
+                    null,
+                    InputOption::VALUE_REQUIRED,
                     'The name of the theme whose config you are converting.'
                 ),
                 new InputOption(
-                    'save-php-config', null, InputOption::VALUE_NONE,
+                    'save-php-config',
+                    null,
+                    InputOption::VALUE_NONE,
                     'When used, the theme\'s PHP config file will be saved.'
                 ),
             ]);

@@ -217,11 +217,15 @@ final class PageController extends AbstractStandardFormController
             ]);
         }
         if (!$this->security->hasEntityAccess(
-            'page:pages:viewown', 'page:pages:viewother', $activePage->getCreatedBy()
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $activePage->getCreatedBy()
         )
             || ($activePage->getIsPreferenceCenter()
             && !$this->security->hasEntityAccess(
-                'page:preference_center:viewown', 'page:preference_center:viewother', $activePage->getCreatedBy()
+                'page:preference_center:viewown',
+                'page:preference_center:viewother',
+                $activePage->getCreatedBy()
             ))) {
             $this->throwAccessDenied();
         }
@@ -325,7 +329,9 @@ final class PageController extends AbstractStandardFormController
         ];
 
         return $this->delegateView([
-            'returnUrl' => $this->generateUrl('mautic_page_action', [
+            'returnUrl' => $this->generateUrl(
+                'mautic_page_action',
+                [
                 'objectAction' => 'view',
                 'objectId'     => $activePage->getId(), ]
             ),
@@ -534,10 +540,14 @@ final class PageController extends AbstractStandardFormController
             );
         }
         if (!$this->security->hasEntityAccess(
-            'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $entity->getCreatedBy()
         )
             || ($entity->getIsPreferenceCenter() && !$this->security->hasEntityAccess(
-                'page:preference_center:viewown', 'page:preference_center:viewother', $entity->getCreatedBy()
+                'page:preference_center:viewown',
+                'page:preference_center:viewother',
+                $entity->getCreatedBy()
             ))) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
@@ -700,7 +710,9 @@ final class PageController extends AbstractStandardFormController
         if (null != $entity) {
             if (!$this->security->isGranted('page:pages:create')
                 || !$this->security->hasEntityAccess(
-                    'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+                    'page:pages:viewown',
+                    'page:pages:viewother',
+                    $entity->getCreatedBy()
                 )
             ) {
                 $this->throwAccessDenied();
@@ -814,7 +826,9 @@ final class PageController extends AbstractStandardFormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    'page:pages:deleteown', 'page:pages:deleteother', $entity->getCreatedBy()
+                    'page:pages:deleteown',
+                    'page:pages:deleteother',
+                    $entity->getCreatedBy()
                 )) {
                     $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($this->pageModel->isLocked($entity)) {
@@ -864,7 +878,9 @@ final class PageController extends AbstractStandardFormController
             $isNew  = false;
             $entity = $model->getEntity($objectId);
             if (null == $entity || !$this->security->hasEntityAccess(
-                'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+                'page:pages:viewown',
+                'page:pages:viewother',
+                $entity->getCreatedBy()
             )) {
                 $this->throwAccessDenied();
             }
@@ -905,7 +921,9 @@ final class PageController extends AbstractStandardFormController
 
         if ($parent || !$this->security->isGranted('page:pages:create')
                 || !$this->security->hasEntityAccess(
-                    'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+                    'page:pages:viewown',
+                    'page:pages:viewother',
+                    $entity->getCreatedBy()
                 )
         ) {
             $this->throwAccessDenied();

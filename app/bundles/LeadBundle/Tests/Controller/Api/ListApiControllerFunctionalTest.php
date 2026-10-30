@@ -176,7 +176,8 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertGreaterThan(0, $segmentId);
         $this->assertEquals($payload['name'], $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
-        $this->assertEquals([
+        $this->assertEquals(
+            [
             [
                 'object'     => 'lead',
                 'glue'       => 'and',

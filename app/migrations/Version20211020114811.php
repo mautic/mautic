@@ -11,10 +11,13 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 final class Version20211020114811 extends PreUpAssertionMigration
 {
     private const string COMPANIES_TABLE           = 'companies';
+
     private const string SYNC_OBJECT_MAPPING_TABLE = 'sync_object_mapping';
 
     private const string INDEX_COMPANY_MATCH         = MAUTIC_TABLE_PREFIX.'company_match';
+
     private const string INDEX_INTEGRATION_OBJECT    = MAUTIC_TABLE_PREFIX.'integration_object';
+
     private const string INDEX_INTEGRATION_REFERENCE = MAUTIC_TABLE_PREFIX.'integration_reference';
 
     protected function preUpAssertions(): void
@@ -106,7 +109,8 @@ final class Version20211020114811 extends PreUpAssertionMigration
             $this->addSql(
                 sprintf(
                     'ALTER TABLE %s CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;',
-                    $tableName)
+                    $tableName
+                )
             );
         }
         $this->addSql('SET FOREIGN_KEY_CHECKS=1;');

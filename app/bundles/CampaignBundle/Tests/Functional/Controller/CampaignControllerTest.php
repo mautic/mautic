@@ -122,7 +122,9 @@ final class CampaignControllerTest extends MauticMysqlTestCase
         $this->campaign = $this->createCampaign('Campaign');
         $this->campaign->addList($segment);
 
-        $this->createEvent('Add 10 points', $this->campaign,
+        $this->createEvent(
+            'Add 10 points',
+            $this->campaign,
             'lead.changepoints',
             'action',
             ['points' => 10]
@@ -294,7 +296,7 @@ final class CampaignControllerTest extends MauticMysqlTestCase
     {
         $crawler = $this->getCrawler($campaign);
         $events  = [];
-        for ($eventIndex = 0;; ++$eventIndex) {
+        for ($eventIndex = 0; ; ++$eventIndex) {
             $node = $crawler->filter('.campaign-event-list')->filter('span')->eq($eventIndex * 3);
             if (1 > $node->count()) {
                 break;

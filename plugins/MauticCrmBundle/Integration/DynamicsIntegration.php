@@ -512,8 +512,18 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                 if ('accounts' === $object) {
                     $recordId = $entityData['accountid'];
                     // first try to find integration entity
-                    $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object, 'company',
-                        null, null, null, false, 0, 0, "'".$recordId."'");
+                    $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId(
+                        'Dynamics',
+                        $object,
+                        'company',
+                        null,
+                        null,
+                        null,
+                        false,
+                        0,
+                        0,
+                        "'".$recordId."'"
+                    );
                     if (count($integrationId)) { // company exists, then update local fields
                         /** @var Company $entity */
                         $entity        = $this->companyModel->getEntity($integrationId[0]['internal_entity_id']);
@@ -562,8 +572,18 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                 } elseif ('contacts' === $object) {
                     $recordId = $entityData['contactid'];
                     // first try to find integration entity
-                    $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object, 'lead',
-                        null, null, null, false, 0, 0, "'".$recordId."'");
+                    $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId(
+                        'Dynamics',
+                        $object,
+                        'lead',
+                        null,
+                        null,
+                        null,
+                        false,
+                        0,
+                        0,
+                        "'".$recordId."'"
+                    );
                     if (count($integrationId)) { // lead exists, then update
                         /** @var Lead $entity */
                         $entity        = $this->leadModel->getEntity($integrationId[0]['internal_entity_id']);
@@ -852,8 +872,16 @@ final class DynamicsIntegration extends CrmAbstractIntegration
     {
         foreach ($ids as $oid => $leadId) {
             $this->logger->debug('CREATE INTEGRATION ENTITY: '.$oid);
-            $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object,
-                'lead', null, null, null, false, 0, 0,
+            $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId(
+                'Dynamics',
+                $object,
+                'lead',
+                null,
+                null,
+                null,
+                false,
+                0,
+                0,
                 "'".$oid."'"
             );
 

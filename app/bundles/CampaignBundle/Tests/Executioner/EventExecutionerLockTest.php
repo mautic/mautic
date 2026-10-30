@@ -29,6 +29,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
     private Logger $logger;
 
     private TestHandler $testHandler;
+
     private const int ADD_POINTS = 10;
 
     private EventExecutioner $eventExecutioner;

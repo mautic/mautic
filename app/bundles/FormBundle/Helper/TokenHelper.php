@@ -33,7 +33,9 @@ final readonly class TokenHelper
                     && (
                         $form->isPublished(false)
                         || $this->security->hasEntityAccess(
-                            'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
+                            'form:forms:viewown',
+                            'form:forms:viewother',
+                            $form->getCreatedBy()
                         )
                     )
                 ) {

@@ -10,7 +10,9 @@ use Symfony\Component\Dotenv\Dotenv;
 final class EnvHelper extends Module
 {
     private string $envLocalPath       = '.env.local';
+
     private string $envLocalBackupPath = '.env.local.e2e.backup';
+
     private bool $envLocalOverridden   = false;
 
     public function _beforeSuite($settings = []): void

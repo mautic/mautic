@@ -11,6 +11,7 @@ final class MaintenanceEvent extends Event
     private array $stats = [];
 
     private array $debug = [];
+
     public function __construct(
         private readonly int $daysOld,
         private readonly bool $dryRun,

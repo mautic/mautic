@@ -223,10 +223,17 @@ final class SearchStringHelper
         return $filters;
     }
 
-    private function setFilter(\stdClass &$filters, string $baseName, int &$keyCount, string &$string, string &$command, string $overrideCommand,
+    private function setFilter(
+        \stdClass &$filters,
+        string $baseName,
+        int &$keyCount,
+        string &$string,
+        string &$command,
+        string $overrideCommand,
         bool $setFilter = true,
         ?string $type = null,
-        bool $setUpNext = true): void
+        bool $setUpNext = true
+    ): void
     {
         if (!empty($type)) {
             $filters->{$baseName}[$keyCount]->type = ('OR' === $type || 'AND' === $type) ? strtolower($type) : 'and';

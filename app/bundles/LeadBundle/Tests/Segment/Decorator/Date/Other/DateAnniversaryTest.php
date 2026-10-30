@@ -49,7 +49,10 @@ final class DateAnniversaryTest extends TestCase
             ->with(false)
             ->willReturn(
                 new DateTimeHelper(
-                    new \DateTime('midnight today', new \DateTimeZone('UTC')), null, 'UTC')
+                    new \DateTime('midnight today', new \DateTimeZone('UTC')),
+                    null,
+                    'UTC'
+                )
             );
 
         $filter        = [
