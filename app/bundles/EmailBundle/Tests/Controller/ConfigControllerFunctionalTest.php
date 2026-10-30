@@ -26,14 +26,19 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form = $crawler->selectButton('config[buttons][save]')->form();
         $values = $form->getPhpValues();
 
+        $values['config']['coreconfig']['site_url'] = 'https://mautic-community.local';
         $values['config']['leadconfig']['contact_columns'] = ['name', 'email', 'id'];
         $values['config']['companyconfig']['company_columns'] = ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'];
         $values['config']['emailconfig']['monitored_email']['general']['password'] = $password;
 
         $this->client->request($form->getMethod(), $form->getUri(), $values);
         $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('#flashes', 'Configuration successfully updated');
 
         $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('monitored_email', $configParameters);
+        $this->assertArrayHasKey('general', $configParameters['monitored_email']);
+        $this->assertArrayHasKey('password', $configParameters['monitored_email']['general']);
         $this->assertSame(
             $expectedStoredPassword,
             $configParameters['monitored_email']['general']['password']
@@ -45,14 +50,19 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form = $crawler->selectButton('config[buttons][save]')->form();
         $values = $form->getPhpValues();
 
+        $values['config']['coreconfig']['site_url'] = 'https://mautic-community.local';
         $values['config']['leadconfig']['contact_columns'] = ['name', 'email', 'id'];
         $values['config']['companyconfig']['company_columns'] = ['companyname', 'companyemail', 'companywebsite', 'score', 'leadcount', 'id'];
         $values['config']['emailconfig']['monitored_email']['general']['password'] = '';
 
         $this->client->request($form->getMethod(), $form->getUri(), $values);
         $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('#flashes', 'Configuration successfully updated');
 
         $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('monitored_email', $configParameters);
+        $this->assertArrayHasKey('general', $configParameters['monitored_email']);
+        $this->assertArrayHasKey('password', $configParameters['monitored_email']['general']);
         $this->assertSame(
             $expectedStoredPassword,
             $configParameters['monitored_email']['general']['password']
