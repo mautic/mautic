@@ -204,7 +204,7 @@ export const editorLifecycleMixin = {
       return rte;
     }
 
-    this.originalContent = typeof el?.innerHTML === 'string' ? el.innerHTML : '';
+    this.originalContent = this.getExportInnerHtml(el);
     this.latestContent = this.originalContent;
 
     const selectedComponent =
@@ -610,6 +610,55 @@ export const editorLifecycleMixin = {
     );
   },
 
+  /**
+   * Gets the element's inner HTML without the editor-only attributes GrapesJS adds to the
+   * canvas DOM (auto-generated ids, data-gjs-type, draggable, gjs-* state classes), so they
+   * do not end up in the edited content.
+   * Auto-generated ids already saved in plain HTML are kept, they cannot be told apart from real ids.
+   *
+   * @param {HTMLElement} el
+   * @returns {string}
+   */
+  getExportInnerHtml(el) {
+    if (typeof el?.innerHTML !== 'string') {
+      return '';
+    }
+
+    const editorClasses = [
+      'selected',
+      'selected-parent',
+      'freezed',
+      'hovered',
+      'no-pointer',
+      'pointer-init',
+    ].map((name) => `gjs-${name}`);
+    const clone = el.cloneNode(true);
+    const clonedElements = clone.querySelectorAll('*');
+
+    el.querySelectorAll('*').forEach((element, index) => {
+      const clonedElement = clonedElements[index];
+      const model = element.__gjsv?.model;
+
+      // Auto-generated ids are not exported, real ones are
+      if (typeof model?.getAttrToHTML === 'function' && !model.getAttrToHTML().id) {
+        clonedElement.removeAttribute('id');
+      }
+
+      // Also cleans content saved before this fix, which contains these as plain HTML
+      Array.from(clonedElement.attributes).forEach(({ name }) => {
+        if (name === 'draggable' || name.startsWith('data-gjs-')) {
+          clonedElement.removeAttribute(name);
+        }
+      });
+      clonedElement.classList.remove(...editorClasses);
+      if (clonedElement.getAttribute('class') === '') {
+        clonedElement.removeAttribute('class');
+      }
+    });
+
+    return clone.innerHTML;
+  },
+
   restoreOriginalElementAttributes(content) {
     if (typeof content !== 'string') {
       return '';
@@ -839,7 +888,7 @@ export const editorLifecycleMixin = {
         // original: <div class="gjs-heading-wrapper"><span ...>text</span></div>
         // current:  <span ...>text</span>
         // Reconcile attributes from the inner element to the current element so
-        // data-gjs-type, id, draggable etc. are preserved after editing.
+        // id, data-* etc. are preserved after editing.
         if (
           originalTagName === 'div' &&
           originalElement.classList.contains('gjs-heading-wrapper')
