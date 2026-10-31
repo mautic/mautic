@@ -58,7 +58,7 @@ class ReportRepository extends CommonRepository
                 break;
             case $this->translator->trans('mautic.core.searchcommand.ismine'):
             case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
-                $expr = $q->expr()->eq('IDENTITY(r.createdBy)', $this->currentUser->getId());
+                $expr = $q->expr()->eq('r.createdBy', $this->currentUser->getId());
                 break;
         }
 
