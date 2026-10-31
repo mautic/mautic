@@ -8,8 +8,8 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\GlobalSearch;
+use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
-use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
@@ -99,7 +99,7 @@ final class SearchSubscriberTest extends TestCase
         );
 
         $dispatcher = new EventDispatcher();
-        ReflectionHelper::registerAttributeListeners($dispatcher, $subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $subscriber);
 
         $alias = 'mytestalias';
 

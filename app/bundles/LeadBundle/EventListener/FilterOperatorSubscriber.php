@@ -116,8 +116,10 @@ final class FilterOperatorSubscriber
         });
     }
 
+    // priority 1 so static fields register before custom fields; addChoice() is first-wins
     #[AsEventListener(
         event: LeadListFiltersChoicesEvent::class,
+        priority: 1
     )]
     public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
     {

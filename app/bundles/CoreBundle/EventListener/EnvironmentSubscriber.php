@@ -14,9 +14,11 @@ final readonly class EnvironmentSubscriber
     ) {
     }
 
+    // priority 127 so this runs after Symfony's session_listener (priority 128);
+    // hasPreviousSession() needs the session started first
     #[AsEventListener(
         event: KernelEvents::REQUEST,
-        priority: 128
+        priority: 127
     )]
     public function onKernelRequestSetTimezone(RequestEvent $event): void
     {

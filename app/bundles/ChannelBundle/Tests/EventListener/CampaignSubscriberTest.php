@@ -18,6 +18,7 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\EventListener\CampaignSubscriber;
 use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
+use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
@@ -141,7 +142,7 @@ final class CampaignSubscriberTest extends TestCase
             $this->createStub(Translator::class)
         );
 
-        ReflectionHelper::registerAttributeListeners($this->dispatcher, $campaignSubscriber);
+        AttributeEventListenerRegistrar::register($this->dispatcher, $campaignSubscriber);
         $this->dispatcher->addListener(EmailEvents::ON_CAMPAIGN_BATCH_ACTION, $this->sendMarketingMessageEmail(...));
         $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION, $this->sendMarketingMessageSms(...));
     }

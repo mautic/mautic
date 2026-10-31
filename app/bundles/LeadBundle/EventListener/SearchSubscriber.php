@@ -89,22 +89,6 @@ final readonly class SearchSubscriber
     #[AsEventListener(
         event: GlobalSearchEvent::class,
     )]
-    public function onGlobalSearchForSegments(GlobalSearchEvent $event): void
-    {
-        $results = $this->globalSearch->performSearch(
-            new GlobalSearchFilterDTO($event->getSearchString()),
-            $this->listModel,
-            '@MauticLead/SubscribedEvents/Search/global_segment.html.twig'
-        );
-
-        if ([] !== $results) {
-            $event->addResults('mautic.segment.segment', $results);
-        }
-    }
-
-    #[AsEventListener(
-        event: GlobalSearchEvent::class,
-    )]
     public function onGlobalSearchForCompanies(GlobalSearchEvent $event): void
     {
         $str = $event->getSearchString();
@@ -134,6 +118,22 @@ final readonly class SearchSubscriber
                 'mautic.company.company',
                 '@MauticLead/SubscribedEvents/Search/global_company.html.twig'
             );
+        }
+    }
+
+    #[AsEventListener(
+        event: GlobalSearchEvent::class,
+    )]
+    public function onGlobalSearchForSegments(GlobalSearchEvent $event): void
+    {
+        $results = $this->globalSearch->performSearch(
+            new GlobalSearchFilterDTO($event->getSearchString()),
+            $this->listModel,
+            '@MauticLead/SubscribedEvents/Search/global_segment.html.twig'
+        );
+
+        if ([] !== $results) {
+            $event->addResults('mautic.segment.segment', $results);
         }
     }
 

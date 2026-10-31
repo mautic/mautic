@@ -5,24 +5,9 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Test;
 
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ReflectionHelper
 {
-    /**
-     * Registers every #[AsEventListener] method of the subscriber on the dispatcher,
-     * mirroring what the DI compiler pass does, so tests can keep dispatching events.
-     */
-    public static function registerAttributeListeners(EventDispatcherInterface $dispatcher, object $subscriber): void
-    {
-        foreach (new \ReflectionObject($subscriber)->getMethods() as $method) {
-            foreach ($method->getAttributes(AsEventListener::class) as $attribute) {
-                $listener = $attribute->newInstance();
-                $dispatcher->addListener($listener->event, [$subscriber, $method->getName()], $listener->priority);
-            }
-        }
-    }
-
     /**
      * Returns the #[AsEventListener] bindings of a class as a sorted list of
      * [event, method, priority] triples, so tests can assert the wiring regardless of order.

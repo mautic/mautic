@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
@@ -52,7 +52,7 @@ final class WebhookSubscriberTest extends TestCase
 
         $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class), $this->createStub(LeadRepository::class));
 
-        ReflectionHelper::registerAttributeListeners($this->dispatcher, $webhookSubscriber);
+        AttributeEventListenerRegistrar::register($this->dispatcher, $webhookSubscriber);
 
         $lead = new Lead();
         $lead->setEmail('hello@hello.com');
@@ -73,7 +73,7 @@ final class WebhookSubscriberTest extends TestCase
 
         $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class), $this->createStub(LeadRepository::class));
 
-        ReflectionHelper::registerAttributeListeners($this->dispatcher, $webhookSubscriber);
+        AttributeEventListenerRegistrar::register($this->dispatcher, $webhookSubscriber);
 
         $lead = new Lead();
         $lead->setEmail('hello@hello.com');
@@ -92,7 +92,7 @@ final class WebhookSubscriberTest extends TestCase
 
         $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class), $this->createStub(LeadRepository::class));
 
-        ReflectionHelper::registerAttributeListeners($this->dispatcher, $webhookSubscriber);
+        AttributeEventListenerRegistrar::register($this->dispatcher, $webhookSubscriber);
 
         $lead  = new Lead();
         $event = new LeadPostSaveEvent($lead, false);
@@ -109,7 +109,7 @@ final class WebhookSubscriberTest extends TestCase
 
         $webhookSubscriber = new WebhookSubscriber($mockModel, $leadModel, $this->createStub(LeadRepository::class));
 
-        ReflectionHelper::registerAttributeListeners($this->dispatcher, $webhookSubscriber);
+        AttributeEventListenerRegistrar::register($this->dispatcher, $webhookSubscriber);
 
         $lead  = new Lead();
         $lead->setEmail('test@test.com');
@@ -148,7 +148,7 @@ final class WebhookSubscriberTest extends TestCase
 
         $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class), $this->createStub(LeadRepository::class));
 
-        ReflectionHelper::registerAttributeListeners($this->dispatcher, $webhookSubscriber);
+        AttributeEventListenerRegistrar::register($this->dispatcher, $webhookSubscriber);
 
         $event = new ChannelSubscriptionChange($lead, $channel, DoNotContact::IS_CONTACTABLE, DoNotContact::UNSUBSCRIBED);
         $this->dispatcher->dispatch($event);
@@ -177,7 +177,7 @@ final class WebhookSubscriberTest extends TestCase
 
         $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class), $this->createStub(LeadRepository::class));
 
-        ReflectionHelper::registerAttributeListeners($this->dispatcher, $webhookSubscriber);
+        AttributeEventListenerRegistrar::register($this->dispatcher, $webhookSubscriber);
 
         $event = new LeadChangeCompanyEvent($lead, $company);
         $this->dispatcher->dispatch($event);
@@ -193,7 +193,7 @@ final class WebhookSubscriberTest extends TestCase
 
         $webhookSubscriber = new WebhookSubscriber($this->mockModel, $this->createStub(LeadModel::class), $this->createStub(LeadRepository::class));
 
-        ReflectionHelper::registerAttributeListeners($dispatcher, $webhookSubscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $webhookSubscriber);
 
         $company = new Company();
         $company->setName('company');

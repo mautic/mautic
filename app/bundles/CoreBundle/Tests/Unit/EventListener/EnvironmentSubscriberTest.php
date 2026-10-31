@@ -6,12 +6,15 @@ namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\EventListener\EnvironmentSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 #[AllowMockObjectsWithoutExpectations]
 final class EnvironmentSubscriberTest extends TestCase
@@ -104,5 +107,26 @@ final class EnvironmentSubscriberTest extends TestCase
             ->with('_locale');
 
         $this->environmentSubscriber->onKernelRequestSetLocale($requestEventMock);
+    }
+
+    public function testTimezoneListenerRunsAfterSessionListener(): void
+    {
+        $sessionListenerPriority = AbstractSessionListener::getSubscribedEvents()[KernelEvents::REQUEST][1];
+
+        $timezonePriority = null;
+        foreach (ReflectionHelper::getAttributeListeners(EnvironmentSubscriber::class) as [$event, $method, $priority]) {
+            if (KernelEvents::REQUEST === $event && 'onKernelRequestSetTimezone' === $method) {
+                $timezonePriority = $priority;
+            }
+        }
+
+        self::assertNotNull($timezonePriority, 'onKernelRequestSetTimezone must listen on the kernel.request event.');
+
+        // lower priority runs later; the session must be started before hasPreviousSession() is checked
+        self::assertLessThan(
+            $sessionListenerPriority,
+            $timezonePriority,
+            'onKernelRequestSetTimezone must run after Symfony\'s session listener.'
+        );
     }
 }

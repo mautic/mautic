@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\InstallBundle\Install\InstallService;
@@ -58,7 +58,7 @@ EOF;
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getPageSubscriber();
 
-        ReflectionHelper::registerAttributeListeners($dispatcher, $subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $subscriber);
 
         $dispatcher->dispatch($event);
 

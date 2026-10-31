@@ -9,7 +9,7 @@ use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -171,7 +171,7 @@ CONTENT
             ->onlyMethods([])
             ->getMock();
 
-        ReflectionHelper::registerAttributeListeners($dispatcher, $subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $subscriber);
 
         $event = new EmailSendEvent($mailHelper);
 
