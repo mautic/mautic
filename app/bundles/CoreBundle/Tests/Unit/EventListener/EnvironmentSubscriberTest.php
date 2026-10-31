@@ -120,10 +120,10 @@ final class EnvironmentSubscriberTest extends TestCase
             }
         }
 
-        self::assertNotNull($timezonePriority, 'onKernelRequestSetTimezone must listen on the kernel.request event.');
+        $this->assertNotNull($timezonePriority, 'onKernelRequestSetTimezone must listen on the kernel.request event.');
 
         // lower priority runs later; the session must be started before hasPreviousSession() is checked
-        self::assertLessThan(
+        $this->assertLessThan(
             $sessionListenerPriority,
             $timezonePriority,
             'onKernelRequestSetTimezone must run after Symfony\'s session listener.'

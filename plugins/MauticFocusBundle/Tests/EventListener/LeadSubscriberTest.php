@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -90,7 +90,7 @@ final class LeadSubscriberTest extends TestCase
         );
 
         $dispatcher = new EventDispatcher();
-        ReflectionHelper::registerAttributeListeners($dispatcher, $subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $subscriber);
         $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
@@ -117,7 +117,7 @@ final class LeadSubscriberTest extends TestCase
         );
 
         $dispatcher = new EventDispatcher();
-        ReflectionHelper::registerAttributeListeners($dispatcher, $subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $subscriber);
         $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
@@ -150,7 +150,7 @@ final class LeadSubscriberTest extends TestCase
         );
 
         $dispatcher = new EventDispatcher();
-        ReflectionHelper::registerAttributeListeners($dispatcher, $subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $subscriber);
         $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
@@ -177,7 +177,7 @@ final class LeadSubscriberTest extends TestCase
         );
 
         $dispatcher = new EventDispatcher();
-        ReflectionHelper::registerAttributeListeners($dispatcher, $subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $subscriber);
         $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
