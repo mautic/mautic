@@ -111,7 +111,7 @@ final class FormModelTest extends TestCase
         $dispatcherMock           = $this->createStub(EventDispatcherInterface::class);
         $routerMock               = $this->createStub(UrlGeneratorInterface::class);
         $translatorMock           = $this->createStub(Translator::class);
-        $userHelperMock           = $this->createMock(UserHelper::class);
+        $userHelperMock           = $this->createStub(UserHelper::class);
         $loggerMock               = $this->createStub(LoggerInterface::class);
         $coreParametersHelperMock = $this->createStub(CoreParametersHelper::class);
 
@@ -140,16 +140,7 @@ final class FormModelTest extends TestCase
         $dateModified2 = $lead->getDateModified();
         $dateAdded2    = $lead->getDateAdded();
 
-        self::assertSame(
-            $dateAdded1,
-            $dateAdded2,
-            'Date added should not be updated after saving the entity again',
-        );
-
-        self::assertGreaterThan(
-            $dateModified1,
-            $dateModified2,
-            'Date modified should be updated after saving the entity again',
-        );
+        $this->assertSame($dateAdded1, $dateAdded2, 'Date added should not be updated after saving the entity again');
+        $this->assertGreaterThan($dateModified1, $dateModified2, 'Date modified should be updated after saving the entity again');
     }
 }
