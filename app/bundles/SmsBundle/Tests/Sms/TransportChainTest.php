@@ -120,6 +120,42 @@ final class TransportChainTest extends MauticMysqlTestCase
         $this->createDataAndAssertSendMessage($mmsTransport);
     }
 
+    public function testProviderErrorStringIsNotCoercedToSuccessOrRetained(): void
+    {
+        $providerError = 'Provider rejected +41790000000: private message body';
+        $transport     = new class($providerError) implements TransportInterface {
+            public function __construct(private readonly string $providerError)
+            {
+            }
+
+            public function sendSms(Lead $lead, $content): string
+            {
+                return $this->providerError;
+            }
+        };
+        $transportChain = new class('test', self::getContainer()->get(IntegrationHelper::class)) extends TransportChain {
+            public function getEnabledTransports(): array
+            {
+                return array_map(
+                    static fn (array $transport): TransportInterface => $transport['service'],
+                    $this->getTransports(),
+                );
+            }
+        };
+        $transportChain->addTransport('test', $transport, 'test', 'test');
+
+        $lead = new Lead();
+        $lead->setId(1);
+        $lead->setMobile('+41790000000');
+        $recipients = new RecipientCollection(new Sms(), [new SmsRecipientDTO($lead, [], 'private message body')]);
+
+        $result = $transportChain->sendBatchSms($recipients, 'private message body');
+        $recipient = $result->getFieldByKey(1);
+
+        $this->assertFalse($recipient->getResult());
+        $this->assertStringNotContainsString($providerError, json_encode($recipient, JSON_THROW_ON_ERROR));
+    }
+
     private function createDataAndAssertSendMessage(TransportInterface $transport): void
     {
         $transportChain = new class('mautic.test.bulktwilio.mock', self::getContainer()->get(IntegrationHelper::class)) extends TransportChain {
