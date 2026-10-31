@@ -2,12 +2,13 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * @extends CommonRepository<LeadTriggerLog>
  */
-class LeadTriggerLogRepository extends CommonRepository
+final class LeadTriggerLogRepository extends CommonRepository
 {
     /**
      * Updates lead ID (e.g. after a lead merge).
@@ -32,10 +33,12 @@ class LeadTriggerLogRepository extends CommonRepository
             ->set('lead_id', (int) $toLeadId)
             ->where('lead_id = '.(int) $fromLeadId);
 
-        if (!empty($events)) {
+        if ([] !== $events) {
             $q->andWhere(
-                $q->expr()->notIn('event_id', $events)
-            )->executeStatement();
+                $q->expr()->notIn('event_id', ':events')
+            )
+                ->setParameter('events', $events, ArrayParameterType::INTEGER)
+                ->executeStatement();
 
             // Delete remaining leads as the new lead already belongs
             $this->_em->getConnection()->createQueryBuilder()

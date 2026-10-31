@@ -8,9 +8,6 @@ class AppTestKernel extends AppKernel
 {
     private bool $isTestContainerSet = false;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isInstalled(): bool
     {
         return true;

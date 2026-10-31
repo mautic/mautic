@@ -53,7 +53,7 @@ abstract class AbstractFormStandardType extends AbstractType
                 TextType::class,
                 [
                     'label'      => 'mautic.core.name',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => ['class' => 'form-control'],
                 ]
             );
@@ -65,7 +65,7 @@ abstract class AbstractFormStandardType extends AbstractType
                 TextareaType::class,
                 [
                     'label'      => 'mautic.core.description',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => ['class' => 'form-control editor'],
                     'required'   => false,
                 ]
@@ -82,16 +82,21 @@ abstract class AbstractFormStandardType extends AbstractType
             );
         }
 
-        if (!$builder->has('isPublished') && method_exists($options['data'], 'getIsPublished')) {
+        $formData = $options['data'];
+        if (
+            !$builder->has('isPublished')
+            && is_object($formData)
+            && method_exists($formData, 'isPublished')
+        ) {
             $readonly = false;
-            $data     = $options['data']->isPublished(false);
+            $data     = $formData->isPublished(false);
 
             if ($this->security instanceof CorePermissions && isset($options['permission_base'])) {
-                if (!empty($options['data']) && $options['data']->getId()) {
+                if (method_exists($formData, 'getId') && method_exists($formData, 'getCreatedBy') && $formData->getId()) {
                     $readonly = !$this->security->hasEntityAccess(
                         $options['permission_base'].':publishown',
                         $options['permission_base'].':publishother',
-                        $options['data']->getCreatedBy()
+                        $formData->getCreatedBy()
                     );
                 } elseif (!$this->security->isGranted($options['permission_base'].':publishown')) {
                     $readonly = true;
@@ -114,7 +119,7 @@ abstract class AbstractFormStandardType extends AbstractType
                 ]
             );
 
-            if (!$builder->has('publishUp') && method_exists($options['data'], 'getPublishUp')) {
+            if (!$builder->has('publishUp') && method_exists($formData, 'getPublishUp')) {
                 $builderOptions = [
                     'attr' => [
                         'class'       => 'form-control',
@@ -133,7 +138,7 @@ abstract class AbstractFormStandardType extends AbstractType
                 LocaleType::class,
                 [
                     'label'      => 'mautic.core.language',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class' => 'form-control',
                     ],

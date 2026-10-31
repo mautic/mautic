@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\RequestOptions;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\PreUpdateCheckHelper;
@@ -21,45 +24,40 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 
-class UpdateHelperTest extends TestCase
+final class UpdateHelperTest extends TestCase
 {
     /**
-     * @var PathsHelper|MockObject
-     */
-    private MockObject $pathsHelper;
-
-    /**
-     * @var Logger|MockObject
+     * @var MockObject&Logger
      */
     private MockObject $logger;
 
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var MockObject&CoreParametersHelper
      */
     private MockObject $coreParametersHelper;
 
     /**
-     * @var Client|MockObject
+     * @var MockObject&Client
      */
     private MockObject $client;
 
     /**
-     * @var ResponseInterface|MockObject
+     * @var MockObject&ResponseInterface
      */
     private MockObject $response;
 
     /**
-     * @var StreamInterface|MockObject
+     * @var MockObject&StreamInterface
      */
     private MockObject $streamBody;
 
     /**
-     * @var ReleaseParser|MockObject
+     * @var MockObject&ReleaseParser
      */
     private MockObject $releaseParser;
 
     /**
-     * @var PreUpdateCheckHelper|MockObject
+     * @var MockObject&PreUpdateCheckHelper
      */
     private MockObject $preUpdateCheckHelper;
 
@@ -67,8 +65,8 @@ class UpdateHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->pathsHelper = $this->createMock(PathsHelper::class);
-        $this->pathsHelper->method('getSystemPath')
+        $pathsHelper = $this->createMock(PathsHelper::class);
+        $pathsHelper->method('getSystemPath')
             ->with('cache')
             ->willReturn(__DIR__.'/resource/update/tmp');
 
@@ -85,7 +83,7 @@ class UpdateHelperTest extends TestCase
         $this->client = $this->createMock(Client::class);
 
         $this->helper = new UpdateHelper(
-            $this->pathsHelper,
+            $pathsHelper,
             $this->logger,
             $this->coreParametersHelper,
             $this->client, $this->releaseParser,
@@ -117,11 +115,11 @@ class UpdateHelperTest extends TestCase
             ->willReturn($this->response);
 
         $result = $this->helper->fetchPackage('update.zip');
-        $this->assertTrue(isset($result['error']));
+        $this->assertArrayHasKey('error', $result);
         $this->assertFalse($result['error']);
 
         $updatePackage = __DIR__.'/resource/update/tmp/update.zip';
-        $this->assertTrue(file_exists($updatePackage));
+        $this->assertFileExists($updatePackage);
         @unlink($updatePackage);
     }
 
@@ -139,7 +137,7 @@ class UpdateHelperTest extends TestCase
             ->willReturn($this->response);
 
         $result = $this->helper->fetchPackage('update.zip');
-        $this->assertTrue(isset($result['error']));
+        $this->assertArrayHasKey('error', $result);
         $this->assertTrue($result['error']);
         $this->assertEquals('mautic.core.updater.error.fetching.package', $result['message']);
     }
@@ -308,12 +306,12 @@ class UpdateHelperTest extends TestCase
                 'POST',
                 $statsUrl,
                 $this->callback(
-                    function (array $options) {
-                        $this->assertArrayHasKey(\GuzzleHttp\RequestOptions::FORM_PARAMS, $options);
-                        $this->assertArrayHasKey(\GuzzleHttp\RequestOptions::CONNECT_TIMEOUT, $options);
-                        $this->assertArrayHasKey(\GuzzleHttp\RequestOptions::HEADERS, $options);
+                    function (array $options): true {
+                        $this->assertArrayHasKey(RequestOptions::FORM_PARAMS, $options);
+                        $this->assertArrayHasKey(RequestOptions::CONNECT_TIMEOUT, $options);
+                        $this->assertArrayHasKey(RequestOptions::HEADERS, $options);
                         // We need to send an Accept header to the stats server or we'll get 500 errors
-                        $this->assertEquals(['Accept' => '*/*'], $options[\GuzzleHttp\RequestOptions::HEADERS]);
+                        $this->assertEquals(['Accept' => '*/*'], $options[RequestOptions::HEADERS]);
 
                         return true;
                     }
@@ -417,7 +415,7 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new \Exception('something bad happened');
@@ -486,7 +484,7 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
                     throw new RequestException('something bad happened', $request, $this->response);
@@ -553,10 +551,10 @@ class UpdateHelperTest extends TestCase
             ->method('request')
             ->with('POST', $statsUrl, $this->anything())
             ->willReturnCallback(
-                function (string $method, string $url, array $options): void {
+                function (string $method, string $url, array $options): never {
                     $request = $this->createMock(RequestInterface::class);
 
-                    throw new RequestException('something bad happened', $request, null);
+                    throw new RequestException('something bad happened', $request);
                 }
             );
 
@@ -715,7 +713,7 @@ class UpdateHelperTest extends TestCase
         $this->client->expects($this->once())
             ->method('request')
             ->with('GET', $updateUrl)
-            ->willThrowException(new RequestException('bad', $this->createMock(RequestInterface::class), $this->response));
+            ->willThrowException(new RequestException('bad', $this->createStub(RequestInterface::class), $this->response));
 
         $this->releaseParser->expects($this->never())
             ->method('getLatestSupportedRelease');
@@ -842,8 +840,8 @@ class UpdateHelperTest extends TestCase
         $errors  = [];
 
         foreach ($results as $result) {
-            if (!empty($result->errors)) {
-                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error) => $error->key, $result->errors));
+            if ([] !== $result->errors) {
+                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error): string => $error->key, $result->errors));
             }
         }
 
@@ -867,8 +865,8 @@ class UpdateHelperTest extends TestCase
         $errors  = [];
 
         foreach ($results as $result) {
-            if (!empty($result->errors)) {
-                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error) => $error->key, $result->errors));
+            if ([] !== $result->errors) {
+                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error): string => $error->key, $result->errors));
             }
         }
 
@@ -877,7 +875,7 @@ class UpdateHelperTest extends TestCase
 
     private function getFailingPreUpdateTest(): AbstractPreUpdateCheck
     {
-        return new class extends AbstractPreUpdateCheck {
+        return new class() extends AbstractPreUpdateCheck {
             public function runCheck(): PreUpdateCheckResult
             {
                 return new PreUpdateCheckResult(false, null, [new PreUpdateCheckError('Dummy')]);
@@ -887,7 +885,7 @@ class UpdateHelperTest extends TestCase
 
     private function getPassingPreUpdateTest(): AbstractPreUpdateCheck
     {
-        return new class extends AbstractPreUpdateCheck {
+        return new class() extends AbstractPreUpdateCheck {
             public function runCheck(): PreUpdateCheckResult
             {
                 return new PreUpdateCheckResult(true, null);

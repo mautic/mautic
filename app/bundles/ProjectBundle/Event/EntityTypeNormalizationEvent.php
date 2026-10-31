@@ -14,8 +14,9 @@ final class EntityTypeNormalizationEvent extends Event
     /**
      * @param array<string, string> $mappings
      */
-    public function __construct(private array $mappings = [])
-    {
+    public function __construct(
+        private array $mappings = [],
+    ) {
     }
 
     /**

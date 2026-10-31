@@ -17,7 +17,7 @@ Mautic.downloadIpLookupDataStore = function() {
             mQuery('#iplookup_fetch_button_container').parent().removeClass('has-success').addClass('has-error');
             mQuery('#iplookup_fetch_button_container').next('.help-block').html(response.error);
         }
-    }, false, false, 'GET');
+    }, false, false, 'POST');
 };
 
 Mautic.getIpLookupFormConfig = function() {
@@ -36,6 +36,9 @@ Mautic.getIpLookupFormConfig = function() {
 };
 
 Mautic.configOnLoad = function(container) {
+    // Expand the collapsed sections that contain validation errors so they are visible
+    mQuery(container + ' .accordion-wrapper').has('.has-error').collapse('show');
+
     document.querySelectorAll('input[type="radio"][data-attribute-toggle]').forEach(radio => {
         const attributeName = radio.dataset.attributeToggle;
         const modifiedName = attributeName.replace('-', '_');
@@ -61,5 +64,11 @@ Mautic.configOnLoad = function(container) {
             }
         });
     });
+
+    Mautic.initConfigUnsavedChangesGuard(container);
+};
+
+Mautic.configOnUnload = function() {
+    Mautic.removeConfigUnsavedChangesGuard();
 };
 

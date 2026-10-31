@@ -17,23 +17,33 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Page>
  */
-class PageApiController extends CommonApiController
+final class PageApiController extends CommonApiController
 {
     /**
      * @var PageModel|null
      */
     protected $model;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine, ModelFactory $modelFactory, EventDispatcherInterface $dispatcher, CoreParametersHelper $coreParametersHelper)
-    {
-        $pageModel = $modelFactory->getModel('page');
-        \assert($pageModel instanceof PageModel);
-
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        EventDispatcherInterface $dispatcher,
+        CoreParametersHelper $coreParametersHelper,
+        PageModel $pageModel,
+    ) {
         $this->model            = $pageModel;
         $this->entityClass      = Page::class;
         $this->entityNameOne    = 'page';
@@ -46,10 +56,8 @@ class PageApiController extends CommonApiController
 
     /**
      * Obtains a list of pages.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getEntitiesAction(Request $request, UserHelper $userHelper)
+    public function getEntitiesAction(Request $request, UserHelper $userHelper): Response
     {
         // get parent level only
         $this->listFilters[] = [

@@ -1,22 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ProjectBundle\Entity\Project;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\RoleModel;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CompanyControllerTest extends MauticMysqlTestCase
+final class CompanyControllerTest extends MauticMysqlTestCase
 {
+    private const COUNTRY_UNITED_STATES = 'United States';
+
     private int $company1Id;
 
     private int $company2Id;
 
     protected function setUp(): void
     {
+        $this->configParams['update_company_mapping_data_in_background'] = false;
         parent::setUp();
 
         $companiesData = [
@@ -24,20 +40,20 @@ class CompanyControllerTest extends MauticMysqlTestCase
                 'name'     => 'Amazon',
                 'state'    => 'Washington',
                 'city'     => 'Seattle',
-                'country'  => 'United States',
+                'country'  => self::COUNTRY_UNITED_STATES,
                 'industry' => 'Goods',
             ],
             2 => [
                 'name'     => 'Google',
                 'state'    => 'Washington',
                 'city'     => 'Seattle',
-                'country'  => 'United States',
+                'country'  => self::COUNTRY_UNITED_STATES,
                 'industry' => 'Services',
             ],
         ];
 
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
-        $model = self::getContainer()->get('mautic.lead.model.company');
+        /** @var CompanyModel $model */
+        $model = self::getContainer()->get(CompanyModel::class);
 
         foreach ($companiesData as $i => $companyData) {
             $company    = new Company();
@@ -49,7 +65,11 @@ class CompanyControllerTest extends MauticMysqlTestCase
               ->setIndustry($companyData['industry']);
             $model->saveEntity($company);
 
-            $this->{'company'.$i.'Id'} = $company->getId();
+            if (1 === $i) {
+                $this->company1Id = $company->getId();
+            } elseif (2 === $i) {
+                $this->company2Id = $company->getId();
+            }
         }
     }
 
@@ -58,13 +78,37 @@ class CompanyControllerTest extends MauticMysqlTestCase
      */
     public function testViewActionCompany(): void
     {
-        $this->client->request('GET', '/s/companies/view/'.$this->company1Id);
+        $crawler                = $this->client->request('GET', '/s/companies/view/'.$this->company1Id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $model                  = self::getContainer()->get('mautic.lead.model.company');
+        /** @var CompanyModel $model */
+        $model                  = self::getContainer()->get(CompanyModel::class);
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertStringContainsString($company->getName(), $clientResponseContent, 'The return must contain the name of company');
+        $this->assertInstanceOf(Company::class, $company);
+        $this->assertStringContainsString($company->getName(), (string) $clientResponseContent, 'The return must contain the name of company');
+        $this->assertSame('', trim($crawler->filter('#company_contact_engagement')->text()));
+        $this->assertSame('', trim($crawler->filter('#contacts-table')->text()));
+    }
+
+    public function testCompanyViewGraph(): void
+    {
+        $this->createLead();
+        $segment = $this->createSegment();
+        $this->testSymfonyCommand('mautic:segments:update', ['--list-id' => $segment->getId()]);
+        $crawler  = $this->client->request('GET', "s/company/graph/{$this->company1Id}");
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful();
+        $body           = json_decode($response->getContent(), true);
+        $crawler        = new Crawler($body['newContent']);
+        $canvasJson     = trim($crawler->filter('canvas')->html());
+        $canvasData     = json_decode($canvasJson, true);
+        $datasets       = $canvasData['datasets'] ?? [];
+        $engagementData = $datasets[0]['data'] ?? [];
+        $totalContacts  = array_sum($engagementData);
+
+        $this->assertStringContainsString('Engagements', (string) $response->getContent());
+        $this->assertSame(1, $totalContacts);
     }
 
     /**
@@ -72,58 +116,358 @@ class CompanyControllerTest extends MauticMysqlTestCase
      */
     public function testEditActionCompany(): void
     {
-        $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
+        $crawler                = $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
-        $model                  = self::getContainer()->get('mautic.lead.model.company');
+        /** @var CompanyModel $model */
+        $model                  = self::getContainer()->get(CompanyModel::class);
         $company                = $model->getEntity($this->company1Id);
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertStringContainsString('Edit Company '.$company->getName(), $clientResponseContent, 'The return must contain \'Edit Company\' text');
+        $this->assertInstanceOf(Company::class, $company);
+        $this->assertStringContainsString('Edit Company '.$company->getName(), (string) $clientResponseContent, 'The return must contain \'Edit Company\' text');
+
+        $buttonCrawler = $crawler->selectButton('Save & Close');
+        $form          = $buttonCrawler->form();
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertMatchesRegularExpression('/\/s\/companies\/view\/'.$this->company1Id.'/', $this->client->getRequest()->getUri());
+    }
+
+    public function testEditAndCancelActionCompany(): void
+    {
+        $crawler = $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
+        $this->assertResponseIsSuccessful();
+        $buttonCrawler = $crawler->selectButton('Cancel');
+        $form          = $buttonCrawler->form();
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertMatchesRegularExpression('/\/s\/companies\/view\/'.$this->company1Id.'/', $this->client->getRequest()->getUri());
     }
 
     /* Get company contacts list */
     public function testListCompanyContacts(): void
     {
-        /** @var \Mautic\LeadBundle\Model\CompanyModel $companyModel */
-        $companyModel = self::getContainer()->get('mautic.lead.model.company');
-        $leadModel    = self::getContainer()->get('mautic.lead.model.lead');
-        $company1     = $companyModel->getEntity($this->company1Id);
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
+
+        /** @var LeadModel $leadModel */
+        $leadModel = self::getContainer()->get(LeadModel::class);
+        $this->assertInstanceOf(LeadModel::class, $leadModel);
+
+        $company1 = $companyModel->getEntity($this->company1Id);
 
         // Create a lead linked to the first company
-        $lead1    = new Lead();
-        $lead1
-          ->setFirstname('lead')
-          ->setLastname('for '.$company1->getName());
+        $lead1 = new Lead();
+        $this->assertInstanceOf(Company::class, $company1);
+        $lead1->setFirstname('lead')
+            ->setEmail('test1@test.com')
+            ->setLastname('for '.$company1->getName());
         $leadModel->saveEntity($lead1);
 
         $companyModel->addLeadToCompany($company1, $lead1);
 
         // Create a lead not linked to a company
-        $lead2    = new Lead();
-        $lead2
-          ->setFirstname('lead')
-          ->setLastname('without company');
+        $lead2 = new Lead();
+        $lead2->setFirstname('lead')
+            ->setLastname('without company');
         $leadModel->saveEntity($lead2);
 
         // Create a lead not linked to a company, but with `ids` in it's name (see https://github.com/mautic/mautic/issues/12415)
-        $lead3    = new Lead();
-        $lead3
-          ->setFirstname('lead')
-          ->setLastname('without company')
-          ->setEmail('example@idstart.com');
+        $lead3 = new Lead();
+        $lead3->setFirstname('lead')
+            ->setLastname('without company')
+            ->setEmail('example@idstart.com');
         $leadModel->saveEntity($lead3);
 
         $crawler        = $this->client->request('GET', '/s/company/'.$this->company1Id.'/contacts/');
         $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals(1, $leadsTableRows->count(), $crawler->html());
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $leadsTableRows, $crawler->html());
 
-        $crawler         = $this->client->request('GET', '/s/company/'.$this->company2Id.'/contacts/');
-        $leadsTableRows  = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
+        $clientResponse = $this->client->getResponse();
+        $this->assertStringContainsString('test1@test.com', (string) $clientResponse->getContent());
+        $this->assertStringContainsString('/s/contacts/view/'.$lead1->getId(), (string) $clientResponse->getContent());
+        $this->assertStringContainsString('1 item', (string) $clientResponse->getContent());
 
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $this->assertEquals(0, $leadsTableRows->count(), $crawler->html());
+        $crawler        = $this->client->request('GET', '/s/company/'.$this->company2Id.'/contacts/');
+        $leadsTableRows = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
+
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(0, $leadsTableRows, $crawler->html());
+    }
+
+    public function testBatchRemoveContactsRemovesOnlySelectedContactsFromCompany(): void
+    {
+        $this->setCsrfHeader();
+        $selectedContact   = $this->createLead('Selected', 'Contact', 'selected@example.com');
+        $remainingContact  = $this->createLead('Remaining', 'Contact', 'remaining@example.com');
+        $unrelatedContact  = new Lead();
+        $unrelatedContact->setFirstname('Unrelated')->setLastname('Contact')->setEmail('unrelated@example.com');
+        $this->em->persist($unrelatedContact);
+        $this->em->flush();
+
+        $this->client->request(
+            Request::METHOD_POST,
+            sprintf(
+                '/s/companies/batchRemoveContacts/%d?ids=%s',
+                $this->company1Id,
+                urlencode((string) json_encode([$selectedContact->getId(), $unrelatedContact->getId()]))
+            )
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($response->getContent());
+        $this->assertStringContainsString('1 contact removed from company', (string) $response->getContent());
+
+        $companyLeadIds = $this->getCompanyLeadIds($this->company1Id);
+        $this->assertNotContains($selectedContact->getId(), $companyLeadIds);
+        $this->assertContains($remainingContact->getId(), $companyLeadIds);
+        $this->assertNotContains($unrelatedContact->getId(), $companyLeadIds);
+    }
+
+    public function testBatchRemoveContactsCountsDuplicateContactOnlyOnce(): void
+    {
+        $this->setCsrfHeader();
+        $contact = $this->createLead('Duplicate', 'Contact', 'duplicate@example.com');
+
+        $this->client->request(
+            Request::METHOD_POST,
+            sprintf(
+                '/s/companies/batchRemoveContacts/%d?ids=%s',
+                $this->company1Id,
+                urlencode((string) json_encode([$contact->getId(), $contact->getId()]))
+            )
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($response->getContent());
+        $this->assertStringContainsString('1 contact removed from company', (string) $response->getContent());
+        $this->assertNotContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testBatchRemoveContactsRejectsMoreThanOneThousandIds(): void
+    {
+        $this->setCsrfHeader();
+        $contact = $this->createLead('Limited', 'Contact', 'limited@example.com');
+
+        $this->client->request(
+            Request::METHOD_POST,
+            sprintf(
+                '/s/companies/batchRemoveContacts/%d?ids=%s',
+                $this->company1Id,
+                urlencode((string) json_encode(array_fill(0, 1001, $contact->getId())))
+            )
+        );
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($response->getContent());
+        $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testBatchRemoveContactsDeniesUsersWithoutContactEditAccess(): void
+    {
+        $contact = $this->createLead('Readonly', 'Contact', 'readonly@example.com');
+        $this->loginUser($this->createUserWithLeadPermissions(['viewown', 'viewother']));
+        $this->setCsrfHeader();
+        $this->client->request(Request::METHOD_POST, sprintf(
+            '/s/companies/batchRemoveContacts/%d?ids=%s',
+            $this->company1Id,
+            urlencode((string) json_encode([$contact->getId()]))
+        ));
+        $this->assertResponseIsSuccessful();
+        $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testBatchRemoveContactsDoesNotRemoveOnGet(): void
+    {
+        $contact = $this->createLead('Retained', 'Contact', 'get@example.com');
+        $this->client->request(Request::METHOD_GET, sprintf(
+            '/s/companies/batchRemoveContacts/%d?ids=%s',
+            $this->company1Id,
+            urlencode((string) json_encode([$contact->getId()]))
+        ));
+        $this->assertResponseIsSuccessful();
+        $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testBatchRemoveContactsRejectsMissingCsrfToken(): void
+    {
+        $contact = $this->createLead('Protected', 'Contact', 'csrf@example.com');
+        $this->client->request(Request::METHOD_POST, sprintf(
+            '/s/companies/batchRemoveContacts/%d?ids=%s',
+            $this->company1Id,
+            urlencode((string) json_encode([$contact->getId()]))
+        ));
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+        $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testBatchRemoveContactsIgnoresMalformedIds(): void
+    {
+        $this->setCsrfHeader();
+        $contact = $this->createLead('Retained', 'Contact', 'retained@example.com');
+        $this->client->request(Request::METHOD_POST, sprintf(
+            '/s/companies/batchRemoveContacts/%d?ids=%s',
+            $this->company1Id,
+            urlencode((string) json_encode([$contact->getId().'invalid', (float) $contact->getId(), [$contact->getId()], true, null], JSON_PRESERVE_ZERO_FRACTION))
+        ));
+        $this->assertResponseIsSuccessful();
+        $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testBatchRemoveContactsReportsMissingCompany(): void
+    {
+        $companyId = 999999999;
+
+        $this->client->request(Request::METHOD_GET, sprintf('/s/companies/batchRemoveContacts/%d', $companyId));
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($response->getContent());
+        $this->assertStringContainsString('Company not found.', (string) $response->getContent());
+    }
+
+    public function testBatchRemoveContactsDeniesUsersWithoutCompanyAccess(): void
+    {
+        $contact = $this->createLead('Protected', 'Contact', 'protected@example.com');
+        $this->loginUser($this->createUserWithLeadPermissions([]));
+        $this->client->request(
+            Request::METHOD_POST,
+            sprintf(
+                '/s/companies/batchRemoveContacts/%d?ids=%s',
+                $this->company1Id,
+                urlencode((string) json_encode([$contact->getId()]))
+            )
+        );
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_FORBIDDEN);
+
+        $this->assertContains($contact->getId(), $this->getCompanyLeadIds($this->company1Id));
+    }
+
+    public function testCompanyContactsListShowsBatchRemoveConfirmation(): void
+    {
+        $this->createLead('Listed', 'Contact', 'listed@example.com');
+
+        $this->client->request(Request::METHOD_GET, '/s/company/'.$this->company1Id.'/contacts/');
+
+        $response = $this->client->getResponse();
+        $this->assertResponseIsSuccessful($response->getContent());
+        $this->assertStringContainsString('Remove from company', (string) $response->getContent());
+        $this->assertStringContainsString(
+            "Remove the selected contacts from this company? The contacts will remain in Mautic. If this is a contact's primary company, another company may become primary or the contact will have no company.",
+            html_entity_decode((string) $response->getContent())
+        );
+        $this->assertStringContainsString('/s/companies/batchRemoveContacts/'.$this->company1Id, (string) $response->getContent());
+    }
+
+    public function testCompanyFieldsAreUpdatedWithBatchFindAndReplace(): void
+    {
+        $companyA = $this->createCompany('Find Replace Company A', 'Goods');
+        $companyB = $this->createCompany('Find Replace Company B', 'Goods');
+        $companyC = $this->createCompany('Find Replace Company C', 'Services');
+
+        $payload = [
+            'lead_batch_find_replace' => [
+                'field'   => 'companyindustry',
+                'find'    => 'Goods',
+                'replace' => 'Retail',
+                'ids'     => json_encode([$companyA->getId(), $companyB->getId(), $companyC->getId()]),
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/s/companies/batchFindReplace', $payload);
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+
+        $this->em->clear();
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+
+        $companyA = $companyModel->getEntity($companyA->getId());
+        $companyB = $companyModel->getEntity($companyB->getId());
+        $companyC = $companyModel->getEntity($companyC->getId());
+
+        $this->assertInstanceOf(Company::class, $companyA);
+        $this->assertInstanceOf(Company::class, $companyB);
+        $this->assertInstanceOf(Company::class, $companyC);
+        $this->assertSame('Retail', $companyA->getIndustry());
+        $this->assertSame('Retail', $companyB->getIndustry());
+        $this->assertSame('Services', $companyC->getIndustry());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('closeModal', $response, 'The response does not contain the `closeModal` param.');
+        $this->assertTrue($response['closeModal']);
+        $this->assertStringContainsString('2 companies affected', (string) $response['flashes']);
+    }
+
+    public function testCompanyFieldsAreUpdatedWithBatchFindAndReplaceForCurrentSearch(): void
+    {
+        $companyA = $this->createCompany('Find Replace Current Company A', 'Goods');
+        $companyB = $this->createCompany('Find Replace Current Company B', 'Goods');
+        $companyC = $this->createCompany('Other Company', 'Goods');
+        $companyD = $this->createCompany('Find Replace Current Company D', 'Services');
+        $companyE = $this->createCompany('Find Replace Current Company E', 'Goods');
+        $companyF = $this->createCompany('Find Replace Current Company F', 'Goods');
+        $companyG = $this->createCompany('Find Replace Current Company G', 'Goods');
+
+        $crawler = $this->client->request(
+            Request::METHOD_GET,
+            '/s/companies?search=Find Replace Current&name=company&limit=5'
+        );
+
+        $companyTableRows = $crawler->filterXPath("//table[@id='companyTable']//tbody//tr");
+        $this->assertCount(5, $companyTableRows, $crawler->html());
+
+        $payload = [
+            'lead_batch_find_replace' => [
+                'field'   => 'companyindustry',
+                'find'    => 'Goods',
+                'replace' => 'Retail',
+                'all'     => '1',
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/s/companies/batchFindReplace', $payload);
+
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+
+        $this->em->clear();
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+
+        $companyA = $companyModel->getEntity($companyA->getId());
+        $companyB = $companyModel->getEntity($companyB->getId());
+        $companyC = $companyModel->getEntity($companyC->getId());
+        $companyD = $companyModel->getEntity($companyD->getId());
+        $companyE = $companyModel->getEntity($companyE->getId());
+        $companyF = $companyModel->getEntity($companyF->getId());
+        $companyG = $companyModel->getEntity($companyG->getId());
+
+        $this->assertInstanceOf(Company::class, $companyA);
+        $this->assertInstanceOf(Company::class, $companyB);
+        $this->assertInstanceOf(Company::class, $companyC);
+        $this->assertInstanceOf(Company::class, $companyD);
+        $this->assertInstanceOf(Company::class, $companyE);
+        $this->assertInstanceOf(Company::class, $companyF);
+        $this->assertInstanceOf(Company::class, $companyG);
+        $this->assertSame('Retail', $companyA->getIndustry());
+        $this->assertSame('Retail', $companyB->getIndustry());
+        $this->assertSame('Goods', $companyC->getIndustry());
+        $this->assertSame('Services', $companyD->getIndustry());
+        $this->assertSame('Retail', $companyE->getIndustry());
+        $this->assertSame('Retail', $companyF->getIndustry());
+        $this->assertSame('Retail', $companyG->getIndustry());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('closeModal', $response, 'The response does not contain the `closeModal` param.');
+        $this->assertTrue($response['closeModal']);
+        $this->assertStringContainsString('5 companies affected', (string) $response['flashes']);
     }
 
     /**
@@ -133,7 +477,6 @@ class CompanyControllerTest extends MauticMysqlTestCase
     {
         $this->client->request('GET', '/s/companies/new/');
         $clientResponse         = $this->client->getResponse();
-        $clientResponseContent  = $clientResponse->getContent();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
     }
 
@@ -155,7 +498,7 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
 
         // Use the Crawler to parse the HTML content
-        $crawler = new \Symfony\Component\DomCrawler\Crawler($clientResponseContent);
+        $crawler = new Crawler($clientResponseContent);
 
         // Check for specific buttons by their IDs
         $applyButton  = $crawler->filter('#company_buttons_apply');
@@ -187,6 +530,183 @@ class CompanyControllerTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $savedCompany = $this->em->find(Company::class, $this->company1Id);
+        $this->assertInstanceOf(Company::class, $savedCompany);
         $this->assertSame($project->getId(), $savedCompany->getProjects()->first()->getId());
+    }
+
+    public function testEditActionForChangeInNameReflectsOnLeads(): void
+    {
+        $leadA = $this->createLead();
+        $leadB = $this->createLead('F1', 'L1', 'f@l.com', '123');
+
+        $crawler = $this->client->request('GET', '/s/companies/edit/'.$this->company1Id);
+        $this->assertResponseIsSuccessful();
+
+        $buttonCrawler = $crawler->selectButton('Save & Close');
+        $form          = $buttonCrawler->form();
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
+
+        $company     = $companyModel->getEntity($this->company1Id);
+        $this->assertInstanceOf(Company::class, $company);
+        $updatedName = $company->getName().' - Updated';
+        $form->setValues(
+            [
+                'company[companyname]'    => $updatedName,
+                'company[companyemail]'   => $company->getEmail(),
+                'company[companystate]'   => $company->getState(),
+                'company[companycity]'    => $company->getCity(),
+                'company[companycountry]' => $company->getCountry(),
+            ]
+        );
+
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
+        $this->assertMatchesRegularExpression('/\/s\/companies\/view\/'.$this->company1Id.'/', $this->client->getRequest()->getUri());
+
+        /** @var LeadRepository $leadRepo */
+        $leadRepo = $this->em->getRepository(Lead::class);
+        $this->assertSame($updatedName, $leadRepo->getValue($leadA->getId(), 'company'));
+        $this->assertSame($updatedName, $leadRepo->getValue($leadB->getId(), 'company'));
+    }
+
+    public function testIndexAction(): void
+    {
+        $this->client->request('GET', '/s/companies');
+        $clientResponse = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
+
+        $content = $clientResponse->getContent();
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
+        $company1 = $companyModel->getEntity($this->company1Id);
+        $company2 = $companyModel->getEntity($this->company2Id);
+        $this->assertInstanceOf(Company::class, $company1);
+
+        $this->assertStringContainsString($company1->getName(), (string) $content);
+        $this->assertInstanceOf(Company::class, $company2);
+        $this->assertStringContainsString($company2->getName(), (string) $content);
+
+        $translator  = self::getContainer()->get(TranslatorInterface::class);
+        $itemMessage = $translator->trans('mautic.core.pagination.items', ['%count%' => 2]);
+        $this->assertStringContainsString($itemMessage, (string) $content);
+
+        $pageMessage = $translator->trans('mautic.core.pagination.pages', ['%count%' => 1]);
+        $this->assertStringContainsString($pageMessage, (string) $content);
+    }
+
+    protected function createLead(string $firstName = 'Firstname', string $lastName = 'Lastname', string $email = 'test@test.com', string $phoneNumber = '555-666-777'): Lead
+    {
+        $lead = new Lead();
+        $lead->setFirstname($firstName);
+        $lead->setLastname($lastName);
+        $lead->setEmail($email);
+        $lead->setPhone($phoneNumber);
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $this->assertInstanceOf(CompanyModel::class, $companyModel);
+
+        $company = $companyModel->getEntity($this->company1Id);
+
+        $companyModel->addLeadToCompany($company, $lead);
+
+        $lead->setCompany($company->getName());
+
+        $this->em->persist($lead);
+        $this->em->flush();
+
+        return $lead;
+    }
+
+    private function createCompany(string $name, string $industry): Company
+    {
+        $company = new Company();
+        $company->setIsPublished(true)
+            ->setName($name)
+            ->setState('Washington')
+            ->setCity('Seattle')
+            ->setCountry(self::COUNTRY_UNITED_STATES)
+            ->setIndustry($industry);
+
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+        $companyModel->saveEntity($company);
+
+        return $company;
+    }
+
+    /**
+     * @param string[] $permissions
+     */
+    private function createUserWithLeadPermissions(array $permissions): User
+    {
+        $role = new Role();
+        $role->setName('Company controller role '.uniqid('', true));
+        $this->em->persist($role);
+        $this->em->flush();
+
+        $roleModel = self::getContainer()->get(RoleModel::class);
+        $roleModel->setRolePermissions($role, ['lead:leads' => $permissions]);
+        $roleModel->saveEntity($role);
+
+        $user = new User();
+        $user->setFirstName('Company')->setLastName('Editor');
+        $user->setUsername('company.editor.'.uniqid());
+        $user->setEmail('company.editor.'.uniqid().'@example.com');
+        $user->setRole($role);
+
+        $hasher = self::getContainer()->get(PasswordHasherFactoryInterface::class)->getPasswordHasher($user);
+        $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
+        $user->setPassword($hasher->hash('Maut1cR0cks!'));
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
+    }
+
+    /**
+     * @return int[]
+     */
+    private function getCompanyLeadIds(int $companyId): array
+    {
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::getContainer()->get(CompanyModel::class);
+
+        return array_map(
+            static fn (array $companyLead): int => (int) $companyLead['lead_id'],
+            $companyModel->getCompanyLeadRepository()->getCompanyLeads($companyId)
+        );
+    }
+
+    private function createSegment(): LeadList
+    {
+        $filters = [
+            [
+                'glue'     => 'and',
+                'field'    => 'email',
+                'object'   => 'lead',
+                'type'     => 'email',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',
+            ],
+        ];
+
+        $segment = new LeadList();
+        $segment->setFilters($filters);
+        $segment->setName('Segment A');
+        $segment->setPublicName('Segment A');
+        $segment->setAlias('segment-a');
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        return $segment;
     }
 }

@@ -16,8 +16,8 @@ final class DncFormatterHelper
     private ?array $dncReasons = null;
 
     public function __construct(
-        private TranslatorInterface $translator,
-        private ChannelListHelper $channelListHelper,
+        private readonly TranslatorInterface $translator,
+        private readonly ChannelListHelper $channelListHelper,
     ) {
     }
 

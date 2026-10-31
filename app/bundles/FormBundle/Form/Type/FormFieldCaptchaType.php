@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -9,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldCaptchaType extends AbstractType
+final class FormFieldCaptchaType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -18,7 +20,7 @@ class FormFieldCaptchaType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_captcha',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'       => 'form-control',
                     'tooltip'     => 'mautic.form.field.help.captcha',
@@ -33,7 +35,7 @@ class FormFieldCaptchaType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_placeholder',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
@@ -44,7 +46,7 @@ class FormFieldCaptchaType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_captchaerror',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]

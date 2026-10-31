@@ -18,12 +18,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
     name: SyncCommand::NAME,
     description: 'Fetch objects from integration.'
 )]
-class SyncCommand extends Command
+final class SyncCommand extends Command
 {
     public const NAME = 'mautic:integrations:sync';
 
     public function __construct(
-        private SyncServiceInterface $syncService,
+        private readonly SyncServiceInterface $syncService,
     ) {
         parent::__construct();
     }
@@ -34,8 +34,7 @@ class SyncCommand extends Command
             ->addArgument(
                 'integration',
                 InputOption::VALUE_REQUIRED,
-                'Fetch objects from integration.',
-                null
+                'Fetch objects from integration.'
             )
             ->addOption(
                 '--start-datetime',
@@ -108,10 +107,10 @@ class SyncCommand extends Command
         }
 
         try {
-            defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') or define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $inputOptions->getIntegration());
+            defined('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS') || define('MAUTIC_INTEGRATION_SYNC_IN_PROGRESS', $inputOptions->getIntegration());
 
             // Tell audit log to use integration name rather than "System"
-            defined('MAUTIC_AUDITLOG_USER') or define('MAUTIC_AUDITLOG_USER', $inputOptions->getIntegration());
+            defined('MAUTIC_AUDITLOG_USER') || define('MAUTIC_AUDITLOG_USER', $inputOptions->getIntegration());
 
             $this->syncService->processIntegrationSync($inputOptions);
         } catch (\Throwable $e) {

@@ -15,14 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber implements EventSubscriberInterface
 {
     use ChannelTrait;
-
-    /**
-     * @var RouterInterface
-     */
-    private $router;
 
     /**
      * @param ModelFactory<object> $modelFactory
@@ -31,11 +26,9 @@ class LeadSubscriber implements EventSubscriberInterface
         private PageModel $pageModel,
         private VideoModel $pageVideoModel,
         private TranslatorInterface $translator,
-        RouterInterface $router,
+        private RouterInterface $router,
         ModelFactory $modelFactory,
     ) {
-        $this->router         = $router;
-
         $this->setModelFactory($modelFactory);
     }
 

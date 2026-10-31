@@ -43,3 +43,33 @@
     display: flex;
     scrollbar-width: thin; /* Firefox */
 }
+
+.abtest-sidebar-actions {
+    width: 100%;
+}
+
+.abtest-sidebar-actions > .btn,
+.abtest-sidebar-actions > .btn-group,
+.abtest-sidebar-actions > .btn + .btn,
+.abtest-sidebar-actions > .btn-group + .btn,
+.abtest-sidebar-actions > .btn + .btn-group,
+.abtest-sidebar-actions > .btn-group + .btn-group {
+    margin-left: 0;
+}
+
+.abtest-sidebar-actions .btn {
+    justify-content: flex-start;
+}
+
+.abtest-sidebar-actions .btn-primary,
+.abtest-sidebar-actions .btn-tertiary {
+    gap: var(--spacing-03);
+}
+
+.abtest-sidebar-actions .btn i {
+    order: 0;
+}
+
+.abtest-sidebar-actions .btn span {
+    width: auto;
+}

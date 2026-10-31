@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Update\PreUpdateChecks;
 
 use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\CheckDatabaseDriverAndVersion;
 use Mautic\CoreBundle\Release\Metadata;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
-class CheckDatabaseDriverAndVersionTest extends MauticMysqlTestCase
+final class CheckDatabaseDriverAndVersionTest extends MauticMysqlTestCase
 {
     public function testDatabaseDriverAndVersionOk(): void
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\LanguageHelper;
@@ -8,20 +10,20 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UpdateTranslationsStepTest extends AbstractStepTestCase
+final class UpdateTranslationsStepTest extends AbstractStepTestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var MockObject|LanguageHelper
+     * @var MockObject&LanguageHelper
      */
     private MockObject $languageHelper;
 
     /**
-     * @var MockObject|LoggerInterface
+     * @var MockObject&LoggerInterface
      */
     private MockObject $logger;
 
@@ -69,7 +71,7 @@ class UpdateTranslationsStepTest extends AbstractStepTestCase
             ->method('error')
             ->with('UPDATE ERROR: there was an error');
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
@@ -96,7 +98,7 @@ class UpdateTranslationsStepTest extends AbstractStepTestCase
             ->with('es_MX')
             ->willReturn(['error' => false]);
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
@@ -125,7 +127,7 @@ class UpdateTranslationsStepTest extends AbstractStepTestCase
 
         $this->translator->method('trans')
             ->willReturnCallback(
-                fn (string $key) => $key
+                fn (string $key): string => $key
             );
 
         $this->logger->expects($this->once())

@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Test\Container;
 use Symfony\Bundle\FrameworkBundle\Test\TestContainer as BaseTestContainer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class TestContainer extends BaseTestContainer
+final class TestContainer extends BaseTestContainer
 {
     private ContainerInterface $publicContainer;
 
@@ -16,7 +16,7 @@ class TestContainer extends BaseTestContainer
      */
     public function set(string $id, $service): void
     {
-        $closure = static function (ContainerInterface $container) use ($id, $service) {
+        $closure = static function (ContainerInterface $container) use ($id, $service): void {
             $container->services[$id] = $service; // @phpstan-ignore-line
             $container->privates[$id] = $service; // @phpstan-ignore-line
         };

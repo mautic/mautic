@@ -48,7 +48,7 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
-    <div class="col-md-9 height-auto">
+    <div class="col-md-7 col-lg-8 height-auto">
         <div>
             <!-- notification detail collapseable -->
             <div class="collapse pr-md pl-md" id="notification-details">
@@ -93,13 +93,13 @@
                         {% endif %}
                         <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="col-md-3 va-m">
+                                <div class="col-md-3 align-middle">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="ri-line-chart-fill"></span>
                                         {{ 'mautic.core.stats'|trans }}
                                     </h5>
                                 </div>
-                                <div class="col-md-9 va-m">
+                                <div class="col-md-9 align-middle">
                                     {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}, with_context=false) }}
                                 </div>
                             </div>
@@ -148,7 +148,10 @@
     <!--/ left section -->
 
     <!-- right section -->
-    <div class="col-md-3 bdr-l height-auto">
+    <div class="col-md-5 col-lg-4 height-auto">
+        <div class="pa-md mb-32 animation--slide-in-right">
+            {{ include('@MauticNotification/Notification/preview.html.twig') }}
+        </div>
         <!-- activity feed -->
         {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
     </div>

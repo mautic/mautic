@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
-class MauticCategoryExtension extends Extension
+final class MauticCategoryExtension extends Extension
 {
     /**
      * @param mixed[] $configs

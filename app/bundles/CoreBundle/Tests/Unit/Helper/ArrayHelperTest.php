@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
-class ArrayHelperTest extends \PHPUnit\Framework\TestCase
+final class ArrayHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetValue(): void
     {
@@ -44,10 +46,10 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
      * @param mixed[] $value
      * @param mixed[] $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('removeEmptyValuesProvider')]
+    #[DataProvider('removeEmptyValuesProvider')]
     public function testRemoveEmptyValues(array $value, array $expected): void
     {
-        Assert::assertSame($expected, ArrayHelper::removeEmptyValues($value));
+        $this->assertSame($expected, ArrayHelper::removeEmptyValues($value));
     }
 
     /**
@@ -100,13 +102,10 @@ class ArrayHelperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        Assert::assertSame(
-            [
-                'first'  => 'Custom first',
-                'second' => 'Custom second',
-                'third'  => 'Custom third',
-            ],
-            ArrayHelper::flatten($multidimensionalArray)
-        );
+        $this->assertSame([
+            'first'  => 'Custom first',
+            'second' => 'Custom second',
+            'third'  => 'Custom third',
+        ], ArrayHelper::flatten($multidimensionalArray));
     }
 }

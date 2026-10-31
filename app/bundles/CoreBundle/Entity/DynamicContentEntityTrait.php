@@ -42,7 +42,7 @@ trait DynamicContentEntityTrait
     #[Groups(['email:read', 'email:write'])]
     private $dynamicContent = [];
 
-    protected static function addDynamicContentMetadata(ClassMetadataBuilder $builder)
+    protected static function addDynamicContentMetadata(ClassMetadataBuilder $builder): void
     {
         $builder->createField('dynamicContent', 'array')
             ->columnName('dynamic_content')

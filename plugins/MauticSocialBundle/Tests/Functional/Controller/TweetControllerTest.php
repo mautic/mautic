@@ -10,7 +10,7 @@ use MauticPlugin\MauticSocialBundle\Entity\TweetRepository;
 use MauticPlugin\MauticSocialBundle\Model\TweetModel;
 use Symfony\Component\HttpFoundation\Request;
 
-class TweetControllerTest extends MauticMysqlTestCase
+final class TweetControllerTest extends MauticMysqlTestCase
 {
     private TweetRepository $tweetsRepo;
 
@@ -19,7 +19,7 @@ class TweetControllerTest extends MauticMysqlTestCase
         parent::setUp();
 
         /** @var TweetModel $tweetsModel */
-        $tweetsModel      = static::getContainer()->get('mautic.social.model.tweet');
+        $tweetsModel      = self::getContainer()->get(TweetModel::class);
         $this->tweetsRepo = $tweetsModel->getRepository();
 
         $tweet = new Tweet();
@@ -33,9 +33,9 @@ class TweetControllerTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/tweets');
         $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
-        $this->assertStringContainsString('Tweet One', $response->getContent());
+        $this->assertStringContainsString('Tweet One', (string) $response->getContent());
     }
 
     public function testCreateTweet(): void
@@ -47,9 +47,8 @@ class TweetControllerTest extends MauticMysqlTestCase
         $form['twitter_tweet[name]']->setValue($name);
         $form['twitter_tweet[text]']->setValue('Here is the first tweet');
 
-        $crawler  = $this->client->submit($form);
-        $response = $this->client->getResponse();
-        $this->assertTrue($response->isOk());
+        $this->client->submit($form);
+        $this->assertResponseIsSuccessful();
 
         $this->assertSame(1, $this->tweetsRepo->count(['name' => $name]));
     }
@@ -57,12 +56,13 @@ class TweetControllerTest extends MauticMysqlTestCase
     public function testEditAction(): void
     {
         $tweet = $this->tweetsRepo->findOneBy([]);
+        $this->assertInstanceOf(Tweet::class, $tweet);
 
         $crawler               = $this->client->request('GET', '/s/tweets/edit/'.$tweet->getId());
         $clientResponse        = $this->client->getResponse();
         $clientResponseContent = $clientResponse->getContent();
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
-        $this->assertStringContainsString('Edit tweet '.$tweet->getName(), $clientResponseContent, 'The return must contain \'Edit tweet\' text');
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Edit tweet '.$tweet->getName(), (string) $clientResponseContent, 'The return must contain \'Edit tweet\' text');
 
         $form = $crawler->selectButton('Save & Close')->form();
         $form['twitter_tweet[name]']->setValue('Updated tweet name');

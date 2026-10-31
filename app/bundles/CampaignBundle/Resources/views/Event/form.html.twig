@@ -60,38 +60,27 @@
                     <div class="col-sm-12" style="font-weight: 600;">{{ 'mautic.campaign.form.type.interval_trigger_restricted_dow'|trans }}</div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-3">
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][0]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][0]) }}</label>
+                    {% for start in [0, 2, 4, 6] %}
+                        <div class="col-sm-3">
+                            {% for day in form['triggerRestrictedDaysOfWeek']|slice(start, 2) %}
+                                {% do day.setRendered() %}
+                                {% include '@MauticCore/Components/checkbox.html.twig' with {
+                                    items: [{
+                                        id: day.vars.id,
+                                        name: day.vars.full_name,
+                                        value: day.vars.value,
+                                        checked: day.vars.checked,
+                                        disabled: day.vars.disabled,
+                                        label: day.vars.label,
+                                        label_html: day.vars.label_html,
+                                        translation_domain: day.vars.translation_domain,
+                                        label_translation_parameters: day.vars.label_translation_parameters,
+                                        attributes: day.vars.attr
+                                    }]
+                                } only %}
+                            {% endfor %}
                         </div>
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][1]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][1]) }}</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][2]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][2]) }}</label>
-                        </div>
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][3]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][3]) }}</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][4]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][4]) }}</label>
-                        </div>
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][5]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][5]) }}</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][6]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][6]) }}</label>
-                        </div>
-                        <div class="checkbox">
-                            <label>{{ form_widget(form['triggerRestrictedDaysOfWeek'][7]) }} {{ form_label(form['triggerRestrictedDaysOfWeek'][7]) }}</label>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>

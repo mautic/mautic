@@ -24,13 +24,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<Client>
  */
-class ClientType extends AbstractType
+final class ClientType extends AbstractType
 {
     public function __construct(
-        private RequestStack $requestStack,
-        private TranslatorInterface $translator,
-        private ValidatorInterface $validator,
-        private RouterInterface $router,
+        private readonly RequestStack $requestStack,
+        private readonly TranslatorInterface $translator,
+        private readonly ValidatorInterface $validator,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -58,7 +58,7 @@ class ClientType extends AbstractType
                 [
                     'mapped'     => false,
                     'label'      => 'mautic.api.client.form.auth_protocol',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'    => 'form-control',
                         'onchange' => 'Mautic.refreshApiClientForm(\''.$this->router->generate('mautic_client_action', ['objectAction' => 'new']).'\', this)',
@@ -78,7 +78,7 @@ class ClientType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -90,7 +90,7 @@ class ClientType extends AbstractType
                 TextType::class,
                 [
                     'label'      => 'mautic.api.client.redirecturis',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.api.client.form.help.requesturis',
@@ -105,7 +105,7 @@ class ClientType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.api.client.form.clientid',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'disabled'   => true,
                 'required'   => false,
@@ -119,7 +119,7 @@ class ClientType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.api.client.form.clientsecret',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'disabled'   => true,
                 'required'   => false,

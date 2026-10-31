@@ -15,7 +15,7 @@ class LeadChangeEventDispatcher
     private ?array $changes = null;
 
     public function __construct(
-        private EventDispatcherInterface $dispatcher,
+        private readonly EventDispatcherInterface $dispatcher,
     ) {
     }
 

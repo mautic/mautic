@@ -13,10 +13,10 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class IntegrationCampaignsTaskType extends AbstractType
+final class IntegrationCampaignsTaskType extends AbstractType
 {
     public function __construct(
-        private ConnectwiseIntegration $connectwiseIntegration,
+        private readonly ConnectwiseIntegration $connectwiseIntegration,
     ) {
     }
 
@@ -31,7 +31,7 @@ class IntegrationCampaignsTaskType extends AbstractType
             TextType::class,
             [
                 'label'       => 'mautic.connectwise.activity.name',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'constraints' => [
                     new Callback(

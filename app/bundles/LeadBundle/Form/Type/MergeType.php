@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class MergeType extends AbstractType
+final class MergeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -22,7 +22,7 @@ class MergeType extends AbstractType
             [
                 'choices'           => $options['leads'],
                 'label'             => 'mautic.lead.merge.select',
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'multiple'          => false,
                 'placeholder'       => '',
                 'attr'              => [
@@ -31,9 +31,7 @@ class MergeType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]

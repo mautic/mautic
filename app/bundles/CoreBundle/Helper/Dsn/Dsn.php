@@ -60,7 +60,7 @@ final class Dsn implements \Stringable
         $host     = urldecode($parsedDsn['host']);
         $user     = '' !== ($parsedDsn['user'] ?? '') ? urldecode($parsedDsn['user']) : null;
         $password = '' !== ($parsedDsn['pass'] ?? '') ? urldecode($parsedDsn['pass']) : null;
-        $port     = isset($parsedDsn['port']) ? (int) $parsedDsn['port'] : null;
+        $port     = $parsedDsn['port'] ?? null;
         $path     = isset($parsedDsn['path']) ? ltrim(urldecode($parsedDsn['path']), '/') : null;
         parse_str($parsedDsn['query'] ?? '', $query);
 
@@ -107,7 +107,7 @@ final class Dsn implements \Stringable
         return $this->scheme;
     }
 
-    public function setScheme(string $scheme): Dsn
+    public function setScheme(string $scheme): self
     {
         $dsn         = clone $this;
         $dsn->scheme = $scheme;
@@ -120,7 +120,7 @@ final class Dsn implements \Stringable
         return $this->host;
     }
 
-    public function setHost(string $host): Dsn
+    public function setHost(string $host): self
     {
         $dsn       = clone $this;
         $dsn->host = $host;
@@ -133,7 +133,7 @@ final class Dsn implements \Stringable
         return $this->user;
     }
 
-    public function setUser(?string $user): Dsn
+    public function setUser(?string $user): self
     {
         $dsn       = clone $this;
         $dsn->user = $user;
@@ -159,7 +159,7 @@ final class Dsn implements \Stringable
         return $this->port;
     }
 
-    public function setPort(?int $port): Dsn
+    public function setPort(?int $port): self
     {
         $dsn       = clone $this;
         $dsn->port = $port;
@@ -183,7 +183,7 @@ final class Dsn implements \Stringable
     /**
      * @param array<string, string> $options
      */
-    public function setOptions(array $options): Dsn
+    public function setOptions(array $options): self
     {
         $dsn          = clone $this;
         $dsn->options = $options;
@@ -196,7 +196,7 @@ final class Dsn implements \Stringable
         return $this->path;
     }
 
-    public function setPath(?string $path): Dsn
+    public function setPath(?string $path): self
     {
         $dsn       = clone $this;
         $dsn->path = $path;

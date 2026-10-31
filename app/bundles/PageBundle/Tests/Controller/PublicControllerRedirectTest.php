@@ -11,14 +11,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicControllerRedirectTest extends MauticMysqlTestCase
+final class PublicControllerRedirectTest extends MauticMysqlTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('redirectTypeOptions')]
+    #[DataProvider('redirectTypeOptions')]
     public function testValidationRedirectWithoutUrl(string $redirectUrl, string $expectedMessage): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/pages/new');
@@ -31,7 +31,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
 
-        Assert::assertStringContainsString($expectedMessage, $this->client->getResponse()->getContent());
+        $this->assertStringContainsString($expectedMessage, (string) $this->client->getResponse()->getContent());
     }
 
     /**
@@ -58,12 +58,12 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_GET, '/page-a');
 
-        Assert::assertSame(Response::HTTP_NOT_FOUND, $this->client->getResponse()->getStatusCode());
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
-    public function testRedirectWithSpacesInQuery(): void
+    #[DataProvider('redirectUrlProvider')]
+    public function testRedirectWithSpecialCharsInQuery(string $url): void
     {
-        $url      = 'https://google.com?q=this%20has%20spaces';
         $redirect = new Redirect();
         $redirect->setUrl($url);
         $redirect->setRedirectId('57cf5a66a9f9414f301082cf0');
@@ -74,9 +74,23 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/r/%s', $redirect->getRedirectId()));
 
         $response = $this->client->getResponse();
-        \assert($response instanceof RedirectResponse);
-        Assert::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        Assert::assertSame($url, $response->getTargetUrl(), 'The spaces in the query part must not be encoded with plus signs.');
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        $this->assertSame($url, $response->getTargetUrl());
+    }
+
+    /**
+     * @return iterable<string, array<string, string>>
+     */
+    public static function redirectUrlProvider(): iterable
+    {
+        yield 'The spaces in the query part must not be encoded with plus signs.' => [
+            'url' => 'https://google.com?q=this%20has%20spaces',
+        ];
+
+        yield 'The dot in the query part must not be replaced with underscore.' => [
+            'url' => 'https://google.com?registrants.source=email',
+        ];
     }
 
     public function testRedirectWithCorrectHitUrl(): void
@@ -99,7 +113,7 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->em->persist($redirect);
         $this->em->flush();
 
-        $ct = $this->getEncodedClickThroughValue($stat->getTrackingHash(), (int) $lead->getId());
+        $ct = $this->getEncodedClickThroughValue($stat->getTrackingHash(), $lead->getId());
 
         $this->logoutUser();
 
@@ -107,12 +121,12 @@ class PublicControllerRedirectTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, sprintf('/r/%s?ct=%s', $redirect->getRedirectId(), $ct));
 
         $response = $this->client->getResponse();
-        \assert($response instanceof RedirectResponse);
-        Assert::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        Assert::assertSame($url, $response->getTargetUrl(), 'The dots in the query part must be preserved.');
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        $this->assertSame($url, $response->getTargetUrl(), 'The dots in the query part must be preserved.');
 
         $hit = $this->em->getRepository(Hit::class)->findOneBy(['url' => $url]);
-        Assert::assertNotNull($hit);
+        $this->assertInstanceOf(Hit::class, $hit);
     }
 
     private function getEncodedClickThroughValue(string $trackingHash, int $leadId): string

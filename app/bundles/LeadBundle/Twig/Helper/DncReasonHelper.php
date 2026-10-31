@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Twig\Helper;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -9,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Convert DNC reason ID to text.
  */
-final class DncReasonHelper
+final readonly class DncReasonHelper
 {
     public function __construct(
         private TranslatorInterface $translator,

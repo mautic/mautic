@@ -4,12 +4,13 @@ namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FormBuilderEvent extends Event
+final class FormBuilderEvent extends Event
 {
     use ComponentValidationTrait;
 
@@ -34,11 +35,10 @@ class FormBuilderEvent extends Event
      *                       'label'              => (required) what to display in the list
      *                       'eventName'          => (required) Event dispatched to execute action; it will receive a SubmissionEvent object
      *                       'formType'           => (required) name of the form type SERVICE for the action
-     *                       'allowCampaignForm'  => (optional) true to allow this action for campaign forms; defaults to false
      *                       'description'        => (optional) short description of event
      *                       'template'           => (optional) template to use for the action's HTML in the form builder; eg AcmeMyBundle:FormAction:theaction.html.twig
      *                       'formTypeOptions'    => (optional) array of options to pass to formType
-     *                       'formTheme'          => (optional  theme for custom form views
+     *                       'formTheme'          => (optional)  theme for custom form views
      *                       ]
      *
      * @throws BadConfigurationException
@@ -46,7 +46,7 @@ class FormBuilderEvent extends Event
     public function addSubmitAction(string $key, array $action): void
     {
         if (array_key_exists($key, $this->actions)) {
-            throw new \InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
+            throw new \InvalidArgumentException("The key, '{$key}' is already used by another action. Please use a different key.");
         }
 
         // check for required keys and that given functions are callable
@@ -61,12 +61,7 @@ class FormBuilderEvent extends Event
         $this->actions[$key] = $action;
     }
 
-    /**
-     * Get submit actions.
-     *
-     * @return array
-     */
-    public function getSubmitActions()
+    public function getSubmitActions(): array
     {
         uasort(
             $this->actions,
@@ -123,7 +118,7 @@ class FormBuilderEvent extends Event
     public function addFormField($key, array $field): void
     {
         if (array_key_exists($key, $this->fields)) {
-            throw new \InvalidArgumentException("The key, '$key' is already used by another field. Please use a different key.");
+            throw new \InvalidArgumentException("The key, '{$key}' is already used by another field. Please use a different key.");
         }
 
         $callbacks = [];
@@ -132,7 +127,7 @@ class FormBuilderEvent extends Event
         if (isset($field['valueFilter'])
             && (!is_string($field['valueFilter'])
                 || !is_callable(
-                    [\Mautic\CoreBundle\Helper\InputHelper::class, $field['valueFilter']]
+                    [InputHelper::class, $field['valueFilter']]
                 ))
         ) {
             $callbacks = ['valueFilter'];
@@ -144,11 +139,9 @@ class FormBuilderEvent extends Event
     }
 
     /**
-     * Get form fields.
-     *
-     * @return mixed
+     * @return array<string, mixed>
      */
-    public function getFormFields()
+    public function getFormFields(): array
     {
         return $this->fields;
     }
@@ -165,7 +158,7 @@ class FormBuilderEvent extends Event
     public function addValidator($key, array $validator): void
     {
         if (array_key_exists($key, $this->fields)) {
-            throw new \InvalidArgumentException("The key, '$key' is already used by another validator. Please use a different key.");
+            throw new \InvalidArgumentException("The key, '{$key}' is already used by another validator. Please use a different key.");
         }
 
         // check for required keys and that given functions are callable
@@ -179,7 +172,7 @@ class FormBuilderEvent extends Event
      */
     public function addValidatorsToBuilder(FormInterface $form): void
     {
-        if (!empty($this->validators)) {
+        if ([] !== $this->validators) {
             $validationData = $form->getData()['validation'] ?? [];
             foreach ($this->validators as $validator) {
                 if (isset($validator['formType']) && isset($validator['fieldType']) && $validator['fieldType'] == $form->getData()['type']) {

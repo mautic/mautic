@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Exception\MessageOnlyErrorHandlerException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class RequirementsPass implements CompilerPassInterface
+final class RequirementsPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {

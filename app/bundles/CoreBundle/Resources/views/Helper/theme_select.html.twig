@@ -37,25 +37,45 @@
                                 {
                                     href: '#',
                                     label: 'mautic.core.select',
-                                    variant: 'ghost',
+                                    variant: 'tertiary',
                                     attributes: {
                                         'type': 'button',
                                         'data-theme': themeKey,
-                                        'class': 'select-theme-link' ~ (isSelected ? ' hide' : ''),
+                                        'class': 'btn-wide mt-md select-theme-link' ~ (isSelected ? ' hide' : ''),
                                         'onclick': "mQuery('#dynamic-content-tab').addClass('hidden')"
-                                    }
+                                    },
                                 },
                                 {
                                     label: 'mautic.core.form.filters.selected',
-                                    variant: 'ghost',
+                                    variant: 'tertiary',
                                     attributes: {
                                         'type': 'button',
-                                        'class': 'select-theme-selected' ~ (not isSelected ? ' hide' : ''),
+                                        'class': 'btn-wide mt-md select-theme-selected' ~ (not isSelected ? ' hide' : ''),
                                         'disabled': ''
-                                    }
+                                    },
                                 }
                             ]
                         } %}
+                        {% if themeInfo.config.tags is defined and themeInfo.config.tags|length %}
+                            {% set tags = [] %}
+                            {% for tag in themeInfo.config.tags %}
+                                {% set tagObj = {
+                                    'label': 'mautic.core.theme.tag.' ~ tag|replace({'-': '_'}),
+                                    'size': 'sm'
+                                } %}
+                                {% if tag == 'adaptative' %}
+                                    {% set tagObj = tagObj|merge({
+                                        'color': 'brand',
+                                        'icon_only': true,
+                                        'icon': 'ri-pantone-fill'
+                                    }) %}
+                                {% endif %}
+                                {% set tags = tags|merge([tagObj]) %}
+                            {% endfor %}
+                            <div class="mt-md">
+                                {% include '@MauticCore/Helper/_tag.html.twig' with { tags: tags } %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
                 {% if hasThumbnail %}
@@ -89,22 +109,22 @@
                       {
                           href: '#',
                           label: 'mautic.core.select',
-                          variant: 'ghost',
+                          variant: 'tertiary',
                           attributes: {
                               'type': 'button',
                               'data-theme': codeMode,
-                              'class': 'select-theme-link' ~ (isCodeMode ? ' hide' : ''),
+                              'class': 'btn-wide mt-md select-theme-link' ~ (isCodeMode ? ' hide' : ''),
                               'onclick': "mQuery('#dynamic-content-tab').removeClass('hidden')"
-                          }
+                          },
                       },
                       {
                           label: 'mautic.core.form.filters.selected',
-                          variant: 'ghost',
+                          variant: 'tertiary',
                           attributes: {
                               'type': 'button',
-                              'class': 'select-theme-selected' ~ (not isCodeMode ? ' hide' : ''),
+                              'class': 'btn-wide mt-md select-theme-selected' ~ (not isCodeMode ? ' hide' : ''),
                               'disabled': 'disabled'
-                          }
+                          },
                       }
                   ]
               } %}

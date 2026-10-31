@@ -1,7 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Exception;
 
-class PrimaryTransportNotEnabledException extends \Exception
+final class PrimaryTransportNotEnabledException extends \Exception
 {
 }

@@ -1,6 +1,8 @@
 <?php
 
-namespace Mautic\WebhookBundle\Tests\Http;
+declare(strict_types=1);
+
+namespace Mautic\WebhookBundle\Tests\Unit\Http;
 
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Psr7\Request;
@@ -50,6 +52,7 @@ final class ClientTest extends TestCase
             'Content-Type'      => 'application/json',
             'X-Origin-Base-URL' => $siteUrl,
             'Webhook-Signature' => $expectedSignature,
+            'User-Agent'        => 'Webhook',
         ];
 
         $response = new Response();
@@ -57,7 +60,7 @@ final class ClientTest extends TestCase
         $matcher = $this->exactly(2);
         $this->parametersMock->expects($matcher)
             ->method('get')
-            ->willReturnCallback(function (string $parameter) use ($matcher, $siteUrl) {
+            ->willReturnCallback(function (string $parameter) use ($matcher, $siteUrl): string|array {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('site_url', $parameter);
 
@@ -73,7 +76,7 @@ final class ClientTest extends TestCase
 
         $this->httpClientMock->expects($this->once())
             ->method('sendRequest')
-            ->with($this->callback(function (Request $request) use ($method, $url, $headers, $payload) {
+            ->willReturnCallback(function (Request $request) use ($method, $url, $headers, $payload, $response): Response {
                 $this->assertSame($method, $request->getMethod());
                 $this->assertSame($url, (string) $request->getUri());
 
@@ -84,9 +87,8 @@ final class ClientTest extends TestCase
 
                 $this->assertSame(json_encode($payload), (string) $request->getBody());
 
-                return true;
-            }))
-            ->willReturn($response);
+                return $response;
+            });
 
         $this->assertEquals($response, $this->client->post($url, $payload, $secret));
     }

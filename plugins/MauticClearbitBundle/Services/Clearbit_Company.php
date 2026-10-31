@@ -5,7 +5,7 @@ namespace MauticPlugin\MauticClearbitBundle\Services;
 /**
  * This class handles everything related to the Company lookup API.
  */
-class Clearbit_Company extends Clearbit_Base
+final class Clearbit_Company extends Clearbit_Base
 {
     public function __construct($api_key)
     {

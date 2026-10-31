@@ -4,23 +4,49 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
+use Mautic\CoreBundle\Event\BuildJsScope;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Response;
 
-class JsController extends CommonController
+final class JsController extends CommonController
 {
     public function indexAction(
         #[Autowire(param: 'kernel.debug')]
         bool $kernelDebug,
     ): Response {
+        return $this->buildJs($kernelDebug);
+    }
+
+    public function essentialAction(
+        #[Autowire(param: 'kernel.debug')]
+        bool $kernelDebug,
+    ): Response {
+        return $this->buildJs($kernelDebug, [BuildJsScope::RUNTIME, BuildJsScope::ESSENTIAL]);
+    }
+
+    public function trackingAction(
+        #[Autowire(param: 'kernel.debug')]
+        bool $kernelDebug,
+    ): Response {
+        return $this->buildJs($kernelDebug, [BuildJsScope::TRACKING]);
+    }
+
+    /**
+     * @param BuildJsScope[] $acceptedScopes
+     */
+    private function buildJs(bool $kernelDebug, array $acceptedScopes = [
+        BuildJsScope::RUNTIME,
+        BuildJsScope::ESSENTIAL,
+        BuildJsScope::TRACKING,
+    ]): Response
+    {
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
 
-        $dispatcher = $this->dispatcher;
-        $event      = new BuildJsEvent($this->getJsHeader(), $kernelDebug);
+        $event = new BuildJsEvent($this->getJsHeader(), $kernelDebug, $acceptedScopes);
 
-        if ($dispatcher->hasListeners(CoreEvents::BUILD_MAUTIC_JS)) {
-            $dispatcher->dispatch($event, CoreEvents::BUILD_MAUTIC_JS);
+        if ($this->dispatcher->hasListeners(CoreEvents::BUILD_MAUTIC_JS)) {
+            $this->dispatcher->dispatch($event, CoreEvents::BUILD_MAUTIC_JS);
         }
 
         return new Response($event->getJs(), 200, ['Content-Type' => 'application/javascript']);
@@ -29,7 +55,7 @@ class JsController extends CommonController
     /**
      * Build a JS header for the Mautic embedded JS.
      */
-    protected function getJsHeader(): string
+    private function getJsHeader(): string
     {
         $year = date('Y');
 

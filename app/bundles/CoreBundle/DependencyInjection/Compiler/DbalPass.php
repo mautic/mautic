@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class DbalPass implements CompilerPassInterface
+final class DbalPass implements CompilerPassInterface
 {
     /**
      * Allows result caching with DBAL using the same configuration as the orm if provided and enabled.

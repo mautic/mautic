@@ -15,27 +15,19 @@ use Symfony\Component\Finder\Finder;
  */
 #[AsCommand(
     name: 'mautic:assets:cleanup',
-    description: 'Cleans up obsolete files in the media folder that are present in the app/assets folder'
-)]
-class CleanupMediaAssetsCommand extends Command
-{
-    public function __construct(
-        private PathsHelper $pathsHelper,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure(): void
-    {
-        $this
-          ->setHelp(
-              <<<'EOT'
+    description: 'Cleans up obsolete files in the media folder that are present in the app/assets folder',
+    help: <<<'TXT'
                 The <info>%command.name%</info> command is used to clean up obsolete files in the media folder that are present in the app/assets folder.
 
 <info>php %command.full_name%</info>
-EOT
-          );
-        parent::configure();
+TXT
+)]
+final class CleanupMediaAssetsCommand extends Command
+{
+    public function __construct(
+        private readonly PathsHelper $pathsHelper,
+    ) {
+        parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

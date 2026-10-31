@@ -10,8 +10,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class InternalContactEvent extends Event
 {
     public function __construct(
-        private string $integrationName,
-        private Lead $contact,
+        private readonly string $integrationName,
+        private readonly Lead $contact,
     ) {
     }
 

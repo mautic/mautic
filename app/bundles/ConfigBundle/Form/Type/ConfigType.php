@@ -13,11 +13,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function __construct(
-        private RestrictionHelper $restrictionHelper,
-        private EscapeTransformer $escapeTransformer,
+        private readonly RestrictionHelper $restrictionHelper,
+        private readonly EscapeTransformer $escapeTransformer,
     ) {
     }
 
@@ -61,7 +61,9 @@ class ConfigType extends AbstractType
                 $form = $event->getForm();
 
                 foreach ($form as $configForm) {
-                    foreach ($configForm as $child) {
+                    $children = iterator_to_array($configForm);
+
+                    foreach ($children as $child) {
                         $this->restrictionHelper->applyRestrictions($child, $configForm);
                     }
                 }

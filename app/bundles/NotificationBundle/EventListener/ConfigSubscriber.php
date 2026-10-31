@@ -9,7 +9,7 @@ use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\NotificationBundle\Form\Type\NotificationConfigType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class ConfigSubscriber implements EventSubscriberInterface
+final class ConfigSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

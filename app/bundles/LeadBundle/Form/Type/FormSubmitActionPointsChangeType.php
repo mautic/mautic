@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\PointBundle\Form\Type\GroupListType;
@@ -11,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormSubmitActionPointsChangeType extends AbstractType
+final class FormSubmitActionPointsChangeType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -21,7 +23,7 @@ class FormSubmitActionPointsChangeType extends AbstractType
             [
                 'label'             => 'mautic.lead.lead.submitaction.operator',
                 'attr'              => ['class' => 'form-control'],
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'choices'           => [
                     'mautic.lead.lead.submitaction.operator_plus'   => 'plus',
                     'mautic.lead.lead.submitaction.operator_minus'  => 'minus',
@@ -38,7 +40,7 @@ class FormSubmitActionPointsChangeType extends AbstractType
             [
                 'label'      => 'mautic.lead.lead.submitaction.points',
                 'attr'       => ['class' => 'form-control'],
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'scale'      => 0,
                 'data'       => $default,
             ]
@@ -46,7 +48,7 @@ class FormSubmitActionPointsChangeType extends AbstractType
 
         $builder->add('group', GroupListType::class, [
             'label'            => 'mautic.lead.campaign.event.point_group',
-            'label_attr'       => ['class' => 'control-label'],
+            'label_attr'       => ['class' => 'form-label'],
             'attr'             => [
                 'class'    => 'form-control',
                 'tooltip'  => 'mautic.lead.campaign.event.point_group.help',

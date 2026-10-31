@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\BuildJsEvent;
+use Mautic\CoreBundle\Event\BuildJsScope;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class BuildJsSubscriber implements EventSubscriberInterface
+final class BuildJsSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {
@@ -90,8 +93,12 @@ MauticJS.createCORSRequest = function(method, url) {
     return xhr;
 };
 MauticJS.CORSRequestsAllowed = true;
+MauticJS.requestWithCredentials = false;
+MauticJS.appendTrackedContact = function(data) {
+    return data;
+};
 MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callbackError) {
-    // Check for stored contact in localStorage
+    // Tracking overrides this hook to append stored contact data.
     data = MauticJS.appendTrackedContact(data);
     
     var query = MauticJS.serialize(data);
@@ -139,7 +146,7 @@ MauticJS.makeCORSRequest = function(method, url, data, callbackSuccess, callback
         }
     
         xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-        xhr.withCredentials = true;
+        xhr.withCredentials = MauticJS.requestWithCredentials;
     }
     xhr.send(query);
 };
@@ -205,6 +212,36 @@ function s4() {
     .substring(1);
 }
 
+MauticJS.preEventDeliveryQueue = [];
+MauticJS.beforeFirstDeliveryMade = false;
+MauticJS.beforeFirstEventDelivery = function(f) {
+    MauticJS.preEventDeliveryQueue.push(f);
+};
+
+MauticJS.ensureEventContext = function(event, context0, context1) {
+    return (typeof(event.detail) !== 'undefined'
+        && event.detail[0] === context0
+        && event.detail[1] === context1);
+};
+
+MauticJS.trackingEnabled = false;
+// The aggregate build appends its tracking contribution after this readiness signal.
+MauticJS.runtimeReady = true;
+JS_WRAP;
+        $event->appendJsForScope($js, BuildJsScope::RUNTIME, 'Mautic Core Runtime');
+
+        $js = <<<'JS_WRAP'
+(function(window) {
+var MauticJS = window.MauticJS;
+if (!MauticJS || MauticJS.runtimeReady !== true) {
+    if (window.console) {
+        console.warn('Mautic tracking requires the Mautic essential runtime.');
+    }
+    return;
+}
+
+MauticJS.trackingEnabled = true;
+MauticJS.requestWithCredentials = true;
 MauticJS.mtcSet = false;
 MauticJS.appendTrackedContact = function(data) {
     if (window.localStorage) {
@@ -249,11 +286,6 @@ MauticJS.postEventDeliveryQueue = [];
 MauticJS.firstDeliveryMade      = false;
 MauticJS.onFirstEventDelivery = function(f) {
     MauticJS.postEventDeliveryQueue.push(f);
-};
-MauticJS.preEventDeliveryQueue = [];
-MauticJS.beforeFirstDeliveryMade = false;
-MauticJS.beforeFirstEventDelivery = function(f) {
-    MauticJS.preEventDeliveryQueue.push(f);
 };
 document.addEventListener('mauticPageEventDelivered', function(e) {
     var detail   = e.detail;
@@ -379,13 +411,8 @@ if (typeof window[window.MauticTrackingObject] !== 'undefined') {
         return matches; 
     }
 }
-
-MauticJS.ensureEventContext = function(event, context0, context1) { 
-    return (typeof(event.detail) !== 'undefined'
-        && event.detail[0] === context0
-        && event.detail[1] === context1);
-};
+})(window);
 JS_WRAP;
-        $event->appendJs($js, 'Mautic Core');
+        $event->appendJsForScope($js, BuildJsScope::TRACKING, 'Mautic Core Tracking');
     }
 }

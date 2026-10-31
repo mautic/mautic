@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
@@ -11,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class UpdateLeadActionType extends AbstractType
+final class UpdateLeadActionType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 

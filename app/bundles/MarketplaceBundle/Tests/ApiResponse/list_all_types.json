@@ -1,0 +1,77 @@
+{
+    "results": [
+        {
+            "name": "example/newsletter-plugin-one",
+            "display_name": "Newsletter Plugin One",
+            "type": "mautic-plugin",
+            "description": "A newsletter plugin package.",
+            "url": "https://marketplace.mautic.org/packages/example/newsletter-plugin-one",
+            "repository": "https://github.com/example/newsletter-plugin",
+            "downloads": 123,
+            "favers": 4,
+            "average_rating": 4.5,
+            "total_reviews": 2
+        },
+        {
+            "name": "example/newsletter-plugin-two",
+            "display_name": "Newsletter Plugin Two",
+            "type": "mautic-plugin",
+            "description": "A newsletter plugin package.",
+            "url": "https://marketplace.mautic.org/packages/example/newsletter-plugin-two",
+            "repository": "https://github.com/example/newsletter-plugin",
+            "downloads": 123,
+            "favers": 4,
+            "average_rating": 4.5,
+            "total_reviews": 2
+        },
+        {
+            "name": "example/newsletter-theme-one",
+            "display_name": "Newsletter Theme One",
+            "type": "mautic-theme",
+            "description": "A newsletter theme package.",
+            "url": "https://marketplace.mautic.org/packages/example/newsletter-theme-one",
+            "repository": "https://github.com/example/newsletter-theme",
+            "downloads": 123,
+            "favers": 4,
+            "average_rating": 4.5,
+            "total_reviews": 2
+        },
+        {
+            "name": "example/newsletter-theme-two",
+            "display_name": "Newsletter Theme Two",
+            "type": "mautic-theme",
+            "description": "A newsletter theme package.",
+            "url": "https://marketplace.mautic.org/packages/example/newsletter-theme-two",
+            "repository": "https://github.com/example/newsletter-theme",
+            "downloads": 123,
+            "favers": 4,
+            "average_rating": 4.5,
+            "total_reviews": 2
+        },
+        {
+            "name": "example/newsletter-resource-one",
+            "display_name": "Newsletter Campaign One",
+            "type": "mautic-resource",
+            "description": "A newsletter resource package.",
+            "url": "https://marketplace.mautic.org/packages/example/newsletter-resource-one",
+            "repository": "https://github.com/example/newsletter-resource",
+            "downloads": 123,
+            "favers": 4,
+            "average_rating": 4.5,
+            "total_reviews": 2
+        },
+        {
+            "name": "example/newsletter-resource-two",
+            "display_name": "Newsletter Campaign Two",
+            "type": "mautic-resource",
+            "description": "A newsletter resource package.",
+            "url": "https://marketplace.mautic.org/packages/example/newsletter-resource-two",
+            "repository": "https://github.com/example/newsletter-resource",
+            "downloads": 123,
+            "favers": 4,
+            "average_rating": 4.5,
+            "total_reviews": 2
+        }
+    ],
+    "total": 6
+}

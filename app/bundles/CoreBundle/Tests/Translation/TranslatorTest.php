@@ -7,19 +7,19 @@ namespace Mautic\CoreBundle\Tests\Translation;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TranslatorTest extends AbstractMauticTestCase
+final class TranslatorTest extends AbstractMauticTestCase
 {
     public function testMissingPluralOptions(): void
     {
         /** @var Translator $translator */
-        $translator = self::getContainer()->get('translator');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
         $fallback   = 'en_US';
         $locale     = 'ru';
 
-        $reflection = new \ReflectionClass($translator);
-        $property   = $reflection->getProperty('translator');
-        $property->setAccessible(true);
+        $reflection         = new \ReflectionClass($translator);
+        $property           = $reflection->getProperty('translator');
         $internalTranslator = $property->getValue($translator);
 
         $internalTranslator->addLoader('array', new ArrayLoader());

@@ -14,12 +14,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class CompanyListType extends AbstractType
+final class CompanyListType extends AbstractType
 {
     public const DEFAULT_LIMIT = 100;
 
     public function __construct(
-        private CompanyRepository $companyRepository,
+        private readonly CompanyRepository $companyRepository,
     ) {
     }
 
@@ -52,7 +52,7 @@ class CompanyListType extends AbstractType
             $existingChoices = array_column($view->vars['choices'], 'value');
             $missingIds      = array_diff($selectedIds, $existingChoices);
 
-            if ($missingIds) {
+            if ([] !== $missingIds) {
                 $missingCompanies = $this->companyRepository->findBy(['id' => $missingIds]);
                 foreach ($missingCompanies as $company) {
                     $view->vars['choices'][] = new ChoiceView(
@@ -65,7 +65,7 @@ class CompanyListType extends AbstractType
         }
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return EntityLookupType::class;
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -10,7 +12,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class CampaignEventJumpToEventType extends AbstractType
+final class CampaignEventJumpToEventType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -24,7 +26,7 @@ class CampaignEventJumpToEventType extends AbstractType
                 'choices'    => [],
                 'multiple'   => false,
                 'label'      => 'mautic.campaign.form.jump_to_event',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'                => 'form-control',
                     'data-onload-callback' => 'updateJumpToEventOptions',
@@ -32,9 +34,7 @@ class CampaignEventJumpToEventType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]

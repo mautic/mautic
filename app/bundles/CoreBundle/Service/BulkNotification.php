@@ -15,7 +15,7 @@ final class BulkNotification implements BulkNotificationInterface
     private array $notifications = [];
 
     public function __construct(
-        private NotificationModel $notificationModel,
+        private readonly NotificationModel $notificationModel,
     ) {
     }
 

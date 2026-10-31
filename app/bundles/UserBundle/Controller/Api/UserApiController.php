@@ -14,18 +14,18 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * @extends CommonApiController<User>
  */
-class UserApiController extends CommonApiController
+final class UserApiController extends CommonApiController
 {
     /**
      * @var UserModel|null
@@ -39,16 +39,13 @@ class UserApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        private UserPasswordHasherInterface $hasher,
         RequestStack $requestStack,
         ManagerRegistry $doctrine,
         ModelFactory $modelFactory,
         EventDispatcherInterface $dispatcher,
         CoreParametersHelper $coreParametersHelper,
+        UserModel $userModel,
     ) {
-        $userModel     = $modelFactory->getModel('user.user');
-        \assert($userModel instanceof UserModel);
-
         $this->model            = $userModel;
         $this->entityClass      = User::class;
         $this->entityNameOne    = 'user';
@@ -62,11 +59,9 @@ class UserApiController extends CommonApiController
     /**
      * Obtains the logged in user's data.
      *
-     * @return Response
-     *
      * @throws NotFoundHttpException
      */
-    public function getSelfAction(TokenStorageInterface $tokenStorage)
+    public function getSelfAction(TokenStorageInterface $tokenStorage): Response
     {
         $currentUser = $tokenStorage->getToken()->getUser();
         $view        = $this->view($currentUser, Response::HTTP_OK);
@@ -77,7 +72,7 @@ class UserApiController extends CommonApiController
     /**
      * Creates a new user.
      */
-    public function newEntityAction(Request $request)
+    public function newEntityAction(Request $request): Response
     {
         $entity = $this->model->getEntity();
 
@@ -89,7 +84,7 @@ class UserApiController extends CommonApiController
 
         if (isset($parameters['plainPassword']['password'])) {
             $submittedPassword = $parameters['plainPassword']['password'];
-            $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword));
+            $entity->setPassword($this->model->checkNewPassword($entity, $submittedPassword));
         }
 
         return $this->processForm($request, $entity, $parameters, 'POST');
@@ -100,11 +95,9 @@ class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @return Response
-     *
      * @throws NotFoundHttpException
      */
-    public function editEntityAction(Request $request, $id)
+    public function editEntityAction(Request $request, $id): Response
     {
         $entity     = $this->model->getEntity($id);
         $parameters = $request->request->all();
@@ -120,19 +113,18 @@ class UserApiController extends CommonApiController
             ) {
                 // PATCH requires that an entity exists or must have create access for PUT
                 return $this->notFound();
-            } else {
-                $entity = $this->model->getEntity();
-                if (isset($parameters['plainPassword']['password'])) {
-                    $submittedPassword = $parameters['plainPassword']['password'];
-                    $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword));
-                }
+            }
+            $entity = $this->model->getEntity();
+            if (isset($parameters['plainPassword']['password'])) {
+                $submittedPassword = $parameters['plainPassword']['password'];
+                $entity->setPassword($this->model->checkNewPassword($entity, $submittedPassword));
             }
         } else {
             // Changing passwords via API is forbidden
             if (!empty($parameters['plainPassword'])) {
                 unset($parameters['plainPassword']);
             }
-            if ('PATCH' == $method) {
+            if ('PATCH' === $method) {
                 // PATCH will accept a diff so just remove the entities
 
                 // Changing username via API is forbidden
@@ -149,21 +141,24 @@ class UserApiController extends CommonApiController
         return $this->processForm($request, $entity, $parameters, $method);
     }
 
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    /**
+     * @param User                 $entity
+     * @param FormInterface<mixed> $form
+     * @param array<mixed>         $parameters
+     * @param string               $action
+     */
+    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
     {
-        switch ($action) {
-            case 'new':
-                $submittedPassword = null;
-                if (isset($parameters['plainPassword'])) {
-                    if (is_array($parameters['plainPassword']) && isset($parameters['plainPassword']['password'])) {
-                        $submittedPassword = $parameters['plainPassword']['password'];
-                    } else {
-                        $submittedPassword = $parameters['plainPassword'];
-                    }
+        if ('new' === $action) {
+            $submittedPassword = null;
+            if (isset($parameters['plainPassword'])) {
+                if (is_array($parameters['plainPassword']) && isset($parameters['plainPassword']['password'])) {
+                    $submittedPassword = $parameters['plainPassword']['password'];
+                } else {
+                    $submittedPassword = $parameters['plainPassword'];
                 }
-
-                $entity->setPassword($this->model->checkNewPassword($entity, $this->hasher, $submittedPassword, true));
-                break;
+            }
+            $entity->setPassword($this->model->checkNewPassword($entity, $submittedPassword, true));
         }
     }
 
@@ -172,12 +167,10 @@ class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @return Response
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws NotFoundHttpException
      */
-    public function isGrantedAction(Request $request, $id)
+    public function isGrantedAction(Request $request, $id): Response
     {
         $entity = $this->model->getEntity($id);
         if (!$entity instanceof $this->entityClass) {
@@ -188,7 +181,8 @@ class UserApiController extends CommonApiController
 
         if (empty($permissions)) {
             return $this->badRequest('mautic.api.call.permissionempty');
-        } elseif (!is_array($permissions)) {
+        }
+        if (!is_array($permissions)) {
             $permissions = [$permissions];
         }
 
@@ -200,10 +194,8 @@ class UserApiController extends CommonApiController
 
     /**
      * Obtains a list of roles for user edits.
-     *
-     * @return Response
      */
-    public function getRolesAction(Request $request)
+    public function getRolesAction(Request $request): Response
     {
         if (!$this->security->isGranted(
             ['user:users:create', 'user:users:edit'],
@@ -213,8 +205,8 @@ class UserApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filter = $request->query->get('filter', null);
-        $limit  = (int) $request->query->get('limit', null);
+        $filter = $request->query->get('filter');
+        $limit  = (int) $request->query->get('limit');
         $roles  = $this->model->getLookupResults('role', $filter, $limit);
 
         $view    = $this->view($roles, Response::HTTP_OK);

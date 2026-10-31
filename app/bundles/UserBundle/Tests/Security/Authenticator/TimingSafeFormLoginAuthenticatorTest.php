@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\FormLoginAuthenticator;
 
-class TimingSafeFormLoginAuthenticatorTest extends TestCase
+final class TimingSafeFormLoginAuthenticatorTest extends TestCase
 {
     /**
      * @return array<mixed>
@@ -24,7 +24,6 @@ class TimingSafeFormLoginAuthenticatorTest extends TestCase
     private function getCredentials(TimingSafeFormLoginAuthenticator $authenticator, Request $request): array
     {
         $method = new \ReflectionMethod(TimingSafeFormLoginAuthenticator::class, 'getCredentials');
-        $method->setAccessible(true);
 
         return $method->invoke($authenticator, $request);
     }
@@ -42,15 +41,13 @@ class TimingSafeFormLoginAuthenticatorTest extends TestCase
             ->method('loadUserByIdentifier')
             ->with('testuser')
             ->willReturn($user);
-
-        $passwordHasher = $this->createMock(PasswordHasherInterface::class);
         /** @var PasswordHasherFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $passwordHasherFactory */
         $passwordHasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
         $passwordHasherFactory->expects($this->never())
             ->method('getPasswordHasher');
 
         /** @var FormLoginAuthenticator|\PHPUnit\Framework\MockObject\MockObject $formLoginAuthenticator */
-        $formLoginAuthenticator = $this->createMock(FormLoginAuthenticator::class);
+        $formLoginAuthenticator = $this->createStub(FormLoginAuthenticator::class);
 
         $authenticator = new TimingSafeFormLoginAuthenticator(
             $formLoginAuthenticator,
@@ -100,7 +97,7 @@ class TimingSafeFormLoginAuthenticatorTest extends TestCase
             ->willReturn($passwordHasher);
 
         /** @var FormLoginAuthenticator|\PHPUnit\Framework\MockObject\MockObject $formLoginAuthenticator */
-        $formLoginAuthenticator = $this->createMock(FormLoginAuthenticator::class);
+        $formLoginAuthenticator = $this->createStub(FormLoginAuthenticator::class);
 
         $authenticator = new TimingSafeFormLoginAuthenticator(
             $formLoginAuthenticator,

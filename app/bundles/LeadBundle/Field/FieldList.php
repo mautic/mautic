@@ -12,8 +12,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FieldList
 {
     public function __construct(
-        private LeadFieldRepository $leadFieldRepository,
-        private TranslatorInterface $translator,
+        private readonly LeadFieldRepository $leadFieldRepository,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -55,12 +55,12 @@ class FieldList
 
         if ($alphabetical) {
             // Sort the groups
-            uksort($leadFields, 'strnatcmp');
+            uksort($leadFields, strnatcmp(...));
 
             if ($byGroup) {
                 // Sort each group by translation
                 foreach ($leadFields as &$fieldGroup) {
-                    uasort($fieldGroup, 'strnatcmp');
+                    uasort($fieldGroup, strnatcmp(...));
                 }
             }
         }

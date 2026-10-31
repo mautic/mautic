@@ -4,9 +4,9 @@ namespace Mautic\CoreBundle\Event;
 
 use Symfony\Component\HttpFoundation\Request;
 
-class CustomTemplateEvent extends AbstractCustomRequestEvent
+final class CustomTemplateEvent extends AbstractCustomRequestEvent
 {
-    protected string $template;
+    private string $template;
 
     /**
      * @param array<string, string> $vars
@@ -14,7 +14,7 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     public function __construct(
         ?Request $request = null,
         string $template = '',
-        protected array $vars = [],
+        private array $vars = [],
     ) {
         parent::__construct($request);
 
@@ -40,7 +40,7 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     public function getVars(): array
     {
@@ -48,7 +48,7 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @param array<string, string> $vars
+     * @param array<string, mixed> $vars
      */
     public function setVars(array $vars): self
     {

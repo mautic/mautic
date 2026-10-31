@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
@@ -17,10 +19,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailSendType extends AbstractType
+final class EmailSendType extends AbstractType
 {
     public function __construct(
-        private RouterInterface $router,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -31,17 +33,18 @@ class EmailSendType extends AbstractType
             EmailListType::class,
             [
                 'label'      => 'mautic.email.send.selectemails',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
-                    'class'    => 'form-control',
-                    'tooltip'  => 'mautic.email.choose.emails_descr',
-                    'onchange' => 'Mautic.disabledEmailAction(window, this)',
+                    'class'                => 'form-control',
+                    'tooltip'              => 'mautic.email.choose.emails_descr',
+                    'onchange'             => 'Mautic.disabledEmailAction(window, this)',
+                    'data-onload-callback' => 'setSendToDncOnModelLoad',
                 ],
                 'multiple'    => false,
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.email.chooseemail.notblank']
+                        message: 'mautic.email.chooseemail.notblank'
                     ),
                 ],
             ]
@@ -53,11 +56,11 @@ class EmailSendType extends AbstractType
                 ButtonGroupType::class,
                 [
                     'choices' => [
-                        'mautic.email.send.emailtype.transactional' => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
-                        'mautic.email.send.emailtype.marketing'     => MailHelper::EMAIL_TYPE_MARKETING,
+                        'mautic.core.form.no'  => MailHelper::EMAIL_TYPE_MARKETING,
+                        'mautic.core.form.yes' => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
                     ],
                     'label'      => 'mautic.email.send.emailtype',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control email-type',
                         'tooltip' => 'mautic.email.send.emailtype.tooltip',
@@ -148,7 +151,6 @@ class EmailSendType extends AbstractType
                         'attr'     => [
                             'class'        => 'form-control',
                             'tooltip'      => 'mautic.channel.message.send.priority.tooltip',
-                            'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
                         ],
                         'data'        => $data,
                         'placeholder' => false,
@@ -164,7 +166,6 @@ class EmailSendType extends AbstractType
                         'attr'  => [
                             'class'        => 'form-control',
                             'tooltip'      => 'mautic.channel.message.send.attempts.tooltip',
-                            'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
                         ],
                         'data'       => $data,
                         'empty_data' => 0,

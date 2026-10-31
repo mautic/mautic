@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Event;
 
 use Mautic\CoreBundle\Event\CustomTemplateEvent;
 
-class CustomTemplateEventTest extends \PHPUnit\Framework\TestCase
+final class CustomTemplateEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testNullRequestDoesNotThrowException(): void
     {

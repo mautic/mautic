@@ -4,12 +4,9 @@ namespace Mautic\ApiBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CsvHelper;
 
-class BatchIdToEntityHelper
+final class BatchIdToEntityHelper
 {
-    /**
-     * @var array
-     */
-    private $ids = [];
+    private array $ids = [];
 
     private array $originalKeys = [];
 
@@ -29,26 +26,20 @@ class BatchIdToEntityHelper
 
     public function hasIds(): bool
     {
-        return !empty($this->ids);
+        return [] !== $this->ids;
     }
 
-    /**
-     * @return array
-     */
-    public function getIds()
+    public function getIds(): array
     {
         return $this->ids;
     }
 
     public function hasErrors(): bool
     {
-        return !empty($this->errors);
+        return [] !== $this->errors;
     }
 
-    /**
-     * @return array
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }
@@ -78,10 +69,10 @@ class BatchIdToEntityHelper
             if (!isset($entitiesKeyedById[$id])) {
                 $hasPreviousId = array_filter(
                     $entities,
-                    fn ($entity) => $id == $entity->getPreviousId()
+                    fn ($entity): bool => $id == $entity->getPreviousId()
                 );
 
-                if ($hasPreviousId) {
+                if ([] !== $hasPreviousId) {
                     $orderedEntities[$key] = array_shift($hasPreviousId);
                 }
 
@@ -164,7 +155,7 @@ class BatchIdToEntityHelper
 
     private function isAssociativeArray(array $array): bool
     {
-        if (empty($array)) {
+        if ([] === $array) {
             return false;
         }
         $firstKey = array_key_first($array);

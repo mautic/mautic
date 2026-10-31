@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Event;
 
 use Mautic\CoreBundle\Entity\CommonEntity;
@@ -9,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class TokenReplacementEvent extends CommonEvent
 {
     /**
-     * @var CommonEntity|string
+     * @var CommonEntity|string|null
      */
     protected $entity;
 
@@ -35,7 +37,7 @@ class TokenReplacementEvent extends CommonEvent
         protected $lead = null,
         protected array $clickthrough = [],
         protected $passthrough = null,
-        private bool $internalSend = false,
+        private readonly bool $internalSend = false,
     ) {
         if ($content instanceof CommonEntity) {
             $this->entity = $content;
@@ -71,7 +73,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @return mixed[]
      */
-    public function getClickthrough()
+    public function getClickthrough(): array
     {
         if (!in_array('lead', $this->clickthrough)) {
             if (is_array($this->lead) && !empty($this->lead['id'])) {
@@ -87,7 +89,7 @@ class TokenReplacementEvent extends CommonEvent
     /**
      * @param mixed[] $clickthrough
      */
-    public function setClickthrough($clickthrough): void
+    public function setClickthrough(array $clickthrough): void
     {
         $this->clickthrough = $clickthrough;
     }

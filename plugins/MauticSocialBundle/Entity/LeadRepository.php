@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -7,6 +9,6 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Lead>
  */
-class LeadRepository extends CommonRepository
+final class LeadRepository extends CommonRepository
 {
 }

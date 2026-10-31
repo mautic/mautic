@@ -4,6 +4,6 @@ namespace Helper;
 
 use Codeception\Module;
 
-class Functional extends Module
+final class Functional extends Module
 {
 }

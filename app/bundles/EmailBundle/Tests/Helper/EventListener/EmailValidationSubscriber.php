@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\Helper\EventListener;
 
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class EmailValidationSubscriber implements EventSubscriberInterface
+final class EmailValidationSubscriber implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
     {

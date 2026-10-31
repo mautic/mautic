@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class UpdateFieldController extends CommonController
+final class UpdateFieldController extends CommonController
 {
     public function updateAction(Request $request, string $integration, string $object, string $field): JsonResponse
     {

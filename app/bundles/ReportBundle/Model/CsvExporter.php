@@ -12,8 +12,8 @@ class CsvExporter
 {
     public function __construct(
         protected FormatterHelper $formatterHelper,
-        private CoreParametersHelper $coreParametersHelper,
-        private TranslatorInterface $translator,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -40,7 +40,7 @@ class CsvExporter
         if ($reportDataResult->isLastPage()) {
             $totalsRow = $reportDataResult->getTotalsToExport($this->formatterHelper);
 
-            if (!empty($totalsRow)) {
+            if ([] !== $totalsRow) {
                 $this->putTotals($totalsRow, $handle);
             }
         }
@@ -76,7 +76,7 @@ class CsvExporter
     private function putRow($handle, array $row): void
     {
         if ($this->coreParametersHelper->get('csv_always_enclose')) {
-            fputs($handle, '"'.implode('","', $row).'"'."\n");
+            fwrite($handle, '"'.implode('","', $row).'"'."\n");
         } else {
             CsvHelper::putCsv($handle, $row);
         }

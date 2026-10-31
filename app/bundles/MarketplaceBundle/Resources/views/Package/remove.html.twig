@@ -27,12 +27,12 @@
         '{{ packageDetail.packageBase.getVendorName()|escape }}',
         '{{ packageDetail.packageBase.getPackageName()|escape }}',
         (response) => {
-            if (response.success) {
-                mQuery('#marketplace-removal-in-progress').hide();
-                mQuery('#marketplace-removal-success').show();
-            } else if (response.redirect) {
+            if (response && response.redirect) {
                 window.location = response.redirect;
+                return;
             }
+            mQuery('#marketplace-removal-in-progress').hide();
+            mQuery('#marketplace-removal-success').show();
         },
         (request, textStatus, errorThrown) => {
             let error;

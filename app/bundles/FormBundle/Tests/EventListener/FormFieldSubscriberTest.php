@@ -11,23 +11,18 @@ use PHPUnit\Framework\TestCase;
 
 final class FormFieldSubscriberTest extends TestCase
 {
-    /**
-     * @var FormFieldSubscriber
-     */
-    private $subscriber;
+    private FormFieldSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $fieldModel = $this->createMock(FieldModel::class);
-
-        $this->subscriber = new FormFieldSubscriber($fieldModel);
+        $this->subscriber = new FormFieldSubscriber($this->createStub(FieldModel::class));
     }
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 FormEvents::FIELD_POST_DELETE => ['onFieldPostDelete', 0],
             ],

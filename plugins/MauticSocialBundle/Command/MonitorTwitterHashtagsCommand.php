@@ -9,7 +9,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
     name: 'social:monitor:twitter:hashtags',
     description: 'Looks at our monitoring records and finds hashtags'
 )]
-class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
+final class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
 {
     /**
      * Search for tweets by hashtag.

@@ -12,10 +12,9 @@ use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
+final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -30,7 +29,7 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
     public function testBooleanWithPrepareDbalFieldsForSave(): void
     {
-        $trait  = $this->createMock(LeadRepository::class);
+        $trait  = $this->createStub(LeadRepository::class);
         $fields = [
             'true'   => true,
             'false'  => false,
@@ -39,12 +38,11 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionObject($trait);
         $method     = $reflection->getMethod('prepareDbalFieldsForSave');
-        $method->setAccessible(true);
         $method->invokeArgs($trait, [&$fields]);
 
-        $this->assertEquals(1, $fields['true']);
-        $this->assertEquals(0, $fields['false']);
-        $this->assertEquals('blah', $fields['string']);
+        $this->assertSame(1, $fields['true']);
+        $this->assertSame(0, $fields['false']);
+        $this->assertSame('blah', $fields['string']);
     }
 
     /**
@@ -65,7 +63,6 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionClass(LeadRepository::class);
         $refMethod  = $reflection->getMethod('buildQueryForGetLeadsByFieldValue');
-        $refMethod->setAccessible(true);
 
         $refMethod->invoke($mock, 'email', ['test@example.com', 'test2@example.com']);
 
@@ -74,12 +71,32 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(2, $parameters, 'There should be two parameters bound because that\'s the number of emails we passed into the method.');
     }
 
+    public function testBuildQueryForGetLeadsByFieldValueQuotesFieldIdentifier(): void
+    {
+        $dbalMock = new DBALMocker($this);
+
+        $repository = $this->getMockBuilder(LeadRepository::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getEntityManager'])
+            ->getMock();
+
+        $repository->method('getEntityManager')->willReturn($dbalMock->getMockEm());
+
+        $reflection = new \ReflectionClass(LeadRepository::class);
+        $method     = $reflection->getMethod('buildQueryForGetLeadsByFieldValue');
+        $method->invoke($repository, 'email OR 1=1-- -', 'a');
+
+        $where = $dbalMock->getQueryPart('where');
+
+        $this->assertSame('`l`.`email OR 1=1-- -` = :search', (string) $where[0][0]);
+    }
+
     /**
      * Ensure that the array_combine return value matches the old style.
      */
     public function testGetLeadsByFieldValueArrayMapReturn(): void
     {
-        /** @var MockObject&LeadRepository */
+        /** @var MockObject&LeadRepository $repository */
         $repository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getEntities', 'buildQueryForGetLeadsByFieldValue'])
@@ -132,10 +149,7 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
             true
         );
 
-        Assert::assertSame(
-            'SELECT * FROM '.MAUTIC_TABLE_PREFIX.'table_a INNER JOIN '.MAUTIC_TABLE_PREFIX.'table_b alias_b ON condition_b INNER JOIN '.MAUTIC_TABLE_PREFIX.'table_c alias_c ON condition_c GROUP BY l.id',
-            $queryBuilder->getSQL()
-        );
+        $this->assertSame('SELECT * FROM '.MAUTIC_TABLE_PREFIX.'table_a INNER JOIN '.MAUTIC_TABLE_PREFIX.'table_b alias_b ON condition_b INNER JOIN '.MAUTIC_TABLE_PREFIX.'table_c alias_c ON condition_c GROUP BY l.id', $queryBuilder->getSQL());
     }
 
     public function testGetContactIdsByEmails(): void
@@ -146,11 +160,11 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         ];
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects(self::once())
+        $query->expects($this->once())
             ->method('setParameter')
             ->with('emails', $emails, ArrayParameterType::STRING)
             ->willReturn($query);
-        $query->expects(self::once())
+        $query->expects($this->once())
             ->method('getArrayResult')
             ->willReturn([
                 0 => [
@@ -161,14 +175,11 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->entityManager->expects(self::once())
+        $this->entityManager->expects($this->once())
             ->method('createQuery')
             ->willReturn($query);
 
-        self::assertEquals(
-            [1, 2],
-            $this->repository->getContactIdsByEmails($emails)
-        );
+        $this->assertSame([1, 2], $this->repository->getContactIdsByEmails($emails));
     }
 
     public function testGetUniqueIdentifiersOperator(): void
@@ -177,7 +188,6 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $reflection = new \ReflectionClass(LeadRepository::class);
         $refMethod  = $reflection->getMethod('getUniqueIdentifiersWherePart');
-        $refMethod->setAccessible(true);
 
         $this->assertEquals('andWhere', $refMethod->invoke($this->repository));
 

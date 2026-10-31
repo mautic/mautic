@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Exception;
 
-class InvalidProviderException extends \Exception
+final class InvalidProviderException extends \Exception
 {
     public function __construct($provider, $code = 0, ?\Throwable $previous = null)
     {

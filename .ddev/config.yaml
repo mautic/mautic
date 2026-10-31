@@ -1,7 +1,8 @@
 type: php
 docroot: ""
-php_version: "8.4"
+php_version: "8.5"
 webserver_type: apache-fpm
+timezone: UTC
 database:
     type: mariadb
     version: "10.11"
@@ -11,6 +12,7 @@ hooks:
         - exec: sed -i -e 's/\r$//' ./.git/hooks/*
         - exec: chmod +x ./.ddev/mautic-setup.sh
         - exec: yes | ./.ddev/mautic-setup.sh
+        - composer: motd
 upload_dirs:
     - media/files
     - media/images

@@ -16,7 +16,7 @@ class CustomAssetsEvent extends Event
      * @param string $location
      * @param string $context
      */
-    public function addCustomDeclaration($declaration, $location = 'head', $context = AssetsHelper::CONTEXT_APP)
+    public function addCustomDeclaration($declaration, $location = 'head', $context = AssetsHelper::CONTEXT_APP): static
     {
         $this->assetsHelper->setContext($context)
             ->addCustomDeclaration($declaration, $location)
@@ -30,7 +30,7 @@ class CustomAssetsEvent extends Event
      * @param bool   $async
      * @param string $context
      */
-    public function addScript($script, $location = 'head', $async = false, $name = null, $context = AssetsHelper::CONTEXT_APP)
+    public function addScript($script, $location = 'head', $async = false, $name = null, $context = AssetsHelper::CONTEXT_APP): static
     {
         $this->assetsHelper->setContext($context)
             ->addScript($script, $location, $async, $name)
@@ -43,7 +43,7 @@ class CustomAssetsEvent extends Event
      * @param string $location
      * @param string $context
      */
-    public function addScriptDeclaration($script, $location = 'head', $context = AssetsHelper::CONTEXT_APP)
+    public function addScriptDeclaration($script, $location = 'head', $context = AssetsHelper::CONTEXT_APP): static
     {
         $this->assetsHelper->setContext($context)
             ->addScriptDeclaration($script, $location)
@@ -55,7 +55,7 @@ class CustomAssetsEvent extends Event
     /**
      * @param string $context
      */
-    public function addStylesheet($stylesheet, $context = AssetsHelper::CONTEXT_APP)
+    public function addStylesheet($stylesheet, $context = AssetsHelper::CONTEXT_APP): static
     {
         $this->assetsHelper->setContext($context)
             ->addStylesheet($stylesheet)
@@ -67,7 +67,7 @@ class CustomAssetsEvent extends Event
     /**
      * @param string $context
      */
-    public function addStyleDeclaration($styles, $context = AssetsHelper::CONTEXT_APP)
+    public function addStyleDeclaration($styles, $context = AssetsHelper::CONTEXT_APP): static
     {
         $this->assetsHelper->setContext($context)
             ->addStyleDeclaration($styles)

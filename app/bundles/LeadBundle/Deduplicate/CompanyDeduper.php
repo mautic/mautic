@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Deduplicate;
 
 use Mautic\LeadBundle\Entity\Company;
@@ -30,7 +32,7 @@ class CompanyDeduper
     public function checkForDuplicateCompanies(array $queryFields): array
     {
         $uniqueData = $this->getUniqueData($queryFields);
-        if (empty($uniqueData)) {
+        if ([] === $uniqueData) {
             throw new UniqueFieldNotFoundException();
         }
 

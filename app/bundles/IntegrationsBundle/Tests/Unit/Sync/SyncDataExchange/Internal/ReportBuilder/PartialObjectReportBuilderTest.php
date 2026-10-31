@@ -28,12 +28,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class PartialObjectReportBuilderTest extends TestCase
+final class PartialObjectReportBuilderTest extends TestCase
 {
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var FieldChangeRepository|MockObject
+     * @var MockObject&FieldChangeRepository
      */
     private MockObject $fieldChangeRepository;
 
@@ -43,17 +43,17 @@ class PartialObjectReportBuilderTest extends TestCase
     private MockObject $fieldHelper;
 
     /**
-     * @var EventDispatcherInterface|MockObject
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $dispatcher;
 
     /**
-     * @var FieldBuilder|MockObject
+     * @var MockObject&FieldBuilder
      */
     private MockObject $fieldBuilder;
 
     /**
-     * @var ObjectProvider|MockObject
+     * @var MockObject&ObjectProvider
      */
     private MockObject $objectProvider;
 
@@ -143,7 +143,7 @@ class PartialObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject): true {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame([1], $event->getIds());
 
@@ -164,7 +164,7 @@ class PartialObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(Contact::NAME);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());
         $this->assertEquals('Bob', $objects[1]->getField('firstname')->getValue()->getNormalizedValue());
     }
@@ -234,7 +234,7 @@ class PartialObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject): true {
                     $this->assertSame([1], $event->getIds());
                     $this->assertSame($internalObject, $event->getObject());
 
@@ -255,7 +255,7 @@ class PartialObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(InternalCompany::NAME);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         $this->assertEquals('test@test.com', $objects[1]->getField('email')->getValue()->getNormalizedValue());
         $this->assertEquals('Bob and Cat', $objects[1]->getField('companyname')->getValue()->getNormalizedValue());
     }
@@ -372,7 +372,7 @@ class PartialObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
+                $this->callback(function (InternalObjectFindEvent $event) use ($internalObject): true {
                     $this->assertSame([1], $event->getIds());
                     $this->assertSame($internalObject, $event->getObject());
 
@@ -393,7 +393,7 @@ class PartialObjectReportBuilderTest extends TestCase
         $report  = $this->reportBuilder->buildReport($requestDAO);
         $objects = $report->getObjects(InternalCompany::NAME);
 
-        $this->assertTrue(isset($objects[1]));
+        $this->assertArrayHasKey(1, $objects);
         // trying to access non-existent object
         $objects[1]->getField('email');
     }

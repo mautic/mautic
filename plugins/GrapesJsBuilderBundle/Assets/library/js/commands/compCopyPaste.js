@@ -1,5 +1,7 @@
 // copied from: https://github.com/GrapesJS/grapesjs/issues/1855
 
+import ContentService from '../preset-mautic/content.service';
+
 export default class CompCopyPaste {
   static storage_key = 'preset-mautic:grapesjs-clipboard';
   editor;
@@ -53,18 +55,43 @@ export default class CompCopyPaste {
         components.forEach((comp) => {
           if (currentSelection) {
             const added = currentSelection.add(comp, { at: index + 1 });
-            editor.trigger('component:paste', added);
+            this.editor.trigger('component:paste', added);
             this.setStyles(added);
           }
         });
         selected.emitUpdate();
       } else {
-        components = editor.addComponents(components);
+        components = this.editor.addComponents(components);
         components.forEach((comp) => {
           this.setStyles(comp);
         });
       }
     }
+  }
+
+  // Sort components back into document order, regardless of selection order.
+  sortByDocumentOrder(components) {
+    const { DOCUMENT_POSITION_FOLLOWING, DOCUMENT_POSITION_PRECEDING } = Node;
+
+    // Resolve each element once instead of on every comparison.
+    const entries = components.map((component) => ({
+      component,
+      el: component.getEl?.() ?? null,
+    }));
+
+    const compare = (a, b) => {
+      // Unrendered components sort last, keeping the comparator consistent.
+      if (!a.el || !b.el) return (a.el ? 0 : 1) - (b.el ? 0 : 1);
+
+      const position = a.el.compareDocumentPosition(b.el);
+      // eslint-disable-next-line no-bitwise
+      if (position & DOCUMENT_POSITION_FOLLOWING) return -1;
+      // eslint-disable-next-line no-bitwise
+      if (position & DOCUMENT_POSITION_PRECEDING) return 1;
+      return 0;
+    };
+
+    return entries.sort(compare).map(({ component }) => component);
   }
 
   constructor(editor) {
@@ -77,13 +104,29 @@ export default class CompCopyPaste {
   addCommand() {
     this.editor.Commands.add('core:copy', (ed) => {
       const selected = this.getStyles([...ed.getSelectedAll()]);
-      let filteredSelected = selected.filter((item) => item.attributes.copyable == true);
+      // In MJML mode, multi-select copy is scoped to sections, wrappers, and heroes;
+      // mixed selections are allowed in the canvas, but any other type is silently
+      // dropped here. Other modes (e.g. landing pages, which have no MJML types)
+      // keep the original behaviour of copying any copyable component.
+      const copyableTypes = new Set(['mj-section', 'mj-wrapper', 'mj-hero']);
+      const isMjmlMode = ContentService.isMjmlMode(ed);
+      let filteredSelected = selected.filter(
+        (item) => item.attributes.copyable && (!isMjmlMode || copyableTypes.has(item.get('type')))
+      );
       if (filteredSelected.length) {
+        filteredSelected = this.sortByDocumentOrder(filteredSelected);
         this.newCopy(filteredSelected);
       }
     });
 
     this.editor.Commands.add('core:paste', (ed) => {
+      // Paste always targets a single selected component (section or wrapper) as the anchor point.
+      // If multiple components are still selected, bail out rather than guessing a target.
+      if (ed.getSelectedAll().length > 1) {
+        // eslint-disable-next-line no-console
+        console.warn('Paste requires a single selected target.');
+        return;
+      }
       const selected = ed.getSelected();
       this.newPaste(selected);
     });

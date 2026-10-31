@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Mautic\PluginBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
-class PluginControllerTest extends MauticMysqlTestCase
+final class PluginControllerTest extends MauticMysqlTestCase
 {
     public function testConfigurePluginSuccessValidation(): void
     {
@@ -26,7 +25,7 @@ class PluginControllerTest extends MauticMysqlTestCase
         ]);
 
         $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        self::assertResponseIsSuccessful();
     }
 
     public function testConfigurePluginValidationError(): void
@@ -45,6 +44,22 @@ class PluginControllerTest extends MauticMysqlTestCase
         ]);
 
         $crawler     = $this->client->submit($form);
-        Assert::assertStringContainsString('A value is required.', $crawler->filter('#integration_details_apiKeys div')->html());
+        $this->assertStringContainsString('A value is required.', $crawler->filter('#integration_details_apiKeys div')->html());
+    }
+
+    public function testReturnPluginVersion(): void
+    {
+        $this->testSymfonyCommand('mautic:plugins:install');
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/plugins/info/MauticFocusBundle');
+
+        $response = $this->client->getResponse();
+        self::assertResponseIsSuccessful();
+
+        $content = $response->getContent();
+        $this->assertJson($content);
+
+        $data = json_decode($content, true);
+        $this->assertArrayHasKey('pluginVersion', $data);
+        $this->assertSame('1.0', $data['pluginVersion']);
     }
 }

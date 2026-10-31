@@ -82,7 +82,7 @@ Mautic.integrationOnLoad = function(container, response) {
     } else {
         Mautic.filterIntegrations();
     }
-    mQuery('[data-toggle="tooltip"]').tooltip();
+    mQuery('[data-toggle="tooltip"], [data-bs-toggle="tooltip"]').tooltip();
 };
 
 Mautic.integrationConfigOnLoad = function(container) {
@@ -319,4 +319,22 @@ Mautic.getIntegrationCampaignStatus = function (el, settings) {
         false,
         "GET"
     );
+};
+
+Mautic.initPluginEvents = function () {
+    const $integrationModal = mQuery('#IntegrationEditModal');
+
+    $integrationModal.off('mautic:onPageLoad:before');
+    $integrationModal.on('mautic:onPageLoad:before', function(e, container, response) {
+        if (container === '#IntegrationEditModal' && response && response.pluginVersion) {
+            const $modalLabel = mQuery('#IntegrationEditModal-label');
+            if ($modalLabel.find('.plugin-version-badge').length === 0) {
+                const $badge = mQuery('<span>')
+                    .addClass('plugin-version-badge label label-default ml-xs')
+                    .text('v' + String(response.pluginVersion));
+
+                $modalLabel.append(' ').append($badge);
+            }
+        }
+    });
 };

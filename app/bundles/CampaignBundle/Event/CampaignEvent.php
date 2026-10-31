@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-class CampaignEvent extends CommonEvent
+final class CampaignEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

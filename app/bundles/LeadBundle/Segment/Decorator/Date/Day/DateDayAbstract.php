@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Day;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;

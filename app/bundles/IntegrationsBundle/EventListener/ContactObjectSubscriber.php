@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Exception\ImportFailedException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class ContactObjectSubscriber implements EventSubscriberInterface
+final readonly class ContactObjectSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private ContactObjectHelper $contactObjectHelper,
@@ -85,7 +85,7 @@ class ContactObjectSubscriber implements EventSubscriberInterface
 
     public function findContactsByDateRange(InternalObjectFindEvent $event): void
     {
-        if (Contact::NAME !== $event->getObject()->getName() || empty($event->getDateRange())) {
+        if (Contact::NAME !== $event->getObject()->getName() || !$event->getDateRange() instanceof \Mautic\IntegrationsBundle\Sync\DAO\DateRange) {
             return;
         }
 

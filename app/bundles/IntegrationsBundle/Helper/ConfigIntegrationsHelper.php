@@ -7,20 +7,29 @@ namespace Mautic\IntegrationsBundle\Helper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
 use Mautic\PluginBundle\Entity\Integration;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-class ConfigIntegrationsHelper
+final class ConfigIntegrationsHelper
 {
     /**
      * @var ConfigFormInterface[]
      */
     private array $integrations = [];
 
+    /**
+     * @param iterable<ConfigFormInterface> $integrations
+     */
     public function __construct(
-        private IntegrationsHelper $integrationsHelper,
+        private readonly IntegrationsHelper $integrationsHelper,
+        #[AutowireIterator('mautic.config_integration')]
+        iterable $integrations = [],
     ) {
+        foreach ($integrations as $integration) {
+            $this->addIntegration($integration);
+        }
     }
 
-    public function addIntegration(ConfigFormInterface $integration): void
+    private function addIntegration(ConfigFormInterface $integration): void
     {
         $this->integrations[$integration->getName()] = $integration;
     }
@@ -33,7 +42,7 @@ class ConfigIntegrationsHelper
     public function getIntegration(string $integration)
     {
         if (!isset($this->integrations[$integration])) {
-            throw new IntegrationNotFoundException("$integration either doesn't exist or has not been tagged with mautic.config_integration");
+            throw new IntegrationNotFoundException("{$integration} either doesn't exist or has not been tagged with mautic.config_integration");
         }
 
         // Ensure the configuration is hydrated

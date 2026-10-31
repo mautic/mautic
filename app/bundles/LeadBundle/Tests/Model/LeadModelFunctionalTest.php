@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
@@ -13,25 +16,28 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LeadModelFunctionalTest extends MauticMysqlTestCase
+final class LeadModelFunctionalTest extends MauticMysqlTestCase
 {
-    private $pointsAdded = false;
+    private bool $pointsAdded = false;
 
     protected $useCleanupRollback = false;
 
     public function testSavingPrimaryCompanyAfterPointsAreSetByListenerAreNotResetToDefaultOf0BecauseOfPointsFieldDefaultIs0(): void
     {
         /** @var EventDispatcher $eventDispatcher */
-        $eventDispatcher = static::getContainer()->get('event_dispatcher');
-        $eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, [$this, 'addPointsListener']);
+        $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        $eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, $this->addPointsListener(...));
 
         /** @var LeadModel $model */
-        $model = static::getContainer()->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get(LeadModel::class);
         /** @var EntityManager $em */
-        $em   = static::getContainer()->get('doctrine.orm.entity_manager');
+        $em   = self::getContainer()->get(EntityManagerInterface::class);
 
         // Set company to trigger setPrimaryCompany()
         $lead = new Lead();
@@ -44,6 +50,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         // Clear from doctrine memory so we get a fresh entity to ensure the points are definitely saved
         $em->detach($lead);
         $lead = $model->getEntity($lead->getId());
+        $this->assertInstanceOf(Lead::class, $lead);
 
         $this->assertEquals(10, $lead->getPoints());
     }
@@ -64,20 +71,20 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $lead->adjustPoints(10);
 
         /** @var LeadModel $model */
-        $model = static::getContainer()->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get(LeadModel::class);
         $model->saveEntity($lead);
     }
 
     public function testMultipleAssignedCompany(): void
     {
-        self::assertEquals(2, count($this->getContactWithAssignTwoCompanies()));
+        $this->assertCount(2, $this->getContactWithAssignTwoCompanies());
     }
 
     public function testSignleAssignedCompany(): void
     {
         $this->setUpSymfony(array_merge($this->configParams, ['contact_allow_multiple_companies' => 0]));
 
-        self::assertEquals(1, count($this->getContactWithAssignTwoCompanies()));
+        $this->assertCount(1, $this->getContactWithAssignTwoCompanies());
     }
 
     /**
@@ -106,21 +113,22 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var LeadModel $leadModel */
-        $leadModel = $this->getContainer()->get('mautic.lead.model.lead');
+        $leadModel = $this->getContainer()->get(LeadModel::class);
         $leadModel->addToCompany($contact, $company);
         $leadModel->addToCompany($contact, $company2);
 
         /** @var CompanyLeadRepository $companyLeadRepo */
         $companyLeadRepo  = $this->em->getRepository(CompanyLead::class);
-        $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
 
-        return $contactCompanies;
+        return $companyLeadRepo->getCompaniesByLeadId($contact->getId());
     }
 
     public function testGetCustomLeadFieldLength(): void
     {
-        $leadModel  = $this->getContainer()->get('mautic.lead.model.lead');
-        $fieldModel = $this->getContainer()->get('mautic.lead.model.field');
+        /** @var LeadModel $leadModel */
+        $leadModel  = $this->getContainer()->get(LeadModel::class);
+        /** @var FieldModel $fieldModel */
+        $fieldModel = $this->getContainer()->get(FieldModel::class);
 
         // Create a lead field.
         $leadField = new LeadField();
@@ -170,17 +178,19 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
     {
         $this->expectException(DBALException::class);
 
-        $leadModel  = $this->getContainer()->get('mautic.lead.model.lead');
+        /** @var LeadModel $leadModel */
+        $leadModel  = $this->getContainer()->get(LeadModel::class);
         $leadModel->getCustomLeadFieldLength(['unknown_field']);
     }
 
     /**
      * @throws MappingException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('fieldValueProvider')]
+    #[DataProvider('fieldValueProvider')]
     public function testSelectFieldSavesOnlyAllowedValuesInDB(string $selectFieldValue, ?string $expectedValue): void
     {
-        $fieldModel = self::getContainer()->get('mautic.lead.model.field');
+        /** @var FieldModel $fieldModel */
+        $fieldModel = self::getContainer()->get(FieldModel::class);
 
         // Create a lead field.
         $selectField = new LeadField();
@@ -196,7 +206,8 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $fieldModel->saveEntity($selectField);
         $this->em->clear();
 
-        $leadModel  = self::getContainer()->get('mautic.lead.model.lead');
+        /** @var LeadModel $leadModel */
+        $leadModel  = self::getContainer()->get(LeadModel::class);
 
         $fields = [
             'core' => [
@@ -241,19 +252,18 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $lead = $leadModel->getEntity($lead->getId());
+        $this->assertInstanceOf(Lead::class, $lead);
 
         $this->assertSame($expectedValue, $lead->getFieldValue($selectField->getAlias()));
     }
 
     /**
-     * @return array<mixed>
+     * @return \Iterator<(int|string), mixed>
      */
-    public static function fieldValueProvider(): array
+    public static function fieldValueProvider(): \Iterator
     {
-        return [
-            'allowed_value'    => ['female', 'female'],
-            'disallowed_value' => ['gibberish', null],
-            'with_quotes'      => ['other\'s', 'other\'s'],
-        ];
+        yield 'allowed_value' => ['female', 'female'];
+        yield 'disallowed_value' => ['gibberish', null];
+        yield 'with_quotes' => ['other\'s', 'other\'s'];
     }
 }

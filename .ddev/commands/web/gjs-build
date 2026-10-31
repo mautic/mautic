@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+## Description: Rebuild the GrapesJs builder JS/CSS assets
+## Usage: gjs-build
+## Example: "ddev gjs-build"
+
+cd plugins/GrapesJsBuilderBundle
+[ -d node_modules ] || npm ci
+npm run build-dev

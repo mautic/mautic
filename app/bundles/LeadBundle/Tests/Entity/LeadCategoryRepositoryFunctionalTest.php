@@ -8,19 +8,21 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
-#[\PHPUnit\Framework\Attributes\PreserveGlobalState(false)]
-#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
-class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
+#[PreserveGlobalState(false)]
+#[RunTestsInSeparateProcesses]
+final class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
     /**
      * @var array<string, bool>
      */
-    private $categoryFlags = [
+    private array $categoryFlags = [
         'one'   => true,
         'two'   => false,
         'three' => true,
@@ -39,7 +41,7 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->model = self::getContainer()->get('mautic.lead.model.lead');
+        $this->model = self::getContainer()->get(LeadModel::class);
         $this->lead  = $this->createLead('John', 'Doe', 'john@doe.com');
 
         // Add three categories to the lead.
@@ -57,9 +59,8 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testCategoriesOnContactPreferences(): void
     {
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/contactFrequency/'.$this->lead->getId());
-        $response   = $this->client->getResponse();
 
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $subscribedCats = $crawler->filter('select[id="lead_contact_frequency_rules_global_categories"]')->filter('option[selected="selected"]');
 
@@ -73,9 +74,8 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
 
         // Request the preference on Lead detail page.
         $crawler  = $this->client->request(Request::METHOD_GET, '/s/contacts/contactFrequency/'.$this->lead->getId());
-        $response = $this->client->getResponse();
 
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         $subscribedCats = $crawler->filter('select[id="lead_contact_frequency_rules_global_categories"]')->filter('option[selected="selected"]');
 
@@ -199,10 +199,9 @@ class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     private function getContactFrequencyCrawler(Lead $lead): Crawler
     {
         // Request the preference on Lead detail page.
-        $crawler  = $this->client->request(Request::METHOD_GET, '/s/contacts/contactFrequency/'.$lead->getId());
-        $response = $this->client->getResponse();
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/contacts/contactFrequency/'.$lead->getId());
 
-        $this->assertTrue($response->isOk());
+        $this->assertResponseIsSuccessful();
 
         return $crawler;
     }

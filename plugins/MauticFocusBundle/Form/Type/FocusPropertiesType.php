@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFocusBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -11,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<string, mixed>>
  */
-class FocusPropertiesType extends AbstractType
+final class FocusPropertiesType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -67,7 +69,7 @@ class FocusPropertiesType extends AbstractType
                             'mautic.focus.form.bar.size.regular' => 'regular',
                         ],
                         'label'      => 'mautic.focus.form.bar.size',
-                        'label_attr' => ['class' => 'control-label'],
+                        'label_attr' => ['class' => 'form-label'],
                         'attr'       => [
                             'class'    => 'form-control',
                             'onchange' => 'Mautic.focusUpdatePreview()',
@@ -101,14 +103,14 @@ class FocusPropertiesType extends AbstractType
                 break;
         }
 
-        if (!empty($choices)) {
+        if ([] !== $choices) {
             $builder->add(
                 'placement',
                 ChoiceType::class,
                 [
                     'choices'           => $choices,
                     'label'             => 'mautic.focus.form.placement',
-                    'label_attr'        => ['class' => 'control-label'],
+                    'label_attr'        => ['class' => 'form-label'],
                     'attr'              => [
                         'class'    => 'form-control',
                         'onchange' => 'Mautic.focusUpdatePreview()',

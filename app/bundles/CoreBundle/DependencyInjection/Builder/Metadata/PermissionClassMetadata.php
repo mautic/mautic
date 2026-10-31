@@ -10,7 +10,7 @@ use Symfony\Component\Finder\Finder;
  * This is an temporary necessity until https://github.com/mautic/mautic/pull/7312 is merged and permission classes are
  * converted to services.
  */
-class PermissionClassMetadata
+final readonly class PermissionClassMetadata
 {
     public function __construct(
         private BundleMetadata $metadata,

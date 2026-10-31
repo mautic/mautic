@@ -30,7 +30,7 @@
             {% endif %}
         </a>
     {% else %}
-        <button type="button" class="tile tile--clickable" id="clickable-tile-{{ random() }}" {% if onclick is defined %}onclick="{{ onclick }}"{% endif %} {% if attributes is defined and attributes is not empty %}{% for attr_key, attr_value in attributes %}{{ attr_key }}="{{ attr_value }}" {% endfor %}{% endif %}>
+        <button type="button" class="tile tile--clickable {{ className|default('') }}" id="clickable-tile-{{ random() }}" {% if onclick is defined %}onclick="{{ onclick }}"{% endif %} {% if attributes is defined and attributes is not empty %}{% for attr_key, attr_value in attributes %}{{ attr_key }}="{{ attr_value }}" {% endfor %}{% endif %}>
             {{ content|raw }}
             {% if icon is defined %}
                 <div class="tile-icon">

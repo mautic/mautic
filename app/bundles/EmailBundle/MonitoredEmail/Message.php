@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\MonitoredEmail;
 
-class Message
+final class Message
 {
     public $id;
 
@@ -45,7 +45,7 @@ class Message
     /**
      * @var Attachment[]
      */
-    protected $attachments = [];
+    private array $attachments = [];
 
     public function addAttachment(Attachment $attachment): void
     {
@@ -55,7 +55,7 @@ class Message
     /**
      * @return Attachment[]
      */
-    public function getAttachments()
+    public function getAttachments(): array
     {
         return $this->attachments;
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand as MigrateCommand;
@@ -16,32 +18,22 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UpdateSchemaStepTest extends AbstractStepTestCase
+final class UpdateSchemaStepTest extends AbstractStepTestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
     private MockObject $translator;
 
     /**
-     * @var MockObject|KernelInterface
-     */
-    private MockObject $kernel;
-
-    /**
-     * @var MockObject|MigrateCommand
+     * @var MockObject&MigrateCommand
      */
     private MockObject $migrateCommand;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
     private MockObject $eventDispatcher;
-
-    /**
-     * @var MockObject&HelperSet
-     */
-    private MockObject $helperSet;
 
     private UpdateSchemaStep $step;
 
@@ -50,9 +42,8 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
         parent::setUp();
 
         $this->translator     = $this->createMock(TranslatorInterface::class);
-        $this->kernel         = $this->createMock(KernelInterface::class);
-        $this->helperSet      = $this->createMock(HelperSet::class);
-        $this->kernel
+        $kernel               = $this->createMock(KernelInterface::class);
+        $kernel
             ->method('getBundles')
             ->willReturn([]);
 
@@ -64,7 +55,7 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
         $this->migrateCommand->method('getAliases')
             ->willReturn([]);
         $this->migrateCommand->method('getHelperSet')
-            ->willReturn($this->helperSet);
+            ->willReturn($this->createStub(HelperSet::class));
 
         $definition = $this->createMock(InputDefinition::class);
         $definition->method('hasArgument')
@@ -85,7 +76,7 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
         $container = $this->createMock(ContainerInterface::class);
         $container->method('get')
             ->willReturnMap([
-                ['kernel', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->kernel],
+                ['kernel', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $kernel],
                 ['event_dispatcher', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->eventDispatcher],
                 ['doctrine:migrations:migrate', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->migrateCommand],
             ]);
@@ -101,10 +92,10 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
                 ['doctrine:migrations:migrate']
             );
 
-        $this->kernel->method('getContainer')
+        $kernel->method('getContainer')
             ->willReturn($container);
 
-        $this->step = new UpdateSchemaStep($this->translator, $container);
+        $this->step = new UpdateSchemaStep($this->translator, $kernel);
     }
 
     public function testUpdateFailedExceptionThrownIfMigrationsFailed(): void
@@ -116,18 +107,16 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (ConsoleEvent $event, string $eventName) {
-                    switch (true) {
-                        case $event instanceof ConsoleCommandEvent:
-                            $event->enableCommand();
-                            break;
+                function (ConsoleEvent $event, string $eventName): ConsoleEvent {
+                    if ($event instanceof ConsoleCommandEvent) {
+                        $event->enableCommand();
                     }
 
                     return $event;
                 }
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
@@ -141,26 +130,19 @@ class UpdateSchemaStepTest extends AbstractStepTestCase
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (ConsoleEvent $event, string $eventName) {
-                    switch (true) {
-                        case $event instanceof ConsoleCommandEvent:
-                            $event->enableCommand();
-                            break;
+                function (ConsoleEvent $event, string $eventName): ConsoleEvent {
+                    if ($event instanceof ConsoleCommandEvent) {
+                        $event->enableCommand();
                     }
 
                     return $event;
                 }
             );
 
-        $this->translator->expects($this->any())
+        $this->translator
             ->method('trans')
             ->willReturn('');
 
-        try {
-            $this->step->execute($this->progressBar, $this->input, $this->output);
-            $this->expectNotToPerformAssertions();
-        } catch (UpdateFailedException) {
-            $this->fail('UpdateFailedException should not have been thrown');
-        }
+        $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 }

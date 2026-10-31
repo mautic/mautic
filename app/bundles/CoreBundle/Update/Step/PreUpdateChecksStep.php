@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class PreUpdateChecksStep implements StepInterface
+final readonly class PreUpdateChecksStep implements StepInterface
 {
     public function __construct(
         private TranslatorInterface $translator,
@@ -51,15 +51,15 @@ final class PreUpdateChecksStep implements StepInterface
 
         foreach ($results as $result) {
             if (!$result->success) {
-                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error) => $this->translator->trans($error->key, $error->parameters), $result->errors));
+                $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error): string => $this->translator->trans($error->key, $error->parameters), $result->errors));
             }
         }
 
-        if (!empty($errors)) {
+        if ([] !== $errors) {
             $errorString = '';
 
             foreach ($errors as $error) {
-                $errorString .= "- $error\n";
+                $errorString .= "- {$error}\n";
             }
 
             throw new UpdateFailedException($this->translator->trans('mautic.core.update.check.error')."\n".$errorString);

@@ -19,10 +19,12 @@ use Symfony\Component\Form\FormEvents;
 /**
  * @extends AbstractType<mixed>
  */
-class WidgetType extends AbstractType
+final class WidgetType extends AbstractType
 {
-    public function __construct(protected EventDispatcherInterface $dispatcher, protected CorePermissions $security)
-    {
+    public function __construct(
+        private readonly EventDispatcherInterface $dispatcher,
+        private readonly CorePermissions $security,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -32,7 +34,7 @@ class WidgetType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.dashboard.widget.form.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control form-control-widget'],
                 'required'   => false,
             ]
@@ -42,7 +44,7 @@ class WidgetType extends AbstractType
         $event->setSecurity($this->security);
         $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
 
-        $types = array_map(fn ($category): array => array_flip($category), $event->getTypes());
+        $types = array_map(array_flip(...), $event->getTypes());
 
         $builder->add(
             'type',
@@ -50,7 +52,7 @@ class WidgetType extends AbstractType
             [
                 'label'             => 'mautic.dashboard.widget.form.type',
                 'choices'           => $types,
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'placeholder'       => 'mautic.core.select',
                 'attr'              => [
                     'class'    => 'form-control form-control-widget',
@@ -71,7 +73,7 @@ class WidgetType extends AbstractType
                     '100%' => '100',
                 ],
                 'empty_data'        => '100',
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => ['class' => 'form-control form-control-widget'],
                 'required'          => false,
             ]
@@ -90,7 +92,7 @@ class WidgetType extends AbstractType
                     'mautic.dashboard.widget.size.extra_large' => '675',
                 ],
                 'empty_data'        => '330',
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => ['class' => 'form-control form-control-widget'],
                 'required'          => false,
             ]

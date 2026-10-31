@@ -16,8 +16,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class ProjectType extends AbstractType
 {
     public function __construct(
-        private TranslatorInterface $translator,
-        private CorePermissions $corePermissions,
+        private readonly TranslatorInterface $translator,
+        private readonly CorePermissions $corePermissions,
     ) {
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\EntityLookupType;
@@ -10,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class TweetListType extends AbstractType
+final class TweetListType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -26,14 +28,14 @@ class TweetListType extends AbstractType
                     'limit'  => 0,
                     'start'  => 0,
                 ],
-                'ajax_lookup_action' => fn (Options $options) => 'mauticSocial:getLookupChoiceList',
+                'ajax_lookup_action' => fn (Options $options): string => 'mauticSocial:getLookupChoiceList',
                 'multiple'           => true,
                 'required'           => false,
             ]
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return EntityLookupType::class;
     }

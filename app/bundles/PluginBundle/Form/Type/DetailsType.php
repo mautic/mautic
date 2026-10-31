@@ -19,13 +19,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<Integration>
  */
-class DetailsType extends AbstractType
+final class DetailsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('isPublished', YesNoButtonGroupType::class, [
             'constraints' => [
-                new CanPublish($options['integration'] ?? ''),
+                new CanPublish(integrationName: $options['integration'] ?? ''),
             ],
         ]);
 
@@ -111,7 +111,7 @@ class DetailsType extends AbstractType
                 [
                     'choices'     => $choices,
                     'expanded'    => true,
-                    'label_attr'  => ['class' => 'control-label'],
+                    'label_attr'  => ['class' => 'form-label'],
                     'multiple'    => true,
                     'label'       => 'mautic.integration.form.features',
                     'required'    => false,
@@ -119,7 +119,7 @@ class DetailsType extends AbstractType
                     'choice_attr' => function ($val) use ($tooltips): array {
                         if (array_key_exists($val, $tooltips)) {
                             return [
-                                'data-toggle' => 'tooltip',
+                                'data-bs-toggle' => 'tooltip',
                                 'title'       => $tooltips[$val],
                             ];
                         }
@@ -137,7 +137,7 @@ class DetailsType extends AbstractType
                 'label'              => 'mautic.integration.form.feature.settings',
                 'required'           => true,
                 'data'               => $integration->getFeatureSettings(),
-                'label_attr'         => ['class' => 'control-label'],
+                'label_attr'         => ['class' => 'form-label'],
                 'integration'        => $options['integration'],
                 'integration_object' => $integrationObject,
                 'lead_fields'        => $options['lead_fields'],

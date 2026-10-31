@@ -8,14 +8,12 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Monitoring>
  */
-class MonitoringRepository extends CommonRepository
+final class MonitoringRepository extends CommonRepository
 {
     /**
-     * @param array $args
-     *
      * @return Paginator
      */
-    public function getPublishedEntities($args = [])
+    public function getPublishedEntities(array $args = [])
     {
         $q    = $this->createQueryBuilder($this->getTableAlias());
         $expr = $this->getPublishedByDateExpression($q);

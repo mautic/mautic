@@ -45,7 +45,7 @@ final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
         ];
 
         /** @var LeadModel $model */
-        $model = static::getContainer()->get('mautic.lead.model.lead');
+        $model = self::getContainer()->get(LeadModel::class);
         $model->setFrequencyRules($lead, $data, [], []);
 
         $subscribedCategories   = $model->getLeadCategories($lead);

@@ -10,7 +10,7 @@ trait PropertiesTrait
     /**
      * @param FormBuilderInterface|Form $builder
      */
-    protected function addPropertiesType($builder, array $options, array &$masks)
+    protected function addPropertiesType($builder, array $options, array &$masks): void
     {
         $properties = null;
         if (!empty($options['data'])) {

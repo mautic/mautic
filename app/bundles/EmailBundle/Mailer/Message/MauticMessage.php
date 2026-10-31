@@ -31,9 +31,6 @@ class MauticMessage extends Email
         return $this->metadata;
     }
 
-    /**
-     * Clears the metadata.
-     */
     public function clearMetadata(): void
     {
         $this->metadata = [];

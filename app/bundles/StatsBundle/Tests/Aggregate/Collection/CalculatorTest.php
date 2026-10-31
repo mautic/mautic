@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Tests\Aggregate\Collection;
 
 use Mautic\StatsBundle\Aggregate\Calculator;
 use Mautic\StatsBundle\Aggregate\Collection\DAO\StatsDAO;
 use PHPUnit\Framework\TestCase;
 
-class CalculatorTest extends TestCase
+final class CalculatorTest extends TestCase
 {
     public function testSumByYearReturnsExpectedCount(): void
     {
@@ -15,12 +17,13 @@ class CalculatorTest extends TestCase
             2019 => 300,
         ];
 
-        $this->assertEquals($expected, $this->getCalculator()->getSumsByYear()->getStats());
+        $this->assertSame($expected, $this->getCalculator()->getSumsByYear()->getStats());
     }
 
     public function testSumByMonthReturnsExpectedCount(): void
     {
         $expected = [
+            12  => 700,
             1   => 0,
             2   => 0,
             3   => 0,
@@ -32,10 +35,9 @@ class CalculatorTest extends TestCase
             9   => 0,
             10  => 0,
             11  => 200,
-            12  => 700,
         ];
 
-        $this->assertEquals($expected, $this->getCalculator()->getSumsByMonth('n')->getStats());
+        $this->assertSame($expected, $this->getCalculator()->getSumsByMonth('n')->getStats());
 
         $expected = [
             '2018-12' => 600,
@@ -53,7 +55,7 @@ class CalculatorTest extends TestCase
             '2019-12' => 100,
         ];
 
-        $this->assertEquals($expected, $this->getCalculator()->getSumsByMonth('Y-m')->getStats());
+        $this->assertSame($expected, $this->getCalculator()->getSumsByMonth('Y-m')->getStats());
     }
 
     public function testSumByDayReturnsExpectedCount(): void
@@ -92,7 +94,7 @@ class CalculatorTest extends TestCase
             6  => 0,
         ];
 
-        $this->assertEquals($expected, $this->getCalculator()->getSumsByDay('j')->getStats());
+        $this->assertSame($expected, $this->getCalculator()->getSumsByDay('j')->getStats());
 
         $expected = [
             '2018-12-07' => 300,
@@ -523,7 +525,7 @@ class CalculatorTest extends TestCase
             '2019-48' => 0,
             '2019-49' => 100,
         ];
-        $this->assertEquals($expected, $this->getCalculator()->getSumsByWeek('Y-W')->getStats());
+        $this->assertSame($expected, $this->getCalculator()->getSumsByWeek('Y-W')->getStats());
     }
 
     public function testSumByHoursReturnsExpectedCount(): void
@@ -566,7 +568,7 @@ class CalculatorTest extends TestCase
         $dateTo   = new \DateTime('2021-12-07');
 
         $calculatorObj = new Calculator($stats, $dateFrom, $dateTo);
-        $this->assertEquals($expected, $calculatorObj->getCountsByHour()->getStats());
+        $this->assertSame($expected, $calculatorObj->getCountsByHour()->getStats());
     }
 
     /**

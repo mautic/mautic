@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale|default('en') }}">
+    <head>
+        <title>{{ 'mautic.user.invite.subject'|trans }}</title>
+    </head>
+    <body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,Helvetica,sans-serif;color:#1f2933;">
+        <div style="background:#f4f4f4;padding:24px 0;">
+            <div style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #dfe3e8;">
+                <div style="padding:24px 32px;border-bottom:1px solid #dfe3e8;">
+                    <strong style="font-size:20px;line-height:28px;">Mautic</strong>
+                </div>
+                <div style="padding:32px;">
+                    <h1 style="margin:0 0 16px;font-size:24px;line-height:32px;font-weight:600;">{{ 'mautic.user.invite.email.heading'|trans }}</h1>
+                    <p style="margin:0 0 24px;font-size:16px;line-height:24px;">{{ 'mautic.user.invite.email.intro'|trans }}</p>
+                    <p style="margin:0 0 24px;">
+                        <a href="{{ inviteLink }}" style="display:inline-block;padding:12px 18px;background:#1b75bb;color:#ffffff;text-decoration:none;font-size:16px;line-height:20px;">{{ 'mautic.user.invite.register'|trans }}</a>
+                    </p>
+                    <p style="margin:0;font-size:14px;line-height:20px;color:#52616b;">{{ 'mautic.user.invite.email.fallback'|trans({'%invite_link%': inviteLink}) }}</p>
+                </div>
+                <div style="padding:20px 32px;border-top:1px solid #dfe3e8;font-size:12px;line-height:18px;color:#697b8c;">
+                    {{ 'mautic.user.invite.email.footer'|trans }}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

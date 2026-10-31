@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Tracker;
 
 use Mautic\CacheBundle\Cache\CacheProvider;
@@ -15,31 +17,23 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
+final class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
 {
     private DeviceCreatorService $deviceCreatorService;
 
     private DeviceDetectorFactory $deviceDetectorFactory;
 
     /**
-     * @var DeviceTrackingServiceInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject&DeviceTrackingServiceInterface
      */
     private \PHPUnit\Framework\MockObject\MockObject $deviceTrackingService;
 
-    /**
-     * @var Logger
-     */
-    private \PHPUnit\Framework\MockObject\MockObject $logger;
-
-    /**
-     * @var string
-     */
-    private $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36';
+    private string $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36';
 
     protected function setUp(): void
     {
         $createCacheItem = \Closure::bind(
-            function ($key) {
+            function ($key): CacheItem {
                 $item        = new CacheItem();
                 $item->key   = $key;
                 $item->isHit = false;
@@ -62,22 +56,20 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $coreParametersHelper->expects($this->once())
           ->method('get')
-          ->with($this->equalTo('cache_adapter'))
+          ->with('cache_adapter')
           ->willReturn('mautic.cache.adapter.filesystem');
 
         $container = $this->createMock(ContainerInterface::class);
         $container
           ->expects($this->once())
           ->method('get')
-          ->with($this->equalTo('mautic.cache.adapter.filesystem'))
+          ->with('mautic.cache.adapter.filesystem')
           ->willReturn($cacheAdapter);
 
         $cacheProvider               = new CacheProvider($coreParametersHelper, $container);
         $this->deviceDetectorFactory = new DeviceDetectorFactory($cacheProvider);
         $this->deviceCreatorService  = new DeviceCreatorService();
         $this->deviceTrackingService = $this->createMock(DeviceTrackingServiceInterface::class);
-
-        $this->logger = $this->createMock(Logger::class);
     }
 
     public function testDeviceCreatedByUserAgent(): void
@@ -90,15 +82,17 @@ class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
             ->method('trackCurrentDevice')
             ->willReturn($device);
 
-        $tracker = new DeviceTracker($this->deviceCreatorService, $this->deviceDetectorFactory, $this->deviceTrackingService, $this->logger);
+        $tracker = new DeviceTracker($this->deviceCreatorService, $this->deviceDetectorFactory, $this->deviceTrackingService, $this->createStub(Logger::class));
 
         $device = $tracker->createDeviceFromUserAgent($lead, $this->userAgent);
-        $this->assertEquals('3dfc9e6dff07948058df37455718cb98', $device->getSignature());
+        $this->assertInstanceOf(LeadDevice::class, $device);
+        $this->assertSame('3dfc9e6dff07948058df37455718cb98', $device->getSignature());
 
         // Subsequent calls should not create a new tracking ID
         $device2 = $tracker->createDeviceFromUserAgent($lead, $this->userAgent);
+        $this->assertInstanceOf(LeadDevice::class, $device2);
         $this->assertEquals($device->getTrackingId(), $device2->getTrackingId());
         $this->assertEquals('apple', $device2->getDeviceBrand());
-        $this->assertEquals($device->getSignature(), $device2->getSignature());
+        $this->assertSame($device->getSignature(), $device2->getSignature());
     }
 }

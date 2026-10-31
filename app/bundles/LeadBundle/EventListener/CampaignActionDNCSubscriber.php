@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CampaignActionDNCSubscriber implements EventSubscriberInterface
+final readonly class CampaignActionDNCSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private DoNotContact $doNotContact,

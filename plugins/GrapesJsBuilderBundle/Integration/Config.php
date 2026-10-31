@@ -11,7 +11,7 @@ use Mautic\PluginBundle\Entity\Integration;
 class Config
 {
     public function __construct(
-        private IntegrationsHelper $integrationsHelper,
+        private readonly IntegrationsHelper $integrationsHelper,
     ) {
     }
 
@@ -20,7 +20,7 @@ class Config
         try {
             $integration = $this->getIntegrationEntity();
 
-            return (bool) $integration->getIsPublished() ?: false;
+            return (bool) $integration->getIsPublished();
         } catch (IntegrationNotFoundException) {
             return false;
         }

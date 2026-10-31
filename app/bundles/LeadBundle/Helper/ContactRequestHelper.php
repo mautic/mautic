@@ -23,25 +23,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContactRequestHelper
 {
-    /**
-     * @var Lead|null
-     */
-    private $trackedContact;
+    private ?Lead $trackedContact = null;
 
     private array $queryFields = [];
 
     private array $publiclyUpdatableFieldValues = [];
 
     public function __construct(
-        private LeadModel $leadModel,
-        private ContactTracker $contactTracker,
-        private IpLookupHelper $ipLookupHelper,
-        private RequestStack $requestStack,
-        private LoggerInterface $logger,
-        private EventDispatcherInterface $eventDispatcher,
-        private ContactMerger $contactMerger,
-        private StatRepository $statRepository,
-        private BotRatioHelper $botRatioHelper,
+        private readonly LeadModel $leadModel,
+        private readonly ContactTracker $contactTracker,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly RequestStack $requestStack,
+        private readonly LoggerInterface $logger,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly ContactMerger $contactMerger,
+        private readonly StatRepository $statRepository,
+        private readonly BotRatioHelper $botRatioHelper,
     ) {
     }
 
@@ -121,8 +118,8 @@ class ContactRequestHelper
         } catch (ContactNotFoundException) {
         }
 
-        /* @var Lead $foundContact */
-        if (!empty($this->queryFields)) {
+        if ([] !== $this->queryFields) {
+            /** @var Lead $foundContact */
             [$foundContact, $this->publiclyUpdatableFieldValues] = $this->leadModel->checkForDuplicateContact(
                 $this->queryFields,
                 true,
@@ -136,7 +133,7 @@ class ContactRequestHelper
                 }
             }
 
-            if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {
+            if (null === $this->trackedContact || $foundContact->getId() !== $this->trackedContact->getId()) {
                 // A contact was found by a publicly updatable field
                 if (!$foundContact->isNew()) {
                     return $foundContact;
@@ -177,7 +174,7 @@ class ContactRequestHelper
             $this->trackedContact->addIpAddress($ipAddress);
         }
 
-        if (!empty($this->publiclyUpdatableFieldValues)) {
+        if ([] !== $this->publiclyUpdatableFieldValues) {
             $this->leadModel->setFieldValues(
                 $this->trackedContact,
                 $this->publiclyUpdatableFieldValues,

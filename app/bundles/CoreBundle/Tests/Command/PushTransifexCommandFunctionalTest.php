@@ -8,11 +8,10 @@ use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Command\PushTransifexCommand;
 use Mautic\CoreBundle\Test\Guzzle\ClientMockTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
-class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
+final class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 {
     use ClientMockTrait;
 
@@ -29,9 +28,9 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         // One resource is going to be found in the Transifex project:
         $handlerStack->append(
-            function (RequestInterface $request) {
-                Assert::assertSame('GET', $request->getMethod());
-                Assert::assertSame('https://rest.api.transifex.com/resources?filter%5Bproject%5D=o%3Amautic%3Ap%3Amautic', $request->getUri()->__toString());
+            function (RequestInterface $request): Response {
+                $this->assertSame('GET', $request->getMethod());
+                $this->assertSame('https://rest.api.transifex.com/resources?filter%5Bproject%5D=o%3Amautic%3Ap%3Amautic', $request->getUri()->__toString());
 
                 return new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../Fixtures/Transifex/resources.json'));
             }
@@ -39,14 +38,14 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         // The first resource does not exist and must be created
         $handlerStack->append(
-            function (RequestInterface $request) {
+            function (RequestInterface $request): Response {
                 $body = json_decode($request->getBody()->__toString(), true);
-                Assert::assertSame('POST', $request->getMethod());
-                Assert::assertSame('https://rest.api.transifex.com/resources', $request->getUri()->__toString());
-                Assert::assertSame('WebhookBundle flashes', $body['data']['attributes']['name']);
-                Assert::assertSame('webhookbundle-flashes', $body['data']['attributes']['slug']);
-                Assert::assertSame('INI', $body['data']['relationships']['i18n_format']['data']['id']);
-                Assert::assertSame('o:mautic:p:mautic', $body['data']['relationships']['project']['data']['id']);
+                $this->assertSame('POST', $request->getMethod());
+                $this->assertSame('https://rest.api.transifex.com/resources', $request->getUri()->__toString());
+                $this->assertSame('WebhookBundle flashes', $body['data']['attributes']['name']);
+                $this->assertSame('webhookbundle-flashes', $body['data']['attributes']['slug']);
+                $this->assertSame('INI', $body['data']['relationships']['i18n_format']['data']['id']);
+                $this->assertSame('o:mautic:p:mautic', $body['data']['relationships']['project']['data']['id']);
 
                 return new Response(SymfonyResponse::HTTP_CREATED, [], file_get_contents(__DIR__.'/../Fixtures/Transifex/resources-create.json'));
             }
@@ -54,11 +53,11 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         // Starting the upload of content for the first resource
         $handlerStack->append(
-            function (RequestInterface $request) {
+            function (RequestInterface $request): Response {
                 $body = json_decode($request->getBody()->__toString(), true);
-                Assert::assertSame('POST', $request->getMethod());
-                Assert::assertSame('https://rest.api.transifex.com/resource_strings_async_uploads', $request->getUri()->__toString());
-                Assert::assertNotEmpty($body['data']['attributes']['content']);
+                $this->assertSame('POST', $request->getMethod());
+                $this->assertSame('https://rest.api.transifex.com/resource_strings_async_uploads', $request->getUri()->__toString());
+                $this->assertNotEmpty($body['data']['attributes']['content']);
 
                 return new Response(SymfonyResponse::HTTP_ACCEPTED, [], file_get_contents(__DIR__.'/../Fixtures/Transifex/resources-upload.json'));
             }
@@ -66,11 +65,11 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         // Starting the upload of content for the second resource
         $handlerStack->append(
-            function (RequestInterface $request) {
+            function (RequestInterface $request): Response {
                 $body = json_decode($request->getBody()->__toString(), true);
-                Assert::assertSame('POST', $request->getMethod());
-                Assert::assertSame('https://rest.api.transifex.com/resource_strings_async_uploads', $request->getUri()->__toString());
-                Assert::assertNotEmpty($body['data']['attributes']['content']);
+                $this->assertSame('POST', $request->getMethod());
+                $this->assertSame('https://rest.api.transifex.com/resource_strings_async_uploads', $request->getUri()->__toString());
+                $this->assertNotEmpty($body['data']['attributes']['content']);
 
                 return new Response(SymfonyResponse::HTTP_ACCEPTED, [], file_get_contents(__DIR__.'/../Fixtures/Transifex/resources-upload.json'));
             }
@@ -78,9 +77,9 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         // The first resource uploaded successfully
         $handlerStack->append(
-            function (RequestInterface $request) {
-                Assert::assertSame('GET', $request->getMethod());
-                Assert::assertSame('https://rest.api.transifex.com//resource_strings_async_uploads/4abfc726-6a27-4c33-9d99-e5254c8df748', $request->getUri()->__toString());
+            function (RequestInterface $request): Response {
+                $this->assertSame('GET', $request->getMethod());
+                $this->assertSame('https://rest.api.transifex.com//resource_strings_async_uploads/4abfc726-6a27-4c33-9d99-e5254c8df748', $request->getUri()->__toString());
 
                 return new Response(SymfonyResponse::HTTP_ACCEPTED, [], '');
             }
@@ -88,9 +87,9 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
         // The second resource uploaded successfully
         $handlerStack->append(
-            function (RequestInterface $request) {
-                Assert::assertSame('GET', $request->getMethod());
-                Assert::assertSame('https://rest.api.transifex.com//resource_strings_async_uploads/4abfc726-6a27-4c33-9d99-e5254c8df748', $request->getUri()->__toString());
+            function (RequestInterface $request): Response {
+                $this->assertSame('GET', $request->getMethod());
+                $this->assertSame('https://rest.api.transifex.com//resource_strings_async_uploads/4abfc726-6a27-4c33-9d99-e5254c8df748', $request->getUri()->__toString());
 
                 return new Response(SymfonyResponse::HTTP_ACCEPTED, [], '');
             }
@@ -108,7 +107,7 @@ Resource for {$dir}/WebhookBundle/Translations/en_US/messages.ini updated succes
 
 EOT;
 
-        Assert::assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
-        Assert::assertSame($expectedOutput, $commandTester->getDisplay());
+        $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
+        $this->assertSame($expectedOutput, $commandTester->getDisplay());
     }
 }

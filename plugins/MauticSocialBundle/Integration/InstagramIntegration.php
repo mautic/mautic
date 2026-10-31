@@ -2,7 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
-class InstagramIntegration extends SocialIntegration
+final class InstagramIntegration extends SocialIntegration
 {
     public function getName(): string
     {
@@ -34,7 +34,7 @@ class InstagramIntegration extends SocialIntegration
 
     public function getApiUrl($endpoint): string
     {
-        return "https://api.instagram.com/v1/$endpoint";
+        return "https://api.instagram.com/v1/{$endpoint}";
     }
 
     public function getUserData($identifier, &$socialCache): void
@@ -53,12 +53,15 @@ class InstagramIntegration extends SocialIntegration
         }
     }
 
+    /**
+     * @param array<string, mixed> $socialCache
+     */
     public function getPublicActivity($identifier, &$socialCache): void
     {
         $socialCache['has']['activity'] = false;
         if ($id = $this->getContactUserId($identifier, $socialCache)) {
             // get more than 10 so we can weed out videos
-            $data = $this->makeRequest($this->getApiUrl("users/$id/media/recent"), ['count' => 20]);
+            $data = $this->makeRequest($this->getApiUrl("users/{$id}/media/recent"), ['count' => 20]);
 
             $socialCache['activity'] = [
                 'photos' => [],
@@ -98,7 +101,7 @@ class InstagramIntegration extends SocialIntegration
         }
     }
 
-    public function getAvailableLeadFields($settings = []): array
+    public function getAvailableLeadFields(array $settings = []): array
     {
         return [
             'full_name' => ['type' => 'string'],
@@ -107,11 +110,15 @@ class InstagramIntegration extends SocialIntegration
         ];
     }
 
-    private function getContactUserId(&$identifier, &$socialCache)
+    /**
+     * @param array<string, mixed> $socialCache
+     */
+    private function getContactUserId(&$identifier, array &$socialCache)
     {
         if (!empty($socialCache['id'])) {
             return $socialCache['id'];
-        } elseif (empty($identifier)) {
+        }
+        if (empty($identifier)) {
             return false;
         }
 
@@ -121,7 +128,7 @@ class InstagramIntegration extends SocialIntegration
             foreach ($data->data as $user) {
                 // its possible that instagram may return multiple users if the username is a base of another
                 // for example, search for alan may return alanh, alanhartless, etc
-                if (strtolower($user->username) == strtolower($identifier)) {
+                if (strtolower($user->username) === strtolower($identifier)) {
                     $socialCache['id'] = $user->id;
                     break;
                 }

@@ -1,0 +1,135 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block headerTitle %}{{ 'mautic.campaign.share.publishing'|trans }}{% endblock %}
+
+{% block content %}
+<div class="box-layout">
+    <div class="col-md-6 col-md-offset-3 height-auto">
+        <div class="pa-lg text-center">
+            <div class="panel panel-default" id="campaign-share-publish"
+                 data-archive-url="{{ archiveUrl|e('html_attr') }}"
+                 data-marketplace-url="{{ marketplaceUrl|e('html_attr') }}"
+                 data-campaign-id="{{ campaignId }}">
+                <div class="panel-body pa-lg">
+                    <i class="ri-share-line ri-3x text-primary mb-md"></i>
+                    <h3 id="campaign-share-status">{{ 'mautic.campaign.share.publishing'|trans }}</h3>
+                    <p class="text-muted" id="campaign-share-detail">
+                        {{ 'mautic.campaign.share.opening_marketplace.desc'|trans }}
+                    </p>
+                    <div id="campaign-share-error" class="alert alert-danger mt-md" style="display:none"></div>
+                    <div id="campaign-share-actions" class="mt-md">
+                        <a href="{{ path('mautic_campaign_action', {'objectAction': 'view', 'objectId': campaignId}) }}">
+                            {{ 'mautic.campaign.share.back_to_campaign'|trans }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(function () {
+    const root          = document.getElementById('campaign-share-publish');
+    const statusEl      = document.getElementById('campaign-share-status');
+    const detailEl      = document.getElementById('campaign-share-detail');
+    const errorEl       = document.getElementById('campaign-share-error');
+    const archiveUrl    = root.getAttribute('data-archive-url');
+    const marketplace   = root.getAttribute('data-marketplace-url').replace(/\/$/, '');
+    const marketplaceUploadUrl = marketplace + '/publish/upload';
+    const marketplaceOrigin = new URL(marketplace).origin;
+
+    const popup = window.open(marketplaceUploadUrl, 'mautic-marketplace-publish');
+    if (!popup) {
+        showError('{{ 'mautic.campaign.share.popup_blocked'|trans|e('js') }}');
+        return;
+    }
+
+    let done = false;
+
+    window.addEventListener('message', function (event) {
+        if (event.source !== popup) {
+            return;
+        }
+        // The popup window may navigate anywhere (Auth0, user clicks a link), and any
+        // page occupying it can post messages — only the marketplace may get the archive.
+        if (event.origin !== marketplaceOrigin) {
+            return;
+        }
+        if (!event.data || typeof event.data !== 'object') {
+            return;
+        }
+
+        // Re-send the archive every time the popup signals it's ready. The popup
+        // re-emits 'marketplace:ready' after an Auth0 round-trip (logged-out user
+        // gets bounced to login and back), at which point it has lost its in-memory
+        // Blob and needs us to push it again.
+        if (event.data.type === 'marketplace:ready' && !done) {
+            sendArchiveToPopup();
+        }
+
+        if (event.data.type === 'marketplace:done') {
+            done = true;
+            statusEl.textContent = '{{ 'mautic.campaign.share.publish_success'|trans|e('js') }}';
+            detailEl.textContent = event.data.package_name + ' (' + event.data.version + ')';
+        }
+    });
+
+    // If user closes the popup before completion, surface that.
+    const poll = setInterval(function () {
+        if (popup.closed) {
+            clearInterval(poll);
+            if (!done) {
+                showError('{{ 'mautic.campaign.share.popup_closed'|trans|e('js') }}');
+            }
+        }
+    }, 800);
+
+    // The server deletes the transient ZIP after the first download, but the popup can
+    // ask for the archive again (e.g. after an Auth0 round-trip) — so fetch it once and
+    // hand out the cached Blob on every subsequent 'marketplace:ready'.
+    let archivePromise = null;
+
+    function getArchive() {
+        if (!archivePromise) {
+            archivePromise = fetch(archiveUrl, { credentials: 'same-origin' })
+                .then(function (resp) {
+                    if (!resp.ok) {
+                        throw new Error('HTTP ' + resp.status);
+                    }
+                    return resp.blob();
+                })
+                .catch(function (err) {
+                    // Allow a retry on the next 'marketplace:ready' — the fetch may have
+                    // failed before the server served (and deleted) the file.
+                    archivePromise = null;
+                    throw err;
+                });
+        }
+
+        return archivePromise;
+    }
+
+    function sendArchiveToPopup() {
+        statusEl.textContent = '{{ 'mautic.campaign.share.sending_archive'|trans|e('js') }}';
+        getArchive()
+            .then(function (blob) {
+                popup.postMessage({
+                    type:     'mautic:upload',
+                    archive:  blob,
+                    filename: 'campaign.zip',
+                }, marketplaceOrigin);
+                statusEl.textContent = '{{ 'mautic.campaign.share.waiting_for_marketplace'|trans|e('js') }}';
+            })
+            .catch(function (err) {
+                showError('{{ 'mautic.campaign.share.archive_fetch_failed'|trans|e('js') }} (' + err.message + ')');
+            });
+    }
+
+    function showError(msg) {
+        statusEl.textContent = '{{ 'mautic.campaign.share.publish_failed'|trans|e('js') }}';
+        errorEl.textContent = msg;
+        errorEl.style.display = 'block';
+    }
+})();
+</script>
+{% endblock %}

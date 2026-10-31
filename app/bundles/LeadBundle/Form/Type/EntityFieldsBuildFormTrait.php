@@ -16,12 +16,14 @@ use Mautic\LeadBundle\Form\FieldAliasToFqcnMap;
 use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddress;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Validator\Constraints\Length;
+use Mautic\LeadBundle\Validator\Constraints\SafeUrl;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
+use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -72,7 +74,7 @@ trait EntityFieldsBuildFormTrait
             $constraints = [];
             if ($required && empty($options['ignore_required_constraints'])) {
                 $constraints[] = new NotBlank(
-                    ['message' => 'mautic.lead.customfield.notblank']
+                    message: 'mautic.lead.customfield.notblank'
                 );
             } elseif (!empty($options['ignore_required_constraints'])) {
                 $required            = false;
@@ -103,7 +105,7 @@ trait EntityFieldsBuildFormTrait
                         [
                             'required'      => $required,
                             'label'         => $field['label'],
-                            'label_attr'    => ['class' => 'control-label'],
+                            'label_attr'    => ['class' => 'form-label'],
                             'attr'          => $attr,
                             'data'          => (null !== $value) ? (float) $value : $value,
                             'mapped'        => $mapped,
@@ -119,7 +121,7 @@ trait EntityFieldsBuildFormTrait
                     $opts                = [
                         'required'    => $required,
                         'label'       => $field['label'],
-                        'label_attr'  => ['class' => 'control-label'],
+                        'label_attr'  => ['class' => 'form-label'],
                         'attr'        => $attr,
                         'mapped'      => $mapped,
                         'constraints' => $constraints,
@@ -274,6 +276,8 @@ trait EntityFieldsBuildFormTrait
                         case HtmlType::class:
                             $cleaningRules[$field['alias']] = 'html';
                             break;
+                        case UrlType::class:
+                            $constraints[] = new SafeUrl();
                     }
 
                     $builder->add(
@@ -282,7 +286,7 @@ trait EntityFieldsBuildFormTrait
                         [
                             'required'    => $field['isRequired'],
                             'label'       => $field['label'],
-                            'label_attr'  => ['class' => 'control-label'],
+                            'label_attr'  => ['class' => 'form-label'],
                             'attr'        => $attr,
                             'data'        => $value,
                             'mapped'      => $mapped,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -13,7 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailToUserType extends AbstractType
+final class EmailToUserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -34,7 +36,7 @@ class EmailToUserType extends AbstractType
             UserListType::class,
             [
                 'label'      => 'mautic.email.form.users',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.help.autocomplete',
@@ -57,7 +59,7 @@ class EmailToUserType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.send.email.to',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'       => 'form-control',
                     'placeholder' => 'mautic.core.optional',
@@ -73,7 +75,7 @@ class EmailToUserType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.send.email.cc',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'       => 'form-control',
                     'placeholder' => 'mautic.core.optional',
@@ -89,7 +91,7 @@ class EmailToUserType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.send.email.bcc',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'       => 'form-control',
                     'placeholder' => 'mautic.core.optional',

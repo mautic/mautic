@@ -13,7 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class CampaignMapStatsController extends AbstractController
+final class CampaignMapStatsController extends AbstractController
 {
     public const MAP_OPTIONS = [
         'contacts' => [
@@ -32,8 +32,9 @@ class CampaignMapStatsController extends AbstractController
 
     public const LEGEND_TEXT = 'Total: %total (%withCountry with country)';
 
-    public function __construct(private CampaignModel $model)
-    {
+    public function __construct(
+        private readonly CampaignModel $model,
+    ) {
     }
 
     /**
@@ -85,7 +86,7 @@ class CampaignMapStatsController extends AbstractController
     ): Response {
         $entity = $this->model->getEntity($objectId);
 
-        if (empty($entity) || !$this->hasAccess($security, $entity)) {
+        if (!$entity instanceof Campaign || !$this->hasAccess($security, $entity)) {
             throw new AccessDeniedHttpException();
         }
 

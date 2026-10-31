@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
+use Mautic\ProjectBundle\Validator\Constraints\UniqueName;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -80,7 +81,7 @@ class Project extends FormEntity implements UuidInterface
 
         $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(ProjectRepository::class)
-            ->addIndex(['name'], 'project_name');
+            ->addUniqueConstraint(['name'], 'unique_project_name');
 
         $builder->addIdColumns();
 
@@ -111,8 +112,9 @@ class Project extends FormEntity implements UuidInterface
     {
         $metadata->addPropertyConstraint(
             'name',
-            new NotBlank(['message' => 'mautic.core.name.required'])
+            new NotBlank(message: 'mautic.core.name.required')
         );
+        $metadata->addConstraint(new UniqueName());
     }
 
     public function getId(): ?int

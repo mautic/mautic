@@ -48,6 +48,7 @@
                                 <a href="{{ path('mautic_social_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                                     {{ item.title }}
                                 </a>
+                                {{ customContent('monitoring.name', _context) }}
                             </div>
 
                             {{ include('@MauticCore/Helper/description--inline.html.twig', {

@@ -12,9 +12,9 @@ use Mautic\UserBundle\Entity\User;
 class BulkNotification
 {
     public function __construct(
-        private BulkNotificationInterface $bulkNotification,
-        private UserNotificationBuilder $userNotificationBuilder,
-        private EntityManagerInterface $entityManager,
+        private readonly BulkNotificationInterface $bulkNotification,
+        private readonly UserNotificationBuilder $userNotificationBuilder,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 

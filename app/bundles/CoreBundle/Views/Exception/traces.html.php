@@ -1,6 +1,6 @@
 <?php
 
-$formatArgs = function ($args) use (&$formatArgs) {
+$formatArgs = function ($args) use (&$formatArgs): string {
     $result = [];
     foreach ($args as $key => $item) {
         if (is_array($item) && isset($item[0]) && is_string($item[0]) && 2 === count($item)) {

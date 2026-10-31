@@ -5,6 +5,7 @@ namespace Mautic\PluginBundle\Controller;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\PluginBundle\Entity\PluginRepository;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Event\PluginIntegrationEvent;
 use Mautic\PluginBundle\Facade\ReloadFacade;
@@ -16,26 +17,33 @@ use Mautic\PluginBundle\PluginEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class PluginController extends FormController
+final class PluginController extends FormController
 {
-    /**
-     * @return JsonResponse|Response
-     */
-    public function indexAction(Request $request, IntegrationHelper $integrationHelper)
+    private PluginRepository $pluginRepository;
+
+    private PluginModel $pluginModel;
+
+    #[Required]
+    public function autowirePluginController(
+        PluginModel $pluginModel,
+        PluginRepository $pluginRepository,
+    ): void {
+        $this->pluginModel = $pluginModel;
+        $this->pluginRepository = $pluginRepository;
+    }
+
+    public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        /** @var PluginModel $pluginModel */
-        $pluginModel = $this->getModel('plugin');
-
         // List of plugins for filter and to show as a single integration
-        $plugins = $pluginModel->getEntities(
+        $plugins = $this->pluginModel->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -92,7 +100,7 @@ class PluginController extends FormController
         // sort by name
         uksort(
             $integrations,
-            fn ($a, $b): int => strnatcasecmp($a, $b)
+            strnatcasecmp(...)
         );
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
@@ -127,13 +135,11 @@ class PluginController extends FormController
 
     /**
      * @param string $name
-     *
-     * @return JsonResponse|Response
      */
-    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1)
+    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
         if (!empty($request->get('activeTab'))) {
             $activeTab = $request->get('activeTab');
@@ -142,7 +148,7 @@ class PluginController extends FormController
         $session   = $request->getSession();
 
         $integrationDetailsPost = $request->request->all()['integration_details'] ?? [];
-        $authorize              = empty($integrationDetailsPost['in_auth']) ? false : true;
+        $authorize              = !empty($integrationDetailsPost['in_auth']);
 
         /** @var AbstractIntegration $integrationObject */
         $integrationObject = $integrationHelper->getIntegrationObject($name);
@@ -160,11 +166,8 @@ class PluginController extends FormController
         }
         $session->set('mautic.plugin.'.$name.'.'.$object.'.start', $start);
         $session->set('mautic.plugin.'.$name.'.'.$object.'.page', $page);
-
-        /** @var PluginModel $pluginModel */
-        $pluginModel   = $this->getModel('plugin');
-        $leadFields    = $pluginModel->getLeadFields();
-        $companyFields = $pluginModel->getCompanyFields();
+        $leadFields    = $this->pluginModel->getLeadFields();
+        $companyFields = $this->pluginModel->getCompanyFields();
         /** @var AbstractIntegration $integrationObject */
         $entity                 = $integrationObject->getIntegrationSettings();
         $existingPublishedState = $entity->getIsPublished();
@@ -180,7 +183,7 @@ class PluginController extends FormController
             ]
         );
 
-        if ('POST' == $request->getMethod()) {
+        if ('POST' === $request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $currentKeys            = $integrationObject->getDecryptedApiKeys($entity);
@@ -250,16 +253,15 @@ class PluginController extends FormController
                     }
 
                     if ($valid || $authorize) {
-                        $dispatcher = $this->dispatcher;
                         $mauticLogger->info('Dispatching integration config save event.');
-                        if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
+                        if ($this->dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
                             $mauticLogger->info('Event dispatcher has integration config save listeners.');
                             if (!$valid && !$existingPublishedState) {
                                 $integrationObject->getIntegrationSettings()->setIsPublished(false);
                             }
                             $event = new PluginIntegrationEvent($integrationObject);
 
-                            $dispatcher->dispatch($event, PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE);
+                            $this->dispatcher->dispatch($event, PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE);
 
                             $entity = $event->getEntity();
                         }
@@ -338,6 +340,9 @@ class PluginController extends FormController
             }
         }
 
+        $plugin  = $entity->getPlugin();
+        $version = $plugin?->getVersion();
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -355,31 +360,26 @@ class PluginController extends FormController
                     'mauticContent' => 'integrationConfig',
                     'route'         => false,
                     'sidebar'       => $this->renderView('@MauticCore/LeftPanel/index.html.twig'),
+                    'pluginVersion' => $version,
                 ],
             ]
         );
     }
 
-    /**
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
-    public function infoAction(IntegrationHelper $integrationHelper, $name)
+    public function infoAction(IntegrationHelper $integrationHelper, $name): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
-        /** @var PluginModel $pluginModel */
-        $pluginModel = $this->getModel('plugin');
-
-        $bundle = $pluginModel->getRepository()->findOneBy(
+        $bundle = $this->pluginRepository->findOneBy(
             [
                 'bundle' => InputHelper::clean($name),
             ]
         );
 
         if (!$bundle) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $bundle->splitDescriptions();
@@ -395,6 +395,7 @@ class PluginController extends FormController
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',
                     'route'         => false,
+                    'pluginVersion' => $bundle->getVersion(),
                 ],
             ]
         );
@@ -402,13 +403,11 @@ class PluginController extends FormController
 
     /**
      * Scans the addon bundles directly and loads bundles which are not registered to the database.
-     *
-     * @return Response
      */
-    public function reloadAction(Request $request, ReloadFacade $reloadFacade)
+    public function reloadAction(Request $request, ReloadFacade $reloadFacade): Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
-            return $this->accessDenied();
+            $this->throwAccessDenied();
         }
 
         $this->addFlashMessage(

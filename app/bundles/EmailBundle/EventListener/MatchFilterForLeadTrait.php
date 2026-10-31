@@ -3,11 +3,16 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Exception\OperatorsNotFoundException;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
 trait MatchFilterForLeadTrait
 {
+    /**
+     * @param array<int, array<string, mixed>> $filter
+     * @param array<string, mixed>             $lead
+     */
     protected function matchFilterForLead(array $filter, array $lead): bool
     {
         if (empty($lead['id'])) {
@@ -20,20 +25,6 @@ trait MatchFilterForLeadTrait
         foreach ($filter as $data) {
             $isCompanyField = (str_starts_with((string) $data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
-
-            if ('leadlist' === $data['type'] && isset($this->segmentRepository) && $this->segmentRepository instanceof LeadListRepository) {
-                return $this->isContactSegmentRelationshipValid($this->segmentRepository, (int) $lead['id'], $data['operator'], $data['filter']);
-            }
-
-            if ($isCompanyField) {
-                if (empty($primaryCompany)) {
-                    continue;
-                }
-            } else {
-                if (!array_key_exists($data['field'], $lead)) {
-                    continue;
-                }
-            }
 
             /*
              * Split the filters into groups based on the glue.
@@ -62,6 +53,21 @@ trait MatchFilterForLeadTrait
                 $groups[$groupNum] = false;
             }
 
+            if ('leadlist' === $data['type'] && property_exists($this, 'segmentRepository') && $this->segmentRepository instanceof LeadListRepository) {
+                $groups[$groupNum] = $this->isContactSegmentRelationshipValid($this->segmentRepository, (int) $lead['id'], $data['operator'], $data['filter']);
+                continue;
+            }
+
+            if ($isCompanyField) {
+                if (empty($primaryCompany)) {
+                    continue;
+                }
+            } else {
+                if (!array_key_exists($data['field'] ?? '', $lead)) {
+                    continue;
+                }
+            }
+
             $leadVal   = ($isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]);
             $filterVal = $data['filter'];
 
@@ -85,11 +91,12 @@ trait MatchFilterForLeadTrait
                     }
                     break;
                 case 'tags':
+                case 'select':
                 case 'multiselect':
-                    if (!is_array($leadVal)) {
+                    if (null !== $leadVal && !is_array($leadVal)) {
                         $leadVal = explode('|', $leadVal);
                     }
-                    if (!is_array($filterVal)) {
+                    if (null !== $filterVal && !is_array($filterVal)) {
                         $filterVal = explode('|', $filterVal);
                     }
                     break;
@@ -119,11 +126,6 @@ trait MatchFilterForLeadTrait
                                 $filterVal[$key] = $regions[$value];
                             }
                         }
-                    }
-                    break;
-                case 'select':
-                    if (!is_array($filterVal)) {
-                        $filterVal = explode('|', $filterVal);
                     }
                     break;
             }
@@ -199,6 +201,8 @@ trait MatchFilterForLeadTrait
                 case 'contains':
                     $groups[$groupNum] = str_contains((string) $leadVal, (string) $filterVal);
                     break;
+                default:
+                    throw new OperatorsNotFoundException('Operator is not defined or invalid operator found.');
             }
         }
 

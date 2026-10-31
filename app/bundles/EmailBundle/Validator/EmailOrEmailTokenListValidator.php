@@ -18,11 +18,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 final class EmailOrEmailTokenListValidator extends ConstraintValidator
 {
-    private ArrayStringTransformer $transformer;
+    private readonly ArrayStringTransformer $transformer;
 
     public function __construct(
-        private EmailValidator $emailValidator,
-        private CustomFieldValidator $customFieldValidator,
+        private readonly EmailValidator $emailValidator,
+        private readonly CustomFieldValidator $customFieldValidator,
     ) {
         $this->transformer = new ArrayStringTransformer();
     }
@@ -41,9 +41,13 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
             throw new UnexpectedTypeException($csv, 'string');
         }
 
+        $values = $constraint->allowMultiple
+            ? $this->transformer->reverseTransform($csv)
+            : [trim($csv)];
+
         array_map(
             $this->makeEmailOrEmailTokenValidator(),
-            $this->transformer->reverseTransform($csv)
+            $values
         );
     }
 

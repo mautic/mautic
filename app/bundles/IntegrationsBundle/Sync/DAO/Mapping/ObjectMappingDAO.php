@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
-class ObjectMappingDAO
+final class ObjectMappingDAO
 {
     public const SYNC_TO_MAUTIC       = 'mautic';
 
@@ -22,8 +22,8 @@ class ObjectMappingDAO
     private array $fieldMappings = [];
 
     public function __construct(
-        private string $internalObjectName,
-        private string $integrationObjectName,
+        private readonly string $internalObjectName,
+        private readonly string $integrationObjectName,
     ) {
     }
 

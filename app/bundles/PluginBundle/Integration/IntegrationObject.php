@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\PluginBundle\Integration;
 
-class IntegrationObject
+final class IntegrationObject
 {
     /**
      * @param string $type

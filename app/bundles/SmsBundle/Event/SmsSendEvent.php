@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -37,18 +39,12 @@ class SmsSendEvent extends CommonEvent
         $this->content = $content;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function setLead($lead): void
+    public function setLead(Lead $lead): void
     {
         $this->lead = $lead;
     }

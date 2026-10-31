@@ -19,6 +19,7 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\CategoryBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->alias('mautic.category.repository.category', Mautic\CategoryBundle\Entity\CategoryRepository::class);
     $services->alias('mautic.category.model.category', Mautic\CategoryBundle\Model\CategoryModel::class);
     $services->alias('mautic.category.model.contact.action', Mautic\CategoryBundle\Model\ContactActionModel::class);
 };
