@@ -200,6 +200,7 @@ $container->loadFromExtension('doctrine', [
             ]),
         ],
         'types'    => [
+            Type\UTCDateTimeMicrosecondType::NAME => Type\UTCDateTimeMicrosecondType::class,
             Types::ARRAY                  => Type\ArrayType::class,
             Types::DATETIME_MUTABLE       => Type\UTCDateTimeType::class,
             Types::DATETIME_IMMUTABLE     => Type\UTCDateTimeImmutableType::class,
