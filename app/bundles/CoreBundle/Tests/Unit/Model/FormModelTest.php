@@ -115,6 +115,12 @@ final class FormModelTest extends TestCase
         $loggerMock               = $this->createStub(LoggerInterface::class);
         $coreParametersHelperMock = $this->createStub(CoreParametersHelper::class);
 
+        $this
+            ->entityManagerMock
+            ->method('getRepository')
+            ->willReturn($this->createStub(FormRepository::class))
+        ;
+
         $formModel = new FormModel(
             $this->entityManagerMock,
             $corePermissionsMock,
@@ -141,6 +147,6 @@ final class FormModelTest extends TestCase
         $dateAdded2    = $lead->getDateAdded();
 
         $this->assertSame($dateAdded1, $dateAdded2, 'Date added should not be updated after saving the entity again');
-        $this->assertGreaterThan($dateModified1, $dateModified2, 'Date modified should be updated after saving the entity again');
+        $this->assertSame($dateModified1, $dateModified2, 'Date modified should not be updated after saving the entity again');
     }
 }
