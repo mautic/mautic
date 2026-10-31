@@ -107,15 +107,23 @@ final class FormModelTest extends TestCase
 
     public function testSaveEntityToCheckDateAddedAndDateModified(): void
     {
+        $corePermissionsMock      = $this->createStub(CorePermissions::class);
+        $dispatcherMock           = $this->createStub(EventDispatcherInterface::class);
+        $routerMock               = $this->createStub(UrlGeneratorInterface::class);
+        $translatorMock           = $this->createStub(Translator::class);
+        $userHelperMock           = $this->createMock(UserHelper::class);
+        $loggerMock               = $this->createStub(LoggerInterface::class);
+        $coreParametersHelperMock = $this->createStub(CoreParametersHelper::class);
+
         $formModel = new FormModel(
             $this->entityManagerMock,
-            $this->corePermissionsMock,
-            $this->dispatcherMock,
-            $this->routerMock,
-            $this->translatorMock,
-            $this->userHelperMock,
-            $this->loggerMock,
-            $this->coreParametersHelperMock,
+            $corePermissionsMock,
+            $dispatcherMock,
+            $routerMock,
+            $translatorMock,
+            $userHelperMock,
+            $loggerMock,
+            $coreParametersHelperMock,
         );
 
         // Step 1: Create a new entity and save it
