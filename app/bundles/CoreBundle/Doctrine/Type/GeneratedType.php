@@ -10,7 +10,7 @@ use Doctrine\DBAL\Types\Type;
 /**
  * Type that creates a read-only generated (virtual) column.
  */
-class GeneratedType extends Type
+final class GeneratedType extends Type
 {
     /**
      * @var string

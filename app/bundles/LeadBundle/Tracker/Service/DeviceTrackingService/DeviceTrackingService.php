@@ -16,12 +16,12 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
     private ?LeadDevice $trackedDevice = null;
 
     public function __construct(
-        private CookieHelper $cookieHelper,
-        private EntityManagerInterface $entityManager,
-        private LeadDeviceRepository $leadDeviceRepository,
-        private RandomHelperInterface $randomHelper,
-        private RequestStack $requestStack,
-        private CorePermissions $security,
+        private readonly CookieHelper $cookieHelper,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly LeadDeviceRepository $leadDeviceRepository,
+        private readonly RandomHelperInterface $randomHelper,
+        private readonly RequestStack $requestStack,
+        private readonly CorePermissions $security,
     ) {
     }
 
@@ -90,6 +90,11 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
         $this->cookieHelper->deleteCookie('mtc_id');
     }
 
+    public function reset(): void
+    {
+        $this->trackedDevice = null;
+    }
+
     private function getTrackedIdentifier(): ?string
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -103,9 +108,9 @@ final class DeviceTrackingService implements DeviceTrackingServiceInterface
             return $this->trackedDevice->getTrackingId();
         }
 
-        $deviceTrackingId = $this->cookieHelper->getCookie('mautic_device_id', null);
+        $deviceTrackingId = $this->cookieHelper->getCookie('mautic_device_id');
         if (null === $deviceTrackingId) {
-            $deviceTrackingId = $request->get('mautic_device_id', null);
+            $deviceTrackingId = $request->get('mautic_device_id');
         }
 
         return $deviceTrackingId;

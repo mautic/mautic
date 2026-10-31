@@ -6,6 +6,8 @@ namespace Mautic\CoreBundle\Tests\Functional;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Entity\LeadEventLog as CampaignLeadEventLog;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Company;
@@ -65,7 +67,7 @@ trait CreateTestEntitiesTrait
         $event->setTriggerInterval(1);
         $event->setTriggerMode('immediate');
 
-        if ($properties) {
+        if ([] !== $properties) {
             $event->setProperties($properties);
         }
 
@@ -177,6 +179,16 @@ trait CreateTestEntitiesTrait
         return $companyLead;
     }
 
+    private function addContactToCampaign(Lead $contact, Campaign $campaign, bool $manuallyRemoved = false): void
+    {
+        $campaignLead = new CampaignLead();
+        $campaignLead->setCampaign($campaign);
+        $campaignLead->setLead($contact);
+        $campaignLead->setDateAdded(new \DateTime());
+        $campaignLead->setManuallyRemoved($manuallyRemoved);
+        $this->em->persist($campaignLead);
+    }
+
     private function createProject(string $name): Project
     {
         $project = new Project();
@@ -185,5 +197,19 @@ trait CreateTestEntitiesTrait
         $this->em->persist($project);
 
         return $project;
+    }
+
+    private function createCampaignLeadEventLog(Lead $lead, Event $event, ?Campaign $campaign, int $rotation = 1, bool $isScheduled =  false): CampaignLeadEventLog
+    {
+        $campaignLeadEventLog = new CampaignLeadEventLog();
+        $campaignLeadEventLog->setLead($lead);
+        $campaignLeadEventLog->setEvent($event);
+        $campaignLeadEventLog->setCampaign($campaign);
+        $campaignLeadEventLog->setRotation($rotation);
+        $campaignLeadEventLog->setIsScheduled($isScheduled);
+
+        $this->em->persist($campaignLeadEventLog);
+
+        return $campaignLeadEventLog;
     }
 }

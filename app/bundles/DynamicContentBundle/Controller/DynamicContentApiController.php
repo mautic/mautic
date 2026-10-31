@@ -11,13 +11,20 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Contracts\Service\Attribute\Required;
 
-class DynamicContentApiController extends CommonController
+final class DynamicContentApiController extends CommonController
 {
-    /**
-     * @return mixed
-     */
-    public function processAction(Request $request, $objectAlias)
+    private PageModel $pageModel;
+
+    #[Required]
+    public function autowireDynamicContentApiController(
+        PageModel $pageModel,
+    ): void {
+        $this->pageModel = $pageModel;
+    }
+
+    public function processAction(Request $request, $objectAlias): Response
     {
         // Don't store a visitor with this request
         defined('MAUTIC_NON_TRACKABLE_REQUEST') || define('MAUTIC_NON_TRACKABLE_REQUEST', 1);
@@ -25,16 +32,15 @@ class DynamicContentApiController extends CommonController
         $method = strtolower($request->getMethod());
         if (method_exists($this, $method.'Action')) {
             return $this->forwardWithPost(
-                static::class.'::'.$method.'Action',
+                self::class.'::'.$method.'Action',
                 $request->request->all(),
                 [
                     'objectAlias' => $objectAlias,
                 ],
                 $request->query->all()
             );
-        } else {
-            throw new HttpException(Response::HTTP_FORBIDDEN, 'This endpoint is not able to process '.strtoupper($method).' requests.');
         }
+        throw new HttpException(Response::HTTP_FORBIDDEN, 'This endpoint is not able to process '.strtoupper($method).' requests.');
     }
 
     public function getAction(
@@ -42,12 +48,9 @@ class DynamicContentApiController extends CommonController
         DynamicContentHelper $helper,
         DeviceTrackingServiceInterface $deviceTrackingService,
         ContactRequestHelper $contactRequestHelper,
-        $objectAlias,
+        string $objectAlias,
     ): Response {
-        /** @var PageModel $pageModel */
-        $pageModel = $this->getModel('page');
-
-        $lead          = $contactRequestHelper->getContactFromQuery($pageModel->getHitQuery($request));
+        $lead          = $contactRequestHelper->getContactFromQuery($this->pageModel->getHitQuery($request));
         $content       = $helper->getDynamicContentForLead($objectAlias, $lead);
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
         $deviceId      = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());

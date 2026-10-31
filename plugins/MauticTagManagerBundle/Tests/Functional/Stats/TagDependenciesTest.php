@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\ReportBundle\Entity\Report;
-use Symfony\Component\HttpFoundation\Response;
 
 final class TagDependenciesTest extends MauticMysqlTestCase
 {
@@ -30,8 +29,8 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
-        $searchIds      = join(',', [$campaign->getId(), $campaign2->getId()]);
-        $this->assertStringContainsString("href=\"/s/campaigns?search=ids:{$searchIds}\"", $content);
+        $searchIds      = implode(',', [$campaign->getId(), $campaign2->getId()]);
+        $this->assertStringContainsString("href=\"/s/campaigns?search=ids:{$searchIds}\"", (string) $content);
     }
 
     public function testTagUsageInSegments(): void
@@ -58,8 +57,8 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
-        $searchIds      = join(',', [$segmentWithTag->getId()]);
-        $this->assertStringContainsString("href=\"/s/segments?search=ids:{$searchIds}\"", $content);
+        $searchIds      = implode(',', [$segmentWithTag->getId()]);
+        $this->assertStringContainsString("href=\"/s/segments?search=ids:{$searchIds}\"", (string) $content);
     }
 
     public function testTagUsageInForms(): void
@@ -72,8 +71,8 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
-        $searchIds      = join(',', [$form->getId()]);
-        $this->assertStringContainsString("href=\"/s/forms?search=ids:{$searchIds}\"", $content);
+        $searchIds      = implode(',', [$form->getId()]);
+        $this->assertStringContainsString("href=\"/s/forms?search=ids:{$searchIds}\"", (string) $content);
     }
 
     public function testTagUsageInPointTriggers(): void
@@ -85,8 +84,8 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
-        $searchIds      = join(',', [$pointActionIsSent->getId()]);
-        $this->assertStringContainsString("href=\"/s/points/triggers?search=ids:{$searchIds}\"", $content);
+        $searchIds      = implode(',', [$pointActionIsSent->getId()]);
+        $this->assertStringContainsString("href=\"/s/points/triggers?search=ids:{$searchIds}\"", (string) $content);
     }
 
     public function testTagUsageInReports(): void
@@ -96,8 +95,8 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
         $clientResponse = $this->client->getResponse();
         $content        = $clientResponse->getContent();
-        $searchIds      = join(',', [$report->getId()]);
-        $this->assertStringContainsString("href=\"/s/reports?search=ids:{$searchIds}\"", $content);
+        $searchIds      = implode(',', [$report->getId()]);
+        $this->assertStringContainsString("href=\"/s/reports?search=ids:{$searchIds}\"", (string) $content);
     }
 
     public function testTagUsageInReportsEmpty(): void
@@ -105,9 +104,7 @@ final class TagDependenciesTest extends MauticMysqlTestCase
         $tag         = $this->createTag('TagA');
         $this->createReportWithTagEmpty();
         $this->client->request('GET', "/s/tags/view/{$tag->getId()}");
-        $clientResponse = $this->client->getResponse();
-        // check that the page loads without errors
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertResponseIsSuccessful();
     }
 
     private function createTag(string $tagName): Tag

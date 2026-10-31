@@ -6,28 +6,43 @@ use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberFormat;
 use libphonenumber\PhoneNumberUtil;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\SmsBundle\Sms\MMSTransportInterface;
 use Mautic\SmsBundle\Sms\TransportInterface;
 use Psr\Log\LoggerInterface;
 use Twilio\Exceptions\ConfigurationException;
 use Twilio\Exceptions\TwilioException;
 use Twilio\Rest\Client;
 
-class TwilioTransport implements TransportInterface
+class TwilioTransport implements TransportInterface, MMSTransportInterface
 {
     private ?Client $client = null;
 
     public function __construct(
-        private Configuration $configuration,
-        private LoggerInterface $logger,
+        private readonly Configuration $configuration,
+        private readonly LoggerInterface $logger,
     ) {
     }
 
     /**
      * @param string $content
-     *
-     * @return bool|string
      */
-    public function sendSms(Lead $lead, $content)
+    public function sendSms(Lead $lead, $content): bool|string
+    {
+        return $this->sendMessage($lead, $content);
+    }
+
+    /**
+     * @param array<mixed> $media
+     */
+    public function sendMms(Lead $lead, string $content, array $media): bool|string
+    {
+        return $this->sendMessage($lead, $content, $media);
+    }
+
+    /**
+     * @param array<mixed> $media
+     */
+    private function sendMessage(Lead $lead, string $content, array $media = []): bool|string
     {
         $number = $lead->getLeadPhoneNumber();
 
@@ -41,7 +56,7 @@ class TwilioTransport implements TransportInterface
 
             $this->client->messages->create(
                 $this->sanitizeNumber($number),
-                $this->createPayload($messagingServiceSid, $content)
+                $this->createPayload($messagingServiceSid, $content, $media)
             );
 
             return true;
@@ -86,14 +101,22 @@ class TwilioTransport implements TransportInterface
     }
 
     /**
+     * @param mixed[] $media
+     *
      * @return mixed[]
      */
-    private function createPayload(string $messagingServiceSid, string $content): array
+    private function createPayload(string $messagingServiceSid, string $content, array $media): array
     {
-        return [
+        $payload = [
             'messagingServiceSid' => $messagingServiceSid,
             'body'                => $content,
         ];
+
+        if ([] !== $media) {
+            $payload['mediaUrl'] = $media;
+        }
+
+        return $payload;
     }
 
     /**

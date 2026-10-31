@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -60,7 +62,7 @@ class PushID
     }
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -69,10 +71,8 @@ class PushID
 
     /**
      * @param int $id
-     *
-     * @return $this
      */
-    public function setId($id)
+    public function setId($id): static
     {
         $this->id = $id;
 
@@ -80,17 +80,14 @@ class PushID
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @return $this
-     */
-    public function setLead(Lead $lead)
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 
@@ -98,7 +95,7 @@ class PushID
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getPushID()
     {
@@ -107,10 +104,8 @@ class PushID
 
     /**
      * @param string $pushID
-     *
-     * @return $this
      */
-    public function setPushID($pushID)
+    public function setPushID($pushID): static
     {
         $this->pushID = $pushID;
 
@@ -118,17 +113,14 @@ class PushID
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function isEnabled()
     {
         return $this->enabled;
     }
 
-    /**
-     * @return $this
-     */
-    public function setEnabled($enabled)
+    public function setEnabled($enabled): static
     {
         $this->enabled = $enabled;
 
@@ -136,7 +128,7 @@ class PushID
     }
 
     /**
-     * @return bool
+     * @return bool|null
      */
     public function isMobile()
     {
@@ -145,10 +137,8 @@ class PushID
 
     /**
      * @param bool $mobile
-     *
-     * @return $this
      */
-    public function setMobile($mobile)
+    public function setMobile($mobile): static
     {
         $this->mobile = $mobile;
 

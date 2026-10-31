@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'routes' => [
         'main' => [
@@ -10,6 +12,15 @@ return [
             'mautic_project_action' => [
                 'path'       => '/projects/{objectAction}/{objectId}',
                 'controller' => 'Mautic\ProjectBundle\Controller\ProjectController::executeAction',
+            ],
+        ],
+        'api' => [
+            'mautic_api_projectsstandard' => [
+                'standard_entity' => true,
+                'name'            => 'projects',
+                'path'            => '/projects',
+                'controller'      => Mautic\ProjectBundle\Controller\Api\ProjectApiController::class,
+                'methods'         => 'GET',
             ],
         ],
     ],

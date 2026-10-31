@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Adapter;
 
 use Mautic\ReportBundle\Crate\ReportDataResult;
@@ -10,7 +12,7 @@ use Mautic\ReportBundle\Model\ReportModel;
 class ReportDataAdapter
 {
     public function __construct(
-        private ReportModel $reportModel,
+        private readonly ReportModel $reportModel,
     ) {
     }
 

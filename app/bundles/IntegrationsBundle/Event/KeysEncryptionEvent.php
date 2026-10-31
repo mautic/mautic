@@ -7,10 +7,10 @@ namespace Mautic\IntegrationsBundle\Event;
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class KeysEncryptionEvent extends Event
+final class KeysEncryptionEvent extends Event
 {
     public function __construct(
-        private Integration $integrationConfiguration,
+        private readonly Integration $integrationConfiguration,
         private array $keys,
     ) {
     }

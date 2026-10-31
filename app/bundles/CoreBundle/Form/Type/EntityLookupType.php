@@ -20,7 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class EntityLookupType extends AbstractType
+final class EntityLookupType extends AbstractType
 {
     /**
      * @var EntityLookupChoiceLoader[]
@@ -31,10 +31,10 @@ class EntityLookupType extends AbstractType
      * @param ModelFactory<object> $modelFactory
      */
     public function __construct(
-        private ModelFactory $modelFactory,
-        private TranslatorInterface $translator,
-        private Connection $connection,
-        private RouterInterface $router,
+        private readonly ModelFactory $modelFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly Connection $connection,
+        private readonly RouterInterface $router,
     ) {
     }
 
@@ -71,7 +71,7 @@ class EntityLookupType extends AbstractType
                 'force_popup'            => false,
                 'entity_label_column'    => 'name',
                 'entity_id_column'       => 'id',
-                'choice_loader'          => function (Options $options) {
+                'choice_loader'          => function (Options $options): EntityLookupChoiceLoader {
                     // This class is defined as a service therefore the choice loader has to be unique per field that inherits this class as a parent
                     // if you have multiple lookup fields with same type then use different - 2 'key' for all fields
                     $model                       = $this->getModelName($options);
@@ -93,7 +93,7 @@ class EntityLookupType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }
@@ -128,7 +128,7 @@ class EntityLookupType extends AbstractType
     /**
      * @param Options<mixed[]>|array<mixed> $options
      */
-    private function getModelName($options): string
+    private function getModelName(array|Options $options): string
     {
         $key = $options['model_key'] ?? null;
         if (!$key) {

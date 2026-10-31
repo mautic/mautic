@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -20,15 +20,13 @@ class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.asset.config.form.upload.dir',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.asset.config.form.upload.dir.tooltip',
                 ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.core.value.required',
-                    ]),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
             ]
         );
@@ -38,15 +36,13 @@ class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.asset.config.form.max.size',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.asset.config.form.max.size.tooltip',
                 ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.core.value.required',
-                    ]),
+                    new NotBlank(message: 'mautic.core.value.required'),
                 ],
             ]
         );
@@ -58,7 +54,7 @@ class ConfigType extends AbstractType
                 TextType::class,
                 [
                     'label'      => 'mautic.asset.config.form.allowed.extensions',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.asset.config.form.allowed.extensions.tooltip',

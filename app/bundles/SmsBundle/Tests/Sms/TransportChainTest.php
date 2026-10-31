@@ -1,39 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Tests\Sms;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\SmsBundle\Collection\RecipientCollection;
+use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
 use Mautic\SmsBundle\Integration\Twilio\TwilioTransport;
+use Mautic\SmsBundle\Sms\BulkTransportInterface;
+use Mautic\SmsBundle\Sms\MMSTransportInterface;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\Sms\TransportInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 
-class TransportChainTest extends MauticMysqlTestCase
+final class TransportChainTest extends MauticMysqlTestCase
 {
     private TransportChain $transportChain;
 
-    /**
-     * @var TransportInterface|MockObject
-     */
-    private MockObject $twilioTransport;
+    private MockObject&TransportInterface $twilioTransport;
 
     /**
      * Call protected/private method of a class.
      *
-     * @param object &$object    Instantiated object that we will run method on
-     * @param string $methodName Method name to call
-     * @param array  $parameters array of parameters to pass into method
+     * @param object            $object     Instantiated object that we will run method on
+     * @param string            $methodName Method name to call
+     * @param array<int, mixed> $parameters array of parameters to pass into method
      *
      * @return mixed method return
      *
      * @throws \ReflectionException
      */
-    public function invokeMethod(&$object, $methodName, array $parameters = [])
+    public function invokeMethod(object $object, string $methodName, array $parameters = []): mixed
     {
         $reflection = new \ReflectionClass($object::class);
         $method     = $reflection->getMethod($methodName);
-        $method->setAccessible(true);
 
         return $method->invokeArgs($object, $parameters);
     }
@@ -44,7 +48,7 @@ class TransportChainTest extends MauticMysqlTestCase
 
         $this->transportChain = new TransportChain(
             'mautic.test.twilio.mock',
-            static::getContainer()->get('mautic.helper.integration')
+            self::getContainer()->get(IntegrationHelper::class)
         );
 
         $this->twilioTransport = $this->createMock(TwilioTransport::class);
@@ -58,7 +62,7 @@ class TransportChainTest extends MauticMysqlTestCase
     {
         $count = count($this->transportChain->getTransports());
 
-        $this->transportChain->addTransport('mautic.transport.test', static::getContainer()->get('mautic.sms.twilio.transport'), 'mautic.transport.test', 'Twilio');
+        $this->transportChain->addTransport('mautic.transport.test', self::getContainer()->get(TwilioTransport::class), 'mautic.transport.test', 'Twilio');
 
         $this->assertCount($count + 1, $this->transportChain->getTransports());
     }
@@ -76,7 +80,84 @@ class TransportChainTest extends MauticMysqlTestCase
             $this->transportChain->sendSms($lead, 'Yeah');
         } catch (\Exception $e) {
             $message = $e->getMessage();
-            $this->assertEquals('Primary SMS transport is not enabled', $message);
+            $this->assertSame('Primary SMS transport is not enabled', $message);
         }
+    }
+
+    public function testSendBatchSms(): void
+    {
+        $bulkSmsTransport = new class() implements BulkTransportInterface {
+            public function sendBatchSms(RecipientCollection $collection, string $content): RecipientCollection
+            {
+                foreach ($collection as &$recipient) {
+                    $recipient->setResult(true);
+                }
+
+                return $collection;
+            }
+
+            public function sendSms(Lead $lead, $content): bool
+            {
+                return true;
+            }
+        };
+        $this->createDataAndAssertSendMessage($bulkSmsTransport);
+    }
+
+    public function testSendMessage(): void
+    {
+        $mmsTransport = new class() implements TransportInterface, MMSTransportInterface {
+            public function sendMms(Lead $lead, string $content, array $media): bool
+            {
+                return true;
+            }
+
+            public function sendSms(Lead $lead, $content): bool
+            {
+                return true;
+            }
+        };
+        $this->createDataAndAssertSendMessage($mmsTransport);
+    }
+
+    private function createDataAndAssertSendMessage(TransportInterface $transport): void
+    {
+        $transportChain = new class('mautic.test.bulktwilio.mock', self::getContainer()->get(IntegrationHelper::class)) extends TransportChain {
+            public function getEnabledTransports(): array
+            {
+                $transports = $this->getTransports();
+
+                return array_map(fn (array $v): TransportInterface => $v['service'], $transports);
+            }
+        };
+
+        $transportChain->addTransport('mautic.test.bulktwilio.mock', $transport, 'mautic.test.bulktwilio.mock', 'BulkTwilio');
+
+        $lead1 = new Lead();
+        $lead1->setMobile('+123456789');
+        $lead1->setId(1);
+
+        $lead2 = new Lead();
+        $lead2->setMobile('+123456790');
+        $lead2->setId(2);
+
+        $recipientCollection = new RecipientCollection(new Sms());
+        $recipientCollection->append(new SmsRecipientDTO($lead1, [], 'Yeah'));
+        $recipientCollection->append(new SmsRecipientDTO($lead2, [], 'Yeah'));
+
+        if ($transport instanceof MMSTransportInterface) {
+            $recipientCollection = $transportChain->sendMMS($recipientCollection, ['test.png']);
+        } elseif ($transport instanceof BulkTransportInterface) {
+            $recipientCollection = $transportChain->sendBatchSms($recipientCollection, 'Yeah');
+        }
+
+        $sentCount = 0;
+        foreach ($recipientCollection as $recipient) {
+            if ($recipient->getResult()) {
+                ++$sentCount;
+            }
+        }
+
+        $this->assertSame(2, $sentCount);
     }
 }

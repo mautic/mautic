@@ -3,11 +3,12 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class EnvironmentSubscriber implements EventSubscriberInterface
+final readonly class EnvironmentSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
@@ -35,8 +36,9 @@ class EnvironmentSubscriber implements EventSubscriberInterface
         }
 
         // Set date/time
-        date_default_timezone_set($request->getSession()->get('_timezone',
-            $this->coreParametersHelper->getDefaultTimezone()));
+        $timezone = $request->getSession()->get('_timezone', $this->coreParametersHelper->getDefaultTimezone());
+        date_default_timezone_set($timezone);
+        DateTimeHelper::setLocalTimezone($timezone);
     }
 
     /**

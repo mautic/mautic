@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
-use Symfony\Component\HttpFoundation\Response;
 
-class AbstractFormControllerTest extends MauticMysqlTestCase
+final class AbstractFormControllerTest extends MauticMysqlTestCase
 {
     public function testUnlockActionWithValidReturnUrl(): void
     {
@@ -18,7 +16,7 @@ class AbstractFormControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             'GET',
-            "/s/action/unlock/$objectModel/$objectId",
+            "/s/action/unlock/{$objectModel}/{$objectId}",
             [
                 'returnUrl' => urlencode($returnUrl),
                 'name'      => 'test',
@@ -28,8 +26,8 @@ class AbstractFormControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $payload        = $clientResponse->getContent();
 
-        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertStringContainsString("Forms\n</h1>", $payload);
+        self::assertResponseIsSuccessful();
+        $this->assertStringContainsString("Forms\n</h1>", (string) $payload);
     }
 
     public function testUnlockActionWithInvalidReturnUrl(): void
@@ -40,7 +38,7 @@ class AbstractFormControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             'GET',
-            "/s/action/unlock/$objectModel/$objectId",
+            "/s/action/unlock/{$objectModel}/{$objectId}",
             [
                 'returnUrl' => $invalidReturnUrl,
                 'name'      => 'test',
@@ -50,8 +48,8 @@ class AbstractFormControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $payload  = $response->getContent();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertStringContainsString('Dashboard</h1>', $payload);
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Dashboard</h1>', (string) $payload);
     }
 
     public function testUnlockActionWithDifferentHostReturnUrl(): void
@@ -62,7 +60,7 @@ class AbstractFormControllerTest extends MauticMysqlTestCase
 
         $this->client->request(
             'GET',
-            "/s/action/unlock/$objectModel/$objectId",
+            "/s/action/unlock/{$objectModel}/{$objectId}",
             [
                 'returnUrl' => urlencode($returnUrl),
                 'name'      => 'test',
@@ -72,7 +70,7 @@ class AbstractFormControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         $payload  = $response->getContent();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
-        $this->assertStringContainsString('Dashboard</h1>', $payload);
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('Dashboard</h1>', (string) $payload);
     }
 }

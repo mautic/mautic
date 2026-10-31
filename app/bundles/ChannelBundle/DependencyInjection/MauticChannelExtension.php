@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
-class MauticChannelExtension extends Extension
+final class MauticChannelExtension extends Extension
 {
     /**
      * @param mixed[] $configs

@@ -6,38 +6,29 @@ use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Progress
+final class Progress
 {
     /**
      * Total number of items representing 100%.
-     *
-     * @var int
      */
-    protected $total = 0;
+    private int $total = 0;
 
     /**
      * Currently proccessed items.
-     *
-     * @var int
      */
-    protected $done = 0;
+    private int $done = 0;
 
-    /**
-     * @var ProgressBar|null
-     */
-    protected $bar;
+    private ?ProgressBar $bar = null;
 
     public function __construct(
-        protected ?OutputInterface $output = null,
+        private readonly ?OutputInterface $output = null,
     ) {
     }
 
     /**
      * Returns count of all items.
-     *
-     * @return int
      */
-    public function getTotal()
+    public function getTotal(): int
     {
         return $this->total;
     }
@@ -46,10 +37,8 @@ class Progress
      * Set total value.
      *
      * @param int $total
-     *
-     * @return Progress
      */
-    public function setTotal($total)
+    public function setTotal($total): static
     {
         $this->total = (int) $total;
 
@@ -63,20 +52,16 @@ class Progress
 
     /**
      * Returns count of processed items.
-     *
-     * @return int
      */
-    public function getDone()
+    public function getDone(): int
     {
         return $this->done;
     }
 
     /**
      * Set total value.
-     *
-     * @return Progress
      */
-    public function setDone($done)
+    public function setDone($done): static
     {
         $this->done = (int) $done;
 
@@ -94,10 +79,8 @@ class Progress
 
     /**
      * Increase done count by 1.
-     *
-     * @return Progress
      */
-    public function increase()
+    public function increase(): static
     {
         $this->setDone($this->done + 1);
 
@@ -114,10 +97,8 @@ class Progress
 
     /**
      * Bind Progress from simple array.
-     *
-     * @return Progress
      */
-    public function bindArray(array $progress)
+    public function bindArray(array $progress): static
     {
         if (isset($progress[0])) {
             $this->setDone($progress[0]);
@@ -146,7 +127,7 @@ class Progress
      *
      * @return int
      */
-    public function toPercent()
+    public function toPercent(): float|int
     {
         return ($this->total) ? ceil(($this->done / $this->total) * 100) : 100;
     }

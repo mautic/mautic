@@ -15,7 +15,7 @@ use Doctrine\ORM\Tools\Pagination\CountWalker;
  *
  * @implements \IteratorAggregate<mixed>
  */
-class SimplePaginator implements \IteratorAggregate, \Countable
+final class SimplePaginator implements \IteratorAggregate, \Countable
 {
     private ?int $count = null;
 
@@ -23,7 +23,7 @@ class SimplePaginator implements \IteratorAggregate, \Countable
      * @param Query<T> $query a Doctrine ORM query or query builder
      */
     public function __construct(
-        private Query $query,
+        private readonly Query $query,
     ) {
     }
 

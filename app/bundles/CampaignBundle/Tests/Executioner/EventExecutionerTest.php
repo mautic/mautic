@@ -24,69 +24,51 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
+use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Form\Type\PointActionType;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
-class EventExecutionerTest extends \PHPUnit\Framework\TestCase
+final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventCollector&MockObject
+     * @var MockObject&EventCollector
      */
     private MockObject $eventCollector;
 
     /**
-     * @var EventLogger&MockObject
+     * @var MockObject&EventLogger
      */
     private MockObject $eventLogger;
 
     /**
-     * @var ActionExecutioner&MockObject
+     * @var MockObject&ActionExecutioner
      */
     private MockObject $actionExecutioner;
 
     /**
-     * @var ConditionExecutioner&MockObject
-     */
-    private MockObject $conditionExecutioner;
-
-    /**
-     * @var DecisionExecutioner&MockObject
-     */
-    private MockObject $decisionExecutioner;
-
-    /**
-     * @var LoggerInterface&MockObject
-     */
-    private MockObject $logger;
-
-    /**
-     * @var EventScheduler&MockObject
+     * @var MockObject&EventScheduler
      */
     private MockObject $eventScheduler;
 
     /**
-     * @var RemovedContactTracker&MockObject
-     */
-    private MockObject $removedContactTracker;
-
-    /**
-     * @var LeadRepository&MockObject
+     * @var MockObject&LeadRepository
      */
     private MockObject $leadRepository;
 
     /**
-     * @var EventRepository&MockObject
+     * @var MockObject&EventRepository
      */
     private MockObject $eventRepository;
 
     /**
-     * @var Translator&MockObject
+     * @var OptimisticLockServiceInterface&MockObject
      */
-    private MockObject $translator;
+    private MockObject $optimisticLockService;
 
     protected function setUp(): void
     {
@@ -95,14 +77,10 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->eventLogger->method('persistCollection')
             ->willReturn($this->eventLogger);
         $this->actionExecutioner     = $this->createMock(ActionExecutioner::class);
-        $this->conditionExecutioner  = $this->createMock(ConditionExecutioner::class);
-        $this->decisionExecutioner   = $this->createMock(DecisionExecutioner::class);
-        $this->logger                = $this->createMock(LoggerInterface::class);
         $this->eventScheduler        = $this->createMock(EventScheduler::class);
-        $this->removedContactTracker = $this->createMock(RemovedContactTracker::class);
         $this->leadRepository        = $this->createMock(LeadRepository::class);
         $this->eventRepository       = $this->createMock(EventRepository::class);
-        $this->translator            = $this->createMock(Translator::class);
+        $this->optimisticLockService = $this->createMock(OptimisticLockServiceInterface::class);
     }
 
     public function testJumpToEventsAreProcessedAfterOtherEvents(): void
@@ -152,7 +130,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->eventCollector->method('getEventConfig')
             ->willReturnCallback(
-                function (Event $event) use ($jumpConfig, $otherConfig) {
+                function (Event $event) use ($jumpConfig, $otherConfig): ActionAccessor {
                     if (CampaignActionJumpToEventSubscriber::EVENT_NAME === $event->getType()) {
                         return $jumpConfig;
                     }
@@ -168,7 +146,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->eventLogger->expects($this->exactly(2))
             ->method('fetchRotationAndGenerateLogsFromContacts')
             ->willReturnCallback(
-                function (Event $event, ActionAccessor $config, ArrayCollection $contacts, $isInactiveEntry) {
+                function (Event $event, ActionAccessor $config, ArrayCollection $contacts, $isInactiveEntry): ArrayCollection {
                     $logs = new ArrayCollection();
                     foreach ($contacts as $contact) {
                         $log = new LeadEventLog();
@@ -184,7 +162,7 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $this->actionExecutioner->expects($matcher)
-            ->method('execute')->willReturnCallback(function (...$parameters) use ($matcher, $otherConfig, $jumpConfig) {
+            ->method('execute')->willReturnCallback(function (...$parameters) use ($matcher, $otherConfig, $jumpConfig): EvaluatedContacts {
                 $this->assertInstanceOf(ArrayCollection::class, $parameters[1]);
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertEquals($otherConfig, $parameters[0]);
@@ -209,11 +187,12 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->eventCollector,
             $this->eventLogger,
             $this->actionExecutioner,
-            $this->conditionExecutioner,
-            $this->decisionExecutioner,
-            $this->logger,
+            $this->createStub(ConditionExecutioner::class),
+            $this->createStub(DecisionExecutioner::class),
+            $this->createStub(LoggerInterface::class),
             $this->eventScheduler,
-            $this->removedContactTracker,
+            $this->createStub(RemovedContactTracker::class),
+            $this->optimisticLockService
         );
     }
 
@@ -269,18 +248,61 @@ class EventExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->eventRepository->method('getEntities')
             ->willReturn([]);
 
-        $eventScheduler = $this->createMock(EventScheduler::class);
+        $eventScheduler = $this->createStub(EventScheduler::class);
 
         $subscriber = new CampaignActionJumpToEventSubscriber(
             $this->eventRepository,
             $this->getEventExecutioner(),
-            $this->translator,
+            $this->createStub(Translator::class),
             $this->leadRepository,
             $eventScheduler
         );
         $subscriber->onJumpToEvent($pendingEvent);
 
-        $this->assertEquals(count($pendingEvent->getSuccessful()), 1);
-        $this->assertEquals(count($pendingEvent->getFailures()), 0);
+        $this->assertCount(1, $pendingEvent->getSuccessful());
+        $this->assertCount(0, $pendingEvent->getFailures());
+    }
+
+    public function testActionExecutionHandlesExceptionAndResetsVersionForFailedLogs(): void
+    {
+        $event = $this->createMock(Event::class);
+        $event->method('getId')->willReturn(123);
+        $event->method('getEventType')->willReturn(Event::TYPE_ACTION);
+
+        $config = new ActionAccessor(
+            [
+                'label'                => 'mautic.lead.lead.events.changepoints',
+                'description'          => 'mautic.lead.lead.events.changepoints_descr',
+                'formType'             => PointActionType::class,
+            ]
+        );
+
+        $this->eventCollector->method('getEventConfig')
+            ->with($event)
+            ->willReturn($config);
+
+        $executedLog = $this->createMock(LeadEventLog::class);
+        $executedLog->method('isExecuted')->willReturn(true);
+
+        $failedLog = $this->createMock(LeadEventLog::class);
+        $failedLog->method('isExecuted')->willReturn(false);
+
+        $logs = new ArrayCollection([$executedLog, $failedLog]);
+
+        $exception = new \Exception('Test exception');
+
+        $this->actionExecutioner->expects($this->once())
+            ->method('execute')
+            ->with($config, $logs)
+            ->willThrowException($exception);
+
+        $this->optimisticLockService->expects($this->once())
+            ->method('resetVersion')
+            ->with($failedLog);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Test exception');
+
+        $this->getEventExecutioner()->executeLogs($event, $logs);
     }
 }

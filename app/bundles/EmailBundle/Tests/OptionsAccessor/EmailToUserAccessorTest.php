@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Tests\OptionsAccessor;
 
 use Mautic\EmailBundle\OptionsAccessor\EmailToUserAccessor;
 use Mautic\UserBundle\Entity\User;
 
-class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
+final class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testTransformToUserIds(): void
     {
@@ -19,7 +21,7 @@ class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
             ['id' => 6],
         ];
 
-        $this->assertEquals($expected, $emailToUserAccessor->getUserIdsToSend());
+        $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend());
     }
 
     public function testTransformToUserIdsWithOwnerEntityButNoOwnerSetting(): void
@@ -40,7 +42,7 @@ class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(5);
 
-        $this->assertEquals($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
+        $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }
 
     public function testTransformToUserIdsWithDifferentOwnerId(): void
@@ -63,7 +65,7 @@ class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(5);
 
-        $this->assertEquals($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
+        $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }
 
     public function testTransformToUserIdsWithSameOwnerId(): void
@@ -85,7 +87,7 @@ class EmailToUserAccessorTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(6);
 
-        $this->assertEquals($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
+        $this->assertSame($expected, $emailToUserAccessor->getUserIdsToSend($mockOwner));
     }
 
     public function testFormatToAddressOneEmail(): void

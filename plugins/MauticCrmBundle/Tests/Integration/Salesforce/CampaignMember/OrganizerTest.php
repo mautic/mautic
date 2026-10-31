@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration\Salesforce\CampaignMember;
 
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\CampaignMember\Organizer;
 
-class OrganizerTest extends \PHPUnit\Framework\TestCase
+final class OrganizerTest extends \PHPUnit\Framework\TestCase
 {
     public function testRecordsAreOrganizedIntoLeadsAndContacts(): void
     {
@@ -114,7 +116,7 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
         $organizer = new Organizer($records);
 
         $leads     = ['00Qf100000YjYv4EAF', '00Qf100000YjYv9EAF', '00Qf100000YjYvEEAV', '00Qf100000YjYvJEAV', '00Qf100000YjYvOEAV'];
-        $this->assertEquals($leads, $organizer->getLeadIds());
+        $this->assertSame($leads, $organizer->getLeadIds());
 
         $organizedLeads = $organizer->getLeads();
         foreach ($leads as $id) {
@@ -123,7 +125,7 @@ class OrganizerTest extends \PHPUnit\Framework\TestCase
         }
 
         $contacts  = ['00Qf100000YjYvTEAV', '00Qf100000X1NR5EAN', '00Qf100000YjYvYEAV', '00Qf100000YjYvdEAF', '00Qf100000YjYviEAF'];
-        $this->assertEquals($contacts, $organizer->getContactIds());
+        $this->assertSame($contacts, $organizer->getContactIds());
 
         $organizedContacts = $organizer->getContacts();
         foreach ($contacts as $id) {

@@ -8,47 +8,52 @@ Mautic is an open-source marketing automation platform built on **Symfony 7.4** 
 
 ## Essential Commands
 
+### Command Execution Rule
+- Prefer `ddev` wrappers for agent-run PHP, Composer, Symfony console, and PHPUnit commands in this repository.
+- Use forms like `ddev exec php bin/phpunit -c app/phpunit.xml.dist ...`, `ddev exec php bin/console ...`, and `ddev composer ...`.
+- Avoid running `php`, `composer`, `bin/console`, or `bin/phpunit` directly on the host unless the user explicitly asks for that.
+
 ### Development Setup
 ```bash
 # DDEV-based setup (recommended) - auto-installs and configures everything
 ddev start
 
 # Manual setup
-composer install
+ddev composer install
 npm ci && npm run build
-bin/console mautic:install <site-url>
+ddev exec php bin/console mautic:install <site-url>
 ```
 
 ### Testing
 ```bash
 # Run all PHPUnit tests
-composer test
+ddev composer test
 
 # Run specific test file
-bin/phpunit app/bundles/EmailBundle/Tests/Functional/EmailClickTrackingTest.php
+ddev exec php bin/phpunit -c app/phpunit.xml.dist app/bundles/EmailBundle/Tests/Functional/EmailClickTrackingTest.php
 
 # Run specific bundle tests
-bin/phpunit app/bundles/CoreBundle/Tests
+ddev exec php bin/phpunit -c app/phpunit.xml.dist app/bundles/CoreBundle/Tests
 
 # Run specific test method
-bin/phpunit --filter testGuessTimezoneFromOffset
+ddev exec php bin/phpunit -c app/phpunit.xml.dist --filter testGuessTimezoneFromOffset
 
 # E2E acceptance tests (Codeception)
-composer run e2e-test
+ddev composer run e2e-test
 ```
 
 ### Code Quality
 ```bash
-composer phpstan          # Static analysis (level 6)
-composer cs               # Check coding standards (dry-run)
-composer fixcs            # Auto-fix coding standards
-composer rector           # Run Rector refactoring (code + tests)
-bin/console lint:twig app plugins  # Lint Twig templates
+ddev composer phpstan                  # Static analysis (level 6)
+ddev composer cs                       # Check coding standards (dry-run)
+ddev composer fixcs                    # Auto-fix coding standards
+ddev composer rector                   # Run Rector refactoring (code + tests)
+ddev exec php bin/console lint:twig app plugins  # Lint Twig templates
 ```
 
 ### Asset Management
 ```bash
-composer generate-assets  # Regenerate compiled assets
+ddev composer generate-assets  # Regenerate compiled assets
 npm run build            # Build frontend with webpack
 ```
 
@@ -58,6 +63,9 @@ npm run build            # Build frontend with webpack
 Each bundle follows this pattern:
 ```
 MauticExampleBundle/
+├── Assets/           # Frontend assets (auto-discovered)
+│   ├── css/          # Bundle-specific stylesheets
+│   └── js/           # Bundle-specific JavaScript
 ├── Command/          # Console commands
 ├── Config/           # Bundle config (services in config.php)
 ├── Controller/       # Controllers (extend CommonController)
@@ -84,6 +92,10 @@ MauticExampleBundle/
 - **Unit tests**: Extend `PHPUnit\Framework\TestCase`
 - **Functional tests**: Extend `Mautic\CoreBundle\Test\MauticMysqlTestCase` (provides `$this->em`, `$this->client`, database access)
 
+## Design System
+
+Before building or changing any UI, read `DESIGN.md` in the repository root.
+
 ## Coding Standards
 
 - **PHP 8.2+** with strict types, PSR-12/Symfony style
@@ -103,12 +115,12 @@ MauticExampleBundle/
 
 Before submitting PRs, run:
 ```bash
-composer test      # PHPUnit tests pass
-composer phpstan   # Static analysis passes
-composer cs        # Coding standards check
+ddev composer test      # PHPUnit tests pass
+ddev composer phpstan   # Static analysis passes
+ddev composer cs        # Coding standards check
 ```
 
-For UI changes, also run `composer run e2e-test`.
+For UI changes, also run `ddev composer run e2e-test`.
 
 ## Configuration
 
@@ -116,3 +128,11 @@ For UI changes, also run `composer run e2e-test`.
 - Environment configs: `app/config/config_*.php`
 - Test environment: `APP_ENV=test`
 - DDEV auto-generates `config/local.php` from `.ddev/local.config.php.dist`
+
+## Agent Skills
+
+Deeper, task-specific guidance lives in `.agents/skills/`, the directory Codex, Cursor, Gemini CLI and Copilot scan. Each skill also has a symlink in `.claude/skills/` pointing to it, for Claude Code. Each skill is a `SKILL.md` with optional `references/`, following the [Agent Skills](https://agentskills.io) format, and is loaded on demand by agents that support it. Any agent can read the files directly.
+
+`.gitignore` ignores every directory that starts with a dot, so a new skill and its symlink are added with `git add -f`. Once tracked, Git follows changes to them as usual, and contributors' own skills and agent settings stay ignored.
+
+- `.agents/skills/mautic-dev/`: Mautic-specific pitfalls, how to verify a change before CI does, and links to the developer documentation and to code examples, for core and plugin development.

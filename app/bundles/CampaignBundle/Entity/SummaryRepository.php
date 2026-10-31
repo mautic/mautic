@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 /**
  * @extends CommonRepository<Summary>
  */
-class SummaryRepository extends CommonRepository
+final class SummaryRepository extends CommonRepository
 {
     use TimelineTrait;
     use ContactLimiterTrait;
@@ -30,17 +30,15 @@ class SummaryRepository extends CommonRepository
     ): array {
         $q = $this->_em->getConnection()->createQueryBuilder()
             ->select(
-                [
-                    'cs.event_id',
-                    'SUM(cs.scheduled_count) as scheduled_count',
-                    'SUM(cs.triggered_count) as triggered_count',
-                    'SUM(cs.non_action_path_taken_count) as non_action_path_taken_count',
-                    'SUM(cs.failed_count) as failed_count',
-                    'SUM(cs.log_counts_processed) as log_counts_processed',
-                ]
+                'cs.event_id',
+                'SUM(cs.scheduled_count) as scheduled_count',
+                'SUM(cs.triggered_count) as triggered_count',
+                'SUM(cs.non_action_path_taken_count) as non_action_path_taken_count',
+                'SUM(cs.failed_count) as failed_count',
+                'SUM(cs.log_counts_processed) as log_counts_processed',
             )
             ->from(MAUTIC_TABLE_PREFIX.'campaign_summary', 'cs')
-            ->where('cs.campaign_id = '.(int) $campaignId)
+            ->where('cs.campaign_id = '.$campaignId)
             ->groupBy('cs.event_id');
 
         if ($dateFrom && $dateTo) {

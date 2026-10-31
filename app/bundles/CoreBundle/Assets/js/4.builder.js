@@ -8,8 +8,18 @@ Mautic.launchBuilder = function () {
  * @param jQuery object of form
  */
 Mautic.inBuilderSubmissionOn = function(form) {
-    var inBuilder = mQuery('<input type="hidden" name="inBuilder" value="1" />');
+    const inBuilder = mQuery('<input type="hidden" name="inBuilder" value="1" />');
+    const applyButton = mQuery('#btn-views-apply').css('pointer-events', 'none');
     form.append(inBuilder);
+    form.one('submit:success', function (event, action, data) {
+        if (data?.newContent) {
+            // update the value of the optimistic lock version
+            const selector = '#page_version, #emailform_version';
+            const version = mQuery(data.newContent).find(selector).val();
+            mQuery(this).find(selector).val(version);
+        }
+        applyButton.css('pointer-events', 'auto');
+    });
 }
 
 /**

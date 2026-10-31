@@ -54,13 +54,18 @@ class FormRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $viewOther
+     * @param string      $search
+     * @param int         $limit
+     * @param int         $start
+     * @param bool        $viewOther
+     * @param string|null $formType  @deprecated since Mautic 7.1, this parameter is ignored and will be removed in 8.0
      */
     public function getFormList($search = '', $limit = 10, $start = 0, $viewOther = false, $formType = null): array
     {
+        if (null !== $formType) {
+            trigger_deprecation('mautic/mautic', '7.1', 'The $formType parameter in FormRepository::getFormList() is deprecated and will be removed in 8.0.');
+        }
+
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, alias}');
 
@@ -114,7 +119,7 @@ class FormRepository extends CommonRepository
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired'):
             case $this->translator->trans('mautic.form.form.searchcommand.isexpired', [], null, 'en_US'):
                 $expr = $q->expr()->and(
-                    $q->expr()->eq('f.isPublished', ":$unique"),
+                    $q->expr()->eq('f.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('f.publishDown'),
                     $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
                     $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()')
@@ -124,7 +129,7 @@ class FormRepository extends CommonRepository
             case $this->translator->trans('mautic.form.form.searchcommand.ispending'):
             case $this->translator->trans('mautic.form.form.searchcommand.ispending', [], null, 'en_US'):
                 $expr = $q->expr()->and(
-                    $q->expr()->eq('f.isPublished', ":$unique"),
+                    $q->expr()->eq('f.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('f.publishUp'),
                     $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
                     $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()')
@@ -144,7 +149,7 @@ class FormRepository extends CommonRepository
                         $q->expr()->eq('s.form', 'f')
                     )
                     ->getDql();
-                $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 1);
+                $expr = $q->expr()->gt(sprintf('(%s)', $subquery), 0);
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
@@ -171,7 +176,7 @@ class FormRepository extends CommonRepository
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
             $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
-            $parameters = ["$unique" => $string];
+            $parameters = ["{$unique}" => $string];
         }
 
         return [
@@ -211,6 +216,20 @@ class FormRepository extends CommonRepository
         }
 
         return $query->executeQuery()->fetchAllAssociative();
+    }
+
+    /**
+     * @return array<int, array<string,string>>
+     *
+     * @throws \Doctrine\DBAL\Exception
+     */
+    public function getValidFormResultsTable(): array
+    {
+        return $this->_em->getConnection()->createQueryBuilder()
+            ->select("CONCAT('".MAUTIC_TABLE_PREFIX."','form_results_', t.id, '_', t.alias) as validFormTable")
+            ->from(MAUTIC_TABLE_PREFIX.'forms', 't')
+            ->executeQuery()
+            ->fetchAllAssociative();
     }
 
     /**
@@ -263,5 +282,33 @@ class FormRepository extends CommonRepository
     public function getTableAlias(): string
     {
         return 'f';
+    }
+
+    /**
+     * Atomically increment the submission count for a form.
+     */
+    public function incrementSubmissionCount(int $formId): void
+    {
+        $qb = $this->createQueryBuilder('f');
+        $qb->update()
+            ->set('f.submissionCount', 'f.submissionCount + 1')
+            ->where('f.id = :id')
+            ->setParameter('id', $formId)
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * Atomically decrement the submission count for a form.
+     */
+    public function decrementSubmissionCount(int $formId): void
+    {
+        $qb = $this->createQueryBuilder('f');
+        $qb->update()
+            ->set('f.submissionCount', 'CASE WHEN f.submissionCount > 0 THEN f.submissionCount - 1 ELSE 0 END')
+            ->where('f.id = :id')
+            ->setParameter('id', $formId)
+            ->getQuery()
+            ->execute();
     }
 }

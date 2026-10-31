@@ -7,7 +7,7 @@ namespace Mautic\ChannelBundle\Tests\Controller\Api;
 use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class MessageApiControllerTest extends MauticMysqlTestCase
 {
@@ -39,7 +39,7 @@ JSON;
      * @param mixed[] $payload
      * @param mixed[] $expectedResponsePayload
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('patchProvider')]
+    #[DataProvider('patchProvider')]
     public function testEditMessageWithPatch(array $payload, array $expectedResponsePayload): void
     {
         $channel = new Channel();
@@ -195,14 +195,14 @@ JSON;
      */
     private function assertMessagePayload(array $expectedPayload, array $actualPayload, string $deliveredPayloadJson): void
     {
-        Assert::assertSame($expectedPayload['name'], $actualPayload['name'], $deliveredPayloadJson);
-        Assert::assertSame($expectedPayload['description'], $actualPayload['description'], $deliveredPayloadJson);
-        Assert::assertCount(count($expectedPayload['channels']), $actualPayload['channels'], $deliveredPayloadJson);
-        Assert::assertGreaterThan(0, $actualPayload['id'], $deliveredPayloadJson);
+        $this->assertSame($expectedPayload['name'], $actualPayload['name'], $deliveredPayloadJson);
+        $this->assertSame($expectedPayload['description'], $actualPayload['description'], $deliveredPayloadJson);
+        $this->assertCount(count($expectedPayload['channels']), $actualPayload['channels'], $deliveredPayloadJson);
+        $this->assertGreaterThan(0, $actualPayload['id'], $deliveredPayloadJson);
 
-        Assert::assertSame($expectedPayload['channels']['email']['channel'], $actualPayload['channels'][0]['channel'], $deliveredPayloadJson);
-        Assert::assertSame($expectedPayload['channels']['email']['channelId'], $actualPayload['channels'][0]['channelId'], $deliveredPayloadJson);
-        Assert::assertSame($expectedPayload['channels']['email']['isEnabled'], $actualPayload['channels'][0]['isEnabled'], $deliveredPayloadJson);
-        Assert::assertGreaterThan(0, $actualPayload['channels'][0]['id'], $deliveredPayloadJson);
+        $this->assertSame($expectedPayload['channels']['email']['channel'], $actualPayload['channels'][0]['channel'], $deliveredPayloadJson);
+        $this->assertSame($expectedPayload['channels']['email']['channelId'], $actualPayload['channels'][0]['channelId'], $deliveredPayloadJson);
+        $this->assertSame($expectedPayload['channels']['email']['isEnabled'], $actualPayload['channels'][0]['isEnabled'], $deliveredPayloadJson);
+        $this->assertGreaterThan(0, $actualPayload['channels'][0]['id'], $deliveredPayloadJson);
     }
 }

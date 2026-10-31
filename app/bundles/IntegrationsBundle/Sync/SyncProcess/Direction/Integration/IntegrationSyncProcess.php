@@ -27,9 +27,9 @@ class IntegrationSyncProcess
     private ?SyncDataExchangeInterface $syncDataExchange = null;
 
     public function __construct(
-        private SyncDateHelper $syncDateHelper,
-        private MappingHelper $mappingHelper,
-        private ObjectChangeGenerator $objectChangeGenerator,
+        private readonly SyncDateHelper $syncDateHelper,
+        private readonly MappingHelper $mappingHelper,
+        private readonly ObjectChangeGenerator $objectChangeGenerator,
     ) {
     }
 
@@ -66,7 +66,7 @@ class IntegrationSyncProcess
                             'Integration to Mautic; skipping sync for the %s object because object IDs have been explicitly specified for other objects',
                             $integrationObjectName
                         ),
-                        __CLASS__.':'.__FUNCTION__
+                        self::class.':'.__FUNCTION__
                     );
                     continue;
                 }

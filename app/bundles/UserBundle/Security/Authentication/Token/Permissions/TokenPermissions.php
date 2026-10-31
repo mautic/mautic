@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Security\Authentication\Token\Permissions;
 
-use Doctrine\ORM\EntityManagerInterface;
 use FOS\OAuthServerBundle\Model\TokenInterface as OAuthTokenInterface;
 use FOS\OAuthServerBundle\Security\Authenticator\Token\OAuthToken;
-use Mautic\ApiBundle\Entity\oAuth2\AccessToken;
+use Mautic\ApiBundle\Entity\oAuth2\AccessTokenRepository;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\User;
@@ -18,8 +17,11 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class TokenPermissions
 {
-    public function __construct(private TokenStorageInterface $tokenStorage, private PermissionRepository $permissionRepository, private EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        private readonly TokenStorageInterface $tokenStorage,
+        private readonly PermissionRepository $permissionRepository,
+        private readonly AccessTokenRepository $accessTokenRepository,
+    ) {
     }
 
     /**
@@ -65,8 +67,7 @@ class TokenPermissions
      */
     private function assignRoleFromToken(string $tokenIdentifier): User
     {
-        /** @var AccessToken|null $accessToken assert ill yield phpstan error. */
-        $accessToken = $this->entityManager->getRepository(AccessToken::class)->findOneBy(['token' => $tokenIdentifier]);
+        $accessToken = $this->accessTokenRepository->findOneBy(['token' => $tokenIdentifier]);
 
         if (null === $accessToken) {
             throw new UserNotFoundException('API access token not found.');

@@ -19,9 +19,23 @@
 {% endblock %}
 
 {% block actions %}
+    {% set buttons = [] %}
+    {% if security.isGranted('tagManager:tagManager:edit') and security.isGranted('tagManager:tagManager:delete') %}
+        {% set buttons = buttons|merge([{
+            'attr': {
+                'data-toggle': 'ajaxmodal',
+                'data-target': '#MauticSharedModal',
+                'data-header': 'mautic.tagmanager.tag.header.merge'|trans({'%name%': tag.tag}),
+                'href': path('mautic_tagmanager_action', {'objectId': tag.id, 'objectAction': 'merge'})
+            },
+            'btnText': 'mautic.lead.merge'|trans,
+            'iconClass': 'ri-exchange-2-line'
+        }]) %}
+    {% endif %}
     {{- include('@MauticCore/Helper/page_actions.html.twig', {
         item            : tag,
         nameGetter      : 'getTag',
+        customButtons   : buttons,
         templateButtons : {
             edit   : security.isGranted('tagManager:tagManager:edit'),
             delete : security.isGranted('tagManager:tagManager:delete'),

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Helper\DateTime;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -8,7 +10,7 @@ use Mautic\CoreBundle\Helper\DateTime\DateTimeToken;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
+final class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
 {
     public const DATE_FORMAT      = 'F j, Y';
 
@@ -22,21 +24,19 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTokens(): void
     {
-        $coreParametersHelper = new class($this->createMock(ContainerInterface::class)) extends CoreParametersHelper {
-            public function get($name, $default = null)
+        $coreParametersHelper = new class($this->createStub(ContainerInterface::class)) extends CoreParametersHelper {
+            public function get($name, $default = null): ?string
             {
-                switch ($name) {
-                    case 'default_timezone':
-                        return DateTokenHelperTest::TIMEZONE;
-                    case 'date_format_dateonly':
-                        return DateTokenHelperTest::DATE_FORMAT;
-                    case 'date_format_timeonly':
-                        return DateTokenHelperTest::TIME_FORMAT;
-                }
+                return match ($name) {
+                    'default_timezone' => DateTokenHelperTest::TIMEZONE,
+                    'date_format_dateonly' => DateTokenHelperTest::DATE_FORMAT,
+                    'date_format_timeonly' => DateTokenHelperTest::TIME_FORMAT,
+                    default => null,
+                };
             }
         };
 
-        $dateTimeLocalization = new class($this->createMock(TranslatorInterface::class)) extends DateTimeLocalization {
+        $dateTimeLocalization = new class($this->createStub(TranslatorInterface::class)) extends DateTimeLocalization {
             public function localize(string $format): string
             {
                 return $format;

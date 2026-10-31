@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,57 +13,36 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
+use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\CampaignBundle\Executioner\Result\Responses;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
-class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
+final class RealTimeExecutionerTest extends TestCase
 {
-    /**
-     * @var MockObject|LeadModel
-     */
-    private MockObject $leadModel;
+    private MockObject&LeadModel $leadModel;
 
-    /**
-     * @var MockObject|EventRepository
-     */
-    private MockObject $eventRepository;
+    private MockObject&EventRepository $eventRepository;
 
-    /**
-     * @var MockObject|EventExecutioner
-     */
-    private MockObject $executioner;
+    private MockObject&EventExecutioner $executioner;
 
-    /**
-     * @var MockObject|DecisionExecutioner
-     */
-    private MockObject $decisionExecutioner;
+    private MockObject&DecisionExecutioner $decisionExecutioner;
 
-    /**
-     * @var MockObject|EventCollector
-     */
-    private MockObject $eventCollector;
+    private MockObject&EventCollector $eventCollector;
 
-    /**
-     * @var MockObject|EventScheduler
-     */
-    private MockObject $eventScheduler;
+    private MockObject&EventScheduler $eventScheduler;
 
-    /**
-     * @var MockObject|ContactTracker
-     */
-    private MockObject $contactTracker;
-
-    /**
-     * @var MockObject|LeadRepository
-     */
-    private MockObject $leadRepository;
+    private MockObject&ContactTracker $contactTracker;
 
     private DecisionHelper $decisionHelper;
+
+    private EventRedirectionHelper&MockObject $redirectionHelper;
 
     protected function setUp(): void
     {
@@ -79,9 +60,12 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
 
         $this->contactTracker = $this->createMock(ContactTracker::class);
 
-        $this->leadRepository = $this->createMock(LeadRepository::class);
+        $this->decisionHelper    = new DecisionHelper($this->createStub(LeadRepository::class));
+        $this->redirectionHelper = $this->createMock(EventRedirectionHelper::class);
 
-        $this->decisionHelper = new DecisionHelper($this->leadRepository);
+        // Configure the redirection helper mock to return the event it receives
+        $this->redirectionHelper->method('handleEventRedirection')
+            ->willReturnCallback(fn (Event $event): Event => $event);
     }
 
     public function testContactNotFoundResultsInEmptyResponses(): void
@@ -94,8 +78,9 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getContactPendingEvents');
 
         $responses = $this->getExecutioner()->execute('something');
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     public function testNoRelatedEventsResultInEmptyResponses(): void
@@ -117,8 +102,9 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getEventConfig');
 
         $responses = $this->getExecutioner()->execute('something');
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     public function testChannelMisMatchResultsInEmptyResponses(): void
@@ -147,8 +133,9 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getEventConfig');
 
         $responses = $this->getExecutioner()->execute('something', null, 'page');
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     public function testChannelFuzzyMatchResultsInNonEmptyResponses(): void
@@ -169,8 +156,8 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $event->method('getEventType')
             ->willReturn(Event::TYPE_DECISION);
 
-        $action1 = $this->createMock(Event::class);
-        $action2 = $this->createMock(Event::class);
+        $action1 = $this->createStub(Event::class);
+        $action2 = $this->createStub(Event::class);
 
         $event->expects($this->once())
             ->method('getPositiveChildren')
@@ -225,8 +212,9 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getEventConfig');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 1);
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     public function testEmptyPositiveactionsResultsInEmptyResponses(): void
@@ -259,8 +247,9 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('evaluateForContact');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 3);
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     public function testAssociatedEventsAreExecuted(): void
@@ -280,8 +269,8 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $action1 = $this->createMock(Event::class);
-        $action2 = $this->createMock(Event::class);
+        $action1 = $this->createStub(Event::class);
+        $action2 = $this->createStub(Event::class);
 
         $event = $this->getEventMock(2, 3);
         $event->method('getEventType')
@@ -316,8 +305,9 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->method('executeEventsForContact');
 
         $responses = $this->getExecutioner()->execute('something', null, 'email', 3);
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     public function testNonDecisionEventsAreIgnored(): void
@@ -346,8 +336,9 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$event]);
 
         $responses = $this->getExecutioner()->execute('something');
+        $this->assertInstanceOf(Responses::class, $responses);
 
-        $this->assertEquals(0, $responses->containsResponses());
+        $this->assertSame(0, $responses->containsResponses());
     }
 
     private function getEventMock(int $getChannelExpectsCount, int $getChannelIdExpectsCount): MockObject
@@ -363,10 +354,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         return $event;
     }
 
-    /**
-     * @return RealTimeExecutioner
-     */
-    private function getExecutioner()
+    private function getExecutioner(): RealTimeExecutioner
     {
         return new RealTimeExecutioner(
             new NullLogger(),
@@ -377,7 +365,8 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->eventCollector,
             $this->eventScheduler,
             $this->contactTracker,
-            $this->decisionHelper
+            $this->decisionHelper,
+            $this->redirectionHelper
         );
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Mautic\SmsBundle\Integration\Twilio;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\SmsBundle\Callback\CallbackInterface;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\Helper\ContactHelper;
@@ -11,7 +12,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Twilio\Exceptions\ConfigurationException;
 
-class TwilioCallback implements CallbackInterface
+final readonly class TwilioCallback implements CallbackInterface
 {
     public function __construct(
         private ContactHelper $contactHelper,
@@ -27,7 +28,7 @@ class TwilioCallback implements CallbackInterface
     /**
      * @throws NumberNotFoundException
      */
-    public function getContacts(Request $request): \Doctrine\Common\Collections\ArrayCollection
+    public function getContacts(Request $request): ArrayCollection
     {
         $this->validateRequest($request->request);
 

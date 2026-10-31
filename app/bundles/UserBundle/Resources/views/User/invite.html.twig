@@ -1,0 +1,30 @@
+{% set formContainer %}
+<div class="mb-48">
+    {% include '@MauticCore/Components/pictogram.html.twig' with {
+        'pictogram': 'collaboration',
+        'size': '80'
+    } %}
+</div>
+
+{{ form_start(form, {'attr': {'id': 'invite-user-form', 'class': 'd-flex layer-one', 'data-toggle': 'ajax'}}) }}
+    <div class="form-group fg-1">
+        {{ form_widget(form.email) }}
+        {{ form_errors(form.email) }}
+    </div>
+    <div class="form-group fg-1">
+        {{ form_widget(form.role) }}
+        {{ form_errors(form.role) }}
+    </div>
+    {% if form._token is defined %}
+        {{ form_widget(form._token) }}
+    {% endif %}
+    <button type="submit" class="sr-only" tabindex="-1" aria-hidden="true"></button>
+{{ form_end(form, {'render_rest': false}) }}
+{% endset %}
+
+{{ include('@MauticCore/Components/content-block.html.twig', {
+    heading: 'mautic.user.invite.collaborate.heading'|trans,
+    subheading: 'mautic.user.invite.collaborate.subheading'|trans,
+    childContainer: formContainer,
+    noMargin: true,
+}) }}

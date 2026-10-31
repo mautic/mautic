@@ -9,13 +9,13 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderResultsDAO;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CompletedSyncIterationEvent extends Event
+final class CompletedSyncIterationEvent extends Event
 {
     public function __construct(
-        private OrderResultsDAO $orderResultsDAO,
-        private int $iteration,
-        private InputOptionsDAO $inputOptionsDAO,
-        private MappingManualDAO $mappingManualDAO,
+        private readonly OrderResultsDAO $orderResultsDAO,
+        private readonly int $iteration,
+        private readonly InputOptionsDAO $inputOptionsDAO,
+        private readonly MappingManualDAO $mappingManualDAO,
     ) {
     }
 

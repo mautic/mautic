@@ -36,7 +36,7 @@
   }) %}
 {% endif %}
 
-{% if field.type not in ['checkboxgrp', 'radiogrp', 'textarea'] %}
+{% if field.type not in ['checkboxgrp', 'radiogrp', 'rating', 'textarea'] %}
   {% set inputAttributes = inputAttributes|merge({
           'value': field.defaultValue|default(''),
   }) %}
@@ -81,15 +81,16 @@
   }) %}
 {% endif %}
 
-{# Container #}
+{% set widthClass = 'mauticform-' ~ (field.fieldWidth|default('100%')|u.replace('%', '').replaceMatches('/\\.\\d+/', '')) %}
+
 {% set containerAttributes = containerAttributes|merge({
         'id': 'mauticform' ~ formName|default('') ~ '_' ~ id,
         'class': containerAttributes.class|default([])|merge([
           'mauticform-row',
           'mauticform-' ~ containerClass,
-          'mauticform-field-' ~ order
+          'mauticform-field-' ~ order,
+          widthClass
         ]),
-        'style': 'width: ' ~ field.fieldWidth
 }) %}
 
 {% if field.parent and fields[field.parent] is defined %}
@@ -153,5 +154,5 @@
     <input type="{{ containerType }}" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
   {% endif %}
 
-  <span class="mauticform-errormsg" style="display:none;">{{ validationMessage }}</span>
+  <span class="mauticform-errormsg" aria-live="polite" aria-atomic="true" aria-hidden="true" style="display:none;">{{ validationMessage }}</span>
 </div>

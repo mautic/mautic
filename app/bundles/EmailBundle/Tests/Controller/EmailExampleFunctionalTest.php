@@ -7,21 +7,16 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
-use PHPUnit\Framework\Assert;
+use Mautic\EmailBundle\Mailer\Message\MauticMessage;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
     use CreateTestEntitiesTrait;
 
     protected $useCleanupRollback = false;
-
-    protected function setUp(): void
-    {
-        $this->configParams['mailer_spool_type'] = 'file';
-
-        parent::setUp();
-    }
 
     public function testSendExampleEmailWithContact(): void
     {
@@ -42,7 +37,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        Assert::assertCount(1, $formCrawler);
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
@@ -52,12 +47,10 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
+        $this->assertInstanceOf(MauticMessage::class, $message);
 
-        Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
-        Assert::assertStringContainsString(
-            'Contact emails is test@domain.tld. Company details: Mautic, Pune.',
-            $message->getBody()->toString()
-        );
+        $this->assertSame('[TEST] [TEST] Email subject', $message->getSubject());
+        $this->assertStringContainsString('Contact emails is test@domain.tld. Company details: Mautic, Pune.', $message->getBody()->toString());
     }
 
     public function testSendExampleEmailWithOutContact(): void
@@ -69,15 +62,90 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        self::assertCount(1, $formCrawler);
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
         $this->client->submit($form);
 
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
+        $this->assertInstanceOf(MauticMessage::class, $message);
 
-        Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
-        Assert::assertStringContainsString('Contact emails is [Email]. Company details: [Company Name], [City].', $message->getBody()->toString());
+        $this->assertSame('[TEST] [TEST] Email subject', $message->getSubject());
+        $this->assertStringContainsString('Contact emails is [Email]. Company details: [Company Name], [City].', $message->getBody()->toString());
+    }
+
+    public function testSendExampleEmailWithOutContactAndMonitoringEnabled(): void
+    {
+        $configParams = $this->configParams;
+
+        // Set values, so \Mautic\EmailBundle\MonitoredEmail\Mailbox::isConfigured will return true.
+        // Settings are not deep merged, so test is forced to include all other keys rather than just "general"
+        $monitoredSettings = [
+            'general' => [
+                'host'     => 'some',
+                'port'     => '993',
+                'user'     => 'user',
+                'password' => 'pwd',
+            ],
+            'EmailBundle_bounces' => [
+                'address'           => null,
+                'host'              => null,
+                'port'              => '993',
+                'encryption'        => '/ssl',
+                'user'              => null,
+                'password'          => null,
+                'override_settings' => 0,
+                'folder'            => 'INBOX',
+            ],
+            'EmailBundle_unsubscribes' => [
+                'address'           => null,
+                'host'              => null,
+                'port'              => '993',
+                'encryption'        => '/ssl',
+                'user'              => null,
+                'password'          => null,
+                'override_settings' => 0,
+                'folder'            => null,
+            ],
+            'EmailBundle_replies' => [
+                'address'           => null,
+                'host'              => null,
+                'port'              => '993',
+                'encryption'        => '/ssl',
+                'user'              => null,
+                'password'          => null,
+                'override_settings' => 0,
+                'folder'            => null,
+            ],
+        ];
+
+        $configParams['monitored_email'] = $monitoredSettings;
+
+        $this->setUpSymfony($configParams);
+
+        $user = $this->em->getRepository(User::class)->findOneBy(['username' => $this->clientServer['PHP_AUTH_USER'] ?? 'admin']);
+        $this->assertInstanceOf(User::class, $user);
+        $this->loginUser($user);
+
+        $email = $this->createEmail();
+        $email->setCustomHtml('Contact emails is {contactfield=email}. Company details: {contactfield=companyname}, {contactfield=companycity}.');
+        $this->em->flush();
+        $this->em->clear();
+
+        $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
+        $formCrawler = $crawler->filter('form[name=example_send]');
+        $this->assertCount(1, $formCrawler);
+        $form = $formCrawler->form();
+        $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
+        $this->client->submit($form);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_OK, verbose: true);
+
+        $message = self::getMailerMessagesByToAddress('admin@yoursite.com')[0];
+        $this->assertInstanceOf(MauticMessage::class, $message);
+
+        $this->assertSame('[TEST] [TEST] Email subject', $message->getSubject());
+        $this->assertStringContainsString('Contact emails is [Email]. Company details: [Company Name], [City].', $message->getBody()->toString());
     }
 
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithNoContact(): void
@@ -97,7 +165,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         );
         $response = $this->client->getResponse()->getContent();
         self::assertResponseStatusCodeSame(201, $response);
-        self::assertJson($response);
+        $this->assertJson($response);
 
         // Create email with dynamic content variant
         $email          = $this->createEmail();
@@ -140,15 +208,16 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        Assert::assertCount(1, $formCrawler);
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues(['example_send[emails][list][0]' => 'admin@yoursite.com']);
         $this->client->submit($form);
 
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
+        $this->assertInstanceOf(MauticMessage::class, $message);
 
-        Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
-        Assert::assertStringContainsString('Default Dynamic Content', $message->getBody()->toString());
+        $this->assertSame('[TEST] [TEST] Email subject', $message->getSubject());
+        $this->assertStringContainsString('Default Dynamic Content', $message->getBody()->toString());
     }
 
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithMatchFilterContact(): void
@@ -168,7 +237,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         );
         $response = $this->client->getResponse()->getContent();
         self::assertResponseStatusCodeSame(201, $response);
-        self::assertJson($response);
+        $this->assertJson($response);
 
         // Create email with dynamic content variant
         $email          = $this->createEmail();
@@ -227,7 +296,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        Assert::assertCount(1, $formCrawler);
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
@@ -237,9 +306,10 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
+        $this->assertInstanceOf(MauticMessage::class, $message);
 
-        Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
-        Assert::assertStringContainsString('Variant 1 Dynamic Content', $message->getBody()->toString());
+        $this->assertSame('[TEST] [TEST] Email subject', $message->getSubject());
+        $this->assertStringContainsString('Variant 1 Dynamic Content', $message->getBody()->toString());
     }
 
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithNoMatchFilterContact(): void
@@ -259,7 +329,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         );
         $response = $this->client->getResponse()->getContent();
         self::assertResponseStatusCodeSame(201, $response);
-        self::assertJson($response);
+        $this->assertJson($response);
 
         // Create email with dynamic content variant
         $email          = $this->createEmail();
@@ -318,7 +388,7 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/emails/sendExample/{$email->getId()}");
         $formCrawler = $crawler->filter('form[name=example_send]');
-        Assert::assertCount(1, $formCrawler);
+        $this->assertCount(1, $formCrawler);
         $form = $formCrawler->form();
         $form->setValues([
             'example_send[emails][list][0]' => 'admin@yoursite.com',
@@ -328,9 +398,10 @@ final class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         $message = $this->getMailerMessagesByToAddress('admin@yoursite.com')[0];
+        $this->assertInstanceOf(MauticMessage::class, $message);
 
-        Assert::assertSame('[TEST] [TEST] Email subject', $message->getSubject());
-        Assert::assertStringContainsString('Default Dynamic Content', $message->getBody()->toString());
+        $this->assertSame('[TEST] [TEST] Email subject', $message->getSubject());
+        $this->assertStringContainsString('Default Dynamic Content', $message->getBody()->toString());
     }
 
     private function createEmail(): Email

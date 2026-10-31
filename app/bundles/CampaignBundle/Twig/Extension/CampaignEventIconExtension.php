@@ -15,7 +15,7 @@ final class CampaignEventIconExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('getCampaignEventIcon', [$this, 'getCampaignEventIcon']),
+            new TwigFunction('getCampaignEventIcon', $this->getCampaignEventIcon(...)),
         ];
     }
 

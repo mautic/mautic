@@ -14,26 +14,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 #[AsCommand(
     name: 'mautic:update:find',
-    description: 'Fetches updates for Mautic'
-)]
-class FindUpdatesCommand extends Command
-{
-    public function __construct(
-        private TranslatorInterface $translator,
-        private UpdateHelper $updateHelper,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure()
-    {
-        $this
-            ->setHelp(<<<'EOT'
+    description: 'Fetches updates for Mautic',
+    help: <<<'TXT'
 The <info>%command.name%</info> command checks for updates for the Mautic application.
 
 <info>php %command.full_name%</info>
-EOT
-            );
+TXT
+)]
+final class FindUpdatesCommand extends Command
+{
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly UpdateHelper $updateHelper,
+    ) {
+        parent::__construct();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

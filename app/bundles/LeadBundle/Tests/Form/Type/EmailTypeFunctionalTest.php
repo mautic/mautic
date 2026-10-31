@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -25,7 +27,7 @@ final class EmailTypeFunctionalTest extends MauticMysqlTestCase
 
         // Fetch the form
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$lead->getId());
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
@@ -42,10 +44,11 @@ final class EmailTypeFunctionalTest extends MauticMysqlTestCase
             'lead_quickemail[list]'     => 0,
         ]);
         $this->client->submit($form);
-        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertResponseIsSuccessful();
 
         // Check the email has correct text
         $copy = $this->em->getRepository(Copy::class)->findOneBy(['subject' => 'Test Jap Mautic']);
-        $this->assertStringContainsString('<p style="font-family: メイリオ">Test</p>', $copy->getBody());
+        $this->assertInstanceOf(Copy::class, $copy);
+        $this->assertStringContainsString('<p style="font-family: メイリオ">Test</p>', (string) $copy->getBody());
     }
 }

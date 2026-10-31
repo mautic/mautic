@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Field\Helper\IndexHelper;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version20190524124819 extends PreUpAssertionMigration
+final class Version20190524124819 extends PreUpAssertionMigration
 {
     protected function preUpAssertions(): void
     {

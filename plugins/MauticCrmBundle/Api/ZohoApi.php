@@ -4,19 +4,16 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
-class ZohoApi extends CrmApi
+final class ZohoApi extends CrmApi
 {
     /**
      * @param string $operation
-     * @param string $method
-     * @param bool   $json
-     * @param array  $settings
      *
      * @return array
      *
      * @throws ApiErrorException
      */
-    protected function request($operation, array $parameters = [], $method = 'GET', $json = false, $settings = [])
+    private function request($operation, array $parameters = [], string $method = 'GET', bool $json = false, array $settings = [])
     {
         $tokenData = $this->integration->getKeys();
 

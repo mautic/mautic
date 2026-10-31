@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
@@ -8,14 +10,14 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<FailedLeadEventLog>
  */
-class FailedLeadEventLogRepository extends CommonRepository
+final class FailedLeadEventLogRepository extends CommonRepository
 {
     /**
      * @param array<string|int> $ids
      */
     public function deleteByIds(array $ids): void
     {
-        if (!$ids) {
+        if ([] === $ids) {
             return;
         }
 

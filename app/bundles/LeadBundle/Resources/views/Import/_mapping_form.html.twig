@@ -9,18 +9,24 @@
             <div class="panel-title">{{ 'mautic.lead.import.default.owner'|trans }}</div>
         </div>
         <div class="panel-body">
-            <div class="col-xs-4">
-                {% if form.owner is defined %}{{ form_row(form.owner) }}{% endif %}
+            <div class="row">
+                <div class="col-xs-4">
+                    {% if form.owner is defined %}{{ form_row(form.owner) }}{% endif %}
+                </div>
+                <div class="col-xs-4">
+                    {% if form.list is defined %}{{ form_row(form.list) }}{% endif %}
+                </div>
+                <div class="col-xs-4">
+                    {% if form.tags is defined %}{{ form_row(form.tags) }}{% endif %}
+                </div>
+                <div class="col-xs-4">
+                    {% if form.skip_if_exists is defined %}{{ form_row(form.skip_if_exists) }}{% endif %}
+                </div>
+                <div class="col-xs-4">
+                    {% if form.create_new is defined %}{{ form_row(form.create_new) }}{% endif %}
+                </div>
             </div>
-            <div class="col-xs-4">
-                {% if form.list is defined %}{{ form_row(form.list) }}{% endif %}
-            </div>
-            <div class="col-xs-4">
-                {% if form.tags is defined %}{{ form_row(form.tags) }}{% endif %}
-            </div>
-            <div class="col-xs-4">
-                {% if form.skip_if_exists is defined %}{{ form_row(form.skip_if_exists) }}{% endif %}
-            </div>
+
         </div>
     </div>
     <div class="panel panel-info">

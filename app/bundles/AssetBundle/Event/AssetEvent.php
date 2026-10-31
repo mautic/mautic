@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\AssetBundle\Event;
 
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-class AssetEvent extends CommonEvent
+final class AssetEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

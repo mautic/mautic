@@ -3,19 +3,16 @@
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadListFiltersOperatorsEvent extends CommonEvent
+final class LeadListFiltersOperatorsEvent extends CommonEvent
 {
     /**
      * @deprecated to be removed in Mautic 3
      *
-     * @param array               $operators  @deprecated to be removed in Mautic 3. Subscribe operators instead.
-     * @param TranslatorInterface $translator @deprecated to be removed in Mautic 3
+     * @param array $operators @deprecated to be removed in Mautic 3. Subscribe operators instead.
      */
     public function __construct(
-        protected $operators,
-        protected TranslatorInterface $translator,
+        private $operators,
     ) {
     }
 

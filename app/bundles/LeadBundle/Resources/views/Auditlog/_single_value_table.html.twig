@@ -1,0 +1,14 @@
+<table class="table table-hover">
+    <tr>
+        <th>{{ 'mautic.lead.audit.log.field'|trans }}</th>
+        <th>{{ 'mautic.lead.audit.log.value'|trans }}</th>
+    </tr>
+    {% for field, values in objects %}
+        <tr>
+        {% if values is not iterable %}
+            <td>{{ field|e }}</td>
+            <td>{{ values }}</td>
+        {% endif  %}
+        </tr>
+    {% endfor %}
+</table>	

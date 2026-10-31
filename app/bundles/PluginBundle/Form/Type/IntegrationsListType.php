@@ -14,10 +14,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * @extends AbstractType<mixed>
  */
-class IntegrationsListType extends AbstractType
+final class IntegrationsListType extends AbstractType
 {
     public function __construct(
-        private IntegrationHelper $integrationHelper,
+        private readonly IntegrationHelper $integrationHelper,
     ) {
     }
 
@@ -44,7 +44,7 @@ class IntegrationsListType extends AbstractType
             [
                 'choices'    => $integrations,
                 'expanded'   => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'multiple'   => false,
                 'label'      => 'mautic.integration.integration',
                 'attr'       => [
@@ -55,7 +55,7 @@ class IntegrationsListType extends AbstractType
                 'required'    => true,
                 'constraints' => [
                     new NotBlank(
-                        ['message' => 'mautic.core.value.required']
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]

@@ -6,9 +6,10 @@ use Oneup\UploaderBundle\Controller\DropzoneController;
 use Oneup\UploaderBundle\Uploader\Response\EmptyResponse;
 use Symfony\Component\HttpFoundation\File\Exception\UploadException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Contracts\Service\Attribute\Required;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UploadController extends DropzoneController
+final class UploadController extends DropzoneController
 {
     private TranslatorInterface $translator;
 
@@ -17,9 +18,8 @@ class UploadController extends DropzoneController
         $request  = $this->getRequest();
         $response = new EmptyResponse();
         $files    = $this->getFiles($request->files);
-        $this->setTranslator($this->container->get('translator'));
 
-        if (!empty($files)) {
+        if ([] !== $files) {
             foreach ($files as $file) {
                 try {
                     $this->handleUpload($file, $response, $request);
@@ -39,9 +39,10 @@ class UploadController extends DropzoneController
         return $this->createSupportedJsonResponse($response->assemble());
     }
 
-    #[\Symfony\Contracts\Service\Attribute\Required]
-    public function setTranslator(TranslatorInterface $translator): void
-    {
+    #[Required]
+    public function autowireUploadController(
+        TranslatorInterface $translator,
+    ): void {
         $this->translator = $translator;
     }
 }

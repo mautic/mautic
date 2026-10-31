@@ -1,0 +1,48 @@
+{# Set default name getter if not provided #}
+{% set nameGetter = nameGetter|default('getName') %}
+{% set totalWeight = 0 %}
+
+{# Parent variant #}
+{% if variants.parent %}
+    {{ include('@MauticEmail/Variant/row.html.twig', {
+        variant: variants.parent,
+        variants: variants,
+        abTestResults: abTestResults,
+        actionRoute: actionRoute,
+        activeEntity: activeEntity,
+        model: model,
+        nameGetter: nameGetter,
+        isParent: true
+    }) }}
+{% endif %}
+
+{# Child variants #}
+{% if variants.children|length > 0 %}
+    <div class="variant-children">
+        {% for id, variant in variants.children %}
+            {{ include('@MauticEmail/Variant/row.html.twig', {
+                variant: variant,
+                variants: variants,
+                abTestResults: abTestResults,
+                actionRoute: actionRoute,
+                activeEntity: activeEntity,
+                model: model,
+                nameGetter: nameGetter,
+                isParent: false
+            }) }}
+        {% endfor %}
+    </div>
+{% endif %}
+
+{# Stats Modal #}
+{{ include('@MauticCore/Helper/modal.html.twig', {
+    id: 'abStatsModal',
+    header: 'mautic.core.ab_test.stats'|trans,
+    body: abTestResults.supportTemplate is defined ? 
+        include(abTestResults.supportTemplate, {
+            results: abTestResults,
+            variants: variants
+        }) : 
+        'mautic.core.ab_test.noresults'|trans,
+    size: 'lg'
+}) }}

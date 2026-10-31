@@ -9,11 +9,11 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 
-class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
+final class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterface
 {
     public function __construct(
-        private ListModel $listModel,
-        private LeadModel $contactModel,
+        private readonly ListModel $listModel,
+        private readonly LeadModel $contactModel,
     ) {
     }
 
@@ -1060,6 +1060,46 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => false,
             ],
+            [ // ID 53
+                'name'    => 'segment with In The Last Filter',
+                'alias'   => 'segment-test-with-in-the-last-filter',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'lead',
+                        'type'     => 'date',
+                        'field'    => 'date_added',
+                        'operator' => 'inLast',
+                        'filter'   => [
+                            'interval' => '2',
+                            'unit'     => 'day',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
+            [ // ID 54
+                'name'    => 'segment with In The Next Filter',
+                'alias'   => 'segment-test-with-in-the-next-filter',
+                'public'  => true,
+                'filters' => [
+                    [
+                        'glue'     => 'and',
+                        'object'   => 'lead',
+                        'type'     => 'date',
+                        'field'    => 'date_added',
+                        'operator' => 'inNext',
+                        'filter'   => [
+                            'interval' => '2',
+                            'unit'     => 'day',
+                        ],
+                        'display'  => '',
+                    ],
+                ],
+                'populate' => true,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {
@@ -1067,7 +1107,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
         }
     }
 
-    protected function createSegment($listConfig, ObjectManager $manager)
+    private function createSegment(array $listConfig, ObjectManager $manager): void
     {
         $adminUser = $this->getReference('admin-user');
 
@@ -1101,10 +1141,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
         }
     }
 
-    /**
-     * @return int
-     */
-    public function getOrder()
+    public function getOrder(): int
     {
         return 7;
     }

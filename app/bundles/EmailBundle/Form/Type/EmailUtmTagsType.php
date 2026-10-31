@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -11,7 +13,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailUtmTagsType extends AbstractType
+final class EmailUtmTagsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -20,7 +22,7 @@ class EmailUtmTagsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.campaign_source',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -33,7 +35,7 @@ class EmailUtmTagsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.campaign_medium',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -46,7 +48,7 @@ class EmailUtmTagsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.campaign_name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -59,7 +61,7 @@ class EmailUtmTagsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.email.campaign_content',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],

@@ -26,6 +26,8 @@ class AuthenticationEvent extends Event
      */
     protected $isAuthenticated = false;
 
+    private bool $isSupportUser = false;
+
     /**
      * @var bool
      */
@@ -107,7 +109,7 @@ class AuthenticationEvent extends Event
      *
      * @return PluginToken
      */
-    public function getToken()
+    public function getToken(): TokenInterface
     {
         return $this->token;
     }
@@ -134,7 +136,7 @@ class AuthenticationEvent extends Event
      *
      * @return UserProvider
      */
-    public function getUserProvider()
+    public function getUserProvider(): UserProviderInterface
     {
         return $this->userProvider;
     }
@@ -166,6 +168,22 @@ class AuthenticationEvent extends Event
     public function isAuthenticated()
     {
         return $this->isAuthenticated;
+    }
+
+    /**
+     * Check if the user is a support user.
+     */
+    public function isSupportUser(): bool
+    {
+        return $this->isSupportUser;
+    }
+
+    /**
+     * Set if this user is a support user.
+     */
+    public function setIsSupportUser(bool $isSupportUser): void
+    {
+        $this->isSupportUser = $isSupportUser;
     }
 
     /**
@@ -239,12 +257,7 @@ class AuthenticationEvent extends Event
         return $this->response;
     }
 
-    /**
-     * Get the request.
-     *
-     * @return Request
-     */
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }

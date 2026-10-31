@@ -7,7 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class FormExitSubscriber implements EventSubscriberInterface
+final class FormExitSubscriber implements EventSubscriberInterface
 {
     /**
      * @param string $model

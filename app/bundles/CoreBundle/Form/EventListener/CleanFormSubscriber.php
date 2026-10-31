@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Form\EventListener;
 
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -10,7 +12,7 @@ use Symfony\Component\Form\FormEvents;
 /**
  * Clean data before persisting to DB.
  */
-class CleanFormSubscriber implements EventSubscriberInterface
+final class CleanFormSubscriber implements EventSubscriberInterface
 {
     /**
      * @param string|mixed[] $masks

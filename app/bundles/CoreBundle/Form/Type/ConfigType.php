@@ -10,10 +10,10 @@ use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
 use Mautic\CoreBundle\Shortener\Shortener;
+use Mautic\CoreBundle\Shortener\ShortenerServiceInterface;
 use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -34,22 +34,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class ConfigType extends AbstractType
+final class ConfigType extends AbstractType
 {
-    public function __construct(private TranslatorInterface $translator, private LanguageHelper $langHelper, private IpLookupFactory $ipLookupFactory, private ?AbstractLookup $ipLookup, private Shortener $shortenerFactory, private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly LanguageHelper $langHelper,
+        private readonly IpLookupFactory $ipLookupFactory,
+        private readonly ?AbstractLookup $ipLookup,
+        private readonly Shortener $shortenerFactory,
+        private readonly CoreParametersHelper $coreParametersHelper,
+    ) {
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('last_shown_tab', HiddenType::class);
-
         $builder->add(
             'site_url',
             UrlType::class,
             [
                 'label'      => 'mautic.core.config.form.site.url',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.site.url.tooltip',
@@ -57,9 +61,7 @@ class ConfigType extends AbstractType
                 'default_protocol' => 'https',
                 'constraints'      => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -70,7 +72,7 @@ class ConfigType extends AbstractType
             PageListType::class,
             [
                 'label'      => 'mautic.core.config.form.webroot',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'help'       => 'mautic.core.config.form.webroot.help',
                 'attr'       => [
                     'class'            => 'form-control',
@@ -88,7 +90,7 @@ class ConfigType extends AbstractType
             PageListType::class,
             [
                 'label'         => 'mautic.core.config.form.404_page',
-                'label_attr'    => ['class' => 'control-label'],
+                'label_attr'    => ['class' => 'form-label'],
                 'help'          => 'mautic.core.config.form.404_page.help',
                 'attr'          => [
                     'class'            => 'form-control',
@@ -105,16 +107,14 @@ class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.config.form.cache.path',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.cache.path.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -125,16 +125,14 @@ class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.config.form.log.path',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.log.path.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -145,18 +143,16 @@ class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.config.form.image.path',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.image.path.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
-                    new Callback([$this, 'validateImagePath']),
+                    new Callback($this->validateImagePath(...)),
                 ],
             ]
         );
@@ -197,13 +193,59 @@ class ConfigType extends AbstractType
                 TextType::class,
                 [
                     'label'      => 'mautic.core.config.form.trusted.hosts',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.core.config.form.trusted.hosts.tooltip',
                     ],
-                    'help'       => 'mautic.core.config.form.trusted_hosts.help',
-                    'required'   => false,
+                    'help'        => 'mautic.core.config.form.trusted_hosts.help',
+                    'required'    => false,
+                    'constraints' => [
+                        new Callback(static function (?array $values, ExecutionContextInterface $context): void {
+                            if (null === $values) {
+                                return;
+                            }
+
+                            if ([] === $values) {
+                                return;
+                            }
+
+                            foreach ($values as $value) {
+                                // Valid domain name. @see https://stackoverflow.com/questions/10306690/what-is-a-regular-expression-which-will-match-a-valid-domain-name-without-a-subd
+                                if (0 !== preg_match('/^(((?!-))(xn--|_)?[a-z0-9-]{0,61}[a-z0-9]{1,1}\.)*(xn--)?([a-z0-9][a-z0-9\-]{0,60}|[a-z0-9-]{1,30}\.[a-z]{2,})$/', $value)) {
+                                    continue;
+                                }
+
+                                // Allowed characters are a-z, 0-9 and "-".
+                                if (0 === preg_match('/^[a-z0-9\-.]+$/i', $value)) {
+                                    // Regexp given
+
+                                    // In environments, which set the `error_reporting` to ALL the code need to be executed without warnings.
+                                    $regexpError = false;
+                                    set_error_handler(static function (int $errorNo, string $errorString) use (&$regexpError): bool {
+                                        $regexpError = str_contains($errorString, 'preg_match');
+
+                                        return true;
+                                    });
+
+                                    // There is no way Mautic can validate rexep better than PCRE library.
+                                    $pregMatchResult = @preg_match('/'.$value.'/', '');
+
+                                    restore_error_handler();
+
+                                    if (false === $pregMatchResult || $regexpError) {
+                                        $context->buildViolation('mautic.core.config.form.trusted_hosts.invalid.regexp')->atPath('trusted_hosts')->addViolation();
+
+                                        break;
+                                    }
+                                } else {
+                                    $context->buildViolation('mautic.core.config.form.trusted_hosts.invalid.domain')->atPath('trusted_hosts')->addViolation();
+
+                                    break;
+                                }
+                            }
+                        }),
+                    ],
                 ]
             )->addViewTransformer($arrayStringTransformer)
         );
@@ -214,7 +256,7 @@ class ConfigType extends AbstractType
                 TextType::class,
                 [
                     'label'      => 'mautic.core.config.form.trusted.proxies',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.core.config.form.trusted.proxies.tooltip',
@@ -231,7 +273,7 @@ class ConfigType extends AbstractType
                 TextareaType::class,
                 [
                     'label'      => 'mautic.core.config.form.do_not_track_ips',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.core.config.form.do_not_track_ips.tooltip',
@@ -248,7 +290,7 @@ class ConfigType extends AbstractType
                 TextareaType::class,
                 [
                     'label'      => 'mautic.core.config.form.do_not_track_bots',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.core.config.form.do_not_track_bots.tooltip',
@@ -276,7 +318,7 @@ class ConfigType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.core.config.form.default.pagelimit',
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.default.pagelimit.tooltip',
@@ -291,7 +333,7 @@ class ConfigType extends AbstractType
             TimezoneType::class,
             [
                 'label'      => 'mautic.core.config.form.default.timezone',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.default.timezone.tooltip',
@@ -307,7 +349,7 @@ class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.core.config.form.cached.data.timeout',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'          => 'form-control',
                     'tooltip'        => 'mautic.core.config.form.cached.data.timeout.tooltip',
@@ -315,12 +357,8 @@ class ConfigType extends AbstractType
                     'postaddon_text' => $this->translator->trans('mautic.core.time.minutes'),
                 ],
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'mautic.core.value.required',
-                    ]),
-                    new GreaterThanOrEqual([
-                        'value' => 0,
-                    ]),
+                    new NotBlank(message: 'mautic.core.value.required'),
+                    new GreaterThanOrEqual(value: 0),
                 ],
             ]
         );
@@ -330,16 +368,14 @@ class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.config.form.date.format.full',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.date.format.full.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -350,16 +386,14 @@ class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.config.form.date.format.short',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.date.format.short.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -370,16 +404,14 @@ class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.config.form.date.format.dateonly',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.date.format.dateonly.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -390,16 +422,14 @@ class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.config.form.date.format.timeonly',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.date.format.timeonly.tooltip',
                 ],
                 'constraints' => [
                     new NotBlank(
-                        [
-                            'message' => 'mautic.core.value.required',
-                        ]
+                        message: 'mautic.core.value.required'
                     ),
                 ],
             ]
@@ -424,7 +454,7 @@ class ConfigType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.core.config.form.default.daterange_default',
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'attr'              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.default.daterange_default.tooltip',
@@ -441,7 +471,7 @@ class ConfigType extends AbstractType
                 'choices'           => $this->getIpServicesChoices(),
                 'label'             => 'mautic.core.config.form.ip.lookup.service',
                 'label_attr'        => [
-                    'class' => 'control-label',
+                    'class' => 'form-label',
                 ],
                 'help'              => 'mautic.core.config.form.ip.lookup.service.help',
                 'required'          => false,
@@ -458,7 +488,7 @@ class ConfigType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.config.form.ip.lookup.auth',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.ip.lookup.auth.tooltip',
@@ -472,7 +502,7 @@ class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.core.config.create.organization.from.ip.lookup',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.create.organization.from.ip.lookup.tooltip',
@@ -537,7 +567,7 @@ class ConfigType extends AbstractType
         );
 
         $enabledServices = $this->shortenerFactory->getEnabledServices();
-        $choices         = array_flip(array_map(fn ($enabledService) => $enabledService->getPublicName(), $enabledServices));
+        $choices         = array_flip(array_map(fn (ShortenerServiceInterface $enabledService): string => $enabledService->getPublicName(), $enabledServices));
 
         $builder->add(
             Shortener::SHORTENER_SERVICE,
@@ -583,7 +613,7 @@ class ConfigType extends AbstractType
             NumberType::class,
             [
                 'label'      => 'mautic.core.config.form.link.max_entity_lock_time',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'help'       => 'mautic.core.config.form.link.max_entity_lock_time.help',
                 'attr'       => [
                     'class'   => 'form-control',
@@ -627,7 +657,7 @@ class ConfigType extends AbstractType
                 TextareaType::class,
                 [
                     'label'      => 'mautic.core.config.cors.valid.domains',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'        => 'form-control',
                         'tooltip'      => 'mautic.core.config.cors.valid.domains.tooltip',
@@ -637,6 +667,25 @@ class ConfigType extends AbstractType
                 ]
             )->addViewTransformer($arrayLinebreakTransformer)
         );
+
+        if ($this->coreParametersHelper->get('validate_remote_domains')) {
+            $builder->add(
+                $builder->create(
+                    'allowed_remote_domains',
+                    TextareaType::class,
+                    [
+                        'label'      => 'mautic.core.config.allowed.remote.domains',
+                        'label_attr' => ['class' => 'form-label'],
+                        'attr'       => [
+                            'class'   => 'form-control',
+                            'tooltip' => 'mautic.core.config.allowed.remote.domains.tooltip',
+                            'rows'    => 8,
+                        ],
+                        'required'   => false,
+                    ]
+                )->addViewTransformer($arrayLinebreakTransformer)
+            );
+        }
 
         $builder->add(
             'headers_sts',

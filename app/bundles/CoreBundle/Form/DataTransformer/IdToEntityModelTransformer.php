@@ -10,13 +10,17 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 /**
  * @implements DataTransformerInterface<array<mixed>|int|string, array<mixed>|int|string>
  */
-class IdToEntityModelTransformer implements DataTransformerInterface
+final class IdToEntityModelTransformer implements DataTransformerInterface
 {
     /**
      * @param class-string $repository
      */
-    public function __construct(private EntityManagerInterface $em, private string $repository, private string $id = 'id', private bool $isArray = false)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private string $repository,
+        private string $id = 'id',
+        private readonly bool $isArray = false,
+    ) {
     }
 
     /**
@@ -29,20 +33,20 @@ class IdToEntityModelTransformer implements DataTransformerInterface
         $func = 'get'.ucfirst($this->id);
 
         if (!$this->isArray) {
-            if (is_null($entity) || !is_object($entity) || !method_exists($entity, $func)) {
+            if (null === $entity || !is_object($entity) || !method_exists($entity, $func)) {
                 return '';
             }
 
-            return $entity->$func();
+            return $entity->{$func}();
         }
 
-        if (is_null($entity) && !is_array($entity) && !$entity instanceof PersistentCollection) {
+        if (!is_array($entity) && !$entity instanceof PersistentCollection) {
             return [];
         }
 
         $return = [];
         foreach ($entity as $e) {
-            $return[] = $e->$func();
+            $return[] = $e->{$func}();
         }
 
         return $return;
@@ -100,20 +104,16 @@ class IdToEntityModelTransformer implements DataTransformerInterface
 
     /**
      * Set the repository to use.
-     *
-     * @param string $repo
      */
-    public function setRepository($repo): void
+    public function setRepository(string $repo): void
     {
         $this->repository = $repo;
     }
 
     /**
      * Set the identifier to use.
-     *
-     * @param string $id
      */
-    public function setIdentifier($id): void
+    public function setIdentifier(string $id): void
     {
         $this->id = $id;
     }

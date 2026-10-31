@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine\Provider;
 
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
-use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnsInterface;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
@@ -16,19 +15,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final class GeneratedColumnsProviderTest extends TestCase
 {
     /**
-     * @var MockObject|VersionProviderInterface
+     * @var MockObject&VersionProviderInterface
      */
-    private $versionProvider;
+    private MockObject $versionProvider;
 
     /**
-     * @var MockObject|EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
-    private $dispatcher;
+    private MockObject $dispatcher;
 
-    /**
-     * @var GeneratedColumnsProvider
-     */
-    private $provider;
+    private GeneratedColumnsProvider $provider;
 
     protected function setUp(): void
     {
@@ -54,7 +50,6 @@ final class GeneratedColumnsProviderTest extends TestCase
 
         $generatedColumns = $this->provider->getGeneratedColumns();
 
-        $this->assertInstanceOf(GeneratedColumnsInterface::class, $generatedColumns);
         $this->assertCount(0, $generatedColumns);
     }
 
@@ -74,9 +69,7 @@ final class GeneratedColumnsProviderTest extends TestCase
             ->willReturn($event);
 
         $generatedColumns = $this->provider->getGeneratedColumns();
-        $this->assertInstanceOf(GeneratedColumnsInterface::class, $generatedColumns);
 
-        /** @var GeneratedColumn $generatedColumn */
         $generatedColumn = $generatedColumns->current();
         $this->assertSame(MAUTIC_TABLE_PREFIX.'page_hits', $generatedColumn->getTableName());
 

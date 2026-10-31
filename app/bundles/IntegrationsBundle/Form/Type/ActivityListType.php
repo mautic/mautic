@@ -12,10 +12,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class ActivityListType extends AbstractType
+final class ActivityListType extends AbstractType
 {
     public function __construct(
-        private LeadModel $leadModel,
+        private readonly LeadModel $leadModel,
     ) {
     }
 
@@ -26,7 +26,7 @@ class ActivityListType extends AbstractType
                 'choices'    => array_flip($this->leadModel->getEngagementTypes()),
                 'label'      => 'mautic.integration.feature.push_activity.included_events',
                 'label_attr' => [
-                    'class'       => 'control-label',
+                    'class'       => 'form-label',
                     'tooltip'     => 'mautic.integration.feature.push_activity.included_events.tooltip',
                 ],
                 'multiple'   => true,
@@ -35,7 +35,7 @@ class ActivityListType extends AbstractType
         );
     }
 
-    public function getParent(): ?string
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

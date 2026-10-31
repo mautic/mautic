@@ -11,10 +11,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class ReportWidgetType extends AbstractType
+final class ReportWidgetType extends AbstractType
 {
     public function __construct(
-        protected ReportModel $model,
+        private readonly ReportModel $model,
     ) {
     }
 
@@ -43,7 +43,7 @@ class ReportWidgetType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.report.report.form.choose_graphs',
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'placeholder'       => false,
                 'required'          => false,
                 'attr'              => [

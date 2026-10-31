@@ -14,6 +14,6 @@ final class SearchTest extends MauticMysqlTestCase
         $this->client->request('GET', 's/users?search=name:admin');
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
-        $this->assertStringContainsString('admin', $this->client->getResponse()->getContent());
+        $this->assertStringContainsString('admin', (string) $this->client->getResponse()->getContent());
     }
 }

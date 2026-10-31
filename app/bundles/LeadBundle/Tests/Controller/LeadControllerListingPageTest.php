@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class LeadControllerListingPageTest extends MauticMysqlTestCase
 {
@@ -23,7 +23,7 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
      *
      * @throws ORMException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('dataForContactListing')]
+    #[DataProvider('dataForContactListing')]
     public function testContactListingForLocation(array $location, string $expected): void
     {
         $this->createContact($location);
@@ -31,7 +31,7 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
         $crawler    = $this->client->request('GET', 's/contacts');
         $rowContent = $crawler->filterXPath("//table[@id='leadTable']//tbody//tr");
 
-        Assert::assertStringEndsWith($expected, $rowContent->text());
+        $this->assertStringEndsWith($expected, $rowContent->text());
     }
 
     /**
@@ -89,7 +89,7 @@ final class LeadControllerListingPageTest extends MauticMysqlTestCase
             if (empty($value)) {
                 continue;
             }
-            $contact->$name($value);
+            $contact->{$name}($value);
         }
 
         $this->em->persist($contact);

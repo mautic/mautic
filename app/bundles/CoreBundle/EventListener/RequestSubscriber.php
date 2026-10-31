@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -13,7 +15,7 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-class RequestSubscriber implements EventSubscriberInterface
+final readonly class RequestSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private CsrfTokenManagerInterface $tokenManager,

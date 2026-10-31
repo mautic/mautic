@@ -39,9 +39,38 @@
                     {% trans %}marketplace.package.required.packages{% endtrans %}
                     ({{ latestVersion.require|length }})
                 </th>
-                <td>{{ latestVersion.require|keys|join(', ')|escape }}</td>
+                <td><ul class="list-unstyled mb-0">{% for name, constraint in latestVersion.require %}<li><code>{{ name }}</code> {{ constraint }}</li>{% endfor %}</ul></td>
             </tr>
         {% endif %}
+        {% set metadata = {
+            'marketplace.package.name': packageDetail.packageBase.name,
+            'marketplace.package.language': packageDetail.language,
+            'marketplace.package.languages': latestVersion.extra.mautic.languages|default([])|join(', '),
+            'marketplace.package.compatibility': latestVersion.extra.mautic['works-with']|default([])|join(', '),
+            'marketplace.package.industry': latestVersion.extra.industry|default([])|join(', '),
+            'marketplace.package.keywords': latestVersion.keywords|default([])|join(', ')
+        } %}
+        {% if latestVersion.extra.mautic.price.amount is defined %}
+            <tr><th>{{ 'marketplace.package.price'|trans }}</th><td>{{ latestVersion.extra.mautic.price.amount }} {{ latestVersion.extra.mautic.price.currency|default('') }}</td></tr>
+        {% endif %}
+        {% for label, value in metadata %}
+            {% if value %}<tr><th>{{ label|trans }}</th><td>{{ value }}</td></tr>{% endif %}
+        {% endfor %}
+        {% if latestVersion.authors|default([]) %}
+        <tr><th>{{ 'marketplace.package.authors'|trans }}</th><td>
+            {% for author in latestVersion.authors %}<div>{{ author.name|default('') }}{% if author.role|default('') %} — {{ author.role }}{% endif %}</div>{% endfor %}
+        </td></tr>
+        {% endif %}
+        {% for label, url in latestVersion.support|default({}) %}
+            {% if url starts with 'https://' or url starts with 'http://' %}
+                <tr><th>{{ 'marketplace.package.support'|trans }}: {{ label }}</th><td><a href="{{ url }}" target="_blank" rel="noopener noreferrer">{{ url }}</a></td></tr>
+            {% endif %}
+        {% endfor %}
+        {% for funding in latestVersion.funding|default([]) %}
+            {% if funding.url|default('') starts with 'https://' %}
+                <tr><th>{{ 'marketplace.package.funding'|trans }}</th><td><a href="{{ funding.url }}" target="_blank" rel="noopener noreferrer">{{ funding.type|default(funding.url) }}</a></td></tr>
+            {% endif %}
+        {% endfor %}
     </table>
     </div>
 

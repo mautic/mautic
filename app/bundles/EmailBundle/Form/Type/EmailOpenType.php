@@ -9,13 +9,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @extends AbstractType<mixed>
  */
-class EmailOpenType extends AbstractType
+final class EmailOpenType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $defaultOptions = [
             'label'      => 'mautic.email.open.limittoemails',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.email.open.limittoemails_descr',

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -9,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * @extends AbstractType<mixed>
  */
-class FormFieldGroupType extends AbstractType
+final class FormFieldGroupType extends AbstractType
 {
     use SortableListTrait;
 
@@ -20,7 +22,7 @@ class FormFieldGroupType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.field.group.labelattr',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'     => 'form-control',
                     'tooltip'   => 'mautic.form.field.help.group.labelattr',

@@ -5,10 +5,12 @@ namespace Mautic\CampaignBundle\Executioner;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
+use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
@@ -39,25 +41,25 @@ class InactiveExecutioner implements ExecutionerInterface
     protected ?\DateTime $now = null;
 
     public function __construct(
-        private InactiveContactFinder $inactiveContactFinder,
-        private LoggerInterface $logger,
-        private TranslatorInterface $translator,
-        private EventScheduler $scheduler,
-        private InactiveHelper $helper,
-        private EventExecutioner $executioner,
-        private ProcessSignalService $processSignalService,
+        private readonly InactiveContactFinder $inactiveContactFinder,
+        private readonly LoggerInterface $logger,
+        private readonly TranslatorInterface $translator,
+        private readonly EventScheduler $scheduler,
+        private readonly InactiveHelper $helper,
+        private readonly EventExecutioner $executioner,
+        private readonly ProcessSignalService $processSignalService,
+        private readonly EventRedirectionHelper $redirectionHelper,
+        private readonly LeadRepository $leadRepository,
     ) {
     }
 
     /**
-     * @return Counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null)
+    public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
         $this->campaign = $campaign;
         $this->limiter  = $limiter;
@@ -85,14 +87,12 @@ class InactiveExecutioner implements ExecutionerInterface
     /**
      * @param int $decisionId
      *
-     * @return Counter
-     *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
      * @throws Scheduler\Exception\NotSchedulableException
      */
-    public function validate($decisionId, ContactLimiter $limiter, ?OutputInterface $output = null)
+    public function validate($decisionId, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
         $this->limiter = $limiter;
         $this->output  = $output ?: new NullOutput();
@@ -151,7 +151,7 @@ class InactiveExecutioner implements ExecutionerInterface
             throw new NoEventsFoundException();
         }
         $totalContacts = 0;
-        if (!($this->output instanceof NullOutput)) {
+        if (!$this->output instanceof NullOutput) {
             $totalContacts = $this->inactiveContactFinder->getContactCount($this->campaign->getId(), $this->decisions->getKeys(), $this->limiter);
 
             $this->output->writeln(
@@ -187,7 +187,16 @@ class InactiveExecutioner implements ExecutionerInterface
         $now = $this->now ?? new \DateTime();
 
         /** @var Event $decisionEvent */
-        foreach ($this->decisions as $decisionEvent) {
+        foreach ($this->decisions as $key => $decisionEvent) {
+            $originalDecisionEvent = $decisionEvent;
+
+            $decisionEvent = $this->redirectionHelper->handleEventRedirection($decisionEvent, $this->decisions, $key);
+
+            if ($decisionEvent->getId() !== $originalDecisionEvent->getId()) {
+                $this->handleRedirectedEvent($decisionEvent, $originalDecisionEvent);
+                continue;
+            }
+
             try {
                 // We need the parent ID of the decision in order to fetch the time the contact executed this event
                 $parentEvent   = $decisionEvent->getParent();
@@ -264,6 +273,8 @@ class InactiveExecutioner implements ExecutionerInterface
         $executionDate = $this->executioner->getExecutionDate();
 
         foreach ($events as $key => $event) {
+            $event = $this->redirectionHelper->handleEventRedirection($event, $events, $key);
+
             // Ignore decisions
             if (Event::TYPE_DECISION == $event->getEventType()) {
                 $this->logger->debug('CAMPAIGN: Ignoring child event ID '.$event->getId().' as a decision');
@@ -294,6 +305,67 @@ class InactiveExecutioner implements ExecutionerInterface
 
         if ($events->count()) {
             $this->executioner->executeEventsForContacts($events, $contacts, $childrenCounter, true);
+        }
+    }
+
+    /**
+     * Handle redirection to an action or condition event from a deleted decision.
+     *
+     * @param Event $redirectEvent         The event to redirect to (action or condition)
+     * @param Event $originalDecisionEvent The original deleted decision
+     */
+    private function handleRedirectedEvent(Event $redirectEvent, Event $originalDecisionEvent): void
+    {
+        try {
+            $contacts = $this->inactiveContactFinder->getContacts(
+                $this->campaign->getId(),
+                $originalDecisionEvent,
+                $this->limiter,
+                true
+            );
+
+            while ($contacts->count()) {
+                $batchMinContactId = max($contacts->getKeys()) + 1;
+
+                $this->progressBar->advance($contacts->count());
+                $this->counter->advanceEvaluated($contacts->count());
+
+                $contactIds = $contacts->getKeys();
+                $this->leadRepository->incrementCampaignRotationForContacts(
+                    $contactIds,
+                    $redirectEvent->getCampaign()->getId()
+                );
+
+                $this->executioner->recordLogsAsExecutedForEvent($originalDecisionEvent, $contacts, true);
+
+                $eventCollection = new ArrayCollection([$redirectEvent]);
+                $this->executioner->executeEventsForContacts($eventCollection, $contacts, $this->counter, true);
+
+                $this->inactiveContactFinder->clear($contacts);
+
+                if ($this->limiter->getContactId()) {
+                    break;
+                }
+
+                $this->processSignalService->throwExceptionIfSignalIsCaught();
+
+                $this->logger->debug(
+                    'CAMPAIGN: Fetching the next batch of inactive contacts for redirected decision ID #'
+                    .$originalDecisionEvent->getId().' starting with contact ID '.$batchMinContactId
+                );
+                $this->limiter->setBatchMinContactId($batchMinContactId);
+
+                $contacts = $this->inactiveContactFinder->getContacts(
+                    $this->campaign->getId(),
+                    $originalDecisionEvent,
+                    $this->limiter,
+                    true
+                );
+            }
+        } catch (NoContactsFoundException) {
+            $this->logger->debug(
+                'CAMPAIGN: No more contacts to process for redirected decision ID #'.$originalDecisionEvent->getId()
+            );
         }
     }
 }

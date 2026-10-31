@@ -9,7 +9,6 @@
 .php-cs-fixer.php
 .travis.yml
 codecov.yml
-Gruntfile.js
 README.md
 UPGRADE*.md
 app/console
@@ -32,9 +31,3 @@ node_modules/*
 phpstan*.neon
 rector.php
 tests/*
-vendor/babdev/*
-vendor/liip/*
-vendor/symfony/browser-kit/*
-vendor/symfony/dom-crawler/*
-vendor/symfony/web-profiler-bundle/*
-vendor/webfactory/*

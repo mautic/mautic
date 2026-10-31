@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use PHPUnit\Framework\TestCase;
 
-class BundleMetadataTest extends TestCase
+final class BundleMetadataTest extends TestCase
 {
     public function testGetters(): void
     {

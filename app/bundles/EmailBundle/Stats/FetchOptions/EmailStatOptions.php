@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\Stats\FetchOptions;
 
 use Mautic\StatsBundle\Event\Options\FetchOptions;
 
-class EmailStatOptions extends FetchOptions
+final class EmailStatOptions extends FetchOptions
 {
     private array $ids = [];
 
@@ -32,20 +32,14 @@ class EmailStatOptions extends FetchOptions
      */
     private $unit;
 
-    /**
-     * @return $this
-     */
-    public function setEmailIds(array $ids)
+    public function setEmailIds(array $ids): static
     {
         $this->ids = $ids;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getEmailIds()
+    public function getEmailIds(): array
     {
         return $this->ids;
     }
@@ -104,10 +98,7 @@ class EmailStatOptions extends FetchOptions
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFilters()
+    public function getFilters(): array
     {
         return $this->filters;
     }
@@ -124,10 +115,7 @@ class EmailStatOptions extends FetchOptions
         return $this->canViewOthers;
     }
 
-    /**
-     * @param bool $canViewOthers
-     */
-    public function setCanViewOthers($canViewOthers): self
+    public function setCanViewOthers(bool $canViewOthers): self
     {
         $this->canViewOthers = $canViewOthers;
 
@@ -144,10 +132,8 @@ class EmailStatOptions extends FetchOptions
 
     /**
      * @param string $unit
-     *
-     * @return $this
      */
-    public function setUnit($unit)
+    public function setUnit($unit): static
     {
         $this->unit = $unit;
 

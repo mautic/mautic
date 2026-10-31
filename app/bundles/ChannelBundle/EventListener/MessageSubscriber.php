@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ChannelBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
@@ -7,7 +9,7 @@ use Mautic\ChannelBundle\Event\MessageEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class MessageSubscriber implements EventSubscriberInterface
+final readonly class MessageSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private AuditLogModel $auditLogModel,

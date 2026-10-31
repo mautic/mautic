@@ -13,7 +13,7 @@ use Twig\Environment;
 class GlobalSearch
 {
     public function __construct(
-        private Environment $twig,
+        private readonly Environment $twig,
     ) {
     }
 
@@ -31,7 +31,7 @@ class GlobalSearch
 
         $entities = $model->getEntitiesForGlobalSearch($filterDTO);
 
-        if (is_null($entities) || ($entities instanceof Paginator && empty($entities->count()))) {
+        if (null === $entities || ($entities instanceof Paginator && empty($entities->count()))) {
             return [];
         }
 

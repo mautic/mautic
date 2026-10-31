@@ -22,17 +22,17 @@ final class EmailScheduleCest
         $I->click(EmailsPage::NEW_BUTTON);
 
         // Wait for email type modal
-        $I->waitForElementVisible(EmailsPage::EMAIL_TYPE_MODAL, 10);
+        $I->waitForElementVisible(EmailsPage::EMAIL_TYPE_MODAL, AcceptanceTester::TIMEOUT);
 
         // Click "Triggered email"
         $I->waitForElementClickable(EmailsPage::SELECT_TRIGGERED_EMAIL);
         $I->click(EmailsPage::SELECT_TRIGGERED_EMAIL);
 
         // Wait until modal closes
-        $I->waitForElementNotVisible(EmailsPage::EMAIL_TYPE_MODAL, 10);
+        $I->waitForElementNotVisible(EmailsPage::EMAIL_TYPE_MODAL, AcceptanceTester::TIMEOUT);
 
         // Assert schedule container is visible
-        $I->waitForElementVisible('#scheduleOptions', 10);
+        $I->waitForElementVisible('#scheduleOptions', AcceptanceTester::TIMEOUT);
         $I->seeElement('#scheduleOptions');
 
         // Assert publish up/down datetime fields exist
@@ -52,12 +52,12 @@ final class EmailScheduleCest
         $I->click(EmailsPage::NEW_BUTTON);
 
         // Wait for email type modal
-        $I->waitForElementVisible(EmailsPage::EMAIL_TYPE_MODAL, 10);
+        $I->waitForElementVisible(EmailsPage::EMAIL_TYPE_MODAL, AcceptanceTester::TIMEOUT);
 
         // Click "Segment email"
         $I->waitForElementClickable(EmailsPage::SELECT_SEGMENT_EMAIL);
         $I->click(EmailsPage::SELECT_SEGMENT_EMAIL);
-        $I->waitForElementNotVisible(EmailsPage::EMAIL_TYPE_MODAL, 10);
+        $I->waitForElementNotVisible(EmailsPage::EMAIL_TYPE_MODAL, AcceptanceTester::TIMEOUT);
 
         // Schedule options should exist in DOM but be hidden (class "hide")
         $I->seeElementInDOM('#scheduleOptions');
@@ -75,17 +75,17 @@ final class EmailScheduleCest
         $email->createTriggeredEmail($name);
 
         // Wait for redirect to email detail page
-        $I->waitForText($name, 10, 'h1.page-header-title');
+        $I->waitForText($name, AcceptanceTester::TIMEOUT, 'h1.page-header-title');
 
         // Assert the header contains the created email name
         $I->see($name, 'h1.page-header-title');
 
         // Click on Edit button
-        $I->waitForElementClickable(EmailsPage::EDIT_BUTTON, 10);
+        $I->waitForElementClickable(EmailsPage::EDIT_BUTTON, AcceptanceTester::TIMEOUT);
         $I->click(EmailsPage::EDIT_BUTTON);
 
         // Assert schedule container is visible
-        $I->waitForElementVisible('#scheduleOptions', 10);
+        $I->waitForElementVisible('#scheduleOptions', AcceptanceTester::TIMEOUT);
         $I->seeElement('#scheduleOptions');
 
         // Assert publish up/down datetime fields exist
@@ -107,17 +107,17 @@ final class EmailScheduleCest
         $email->createSegmentEmail($segmentEmailName);
 
         // Wait for redirect to email detail page
-        $I->waitForText($segmentEmailName, 10, 'h1.page-header-title');
+        $I->waitForText($segmentEmailName, AcceptanceTester::TIMEOUT, 'h1.page-header-title');
 
         // Assert the header contains the created email name
         $I->see($segmentEmailName, 'h1.page-header-title');
 
         // Click on Edit button
-        $I->waitForElementClickable(EmailsPage::EDIT_BUTTON, 10);
+        $I->waitForElementClickable(EmailsPage::EDIT_BUTTON, AcceptanceTester::TIMEOUT);
         $I->click(EmailsPage::EDIT_BUTTON);
 
         // Assert schedule container is visible
-        $I->waitForElementVisible('#scheduleOptions', 10);
+        $I->waitForElementVisible('#scheduleOptions', AcceptanceTester::TIMEOUT);
         $I->seeElement('#scheduleOptions');
 
         // Assert publish up/down datetime fields does not exist
@@ -152,11 +152,11 @@ final class EmailScheduleCest
         $email->createSegmentEmail($segmentEmailName);
 
         // Confirm we're on the email view page for the created email
-        $I->waitForText($segmentEmailName, 10, 'h1.page-header-title');
+        $I->waitForText($segmentEmailName, AcceptanceTester::TIMEOUT, 'h1.page-header-title');
         $I->see($segmentEmailName, 'h1.page-header-title');
 
         // Assert Schedule button exists on view page
-        $I->waitForElementVisible(EmailsPage::SCHEDULE_BUTTON, 10);
+        $I->waitForElementVisible(EmailsPage::SCHEDULE_BUTTON, AcceptanceTester::TIMEOUT);
         $I->seeElement(EmailsPage::SCHEDULE_BUTTON);
 
         // Verify it links to scheduleSend/<id>

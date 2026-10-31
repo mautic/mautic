@@ -6,6 +6,7 @@ namespace Mautic\ReportBundle\Tests\Form\DataTransformer;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\ReportBundle\Form\DataTransformer\ReportFilterDataTransformer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -58,7 +59,7 @@ final class ReportFilterDataTransformerTest extends TestCase
         parent::tearDown();
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideTransformData')]
+    #[DataProvider('provideTransformData')]
     public function testTransformUtcToLocalForSupportedTypes(string $column, string $utcValue, string $expectedLocalValue): void
     {
         // Arrange
@@ -97,7 +98,37 @@ final class ReportFilterDataTransformerTest extends TestCase
         $this->assertSame($expectedUtcDateTime, $reverseTransformedFilters[0]['value']);
     }
 
-    #[\PHPUnit\Framework\Attributes\DataProvider('provideStringConditions')]
+    #[DataProvider('provideRelativeDates')]
+    public function testRelativeDatesRemainUnchanged(string $column, string $value): void
+    {
+        $transformer = new ReportFilterDataTransformer($this->columns);
+        $filters     = [['column' => $column, 'condition' => 'eq', 'value' => $value]];
+
+        $this->assertSame($value, $transformer->transform($filters)[0]['value']);
+        $this->assertSame($value, $transformer->reverseTransform($filters)[0]['value']);
+    }
+
+    public static function provideRelativeDates(): \Generator
+    {
+        yield 'today datetime' => ['c.date_added', 'today'];
+        yield 'negative datetime interval' => ['c.date_added', '-2days'];
+        yield 'positive datetime interval' => ['c.publish_up', '+1 week'];
+        yield 'date interval' => ['c.some_date', '-2weeks'];
+        yield 'tomorrow' => ['c.date_added', 'tomorrow'];
+        yield 'yesterday' => ['c.date_added', 'yesterday'];
+        yield 'named week' => ['c.date_added', 'last week'];
+        yield 'named month' => ['c.date_added', 'this month'];
+        yield 'named year' => ['c.date_added', 'next year'];
+        yield 'month interval' => ['c.date_added', '-3 months'];
+        yield 'compound signed interval' => ['c.date_added', '-3 months 2 days'];
+        yield 'ago interval' => ['c.date_added', '5 days ago'];
+        yield 'first day expression' => ['c.date_added', 'first day of next month'];
+        yield 'last day expression' => ['c.date_added', 'last day of this year'];
+        yield 'anniversary' => ['c.date_added', 'anniversary'];
+        yield 'relative birthday' => ['c.date_added', 'birthday +2days'];
+    }
+
+    #[DataProvider('provideStringConditions')]
     public function testTransformationIsSkippedForStringLikeConditions(string $condition): void
     {
         $transformer   = new ReportFilterDataTransformer($this->columns);

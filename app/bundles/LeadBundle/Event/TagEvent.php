@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\LeadBundle\Entity\Tag;
 
-class TagEvent extends CommonEvent
+final class TagEvent extends CommonEvent
 {
     /**
      * @param bool $isNew

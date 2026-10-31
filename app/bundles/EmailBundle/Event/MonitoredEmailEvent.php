@@ -1,26 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Event;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class MonitoredEmailEvent extends Event
+final class MonitoredEmailEvent extends Event
 {
     private array $folders = [];
 
     public function __construct(
-        private FormBuilderInterface $formBuilder,
+        private readonly FormBuilderInterface $formBuilder,
         private array $data,
     ) {
     }
 
     /**
      * Get the FormBuilder for monitored_mailboxes FormType.
-     *
-     * @return FormBuilderInterface
      */
-    public function getFormBuilder()
+    public function getFormBuilder(): FormBuilderInterface
     {
         return $this->formBuilder;
     }
@@ -54,10 +54,8 @@ class MonitoredEmailEvent extends Event
 
     /**
      * Get array of folders.
-     *
-     * @return array
      */
-    public function getFolders()
+    public function getFolders(): array
     {
         return $this->folders;
     }

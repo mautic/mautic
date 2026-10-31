@@ -26,10 +26,12 @@
 {% set submissions = submissions|default(null) %}
 {% set lead = lead|default(null) %}
 {% set successfulSubmitAction = successfulSubmitAction|default('') %}
+{% set isAutoFillFeatureEnabled = configGetParameter('form_field_autofill', false) %}
 
 {{ style|raw }}
 <style type="text/css" scoped>
     .mauticform-field-hidden { display:none }
+    .mauticform-row.mauticform-honeypot { display: none; }
 </style>
 <div id="mauticform_wrapper{{ formName }}" class="mauticform_wrapper">
     <form autocomplete="false" role="form" method="post" action="{{ action }}" id="mauticform{{ formName }}" {% if isAjax %}data-mautic-form="{{ formName|trim('_', 'left') }}"{% endif %} enctype="multipart/form-data" {{ form.formAttributes|raw }}>
@@ -56,6 +58,7 @@
                             not f.showWhenValueExists and
                             f.mappedField is not empty and
                             'contact' is same as f.mappedObject and
+                            isAutoFillFeatureEnabled and
                             f.isAutoFill and
                             (lead is defined and lead is not empty and lead.getFieldValue(f.mappedField) is not empty)
                       -%}
@@ -92,6 +95,7 @@
                             not f.showWhenValueExists and
                             f.mappedField is not empty and
                             'contact' is same as f.mappedObject and
+                            isAutoFillFeatureEnabled and
                             f.isAutoFill and
                             (lead is defined and lead is not empty and lead.getFieldValue(f.mappedField) is not empty)
                       %}

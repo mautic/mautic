@@ -13,14 +13,16 @@ use Mautic\CoreBundle\EventListener\ImportExportTrait;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UuidHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Entity\FieldRepository;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class FieldImportExportSubscriber implements EventSubscriberInterface
 {
@@ -28,12 +30,14 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private FieldRepository $fieldRepository,
+        private FormRepository $formRepository,
         private AuditLogModel $auditLogModel,
         private IpLookupHelper $ipLookupHelper,
         private FieldModel $fieldModel,
         private LeadFieldModel $leadFieldModel,
         private EventDispatcherInterface $dispatcher,
-        private DenormalizerInterface $serializer,
+        private ImportEntityDenormalizer $serializer,
     ) {
     }
 
@@ -103,7 +107,7 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
                     $this->mergeExportData($data, $subEvent);
 
                     $event->addDependencyEntity(Form::ENTITY_NAME, [
-                        Field::ENTITY_NAME       => (int) $fieldId,
+                        Field::ENTITY_NAME       => $fieldId,
                         LeadField::ENTITY_NAME   => (int) $object->getId(),
                     ]);
                 }
@@ -127,11 +131,14 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
         ];
 
         foreach ($event->getEntityData() as $fieldData) {
-            $field = $this->entityManager->getRepository(Field::class)->findOneBy(['uuid' => $fieldData['uuid']]);
+            $field = $this->fieldRepository->findOneBy(['uuid' => $fieldData['uuid']]);
             $isNew = !$field;
             $field ??= new Field();
 
-            foreach (['properties', 'validation', 'custom_parameters', 'conditions', 'label_attr', 'input_attr', 'container_attr'] as $jsonField) {
+            // Only the array and json columns are stored encoded. The *_attr columns are plain
+            // strings ("class=\"btn btn-default\""), and running them through json_decode turned
+            // every one of them into an empty array.
+            foreach (['properties', 'validation', 'custom_parameters', 'conditions'] as $jsonField) {
                 if (isset($fieldData[$jsonField]) && is_string($fieldData[$jsonField])) {
                     $decoded               = json_decode($fieldData[$jsonField], true);
                     $fieldData[$jsonField] = is_array($decoded) ? $decoded : [];
@@ -140,7 +147,7 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
 
             // Form mapping
             if (!empty($fieldData['form'])) {
-                $form = $this->entityManager->getRepository(Form::class)->find($fieldData['form']);
+                $form = $this->formRepository->find($fieldData['form']);
                 if ($form instanceof Form) {
                     $field->setForm($form);
                     unset($fieldData['form']);
@@ -185,7 +192,7 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
         }
 
         foreach ($summary['ids'] as $id) {
-            $field = $this->entityManager->getRepository(Field::class)->find($id);
+            $field = $this->fieldRepository->find($id);
 
             if ($field) {
                 $this->entityManager->remove($field);
@@ -214,7 +221,7 @@ final class FieldImportExportSubscriber implements EventSubscriberInterface
                 break;
             }
 
-            $existing = $this->entityManager->getRepository(Field::class)->findOneBy(['uuid' => $item['uuid']]);
+            $existing = $this->fieldRepository->findOneBy(['uuid' => $item['uuid']]);
             if ($existing) {
                 $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getLabel() ?? $existing->getAlias();
                 $summary[EntityImportEvent::UPDATE]['uuids'][] = $existing->getUuid();

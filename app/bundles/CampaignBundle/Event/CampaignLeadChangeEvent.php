@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CampaignLeadChangeEvent extends Event
+final class CampaignLeadChangeEvent extends Event
 {
     /**
      * @var ?Lead
@@ -23,7 +25,7 @@ class CampaignLeadChangeEvent extends Event
      * @param ?string     $action
      */
     public function __construct(
-        private Campaign $campaign,
+        private readonly Campaign $campaign,
         $leads,
         private $action,
     ) {
@@ -36,10 +38,8 @@ class CampaignLeadChangeEvent extends Event
 
     /**
      * Returns the Campaign entity.
-     *
-     * @return Campaign
      */
-    public function getCampaign()
+    public function getCampaign(): Campaign
     {
         return $this->campaign;
     }
@@ -57,9 +57,9 @@ class CampaignLeadChangeEvent extends Event
     /**
      * If this is a batch event, return array of leads.
      *
-     * @return Lead[]|null
+     * @return Lead[]
      */
-    public function getLeads()
+    public function getLeads(): array
     {
         return $this->leads;
     }

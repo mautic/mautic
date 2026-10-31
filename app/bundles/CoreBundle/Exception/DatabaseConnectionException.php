@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Exception;
 
-class DatabaseConnectionException extends \Exception
+final class DatabaseConnectionException extends \Exception
 {
     public function __construct($message = 'Unable to connect to the database.', $code = 0, ?\Exception $previous = null)
     {

@@ -5,11 +5,12 @@
     {notice: 'alert-success', warning: 'alert-warning', error: 'alert-danger', success: 'alert-success'}
 %}
 {% set flashes = flashes|default(app.flashes) %}
+{% set class = class|default('') %}
 
 {% for type, item in flashes %}
 {% set messages = item is not iterable ? [item] : item %}
     {% for message in messages %}
-        <div class="alert {{ attribute(alertClasses, type) ~ dismissable }} alert-new">
+        <div class="alert {{ attribute(alertClasses, type) ~ dismissable ~ class }} alert-new">
             <span>{{ message|purify }}</span>
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true"><i class="ri-close-line"></i></button>
         </div>

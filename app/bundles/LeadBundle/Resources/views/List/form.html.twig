@@ -96,11 +96,7 @@
                             <div class="clearfix"></div>
                         </div>
                         <div class="selected-filters" id="leadlist_filters">
-                            {% if formContainsErrors(form.filters) %}
-                                <div class="alert alert-danger has-error">
-                                    {{ form_errors(form.filters) }}
-                                </div>
-                            {% endif %}
+                            {{ form_errors(form.filters) }}
                             {{ form_widget(form.filters) }}
                         </div>
                     </div>

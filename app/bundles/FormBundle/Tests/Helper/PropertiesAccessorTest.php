@@ -11,7 +11,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|FormModel
+     * @var MockObject&FormModel
      */
     private MockObject $formModel;
 
@@ -150,6 +150,52 @@ final class PropertiesAccessorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             ['Choice A' => 'Value A'],
+            $this->propertiesAccessor->getChoices($options)
+        );
+    }
+
+    public function testGetChoicesForLabelAliasArrayChoices(): void
+    {
+        $options = [
+            [
+                'label' => 'Choice A',
+                'alias' => 'choice_a',
+            ],
+            [
+                'label' => 'Choice B',
+                'alias' => 'choice_b',
+            ],
+        ];
+
+        $this->assertSame(
+            ['Choice A' => 'choice_a', 'Choice B' => 'choice_b'],
+            $this->propertiesAccessor->getChoices($options)
+        );
+    }
+
+    public function testGetChoicesForStringListChoices(): void
+    {
+        $options = ['Choice A', 'Choice B'];
+
+        $this->assertSame(
+            ['Choice A' => 'Choice A', 'Choice B' => 'Choice B'],
+            $this->propertiesAccessor->getChoices($options)
+        );
+    }
+
+    public function testGetChoicesForNestedStringListChoices(): void
+    {
+        $options = [
+            ['Choice A', 'Choice B'],
+            ['Choice C'],
+        ];
+
+        $this->assertSame(
+            [
+                'Choice A' => 'Choice A',
+                'Choice B' => 'Choice B',
+                'Choice C' => 'Choice C',
+            ],
             $this->propertiesAccessor->getChoices($options)
         );
     }

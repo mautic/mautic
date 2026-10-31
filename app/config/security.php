@@ -19,9 +19,20 @@ $firewalls = [
         'lazy'    => true,
         'context' => 'mautic',
     ],
+    'open_id' => [
+        'pattern'               => '^/s/open_id',
+        'lazy'                  => true,
+        'provider'              => 'open_id_provider',
+        'context'               => 'mautic',
+        'custom_authenticators' => [
+            Mautic\UserBundle\Security\OIDC\OidcAuthenticator::class,
+        ],
+        'entry_point'           => Mautic\UserBundle\Security\OIDC\OidcAuthenticator::class,
+    ],
     'sso_login' => [
         'pattern'            => '^/s/sso_login',
         'lazy'               => true,
+        'provider'           => 'user_provider',
         'mautic_plugin_auth' => true,
         'context'            => 'mautic',
     ],
@@ -59,6 +70,7 @@ $firewalls = [
     ],
     'api' => [
         'pattern'            => '^/api/',
+        'provider'           => 'user_provider',
         'fos_oauth'          => true,
         'mautic_plugin_auth' => true,
         'stateless'          => true,
@@ -67,6 +79,7 @@ $firewalls = [
     ],
     'main' => [
         'pattern'       => '^/(s/|elfinder|efconnect)',
+        'provider'      => 'user_provider',
         'light_saml_sp' => [
             'provider'        => 'user_provider',
             'success_handler' => 'mautic.security.authentication_handler',
@@ -98,10 +111,14 @@ $firewalls = [
             'domain'   => '%mautic.rememberme_domain%',
             'samesite' => 'lax',
         ],
-        'entry_point' => Mautic\UserBundle\Security\EntryPoint\MainEntryPoint::class,
-        'mautic_sso'  => [], // options are copied from `form_login` in \Mautic\UserBundle\DependencyInjection\Firewall\Factory\MauticSsoFactory
-        'fos_oauth'   => true,
-        'context'     => 'mautic',
+        'entry_point'      => Mautic\UserBundle\Security\EntryPoint\MainEntryPoint::class,
+        'mautic_sso'       => [], // options are copied from `form_login` in \Mautic\UserBundle\DependencyInjection\Firewall\Factory\MauticSsoFactory
+        'fos_oauth'        => true,
+        'context'          => 'mautic',
+        'login_throttling' => [
+            'max_attempts' => 3,
+            'interval'     => '30 minutes',
+        ],
     ],
     'public' => [
         'pattern' => '^/',
@@ -120,6 +137,9 @@ $container->loadFromExtension(
         'providers' => [
             'user_provider' => [
                 'id' => 'mautic.user.provider',
+            ],
+            'open_id_provider' => [
+                'id' => Mautic\UserBundle\Security\OIDC\UserProvider::class,
             ],
         ],
         'password_hashers' => [
@@ -145,6 +165,8 @@ $container->loadFromExtension(
             ['path' => '^/s/saml/login$', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
             ['path' => '^/saml/discovery$', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
             ['path' => '^/oauth/v2/authorize', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
+            // OIDC endpoints must be public for authentication to work
+            ['path' => '^/s/open_id/', 'roles' => AuthenticatedVoter::PUBLIC_ACCESS],
             // Second should be URIs that are defined as non-public.
             ['path' => '^/api', 'roles' => AuthenticatedVoter::IS_AUTHENTICATED_FULLY],
             ['path' => '^/(s/|elfinder|efconnect)', 'roles' => AuthenticatedVoter::IS_AUTHENTICATED],

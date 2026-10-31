@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @extends AbstractType<array<mixed>>
  */
-class PasswordResetType extends AbstractType
+final class PasswordResetType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -23,14 +23,14 @@ class PasswordResetType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.user.auth.form.loginusername',
-                'label_attr' => ['class' => 'sr-only'],
+                'label_attr' => ['class' => 'visually-hidden'],
                 'attr'       => [
                     'class'       => 'form-control',
                     'preaddon'    => 'ri-user-6-fill',
                     'placeholder' => 'mautic.user.auth.form.loginusername',
                 ],
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'mautic.user.user.passwordreset.notblank']),
+                    new Assert\NotBlank(message: 'mautic.user.user.passwordreset.notblank'),
                 ],
             ]
         );

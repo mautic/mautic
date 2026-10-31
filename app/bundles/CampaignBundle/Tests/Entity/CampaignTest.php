@@ -6,7 +6,6 @@ namespace Mautic\CampaignBundle\Tests\Entity;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 final class CampaignTest extends TestCase
@@ -15,9 +14,9 @@ final class CampaignTest extends TestCase
     {
         $campaign = $this->addSomeEvents(new Campaign());
 
-        Assert::assertCount(2, $campaign->getEventsByType(Event::TYPE_DECISION));
-        Assert::assertCount(1, $campaign->getEventsByType(Event::TYPE_ACTION));
-        Assert::assertCount(1, $campaign->getEventsByType(Event::TYPE_CONDITION));
+        $this->assertCount(2, $campaign->getEventsByType(Event::TYPE_DECISION));
+        $this->assertCount(1, $campaign->getEventsByType(Event::TYPE_ACTION));
+        $this->assertCount(1, $campaign->getEventsByType(Event::TYPE_CONDITION));
     }
 
     private function addSomeEvents(Campaign $campaign): Campaign

@@ -7,7 +7,7 @@ use Mautic\ConfigBundle\Mapper\Helper\ConfigHelper;
 use Mautic\ConfigBundle\Mapper\Helper\RestrictionHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-class ConfigMapper
+final readonly class ConfigMapper
 {
     /**
      * @var mixed[]

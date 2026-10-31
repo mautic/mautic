@@ -40,7 +40,10 @@ $container->loadFromExtension('framework', [
 ]);
 
 $container->loadFromExtension('web_profiler', [
-    'toolbar'             => true,
+    'toolbar' => [
+        'enabled'      => true,
+        'ajax_replace' => true,
+    ],
     'intercept_redirects' => false,
 ]);
 

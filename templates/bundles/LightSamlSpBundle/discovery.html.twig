@@ -3,8 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" href="{{ asset('/media/css/libraries.css') }}" data-source="mautic">
-    <link rel="stylesheet" href="{{ asset('/media/css/app.css') }}" data-source="mautic">
+    {{ importmap('app') }}
+    {{ outputSystemStylesheets() }}
 </head>
 <body>
 <div class="container">

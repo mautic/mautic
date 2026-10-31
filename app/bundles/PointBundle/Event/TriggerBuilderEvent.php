@@ -6,12 +6,12 @@ use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class TriggerBuilderEvent extends Event
+final class TriggerBuilderEvent extends Event
 {
     private array $events = [];
 
     public function __construct(
-        private TranslatorInterface $translator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -36,7 +36,7 @@ class TriggerBuilderEvent extends Event
     public function addEvent($key, array $event): void
     {
         if (array_key_exists($key, $this->events)) {
-            throw new InvalidArgumentException("The key, '$key' is already used by another action. Please use a different key.");
+            throw new InvalidArgumentException("The key, '{$key}' is already used by another action. Please use a different key.");
         }
 
         // check for required keys and that given functions are callable
@@ -59,10 +59,7 @@ class TriggerBuilderEvent extends Event
         $this->events[$key] = $event;
     }
 
-    /**
-     * @return array
-     */
-    public function getEvents()
+    public function getEvents(): array
     {
         uasort($this->events, fn ($a, $b): int => strnatcasecmp(
             $a['label'], $b['label']));
@@ -77,7 +74,7 @@ class TriggerBuilderEvent extends Event
     {
         foreach ($keys as $k) {
             if (!array_key_exists($k, $component)) {
-                throw new InvalidArgumentException("The key, '$k' is missing.");
+                throw new InvalidArgumentException("The key, '{$k}' is missing.");
             }
         }
 

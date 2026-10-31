@@ -10,7 +10,7 @@ use Mautic\FormBundle\Crate\ObjectCrate;
 
 final class ObjectCollectEvent extends CommonEvent
 {
-    private ObjectCollection $objects;
+    private readonly ObjectCollection $objects;
 
     public function __construct()
     {

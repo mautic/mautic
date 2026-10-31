@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CampaignBundle\Tests\Helper;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -7,7 +9,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Helper\ChannelExtractor;
 
-class ChannelExtractorTest extends \PHPUnit\Framework\TestCase
+final class ChannelExtractorTest extends \PHPUnit\Framework\TestCase
 {
     public function testChannelIsSet(): void
     {
@@ -60,7 +62,7 @@ class ChannelExtractorTest extends \PHPUnit\Framework\TestCase
     public function testChannelIdIsIgnoredIfPropertiesAreEmpty(): void
     {
         $event = new Event();
-        $event->setProperties(null);
+        $event->setProperties([]);
         $config = $this->createMock(AbstractEventAccessor::class);
         $config->expects($this->once())
             ->method('getChannel')

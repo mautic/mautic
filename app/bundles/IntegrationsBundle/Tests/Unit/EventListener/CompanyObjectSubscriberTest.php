@@ -25,15 +25,21 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 
-class CompanyObjectSubscriberTest extends TestCase
+final class CompanyObjectSubscriberTest extends TestCase
 {
-    private CompanyObjectHelper|MockObject $companyObjectHelper;
+    /**
+     * @var MockObject&CompanyObjectHelper
+     */
+    private MockObject $companyObjectHelper;
 
-    private Router|MockObject $router;
+    /**
+     * @var MockObject&Router
+     */
+    private MockObject $router;
 
     private CompanyObjectSubscriber $subscriber;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -47,7 +53,7 @@ class CompanyObjectSubscriberTest extends TestCase
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        $this->assertSame(
             [
                 IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS => ['collectInternalObjects', 0],
                 IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS  => ['updateCompanies', 0],
@@ -96,7 +102,7 @@ class CompanyObjectSubscriberTest extends TestCase
 
         $event = new InternalObjectUpdateEvent(new Company(), [123], [$objectChangeDAO]);
 
-        $objectMapping = $this->createMock(UpdatedObjectMappingDAO::class);
+        $objectMapping = $this->createStub(UpdatedObjectMappingDAO::class);
         $this->companyObjectHelper->expects($this->once())
             ->method('update')
             ->with([123], [$objectChangeDAO])
@@ -123,7 +129,7 @@ class CompanyObjectSubscriberTest extends TestCase
     {
         $event = new InternalObjectCreateEvent(new Company(), [['somefield' => 'somevalue']]);
 
-        $objectMapping = $this->createMock(ObjectMapping::class);
+        $objectMapping = $this->createStub(ObjectMapping::class);
         $this->companyObjectHelper->expects($this->once())
             ->method('create')
             ->with([['somefield' => 'somevalue']])
@@ -328,13 +334,13 @@ class CompanyObjectSubscriberTest extends TestCase
     {
         $event = new InternalObjectFindByIdEvent(new Company());
         $event->setId(1);
-        $companyObj = $this->createMock(CompanyEntity::class);
+        $companyObj = $this->createStub(CompanyEntity::class);
         $this->companyObjectHelper->expects($this->once())
             ->method('findObjectById')
             ->with(1)
             ->willReturn($companyObj);
         $this->subscriber->findCompanyById($event);
-        self::assertSame($companyObj, $event->getEntity());
+        $this->assertSame($companyObj, $event->getEntity());
     }
 
     public function testFindCompanyByIdWithNoIdSet(): void
@@ -343,7 +349,7 @@ class CompanyObjectSubscriberTest extends TestCase
         $this->companyObjectHelper->expects($this->never())
             ->method('findObjectById');
         $this->subscriber->findCompanyById($event);
-        self::assertNull($event->getEntity());
+        $this->assertNull($event->getEntity());
     }
 
     public function testFindCompanyByIdWithNoCompany(): void
@@ -355,6 +361,6 @@ class CompanyObjectSubscriberTest extends TestCase
             ->with(1)
             ->willReturn(null);
         $this->subscriber->findCompanyById($event);
-        self::assertNull($event->getEntity());
+        $this->assertNull($event->getEntity());
     }
 }

@@ -7,29 +7,29 @@ namespace Mautic\LeadBundle\Tests\Validator\Constraints;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddress;
 use Mautic\LeadBundle\Form\Validator\Constraints\EmailAddressValidator;
-use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailAddressValidatorTest extends AbstractMauticTestCase
+final class EmailAddressValidatorTest extends AbstractMauticTestCase
 {
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
+    #[DataProvider('provider')]
     public function testValidate(?string $value, int $expectedViolationCount): void
     {
         /** @var EmailAddressValidator $emailAddressValidator */
-        $emailAddressValidator = static::getContainer()->get('mautic.validator.emailaddress');
-        \assert($emailAddressValidator instanceof EmailAddressValidator);
+        $emailAddressValidator = self::getContainer()->get(EmailAddressValidator::class);
+        $this->assertInstanceOf(EmailAddressValidator::class, $emailAddressValidator);
 
-        $translator = static::getContainer()->get('translator');
-        \assert($translator instanceof TranslatorInterface);
+        $translator = self::getContainer()->get(TranslatorInterface::class);
+        $this->assertInstanceOf(TranslatorInterface::class, $translator);
 
-        $context = new ExecutionContext($this->createMock(ValidatorInterface::class), null, $translator);
+        $context = new ExecutionContext($this->createStub(ValidatorInterface::class), null, $translator);
 
         $emailAddressValidator->initialize($context);
         $emailAddressValidator->validate($value, new EmailAddress());
 
-        Assert::assertCount($expectedViolationCount, $context->getViolations());
+        $this->assertCount($expectedViolationCount, $context->getViolations());
     }
 
     /**

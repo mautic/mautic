@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Doctrine\QueryFormatter;
 
 /**
  * Help generate SQL statements to format column data.
  */
-class MysqlFormatter extends AbstractFormatter
+final class MysqlFormatter extends AbstractFormatter
 {
     /**
      * Format field to datetime.
@@ -14,7 +16,7 @@ class MysqlFormatter extends AbstractFormatter
      */
     public function toDateTime($field, $format = '%Y-%m-%d %k:%i:%s'): string
     {
-        return "STR_TO_DATE($field, '$format')";
+        return "STR_TO_DATE({$field}, '{$format}')";
     }
 
     /**
@@ -24,7 +26,7 @@ class MysqlFormatter extends AbstractFormatter
      */
     public function toDate($field, $format = '%Y-%m-%d'): string
     {
-        return "STR_TO_DATE($field, '$format')";
+        return "STR_TO_DATE({$field}, '{$format}')";
     }
 
     /**
@@ -34,7 +36,7 @@ class MysqlFormatter extends AbstractFormatter
      */
     public function toTime($field, $format = '%k:%i:%s'): string
     {
-        return "STR_TO_DATE($field, '$format')";
+        return "STR_TO_DATE({$field}, '{$format}')";
     }
 
     /**

@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final class GravatarHelper
+final readonly class GravatarHelper
 {
     private bool $devMode;
 
@@ -16,6 +16,8 @@ final class GravatarHelper
      */
     private array $devHosts;
 
+    private bool $enabled;
+
     public function __construct(
         private DefaultAvatarHelper $defaultAvatarHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -23,6 +25,7 @@ final class GravatarHelper
     ) {
         $this->devMode             = MAUTIC_ENV === 'dev';
         $this->devHosts            = (array) $coreParametersHelper->get('dev_hosts');
+        $this->enabled             = (bool) $coreParametersHelper->get('gravatar_enabled', false);
     }
 
     /**
@@ -32,6 +35,11 @@ final class GravatarHelper
      */
     public function getImage($email, $size = '250', $default = null): string
     {
+        // Gravatar is off unless enabled in the Privacy Centre, so no email hashes are sent to gravatar.com by default
+        if (!$this->enabled) {
+            return $this->defaultAvatarHelper->getDefaultAvatar(true);
+        }
+
         $request      = $this->requestStack->getCurrentRequest();
         $localDefault = ($this->devMode
             || ($request

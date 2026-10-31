@@ -40,7 +40,7 @@ class ConfigEvent extends CommonEvent
      */
     public function __construct(
         private ?array $config,
-        private ParameterBag $post,
+        private readonly ParameterBag $post,
     ) {
     }
 
@@ -97,10 +97,8 @@ class ConfigEvent extends CommonEvent
     /**
      * Return array of fields to unset if empty so that existing values are not
      * overwritten if empty.
-     *
-     * @return array
      */
-    public function getPreservedFields()
+    public function getPreservedFields(): array
     {
         return $this->preserve;
     }
@@ -112,10 +110,8 @@ class ConfigEvent extends CommonEvent
      * @param array       $messageVars for translation
      * @param string|null $key
      * @param string|null $field
-     *
-     * @return ConfigEvent
      */
-    public function setError($message, $messageVars = [], $key = null, $field = null)
+    public function setError($message, $messageVars = [], $key = null, $field = null): static
     {
         if (!empty($key) && !empty($field)) {
             if (!isset($this->errors[$key])) {
@@ -137,18 +133,13 @@ class ConfigEvent extends CommonEvent
 
     /**
      * Get error messages.
-     *
-     * @return array
      */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldErrors()
+    public function getFieldErrors(): array
     {
         return $this->fieldErrors;
     }
@@ -167,18 +158,12 @@ class ConfigEvent extends CommonEvent
         return base64_encode($content);
     }
 
-    /**
-     * @return array
-     */
-    public function getOriginalNormData()
+    public function getOriginalNormData(): ?array
     {
         return $this->originalNormData;
     }
 
-    /**
-     * @return ConfigEvent
-     */
-    public function setOriginalNormData(array $normData)
+    public function setOriginalNormData(array $normData): static
     {
         $this->originalNormData = $normData;
 

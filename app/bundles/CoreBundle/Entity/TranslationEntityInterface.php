@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
@@ -10,9 +12,9 @@ use Doctrine\Common\Collections\Collection;
  */
 interface TranslationEntityInterface
 {
-    public function getTranslationParent(): ?TranslationEntityInterface;
+    public function getTranslationParent(): ?self;
 
-    public function setTranslationParent(?TranslationEntityInterface $parent = null): self;
+    public function setTranslationParent(?self $parent = null): self;
 
     public function removeTranslationParent(): void;
 
@@ -21,9 +23,9 @@ interface TranslationEntityInterface
     /**
      * @return $this
      */
-    public function addTranslationChild(TranslationEntityInterface $child);
+    public function addTranslationChild(self $child);
 
-    public function removeTranslationChild(TranslationEntityInterface $child): void;
+    public function removeTranslationChild(self $child): void;
 
     /**
      * @return array<int, mixed>

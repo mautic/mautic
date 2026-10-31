@@ -1,0 +1,21 @@
+#!/bin/bash
+
+## Description: Follow the MySQL/MariaDB general log.
+## Usage: mysql-log
+## Example: "ddev mysql-log"
+## Flags: []
+## DBTypes: mysql,mariadb
+## Aliases: mariadb-log
+
+logFile="/var/log/db-general.log"
+
+sql() {
+    mysql -u root -proot db -e "$1";
+}
+
+cleanup() {
+    sql "SET GLOBAL general_log=OFF;" 2>/dev/null;
+}
+
+trap cleanup EXIT
+sql "SET GLOBAL general_log_file='$logFile';SET GLOBAL general_log=ON;" && tail -f "$logFile"

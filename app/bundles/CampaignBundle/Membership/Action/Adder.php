@@ -14,8 +14,8 @@ class Adder
     public const NAME = 'added';
 
     public function __construct(
-        private LeadRepository $leadRepository,
-        private LeadEventLogRepository $leadEventLogRepository,
+        private readonly LeadRepository $leadRepository,
+        private readonly LeadEventLogRepository $leadEventLogRepository,
     ) {
     }
 
@@ -48,10 +48,19 @@ class Adder
     public function updateExistingMembership(CampaignMember $campaignMember, $isManualAction): void
     {
         $wasRemoved = $campaignMember->wasManuallyRemoved();
-        if (!($wasRemoved && $isManualAction) && !$campaignMember->getCampaign()->allowRestart()) {
-            // A contact cannot restart this campaign
 
-            throw new ContactCannotBeAddedToCampaignException('Contacts cannot restart the campaign');
+        if (!$campaignMember->getCampaign()->allowRestart()) {
+            // Only exception: manually removed contacts (no exit date) being manually re-added
+            $isManualReAddOfManuallyRemoved = $wasRemoved && null === $campaignMember->getDateLastExited() && $isManualAction;
+
+            if (!$isManualReAddOfManuallyRemoved) {
+                // Block all other re-entry scenarios:
+                // - Natural exits (wasRemoved=false, dateLastExited=set) being auto re-added
+                // - Filter removals (wasRemoved=true, dateLastExited=set) being auto re-added
+                // - Manual removals (wasRemoved=true, dateLastExited=null) being auto re-added
+                // - Manual removals being manually re-added (unless caught above)
+                throw new ContactCannotBeAddedToCampaignException('Contacts cannot restart the campaign');
+            }
         }
 
         if ($wasRemoved && !$isManualAction && null === $campaignMember->getDateLastExited()) {
@@ -67,13 +76,13 @@ class Adder
 
         // Contact exited but has been added back to the campaign
         $campaignMember->setManuallyRemoved(false);
-        $campaignMember->setDateLastExited(null);
+        $campaignMember->setDateLastExited();
         $campaignMember->startNewRotation();
 
         $this->saveCampaignMember($campaignMember);
     }
 
-    private function saveCampaignMember($campaignMember): void
+    private function saveCampaignMember(CampaignMember $campaignMember): void
     {
         $this->leadRepository->saveEntity($campaignMember);
         $this->leadRepository->detachEntity($campaignMember);

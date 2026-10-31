@@ -5,23 +5,26 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
 use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
-use Mautic\EmailBundle\Model\EmailModel;
+use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class EmailSubscriber implements EventSubscriberInterface
+final class EmailSubscriber implements EventSubscriberInterface
 {
     private string $existingMjml = '';
+
     private string $existingHtml = '';
 
     public function __construct(
-        private Config $config,
-        private GrapesJsBuilderModel $grapesJsBuilderModel,
-        private EmailModel $emailModel,
-        private EmailConfigInterface $emailConfig,
+        private readonly Config $config,
+        private readonly GrapesJsBuilderModel $grapesJsBuilderModel,
+        private readonly EmailConfigInterface $emailConfig,
+        private readonly GrapesJsBuilderRepository $grapesJsBuilderRepository,
+        private readonly EmailRepository $emailRepository,
     ) {
     }
 
@@ -48,7 +51,7 @@ class EmailSubscriber implements EventSubscriberInterface
 
         $this->existingHtml = $email->getCustomHtml() ?? '';
 
-        if ($grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $email])) {
+        if ($grapesJsBuilder = $this->grapesJsBuilderRepository->findOneBy(['email' => $email])) {
             $this->existingMjml = $grapesJsBuilder->getCustomMjml();
         }
     }
@@ -75,10 +78,10 @@ class EmailSubscriber implements EventSubscriberInterface
         }
 
         $email           = $event->getEmail();
-        $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $email]);
+        $grapesJsBuilder = $this->grapesJsBuilderRepository->findOneBy(['email' => $email]);
 
         if ($grapesJsBuilder) {
-            $this->grapesJsBuilderModel->getRepository()->deleteEntity($grapesJsBuilder);
+            $this->grapesJsBuilderRepository->deleteEntity($grapesJsBuilder);
         }
     }
 
@@ -89,7 +92,7 @@ class EmailSubscriber implements EventSubscriberInterface
         }
 
         $email           = $event->getCurrentEmail();
-        $grapesJsBuilder = $this->grapesJsBuilderModel->getRepository()->findOneBy(['email' => $email]);
+        $grapesJsBuilder = $this->grapesJsBuilderRepository->findOneBy(['email' => $email]);
 
         if ($event->isSaveAsDraft()) {
             // Set draft MJML and restore previous version when saving a draft
@@ -109,7 +112,7 @@ class EmailSubscriber implements EventSubscriberInterface
             $grapesJsBuilder->setDraftCustomMjml(null);
         }
 
-        $this->grapesJsBuilderModel->getRepository()->saveEntity($grapesJsBuilder);
-        $this->emailModel->getRepository()->saveEntity($email);
+        $this->grapesJsBuilderRepository->saveEntity($grapesJsBuilder);
+        $this->emailRepository->saveEntity($email);
     }
 }

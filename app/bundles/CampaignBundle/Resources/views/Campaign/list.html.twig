@@ -87,7 +87,9 @@
                     'tooltip': 'mautic.campaign.campaign.searchcommand.ispending.description',
                     'icon': 'ri-timer-line'
                 }
-            ]
+            ],
+            'searchScopes': searchScopes|default([]),
+            'searchScopeHint': searchScopeHint|default(''),
         }) -}}
         <div class="page-list">
             {{- customContent('content.above', _context) -}}
@@ -160,13 +162,21 @@
                                 item.createdBy
                               ),
                           'clone': permissions['campaign:campaigns:create'],
-                          'export': enableExportPermission,
                           'delete': securityHasEntityAccess(
                                 permissions['campaign:campaigns:deleteown'],
                                 permissions['campaign:campaigns:deleteother'],
                                 item.createdBy
                               ),
                           },
+                          'customButtons': enableExportPermission ? [{
+                              'attr': {
+                                  'class': 'btn btn-ghost btn-sm btn-nospin',
+                                  'href': path('mautic_campaign_action', {'objectAction': 'share', 'objectId': item.id}),
+                              },
+                              'iconClass': 'ri-export-line',
+                              'btnText': 'mautic.core.export'|trans,
+                              'priority': 200,
+                          }] : [],
                           'routeBase': 'campaign',
                       }) -}}
                     </td>

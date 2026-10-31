@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -19,28 +19,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 #[AsCommand(
     name: 'mautic:max-mind:purge',
-    description: 'Purge data connected to MaxMind Do Not Sell list.'
-)]
-class MaxMindDoNotSellPurgeCommand extends Command
-{
-    public function __construct(
-        private EntityManager $em,
-        private LeadRepository $leadRepository,
-        private MaxMindDoNotSellList $doNotSellList,
-    ) {
-        parent::__construct();
-    }
-
-    protected function configure()
-    {
-        $this
-            ->addOption(
-                'dry-run',
-                'd',
-                InputOption::VALUE_NONE,
-                'Get a list of data that will be purged.'
-            )
-            ->setHelp(<<<'EOT'
+    description: 'Purge data connected to MaxMind Do Not Sell list.',
+    help: <<<'TXT'
 The <info>%command.name%</info> command will purge all data from Mautic which is related to any IP found on the MaxMind Do Not Sell List.
 
 <info>php %command.full_name% --dry-run</info>
@@ -50,7 +30,26 @@ Performs a dry-run which will not actually purge any data, but will produce a li
 <info>php %command.full_name% --batch-size</info>
 
 Set the number of records to return in a batch when processing the Do Not Sell List. This option is ignored if IPs are passed as an argument.
-EOT
+TXT
+)]
+final class MaxMindDoNotSellPurgeCommand extends Command
+{
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly LeadRepository $leadRepository,
+        private readonly MaxMindDoNotSellList $doNotSellList,
+    ) {
+        parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->addOption(
+                'dry-run',
+                'd',
+                InputOption::VALUE_NONE,
+                'Get a list of data that will be purged.'
             );
     }
 
@@ -62,12 +61,12 @@ EOT
             $output->writeln('<info>Step 1: Searching for contacts with data from Do Not Sell List...</info>');
 
             $this->doNotSellList->loadList();
-            $doNotSellListIPs = array_map(fn ($item): string =>
+            $doNotSellListIPs = array_map(fn (array $item): string =>
                 // strip subnet mask characters
                 $this->doNotSellList->stripCIDR($item['value']), $this->doNotSellList->getList());
             $doNotSellContacts = $this->findContactsFromIPs($doNotSellListIPs);
 
-            if (0 == count($doNotSellContacts)) {
+            if (0 === count($doNotSellContacts)) {
                 $output->writeln('<info>No matches found.</info>');
 
                 return Command::SUCCESS;
@@ -122,7 +121,7 @@ EOT
         $lead       = $this->leadRepository->findOneBy(['id' => $contactId]);
         $matchedIps = array_filter($lead->getIpAddresses()->getValues(), fn ($item): bool => $item->getIpAddress() == $ip);
 
-        if (!$matchedIps) {
+        if ([] === $matchedIps) {
             return;
         }
 

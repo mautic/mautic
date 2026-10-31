@@ -6,10 +6,11 @@ namespace Mautic\EmailBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-final class EmailConfig implements EmailConfigInterface
+final readonly class EmailConfig implements EmailConfigInterface
 {
-    public function __construct(private CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        private CoreParametersHelper $coreParametersHelper,
+    ) {
     }
 
     public function isDraftEnabled(): bool

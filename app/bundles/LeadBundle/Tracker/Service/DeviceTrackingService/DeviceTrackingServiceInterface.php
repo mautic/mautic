@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tracker\Service\DeviceTrackingService;
 
 use Mautic\LeadBundle\Entity\LeadDevice;
@@ -27,4 +29,9 @@ interface DeviceTrackingServiceInterface
     public function trackCurrentDevice(LeadDevice $device, $replaceExistingTracking = false);
 
     public function clearTrackingCookies();
+
+    /**
+     * Resets cache.
+     */
+    public function reset(): void;
 }

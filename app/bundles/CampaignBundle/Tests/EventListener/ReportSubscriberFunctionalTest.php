@@ -8,9 +8,8 @@ use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\ReportBundle\Tests\Functional\AbstractReportSubscriberTestCase;
-use PHPUnit\Framework\Assert;
 
-class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
+final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
 {
     public function testCampaignLeadLogReportWithDncListColumn(): void
     {
@@ -34,7 +33,7 @@ class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestCase
         $fixtureHelper->createCampaignWithScheduledEvent($campaign);
         $this->em->flush();
         $commandResult = $this->testSymfonyCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
-        Assert::assertStringContainsString('3 total events were scheduled', $commandResult->getDisplay());
+        $this->assertStringContainsString('3 total events were scheduled', $commandResult->getDisplay());
 
         $report = $this->createReport(
             source: 'campaign_lead_event_log',

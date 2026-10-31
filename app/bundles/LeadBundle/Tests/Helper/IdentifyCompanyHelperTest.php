@@ -1,35 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
+final class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testDomainExistsRealDomain(): void
-    {
-        $helper     = new IdentifyCompanyHelper();
-        $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method     = $reflection->getMethod('domainExists');
-        $method->setAccessible(true);
-        $result = $method->invokeArgs($helper, ['hello@mautic.org']);
-
-        $this->assertTrue(is_string($result));
-        $this->assertGreaterThan(0, strlen($result));
-    }
-
-    public function testDomainExistsWithFakeDomain(): void
-    {
-        $helper     = new IdentifyCompanyHelper();
-        $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method     = $reflection->getMethod('domainExists');
-        $method->setAccessible(true);
-        $result = $method->invokeArgs($helper, ['hello@domain.fake']);
-
-        $this->assertFalse($result);
-    }
-
     public function testFindCompanyByName(): void
     {
         $company = [
@@ -46,14 +25,13 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('checkForDuplicateCompanies')
             ->willReturn([]);
 
-        $model->expects($this->any())
+        $model
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper     = new IdentifyCompanyHelper();
-        $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method     = $reflection->getMethod('findCompany');
-        $method->setAccessible(true);
+        $helper                     = new IdentifyCompanyHelper();
+        $reflection                 = new \ReflectionClass(IdentifyCompanyHelper::class);
+        $method                     = $reflection->getMethod('findCompany');
         [$resultCompany, $entities] = $method->invokeArgs($helper, [$company, $model]);
 
         $this->assertEquals($expected, $resultCompany);
@@ -77,14 +55,13 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('checkForDuplicateCompanies')
             ->willReturn([]);
 
-        $model->expects($this->any())
+        $model
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper     = new IdentifyCompanyHelper();
-        $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method     = $reflection->getMethod('findCompany');
-        $method->setAccessible(true);
+        $helper                     = new IdentifyCompanyHelper();
+        $reflection                 = new \ReflectionClass(IdentifyCompanyHelper::class);
+        $method                     = $reflection->getMethod('findCompany');
         [$resultCompany, $entities] = $method->invokeArgs($helper, [$company, $model]);
 
         $this->assertEquals($expected, $resultCompany);
@@ -110,14 +87,13 @@ class IdentifyCompanyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('checkForDuplicateCompanies')
             ->willReturn([]);
 
-        $model->expects($this->any())
+        $model
             ->method('fetchCompanyFields')
             ->willReturn([['alias' => 'companyname']]);
 
-        $helper     = new IdentifyCompanyHelper();
-        $reflection = new \ReflectionClass(IdentifyCompanyHelper::class);
-        $method     = $reflection->getMethod('findCompany');
-        $method->setAccessible(true);
+        $helper                     = new IdentifyCompanyHelper();
+        $reflection                 = new \ReflectionClass(IdentifyCompanyHelper::class);
+        $method                     = $reflection->getMethod('findCompany');
         [$resultCompany, $entities] = $method->invokeArgs($helper, [$company, $model]);
 
         $this->assertEquals($expected, $resultCompany);

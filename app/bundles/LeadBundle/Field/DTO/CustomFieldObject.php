@@ -7,14 +7,14 @@ namespace Mautic\LeadBundle\Field\DTO;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Exception\InvalidObjectTypeException;
 
-class CustomFieldObject
+final class CustomFieldObject
 {
     private array $objects = [
         'lead'    => 'leads',
         'company' => 'companies',
     ];
 
-    private LeadField $leadField;
+    private readonly LeadField $leadField;
 
     /**
      * @throws InvalidObjectTypeException
