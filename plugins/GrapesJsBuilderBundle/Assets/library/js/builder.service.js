@@ -11,9 +11,14 @@ import grapesjstuiimageeditor from 'grapesjs-tui-image-editor';
 import grapesjsstylebg from 'grapesjs-style-bg';
 import grapesjspostcss from 'grapesjs-parser-postcss';
 import grapesjsckeditor from './plugins/grapesjs-ckeditor';
-import grapesjsMjmlThemeTokens, { pluginId as mjmlThemeTokensPluginId } from './plugins/grapesjs-mjmlThemeTokens';
+import grapesjsMjmlThemeTokens, {
+  pluginId as mjmlThemeTokensPluginId,
+} from './plugins/grapesjs-mjmlThemeTokens';
 import grapesjsImageLink from './plugins/grapesjs-image-link';
-import { extractMjHeadContent, createHeadInjectingMjmlParser } from './plugins/grapesjs-mjmlThemeTokens/utils';
+import {
+  extractMjHeadContent,
+  createHeadInjectingMjmlParser,
+} from './plugins/grapesjs-mjmlThemeTokens/utils';
 import contentService from './preset-mautic/content.service';
 import grapesjsmautic from './preset-mautic';
 import editorFontsService from './preset-mautic/editorFonts/editorFonts.service';
@@ -759,7 +764,9 @@ export default class BuilderService {
       }
       this.normalizeTextComponentContainers();
     });
-    this.editor.on('component:add', (component) => this.normalizeTextComponentContainers(component));
+    this.editor.on('component:add', (component) =>
+      this.normalizeTextComponentContainers(component)
+    );
     this.editor.on('rte:disable', (component) => this.normalizeTextComponentContainers(component));
     this.editor.on('mautic:code-editor-update', () => this.normalizeTextComponentContainers());
 
@@ -1245,7 +1252,7 @@ export default class BuilderService {
   mjmlToHtml(mjml) {
     const converted = MjmlService.mjmlToHtml(mjml);
 
-    if (0 === converted.errors.length) {
+    if (converted && 0 === converted.errors.length) {
       return converted.html;
     }
 
@@ -1649,13 +1656,17 @@ export default class BuilderService {
       return;
     }
 
-    cssc.setRule('.gjs-cell, .gjs-cell30, .gjs-cell70', {
-      height: 'auto',
-    }, {
-      atRuleType: 'media',
-      atRuleParams: '(max-width: 768px)',
-      addStyles: true,
-    });
+    cssc.setRule(
+      '.gjs-cell, .gjs-cell30, .gjs-cell70',
+      {
+        height: 'auto',
+      },
+      {
+        atRuleType: 'media',
+        atRuleParams: '(max-width: 768px)',
+        addStyles: true,
+      }
+    );
   }
 
   removeSelectedElementsEmailMjml() {
@@ -1688,6 +1699,14 @@ export default class BuilderService {
 
   normalizeTextComponentContainer(component) {
     if (!component || typeof component.get !== 'function' || typeof component.set !== 'function') {
+      return;
+    }
+
+    // MJML owns the structure of inline content inside mj-text. Applying the
+    // generic HTML normalization here turns inline spans into block wrappers
+    // and changes the layout when the template is serialized again.
+    const mode = this.editor?.getConfig?.()?.pluginsOpts?.grapesjsmautic?.mode;
+    if (mode === contentService.modeEmailMjml) {
       return;
     }
 
