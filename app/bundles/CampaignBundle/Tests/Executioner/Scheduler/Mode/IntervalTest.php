@@ -288,6 +288,47 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         }
     }
 
+    public function testContactsWithTheSameLocalTimeInDifferentTimezonesAreNotGroupedTogether(): void
+    {
+        $event = $this->createMock(Event::class);
+        $event->method('getTriggerMode')
+            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerHour')
+            ->willReturn(
+                new \DateTime('1970-01-01 09:00:00')
+            );
+        $event->method('getTriggerRestrictedDaysOfWeek')
+            ->willReturn([]);
+        $event->method('getId')
+            ->willReturn(1);
+
+        $interval = $this->getInterval();
+        $contact1 = new Lead();
+        $contact1->setId(1);
+        $contact1->setTimezone('America/New_York');
+
+        $contact2 = new Lead();
+        $contact2->setId(2);
+        $contact2->setTimezone('America/Los_Angeles');
+
+        $contacts = new ArrayCollection([
+            1 => $contact1,
+            2 => $contact2,
+        ]);
+
+        $scheduledExecutionDate = new \DateTime('2018-10-18 11:00:00', new \DateTimeZone('UTC'));
+        $grouped                = $interval->groupContactsByDate($event, $contacts, $scheduledExecutionDate);
+        $this->assertCount(2, $grouped);
+
+        $executionDates = [];
+        foreach ($grouped as $groupExecutionDateDAO) {
+            $executionDates[$groupExecutionDateDAO->getContacts()->first()->getId()] = $groupExecutionDateDAO->getExecutionDate()->format(\DateTimeInterface::ATOM);
+        }
+
+        $this->assertSame('2018-10-18T09:00:00-04:00', $executionDates[1]);
+        $this->assertSame('2018-10-18T09:00:00-07:00', $executionDates[2]);
+    }
+
     public function testValidateExecutionDateTimeWhenIsContactSpecificExecutionDateRequiredIsTrue(): void
     {
         $expectedDateTime    = new \DateTime('now');
