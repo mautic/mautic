@@ -11,9 +11,9 @@ use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\PointBundle\Model\PointGroupModel;
 use Mautic\PointBundle\Model\PointModel;
 use Mautic\PointBundle\Model\TriggerModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber
 {
     public function __construct(
         private PointModel $pointModel,
@@ -24,18 +24,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MauticEvents\GlobalSearchEvent::class => [
-                ['onGlobalSearchPointActions', 0],
-                ['onGlobalSearchPointTriggers', 0],
-                ['onGlobalSearchPointGroup', 0],
-            ],
-            MauticEvents\CommandListEvent::class  => ['onBuildCommandList', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: MauticEvents\GlobalSearchEvent::class,
+    )]
     public function onGlobalSearchPointActions(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
@@ -50,6 +41,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: MauticEvents\GlobalSearchEvent::class,
+    )]
     public function onGlobalSearchPointGroup(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
@@ -64,6 +58,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: MauticEvents\GlobalSearchEvent::class,
+    )]
     public function onGlobalSearchPointTriggers(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
@@ -78,6 +75,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: MauticEvents\CommandListEvent::class,
+    )]
     public function onBuildCommandList(MauticEvents\CommandListEvent $event): void
     {
         if ($this->security->isGranted('point:points:view')) {

@@ -6,17 +6,13 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\Form\Type\ConfigThemeType;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class ConfigThemeSubscriber implements EventSubscriberInterface
+final class ConfigThemeSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ConfigBuilderEvent::class => ['onConfigGenerate', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: ConfigBuilderEvent::class,
+    )]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addForm(

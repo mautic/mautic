@@ -21,10 +21,10 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class FieldImportExportSubscriber implements EventSubscriberInterface
+final readonly class FieldImportExportSubscriber
 {
     use ImportExportTrait;
 
@@ -41,16 +41,9 @@ final readonly class FieldImportExportSubscriber implements EventSubscriberInter
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onExport', 0],
-            EntityImportEvent::class        => ['onImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EntityExportEvent::class,
+    )]
     public function onExport(EntityExportEvent $event): void
     {
         if (Field::ENTITY_NAME !== $event->getEntityName()) {
@@ -119,6 +112,9 @@ final readonly class FieldImportExportSubscriber implements EventSubscriberInter
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportEvent::class,
+    )]
     public function onImport(EntityImportEvent $event): void
     {
         if (Field::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -179,6 +175,9 @@ final readonly class FieldImportExportSubscriber implements EventSubscriberInter
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportUndoEvent::class,
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Field::ENTITY_NAME !== $event->getEntityName()) {
@@ -194,7 +193,7 @@ final readonly class FieldImportExportSubscriber implements EventSubscriberInter
         foreach ($summary['ids'] as $id) {
             $field = $this->fieldRepository->find($id);
 
-            if ($field) {
+            if ($field instanceof Field) {
                 $this->entityManager->remove($field);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Field::class], 'formField');
             }
@@ -203,6 +202,9 @@ final readonly class FieldImportExportSubscriber implements EventSubscriberInter
         $this->entityManager->flush();
     }
 
+    #[AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         if (Field::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
@@ -222,7 +224,7 @@ final readonly class FieldImportExportSubscriber implements EventSubscriberInter
             }
 
             $existing = $this->fieldRepository->findOneBy(['uuid' => $item['uuid']]);
-            if ($existing) {
+            if ($existing instanceof Field) {
                 $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getLabel() ?? $existing->getAlias();
                 $summary[EntityImportEvent::UPDATE]['uuids'][] = $existing->getUuid();
             } else {

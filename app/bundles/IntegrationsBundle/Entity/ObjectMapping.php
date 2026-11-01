@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Entity;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -23,7 +25,7 @@ class ObjectMapping
      */
     private $id;
 
-    private readonly ?\DateTimeInterface $dateCreated;
+    private readonly ?DateTimeInterface $dateCreated;
 
     /**
      * @var string
@@ -50,7 +52,7 @@ class ObjectMapping
      */
     private $integrationObjectId;
 
-    private ?\DateTimeInterface $lastSyncDate;
+    private ?DateTimeInterface $lastSyncDate;
 
     /**
      * @var array
@@ -122,9 +124,9 @@ class ObjectMapping
             ->build();
     }
 
-    public function __construct(?\DateTime $dateCreated = null)
+    public function __construct(?DateTime $dateCreated = null)
     {
-        $dateCreated ??= new \DateTime();
+        $dateCreated ??= new DateTime();
 
         $this->dateCreated  = $dateCreated;
         $this->lastSyncDate = $dateCreated;
@@ -148,7 +150,7 @@ class ObjectMapping
         return $this;
     }
 
-    public function getDateCreated(): ?\DateTimeInterface
+    public function getDateCreated(): ?DateTimeInterface
     {
         return $this->dateCreated;
     }
@@ -240,14 +242,14 @@ class ObjectMapping
         return $this;
     }
 
-    public function getLastSyncDate(): ?\DateTimeInterface
+    public function getLastSyncDate(): ?DateTimeInterface
     {
         return $this->lastSyncDate;
     }
 
-    public function setLastSyncDate(?\DateTimeInterface $lastSyncDate): static
+    public function setLastSyncDate(?DateTimeInterface $lastSyncDate): static
     {
-        $lastSyncDate ??= new \DateTime();
+        $lastSyncDate ??= new DateTime();
 
         $this->lastSyncDate = $lastSyncDate;
 

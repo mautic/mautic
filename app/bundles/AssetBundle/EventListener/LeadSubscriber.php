@@ -2,17 +2,18 @@
 
 namespace Mautic\AssetBundle\EventListener;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber
 {
     public function __construct(
         private AssetModel $assetModel,
@@ -22,18 +23,12 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadChangeEvent::class => ['onLeadChange', 0],
-            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
-        ];
-    }
-
     /**
      * Compile events for the lead timeline.
      */
+    #[AsEventListener(
+        event: LeadTimelineEvent::class,
+    )]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -56,7 +51,7 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
             // Add the downloads to the event array
             foreach ($downloads['results'] as $download) {
                 $asset    = $download['asset_id'] ? $this->assetModel->getEntity($download['asset_id']) : null;
-                $hasAsset = $asset && $asset->getId();
+                $hasAsset = $asset instanceof Asset && $asset->getId();
 
                 $eventLabel = $hasAsset
                     ? [
@@ -85,6 +80,9 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadChangeEvent::class,
+    )]
     public function onLeadChange(LeadChangeEvent $event): void
     {
         $this->downloadRepository->updateLeadByTrackingId(
@@ -94,6 +92,9 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: LeadPostMergeEvent::class,
+    )]
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->downloadRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());

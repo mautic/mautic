@@ -2,10 +2,12 @@
 
 namespace Mautic\AssetBundle\Model;
 
+use DateTime;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\PersistentCollection;
+use Exception;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
 use Mautic\AssetBundle\Entity\Download;
@@ -105,7 +107,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
      * @param array<string, mixed> $systemEntry
      *
      * @throws ORMException
-     * @throws \Exception
+     * @throws Exception
      */
     public function trackDownload(Asset $asset, ?Request $request = null, int $code = 200, array $systemEntry = []): void
     {
@@ -125,7 +127,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
         }
 
         $download = new Download();
-        $download->setDateDownload(new \DateTime());
+        $download->setDateDownload(new DateTime());
         $download->setUtmCampaign($request->attributes->all()['utm_campaign'] ?? $request->query->all()['utm_campaign'] ?? $request->request->all()['utm_campaign'] ?? null);
         $download->setUtmContent($request->attributes->all()['utm_content'] ?? $request->query->all()['utm_content'] ?? $request->request->all()['utm_content'] ?? null);
         $download->setUtmMedium($request->attributes->all()['utm_medium'] ?? $request->query->all()['utm_medium'] ?? $request->request->all()['utm_medium'] ?? null);
@@ -148,7 +150,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
 
                 if (!empty($clickthrough['lead'])) {
                     $lead = $this->leadModel->getEntity($clickthrough['lead']);
-                    if (null !== $lead) {
+                    if ($lead instanceof Lead) {
                         $wasTrackedAlready                    = $this->deviceTrackingService->isTracked();
                         $deviceDetector                       = $this->deviceDetectorFactory->create($request->server->get('HTTP_USER_AGENT'));
                         $deviceDetector->parse();
@@ -282,7 +284,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
         try {
             $this->em->persist($download);
             $this->em->flush();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if (MAUTIC_ENV === 'dev') {
                 throw $e;
             }
@@ -496,7 +498,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
      */
-    public function getDownloadsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
+    public function getDownloadsLineChartData($unit, DateTime $dateFrom, DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
@@ -519,8 +521,8 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
      * Get pie chart data of unique vs repetitive downloads.
      * Repetitive in this case mean if a lead downloaded any of the assets more than once.
      *
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
+     * @param DateTime $dateFrom
+     * @param DateTime $dateTo
      * @param mixed[]   $filters
      */
     public function getUniqueVsRepetitivePieChartData($dateFrom, $dateTo, array $filters = [], bool $canViewOthers = true): array
@@ -565,7 +567,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of popular (by downloads) assets.
      */
-    public function getPopularAssets(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], bool $canViewOthers = true): array
+    public function getPopularAssets(int $limit = 10, ?DateTime $dateFrom = null, ?DateTime $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS download_count, a.id, a.title')
@@ -580,7 +582,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom ?? new \DateTime('-30 days'), $dateTo ?? new \DateTime());
+        $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom ?? new DateTime('-30 days'), $dateTo ?? new DateTime());
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_download');
 
@@ -592,7 +594,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
      *
      * @param array<string, mixed> $options
      */
-    public function getAssetList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], array $options = []): array
+    public function getAssetList(int $limit = 10, ?DateTime $dateFrom = null, ?DateTime $dateTo = null, array $filters = [], array $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title as name, t.date_added, t.date_modified')
@@ -636,7 +638,7 @@ final class AssetModel extends FormModel implements GlobalSearchInterface
         }
 
         $entity = $this->getEntity((int) $id);
-        if ($entity && null !== $entity->getAlias()) {
+        if ($entity instanceof Asset && null !== $entity->getAlias()) {
             return $entity;
         }
 

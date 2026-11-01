@@ -2,12 +2,13 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateTime;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class SegmentLogReportSubscriber implements EventSubscriberInterface
+final readonly class SegmentLogReportSubscriber
 {
     public const string SEGMENT_LOG = 'segment.log';
 
@@ -16,17 +17,12 @@ final readonly class SegmentLogReportSubscriber implements EventSubscriberInterf
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[AsEventListener(
+        event: ReportBuilderEvent::class,
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::SEGMENT_LOG])) {
@@ -67,6 +63,9 @@ final readonly class SegmentLogReportSubscriber implements EventSubscriberInterf
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGeneratorEvent::class,
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::SEGMENT_LOG])) {
@@ -85,8 +84,8 @@ final readonly class SegmentLogReportSubscriber implements EventSubscriberInterf
             )
         );
 
-        $dateFrom = $event->getOptions()['dateFrom'] ?? (new \DateTime('-30 days'));
-        $dateTo   = $event->getOptions()['dateTo'] ?? (new \DateTime());
+        $dateFrom = $event->getOptions()['dateFrom'] ?? (new DateTime('-30 days'));
+        $dateTo   = $event->getOptions()['dateTo'] ?? (new DateTime());
 
         $qb->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));
         $qb->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));

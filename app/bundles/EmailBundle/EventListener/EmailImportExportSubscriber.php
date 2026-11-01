@@ -22,10 +22,10 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class EmailImportExportSubscriber implements EventSubscriberInterface
+final readonly class EmailImportExportSubscriber
 {
     use ImportExportTrait;
 
@@ -43,16 +43,9 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onEmailExport', 0],
-            EntityImportEvent::class        => ['onEmailImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EntityExportEvent::class,
+    )]
     public function onEmailExport(EntityExportEvent $event): void
     {
         if (Email::ENTITY_NAME !== $event->getEntityName()) {
@@ -61,7 +54,7 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
 
         $emailId = $event->getEntityId();
         $email   = $this->emailModel->getEntity($emailId);
-        if (!$email) {
+        if (!$email instanceof Email) {
             return;
         }
 
@@ -113,7 +106,7 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
         }
 
         $form = $email->getUnsubscribeForm();
-        if ($form) {
+        if ($form instanceof Form) {
             $subEvent = new EntityExportEvent(Form::ENTITY_NAME, (int) $form->getId());
             $this->dispatcher->dispatch($subEvent);
             $event->addEntities($subEvent->getEntities());
@@ -123,7 +116,7 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
             ]);
         }
         $page = $email->getPreferenceCenter();
-        if ($page) {
+        if ($page instanceof Page) {
             $subEvent = new EntityExportEvent(Page::ENTITY_NAME, (int) $page->getId());
             $this->dispatcher->dispatch($subEvent);
             $event->addEntities($subEvent->getEntities());
@@ -134,6 +127,9 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportEvent::class,
+    )]
     public function onEmailImport(EntityImportEvent $event): void
     {
         if (Email::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -195,6 +191,9 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportUndoEvent::class,
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Email::ENTITY_NAME !== $event->getEntityName()) {
@@ -209,7 +208,7 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
         foreach ($summary['ids'] as $id) {
             $entity = $this->emailRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof Email) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Email::class]);
             }
@@ -218,6 +217,9 @@ final readonly class EmailImportExportSubscriber implements EventSubscriberInter
         $this->entityManager->flush();
     }
 
+    #[AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(

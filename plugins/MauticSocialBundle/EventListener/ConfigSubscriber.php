@@ -7,23 +7,18 @@ use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use MauticPlugin\MauticSocialBundle\Form\Type\ConfigType;
 use MauticPlugin\MauticSocialBundle\Integration\Config;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class ConfigSubscriber implements EventSubscriberInterface
+final readonly class ConfigSubscriber
 {
     public function __construct(
         private Config $config,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ConfigBuilderEvent::class => ['onConfigGenerate', 0],
-            ConfigPreSaveEvent::class => ['onConfigSave', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: ConfigBuilderEvent::class,
+    )]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         if (!$this->config->isPublished()) {
@@ -39,6 +34,9 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: ConfigPreSaveEvent::class,
+    )]
     public function onConfigSave(ConfigEvent $event): void
     {
         $values = $event->getConfig();

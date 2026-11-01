@@ -9,9 +9,9 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportRowFailedException;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class ImportUrlValidationSubscriber implements EventSubscriberInterface
+final class ImportUrlValidationSubscriber
 {
     /**
      * Cached mapping of url/website fields.
@@ -27,18 +27,15 @@ final class ImportUrlValidationSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ImportProcessEvent::class => ['onImportProcess', 210],
-        ];
-    }
-
     /**
      * Validate URL fields during CSV import (lead + company).
      *
      * @throws ImportRowFailedException
      */
+    #[AsEventListener(
+        event: ImportProcessEvent::class,
+        priority: 210
+    )]
     public function onImportProcess(ImportProcessEvent $event): void
     {
         if (!in_array($event->import->getObject(), ['lead', 'company'], true)) {

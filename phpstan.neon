@@ -350,7 +350,6 @@ parameters:
         -
             identifier: argument.templateType
             paths:
-                - app/bundles/CoreBundle/EventListener/CommonStatsSubscriber.php
                 - app/bundles/LeadBundle/Form/DataTransformer/TagEntityModelTransformer.php
         -
             message: '#Method MauticPlugin\\GrapesJsBuilderBundle\\Entity\\GrapesJsBuilderRepository@anonymous/plugins/GrapesJsBuilderBundle/Tests/Unit/Model/GrapesJsBuilderModelTest.php:\d+::findOneBy\(\) is marked as impure but does not have any side effects#'

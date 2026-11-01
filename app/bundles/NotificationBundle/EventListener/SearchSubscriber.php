@@ -8,9 +8,9 @@ use Mautic\CoreBundle\DTO\GlobalSearchFilterDTO;
 use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Service\GlobalSearch;
 use Mautic\NotificationBundle\Model\NotificationModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class SearchSubscriber implements EventSubscriberInterface
+final readonly class SearchSubscriber
 {
     public function __construct(
         private NotificationModel $model,
@@ -18,16 +18,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MauticEvents\GlobalSearchEvent::class => [
-                ['onGlobalSearchWebNotification', 0],
-                ['onGlobalSearchMobileNotification', 0],
-            ],
-        ];
-    }
-
+    #[AsEventListener(
+        event: MauticEvents\GlobalSearchEvent::class,
+    )]
     public function onGlobalSearchWebNotification(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());
@@ -51,6 +44,9 @@ final readonly class SearchSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: MauticEvents\GlobalSearchEvent::class,
+    )]
     public function onGlobalSearchMobileNotification(MauticEvents\GlobalSearchEvent $event): void
     {
         $filterDTO = new GlobalSearchFilterDTO($event->getSearchString());

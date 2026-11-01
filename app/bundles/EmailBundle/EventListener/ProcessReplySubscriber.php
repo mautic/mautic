@@ -8,24 +8,13 @@ use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\Event\PreFetchEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class ProcessReplySubscriber implements EventSubscriberInterface
+final readonly class ProcessReplySubscriber
 {
     public const string BUNDLE     = 'EmailBundle';
-
     public const string FOLDER_KEY = 'replies';
-
     public const string CACHE_KEY  = self::BUNDLE.'_'.self::FOLDER_KEY;
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MonitoredEmailEvent::class => ['onEmailConfig', 0],
-            PreFetchEmailEvent::class  => ['onEmailPreFetch', 0],
-            ParseEmailEvent::class     => ['onEmailParse', 1],
-        ];
-    }
 
     public function __construct(
         private Reply $replier,
@@ -33,11 +22,17 @@ final readonly class ProcessReplySubscriber implements EventSubscriberInterface
     ) {
     }
 
+    #[AsEventListener(
+        event: MonitoredEmailEvent::class,
+    )]
     public function onEmailConfig(MonitoredEmailEvent $event): void
     {
         $event->addFolder(self::BUNDLE, self::FOLDER_KEY, 'mautic.email.config.monitored_email.reply_folder');
     }
 
+    #[AsEventListener(
+        event: PreFetchEmailEvent::class,
+    )]
     public function onEmailPreFetch(PreFetchEmailEvent $event): void
     {
         if (!$lastFetchedUID = $this->cache->getSimpleCache()->get(self::CACHE_KEY)) {
@@ -52,6 +47,10 @@ final readonly class ProcessReplySubscriber implements EventSubscriberInterface
         $event->setCriteriaRequest(self::BUNDLE, self::FOLDER_KEY, Mailbox::CRITERIA_UID." {$startingUID}:{$endingUID}");
     }
 
+    #[AsEventListener(
+        event: ParseEmailEvent::class,
+        priority: 1
+    )]
     public function onEmailParse(ParseEmailEvent $event): void
     {
         if ($event->isApplicable(self::BUNDLE, self::FOLDER_KEY)) {

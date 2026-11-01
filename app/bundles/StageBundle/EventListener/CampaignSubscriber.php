@@ -10,10 +10,11 @@ use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Form\Type\StageActionChangeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use UnexpectedValueException;
 
-final readonly class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber
 {
     public function __construct(
         private LeadModel $leadModel,
@@ -22,14 +23,9 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            StageEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerStageChange', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $action = [
@@ -42,6 +38,9 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $event->addAction('stage.change', $action);
     }
 
+    #[AsEventListener(
+        event: StageEvents::ON_CAMPAIGN_BATCH_ACTION,
+    )]
     public function onCampaignTriggerStageChange(PendingEvent $event): void
     {
         $logs    = $event->getPending();
@@ -49,7 +48,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $stageId = (int) $config['stage'];
         $stage   = $this->stageModel->getEntity($stageId);
 
-        if (!$stage || !$stage->isPublished()) {
+        if (!$stage instanceof Stage || !$stage->isPublished()) {
             $event->passAllWithError($this->translator->trans('mautic.stage.campaign.event.stage_missing'));
 
             return;
@@ -65,7 +64,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         try {
             $this->leadModel->changeStage($log->getLead(), $stage, $log->getEvent()->getName());
             $pendingEvent->pass($log);
-        } catch (\UnexpectedValueException $exception) {
+        } catch (UnexpectedValueException $exception) {
             $pendingEvent->passWithError($log, $exception->getMessage());
         }
     }

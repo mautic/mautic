@@ -2,6 +2,9 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use DateTime;
+use Exception;
+use InvalidArgumentException;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -352,7 +355,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     $mauticObjectReference = 'lead';
                 } else {
                     $this->logIntegrationError(
-                        new \Exception(
+                        new Exception(
                             sprintf('Received an unexpected object "%s"', $object)
                         )
                     );
@@ -369,7 +372,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
                     if (0 === count($integrationId)) {
                         $integrationEntity = new IntegrationEntity();
-                        $integrationEntity->setDateAdded(new \DateTime());
+                        $integrationEntity->setDateAdded(new DateTime());
                         $integrationEntity->setIntegration('Zoho');
                         $integrationEntity->setIntegrationEntity($object);
                         $integrationEntity->setIntegrationEntityId($recordId);
@@ -379,7 +382,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     } else {
                         $integrationEntity = $this->integrationEntityRepository->getEntity($integrationId[0]['id']);
                         if ($isModified) {
-                            $integrationEntity->setLastSyncDate(new \DateTime());
+                            $integrationEntity->setLastSyncDate(new DateTime());
                             $integrationEntities[] = $integrationEntity;
                         }
                     }
@@ -467,7 +470,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     $progress->finish();
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -537,7 +540,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
                     $progress->finish();
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -608,7 +611,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
      * @param Form|FormBuilder $builder
      * @param string           $formArea
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function appendToForm($builder, array $data, $formArea): void
     {
@@ -878,7 +881,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
                         $lead['integration_entity'] = 'Leads';
                         $leadsToUpdateInZ[$key]     = $lead;
                         $integrationEntity          = $this->em->getReference(IntegrationEntity::class, $integrationId[0]['id']);
-                        $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
+                        $integrationEntities[]      = $integrationEntity->setLastSyncDate(new DateTime());
                     }
                 }
             }
@@ -895,7 +898,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
             );
             if (count($integrationId)) { // lead exists, then update
                 $integrationEntity     = $this->em->getReference(IntegrationEntity::class, $integrationId[0]['id']);
-                $integrationEntity->setLastSyncDate(new \DateTime());
+                $integrationEntity->setLastSyncDate(new DateTime());
                 $integrationEntity->setInternalEntity('lead-converted');
                 $integrationEntities[] = $integrationEntity;
                 unset($leadsToUpdateInZ[$email]);
@@ -1055,7 +1058,7 @@ final class ZohoIntegration extends CrmAbstractIntegration
 
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 

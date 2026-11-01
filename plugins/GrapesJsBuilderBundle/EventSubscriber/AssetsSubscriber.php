@@ -8,10 +8,10 @@ use Mautic\CoreBundle\Event\CustomAssetsEvent;
 use Mautic\InstallBundle\Install\InstallService;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final readonly class AssetsSubscriber implements EventSubscriberInterface
+final readonly class AssetsSubscriber
 {
     private const string ASSET_DIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
 
@@ -24,13 +24,9 @@ final readonly class AssetsSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomAssetsEvent::class => ['injectAssets', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CustomAssetsEvent::class,
+    )]
     public function injectAssets(CustomAssetsEvent $assetsEvent): void
     {
         if (!$this->installer->checkIfInstalled() || !$this->isMauticAdministrationPage()) {

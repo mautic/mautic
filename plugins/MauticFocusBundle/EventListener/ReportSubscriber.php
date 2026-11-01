@@ -6,39 +6,26 @@ namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class ReportSubscriber implements EventSubscriberInterface
+final class ReportSubscriber
 {
     public const string CONTEXT_FOCUS_STATS = 'focus_stats';
-
     public const string CONTEXT_FOCUS_LEADS = 'focus_leads';
-
     public const string FOCUS_GROUP         = 'focus';
-
     public const string PREFIX_FOCUS        = 'f';
-
     public const string PREFIX_STATS        = 'fs';
-
     public const string PREFIX_REDIRECTS    = 'r';
-
     public const string PREFIX_TRACKABLES   = 't';
-
     public const string PREFIX_CATEGORIES   = 'c';
-
     public const string PREFIX_LEADS        = 'l';
-
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-        ];
-    }
 
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[AsEventListener(
+        event: ReportBuilderEvent::class,
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_FOCUS_LEADS, self::CONTEXT_FOCUS_STATS])) {
@@ -308,6 +295,9 @@ final class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGeneratorEvent::class,
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_FOCUS_STATS, self::CONTEXT_FOCUS_LEADS])) {

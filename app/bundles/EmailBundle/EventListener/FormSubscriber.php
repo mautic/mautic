@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\Exception\ORMException;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\FormSubmitActionUserEmailType;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -11,9 +12,9 @@ use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber
 {
     public function __construct(
         private EmailModel $emailModel,
@@ -21,19 +22,12 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormBuilderEvent::class             => ['onFormBuilder', 0],
-            FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
-                ['onFormSubmitActionSendEmail', 0],
-            ],
-        ];
-    }
-
     /**
      * Add a send email actions to available form submit actions.
      */
+    #[AsEventListener(
+        event: FormBuilderEvent::class,
+    )]
     public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('email.send.user', [
@@ -61,6 +55,9 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     /**
      * @throws ORMException
      */
+    #[AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+    )]
     public function onFormSubmitActionSendEmail(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('email.send.user') && false === $event->checkContext('email.send.lead')) {
@@ -71,7 +68,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $emailId    = isset($properties['useremail']) ? (int) $properties['useremail']['email'] : (int) $properties['email'];
         $email      = $this->emailModel->getEntity($emailId);
 
-        if (null === $email || false === $email->isPublished()) {
+        if (!$email instanceof Email || false === $email->isPublished()) {
             return;
         }
 

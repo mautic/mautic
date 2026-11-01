@@ -7,11 +7,11 @@ namespace Mautic\CampaignBundle\EventListener;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ButtonSubscriber implements EventSubscriberInterface
+final readonly class ButtonSubscriber
 {
     public function __construct(
         private TranslatorInterface $translator,
@@ -20,13 +20,9 @@ final readonly class ButtonSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CustomButtonEvent::class => ['injectViewButtons', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CustomButtonEvent::class,
+    )]
     public function injectViewButtons(CustomButtonEvent $event): void
     {
         if (!$this->security->isGranted('campaign:export:enable', 'MATCH_ONE')) {

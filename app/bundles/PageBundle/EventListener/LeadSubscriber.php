@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadPostMergeEvent;
@@ -12,11 +13,11 @@ use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\VideoHitRepository;
 use Mautic\PageBundle\Model\PageModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class LeadSubscriber implements EventSubscriberInterface
+final class LeadSubscriber
 {
     use ChannelTrait;
 
@@ -34,21 +35,12 @@ final class LeadSubscriber implements EventSubscriberInterface
         $this->setModelFactory($modelFactory);
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadTimelineEvent::class => [
-                ['onTimelineGenerate', 0],
-                ['onTimelineGenerateVideo', 0],
-            ],
-            LeadChangeEvent::class => ['onLeadChange', 0],
-            LeadPostMergeEvent::class      => ['onLeadMerge', 0],
-        ];
-    }
-
     /**
      * Compile events for the lead timeline.
      */
+    #[AsEventListener(
+        event: LeadTimelineEvent::class,
+    )]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -76,7 +68,7 @@ final class LeadSubscriber implements EventSubscriberInterface
                 $icon     = 'ri-link';
 
                 if (!empty($hit['source'])) {
-                    if ($channelModel = $this->getChannelModel($hit['source'])) {
+                    if (($channelModel = $this->getChannelModel($hit['source'])) instanceof AbstractCommonModel) {
                         if ($channelModel instanceof ChannelTimelineInterface) {
                             if ($overrideTemplate = $channelModel->getChannelTimelineTemplate($eventTypeKey, $hit)) {
                                 $template = $overrideTemplate;
@@ -139,6 +131,9 @@ final class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
+    #[AsEventListener(
+        event: LeadTimelineEvent::class,
+    )]
     public function onTimelineGenerateVideo(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -181,6 +176,9 @@ final class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadChangeEvent::class,
+    )]
     public function onLeadChange(LeadChangeEvent $event): void
     {
         $this->hitRepository->updateLeadByTrackingId(
@@ -190,6 +188,9 @@ final class LeadSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: LeadPostMergeEvent::class,
+    )]
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->hitRepository->updateLead(

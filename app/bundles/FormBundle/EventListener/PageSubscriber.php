@@ -5,14 +5,15 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class PageSubscriber implements EventSubscriberInterface
+final class PageSubscriber
 {
     private string $formRegex = '{form=(.*?)}';
 
@@ -24,17 +25,12 @@ final class PageSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PageDisplayEvent::class => ['onPageDisplay', 0],
-            PageBuilderEvent::class   => ['onPageBuild', 0],
-        ];
-    }
-
     /**
      * Add forms to available page tokens.
      */
+    #[AsEventListener(
+        event: PageBuilderEvent::class,
+    )]
     public function onPageBuild(PageBuilderEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
@@ -61,6 +57,9 @@ final class PageSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: PageDisplayEvent::class,
+    )]
     public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content = $event->getContent();
@@ -72,7 +71,7 @@ final class PageSubscriber implements EventSubscriberInterface
         if (count($matches[0])) {
             foreach ($matches[1] as $id) {
                 $form = $this->formModel->getEntity($id);
-                if (null !== $form
+                if ($form instanceof Form
                     && (
                         $form->isPublished(false)
                         || $this->security->hasEntityAccess(

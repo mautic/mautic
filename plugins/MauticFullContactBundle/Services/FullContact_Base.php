@@ -2,8 +2,10 @@
 
 namespace MauticPlugin\MauticFullContactBundle\Services;
 
+use DateTime;
 use MauticPlugin\MauticFullContactBundle\Exception\NoCreditException;
 use MauticPlugin\MauticFullContactBundle\Exception\NotImplementedException;
+use stdClass;
 
 /**
  * This class handles the actually HTTP request to the FullContact endpoint.
@@ -17,7 +19,7 @@ abstract class FullContact_Base
 
     public const string USER_AGENT      = 'caseysoftware/fullcontact-php-0.9.0';
 
-    private \DateTime $_next_req_time;
+    private DateTime $_next_req_time;
 
     //    protected $_baseUri = 'https://requestbin.fullcontact.com/1ailj6d1?';
     protected $_baseUri     = 'https://api.fullcontact.com/';
@@ -34,7 +36,7 @@ abstract class FullContact_Base
 
     protected $_supportedMethods = [];
 
-    public ?\stdClass $response_obj = null;
+    public ?stdClass $response_obj = null;
 
     public $response_code;
 
@@ -45,7 +47,7 @@ abstract class FullContact_Base
      */
     private function _wait_for_rate_limit(): void
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         if ($this->_next_req_time->getTimestamp() > $now->getTimestamp()) {
             $t = $this->_next_req_time->getTimestamp() - $now->getTimestamp();
             sleep($t);
@@ -61,7 +63,7 @@ abstract class FullContact_Base
         $reset                = (float) $hdr['X-Rate-Limit-Reset'];
         $spacing              = $reset / (1.0 + $remaining);
         $delay                = $spacing - self::REQUEST_LATENCY;
-        $this->_next_req_time = new \DateTime('now + '.$delay.' seconds');
+        $this->_next_req_time = new DateTime('now + '.$delay.' seconds');
     }
 
     /**
@@ -73,7 +75,7 @@ abstract class FullContact_Base
     public function __construct(
         protected $_apiKey,
     ) {
-        $this->_next_req_time = new \DateTime('@0');
+        $this->_next_req_time = new DateTime('@0');
     }
 
     /**

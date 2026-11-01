@@ -10,10 +10,10 @@ use Mautic\FormBundle\Form\Type\FormFieldCheckboxGroupType;
 use Mautic\FormBundle\Form\Type\FormFieldEmailType;
 use Mautic\FormBundle\Form\Type\FormFieldTelType;
 use Mautic\FormBundle\FormEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class FormValidationSubscriber implements EventSubscriberInterface
+final readonly class FormValidationSubscriber
 {
     public function __construct(
         private TranslatorInterface $translator,
@@ -21,17 +21,12 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            Events\FormBuilderEvent::class => ['onFormBuilder', 0],
-            FormEvents::ON_FORM_VALIDATE   => ['onFormValidate', 0],
-        ];
-    }
-
     /**
      * Add a simple email form.
      */
+    #[AsEventListener(
+        event: Events\FormBuilderEvent::class,
+    )]
     public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addValidator(
@@ -69,6 +64,9 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
     /**
      * Custom validation.
      */
+    #[AsEventListener(
+        event: FormEvents::ON_FORM_VALIDATE,
+    )]
     public function onFormValidate(Events\ValidationEvent $event): void
     {
         $value = $event->getValue();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Console\Output;
 
+use DateTime;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 /**
@@ -17,7 +18,7 @@ final class ConsoleDatetimeOutput extends ConsoleOutput
      */
     protected function doWrite(string $message, bool $newline): void
     {
-        $date = new \DateTime()->format('Y-m-d H:i:s');
+        $date = new DateTime()->format('Y-m-d H:i:s');
 
         if (!empty($message)) {
             $message = sprintf('[%s] %s', $date, $message);

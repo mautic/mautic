@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use DateTime;
+use Exception;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -123,7 +125,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
                 $data = ['username' => $this->keys['username'], 'password' => $this->keys['password']];
                 $this->extractAuthKeys($data, 'username');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $e->getMessage();
         }
 
@@ -467,7 +469,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
             }
 
             return $executed;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if (404 !== $e->getCode()) {
                 $this->logIntegrationError($e);
             }
@@ -537,10 +539,10 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
 
         if ($integrationEntities !== []) {
             $integrationEntity = reset($integrationEntities);
-            $integrationEntity->setLastSyncDate(new \DateTime());
+            $integrationEntity->setLastSyncDate(new DateTime());
         } else {
             $integrationEntity = new IntegrationEntity();
-            $integrationEntity->setDateAdded(new \DateTime());
+            $integrationEntity->setDateAdded(new DateTime());
             $integrationEntity->setIntegration($this->getName());
             $integrationEntity->setIntegrationEntity($object);
             $integrationEntity->setIntegrationEntityId($integrationEntityId);
@@ -609,7 +611,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $leadPushed = true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($e instanceof ApiErrorException) {
                 $e->setContact($lead);
             }
@@ -787,14 +789,14 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getCampaigns(): array
     {
         $campaigns = [];
         try {
             $campaigns = $this->getApiHelper()->getCampaigns();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -802,7 +804,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getCampaignChoices(): array
     {
@@ -861,7 +863,7 @@ final class ConnectwiseIntegration extends CrmAbstractIntegration
             }
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if (404 !== $e->getCode()) {
                 $this->logIntegrationError($e);
             }

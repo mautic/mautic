@@ -20,10 +20,10 @@ use Mautic\FormBundle\Entity\ActionRepository;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\ActionModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class ActionImportExportSubscriber implements EventSubscriberInterface
+final readonly class ActionImportExportSubscriber
 {
     use ImportExportTrait;
 
@@ -39,16 +39,9 @@ final readonly class ActionImportExportSubscriber implements EventSubscriberInte
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onExport', 0],
-            EntityImportEvent::class        => ['onImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EntityExportEvent::class,
+    )]
     public function onExport(EntityExportEvent $event): void
     {
         if (Action::ENTITY_NAME !== $event->getEntityName()) {
@@ -97,6 +90,9 @@ final readonly class ActionImportExportSubscriber implements EventSubscriberInte
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportEvent::class,
+    )]
     public function onImport(EntityImportEvent $event): void
     {
         if (Action::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -151,6 +147,9 @@ final readonly class ActionImportExportSubscriber implements EventSubscriberInte
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportUndoEvent::class,
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Action::ENTITY_NAME !== $event->getEntityName()) {
@@ -165,7 +164,7 @@ final readonly class ActionImportExportSubscriber implements EventSubscriberInte
 
         foreach ($summary['ids'] as $id) {
             $action = $this->actionRepository->find($id);
-            if ($action) {
+            if ($action instanceof Action) {
                 $this->entityManager->remove($action);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Action::class], 'formAction');
             }
@@ -174,6 +173,9 @@ final readonly class ActionImportExportSubscriber implements EventSubscriberInte
         $this->entityManager->flush();
     }
 
+    #[AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         if (Action::ENTITY_NAME !== $event->getEntityName() || empty($event->getEntityData())) {
@@ -193,7 +195,7 @@ final readonly class ActionImportExportSubscriber implements EventSubscriberInte
             }
 
             $existing = $this->actionRepository->findOneBy(['uuid' => $item['uuid']]);
-            if ($existing) {
+            if ($existing instanceof Action) {
                 $summary[EntityImportEvent::UPDATE]['names'][] = $existing->getName();
                 $summary[EntityImportEvent::UPDATE]['uuids'][] = $existing->getUuid();
             } else {

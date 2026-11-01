@@ -7,7 +7,7 @@ namespace Mautic\PageBundle\EventListener;
 use Mautic\AssetBundle\Event\AssetExportListEvent;
 use Mautic\EmailBundle\Helper\EmailMediaImageHelper;
 use Mautic\PageBundle\Entity\Page;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
 /**
  * Builder-embedded images in landing pages are referenced by absolute URL inside the page
@@ -16,20 +16,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * listener scans the exported page content for such media images and adds the local files
  * to the export asset list so they are packed alongside the entity data.
  */
-final readonly class PageExportListEventSubscriber implements EventSubscriberInterface
+final readonly class PageExportListEventSubscriber
 {
     public function __construct(
         private EmailMediaImageHelper $mediaImageHelper,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            AssetExportListEvent::class => ['onExportList', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: AssetExportListEvent::class,
+    )]
     public function onExportList(AssetExportListEvent $event): void
     {
         foreach ($event->getEntityData() as $section) {
