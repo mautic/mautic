@@ -71,7 +71,10 @@ class Trackable
             ->build();
     }
 
-    public function getRedirect(): Redirect
+    /**
+     * @return Redirect
+     */
+    public function getRedirect()
     {
         return $this->redirect;
     }

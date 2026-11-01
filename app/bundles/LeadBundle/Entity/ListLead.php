@@ -16,10 +16,13 @@ class ListLead
 {
     public const string TABLE_NAME = 'lead_lists_leads';
 
+    /**
+     * @var LeadList
+     */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: LeadList::class, inversedBy: 'leads')]
     #[ORM\JoinColumn(name: 'leadlist_id', nullable: false, onDelete: 'CASCADE')]
-    private \Mautic\LeadBundle\Entity\LeadList $list;
+    private $list;
 
     /**
      * @var Lead
@@ -69,7 +72,10 @@ class ListLead
         $this->dateAdded = $date;
     }
 
-    public function getLead(): Lead
+    /**
+     * @return Lead
+     */
+    public function getLead()
     {
         return $this->lead;
     }
@@ -82,7 +88,10 @@ class ListLead
         $this->lead = $lead;
     }
 
-    public function getList(): LeadList
+    /**
+     * @return LeadList
+     */
+    public function getList()
     {
         return $this->list;
     }

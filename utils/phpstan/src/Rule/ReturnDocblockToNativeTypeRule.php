@@ -61,6 +61,10 @@ final class ReturnDocblockToNativeTypeRule implements Rule
                     continue;
                 }
 
+                if ($this->isEntityClass($entry['class'])) {
+                    continue;
+                }
+
                 if ($this->isInOverrideFamily($entry['class'], $entry['method'], $classesByMethod[$entry['method']] ?? [])) {
                     continue;
                 }
@@ -80,6 +84,13 @@ final class ReturnDocblockToNativeTypeRule implements Rule
         }
 
         return $ruleErrors;
+    }
+
+    // Doctrine entities live under an \Entity\ namespace; their getters back mapped, possibly-unhydrated
+    // properties, so a native object return type can fatal at runtime (e.g. during serialization).
+    private function isEntityClass(string $className): bool
+    {
+        return str_contains($className, '\\Entity\\');
     }
 
     /**

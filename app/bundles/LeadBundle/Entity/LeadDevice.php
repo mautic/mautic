@@ -313,7 +313,10 @@ class LeadDevice
         return $this;
     }
 
-    public function getLead(): Lead
+    /**
+     * @return Lead
+     */
+    public function getLead()
     {
         return $this->lead;
     }

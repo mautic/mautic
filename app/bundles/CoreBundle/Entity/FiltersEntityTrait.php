@@ -28,8 +28,10 @@ trait FiltersEntityTrait
 
     /**
      * @param array $filters
+     *
+     * @return $this
      */
-    public function setFilters($filters): static
+    public function setFilters($filters)
     {
         $this->isChanged('filters', $filters);
         $this->filters = $filters;

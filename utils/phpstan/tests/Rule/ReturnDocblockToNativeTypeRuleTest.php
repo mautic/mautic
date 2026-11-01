@@ -57,4 +57,9 @@ final class ReturnDocblockToNativeTypeRuleTest extends RuleTestCase
             __DIR__.'/Fixture/ReturnFamily/ChildOverridingObjectReturn.php',
         ], []);
     }
+
+    public function testSkipEntity(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/Entity/EntityWithObjectReturn.php'], []);
+    }
 }

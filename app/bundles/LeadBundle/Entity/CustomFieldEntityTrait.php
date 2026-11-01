@@ -234,7 +234,10 @@ trait CustomFieldEntityTrait
         return $this->eventData[$key] ?? null;
     }
 
-    public function setEventData($key, $value): static
+    /**
+     * @return $this
+     */
+    public function setEventData($key, $value)
     {
         $this->eventData[$key] = $value;
 
