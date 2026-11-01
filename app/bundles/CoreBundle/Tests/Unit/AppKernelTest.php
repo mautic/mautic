@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 final class AppKernelTest extends TestCase
@@ -41,6 +43,8 @@ final class AppKernelTest extends TestCase
         rmdir($this->applicationDir);
     }
 
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testUnreadablePluginDirectoryDoesNotPreventBundleRegistration(): void
     {
         $kernel = new class($this->applicationDir) extends \AppKernel {
