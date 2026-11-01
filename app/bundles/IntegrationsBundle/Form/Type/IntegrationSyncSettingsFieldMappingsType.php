@@ -37,7 +37,9 @@ final class IntegrationSyncSettingsFieldMappingsType extends AbstractType
         }
 
         $integrationObject = $options['integrationObject'];
-        \assert($integrationObject instanceof ConfigFormSyncInterface);
+        if (!$integrationObject instanceof ConfigFormSyncInterface) {
+            throw new InvalidFormOptionException('integrationObject must implement '.ConfigFormSyncInterface::class);
+        }
 
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
 
