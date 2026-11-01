@@ -62,7 +62,8 @@ final class TrackableModelFunctionalTest extends MauticMysqlTestCase
 <a href="https://mautic.org">Mautic</a>
 <a href="https://google.com" data-mautic-disable-tracking="true">Google</a>
 <a href="https://another-link.com">Another Link</a>
-HTML,
+HTML
+,
             ['https://mautic.org', 'https://another-link.com'],
             ['<a href="https://google.com" data-mautic-disable-tracking="true">Google</a>'],
         ];
@@ -72,7 +73,8 @@ HTML,
 <a href="https://mautic.org">Mautic</a>
 <a href="https://google.com" data-mautic-disable-tracking="false">Google</a>
 <a href="https://another-link.com">Another Link</a>
-HTML,
+HTML
+,
             ['https://mautic.org', 'https://google.com', 'https://another-link.com'],
             [],
         ];
@@ -81,7 +83,8 @@ HTML,
             <<<HTML
 <a href="https://mautic.org">Mautic</a>
 <a href="https://google.com">Google</a>
-HTML,
+HTML
+,
             ['https://mautic.org', 'https://google.com'],
             [],
         ];

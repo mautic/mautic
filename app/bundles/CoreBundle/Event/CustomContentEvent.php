@@ -40,6 +40,7 @@ final class CustomContentEvent extends Event
     {
         $this->content[] = $content;
     }
+
     public function addTemplate(string $template, array $vars = []): void
     {
         $this->templates[] = [

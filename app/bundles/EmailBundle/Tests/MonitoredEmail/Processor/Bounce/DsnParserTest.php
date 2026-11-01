@@ -53,7 +53,8 @@ Final-Recipient: rfc822;sdfgsdfg@seznan.cz
 Action: failed
 Status: 5.4.4
 Diagnostic-Code: DNS; Host not found
-DSN,
+DSN
+,
             'expectedEmail'      => 'sdfgsdfg@seznan.cz',
             'expectedCategory'   => Category::DNS_UNKNOWN,
             'expectedType'       => Type::HARD,
@@ -69,7 +70,8 @@ Status: 5.1.1
 Remote-MTA: dns; mail-server.yoursite.com
 Diagnostic-Code: smtp; 550 5.1.1 <aaaaaaaaaaaaa@yoursite.com> User doesn't
     exist: aaaaaaaaaaaaa@yoursite.com
-DSN,
+DSN
+,
             'expectedEmail'      => 'aaaaaaaaaaaaa@yoursite.com',
             'expectedCategory'   => Category::UNKNOWN,
             'expectedType'       => Type::HARD,
@@ -82,7 +84,8 @@ Final-Recipient: rfc822; sender@example.com
 Action: failed
 Status: 5.7.193
 Diagnostic-Code: smtp;550 5.7.193 UnifiedGroupAgent; Delivery failed because the sender isn't a group member or external senders aren't permitted to send to this group.
-DSN,
+DSN
+,
             'expectedEmail'      => 'sender@example.com',
             'expectedCategory'   => Category::USER_REJECT,
             'expectedType'       => Type::HARD,
@@ -95,7 +98,8 @@ Final-Recipient: rfc822; recipient@example.com
 Action: failed
 Status: 5.4.317
 Diagnostic-Code: smtp;550 5.4.317 Message expired, cannot connect to remote server
-DSN,
+DSN
+,
             'expectedEmail'      => 'recipient@example.com',
             'expectedCategory'   => Category::DNS_UNKNOWN,
             'expectedType'       => Type::HARD,
@@ -108,7 +112,8 @@ Final-Recipient: rfc822; user@outlook.com
 Action: failed
 Status: 5.4.1
 Diagnostic-Code: smtp;550 5.4.1 Recipient address rejected: Access denied
-DSN,
+DSN
+,
             'expectedEmail'      => 'user@outlook.com',
             'expectedCategory'   => Category::USER_REJECT,
             'expectedType'       => Type::HARD,
@@ -121,7 +126,8 @@ Final-Recipient: rfc822; user@outlook.com
 Action: failed
 Status: 5.1.10
 Diagnostic-Code: smtp;550 5.1.10 RESOLVER.ADR.RecipientNotFound; Recipient not found by Exchange address book
-DSN,
+DSN
+,
             'expectedEmail'      => 'user@outlook.com',
             'expectedCategory'   => Category::UNKNOWN,
             'expectedType'       => Type::HARD,
@@ -134,7 +140,8 @@ Final-Recipient: rfc822; group@outlook.com
 Action: failed
 Status: 5.7.133
 Diagnostic-Code: smtp;550 5.7.133 RESOLVER.RST.SenderNotAuthenticatedForGroup; Sender not authenticated for group
-DSN,
+DSN
+,
             'expectedEmail'      => 'group@outlook.com',
             'expectedCategory'   => Category::USER_REJECT,
             'expectedType'       => Type::HARD,
@@ -147,7 +154,8 @@ Final-Recipient: rfc822; user@outlook.com
 Action: failed
 Status: 5.7.1
 Diagnostic-Code: smtp;550 5.7.1 Service unavailable, Client host [1.2.3.4] blocked using Spamhaus
-DSN,
+DSN
+,
             'expectedEmail'      => 'user@outlook.com',
             'expectedCategory'   => Category::ANTISPAM,
             'expectedType'       => Type::BLOCKED,
@@ -160,7 +168,8 @@ Final-Recipient: rfc822; user@outlook.com
 Action: failed
 Status: 5.7.606
 Diagnostic-Code: smtp;550 5.7.606 Access denied, banned sending IP [1.2.3.4]
-DSN,
+DSN
+,
             'expectedEmail'      => 'user@outlook.com',
             'expectedCategory'   => Category::ANTISPAM,
             'expectedType'       => Type::BLOCKED,
@@ -173,7 +182,8 @@ Final-Recipient: rfc822; user@outlook.com
 Action: failed
 Status: 5.7.511
 Diagnostic-Code: smtp;550 5.7.511 Access denied, banned sender [user@outlook.com]
-DSN,
+DSN
+,
             'expectedEmail'      => 'user@outlook.com',
             'expectedCategory'   => Category::ANTISPAM,
             'expectedType'       => Type::BLOCKED,

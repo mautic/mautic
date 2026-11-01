@@ -74,7 +74,8 @@ const foo='bar';
 
     </body>
 </html>
-EOF,
+EOF
+,
             $event->getContent()
         );
     }

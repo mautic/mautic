@@ -295,8 +295,7 @@ final class InputHelper
             $parts['query'] = Query::build($query, PHP_QUERY_RFC3986);
         }
 
-        return
-            // already clean due to the exclusion list above
+        return // already clean due to the exclusion list above
             (!empty($parts['scheme']) ? $parts['scheme'].'://' : '').
             // strip tags that could be embedded in the username or password
             (!empty($parts['user']) ? strip_tags($parts['user']).':' : '').
