@@ -162,6 +162,7 @@ class AppKernel extends Kernel
             ->followLinks()
             ->depth('1')
             ->in($searchPath)
+            ->ignoreUnreadableDirs()
             ->name('*Bundle.php');
 
         foreach ($finder as $file) {
