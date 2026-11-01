@@ -59,6 +59,6 @@ final class AppKernelTest extends TestCase
             }
         };
 
-        self::assertIsArray(iterator_to_array($kernel->registerBundles()));
+        $this->assertIsArray(iterator_to_array($kernel->registerBundles()));
     }
 }
