@@ -62,4 +62,9 @@ final class ReturnDocblockToNativeTypeRuleTest extends RuleTestCase
     {
         $this->analyse([__DIR__.'/Fixture/Entity/EntityWithObjectReturn.php'], []);
     }
+
+    public function testSkipEntityReturnType(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/ServiceReturningEntity.php'], []);
+    }
 }

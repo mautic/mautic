@@ -61,7 +61,7 @@ final class ReturnDocblockToNativeTypeRule implements Rule
                     continue;
                 }
 
-                if ($this->isEntityClass($entry['class'])) {
+                if ($this->isEntityClass($entry['class']) || $this->isEntityClass($entry['candidate']['type'])) {
                     continue;
                 }
 
@@ -86,8 +86,9 @@ final class ReturnDocblockToNativeTypeRule implements Rule
         return $ruleErrors;
     }
 
-    // Doctrine entities live under an \Entity\ namespace; their getters back mapped, possibly-unhydrated
-    // properties, so a native object return type can fatal at runtime (e.g. during serialization).
+    // Doctrine entities live under an \Entity\ namespace. A getter on an entity backs a mapped,
+    // possibly-unhydrated property, and a getter that returns an entity usually wraps a nullable
+    // find/getEntity lookup, so a native object return type can fatal at runtime.
     private function isEntityClass(string $className): bool
     {
         return str_contains($className, '\\Entity\\');

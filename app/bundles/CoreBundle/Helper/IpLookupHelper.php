@@ -101,8 +101,10 @@ final class IpLookupHelper
      * Get an IpAddress entity for current session or for passed in IP address.
      *
      * @param string $ip
+     *
+     * @return IpAddress
      */
-    public function getIpAddress($ip = null): IpAddress
+    public function getIpAddress($ip = null)
     {
         $isIpAnonymizationEnabled = (bool) $this->coreParametersHelper->get('anonymize_ip');
 

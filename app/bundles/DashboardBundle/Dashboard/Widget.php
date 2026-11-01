@@ -23,8 +23,10 @@ final readonly class Widget
 
     /**
      * Get ready widget to populate in template.
+     *
+     * @return \Mautic\DashboardBundle\Entity\Widget
      */
-    public function get(int $widgetId): \Mautic\DashboardBundle\Entity\Widget
+    public function get(int $widgetId)
     {
         /** @var \Mautic\DashboardBundle\Entity\Widget $widget */
         $widget = $this->dashboardModel->getEntity($widgetId);
