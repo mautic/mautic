@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle;
 
+use Mautic\CoreBundle\DependencyInjection\Compiler\AssetMapperWebRootPass;
 use Mautic\CoreBundle\DependencyInjection\Compiler\ConfiguratorPass;
 use Mautic\CoreBundle\DependencyInjection\Compiler\DbalPass;
 use Mautic\CoreBundle\DependencyInjection\Compiler\DoctrineMappingDriverPass;
@@ -28,6 +29,7 @@ final class MauticCoreBundle extends Bundle
 
         $container->addCompilerPass(new ORMPurgerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10);
         $container->addCompilerPass(new SystemThemeTemplatePathPass(), PassConfig::TYPE_BEFORE_REMOVING, 0);
+        $container->addCompilerPass(new AssetMapperWebRootPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $container->addCompilerPass(new TestPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);

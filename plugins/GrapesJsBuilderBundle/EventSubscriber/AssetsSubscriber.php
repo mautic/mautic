@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
 use Mautic\CoreBundle\Event\CustomAssetsEvent;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Install\InstallService;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use Psr\Log\LoggerInterface;
@@ -13,13 +14,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final readonly class AssetsSubscriber
 {
-    private const string ASSET_DIR = 'plugins/GrapesJsBuilderBundle/Assets/library/js/dist';
+    private const string ASSET_DIR = 'GrapesJsBuilderBundle/Assets/library/js/dist';
 
     public function __construct(
         private Config $config,
         private InstallService $installer,
         private RequestStack $requestStack,
-        private string $projectDir,
+        private PathsHelper $pathsHelper,
         private LoggerInterface $logger,
     ) {
     }
@@ -37,7 +38,7 @@ final readonly class AssetsSubscriber
             return;
         }
 
-        $assetDir = $this->projectDir.'/'.self::ASSET_DIR;
+        $assetDir = $this->pathsHelper->getPluginsPath().'/'.self::ASSET_DIR;
         if (!is_file($assetDir.'/manifest.json')) {
             $this->logger->warning('GrapesJS builder assets are missing (no manifest.json). Run "composer gjs-build" to generate them.');
 
@@ -45,10 +46,10 @@ final readonly class AssetsSubscriber
         }
 
         if ($js = $this->resolveAsset('builder.js')) {
-            $assetsEvent->addScript(self::ASSET_DIR.'/'.$js);
+            $assetsEvent->addScript('plugins/'.self::ASSET_DIR.'/'.$js);
         }
         if ($css = $this->resolveAsset('builder.css')) {
-            $assetsEvent->addStylesheet(self::ASSET_DIR.'/'.$css);
+            $assetsEvent->addStylesheet('plugins/'.self::ASSET_DIR.'/'.$css);
         }
     }
 
@@ -61,7 +62,7 @@ final readonly class AssetsSubscriber
      */
     private function resolveAsset(string $logicalName): ?string
     {
-        $assetDir     = $this->projectDir.'/'.self::ASSET_DIR;
+        $assetDir     = $this->pathsHelper->getPluginsPath().'/'.self::ASSET_DIR;
         $manifestPath = $assetDir.'/manifest.json';
 
         if (!is_file($manifestPath)) {
