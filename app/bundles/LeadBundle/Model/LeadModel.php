@@ -1333,6 +1333,7 @@ class LeadModel extends FormModel
         }
 
         if (!empty($fields['stage']) && !empty($data[$fields['stage']])) {
+            /** @var Stage[] $stages */
             static $stages = [];
             $stageName     = $data[$fields['stage']];
             if (!array_key_exists($stageName, $stages)) {
@@ -1348,7 +1349,6 @@ class LeadModel extends FormModel
                 $stage = $stages[$stageName];
             }
 
-            /** @var Stage $stage */
             $lead->setStage($stage);
 
             // add a contact stage change log
