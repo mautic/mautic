@@ -1,0 +1,19 @@
+{
+    "name": "mautic/plugin-companyenrich",
+    "description": "CompanyEnrich company and people research for Mautic",
+    "type": "mautic-plugin",
+    "license": "GPL-3.0-or-later",
+    "keywords": [
+        "mautic",
+        "plugin",
+        "integration",
+        "companyenrich",
+        "enrichment"
+    ],
+    "extra": {
+        "install-directory-name": "MauticCompanyEnrichBundle"
+    },
+    "require": {
+        "mautic/core-lib": "^7.0"
+    }
+}

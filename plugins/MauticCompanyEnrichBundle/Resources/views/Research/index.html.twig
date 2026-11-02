@@ -1,0 +1,38 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block headerTitle %}CompanyEnrich{% endblock %}
+{% block mauticContent %}companyenrich{% endblock %}
+{% block content %}
+<div class="pa-md">
+    {% include '@MauticCore/Components/content-block.html.twig' with {
+        copy: ['mautic.companyenrich.intro', 'mautic.companyenrich.credits'],
+        noMargin: true
+    } only %}
+    <div class="row">
+        <div class="col-md-6">{{ form(form) }}</div>
+        <div class="col-md-6">
+            {% include '@MauticCore/Components/content-block.html.twig' with {
+                subheading: 'mautic.companyenrich.examples',
+                copy: 'mautic.companyenrich.examples.help',
+                noMargin: true
+            } only %}
+            <dl>
+                <dt>Company enrichment / workforce</dt><dd>Query: <code>{"domain":"example.com"}</code>; body: <code>{}</code></dd>
+                <dt>Company search</dt><dd>Query: <code>{}</code>; body: <code>{"semanticQuery":"Accounting software","page":1,"pageSize":10}</code></dd>
+                <dt>Similar companies</dt><dd>Query: <code>{}</code>; body: <code>{"domains":["example.com"],"pageSize":10}</code></dd>
+                <dt>Person lookup</dt><dd>Query: <code>{}</code>; body: <code>{"email":"alex@example.com"}</code></dd>
+            </dl>
+            <a href="https://docs.companyenrich.com/reference" target="_blank" rel="noopener noreferrer">{{ 'mautic.companyenrich.docs'|trans }}</a>
+        </div>
+    </div>
+    {% if result is not null %}
+        {% include '@MauticCore/Components/content-block.html.twig' with {
+            subheading: 'mautic.companyenrich.result', noMargin: true
+        } only %}
+        {% if result.credits_consumed is not null %}<p>{{ 'mautic.companyenrich.cost'|trans }}: {{ result.credits_consumed }}</p>{% endif %}
+        {% set resultJson = result.data|json_encode(constant('JSON_PRETTY_PRINT')) %}
+        {% include '@MauticCore/Components/code-snippet.html.twig' with {
+            variant: 'multi', innerText: resultJson|escape('html'), copyText: resultJson
+        } only %}
+    {% endif %}
+</div>
+{% endblock %}

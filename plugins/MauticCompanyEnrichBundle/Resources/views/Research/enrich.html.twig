@@ -1,0 +1,10 @@
+<p>{{ 'mautic.companyenrich.fill.help'|trans }}</p>
+<p><strong>{{ identifier }}</strong></p>
+<p>{{ 'mautic.companyenrich.credits'|trans }}</p>
+{% if creditsConsumed is not null %}<p>{{ 'mautic.companyenrich.cost'|trans }}: {{ creditsConsumed }}</p>{% endif %}
+{% if updated is not null %}
+    <p>{{ 'mautic.companyenrich.updated'|trans }}: {{ updated|length }}</p>
+    {% for field in updated %}<p>{{ field }}</p>{% endfor %}
+{% else %}
+    {{ form(form) }}
+{% endif %}
