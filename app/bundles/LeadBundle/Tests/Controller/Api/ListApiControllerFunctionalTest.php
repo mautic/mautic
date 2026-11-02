@@ -866,7 +866,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $expectedMembers = $expectedMembersForOperator[$operator];
 
-        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        $actualMembers   = array_map(fn (ListLead $segment): int => $segment->getLead()->getId(), $members);
         sort($expectedMembers);
         sort($actualMembers);
         $this->assertSame($expectedMembers, $actualMembers);
@@ -922,7 +922,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $expectedMembers = [$contactB->getId(), $contactC->getId()];
 
-        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        $actualMembers   = array_map(fn (ListLead $segment): int => $segment->getLead()->getId(), $members);
         sort($expectedMembers);
         sort($actualMembers);
         $this->assertSame($expectedMembers, $actualMembers);
