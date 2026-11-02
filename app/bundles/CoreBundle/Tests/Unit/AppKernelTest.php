@@ -84,4 +84,35 @@ PHP
             )
         );
     }
+
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testUnreadablePluginRootDoesNotPreventBundleRegistration(): void
+    {
+        $pluginRoot = $this->applicationDir.'/plugins';
+        chmod($pluginRoot, 0000);
+
+        if (is_readable($pluginRoot)) {
+            chmod($pluginRoot, 0700);
+            $this->markTestSkipped('The test process can read mode-000 plugin roots.');
+        }
+
+        try {
+            $kernel = new class($this->applicationDir) extends \AppKernel {
+                public function __construct(private readonly string $testApplicationDir)
+                {
+                    parent::__construct('prod', false);
+                }
+
+                public function getApplicationDir(): string
+                {
+                    return $this->testApplicationDir;
+                }
+            };
+
+            $this->assertIsArray(iterator_to_array($kernel->registerBundles()));
+        } finally {
+            chmod($pluginRoot, 0700);
+        }
+    }
 }

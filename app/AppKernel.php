@@ -157,33 +157,35 @@ class AppKernel extends Kernel
 
         // dynamically register Mautic Plugin Bundles
         $searchPath = $this->getApplicationDir().'/plugins';
-        $finder     = new Symfony\Component\Finder\Finder();
-        $finder->files()
-            ->followLinks()
-            ->depth('1')
-            ->in($searchPath)
-            ->ignoreUnreadableDirs()
-            ->name('*Bundle.php');
+        if (is_readable($searchPath)) {
+            $finder = new Symfony\Component\Finder\Finder();
+            $finder->files()
+                ->followLinks()
+                ->depth('1')
+                ->in($searchPath)
+                ->ignoreUnreadableDirs()
+                ->name('*Bundle.php');
 
-        foreach ($finder as $file) {
-            $dirname  = basename($file->getRelativePath());
-            $filename = substr($file->getFilename(), 0, -4);
+            foreach ($finder as $file) {
+                $dirname  = basename($file->getRelativePath());
+                $filename = substr($file->getFilename(), 0, -4);
 
-            $class = '\\MauticPlugin\\'.$dirname.'\\'.$filename;
-            if (class_exists($class)) {
-                $plugin = new $class();
+                $class = '\\MauticPlugin\\'.$dirname.'\\'.$filename;
+                if (class_exists($class)) {
+                    $plugin = new $class();
 
-                if ($plugin instanceof Symfony\Component\HttpKernel\Bundle\Bundle) {
-                    if (defined($class.'::MINIMUM_MAUTIC_VERSION')) {
-                        // Check if this version supports the plugin before loading it
-                        if (version_compare($this->getVersion(), constant($class.'::MINIMUM_MAUTIC_VERSION'), 'lt')) {
-                            continue;
+                    if ($plugin instanceof Symfony\Component\HttpKernel\Bundle\Bundle) {
+                        if (defined($class.'::MINIMUM_MAUTIC_VERSION')) {
+                            // Check if this version supports the plugin before loading it
+                            if (version_compare($this->getVersion(), constant($class.'::MINIMUM_MAUTIC_VERSION'), 'lt')) {
+                                continue;
+                            }
                         }
+                        $bundles[] = $plugin;
                     }
-                    $bundles[] = $plugin;
-                }
 
-                unset($plugin);
+                    unset($plugin);
+                }
             }
         }
 
