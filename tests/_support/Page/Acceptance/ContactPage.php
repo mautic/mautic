@@ -50,8 +50,6 @@ final class ContactPage
 
     public static $uploadButton           = '#lead_import_start';
 
-    public static $importModal            = '#app-content > div > div.row.animation--slide-in-up > div > div > div.row > div > div';
-
     public static $firstName              = '#lead_field_import_firstname_chosen';
 
     public static $lastName               = '#lead_field_import_lastname_chosen';
@@ -117,7 +115,7 @@ final class ContactPage
      */
     public static function route($param): string
     {
-        return static::$URL.$param;
+        return self::$URL.$param;
     }
 
     /**
