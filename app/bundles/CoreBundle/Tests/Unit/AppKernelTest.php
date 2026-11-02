@@ -79,7 +79,7 @@ PHP
 
         $this->assertContains(
             'MauticPlugin\\ReadablePluginBundle\\ReadablePluginBundle',
-            array_map('get_class', $bundles)
+            array_map(get_class(...), $bundles)
         );
     }
 
