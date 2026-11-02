@@ -69,6 +69,7 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
             return null;
         }
 
+        /** @var Company $entity */
         if ($entity->getFields()) {
             // Pulled from Doctrine memory so don't make unnecessary queries as this has already happened
             return $entity;

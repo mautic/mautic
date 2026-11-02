@@ -433,6 +433,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $getter  = 'get'.ucfirst($prop);
         $current = $oldValue ?? $this->{$getter}();
         if ('owner' == $prop) {
+            /** @var User|null $current */
+            /** @var User|null $val */
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getId(), $val];
             } elseif (!$current && $val) {
@@ -441,6 +443,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                 $this->changes['owner'] = [$current->getId(), $val->getId()];
             }
         } elseif ('ipAddresses' == $prop) {
+            /** @var IpAddress $val */
             $this->changes['ipAddresses'] = ['', $val->getIpAddress()]; // Kept for BC. Not a good way to track changes on a collection
 
             if (empty($this->changes['ipAddressList'])) {
@@ -483,6 +486,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                 $this->changes['frequencyRules']['removed'][] = $val;
             }
         } elseif ('stage' == $prop) {
+            /** @var Stage|null $current */
+            /** @var Stage|null $val */
             if ($current && !$val) {
                 $this->changes['stage'] = [$current->getId(), $val];
             } elseif (!$current && $val) {

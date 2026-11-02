@@ -183,13 +183,15 @@ final class LeadEventLogRepository extends CommonRepository
             ->andWhere('ll.trigger_date > NOW()');
 
         if (isset($options['lead'])) {
+            /** @var \Mautic\LeadBundle\Entity\Lead $lead */
+            $lead = $options['lead'];
             /** @var IpAddress $ip */
-            foreach ($options['lead']->getIpAddresses() as $ip) {
+            foreach ($lead->getIpAddresses() as $ip) {
                 $leadIps[] = $ip->getId();
             }
 
             $query->andWhere('ll.lead_id = :leadId')
-                ->setParameter('leadId', $options['lead']->getId());
+                ->setParameter('leadId', $lead->getId());
         }
 
         if (isset($options['eventType'])) {

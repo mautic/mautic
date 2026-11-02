@@ -97,8 +97,9 @@ final class LeadDeviceRepository extends CommonRepository
                 $selectQuery->expr()->eq('es.id', $deviceId)
             );
         } elseif (null !== $lead) {
+            /** @var Lead $lead */
             $selectQuery->andWhere(
-                $selectQuery->expr()->eq('es.lead_id', $lead->getId())
+                $selectQuery->expr()->eq('es.lead_id', (string) $lead->getId())
             );
         }
 
