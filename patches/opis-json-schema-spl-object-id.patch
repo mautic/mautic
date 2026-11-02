@@ -1,0 +1,13 @@
+diff --git a/src/SchemaLoader.php b/src/SchemaLoader.php
+index 231af82..f350431 100644
+--- a/src/SchemaLoader.php
++++ b/src/SchemaLoader.php
+@@ -439,7 +439,7 @@ class SchemaLoader
+         if (is_bool($data)) {
+             $data = $data ? 'true' : 'false';
+         } else {
+-            $data = spl_object_hash($data);
++            $data = (string) spl_object_id($data);
+         }
+
+         return "schema:///{$data}.json";
