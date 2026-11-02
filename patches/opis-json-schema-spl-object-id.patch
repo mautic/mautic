@@ -1,7 +1,7 @@
-diff --git a/src/SchemaLoader.php b/src/SchemaLoader.php
+diff --git a/vendor/opis/json-schema/src/SchemaLoader.php b/vendor/opis/json-schema/src/SchemaLoader.php
 index 231af82..f350431 100644
---- a/src/SchemaLoader.php
-+++ b/src/SchemaLoader.php
+--- a/vendor/opis/json-schema/src/SchemaLoader.php
++++ b/vendor/opis/json-schema/src/SchemaLoader.php
 @@ -439,7 +439,7 @@ class SchemaLoader
          if (is_bool($data)) {
              $data = $data ? 'true' : 'false';
