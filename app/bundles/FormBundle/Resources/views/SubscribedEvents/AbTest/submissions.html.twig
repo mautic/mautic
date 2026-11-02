@@ -31,6 +31,10 @@
         mQuery('#abStatsModal').on('shown.bs.modal', function (event) {
             var canvas = document.getElementById("abtest-bar-chart");
             var barData = mQuery.parseJSON('{{ chart.render|json_encode|replace({'\'': '\\\''}) }}');
+            const existingChart = Chart.getChart(canvas);
+            if (existingChart) {
+                existingChart.destroy();
+            }
             var barGraph = new Chart(canvas, {type: 'bar', data: barData});
         });
     });
