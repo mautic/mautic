@@ -137,12 +137,12 @@ final class ThemeHelper implements ThemeHelperInterface
         $this->defaultThemes = array_merge($this->defaultThemes, $themes);
     }
 
-    public function setDefaultTheme($defaultTheme): void
+    public function setDefaultTheme(string $defaultTheme): void
     {
         $this->defaultTheme = $defaultTheme;
     }
 
-    public function createThemeHelper($themeName): TwigThemeHelper
+    public function createThemeHelper(string $themeName): TwigThemeHelper
     {
         if ('current' === $themeName) {
             $themeName = $this->defaultTheme;
@@ -206,7 +206,7 @@ final class ThemeHelper implements ThemeHelperInterface
         $this->updateConfig($root.$theme, $dirName);
     }
 
-    public function delete($theme): void
+    public function delete(string $theme): void
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
@@ -260,7 +260,7 @@ final class ThemeHelper implements ThemeHelperInterface
         return $minors;
     }
 
-    public function checkForTwigTemplate($template): string
+    public function checkForTwigTemplate(string $template): string
     {
         if ($this->twig->getLoader()->exists($template)) {
             return $template;
@@ -270,7 +270,7 @@ final class ThemeHelper implements ThemeHelperInterface
         return $this->findThemeWithTemplate($template);
     }
 
-    public function getInstalledThemes($specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true): array
+    public function getInstalledThemes(string $specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true): array
     {
         // Use a concatenated key since $includeDirs changes what's returned ($includeDirs used by API controller to prevent from exposing file paths)
         $key = $specificFeature.(int) $includeDirs;
@@ -285,7 +285,7 @@ final class ThemeHelper implements ThemeHelperInterface
         return $this->themes[$key];
     }
 
-    public function getTheme($theme = 'current', bool $throwException = false): TwigThemeHelper
+    public function getTheme(string $theme = 'current', bool $throwException = false): TwigThemeHelper
     {
         if (empty($this->themeHelpers[$theme])) {
             try {
@@ -638,7 +638,7 @@ final class ThemeHelper implements ThemeHelperInterface
         };
     }
 
-    public function zip($themeName): string
+    public function zip(string $themeName): string
     {
         $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
         $tmpPath   = $this->pathsHelper->getSystemPath('tmp', true).'/tmp_'.$themeName.'.zip';
