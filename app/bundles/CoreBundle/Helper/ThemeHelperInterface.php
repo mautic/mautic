@@ -53,8 +53,6 @@ interface ThemeHelperInterface
     public function rename($theme, $newName): void;
 
     /**
-     * @param string $theme
-     *
      * @throws FileNotFoundException
      */
     public function delete(string $theme): void;
