@@ -145,10 +145,7 @@ final class AssetsHelperTest extends TestCase
         ], $ckEditorScripts);
     }
 
-    /**
-     * @return MockObject&Packages
-     */
-    private function createPackagesMock()
+    private function createPackagesMock(): MockObject&Packages
     {
         /** @var MockObject&Packages $packagesMock */
         $packagesMock = $this->createMock(Packages::class);

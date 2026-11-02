@@ -91,6 +91,30 @@ final class ReturnObjectDocblock
         return 'x';
     }
 
+    /**
+     * @return \Countable&\Traversable
+     */
+    public function intersectionReturn()
+    {
+        return new \ArrayIterator([1, 2]);
+    }
+
+    /**
+     * @return iterable
+     */
+    public function iterableReturn()
+    {
+        return [1, 2, 3];
+    }
+
+    /**
+     * @return \Generator
+     */
+    public function generatorReturn()
+    {
+        yield $this->make();
+    }
+
     private function make(): SomeReturnObject
     {
         return new SomeReturnObject();

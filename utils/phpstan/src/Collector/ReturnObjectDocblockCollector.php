@@ -8,6 +8,7 @@ use PhpParser\Node;
 use PHPStan\Analyser\Scope;
 use PHPStan\Collectors\Collector;
 use PHPStan\Node\MethodReturnStatementsNode;
+use PHPStan\Type\IntersectionType;
 use PHPStan\Type\NeverType;
 use PHPStan\Type\NullType;
 use PHPStan\Type\ObjectType;
@@ -22,8 +23,9 @@ use PHPStan\Type\UnionType;
  * ReturnDocblockToNativeTypeRule, so a return type is only narrowed when no method in the family stands in the
  * way.
  *
- * A plain single class, "self", "static"/"$this", a nullable object and a union of objects are promoted;
- * generics, intersections, arrays and scalars are left alone.
+ * A plain single class, "self", "static"/"$this", a nullable object, a union of objects, an intersection of
+ * objects, the "iterable" keyword and a generator (promoted to "iterable") are promoted; generics, arrays and
+ * scalars are left alone.
  *
  * @phpstan-type ReturnCandidate array{type: string}
  *
@@ -62,7 +64,7 @@ final readonly class ReturnObjectDocblockCollector implements Collector
             'candidate' => null,
         ];
 
-        if ($node->hasNativeReturnTypehint() || $node->isGenerator()) {
+        if ($node->hasNativeReturnTypehint()) {
             return $entry;
         }
 
@@ -72,6 +74,16 @@ final readonly class ReturnObjectDocblockCollector implements Collector
 
         // the declared return type, which with no native type is the "@return" docblock type
         $docType = $node->getMethodReflection()->getVariants()[0]->getReturnType();
+
+        // a generator always yields a Generator at runtime, so "iterable" is a safe native supertype when the
+        // docblock already documents an iterable-family "@return"; the body-truth check below does not apply
+        if ($node->isGenerator()) {
+            if ($docType->isIterable()->yes()) {
+                $entry['candidate'] = ['type' => 'iterable'];
+            }
+
+            return $entry;
+        }
 
         $nativeType = $docType;
 
@@ -100,12 +112,33 @@ final readonly class ReturnObjectDocblockCollector implements Collector
     }
 
     /**
-     * Renders the native return type for an object docblock, or null when the type is not promotable. A single
-     * object, a nullable object and a union of objects are promoted; a nullable union renders as "A|B|null"
-     * because PHP forbids the "?" shorthand alongside a union.
+     * Renders the native return type for a non-static, non-generator docblock, or null when it is not
+     * promotable. A single object, "self", a nullable object, a union of objects, an intersection of objects
+     * and the "iterable" keyword are promoted; a nullable union renders as "A|B|null" because PHP forbids the
+     * "?" shorthand alongside a union.
      */
     private function buildNativeType(Type $docType, string $declaringClass): ?string
     {
+        // the "iterable" keyword: iterable but neither a definite array nor a definite object (a concrete
+        // Traversable object is handled as a plain object below)
+        if ($docType->isIterable()->yes() && !$docType->isArray()->yes() && !$docType->isObject()->yes()) {
+            return 'iterable';
+        }
+
+        // an intersection of plain objects, rendered "A&B"; an "instanceof IntersectionType" check is
+        // deprecated by the PHPStan API, so it is told apart from a union by holding several object class
+        // names yet equalling a pure intersection of them. Anything that is not an intersection falls through
+        // to the single-object/union handling below.
+        if ($docType->isObject()->yes()) {
+            $objectClassNames = $docType->getObjectClassNames();
+            if (count($objectClassNames) >= 2) {
+                $intersectionType = $this->buildIntersectionType($docType, $objectClassNames, $declaringClass);
+                if (null !== $intersectionType) {
+                    return $intersectionType;
+                }
+            }
+        }
+
         $members = $docType instanceof UnionType ? $docType->getTypes() : [$docType];
 
         $nullable = false;
@@ -141,6 +174,31 @@ final readonly class ReturnObjectDocblockCollector implements Collector
     }
 
     /**
+     * Renders an intersection of plain objects as "A&B", or null when the type is not a pure intersection of
+     * promotable plain classes.
+     *
+     * @param string[] $objectClassNames
+     */
+    private function buildIntersectionType(Type $docType, array $objectClassNames, string $declaringClass): ?string
+    {
+        $plainMembers = array_map(static fn (string $className): ObjectType => new ObjectType($className), $objectClassNames);
+        if (!$docType->equals(new IntersectionType($plainMembers))) {
+            return null;
+        }
+
+        $names = [];
+        foreach ($objectClassNames as $className) {
+            if (!$this->isPromotableClassName($className)) {
+                return null;
+            }
+
+            $names[] = $className === $declaringClass ? 'self' : $className;
+        }
+
+        return implode('&', $names);
+    }
+
+    /**
      * The plain class name of a single promotable object member ("self" for the declaring class), or null for
      * anything that would lose meaning as a native type: a generic, an intersection, a Doctrine collection, a
      * date getter or a service getter.
@@ -163,26 +221,39 @@ final readonly class ReturnObjectDocblockCollector implements Collector
             return null;
         }
 
+        if (!$this->isPromotableClassName($className)) {
+            return null;
+        }
+
+        // "@return self" resolves to the declaring class, so render it back as "self"
+        return $className === $declaringClass ? 'self' : $className;
+    }
+
+    /**
+     * Rejects class names that would lose meaning or fatal as a native type: a Doctrine collection, a date
+     * getter or a service getter.
+     */
+    private function isPromotableClassName(string $className): bool
+    {
         // a Doctrine collection getter returns ArrayCollection before persist and PersistentCollection
         // after, so a native ArrayCollection return type would fatal at runtime
         if (str_starts_with($className, 'Doctrine\\Common\\Collections\\')) {
-            return null;
+            return false;
         }
 
         // date getters back a nullable column but are routinely documented as a non-null "@return
         // DateTimeInterface"; a native non-null type would fatal when the column is null
         if ($this->isDateTimeType($className)) {
-            return null;
+            return false;
         }
 
         foreach (self::SERVICE_SUFFIXES as $suffix) {
             if (str_ends_with($className, $suffix)) {
-                return null;
+                return false;
             }
         }
 
-        // "@return self" resolves to the declaring class, so render it back as "self"
-        return $className === $declaringClass ? 'self' : $className;
+        return true;
     }
 
     private function rawReturnTag(MethodReturnStatementsNode $node): ?string

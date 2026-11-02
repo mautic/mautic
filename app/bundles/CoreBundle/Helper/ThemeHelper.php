@@ -285,7 +285,7 @@ final class ThemeHelper implements ThemeHelperInterface
         return $this->themes[$key];
     }
 
-    public function getTheme($theme = 'current', bool $throwException = false)
+    public function getTheme($theme = 'current', bool $throwException = false): twigThemeHelper
     {
         if (empty($this->themeHelpers[$theme])) {
             try {
