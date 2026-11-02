@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Twig\Helper\ThemeHelper as twigThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\ThemeHelper as TwigThemeHelper;
 use Mautic\CoreBundle\Twig\Sandbox\ThemeSandboxPolicy;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
@@ -45,7 +45,7 @@ final class ThemeHelper implements ThemeHelperInterface
     private $defaultTheme;
 
     /**
-     * @var twigThemeHelper[]
+     * @var TwigThemeHelper[]
      */
     private array $themeHelpers = [];
 
@@ -142,13 +142,13 @@ final class ThemeHelper implements ThemeHelperInterface
         $this->defaultTheme = $defaultTheme;
     }
 
-    public function createThemeHelper($themeName): twigThemeHelper
+    public function createThemeHelper($themeName): TwigThemeHelper
     {
         if ('current' === $themeName) {
             $themeName = $this->defaultTheme;
         }
 
-        return new twigThemeHelper($this->pathsHelper, $themeName);
+        return new TwigThemeHelper($this->pathsHelper, $themeName);
     }
 
     private function getDirectoryName(string $newName): string
@@ -285,7 +285,7 @@ final class ThemeHelper implements ThemeHelperInterface
         return $this->themes[$key];
     }
 
-    public function getTheme($theme = 'current', bool $throwException = false): twigThemeHelper
+    public function getTheme($theme = 'current', bool $throwException = false): TwigThemeHelper
     {
         if (empty($this->themeHelpers[$theme])) {
             try {
