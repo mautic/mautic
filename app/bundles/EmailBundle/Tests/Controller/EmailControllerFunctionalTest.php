@@ -1677,6 +1677,10 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
             'winnerCriteria' => 'asset.downloads',
         ]);
         $this->em->flush();
+        $this->em->clear();
+
+        $auditLogs = $this->findEmailUpdateAuditLogs($email);
+        $this->assertCount(0, $auditLogs, 'There should be no audit log before editing.');
 
         // Edit the email and save it without making any changes.
         $crawler        = $this->client->request(Request::METHOD_GET, '/s/emails/edit/'.$email->getId());
