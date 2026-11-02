@@ -77,11 +77,9 @@ PHP
 
         $bundles = iterator_to_array($kernel->registerBundles());
 
-        $this->assertNotEmpty(
-            array_filter(
-                $bundles,
-                static fn (object $bundle): bool => $bundle instanceof \MauticPlugin\ReadablePluginBundle\ReadablePluginBundle
-            )
+        $this->assertContains(
+            'MauticPlugin\\ReadablePluginBundle\\ReadablePluginBundle',
+            array_map('get_class', $bundles)
         );
     }
 
