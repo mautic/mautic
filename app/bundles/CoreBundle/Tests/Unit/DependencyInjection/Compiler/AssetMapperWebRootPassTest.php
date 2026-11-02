@@ -49,7 +49,7 @@ final class AssetMapperWebRootPassTest extends TestCase
         $applicationDir = $this->createRecommendedProject();
         $container      = $this->createContainer($applicationDir, '/assets/build/');
 
-        (new AssetMapperWebRootPass())->process($container);
+        new AssetMapperWebRootPass()->process($container);
 
         $this->assertAssetMapperDirectories($container, $applicationDir, $applicationDir.'/assets/build');
     }
@@ -75,7 +75,7 @@ final class AssetMapperWebRootPassTest extends TestCase
 
         $container = $this->createContainer($applicationDir, '/custom/build/');
 
-        (new AssetMapperWebRootPass())->process($container);
+        new AssetMapperWebRootPass()->process($container);
 
         $this->assertAssetMapperDirectories($container, $localRoot, $localRoot.'/custom/build');
     }
@@ -85,7 +85,7 @@ final class AssetMapperWebRootPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
 
-        (new MauticCoreBundle())->build($container);
+        new MauticCoreBundle()->build($container);
 
         $passClasses = static fn (array $passes): array => array_map(
             static fn (CompilerPassInterface $pass): string => $pass::class,

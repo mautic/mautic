@@ -28,7 +28,7 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
      *
      * @var string[]
      */
-    private const ALLOWED_OBJECT_NAMESPACES = [
+    private const array ALLOWED_OBJECT_NAMESPACES = [
         'Mautic\\',
         'MauticPlugin\\',
     ];
@@ -39,7 +39,7 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
      *
      * @var string[]
      */
-    private const ALLOWED_METHOD_PREFIXES = [
+    private const array ALLOWED_METHOD_PREFIXES = [
         'get',
         'is',
         'has',
@@ -51,7 +51,7 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
      *
      * @var string[]
      */
-    private const DENIED_METHODS = [
+    private const array DENIED_METHODS = [
         'getpassword',          // User::getPassword() - leaks password hashes
         'getfilecontents',      // Asset::getFileContents() - arbitrary file read
         'getsecret',            // Webhook/UserToken::getSecret() - API secrets
@@ -70,7 +70,7 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
      *
      * @var string[]
      */
-    private const ALLOWED_METHODS = [
+    private const array ALLOWED_METHODS = [
         'showforcontact',           // Field::showForContact() - display logic for progressive profiling
         'increasedisplayedfields',  // DisplayManager::increaseDisplayedFields() - field counter
         'generateformname',         // Form::generateFormName() - unique form identifier
@@ -166,13 +166,7 @@ final class ThemeSandboxPolicy implements SecurityPolicyInterface
         $isAccessor = !str_starts_with($normalized, '__');
 
         if ($isAccessor) {
-            $isAccessor = false;
-            foreach (self::ALLOWED_METHOD_PREFIXES as $prefix) {
-                if (str_starts_with($normalized, $prefix)) {
-                    $isAccessor = true;
-                    break;
-                }
-            }
+            $isAccessor = array_any(self::ALLOWED_METHOD_PREFIXES, fn(string $prefix): bool => str_starts_with($normalized, $prefix));
         }
 
         // method_exists() is false for names handled only via __call, so this

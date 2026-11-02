@@ -21,7 +21,7 @@ use Twig\TwigFunction;
  */
 final class TimelineEventTemplateTest extends TestCase
 {
-    private const TEMPLATE = 'index.html.twig';
+    private const string TEMPLATE = 'index.html.twig';
 
     private Environment $twig;
 

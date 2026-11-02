@@ -61,7 +61,7 @@ final class InstallWorkflowTest extends MauticMysqlTestCase
         $stashedLogDir = $this->logDir.'.stashed';
         if (is_dir($stashedLogDir)) {
             // Put back the real log directory, contents and tracked .gitkeep included.
-            (new Filesystem())->remove($this->logDir);
+            new Filesystem()->remove($this->logDir);
             rename($stashedLogDir, $this->logDir);
         } elseif (!is_dir($this->logDir)) {
             // A test removed it and could not put it back; the suite still logs through it.

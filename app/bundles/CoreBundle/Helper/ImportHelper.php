@@ -6,7 +6,7 @@ namespace Mautic\CoreBundle\Helper;
 
 final readonly class ImportHelper
 {
-    private const BLOCKED_ASSET_EXTENSIONS = [
+    private const array BLOCKED_ASSET_EXTENSIONS = [
         'asp',
         'aspx',
         'bash',
@@ -30,10 +30,10 @@ final readonly class ImportHelper
         'shtml',
     ];
 
-    private const BLOCKED_ASSET_FILENAMES = ['web.config'];
+    private const array BLOCKED_ASSET_FILENAMES = ['web.config'];
 
     // Builder image types (see FileUploader), allowed even if missing from allowed_extensions.
-    private const EXPORTED_IMAGE_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'webp', 'svg'];
+    private const array EXPORTED_IMAGE_EXTENSIONS = ['gif', 'jpg', 'jpeg', 'png', 'webp', 'svg'];
 
     public function __construct(
         private PathsHelper $pathsHelper,

@@ -19,9 +19,9 @@ final class FieldTemplateTest extends MauticMysqlTestCase
 
     private const string RADIO_GROUP_FIELD_TEMPLATE = '@MauticForm/Field/radiogrp.html.twig';
 
-    private const FREE_HTML_FIELD_TEMPLATE = '@MauticForm/Field/freehtml.html.twig';
+    private const string FREE_HTML_FIELD_TEMPLATE = '@MauticForm/Field/freehtml.html.twig';
 
-    private const FREE_TEXT_FIELD_TEMPLATE = '@MauticForm/Field/freetext.html.twig';
+    private const string FREE_TEXT_FIELD_TEMPLATE = '@MauticForm/Field/freetext.html.twig';
 
     public function testFieldTemplateRendersWithCssClasses(): void
     {

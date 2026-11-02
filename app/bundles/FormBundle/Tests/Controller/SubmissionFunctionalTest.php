@@ -200,7 +200,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         $response = json_decode($clientResponse->getContent(), true);
         $formId   = $response['form']['id'];
@@ -218,7 +218,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         );
 
         $submitResponse = $this->client->getResponse();
-        $this->assertSame(Response::HTTP_FOUND, $submitResponse->getStatusCode());
+        $this->assertSame(Response::HTTP_FOUND, $submitResponse->getStatusCode(), (string) $submitResponse->getContent());
 
         $redirectUrl = $submitResponse->headers->get('Location');
         $this->assertNotNull($redirectUrl);
@@ -256,7 +256,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
 
         $response = json_decode($clientResponse->getContent(), true);
         $formId   = $response['form']['id'];
@@ -1568,6 +1568,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         /** @var SubmissionModel $submissionModel */
         $submissionModel = self::getContainer()->get(SubmissionModel::class);
         $submission      = $submissionModel->getEntity($submissionId);
+        $this->assertInstanceOf(\Mautic\FormBundle\Entity\Submission::class, $submission);
         $submissionModel->deleteEntity($submission);
 
         $this->assertSame(0, (int) $this->connection->fetchOne($countSql, [$formId]));

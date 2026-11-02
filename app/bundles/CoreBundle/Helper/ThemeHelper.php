@@ -404,7 +404,7 @@ final class ThemeHelper implements ThemeHelperInterface
             }
 
             $missingFiles = array_diff($requiredFiles, $foundRequiredFiles);
-            if ($missingFiles) {
+            if ($missingFiles !== []) {
                 throw new FileNotFoundException($this->translator->trans('mautic.core.theme.missing.files', ['%files%' => implode(', ', $missingFiles)], 'validators'));
             }
         }

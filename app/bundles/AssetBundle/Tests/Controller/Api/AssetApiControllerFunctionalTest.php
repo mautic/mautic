@@ -157,7 +157,7 @@ final class AssetApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request('POST', 'api/assets/new', $payload);
         $clientResponse = $this->client->getResponse();
 
-        $this->assertSame(400, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        $this->assertSame(\Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST, $clientResponse->getStatusCode(), (string) $clientResponse->getContent());
         $this->assertSame(
             0,
             (int) $this->em->getConnection()->fetchOne('SELECT COUNT(*) FROM '.MAUTIC_TABLE_PREFIX.'assets'),

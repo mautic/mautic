@@ -30,7 +30,7 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 final class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 {
-    private const DYNAMIC_CONTENT = [
+    private const array DYNAMIC_CONTENT = [
         [
             'tokenName' => 'Greeting',
             'content'   => 'Hello <strong>there</strong>',

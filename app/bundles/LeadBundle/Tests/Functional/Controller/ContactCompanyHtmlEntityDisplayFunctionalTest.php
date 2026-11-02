@@ -26,13 +26,13 @@ final class ContactCompanyHtmlEntityDisplayFunctionalTest extends MauticMysqlTes
 
         /** @var CompanyModel $companyModel */
         $companyModel = self::getContainer()->get(CompanyModel::class);
-        $company      = (new Company())->setName($companyName);
+        $company      = new Company()->setName($companyName);
         $companyModel->saveEntity($company);
 
         /** @var LeadModel $leadModel */
         $leadModel = self::getContainer()->get(LeadModel::class);
 
-        $namedContact = (new Lead())
+        $namedContact = new Lead()
             ->setFirstname('John')
             ->setLastname('Doe')
             ->setEmail('john.doe@example.com');
@@ -40,7 +40,7 @@ final class ContactCompanyHtmlEntityDisplayFunctionalTest extends MauticMysqlTes
         $companyModel->addLeadToCompany($company, $namedContact);
         $leadModel->saveEntity($namedContact);
 
-        $namelessContact = (new Lead())
+        $namelessContact = new Lead()
             ->setEmail('test@example.com');
         $leadModel->saveEntity($namelessContact);
         $companyModel->addLeadToCompany($company, $namelessContact);

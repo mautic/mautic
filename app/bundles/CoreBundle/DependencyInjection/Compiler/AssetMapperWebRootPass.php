@@ -9,13 +9,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 final class AssetMapperWebRootPass implements CompilerPassInterface
 {
-    private const PUBLIC_ASSETS_PATH_RESOLVER_ID         = 'asset_mapper.public_assets_path_resolver';
+    private const string PUBLIC_ASSETS_PATH_RESOLVER_ID         = 'asset_mapper.public_assets_path_resolver';
 
-    private const LOCAL_PUBLIC_ASSETS_FILESYSTEM_ID      = 'asset_mapper.local_public_assets_filesystem';
+    private const string LOCAL_PUBLIC_ASSETS_FILESYSTEM_ID      = 'asset_mapper.local_public_assets_filesystem';
 
-    private const COMPILED_ASSET_MAPPER_CONFIG_READER_ID = 'asset_mapper.compiled_asset_mapper_config_reader';
+    private const string COMPILED_ASSET_MAPPER_CONFIG_READER_ID = 'asset_mapper.compiled_asset_mapper_config_reader';
 
-    private const MAUTIC_LOCAL_ROOT                       = '%env(default:kernel.project_dir:resolve:MAUTIC_LOCAL_ROOT)%';
+    private const string MAUTIC_LOCAL_ROOT                       = '%env(default:kernel.project_dir:resolve:MAUTIC_LOCAL_ROOT)%';
 
     public function process(ContainerBuilder $container): void
     {

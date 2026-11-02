@@ -408,7 +408,7 @@ final class InstallServiceTest extends TestCase
                 chmod($this->tempDir.'/var', 0700);
             }
 
-            (new Filesystem())->remove($this->tempDir);
+            new Filesystem()->remove($this->tempDir);
         }
 
         $this->tempDir = null;
