@@ -13,7 +13,7 @@ final class ConfigPrivacySubscriberTest extends MauticMysqlTestCase
 {
     protected function setUp(): void
     {
-        if ('testProfileImageIsLoadedFromGravatarWhenEnabled' === $this->name()) {
+        if ('testProfileImageUsesLocalAvatarWhenGravatarIsEnabled' === $this->name()) {
             $this->configParams['gravatar_enabled'] = true;
         }
 
@@ -57,12 +57,13 @@ final class ConfigPrivacySubscriberTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('gravatar.com', (string) $this->client->getResponse()->getContent());
     }
 
-    public function testProfileImageIsLoadedFromGravatarWhenEnabled(): void
+    public function testProfileImageUsesLocalAvatarWhenGravatarIsEnabled(): void
     {
         $crawler = $this->client->request(Request::METHOD_GET, '/s/account');
         $this->assertResponseIsSuccessful();
 
-        $this->assertStringStartsWith('https://www.gravatar.com/avatar/', (string) $crawler->filter('img.media-object')->attr('src'));
+        $this->assertStringStartsWith('data:image/svg+xml;', (string) $crawler->filter('img.media-object')->attr('src'));
+        $this->assertStringNotContainsString('gravatar.com', (string) $this->client->getResponse()->getContent());
     }
 
     /**
