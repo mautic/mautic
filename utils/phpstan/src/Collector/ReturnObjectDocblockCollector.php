@@ -14,6 +14,7 @@ use PHPStan\Type\ObjectType;
 use PHPStan\Type\StaticType;
 use PHPStan\Type\Type;
 use PHPStan\Type\TypeCombinator;
+use PHPStan\Type\UnionType;
 
 /**
  * Collects, for every method, an object-type return docblock that is not backed by a native return type and
@@ -21,8 +22,8 @@ use PHPStan\Type\TypeCombinator;
  * ReturnDocblockToNativeTypeRule, so a return type is only narrowed when no method in the family stands in the
  * way.
  *
- * A plain single class, "self", "static" and "$this" are promoted; nullable, unions, generics, arrays and
- * scalars are left alone.
+ * A plain single class, "self", "static"/"$this", a nullable object and a union of objects are promoted;
+ * generics, intersections, arrays and scalars are left alone.
  *
  * @phpstan-type ReturnCandidate array{type: string}
  *
@@ -80,40 +81,10 @@ final readonly class ReturnObjectDocblockCollector implements Collector
         if ($docType instanceof StaticType || 'static' === $rawReturnTag || '$this' === $rawReturnTag) {
             $typeString = 'static';
         } else {
-            if (!$docType->isObject()->yes()) {
+            $typeString = $this->buildNativeType($docType, $classReflection->getName());
+            if (null === $typeString) {
                 return $entry;
             }
-
-            $objectClassNames = $docType->getObjectClassNames();
-            if (1 !== count($objectClassNames)) {
-                return $entry;
-            }
-
-            // only a plain class type: nullable, generics and intersections would be lost on promotion
-            if (!$docType->equals(new ObjectType($objectClassNames[0]))) {
-                return $entry;
-            }
-
-            // a Doctrine collection getter returns ArrayCollection before persist and PersistentCollection
-            // after, so a native ArrayCollection return type would fatal at runtime
-            if (str_starts_with($objectClassNames[0], 'Doctrine\\Common\\Collections\\')) {
-                return $entry;
-            }
-
-            // date getters back a nullable column but are routinely documented as a non-null "@return
-            // DateTimeInterface"; a native non-null type would fatal when the column is null
-            if ($this->isDateTimeType($objectClassNames[0])) {
-                return $entry;
-            }
-
-            foreach (self::SERVICE_SUFFIXES as $suffix) {
-                if (str_ends_with($objectClassNames[0], $suffix)) {
-                    return $entry;
-                }
-            }
-
-            // "@return self" resolves to the declaring class, so render it back as "self"
-            $typeString = $objectClassNames[0] === $classReflection->getName() ? 'self' : $objectClassNames[0];
         }
 
         // the docblock must tell the truth: everything the body actually returns has to fit the native type
@@ -126,6 +97,92 @@ final readonly class ReturnObjectDocblockCollector implements Collector
         ];
 
         return $entry;
+    }
+
+    /**
+     * Renders the native return type for an object docblock, or null when the type is not promotable. A single
+     * object, a nullable object and a union of objects are promoted; a nullable union renders as "A|B|null"
+     * because PHP forbids the "?" shorthand alongside a union.
+     */
+    private function buildNativeType(Type $docType, string $declaringClass): ?string
+    {
+        $members = $docType instanceof UnionType ? $docType->getTypes() : [$docType];
+
+        $nullable = false;
+        $names = [];
+        foreach ($members as $member) {
+            if ($member->isNull()->yes()) {
+                $nullable = true;
+
+                continue;
+            }
+
+            $name = $this->objectMemberName($member, $declaringClass);
+            if (null === $name) {
+                return null;
+            }
+
+            $names[] = $name;
+        }
+
+        if ([] === $names) {
+            return null;
+        }
+
+        if ($nullable && 1 === count($names)) {
+            return '?'.$names[0];
+        }
+
+        if ($nullable) {
+            $names[] = 'null';
+        }
+
+        return implode('|', $names);
+    }
+
+    /**
+     * The plain class name of a single promotable object member ("self" for the declaring class), or null for
+     * anything that would lose meaning as a native type: a generic, an intersection, a Doctrine collection, a
+     * date getter or a service getter.
+     */
+    private function objectMemberName(Type $member, string $declaringClass): ?string
+    {
+        if (!$member->isObject()->yes()) {
+            return null;
+        }
+
+        $objectClassNames = $member->getObjectClassNames();
+        if (1 !== count($objectClassNames)) {
+            return null;
+        }
+
+        $className = $objectClassNames[0];
+
+        // only a plain class type: generics and intersections would be lost on promotion
+        if (!$member->equals(new ObjectType($className))) {
+            return null;
+        }
+
+        // a Doctrine collection getter returns ArrayCollection before persist and PersistentCollection
+        // after, so a native ArrayCollection return type would fatal at runtime
+        if (str_starts_with($className, 'Doctrine\\Common\\Collections\\')) {
+            return null;
+        }
+
+        // date getters back a nullable column but are routinely documented as a non-null "@return
+        // DateTimeInterface"; a native non-null type would fatal when the column is null
+        if ($this->isDateTimeType($className)) {
+            return null;
+        }
+
+        foreach (self::SERVICE_SUFFIXES as $suffix) {
+            if (str_ends_with($className, $suffix)) {
+                return null;
+            }
+        }
+
+        // "@return self" resolves to the declaring class, so render it back as "self"
+        return $className === $declaringClass ? 'self' : $className;
     }
 
     private function rawReturnTag(MethodReturnStatementsNode $node): ?string
