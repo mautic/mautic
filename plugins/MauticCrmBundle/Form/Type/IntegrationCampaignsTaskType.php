@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Form\Type;
 
 use MauticPlugin\MauticCrmBundle\Integration\ConnectwiseIntegration;
