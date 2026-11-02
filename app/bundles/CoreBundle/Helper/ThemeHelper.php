@@ -39,10 +39,7 @@ final class ThemeHelper implements ThemeHelperInterface
      */
     private array $steps = [];
 
-    /**
-     * @var string
-     */
-    private $defaultTheme;
+    private ?string $defaultTheme = null;
 
     /**
      * @var TwigThemeHelper[]
