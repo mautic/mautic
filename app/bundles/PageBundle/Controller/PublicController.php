@@ -433,7 +433,11 @@ final class PublicController extends AbstractFormController
             );
         }
 
-        $lead          = $contactTracker->getContact();
+        $lead = $contactTracker->getContact();
+        if (null === $lead) {
+            return $notSuccessResponse;
+        }
+
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
         $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
 
