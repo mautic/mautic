@@ -1351,7 +1351,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
      *                         array emailSettings
      *                         int   listId
      *                         bool  allowResends     If false, exact emails (by id) already sent to the lead will not be resent
-     *                         bool  ignoreDNC        If true, emails listed in the do not contact table will still get the email
+     *                         bool  ignoreDNC        If true, contacts on the do not contact list will still get the email, except contacts marked as bounced
      *                         array assetAttachments Array of optional Asset IDs to attach
      *
      * @return string[]|bool|string|null
