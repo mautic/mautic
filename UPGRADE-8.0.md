@@ -1202,3 +1202,10 @@
 
     `CommonApiController` and `FetchCommonApiController` also renamed their `@template`/`@extends` generic type parameter from `E` to `TEntity`; this only matters for static-analysis consumers that referenced the generic by name.
 - Many getters and setters now declare a native return type promoted from their `@return` docblock (entity getters returning the related entity, fluent setters returning `static`, and similar). A subclass that overrides one of these methods must declare the matching native return type, otherwise PHP raises an incompatible-signature error.
+
+- The `$options` parameter of `createForm()` now declares the native `array` type (previously only a `@param array` docblock). This affects `Mautic\CoreBundle\Model\FormModel::createForm()` and every model override across the bundles (`LeadModel`, `EmailModel`, `PageModel`, `CampaignModel`, `ReportModel`, …). If you extend one of these and override `createForm()`, an untyped `$options` override stays compatible with PHP - leaving a parameter untyped is a valid widening, so no incompatible-declaration error occurs. Add `array $options` to satisfy the `mautic.nativeTypeForArrayOrIterableDocblock` PHPStan rule and keep the signature aligned with the parent:
+
+    ```diff
+    -public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    +public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
+    ```
