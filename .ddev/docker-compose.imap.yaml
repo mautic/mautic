@@ -1,0 +1,23 @@
+# Disposable inboxes for the monitored-email integration tests. No host ports.
+services:
+  imap:
+    container_name: ddev-${DDEV_SITENAME}-imap
+    image: greenmail/standalone:2.1.15
+    environment:
+      JAVA_OPTS: -Djava.net.preferIPv4Stack=true -Xms32m -Xmx128m
+      GREENMAIL_OPTS: >-
+        -Dgreenmail.setup.test.smtp
+        -Dgreenmail.setup.test.imap
+        -Dgreenmail.hostname=0.0.0.0
+        -Dgreenmail.auth.disabled
+        -Dgreenmail.startup.timeout=30000
+    labels:
+      com.ddev.site-name: ${DDEV_SITENAME}
+      com.ddev.approot: ${DDEV_APPROOT}
+  web:
+    environment:
+      MAUTIC_TEST_IMAP_HOST: imap
+      MAUTIC_TEST_IMAP_PORT: 3143
+      MAUTIC_TEST_SMTP_PORT: 3025
+    depends_on:
+      - imap

@@ -1,0 +1,33 @@
+From: =?UTF-8?Q?Ren=C3=A9?= <sender@example.test>
+To: Test Inbox <recipient@example.test>
+Reply-To: Replies <reply@example.test>
+Subject: =?UTF-8?Q?P=C5=99=C3=ADli=C5=A1_=C5=BElu=C5=A5ou=C4=8Dk=C3=BD?=
+Date: Mon, 02 Nov 2026 12:00:00 +0000
+Message-ID: <fixture@example.test>
+In-Reply-To: <original@example.test>
+X-Mautic-Test: mailbox-contract
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="mixed-boundary"
+
+--mixed-boundary
+Content-Type: multipart/alternative; boundary="alternative-boundary"
+
+--alternative-boundary
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Hello, P=C5=99=C3=ADli=C5=A1!
+--alternative-boundary
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
+
+PHA+SGVsbG88L3A+
+--alternative-boundary--
+--mixed-boundary
+Content-Type: text/plain; name="report.txt"
+Content-Disposition: attachment; filename="report.txt"
+Content-ID: <report@example.test>
+Content-Transfer-Encoding: base64
+
+YXR0YWNobWVudCBjb250ZW50Cg==
+--mixed-boundary--

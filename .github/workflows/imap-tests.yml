@@ -1,0 +1,61 @@
+name: Monitored email IMAP compatibility
+
+on:
+  push:
+    branches:
+      - '[0-9].*'
+  pull_request:
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  imap:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.2', '8.4', '8.5']
+    services:
+      imap:
+        image: greenmail/standalone:2.1.15
+        env:
+          JAVA_OPTS: -Djava.net.preferIPv4Stack=true -Xms32m -Xmx128m
+          GREENMAIL_OPTS: >-
+            -Dgreenmail.setup.test.smtp
+            -Dgreenmail.setup.test.imap
+            -Dgreenmail.hostname=0.0.0.0
+            -Dgreenmail.auth.disabled
+            -Dgreenmail.startup.timeout=30000
+        ports:
+          - 3025/tcp
+          - 3143/tcp
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: imap, mbstring, xml, ctype, iconv, intl, pdo_mysql, zip, gd, bcmath
+          coverage: none
+      - uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
+        with:
+          composer-options: --no-scripts
+      - name: Wait for the test mail server
+        env:
+          IMAP_PORT: ${{ job.services.imap.ports[3143] }}
+          SMTP_PORT: ${{ job.services.imap.ports[3025] }}
+        run: |
+          for attempt in {1..30}; do
+            if nc -z 127.0.0.1 "$IMAP_PORT" && nc -z 127.0.0.1 "$SMTP_PORT"; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo 'GreenMail did not become ready' >&2
+          exit 1
+      - name: Test the mailbox contract against a real IMAP server
+        env:
+          MAUTIC_TEST_IMAP_HOST: 127.0.0.1
+          MAUTIC_TEST_IMAP_PORT: ${{ job.services.imap.ports[3143] }}
+          MAUTIC_TEST_SMTP_PORT: ${{ job.services.imap.ports[3025] }}
+        run: php bin/phpunit -c app/phpunit.xml.dist app/bundles/EmailBundle/Tests/Integration/MonitoredEmail
