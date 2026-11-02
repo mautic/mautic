@@ -7,10 +7,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 abstract class AbstractCustomRequestEvent extends Event
 {
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected ?Request $request = null;
 
     /**
      * @var string
@@ -36,7 +33,7 @@ abstract class AbstractCustomRequestEvent extends Event
         }
     }
 
-    public function getRequest(): Request
+    public function getRequest(): ?Request
     {
         return $this->request;
     }
