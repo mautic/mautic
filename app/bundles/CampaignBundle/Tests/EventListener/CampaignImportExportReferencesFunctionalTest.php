@@ -16,6 +16,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Exception\InvalidImportAliasException;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -28,6 +29,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\StageBundle\Entity\Stage;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -342,19 +344,7 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
 
     public function testImportedFormCanBeSubmitted(): void
     {
-        $form = new Form();
-        $form->setName('Form Submitted');
-        $form->setAlias('formsubmitted');
-        $form->setFormType('campaign');
-        $field = new Field();
-        $field->setForm($form);
-        $field->setLabel('Email');
-        $field->setAlias('email');
-        $field->setType('email');
-        $form->addField(0, $field);
-        $formModel = self::getContainer()->get(FormModel::class);
-        $formModel->saveEntity($form);
-        $formModel->createTableSchema($form, true, true);
+        $form = $this->createFormWithEmailField('Form Submitted', 'formsubmitted');
 
         $campaign = $this->createCampaign([
             'form.submit' => ['decision', ['forms' => [$form->getId()]]],
@@ -383,6 +373,66 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         ]], [], ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
         $this->assertResponseIsSuccessful();
         $this->assertSame('imported@example.com', $this->connection->fetchOne("SELECT email FROM {$table}"));
+    }
+
+    /**
+     * The aliases become the name of the form results table and its columns.
+     */
+    #[DataProvider('craftedAliasProvider')]
+    public function testImportWithACraftedAliasIsRejectedBeforeAnythingIsSaved(string $entityName, string $alias): void
+    {
+        $form     = $this->createFormWithEmailField('Crafted', 'crafted');
+        $campaign = $this->createCampaign([
+            'form.submit' => ['decision', ['forms' => [$form->getId()]]],
+        ]);
+        $export = $this->exportCampaign($campaign);
+
+        $uuids = [];
+        foreach ([Campaign::ENTITY_NAME, Form::ENTITY_NAME, Field::ENTITY_NAME] as $exportedName) {
+            $this->assertNotEmpty($export[$exportedName]);
+            foreach ($export[$exportedName] as &$entity) {
+                $entity['uuid']         = Uuid::uuid4()->toString();
+                $uuids[$exportedName][] = $entity['uuid'];
+            }
+            unset($entity);
+        }
+        $export[$entityName][0]['alias'] = $alias;
+
+        $countTables = fn (): int => (int) $this->connection->fetchOne(
+            'SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME LIKE ?',
+            [MAUTIC_TABLE_PREFIX.'form_results_%']
+        );
+        $countColumns = fn (): int => (int) $this->connection->fetchOne(
+            'SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND COLUMN_NAME = ?',
+            ['review_extra']
+        );
+        $tables  = $countTables();
+        $columns = $countColumns();
+
+        try {
+            self::getContainer()->get(EventDispatcherInterface::class)->dispatch(new EntityImportEvent(Campaign::ENTITY_NAME, $export, null));
+            $this->fail('The import with a crafted alias was not rejected.');
+        } catch (InvalidImportAliasException $e) {
+            $this->assertStringContainsString($alias, $e->getMessage());
+        }
+
+        $this->em->clear();
+        foreach ([Campaign::ENTITY_NAME => Campaign::class, Form::ENTITY_NAME => Form::class, Field::ENTITY_NAME => Field::class] as $exportedName => $class) {
+            foreach ($uuids[$exportedName] as $uuid) {
+                $this->assertNull($this->em->getRepository($class)->findOneBy(['uuid' => $uuid]), "{$exportedName} was saved");
+            }
+        }
+        $this->assertSame($tables, $countTables(), 'A form results table was created');
+        $this->assertSame($columns, $countColumns(), 'The crafted alias added a column');
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function craftedAliasProvider(): iterable
+    {
+        yield 'field alias adding a column' => [Field::ENTITY_NAME, 'review_field LONGTEXT, ADD review_extra'];
+        yield 'form alias changing the table' => [Form::ENTITY_NAME, 'x (review_extra TEXT); --'];
     }
 
     public function testImportedCampaignRunsItsActionsOnTheImportedEntities(): void
@@ -628,6 +678,28 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $page->setCustomHtml('<html><body>Page</body></html>');
 
         return $this->save($page);
+    }
+
+    /**
+     * A form with its results table, as the form builder saves it.
+     */
+    private function createFormWithEmailField(string $name, string $alias): Form
+    {
+        $form = new Form();
+        $form->setName($name);
+        $form->setAlias($alias);
+        $form->setFormType('campaign');
+        $field = new Field();
+        $field->setForm($form);
+        $field->setLabel('Email');
+        $field->setAlias('email');
+        $field->setType('email');
+        $form->addField(0, $field);
+        $formModel = self::getContainer()->get(FormModel::class);
+        $formModel->saveEntity($form);
+        $formModel->createTableSchema($form, true, true);
+
+        return $form;
     }
 
     private function createForm(string $name): Form

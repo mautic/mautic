@@ -26,6 +26,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Helper\ImportedAliasValidator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -55,6 +56,7 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
         private TagRepository $tagRepository,
         private CompanyModel $companyModel,
         private CompanyRepository $companyRepository,
+        private ImportedAliasValidator $importedAliasValidator,
     ) {
     }
 
@@ -111,6 +113,9 @@ final class CampaignImportExportSubscriber implements EventSubscriberInterface
 
             return;
         }
+
+        // The form and field aliases become table and column names, so they are checked before anything is saved
+        $this->importedAliasValidator->validate($entityData);
 
         $this->importCampaigns($event, $entityData, $userName);
         $this->importDependentEntities($event, $entityData, $userId);
