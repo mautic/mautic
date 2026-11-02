@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Security\Authenticator;
 
 use FOS\OAuthServerBundle\Model\AccessToken;
+use FOS\OAuthServerBundle\Model\Client;
 use FOS\OAuthServerBundle\Security\Authenticator\Passport\Badge\AccessTokenBadge;
 use OAuth2\OAuth2;
 use OAuth2\OAuth2AuthenticateException;
@@ -40,7 +41,8 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
             /** @var AccessToken $accessToken */
             $accessToken = $this->serverService->verifyAccessToken($tokenString);
 
-            $user   = $accessToken->getUser();
+            $user = $accessToken->getUser();
+            /** @var Client $client */
             $client = $accessToken->getClient();
 
             if (null !== $user) {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field\Command;
 
+use Doctrine\DBAL\Schema\Column;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -121,11 +122,13 @@ final class AnalyseCustomFieldCommand extends Command
                 continue;
             }
 
+            /** @var Column $fieldSchema */
+            $fieldSchema                      = $fieldSchemas[$field->getAlias()];
             $fieldDetails[$field->getAlias()] = [
                 'label'             => $field->getLabel(),
                 'alias'             => $field->getAlias(),
                 'type'              => $schemaDef['type'],
-                'char_length_limit' => $fieldSchemas[$field->getAlias()]->getLength(),
+                'char_length_limit' => $fieldSchema->getLength(),
                 'is_index'          => $field->isIsIndex(),
             ];
         }

@@ -353,7 +353,9 @@ final class SalesforceIntegration extends CrmAbstractIntegration
             foreach ($data['records'] as $record) {
                 $this->logger->debug('SALESFORCE: amendLeadDataBeforeMauticPopulate record '.var_export($record, true));
                 if (isset($params['progress'])) {
-                    $params['progress']->advance();
+                    /** @var ProgressBar $progress */
+                    $progress = $params['progress'];
+                    $progress->advance();
                 }
 
                 $dataObject = [];
@@ -2566,11 +2568,13 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
             foreach ($lastModifiedDNCDate as $logs) {
                 $leadId = $logs['objectId'];
-                if (strtotime($logs['dateAdded']->format('c')) > strtotime($sfModifiedDNC['CreatedDate'])) {
+                /** @var \DateTimeInterface $logDateAdded */
+                $logDateAdded = $logs['dateAdded'];
+                if (strtotime($logDateAdded->format('c')) > strtotime($sfModifiedDNC['CreatedDate'])) {
                     $trackedIds[] = $leadId;
                 }
                 if ((isset($leadIds[$leadId]) && $leadIds[$leadId] == $sfModifiedDNC[$sfObject.'Id'])
-                    && (strtotime($sfModifiedDNC['CreatedDate']) > strtotime($logs['dateAdded']->format('c'))) && !in_array($leadId, $trackedIds)) {
+                    && (strtotime($sfModifiedDNC['CreatedDate']) > strtotime($logDateAdded->format('c'))) && !in_array($leadId, $trackedIds)) {
                     // SF was updated last so update Mautic record
                     $key = $this->getSyncKey($leadEmails[$leadId]);
                     unset($sfRecords[$key]['mauticContactIsContactableByEmail']);

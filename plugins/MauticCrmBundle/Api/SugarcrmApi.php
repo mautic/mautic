@@ -318,11 +318,13 @@ final class SugarcrmApi extends CrmApi
         if ([] !== $activity) {
             foreach ($activity as $sugarId => $records) {
                 foreach ($records['records'] as $record) {
-                    $rec   = [];
-                    $rec[] = ['name' => 'name', 'value' => $record['name']];
-                    $rec[] = ['name' => 'description', 'value' => $record['description']];
-                    $rec[] = ['name' => 'url', 'value' => $records['leadUrl']];
-                    $rec[] = ['name' => 'date_entered', 'value' => $record['dateAdded']->format('c')];
+                    /** @var \DateTimeInterface $recordDateAdded */
+                    $recordDateAdded = $record['dateAdded'];
+                    $rec             = [];
+                    $rec[]           = ['name' => 'name', 'value' => $record['name']];
+                    $rec[]           = ['name' => 'description', 'value' => $record['description']];
+                    $rec[]           = ['name' => 'url', 'value' => $records['leadUrl']];
+                    $rec[]           = ['name' => 'date_entered', 'value' => $recordDateAdded->format('c')];
                     $rec[] = ['name' => 'reference_id', 'value' => $record['id'].'-'.$sugarId];
                     if ('Contacts' == $object) {
                         $rec[] = ['name' => 'contact_id_c', 'value' => $sugarId];

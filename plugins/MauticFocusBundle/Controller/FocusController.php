@@ -196,13 +196,15 @@ final class FocusController extends AbstractStandardFormController
             switch ($action) {
                 case 'new':
                 case 'edit':
+                    /** @var Focus $entity */
+                    $entity      = $args['entity'];
                     $passthrough = $args['passthroughVars'];
                     $passthrough = array_merge(
                         $passthrough,
                         [
                             'updateSelect' => $updateSelect,
-                            'id'           => $args['entity']->getId(),
-                            'name'         => $args['entity']->getName(),
+                            'id'           => $entity->getId(),
+                            'name'         => $entity->getName(),
                         ]
                     );
                     $args['passthroughVars'] = $passthrough;

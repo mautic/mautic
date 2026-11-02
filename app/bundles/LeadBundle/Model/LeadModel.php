@@ -431,6 +431,7 @@ class LeadModel extends FormModel
 
         if (!empty($company)) {
             // Save after the lead in for new leads created through the API and maybe other places
+            /** @var Company $companyEntity */
             $this->companyModel->addLeadToCompany($companyEntity, $entity);
             $this->setPrimaryCompany($companyEntity->getId(), $entity->getId());
         } elseif (array_key_exists('company', $updatedFields) && empty($updatedFields['company'])) {
@@ -1347,6 +1348,7 @@ class LeadModel extends FormModel
                 $stage = $stages[$stageName];
             }
 
+            /** @var Stage $stage */
             $lead->setStage($stage);
 
             // add a contact stage change log
