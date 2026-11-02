@@ -297,7 +297,7 @@ final class EventEntityReferences
      * @param array<int, array<string, mixed>>      $filters
      * @param array<string, array<int|string, int>> $idMaps  the new IDs by the old IDs per entity name or kind
      *
-     * @return array{0: array<int, array<string, mixed>>, 1: bool} the filters, and whether every filter that had a value still has one
+     * @return array{0: array<int, array<string, mixed>>, 1: bool} the filters, and whether every ID in them has a new one
      */
     public function remapSegmentFilters(array $filters, array $idMaps): array
     {
@@ -318,14 +318,31 @@ final class EventEntityReferences
                     continue;
                 }
 
-                $filter   = $this->remapValue($filter, $path, $idMaps[$kind] ?? []);
+                $idMap    = $idMaps[$kind] ?? [];
+                $filter   = $this->remapValue($filter, $path, $idMap);
                 $newValue = $this->getValue($filter, $path);
-                $complete = $complete && null !== $newValue && [] !== $newValue;
+                $complete = $complete && null !== $newValue && [] !== $newValue && $this->hasEveryId($value, $idMap);
             }
         }
         unset($filter);
 
         return [$filters, $complete];
+    }
+
+    /**
+     * Whether every ID in the value has a new one. A filter that keeps only some of its IDs has other rules.
+     *
+     * @param array<int|string, int> $idMap
+     */
+    private function hasEveryId(mixed $value, array $idMap): bool
+    {
+        foreach ($this->toIds($value) as $id) {
+            if (!isset($idMap[$id])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

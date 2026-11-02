@@ -235,9 +235,12 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $byKnownCategory = $this->createSegment('Known category');
         $byKnownCategory->setFilters([$this->segmentFilter('globalcategory', [$category->getId()])]);
         $this->save($byKnownCategory);
+        $bySomeCategories = $this->createSegment('Some categories');
+        $bySomeCategories->setFilters([$this->segmentFilter('globalcategory', [$category->getId(), 999999])]);
+        $this->save($bySomeCategories);
 
         $campaign = $this->createCampaign([
-            'lead.segments' => ['condition', ['segments' => [$segment->getId(), $byCategory->getId(), $byKnownCategory->getId()]]],
+            'lead.segments' => ['condition', ['segments' => [$segment->getId(), $byCategory->getId(), $byKnownCategory->getId(), $bySomeCategories->getId()]]],
         ]);
         $export = $this->exportCampaign($campaign);
 
@@ -270,6 +273,12 @@ final class CampaignImportExportReferencesFunctionalTest extends MauticMysqlTest
         $this->assertInstanceOf(LeadList::class, $importedByKnownCategory);
         $this->assertSame([$category->getId()], $importedByKnownCategory->getFilters()[0]['properties']['filter']);
         $this->assertTrue($importedByKnownCategory->getIsPublished());
+
+        // When only some of the categories are here, the segment keeps those but is unpublished too
+        $importedBySomeCategories = $this->em->find(LeadList::class, $newIds[LeadList::ENTITY_NAME][$bySomeCategories->getId()]);
+        $this->assertInstanceOf(LeadList::class, $importedBySomeCategories);
+        $this->assertSame([$category->getId()], $importedBySomeCategories->getFilters()[0]['properties']['filter']);
+        $this->assertFalse($importedBySomeCategories->getIsPublished());
     }
 
     public function testImportedEmailKeepsItsBuilderMjml(): void

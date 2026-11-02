@@ -338,6 +338,17 @@ final class EventEntityReferencesTest extends TestCase
         $this->assertTrue($complete);
     }
 
+    public function testSegmentFilterWithSomeImportedEntitiesIsIncomplete(): void
+    {
+        [$remapped, $complete] = $this->references->remapSegmentFilters(
+            [$this->segmentFilter('globalcategory', [2, 3])],
+            [EventEntityReferences::CATEGORY => [2 => 102]]
+        );
+
+        $this->assertFalse($complete);
+        $this->assertSame([$this->segmentFilter('globalcategory', [102])], $remapped);
+    }
+
     /**
      * A segment filter as the segment returns it, with the value also outside of the properties for older code.
      *
