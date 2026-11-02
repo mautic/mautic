@@ -90,7 +90,7 @@
             <div class="row">
                 <hr>
                 {% for name, f in form.children %}
-                    {% if name in ['anonymize_ip', 'track_contact_by_ip', 'do_not_track_404_anonymous', 'append_segment_id_tracking_url'] %}
+                    {% if name in ['anonymize_ip', 'track_contact_by_ip', 'do_not_track_404_anonymous', 'append_segment_id_tracking_url', 'aggregate_analytics'] %}
                         <div class="col-xs-12">
                             {{ form_row(f) }}
                             {% if name == 'anonymize_ip' %}

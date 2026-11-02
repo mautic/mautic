@@ -4,7 +4,8 @@
 
 <script>
     function togglePreferredChannel(channel){
-        const status = document.getElementById(channel).checked;
+        const checkbox = document.querySelector('input[name^="lead_contact_frequency_rules[lead_channels][subscribed_channels]"][value="' + channel + '"]');
+        const status = checkbox ? checkbox.checked : false;
 
         const fields = [
             'lead_contact_frequency_rules_lead_channels_frequency_number_' + channel,
@@ -46,20 +47,16 @@
                                         <input type="hidden" id="{{ channel.value }}-hidden"
                                                name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
                                                value="">
-                                        <input type="checkbox" id="{{ channel.value }}"
-                                               name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
-                                               onclick="togglePreferredChannel(this.value);"
-                                               value="{{ channel.value|escape }}" {{ checked }}>
-                                        <label for="{{ channel.value }}" id="is-contactable-{{ channel.value }}">
-                                            {{ 'mautic.lead.contact.me.label'|trans({'%channel%' : channelName}) }}
-                                        </label>
+                                        {% include '@MauticCore/Components/checkbox.html.twig' with {
+                                            items: [{ id: channel.value, name: 'lead_contact_frequency_rules[lead_channels][subscribed_channels][' ~ key ~ ']', value: channel.value, checked: contactMe, label: 'mautic.lead.contact.me.label'|trans({'%channel%': channelName}), attributes: { onclick: 'togglePreferredChannel(this.value);' }, labelAttributes: { id: 'is-contactable-' ~ channel.value } }]
+                                        } only %}
                                     </div>
                                 </td>
                             </tr>
                             {%- do form.lead_channels.subscribed_channels.setRendered(true) %}
                             <tr>
                                 <td>
-                                    <div id="frequency_<?php echo $channel->value; ?>" class="text-left row">
+                                    <div id="frequency_{{ channel.value }}" class="text-left row">
                                         {% if showContactFrequency %}
                                             <div class="col-md-6" data-contact-frequency="1">
                                                 <label class="text-secondary">{{ form.lead_channels['frequency_number_' ~ channel.value].vars.label|trans }}</label>

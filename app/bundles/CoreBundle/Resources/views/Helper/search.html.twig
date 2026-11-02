@@ -53,16 +53,16 @@
 {% if (filters is defined and filters is not empty) or (quickFilters is defined and quickFilters is not empty) %}
 {% set filtering %}
 <div class="row">
+    {% if quickFilters is defined and quickFilters is not empty %}
     <div class="{% if filters is defined and filters is not empty %}col-xs-6 pa-0{% endif %}">
-        {% if quickFilters is defined and quickFilters is not empty %}
         {{ include('@MauticCore/Helper/list_quickfilters.html.twig', {
             'quickFilters': quickFilters
         }) }}
-        {% endif %}
     </div>
+    {% endif %}
     {% if filters is defined and filters is not empty %}
-    <div class="col-xs-6 pa-0">
-        <div class="dropdown-header mt-0">{{ 'mautic.core.quick_filters.more'|trans }}</div>
+    <div class="{{ quickFilters is defined and quickFilters is not empty ? 'col-xs-6' : 'col-xs-12' }} pa-0">
+        <div class="dropdown-header mt-0">{{ filtersLabel|default('mautic.core.quick_filters.more')|trans }}</div>
         <div class="pi-md">
             {{- include('@MauticCore/Helper/list_filters.html.twig', {
                 filters: filters,

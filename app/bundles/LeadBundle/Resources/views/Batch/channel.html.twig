@@ -12,7 +12,9 @@
     <thead >
     <tr >
         <th>
-            <input type="checkbox" id="contact_channels_subscribed_channels_0" name="check_all" onclick="Mautic.togglePreferredChannel('all');" value="all">
+            {% include '@MauticCore/Components/checkbox.html.twig' with {
+                items: [{ id: 'contact_channels_subscribed_channels_0', name: 'check_all', value: 'all', attributes: { onclick: "Mautic.togglePreferredChannel('all');" } }]
+            } only %}
         </th>
         <th>{{ 'mautic.lead.contact.channels'|trans }}</th>
         <th>{{ 'mautic.lead.preferred.frequency'|trans }}</th>
@@ -29,9 +31,9 @@
         {% set disabled = leadChannels[channel.value] is defined ? '' : 'disabled' %}
         <tr>
             <th style="vertical-align: top" class="col-md-1">
-                <input type="checkbox" id="{{ channel.value }}"
-                       name="contact_channels[subscribed_channels][]" class="control-label" onclick="Mautic.togglePreferredChannel(this.value);"
-                       value="{{ channel.value|e }}" {{ checked }}>
+                {% include '@MauticCore/Components/checkbox.html.twig' with {
+                    items: [{ id: channel.value, name: 'contact_channels[subscribed_channels][]', value: channel.value, checked: contactMe, attributes: { onclick: 'Mautic.togglePreferredChannel(this.value);' } }]
+                } only %}
             </th>
             <td class="col-md-1" style="vertical-align: top">
                 <div id="is-contactable-{{ channel.value }}" class="{{ isContactable }} fw-sb">

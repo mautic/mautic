@@ -36,7 +36,7 @@ final class ContactChannelsType extends AbstractType
                 'choices'           => $options['channels'],
                 'expanded'          => true,
                 'label_attr'        => ['class' => 'form-label'],
-                'attr'              => ['onClick' => 'Mautic.togglePreferredChannel(this.value);'],
+                'attr'              => ['onClick' => 'window.Mautic ? Mautic.togglePreferredChannel(this.value) : togglePreferredChannel(this.value);'],
                 'multiple'          => true,
                 'label'             => false,
                 'required'          => false,

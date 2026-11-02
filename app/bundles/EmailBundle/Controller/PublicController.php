@@ -194,11 +194,19 @@ final class PublicController extends CommonFormController
             );
         }
 
+        $formView = $form->createView();
+
+        // The theme sandbox only allows property access on Mautic objects, so the
+        // template gets the child views and their state instead of reading FormView.
         return new Response($this->themeHelper->renderThemeTemplate(
             $contentTemplate,
             [
-                'form'     => $form->createView(),
-                'template' => $themeName,
+                'form'                  => $formView,
+                'emailAddressField'     => $formView['emailAddress'],
+                'emailAddressValid'     => $formView['emailAddress']->vars['valid'],
+                'emailAddressHasErrors' => count($formView['emailAddress']->vars['errors']) > 0,
+                'submitField'           => $formView['submit'],
+                'template'              => $themeName,
             ]
         ));
     }

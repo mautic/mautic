@@ -23,7 +23,7 @@ class Connection
     /**
      * @throws ApiException
      */
-    public function getPlugins(int $page, int $limit, string $query = ''): array
+    public function getPlugins(int $page, int $limit, string $query = '', string $type = ''): array
     {
         $queryParams = [
             'page'  => $page,
@@ -31,6 +31,9 @@ class Connection
         ];
         if ('' !== $query) {
             $queryParams['query'] = $query;
+        }
+        if ('' !== $type) {
+            $queryParams['type'] = $type;
         }
         $url = $this->config->getRegistryUrl().'/api/registry/v1/packages?'.http_build_query($queryParams);
 
