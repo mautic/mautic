@@ -101,7 +101,6 @@ parameters:
                 - app/bundles/CampaignBundle/Entity/LeadEventLogRepository.php
                 - app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
                 - app/bundles/CoreBundle/Entity/CommonEntity.php
-                - app/bundles/CoreBundle/Event/AbstractCustomRequestEvent.php
                 - app/bundles/CoreBundle/Form/DataTransformer/IdToEntityModelTransformer.php
                 - app/bundles/CoreBundle/Form/EventListener/FormExitSubscriber.php
                 - app/bundles/CoreBundle/Form/Type/IpLookupDownloadDataStoreButtonType.php
@@ -202,7 +201,6 @@ parameters:
                 - plugins/MauticSocialBundle/Integration/FoursquareIntegration.php
                 - plugins/MauticSocialBundle/Integration/InstagramIntegration.php
                 - app/bundles/CoreBundle/Entity/CommonRepository.php
-                - app/bundles/CoreBundle/Event/AbstractCustomRequestEvent.php
                 - app/bundles/CoreBundle/Helper/PRedisConnectionHelper.php
                 - app/bundles/CoreBundle/Helper/SearchStringHelper.php
                 - app/bundles/CoreBundle/IpLookup/AbstractMaxmindLookup.php
