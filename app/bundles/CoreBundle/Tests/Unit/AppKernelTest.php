@@ -20,6 +20,20 @@ final class AppKernelTest extends TestCase
         mkdir($this->applicationDir.'/app/config', 0777, true);
         file_put_contents($this->applicationDir.'/app/config/paths.php', '<?php $paths = [];');
         mkdir($this->applicationDir.'/plugins', 0777, true);
+        mkdir($this->applicationDir.'/plugins/ReadablePluginBundle', 0777, true);
+        file_put_contents(
+            $this->applicationDir.'/plugins/ReadablePluginBundle/ReadablePluginBundle.php',
+            <<<'PHP'
+<?php
+
+namespace MauticPlugin\ReadablePluginBundle;
+
+final class ReadablePluginBundle extends \Symfony\Component\HttpKernel\Bundle\Bundle
+{
+}
+PHP
+        );
+        require_once $this->applicationDir.'/plugins/ReadablePluginBundle/ReadablePluginBundle.php';
         mkdir($this->applicationDir.'/plugins/.unreadable', 0000);
         $this->testDirectoryCreated = true;
 
@@ -36,6 +50,8 @@ final class AppKernelTest extends TestCase
 
         chmod($this->applicationDir.'/plugins/.unreadable', 0700);
         rmdir($this->applicationDir.'/plugins/.unreadable');
+        unlink($this->applicationDir.'/plugins/ReadablePluginBundle/ReadablePluginBundle.php');
+        rmdir($this->applicationDir.'/plugins/ReadablePluginBundle');
         rmdir($this->applicationDir.'/plugins');
         unlink($this->applicationDir.'/app/config/paths.php');
         rmdir($this->applicationDir.'/app/config');
@@ -59,6 +75,13 @@ final class AppKernelTest extends TestCase
             }
         };
 
-        $this->assertIsArray(iterator_to_array($kernel->registerBundles()));
+        $bundles = iterator_to_array($kernel->registerBundles());
+
+        $this->assertNotEmpty(
+            array_filter(
+                $bundles,
+                static fn (object $bundle): bool => $bundle instanceof \MauticPlugin\ReadablePluginBundle\ReadablePluginBundle
+            )
+        );
     }
 }
