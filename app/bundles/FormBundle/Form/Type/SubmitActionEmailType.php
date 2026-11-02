@@ -39,7 +39,7 @@ final class SubmitActionEmailType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.form.action.sendemail.subject',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
                 'data'       => $data,
@@ -62,7 +62,7 @@ final class SubmitActionEmailType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.form.action.sendemail.message',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control editor editor-basic', 'allow-full-html' => true],
                 'required'   => false,
                 'data'       => $message,
@@ -115,7 +115,7 @@ final class SubmitActionEmailType extends AbstractType
             EmailListType::class,
             [
                 'label'      => 'mautic.lead.email.template',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'required'   => false,
                 'attr'       => [
                     'class'    => 'form-control',

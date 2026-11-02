@@ -47,7 +47,7 @@ final class VariantType extends AbstractType
 
         $builder->add('weight', IntegerType::class, [
             'label'      => 'mautic.core.ab_test.form.traffic_weight',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'           => 'form-control',
                 'tooltip'         => 'mautic.core.ab_test.form.traffic_weight.help',
@@ -66,7 +66,7 @@ final class VariantType extends AbstractType
 
         $builder->add('totalWeight', IntegerType::class, [
             'label'       => 'mautic.core.ab_test.form.traffic_total_weight',
-            'label_attr'  => ['class' => 'control-label'],
+            'label_attr'  => ['class' => 'form-label'],
             'attr'        => $attr + ['postaddon_text'  => '%'],
             'constraints' => new Assert\Range(min: 0, max: 100),
         ]);
@@ -82,7 +82,7 @@ final class VariantType extends AbstractType
 
         $builder->add('sendWinnerDelay', IntegerType::class, [
             'label'       => 'mautic.core.ab_test.form.send_winner_delay',
-            'label_attr'  => ['class' => 'control-label'],
+            'label_attr'  => ['class' => 'form-label'],
             'attr'        => $attr + ['postaddon_text'  => $this->translator->trans('mautic.core.time.hours')],
             'constraints' => new Assert\Range(min: 1, max: 480),
             'data' => $options['data']['sendWinnerDelay'] ?? self::DEFAULT_WINNER_DELAY,
@@ -114,7 +114,7 @@ final class VariantType extends AbstractType
                 ChoiceType::class,
                 [
                     'label'       => 'mautic.core.ab_test.form.winner',
-                    'label_attr'  => ['class' => 'control-label'],
+                    'label_attr'  => ['class' => 'form-label'],
                     'attr'        => $attr,
                     'expanded'    => false,
                     'multiple'    => false,

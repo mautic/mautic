@@ -27,7 +27,7 @@ final class GroupType extends AbstractType
 
         $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
 
@@ -36,7 +36,7 @@ final class GroupType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.core.description',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control editor'],
                 'required'   => false,
             ]

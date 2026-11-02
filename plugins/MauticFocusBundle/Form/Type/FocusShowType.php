@@ -28,7 +28,7 @@ final class FocusShowType extends AbstractType
             FocusListType::class,
             [
                 'label'      => 'mautic.focus.focusitem.selectitem',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.focus.focusitem.selectitem_descr',

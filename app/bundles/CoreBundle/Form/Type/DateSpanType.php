@@ -22,7 +22,7 @@ final class DateSpanType extends AbstractType
             IntegerType::class,
             [
                 'label'      => false,
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                     'step'  => 1,
@@ -41,7 +41,7 @@ final class DateSpanType extends AbstractType
             ChoiceType::class,
             [
                 'label'      => 'mautic.core.date.to',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'choices'    => [
                     'mautic.core.time.days'   => 'day',

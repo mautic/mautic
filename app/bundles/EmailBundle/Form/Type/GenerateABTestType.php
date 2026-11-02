@@ -50,7 +50,7 @@ final class GenerateABTestType extends AbstractType
                 ChoiceType::class,
                 [
                     'label'       => 'mautic.core.ab_test.form.winner',
-                    'label_attr'  => ['class' => 'control-label'],
+                    'label_attr'  => ['class' => 'form-label'],
                     'attr'        => $attr,
                     'expanded'    => false,
                     'multiple'    => false,
@@ -82,7 +82,7 @@ final class GenerateABTestType extends AbstractType
 
         $builder->add('sendWinnerDelay', IntegerType::class, [
             'label'       => 'mautic.core.ab_test.form.send_winner_delay',
-            'label_attr'  => ['class' => 'control-label'],
+            'label_attr'  => ['class' => 'form-label'],
             'attr'        => $attr + ['postaddon_text' => $this->translator->trans('mautic.core.time.hours')],
             'constraints' => new Range(min: 1, max: 24),
             'data'        => $options['data']['sendWinnerDelay'] ?? VariantType::DEFAULT_WINNER_DELAY,
@@ -90,7 +90,7 @@ final class GenerateABTestType extends AbstractType
 
         $builder->add('totalWeight', IntegerType::class, [
             'label'       => 'mautic.core.ab_test.form.traffic_total_weight',
-            'label_attr'  => ['class' => 'control-label'],
+            'label_attr'  => ['class' => 'form-label'],
             'attr'        => $attr + ['postaddon_text' => '%'],
             'constraints' => new Range(min: 1, max: 50),
             'data'        => $options['data']['totalWeight'] ?? VariantType::DEFAULT_WEIGHT,

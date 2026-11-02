@@ -531,7 +531,7 @@ Mautic.reorderSegmentFilters = function() {
     $firstPanel.find(panelClass).addClass('hide');
     $firstPanel.find('.copy-filter-group').removeClass('hide');
 
-    const $tooltips = $filters.find("*[data-toggle='tooltip']");
+    const $tooltips = $filters.find("*[data-toggle='tooltip'], *[data-bs-toggle='tooltip']");
     $tooltips.each(function() {
         mQuery(this).tooltip({html: true, container: 'body'});
     });
@@ -858,7 +858,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
         selectedVal = 'select';
     }
 
-    mQuery('#leadfield_properties [data-toggle="tooltip"]').tooltip('destroy');
+    mQuery('#leadfield_properties [data-toggle="tooltip"], #leadfield_properties [data-bs-toggle="tooltip"]').tooltip('destroy');
 
     if (mQuery('#field-templates .' + selectedVal).length) {
         mQuery('#leadfield_properties').html(
@@ -906,7 +906,7 @@ Mautic.updateLeadFieldProperties = function(selectedVal, onload) {
             }, 500);
         });
 
-        mQuery('#leadfield_properties [data-toggle="tooltip"]').tooltip();
+        mQuery('#leadfield_properties [data-toggle="tooltip"], #leadfield_properties [data-bs-toggle="tooltip"]').tooltip();
     } else if (!mQuery('#leadfield_properties .' + selectedVal).length) {
         mQuery('#leadfield_properties').html('');
     }

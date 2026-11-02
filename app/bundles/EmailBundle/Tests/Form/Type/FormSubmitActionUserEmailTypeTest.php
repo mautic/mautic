@@ -32,7 +32,7 @@ final class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCas
         $matcher = $this->exactly(2);
 
         $this->formBuilder->expects($matcher)
-            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher): MockObject&\Symfony\Component\Form\FormBuilderInterface {
+            ->method('add')->willReturnCallback(function (...$parameters) use ($matcher): MockObject&FormBuilderInterface {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('useremail', $parameters[0]);
                     $this->assertSame(EmailSendType::class, $parameters[1]);
@@ -50,7 +50,7 @@ final class FormSubmitActionUserEmailTypeTest extends \PHPUnit\Framework\TestCas
                     $this->assertSame(UserListType::class, $parameters[1]);
                     $this->assertEquals([
                         'label'      => 'mautic.email.form.users',
-                        'label_attr' => ['class' => 'control-label'],
+                        'label_attr' => ['class' => 'form-label'],
                         'attr'       => [
                             'class'   => 'form-control',
                             'tooltip' => 'mautic.core.help.autocomplete',

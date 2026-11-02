@@ -33,7 +33,7 @@ final class DoctrineStepType extends AbstractType
                 'expanded'          => false,
                 'multiple'          => false,
                 'label'             => 'mautic.install.form.database.driver',
-                'label_attr'        => ['class' => 'control-label'],
+                'label_attr'        => ['class' => 'form-label'],
                 'placeholder'       => false,
                 'required'          => true,
                 'attr'              => [
@@ -52,7 +52,7 @@ final class DoctrineStepType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.install.form.database.host',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => true,
             ]
@@ -63,7 +63,7 @@ final class DoctrineStepType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.install.form.database.port',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
@@ -74,7 +74,7 @@ final class DoctrineStepType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.install.form.database.name',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => true,
             ]
@@ -85,7 +85,7 @@ final class DoctrineStepType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.install.form.database.table.prefix',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
             ]
@@ -96,7 +96,7 @@ final class DoctrineStepType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.install.form.database.user',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => true,
             ]
@@ -107,7 +107,7 @@ final class DoctrineStepType extends AbstractType
             PasswordType::class,
             [
                 'label'      => 'mautic.install.form.database.password',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'    => 'form-control',
                     'preaddon' => 'ri-lock-fill',
@@ -133,7 +133,7 @@ final class DoctrineStepType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.install.form.backup_prefix',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
@@ -151,7 +151,7 @@ final class DoctrineStepType extends AbstractType
                         'label' => 'mautic.install.next.step',
                         'type'  => 'submit',
                         'attr'  => [
-                            'class'   => 'btn btn-success pull-right btn-next',
+                            'class'   => 'btn btn-success float-end btn-next',
                             'icon'    => 'ri-arrow-right-circle-line',
                             'onclick' => 'MauticInstaller.showWaitMessage(event);',
                         ],

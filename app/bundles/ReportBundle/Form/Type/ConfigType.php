@@ -20,7 +20,7 @@ final class ConfigType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.config.tab.form.csv_always_enclose',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.config.tab.form.csv_always_enclose.tooltip',

@@ -29,7 +29,7 @@ final class MessageSendType extends AbstractType
             [
                 'label'       => 'mautic.channel.send.selectmessages',
                 'attr'        => [],
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'multiple'    => false,
                 'required'    => true,
                 'constraints' => [

@@ -15,6 +15,9 @@
 {% endblock %}
 
 {% block mainContent %}
+	{% if oidcSettings is defined and oidcSettings.isEnabled and oidcSettings.isRequired %}
+		{% include '@MauticUser/Security/oidc_login_top.html.twig' with {parameters: oidcSettings} %}
+	{% endif %}
 	<form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="{{ path('mautic_user_logincheck') }}" method="post">
 		<div class="input-group mb-md">
 
@@ -65,5 +68,8 @@
 				</a>
 			{% endfor %}
 		</ul>
+	{% endif %}
+	{% if oidcSettings is defined and oidcSettings.isEnabled %}
+		{% include '@MauticUser/Security/oidc_login_bottom.html.twig' with {parameters: oidcSettings} %}
 	{% endif %}
 {% endblock %}
