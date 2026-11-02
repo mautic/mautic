@@ -92,6 +92,10 @@ MauticExampleBundle/
 - **Unit tests**: Extend `PHPUnit\Framework\TestCase`
 - **Functional tests**: Extend `Mautic\CoreBundle\Test\MauticMysqlTestCase` (provides `$this->em`, `$this->client`, database access)
 
+## Design System
+
+Before building or changing any UI, read `DESIGN.md` in the repository root.
+
 ## Coding Standards
 
 - **PHP 8.2+** with strict types, PSR-12/Symfony style

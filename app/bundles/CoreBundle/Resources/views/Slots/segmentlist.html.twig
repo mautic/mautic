@@ -18,8 +18,9 @@
             <label class="control-label">{{ segmentlist['label-text']|default('mautic.lead.form.list'|trans) }}</label>
         </div>
         <div id="segment-1" class="text-left">
-            <input type="checkbox" id="lead_contact_frequency_rules_lead_lists_1" name="lead_contact_frequency_rules[lead_lists][]" autocomplete="false" value="2" checked="checked">
-            <label for="lead_contact_frequency_rules_lead_lists_1">{{ 'mautic.lead.lead.field.list'|trans }}</label>
+            {% include '@MauticCore/Components/checkbox.html.twig' with {
+                items: [{ id: 'lead_contact_frequency_rules_lead_lists_1', name: 'lead_contact_frequency_rules[lead_lists][]', value: '2', checked: true, label: 'mautic.lead.lead.field.list' }]
+            } only %}
         </div>
     </div>
 {% endif %}

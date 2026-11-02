@@ -31,10 +31,11 @@
 {% set isWinner = abTestResults.winners is defined and variant.id in abTestResults.winners and variants.parent.variantStartDate and isPublished %}
 {% set actionUrl = path(actionRoute, {'objectAction': 'view', 'objectId': variant.id}) %}
 {% set isCurrent = (variant.id is same as activeEntity.id) %}
+{% set canMakeWinner = variants.parent.variantStartDate and isPublished %}
 
 <li class="list-group-item bg-{% if isCurrent %}dark{% else %}light{% endif %}-xs">
     <div class="box-layout">
-        <div class="col-md-8 va-m">
+        <div class="col-md-8 align-middle">
             <div class="row">
                 <div class="col-xs-1">
                     {% if variants.parent.getId() == variant.getId() %}
@@ -49,7 +50,7 @@
                     {% endif %}
                 </div>
                 <div class="col-xs-11">
-                    {% if isWinner %}
+                    {% if canMakeWinner %}
                         <div class="mr-xs pull-left" data-toggle="tooltip" title="{{ 'mautic.core.ab_test.make_winner'|trans }}">
                             {% include '@MauticCore/Helper/button.html.twig' with {
                                 buttons: [
@@ -57,7 +58,7 @@
                                         label: 'mautic.core.ab_test.make_winner',
                                         variant: 'warning',
                                         icon_only: true,
-                                        icon: 'ri-trophy-fill',
+                                        icon: isWinner ? 'ri-trophy-fill' : 'ri-trophy-line',
                                         href: path(actionRoute, {'objectAction': 'winner', 'objectId': variant.id}),
                                         attributes: {
                                             'data-toggle': 'confirmation',
@@ -93,7 +94,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 va-t text-right">
+        <div class="col-md-4 align-top text-right">
             <em class="text-white dark-sm">
                 {% if true == variants['configurationError'] %}
                     <div class="text-danger" data-toggle="label label-danger" title="{{ 'mautic.core.variant.misconfiguration'|trans }}">

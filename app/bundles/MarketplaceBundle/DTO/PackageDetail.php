@@ -19,6 +19,9 @@ final class PackageDetail
         public int $monthlyDownloads,
         public int $dailyDownloads,
         public \DateTimeInterface $time,
+        public ?string $language = null,
+        public int $dependents = 0,
+        public int $suggesters = 0,
     ) {
     }
 
@@ -37,7 +40,7 @@ final class PackageDetail
                 $reviews->getAverageRating(),
                 $reviews->count(),
                 $array['type'] ?? null,
-                $array['display_name'] ?? null
+                $array['display_name'] ?? $array['displayname'] ?? null
             ),
             VersionCollection::fromArray($array['versions']),
             MaintainerCollection::fromArray($array['maintainers']),
@@ -50,7 +53,10 @@ final class PackageDetail
             ),
             $array['downloads']['monthly'],
             $array['downloads']['daily'],
-            new \DateTimeImmutable($array['time'])
+            new \DateTimeImmutable($array['time']),
+            $array['language'] ?? null,
+            (int) ($array['dependents'] ?? 0),
+            (int) ($array['suggesters'] ?? 0)
         );
     }
 }

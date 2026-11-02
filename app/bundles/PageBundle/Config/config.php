@@ -103,6 +103,7 @@ return [
         'facebook_pixel_landingpage_enabled'    => false,
         'do_not_track_404_anonymous'            => false,
         'append_segment_id_tracking_url'        => false,
+        'aggregate_analytics'                   => true,
         'validate_page_hit_required_data'       => false,
     ],
 ];

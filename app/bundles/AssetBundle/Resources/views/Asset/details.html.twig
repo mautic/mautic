@@ -195,13 +195,13 @@
                         } %}
                         <div class="panel">
                             <div class="panel-body box-layout">
-                                <div class="col-md-4 va-m">
+                                <div class="col-md-4 align-middle">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="ri-download-line"></span>
                                         {% trans %}mautic.asset.graph.line.downloads{% endtrans %}
                                     </h5>
                                 </div>
-                                <div class="col-md-8 va-m">
+                                <div class="col-md-8 align-middle">
                                     {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
                                 </div>
                             </div>

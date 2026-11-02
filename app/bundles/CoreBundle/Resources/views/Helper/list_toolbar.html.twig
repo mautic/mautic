@@ -32,6 +32,7 @@
             {{- include('@MauticCore/Helper/search.html.twig', {
                 searchId: searchId|default(null),
                 searchValue: searchValue,
+                filtersLabel: filtersLabel|default('mautic.core.quick_filters.more'),
                 action: action|default(''),
                 searchHelp: searchHelp|default(''),
                 searchScopes: searchScopes|default([]),
