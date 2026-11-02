@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -25,6 +26,7 @@ final class LeadListAccessValidator extends ConstraintValidator
 
         if (count($value)) {
             $lists = $this->segmentModel->getUserLists();
+            /** @var LeadList $l */
             foreach ($value as $l) {
                 if (!isset($lists[$l->getId()])) {
                     $this->context->addViolation(

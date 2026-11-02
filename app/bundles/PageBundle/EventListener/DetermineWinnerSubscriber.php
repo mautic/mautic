@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\HitRepository;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -25,7 +26,9 @@ final readonly class DetermineWinnerSubscriber
     public function onDetermineBounceRateWinner(DetermineWinnerEvent $event): void
     {
         // find the hits that did not go any further
-        $parent    = $event->getParameters()['parent'];
+        /** @var Page $parent */
+        $parent = $event->getParameters()['parent'];
+        /** @var array<int, Page> $children */
         $children  = $event->getParameters()['children'];
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
@@ -114,6 +117,7 @@ final readonly class DetermineWinnerSubscriber
     public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event): void
     {
         // find the hits that did not go any further
+        /** @var Page $parent */
         $parent    = $event->getParameters()['parent'];
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();

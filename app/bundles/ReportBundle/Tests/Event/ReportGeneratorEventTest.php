@@ -272,13 +272,17 @@ final class ReportGeneratorEventTest extends TestCase
             ->method('setParameter')->willReturnCallback(function (...$parameters) use ($matcher, $dateFormat) {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('dateFrom', $parameters[0]);
-                    $this->assertSame($this->reportGeneratorEvent->getOptions()['dateFrom']->format($dateFormat), $parameters[1]);
+                    /** @var \DateTimeInterface $dateFrom */
+                    $dateFrom = $this->reportGeneratorEvent->getOptions()['dateFrom'];
+                    $this->assertSame($dateFrom->format($dateFormat), $parameters[1]);
 
                     return $this->queryBuilder;
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('dateTo', $parameters[0]);
-                    $this->assertSame($this->reportGeneratorEvent->getOptions()['dateTo']->format($dateFormat), $parameters[1]);
+                    /** @var \DateTimeInterface $dateTo */
+                    $dateTo = $this->reportGeneratorEvent->getOptions()['dateTo'];
+                    $this->assertSame($dateTo->format($dateFormat), $parameters[1]);
 
                     return $this->queryBuilder;
                 }
@@ -322,13 +326,17 @@ final class ReportGeneratorEventTest extends TestCase
             ->method('setParameter')->willReturnCallback(function (...$parameters) use ($matcher, $dateFormat) {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('dateFrom', $parameters[0]);
-                    $this->assertSame($this->reportGeneratorEvent->getOptions()['dateFrom']->format($dateFormat), $parameters[1]);
+                    /** @var \DateTimeInterface $dateFrom */
+                    $dateFrom = $this->reportGeneratorEvent->getOptions()['dateFrom'];
+                    $this->assertSame($dateFrom->format($dateFormat), $parameters[1]);
 
                     return $this->queryBuilder;
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('dateTo', $parameters[0]);
-                    $this->assertSame($this->reportGeneratorEvent->getOptions()['dateTo']->format($dateFormat), $parameters[1]);
+                    /** @var \DateTimeInterface $dateTo */
+                    $dateTo = $this->reportGeneratorEvent->getOptions()['dateTo'];
+                    $this->assertSame($dateTo->format($dateFormat), $parameters[1]);
 
                     return $this->queryBuilder;
                 }

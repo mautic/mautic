@@ -195,6 +195,7 @@ final class PageType extends AbstractType
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($formModifier): void {
+                /** @var Page $page */
                 $page = $event->getData();
                 $formModifier(
                     $event->getForm(),

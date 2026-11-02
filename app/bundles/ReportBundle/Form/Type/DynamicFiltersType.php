@@ -29,7 +29,10 @@ final class DynamicFiltersType extends AbstractType
         /** @var \stdClass $filterDefinitions */
         $filterDefinitions = $options['filterDefinitions'];
 
-        foreach ($options['report']->getFilters() as $filter) {
+        /** @var Report $report */
+        $report = $options['report'];
+
+        foreach ($report->getFilters() as $filter) {
             if (isset($filter['dynamic']) && 1 === $filter['dynamic']) {
                 $column     = $filter['column'];
                 $definition = $filterDefinitions->definitions[$column];
@@ -53,7 +56,7 @@ final class DynamicFiltersType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'    => 'form-control',
-                        'onchange' => "Mautic.filterTableData('report.".$options['report']->getId()."','".$column."',mQuery(this).val(),'list','.report-content');",
+                        'onchange' => "Mautic.filterTableData('report.".$report->getId()."','".$column."',mQuery(this).val(),'list','.report-content');",
                     ],
                     'required' => false,
                 ];

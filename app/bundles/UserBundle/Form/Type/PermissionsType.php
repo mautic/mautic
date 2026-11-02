@@ -2,6 +2,7 @@
 
 namespace Mautic\UserBundle\Form\Type;
 
+use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -25,7 +26,9 @@ final class PermissionsType extends AbstractType
                     'mapped' => false,
                 ]
             );
-            $config['permissionObject']->buildForm($builder, $options, $config['data']);
+            /** @var AbstractPermissions $permissionObject */
+            $permissionObject = $config['permissionObject'];
+            $permissionObject->buildForm($builder, $options, $config['data']);
         }
 
         if (!empty($options['action'])) {

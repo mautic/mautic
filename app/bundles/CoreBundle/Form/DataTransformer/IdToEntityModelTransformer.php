@@ -45,6 +45,7 @@ final class IdToEntityModelTransformer implements DataTransformerInterface
         }
 
         $return = [];
+        /** @var object $e */
         foreach ($value as $e) {
             $return[] = $e->{$func}();
         }
