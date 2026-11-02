@@ -145,7 +145,7 @@ final class EmailTrackingToggleFunctionalTest extends MauticMysqlTestCase
         $email = new Email();
         $email->setTrackingEnabled(false);
 
-        $this->assertFalse((clone $email)->getTrackingEnabled());
+        $this->assertFalse((clone $email)->isTrackingEnabled());
     }
 
     public function testTrackingOptionThroughTheApi(): void

@@ -1274,7 +1274,7 @@ class MailHelper
         }
 
         // An email with tracking off gets no open pixel
-        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel || !$email->getTrackingEnabled());
+        $this->setBody($customHtml, 'text/html', null, $ignoreTrackingPixel || !$email->isTrackingEnabled());
 
         // Reset attachments
         $this->assets = $this->attachedAssets = [];
@@ -1425,7 +1425,7 @@ class MailHelper
 
         // Include the tracking pixel token as it's auto appended to the body. An email with tracking off gets a blank one,
         // also where the token was placed in the content by hand.
-        if ($this->appendTrackingPixel && (!$this->email instanceof Email || $this->email->getTrackingEnabled())) {
+        if ($this->shouldAddTrackingPixel()) {
             $tokens['{tracking_pixel}'] = $this->router->generate(
                 'mautic_email_tracker',
                 [
@@ -1438,6 +1438,15 @@ class MailHelper
         }
 
         return $tokens;
+    }
+
+    private function shouldAddTrackingPixel(): bool
+    {
+        if (!$this->appendTrackingPixel) {
+            return false;
+        }
+
+        return !$this->email instanceof Email || $this->email->isTrackingEnabled();
     }
 
     /**

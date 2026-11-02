@@ -112,7 +112,7 @@ final class PublicController extends CommonFormController
             }
 
             // The analytics code tracks the visitor, so an email with tracking off doesn't get it in the browser either
-            if (!$stat->getEmail() instanceof Email || $stat->getEmail()->getTrackingEnabled()) {
+            if (!$stat->getEmail() instanceof Email || $stat->getEmail()->isTrackingEnabled()) {
                 $content = $analyticsHelper->addCode($content);
             }
 
@@ -605,7 +605,7 @@ final class PublicController extends CommonFormController
         $content = $previewHelper->generatePreviewContent($emailEntity, $contact, $company, $content);
 
         // Same as in the browser view, an email with tracking off doesn't get the analytics code
-        if ($this->security->isAnonymous() && $emailEntity->getTrackingEnabled()) {
+        if ($this->security->isAnonymous() && $emailEntity->isTrackingEnabled()) {
             $content = $analyticsHelper->addCode($content);
         }
 

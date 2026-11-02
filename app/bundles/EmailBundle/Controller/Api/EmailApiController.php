@@ -247,14 +247,15 @@ final class EmailApiController extends CommonApiController
             unset($parameters['sendToDnc']);
         }
 
-        if (Request::METHOD_PUT === $method && !array_key_exists('sendToDnc', $parameters)) {
-            // use default value, in case of PUT method it does not use default value if entity is already exist and tried to call setter method with null value.
-            $parameters['sendToDnc'] = false;
-        }
+        if (Request::METHOD_PUT === $method) {
+            // use default values, in case of PUT method it does not use default value if entity is already exist and tried to call setter method with null value.
+            if (!array_key_exists('sendToDnc', $parameters)) {
+                $parameters['sendToDnc'] = false;
+            }
 
-        if (Request::METHOD_PUT === $method && !array_key_exists('trackingEnabled', $parameters)) {
-            // Same as above, a PUT that leaves the option out falls back to tracking on
-            $parameters['trackingEnabled'] = true;
+            if (!array_key_exists('trackingEnabled', $parameters)) {
+                $parameters['trackingEnabled'] = true;
+            }
         }
 
         if (Request::METHOD_PATCH === $method && !array_key_exists('dynamicContent', $parameters)) {
