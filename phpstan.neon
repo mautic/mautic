@@ -95,7 +95,6 @@ parameters:
         -
             identifier: typePerfect.noMixedMethodCaller
             paths:
-                - app/bundles/ApiBundle/Helper/BatchIdToEntityHelper.php
                 - app/bundles/AssetBundle/EventListener/DetermineWinnerSubscriber.php
                 - app/bundles/CoreBundle/Doctrine/AbstractMauticMigration.php
                 - app/bundles/CoreBundle/Form/DataTransformer/IdToEntityModelTransformer.php

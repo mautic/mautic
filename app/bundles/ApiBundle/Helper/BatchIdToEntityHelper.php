@@ -49,6 +49,7 @@ final class BatchIdToEntityHelper
 
     /**
      * @template TEntity as object
+     *
      * @param TEntity[] $entities
      * @return TEntity[]
      *
@@ -76,7 +77,7 @@ final class BatchIdToEntityHelper
             if (!isset($entitiesKeyedById[$id])) {
                 $hasPreviousId = array_filter(
                     $entities,
-                    fn ($entity): bool => $id == $entity->getPreviousId()
+                    fn (object $entity): bool => $id == $entity->getPreviousId()
                 );
 
                 if ([] !== $hasPreviousId) {
