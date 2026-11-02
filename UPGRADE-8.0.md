@@ -1225,3 +1225,5 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     -public function createForm(object|array $entity, $action = null, $options = []): FormInterface
     +public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     ```
+
+- `Mautic\CoreBundle\Helper\ThemeHelperInterface` methods `setDefaultTheme()`, `createThemeHelper()`, `delete()`, `checkForTwigTemplate()`, `getInstalledThemes()`, `getTheme()` and `zip()` gained native `string` parameter types (and `createThemeHelper()`/`getTheme()` a native `ThemeHelper` return type) promoted from their `@param`/`@return` docblocks. Any class implementing `ThemeHelperInterface` must add the matching native types to its method signatures, otherwise PHP raises an incompatible-signature error.
