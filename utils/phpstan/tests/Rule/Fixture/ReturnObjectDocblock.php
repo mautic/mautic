@@ -58,6 +58,26 @@ final class ReturnObjectDocblock
         return $this->make();
     }
 
+    /**
+     * @return SomeReturnObject|AnotherReturnObject
+     */
+    public function unionReturn()
+    {
+        return random_int(0, 1) ? new SomeReturnObject() : new AnotherReturnObject();
+    }
+
+    /**
+     * @return SomeReturnObject|AnotherReturnObject|null
+     */
+    public function nullableUnionReturn()
+    {
+        if (random_int(0, 1)) {
+            return null;
+        }
+
+        return random_int(0, 1) ? new SomeReturnObject() : new AnotherReturnObject();
+    }
+
     public function alreadyNative(): SomeReturnObject
     {
         return $this->make();

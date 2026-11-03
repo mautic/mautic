@@ -152,7 +152,7 @@ final class SubmissionModel extends CommonFormModel
         }
 
         // clean the referer by removing mauticError and mauticMessage
-        $referer = InputHelper::url($referer, null, null, ['mauticError', 'mauticMessage']);
+        $referer = InputHelper::url($referer, null, null, null, ['mauticError', 'mauticMessage']);
         $submission->setReferer($referer);
 
         // Create an event to be dispatched through the processes
@@ -333,6 +333,8 @@ final class SubmissionModel extends CommonFormModel
             $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields, $company);
         }
 
+        $lead = $this->getManagedLeadForSubmission($lead);
+
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
         $trackingId    = ($trackedDevice?->getTrackingId());
 
@@ -407,6 +409,30 @@ final class SubmissionModel extends CommonFormModel
         // made it to the end so return the submission event to give the calling method access to tokens, results, etc
         // otherwise return false that no errors were encountered (to keep BC really)
         return ($returnEvent) ? ['submission' => $submissionEvent] : false;
+    }
+
+    /**
+     * Ensure a lead assigned to a submission is managed by Doctrine.
+     */
+    private function getManagedLeadForSubmission(?Lead $lead): ?Lead
+    {
+        if (null === $lead) {
+            return null;
+        }
+
+        if ($this->em->contains($lead)) {
+            return $lead;
+        }
+
+        if (!$lead->getId()) {
+            $this->em->persist($lead);
+
+            return $lead;
+        }
+
+        $managedLead = $this->em->find(Lead::class, $lead->getId());
+
+        return $managedLead instanceof Lead ? $managedLead : null;
     }
 
     /**

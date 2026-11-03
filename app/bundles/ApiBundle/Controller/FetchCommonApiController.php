@@ -412,6 +412,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
         /** @var AbstractCommonModel<TEntity> $model */
         $model    = $model ?: $this->model;
+
+        /** @var TEntity[] $entities */
         $entities = $model->getEntities(
             [
                 'filter' => [
@@ -532,7 +534,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @param array<mixed>|Paginator<TEntity> $results
      *
-     * @return array{0: array<mixed>|\ArrayObject<int,mixed>, 1: int}
+     * @return array{0: array<TEntity>|\ArrayObject<int, TEntity>, 1: int}
      */
     protected function prepareEntitiesForView(iterable $results): array
     {

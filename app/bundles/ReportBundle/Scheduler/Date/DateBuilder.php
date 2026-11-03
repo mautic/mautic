@@ -58,6 +58,9 @@ final readonly class DateBuilder
             throw new NoScheduleException();
         }
 
-        return $recurrences[0]->getStart();
+        /** @var \Recurr\Recurrence $recurrence */
+        $recurrence = $recurrences[0];
+
+        return $recurrence->getStart();
     }
 }

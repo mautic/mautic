@@ -47,6 +47,18 @@ final class ReturnDocblockToNativeTypeRuleTest extends RuleTestCase
                 'Method "returnsThis()" has an "@return static" docblock but no native return type. Declare ": static" and drop the "@return" tag.',
                 36,
             ],
+            [
+                'Method "nullableReturn()" has an "@return ?Utils\PHPStan\Tests\Rule\Fixture\SomeReturnObject" docblock but no native return type. Declare ": ?Utils\PHPStan\Tests\Rule\Fixture\SomeReturnObject" and drop the "@return" tag.',
+                44,
+            ],
+            [
+                'Method "unionReturn()" has an "@return Utils\PHPStan\Tests\Rule\Fixture\SomeReturnObject|Utils\PHPStan\Tests\Rule\Fixture\AnotherReturnObject" docblock but no native return type. Declare ": Utils\PHPStan\Tests\Rule\Fixture\SomeReturnObject|Utils\PHPStan\Tests\Rule\Fixture\AnotherReturnObject" and drop the "@return" tag.',
+                64,
+            ],
+            [
+                'Method "nullableUnionReturn()" has an "@return Utils\PHPStan\Tests\Rule\Fixture\SomeReturnObject|Utils\PHPStan\Tests\Rule\Fixture\AnotherReturnObject|null" docblock but no native return type. Declare ": Utils\PHPStan\Tests\Rule\Fixture\SomeReturnObject|Utils\PHPStan\Tests\Rule\Fixture\AnotherReturnObject|null" and drop the "@return" tag.',
+                72,
+            ],
         ]);
     }
 

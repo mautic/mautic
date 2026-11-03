@@ -101,10 +101,8 @@ final class ObjectChangeDAO
 
     /**
      * @param string $name
-     *
-     * @return FieldDAO|null
      */
-    public function getField($name)
+    public function getField($name): ?FieldDAO
     {
         return $this->fields[$name] ?? null;
     }

@@ -274,14 +274,16 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             }
         } elseif ('owner' === $prop) {
             $current = $this->owner;
-            if ($current && !$val) {
-                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
-            } elseif (!$current && $val) {
-                $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
-            } elseif ($current && $current->getId() != $val->getId()) {
+            /** @var User|null $owner */
+            $owner = $val;
+            if ($current && !$owner) {
+                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $owner];
+            } elseif (!$current && $owner) {
+                $this->changes['owner'] = [$current, $owner->getName().' ('.$owner->getId().')'];
+            } elseif ($current && $current->getId() != $owner->getId()) {
                 $this->changes['owner'] = [
                     $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')',
+                    $owner->getName().'('.$owner->getId().')',
                 ];
             }
         } else {

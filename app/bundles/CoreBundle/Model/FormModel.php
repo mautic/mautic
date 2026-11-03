@@ -368,15 +368,14 @@ class FormModel extends AbstractCommonModel
     /**
      * Creates the appropriate form per the model.
      *
-     * @param TEntity|array<string, mixed>      $entity
-     * @param string|null $action
-     * @param array       $options
+     * @param TEntity|array<string, mixed> $entity
+     * @param string|null                  $action
      *
      * @return FormInterface<mixed>
      *
      * @throws NotFoundHttpException
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         throw new NotFoundHttpException('Object does not support edits.');
     }
