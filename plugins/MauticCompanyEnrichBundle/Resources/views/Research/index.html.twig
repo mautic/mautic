@@ -16,10 +16,10 @@
                 noMargin: true
             } only %}
             <dl>
-                <dt>Company enrichment / workforce</dt><dd>Query: <code>{"domain":"example.com"}</code>; body: <code>{}</code></dd>
-                <dt>Company search</dt><dd>Query: <code>{}</code>; body: <code>{"semanticQuery":"Accounting software","page":1,"pageSize":10}</code></dd>
-                <dt>Similar companies</dt><dd>Query: <code>{}</code>; body: <code>{"domains":["example.com"],"pageSize":10}</code></dd>
-                <dt>Person lookup</dt><dd>Query: <code>{}</code>; body: <code>{"email":"alex@example.com"}</code></dd>
+                <dt>{{ 'mautic.companyenrich.example.enrich'|trans }}</dt><dd>{{ 'mautic.companyenrich.example.query'|trans }}: <code>{"domain":"example.com"}</code>; {{ 'mautic.companyenrich.example.body'|trans }}: <code>{}</code></dd>
+                <dt>{{ 'mautic.companyenrich.example.search'|trans }}</dt><dd>{{ 'mautic.companyenrich.example.query'|trans }}: <code>{}</code>; {{ 'mautic.companyenrich.example.body'|trans }}: <code>{"semanticQuery":"Accounting software","page":1,"pageSize":10}</code></dd>
+                <dt>{{ 'mautic.companyenrich.example.similar'|trans }}</dt><dd>{{ 'mautic.companyenrich.example.query'|trans }}: <code>{}</code>; {{ 'mautic.companyenrich.example.body'|trans }}: <code>{"domains":["example.com"],"pageSize":10}</code></dd>
+                <dt>{{ 'mautic.companyenrich.example.lookup'|trans }}</dt><dd>{{ 'mautic.companyenrich.example.query'|trans }}: <code>{}</code>; {{ 'mautic.companyenrich.example.body'|trans }}: <code>{"email":"alex@example.com"}</code></dd>
             </dl>
             <a href="https://docs.companyenrich.com/reference" target="_blank" rel="noopener noreferrer">{{ 'mautic.companyenrich.docs'|trans }}</a>
         </div>

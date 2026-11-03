@@ -95,7 +95,7 @@ final class CompanyEnrichControllerTest extends MauticMysqlTestCase
     }
 
     /** @param array<string, list<string>> $permissions */
-    private function loginWithPermissions(array $permissions): void
+    private function loginWithPermissions(array $permissions): User
     {
         $role = new Role();
         $role->setName('CompanyEnrich restricted');
@@ -115,6 +115,29 @@ final class CompanyEnrichControllerTest extends MauticMysqlTestCase
         $this->em->persist($user);
         $this->em->flush();
         $this->loginUser($user);
+
+        return $user;
+    }
+
+    public function testAccessRevokedDuringLookupReturnsForbiddenWithoutUpdatingProfile(): void
+    {
+        $owner = $this->loginWithPermissions(['plugin:plugins' => ['manage'], 'lead:leads' => ['viewown', 'editown']]);
+        $lead = new Lead();
+        $lead->setEmail('owned@example.com');
+        $lead->setOwner($owner);
+        $this->em->persist($lead);
+        $this->em->flush();
+        $id = $lead->getId();
+        $table = $this->em->getClassMetadata(Lead::class)->getTableName();
+        $this->duringRequest = function () use ($table, $id): void {
+            $this->connection->update($table, ['owner_id' => null, 'created_by' => null], ['id' => $id]);
+        };
+        $crawler = $this->client->request('GET', '/s/companyenrich/enrich/contact/'.$id);
+        $this->assertResponseIsSuccessful();
+        $this->client->submit($crawler->selectButton('Fill missing profile fields')->form());
+        $this->assertResponseStatusCodeSame(403);
+        $this->assertEmpty($this->connection->fetchOne('SELECT lastname FROM '.$table.' WHERE id = ?', [$id]));
+        $this->assertSame(1, $this->calls);
     }
 
     public function testConcurrentIdentityChangePreventsApplyingTheOldProfile(): void

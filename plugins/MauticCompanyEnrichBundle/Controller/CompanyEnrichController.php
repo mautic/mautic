@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 final class CompanyEnrichController extends CommonController
 {
@@ -106,6 +107,8 @@ final class CompanyEnrichController extends CommonController
                 if (null === $updated) {
                     throw new \RuntimeException('The record changed during research. No fields were updated. The lookup may have consumed credits.');
                 }
+            } catch (AccessDeniedHttpException $error) {
+                throw $error;
             } catch (\InvalidArgumentException|\RuntimeException $error) {
                 $form->addError(new FormError($error->getMessage()));
             }
