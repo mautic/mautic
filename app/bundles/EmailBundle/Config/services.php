@@ -17,6 +17,7 @@ return function (ContainerConfigurator $configurator): void {
         'MonitoredEmail/Accessor',
         'MonitoredEmail/Organizer',
         'MonitoredEmail/Processor',
+        'MonitoredEmail/Transport',
         'Stat/Reference.php',
         'Helper/DTO',
         'Model/AbTest/EmailStatus.php',

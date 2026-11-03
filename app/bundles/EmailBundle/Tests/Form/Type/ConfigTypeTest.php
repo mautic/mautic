@@ -98,6 +98,16 @@ final class ConfigTypeTest extends TypeTestCase
         $this->assertTrue($form->has('email_default_utm_content'), 'email_default_utm_content field is missing');
     }
 
+    public function testMonitoredMailboxSettingsAreAvailableWithoutNativeImap(): void
+    {
+        $form = $this->factory->create(ConfigType::class, []);
+        $mailbox = $form->get('monitored_email')->get('general');
+
+        foreach (['host', 'port', 'user', 'password', 'encryption'] as $field) {
+            $this->assertTrue($mailbox->has($field));
+        }
+    }
+
     public function testUtmFieldsAreTextTypeAndNotRequired(): void
     {
         $form = $this->factory->create(ConfigType::class, []);

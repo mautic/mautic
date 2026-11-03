@@ -9,6 +9,10 @@ final class Address
      */
     public static function parseList($addresses): array
     {
+        if (!extension_loaded('imap')) {
+            return \Mautic\EmailBundle\MonitoredEmail\Transport\MessageParser::addresses((string) $addresses);
+        }
+
         $results         = [];
         $parsedAddresses = imap_rfc822_parse_adrlist($addresses, 'default.domain.name');
         foreach ($parsedAddresses as $parsedAddress) {

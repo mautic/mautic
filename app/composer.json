@@ -18,7 +18,6 @@
   "require": {
     "php": "~8.2",
     "ext-iconv": "*",
-    "ext-imap": "*",
     "ext-pdo": "*",
     "ext-zip": "*",
     "ext-zlib": "*",
@@ -38,7 +37,7 @@
     "doctrine/doctrine-migrations-bundle": "^3.2.2",
     "doctrine/orm": "^2.14.0",
     "exercise/htmlpurifier-bundle": "^5.0",
-    "ezyang/htmlpurifier": "^4.16",
+    "ezyang/htmlpurifier": "^4.19",
     "friendsofsymfony/rest-bundle": "^3.8",
     "gaufrette/aws-s3-adapter": "^0.4.0",
     "gaufrette/extras": "^0.1.0",
@@ -47,6 +46,7 @@
     "guzzlehttp/guzzle": "~7.15.2",
     "guzzlehttp/oauth-subscriber": "^0.8.1",
     "helios-ag/fm-elfinder-bundle": "^13.0",
+    "horde/imap_client": "^2.34.1",
     "illuminate/collections": "^10.48",
     "ip2location/ip2location-php": "^7.2",
     "javer/sp-bundle": "^2.0",
@@ -112,7 +112,11 @@
     "twilio/sdk": "^5.25",
     "twbs/bootstrap": "5.3.8",
     "twig/string-extra": "^3.21",
-    "wikimedia/less.php": "^5.5"
+    "wikimedia/less.php": "^5.5",
+    "zbateson/mail-mime-parser": "^3.0"
+  },
+  "suggest": {
+    "ext-imap": "Preserves native IMAP connections for integrations using the legacy mailbox API."
   },
   "conflict": {
     "psr/simple-cache": ">=3.0.0"

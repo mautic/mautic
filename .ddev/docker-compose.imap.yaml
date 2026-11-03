@@ -8,6 +8,7 @@ services:
       GREENMAIL_OPTS: >-
         -Dgreenmail.setup.test.smtp
         -Dgreenmail.setup.test.imap
+        -Dgreenmail.setup.test.imaps
         -Dgreenmail.hostname=0.0.0.0
         -Dgreenmail.auth.disabled
         -Dgreenmail.startup.timeout=30000
@@ -18,6 +19,7 @@ services:
     environment:
       MAUTIC_TEST_IMAP_HOST: imap
       MAUTIC_TEST_IMAP_PORT: 3143
+      MAUTIC_TEST_IMAPS_PORT: 3993
       MAUTIC_TEST_SMTP_PORT: 3025
     depends_on:
       - imap

@@ -169,6 +169,8 @@ class Mailbox
      */
     private array $folders = [];
 
+    private ?Transport\LibraryMailbox $libraryMailbox = null;
+
     public function __construct(CoreParametersHelper $parametersHelper, PathsHelper $pathsHelper)
     {
         $this->mailboxes = $parametersHelper->get('monitored_email', []);
@@ -253,6 +255,10 @@ class Mailbox
         if (null == $settings) {
             $settings = $this->settings;
         }
+        if (null !== $this->libraryMailbox) {
+            $this->disconnect();
+        }
+
         $paths              = $this->getImapPath($settings);
         $this->imapPath     = $paths['path'];
         $this->imapFullPath = $paths['full'];
@@ -325,6 +331,10 @@ class Mailbox
      */
     public function setConnectionArgs($options = 0, $retriesNum = 0, ?array $params = null): void
     {
+        if (!extension_loaded('imap') && ($options || $retriesNum || $params)) {
+            throw new MailboxException('Native IMAP connection arguments require ext-imap.');
+        }
+
         $this->imapOptions    = $options;
         $this->imapRetriesNum = $retriesNum;
         $this->imapParams     = $params;
@@ -340,6 +350,12 @@ class Mailbox
             $this->imapFolder   = $folder;
         }
 
+        if (!extension_loaded('imap')) {
+            $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->switchFolder($folder));
+
+            return;
+        }
+
         $this->getImapStream();
     }
 
@@ -350,6 +366,10 @@ class Mailbox
      */
     public function getImapStream()
     {
+        if (!extension_loaded('imap')) {
+            throw new MailboxException('Native IMAP connections require ext-imap. Monitored email works without it.');
+        }
+
         if (!$this->isConnected()) {
             $this->imapStream = $this->initImapStream();
         } else {
@@ -391,7 +411,7 @@ class Mailbox
      */
     protected function isConnected(): bool
     {
-        if (!$this->isConfigured() || !$this->imapStream) {
+        if (!extension_loaded('imap') || !$this->isConfigured() || !$this->imapStream) {
             return false;
         }
 
@@ -416,6 +436,10 @@ class Mailbox
      */
     public function checkMailbox(): \stdClass|bool
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->checkMailbox($folder));
+        }
+
         return imap_check($this->getImapStream());
     }
 
@@ -424,6 +448,10 @@ class Mailbox
      */
     public function createMailbox(): bool
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->createMailbox($folder));
+        }
+
         return imap_createmailbox($this->getImapStream(), imap_utf7_encode($this->imapFullPath));
     }
 
@@ -437,6 +465,10 @@ class Mailbox
      */
     public function statusMailbox(): \stdClass|bool
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->statusMailbox($folder));
+        }
+
         return imap_status($this->getImapStream(), $this->imapFullPath, SA_ALL);
     }
 
@@ -450,6 +482,10 @@ class Mailbox
     {
         if (!$this->isConfigured()) {
             throw new NotConfiguredException('mautic.email.config.monitored_email.not_configured');
+        }
+
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->getListingFolders());
         }
 
         if (!isset($this->folders[$this->imapFullPath])) {
@@ -516,6 +552,10 @@ class Mailbox
      */
     public function searchMailbox($criteria = self::CRITERIA_ALL): array
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->searchMailbox($folder, $criteria));
+        }
+
         if (preg_match('/'.self::CRITERIA_UID.' ((\d+):(\d+|\*))/', $criteria, $matches)) {
             // PHP imap_search does not support UID n:* so use imap_fetch_overview instead
             $messages = imap_fetch_overview($this->getImapStream(), $matches[1], FT_UID);
@@ -538,6 +578,10 @@ class Mailbox
      */
     public function saveMail($mailId, $filename = 'email.eml'): bool
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->saveMail($folder, (int) $mailId, (string) $filename));
+        }
+
         return imap_savebody($this->getImapStream(), $filename, $mailId, '', FT_UID);
     }
 
@@ -546,6 +590,10 @@ class Mailbox
      */
     public function deleteMail($mailId): bool
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->deleteMail($folder, (string) $mailId));
+        }
+
         return imap_delete($this->getImapStream(), $mailId, FT_UID);
     }
 
@@ -554,6 +602,10 @@ class Mailbox
      */
     public function moveMail($mailId, $mailBox): bool
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->moveMail($folder, (string) $mailId, (string) $mailBox));
+        }
+
         return imap_mail_move($this->getImapStream(), $mailId, $mailBox, CP_UID) && $this->expungeDeletedMails();
     }
 
@@ -562,6 +614,10 @@ class Mailbox
      */
     public function expungeDeletedMails(): bool
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->expungeDeletedMails($folder));
+        }
+
         return imap_expunge($this->getImapStream());
     }
 
@@ -620,6 +676,10 @@ class Mailbox
      */
     public function setFlag(array $mailsIds, $flag): bool
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->setFlag($folder, $mailsIds, (string) $flag));
+        }
+
         return imap_setflag_full($this->getImapStream(), implode(',', $mailsIds), $flag, ST_UID);
     }
 
@@ -630,6 +690,10 @@ class Mailbox
      */
     public function clearFlag(array $mailsIds, $flag): bool
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->clearFlag($folder, $mailsIds, (string) $flag));
+        }
+
         return imap_clearflag_full($this->getImapStream(), implode(',', $mailsIds), $flag, ST_UID);
     }
 
@@ -658,6 +722,10 @@ class Mailbox
      */
     public function getMailsInfo(array $mailsIds): array|false
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->getMailsInfo($folder, $mailsIds));
+        }
+
         $mails = imap_fetch_overview($this->getImapStream(), implode(',', $mailsIds), FT_UID);
         if (is_array($mails) && count($mails)) {
             foreach ($mails as &$mail) {
@@ -691,6 +759,10 @@ class Mailbox
      */
     public function getMailboxInfo(): \stdClass
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->getMailboxInfo($folder));
+        }
+
         return imap_mailboxmsginfo($this->getImapStream());
     }
 
@@ -711,8 +783,12 @@ class Mailbox
      *
      * @return array Mails ids
      */
-    public function sortMails($criteria = SORTARRIVAL, $reverse = true): array|bool
+    public function sortMails($criteria = 1, $reverse = true): array|bool
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->sortMails($folder, (int) $criteria, (bool) $reverse));
+        }
+
         return imap_sort($this->getImapStream(), $criteria, $reverse, SE_UID);
     }
 
@@ -721,6 +797,10 @@ class Mailbox
      */
     public function countMails(): int|bool
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->countMails($folder));
+        }
+
         return imap_num_msg($this->getImapStream());
     }
 
@@ -731,6 +811,10 @@ class Mailbox
      */
     protected function getQuota(): array|bool
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->getQuota());
+        }
+
         return imap_get_quotaroot($this->getImapStream(), 'INBOX');
     }
 
@@ -771,6 +855,10 @@ class Mailbox
      */
     public function getMail($mailId, $markAsSeen = true): Message
     {
+        if (!extension_loaded('imap')) {
+            return $this->callLibrary(fn (Transport\LibraryMailbox $mailbox, string $folder) => $mailbox->getMail($folder, (int) $mailId, (bool) $markAsSeen));
+        }
+
         $header     = imap_fetchheader($this->getImapStream(), $mailId, FT_UID);
         $headObject = imap_rfc822_parse_headers($header);
 
@@ -1073,12 +1161,49 @@ class Mailbox
      */
     protected function disconnect(): void
     {
+        if (!extension_loaded('imap')) {
+            try {
+                $this->libraryMailbox?->disconnect();
+            } catch (\Exception) {
+                // A disconnected server must not cause an exception during destruction.
+            } finally {
+                $this->libraryMailbox = null;
+            }
+
+            return;
+        }
+
         if ($this->isConnected()) {
             // Prevent these from throwing notices such as "SECURITY PROBLEM: insecure server advertised"
             imap_errors();
             imap_alerts();
 
             @imap_close($this->imapStream, CL_EXPUNGE);
+        }
+    }
+
+    /**
+     * @template T
+     *
+     * @param callable(Transport\LibraryMailbox, string): T $operation
+     *
+     * @return T
+     */
+    private function callLibrary(callable $operation): mixed
+    {
+        if (!$this->isConfigured()) {
+            throw new NotConfiguredException('mautic.email.config.monitored_email.not_configured');
+        }
+
+        try {
+            $this->libraryMailbox ??= new Transport\LibraryMailbox($this->settings, $this->attachmentsDir);
+            $folder = $this->imapFullPath ? substr($this->imapFullPath, strlen($this->imapPath)) : $this->imapFolder;
+
+            return $operation($this->libraryMailbox, $folder ?: 'INBOX');
+        } catch (MailboxException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            throw new MailboxException($e->getMessage(), 0, $e);
         }
     }
 

@@ -35,8 +35,10 @@ final class MailboxTest extends TestCase
             self::markTestSkipped('Set MAUTIC_TEST_IMAP_HOST to a disposable GreenMail server; see the adjacent README.md.');
         }
 
-        // An explicitly configured test environment must fail rather than silently skip.
-        $this->assertTrue(extension_loaded('imap'), 'The native mailbox baseline requires ext-imap.');
+        if (false !== $expectedExtension = getenv('MAUTIC_TEST_IMAP_EXTENSION')) {
+            $this->assertSame('imap' === $expectedExtension, extension_loaded('imap'));
+        }
+
         $this->host               = $host;
         $this->address            = 'mautic-'.bin2hex(random_bytes(12)).'@example.test';
         $this->temporaryDirectory = sys_get_temp_dir().'/'.$this->address;
@@ -138,11 +140,14 @@ final class MailboxTest extends TestCase
         $ids = $this->mailbox->searchMailbox();
         $this->assertCount(1, $ids);
 
-        // Provision a destination through the native API, as an external client would.
-        $settings           = $this->mailbox->getMailboxSettings();
-        $settings['folder'] = 'Processed';
-        $path               = $this->mailbox->getImapPath($settings);
-        $this->assertTrue(imap_createmailbox($this->mailbox->getImapStream(), $path['full']));
+        $settings = $this->mailbox->getMailboxSettings();
+        $provisioner = new \Horde_Imap_Client_Socket([
+            'hostspec' => $settings['host'], 'port' => $settings['port'],
+            'username' => $settings['user'], 'password' => $settings['password'],
+            'secure' => false,
+        ]);
+        $provisioner->createMailbox('Processed');
+        $provisioner->logout();
         $this->assertContains('Processed', $this->mailbox->getListingFolders());
         $this->assertTrue($this->mailbox->moveMail($ids[0], 'Processed'));
         $this->assertSame([], $this->mailbox->searchMailbox());
@@ -161,6 +166,14 @@ final class MailboxTest extends TestCase
 
     public function testLegacyConnectionRemainsUsableByNativeImapFunctions(): void
     {
+        if (!extension_loaded('imap')) {
+            $this->expectException(\Mautic\EmailBundle\Exception\MailboxException::class);
+            $this->expectExceptionMessage('Native IMAP connections require ext-imap');
+            $this->mailbox->getImapStream();
+
+            return;
+        }
+
         $this->deliverFixture();
         $this->mailbox->setConnectionArgs(0, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
         $connection = $this->mailbox->getImapStream();
@@ -171,9 +184,152 @@ final class MailboxTest extends TestCase
         $this->assertSame(1, imap_num_msg($connection));
     }
 
-    private function deliverFixture(): void
+    public function testEmptyMailboxAndStatus(): void
     {
-        $fixture = file_get_contents(__DIR__.'/Fixtures/multipart.eml');
+        $this->assertSame([], $this->mailbox->searchMailbox());
+        $this->assertSame(0, $this->mailbox->countMails());
+        $this->assertSame(0, $this->mailbox->statusMailbox()->messages);
+        $this->assertSame(0, $this->mailbox->checkMailbox()->Nmsgs);
+        $this->assertSame(0, $this->mailbox->getMailboxInfo()->Size);
+    }
+
+    public function testOverviewSortingAndMailboxInfo(): void
+    {
+        $this->deliverFixture();
+        $ids = $this->mailbox->searchMailbox();
+        $this->assertSame($ids, $this->mailbox->sortMails());
+        $overview = $this->mailbox->getMailsInfo($ids);
+        $this->assertCount(1, $overview);
+        $this->assertSame($ids[0], $overview[0]->uid);
+        $this->assertSame('Příliš žluťoučký', $overview[0]->subject);
+        $this->assertSame(1, $overview[0]->msgno);
+        $this->assertEquals(0, $overview[0]->seen);
+        $this->assertGreaterThan(0, $overview[0]->size);
+        $info = $this->mailbox->getMailboxInfo();
+        $this->assertSame(1, $info->Nmsgs);
+        $this->assertSame(1, $info->Unread);
+        $this->assertSame(0, $info->Deleted);
+        $this->assertSame($overview[0]->size, $info->Size);
+        $this->assertSame($ids, $this->mailbox->fetchUnread());
+    }
+
+    public function testAttachmentsCanBeDisabled(): void
+    {
+        $this->deliverFixture();
+        $this->mailbox->setMailboxSettings(['use_attachments' => false]);
+        $message = $this->mailbox->getMail($this->mailbox->searchMailbox()[0], false);
+        $this->assertSame([], $message->getAttachments());
+        $this->assertSame('Hello, Příliš!', trim($message->textPlain));
+    }
+
+    public function testDeliveryStatusReachesTheExistingBounceParser(): void
+    {
+        $this->deliverFixture('delivery-status');
+        $message = $this->mailbox->getMail($this->mailbox->searchMailbox()[0], false);
+        $bounce = (new \Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\DsnParser())->getBounce($message);
+        $this->assertSame('failed@example.test', $bounce->getContactEmail());
+        $this->assertStringContainsString('Action: failed', $message->dsnReport);
+    }
+
+    public function testFeedbackReportReachesTheExistingComplaintParser(): void
+    {
+        $this->deliverFixture('feedback-report');
+        $message = $this->mailbox->getMail($this->mailbox->searchMailbox()[0], false);
+        $parser = new \Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop\Parser($message);
+        $this->assertSame('complaint@example.test', $parser->parse());
+        $this->assertStringContainsString('Feedback-Type: abuse', (string) $message->fblReport);
+    }
+
+    public function testSearchCannotInjectAnotherProtocolCommand(): void
+    {
+        if (extension_loaded('imap')) {
+            self::markTestSkipped('The native extension validates its own protocol input.');
+        }
+        $this->expectException(\Mautic\EmailBundle\Exception\MailboxException::class);
+        $this->expectExceptionMessage('Invalid IMAP search criteria');
+        $this->mailbox->searchMailbox("ALL\r\nA2 LOGOUT");
+    }
+
+    public function testNativeConnectionOptionsAreNotSilentlyIgnoredWithoutExtension(): void
+    {
+        if (extension_loaded('imap')) {
+            self::markTestSkipped('Native connection options are covered by the legacy connection test.');
+        }
+        $this->expectException(\Mautic\EmailBundle\Exception\MailboxException::class);
+        $this->expectExceptionMessage('Native IMAP connection arguments require ext-imap');
+        $this->mailbox->setConnectionArgs(1);
+    }
+
+    public function testLibrarySupportsImplicitTlsWithExplicitSelfSignedCertificates(): void
+    {
+        $this->requireLibraryBackend();
+        $port = (int) getenv('MAUTIC_TEST_IMAPS_PORT');
+        if (!$port) {
+            self::markTestSkipped('Set MAUTIC_TEST_IMAPS_PORT to enable TLS integration tests.');
+        }
+        $this->deliverFixture();
+        $this->mailbox->setMailboxSettings(['encryption' => '/ssl/novalidate-cert', 'port' => $port]);
+        $this->assertCount(1, $this->mailbox->searchMailbox());
+    }
+
+    public function testRequiredStartTlsCannotSilentlyFallBackToPlaintext(): void
+    {
+        $this->requireLibraryBackend();
+        // GreenMail offers implicit TLS, but does not implement STARTTLS.
+        $this->mailbox->setMailboxSettings(['encryption' => '/tls']);
+        $this->expectException(\Mautic\EmailBundle\Exception\MailboxException::class);
+        $this->expectExceptionMessage('Server does not support TLS connections');
+        $this->mailbox->searchMailbox();
+    }
+
+    public function testLibraryRejectsUntrustedTlsCertificates(): void
+    {
+        $this->requireLibraryBackend();
+        $port = (int) getenv('MAUTIC_TEST_IMAPS_PORT');
+        if (!$port) {
+            self::markTestSkipped('Set MAUTIC_TEST_IMAPS_PORT to enable TLS integration tests.');
+        }
+        $this->mailbox->setMailboxSettings(['encryption' => '/ssl', 'port' => $port]);
+        $this->expectException(\Mautic\EmailBundle\Exception\MailboxException::class);
+        $this->mailbox->searchMailbox();
+    }
+
+    public function testLibraryCreatesAndSelectsUnicodeFolders(): void
+    {
+        $this->requireLibraryBackend();
+        $this->deliverFixture();
+        $ids = $this->mailbox->searchMailbox();
+        $settings = $this->mailbox->getMailboxSettings();
+        $settings['folder'] = 'Příchozí';
+        $this->mailbox->setImapPath($settings);
+        $this->assertTrue($this->mailbox->createMailbox());
+        $this->mailbox->setImapPath();
+        $this->assertContains('Příchozí', $this->mailbox->getListingFolders());
+        $this->assertTrue($this->mailbox->moveMail($ids[0], 'Příchozí'));
+        $this->mailbox->switchFolder('Příchozí');
+        $this->assertSame(1, $this->mailbox->countMails());
+        $this->mailbox->switchFolder('INBOX');
+        $this->assertSame([], $this->mailbox->searchMailbox());
+    }
+
+    public function testLibraryWrapsConnectionFailuresInMailboxException(): void
+    {
+        $this->requireLibraryBackend();
+        $this->mailbox->setMailboxSettings(['port' => 1]);
+        $this->expectException(\Mautic\EmailBundle\Exception\MailboxException::class);
+        $this->mailbox->searchMailbox();
+    }
+
+    private function requireLibraryBackend(): void
+    {
+        if (extension_loaded('imap')) {
+            self::markTestSkipped('This test exercises the extension-free backend.');
+        }
+    }
+
+    private function deliverFixture(string $name = 'multipart'): void
+    {
+        $fixture = file_get_contents(__DIR__.'/Fixtures/'.$name.'.eml');
         $this->assertNotFalse($fixture);
         $fixture = str_replace("\n", "\r\n", str_replace("\r\n", "\n", $fixture));
 

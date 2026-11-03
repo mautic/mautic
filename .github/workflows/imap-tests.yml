@@ -16,6 +16,7 @@ jobs:
     strategy:
       matrix:
         php: ['8.2', '8.4', '8.5']
+        imap-extension: ['imap', ':imap']
     services:
       imap:
         image: greenmail/standalone:2.1.15
@@ -24,18 +25,20 @@ jobs:
           GREENMAIL_OPTS: >-
             -Dgreenmail.setup.test.smtp
             -Dgreenmail.setup.test.imap
+            -Dgreenmail.setup.test.imaps
             -Dgreenmail.hostname=0.0.0.0
             -Dgreenmail.auth.disabled
             -Dgreenmail.startup.timeout=30000
         ports:
           - 3025/tcp
           - 3143/tcp
+          - 3993/tcp
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: imap, mbstring, xml, ctype, iconv, intl, pdo_mysql, zip, gd, bcmath
+          extensions: ${{ matrix.imap-extension }}, mbstring, xml, ctype, iconv, intl, pdo_mysql, zip, gd, bcmath
           coverage: none
       - uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
         with:
@@ -55,7 +58,9 @@ jobs:
           exit 1
       - name: Test the mailbox contract against a real IMAP server
         env:
+          MAUTIC_TEST_IMAP_EXTENSION: ${{ matrix.imap-extension }}
           MAUTIC_TEST_IMAP_HOST: 127.0.0.1
           MAUTIC_TEST_IMAP_PORT: ${{ job.services.imap.ports[3143] }}
+          MAUTIC_TEST_IMAPS_PORT: ${{ job.services.imap.ports[3993] }}
           MAUTIC_TEST_SMTP_PORT: ${{ job.services.imap.ports[3025] }}
-        run: php bin/phpunit -c app/phpunit.xml.dist app/bundles/EmailBundle/Tests/Integration/MonitoredEmail
+        run: php bin/phpunit -c app/phpunit.xml.dist app/bundles/EmailBundle/Tests/Integration/MonitoredEmail app/bundles/EmailBundle/Tests/MonitoredEmail app/bundles/EmailBundle/Tests/Form/Type/ConfigTypeTest.php

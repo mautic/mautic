@@ -1,0 +1,32 @@
+From: postmaster@example.test
+To: monitored@example.test
+Subject: Delivery report
+Date: Mon, 02 Nov 2026 12:00:00 +0000
+MIME-Version: 1.0
+Content-Type: multipart/report; report-type=delivery-status; boundary="report-boundary"
+
+--report-boundary
+Content-Type: text/plain; charset=UTF-8
+
+The original message could not be delivered.
+--report-boundary
+Content-Type: message/delivery-status
+
+Reporting-MTA: dns; mail.example.test
+
+Final-Recipient: rfc822; failed@example.test
+Action: failed
+Status: 5.1.1
+Diagnostic-Code: smtp; 550 5.1.1 User unknown
+
+--report-boundary
+Content-Type: message/rfc822
+
+From: sender@example.test
+To: failed@example.test
+Subject: Original message
+Message-ID: <original@example.test>
+Content-Type: text/plain
+
+Original body
+--report-boundary--

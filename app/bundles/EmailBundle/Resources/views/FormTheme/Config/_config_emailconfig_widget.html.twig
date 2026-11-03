@@ -67,11 +67,7 @@
     <div class="row">
         <div class="panel panel-default mb-md">
             <div class="panel-body">
-                {% if 'imap_open' is function %}
-                    {{ form_widget(form.monitored_email) }}
-                {% else %}
-                    <div class="alert alert-info">{{ 'mautic.email.imap_extension_missing'|trans|purify }}</div>
-                {% endif %}
+                {{ form_widget(form.monitored_email) }}
             </div>
         </div>
     </div>

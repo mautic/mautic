@@ -1,0 +1,30 @@
+From: postmaster@example.test
+To: monitored@example.test
+Subject: Delivery report
+Date: Mon, 02 Nov 2026 12:00:00 +0000
+MIME-Version: 1.0
+Content-Type: multipart/report; report-type=feedback-report; boundary="report-boundary"
+
+--report-boundary
+Content-Type: text/plain; charset=UTF-8
+
+The original message could not be delivered.
+--report-boundary
+Content-Type: message/feedback-report
+
+Feedback-Type: abuse
+User-Agent: test-feedback-agent
+Version: 1
+Original-Rcpt-To: <complaint@example.test>
+
+--report-boundary
+Content-Type: message/rfc822
+
+From: sender@example.test
+To: failed@example.test
+Subject: Original message
+Message-ID: <original@example.test>
+Content-Type: text/plain
+
+Original body
+--report-boundary--
