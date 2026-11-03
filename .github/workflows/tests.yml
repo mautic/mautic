@@ -221,7 +221,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'Easy Coding Standard', 'Rector', 'Twig Lint', 'Class Leak', 'scaffolded files mismatch', 'composer install', 'composer lock check', 'Identifier order']
+        commands: ['PHPSTAN', 'Easy Coding Standard', 'Rector', 'Twig Lint', 'Class Leak', 'scaffolded files mismatch', 'composer install', 'composer lock check', 'Identifier order', 'Misplaced tests']
         php-versions: ['8.4']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
@@ -383,6 +383,16 @@ jobs:
             --skip-path "plugins/MauticFullContactBundle/Services/"
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then
           composer validate --ansi
+        elif [[ "${{ matrix.commands }}" == "Misplaced tests" ]]; then
+          # Tests must live in app/tests so the app/tests/*Bundle/Tests suite runs them.
+          # A PHPUnit test under app/bundles/*/Tests is silently skipped.
+          misplaced=$(grep -rlE 'extends[[:space:]]+[A-Za-z0-9_\\]*TestCase' app/bundles --include='*.php' | grep '/Tests/' || true)
+          if [[ -n "$misplaced" ]]; then
+            echo "These PHPUnit tests live under app/bundles and are skipped by the app/tests suite:"
+            echo "$misplaced"
+            echo "Move them under app/tests/ keeping the same namespace."
+            exit 1
+          fi
         else
           echo "Invalid command"
           exit 1
