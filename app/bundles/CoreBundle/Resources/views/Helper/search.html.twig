@@ -37,7 +37,7 @@
         }
     ]
 } %}
-<div class="input-group d-flex fg-1">
+<div class="input-group d-flex flex-grow-1">
     {% if searchScopes is defined and searchScopes is not empty %}
         {{ include('@MauticCore/Helper/search_scope.html.twig', {
             id: id,
@@ -54,14 +54,14 @@
 {% set filtering %}
 <div class="row">
     {% if quickFilters is defined and quickFilters is not empty %}
-    <div class="{% if filters is defined and filters is not empty %}col-xs-6 pa-0{% endif %}">
+    <div class="{% if filters is defined and filters is not empty %}col-xs-6 p-0{% endif %}">
         {{ include('@MauticCore/Helper/list_quickfilters.html.twig', {
             'quickFilters': quickFilters
         }) }}
     </div>
     {% endif %}
     {% if filters is defined and filters is not empty %}
-    <div class="{{ quickFilters is defined and quickFilters is not empty ? 'col-xs-6' : 'col-xs-12' }} pa-0">
+    <div class="{{ quickFilters is defined and quickFilters is not empty ? 'col-xs-6' : 'col-xs-12' }} p-0">
         <div class="dropdown-header mt-0">{{ filtersLabel|default('mautic.core.quick_filters.more')|trans }}</div>
         <div class="pi-md">
             {{- include('@MauticCore/Helper/list_filters.html.twig', {
@@ -74,7 +74,7 @@
     {% endif %}
 </div>
 <div class="row">
-    <div class="footer-buttons d-flex fw-nowrap gap-1 mt-lg">
+    <div class="footer-buttons d-flex flex-nowrap gap-1 mt-lg">
         {% include '@MauticCore/Helper/button.html.twig' with {
             buttons: [
                 {

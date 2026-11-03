@@ -205,7 +205,7 @@
                                     {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
                                 </div>
                             </div>
-                            <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                            <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                 {{- include('@MauticCore/Helper/chart.html.twig', {'chartData' : stats.downloads.timeStats, 'chartType' : 'line', 'chartHeight' : 300}) -}}
                             </div>
                         </div>
@@ -222,7 +222,7 @@
     <!-- right section -->
     <div class="col-md-3 bdr-l height-auto">
         <!-- preview URL -->
-        <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel shd-none rounded-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-body pt-xs">
                 {% include '@MauticCore/Components/card.html.twig' with {
                 type: 'link',

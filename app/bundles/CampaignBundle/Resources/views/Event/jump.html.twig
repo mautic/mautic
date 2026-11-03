@@ -5,7 +5,7 @@
 {% endif %}
 <div class="campaign-event-type">
 
-<div class="campaign-event-content d-flex fw-nowrap ai-center gap-sm">
+<div class="campaign-event-content d-flex flex-nowrap align-items-center gap-sm">
     <div class="campaign-event-icon pa-sm mr-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
 
         <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
