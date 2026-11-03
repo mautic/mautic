@@ -1,9 +1,9 @@
 <link rel="stylesheet" type="text/css" href="{{ asset('app/bundles/DynamicContentBundle/Assets/css/dwc-generator.css') }}">
 
 {% set htmlcode %}
-<pre class="dwc--generator-content-code d-flex fd-column fg-1 gap-md pa-0 fs-16 text-helper">{{ '<div
+<pre class="dwc--generator-content-code d-flex flex-column flex-grow-1 gap-md p-0 fs-16 text-helper">{{ '<div
     data-slot="dwc"
-    data-param-slot-name="' ~ entity.slotName ~ '">'|raw }}<div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 ai-center ml-lg text-primary"><i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{{ '</div>'|escape }}</pre>
+    data-param-slot-name="' ~ entity.slotName ~ '">'|raw }}<div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 align-items-center ml-lg text-primary"><i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{{ '</div>'|escape }}</pre>
 {% endset %}
 
 <div class="row mt-lg">
@@ -15,7 +15,7 @@
         <ul class="list-group" role="tablist">
             <li role="presentation" class="list-group-item active">
                 <a href="#dwc--generator-html" aria-controls="dwc--generator-html" role="tab" data-toggle="tab">
-                    <div class="d-flex jc-space-between mb-sm">
+                    <div class="d-flex justify-content-between mb-sm">
                         <h4 class="list-group-item-heading fw-sb">{{ 'mautic.dynamiccontent.generator.html'|trans }}</h4>
                         <i class="ri-html5-fill ri-lg"></i>
                     </div>
@@ -24,7 +24,7 @@
             </li>
             <li role="presentation" class="list-group-item">
                 <a href="#dwc--generator-plugins" aria-controls="dwc--generator-plugins" role="tab" data-toggle="tab">
-                    <div class="d-flex jc-space-between mb-sm">
+                    <div class="d-flex justify-content-between mb-sm">
                         <h4 class="list-group-item-heading fw-sb">{{ 'mautic.dynamiccontent.generator.plugins'|trans }}</h4>
                         <i class="ri-apps-2-add-fill ri-lg"></i>
                     </div>
@@ -38,8 +38,8 @@
 
         <div role="tabpanel" class="tab-pane fade in active" id="dwc--generator-html">
             <div class="tile dwc--generator-wrapper">
-                <div class="d-flex fg-1">
-                    <div class="dwc--generator-toolbar pa-xs layer-two d-flex fd-column jc-space-between ai-start mr-md">
+                <div class="d-flex flex-grow-1">
+                    <div class="dwc--generator-toolbar pa-xs layer-two d-flex flex-column justify-content-between align-items-start mr-md">
                         {% include '@MauticCore/Helper/button.html.twig' with {
                         buttons: [
                         {
@@ -49,7 +49,7 @@
                         variant: 'ghost',
                         size: 'sm',
                         attributes: {
-                        'class': 'ma-0',
+                        'class': 'm-0',
                         'type': 'button'
                         }
                         },
@@ -60,7 +60,7 @@
                         variant: 'ghost',
                         size: 'sm',
                         attributes: {
-                        'class': 'ma-0',
+                        'class': 'm-0',
                         'type': 'button',
                         'data-toggle': 'popover',
                         'title': 'mautic.dynamiccontent.generator.html_tag_title'|trans,
@@ -72,7 +72,7 @@
                         } %}
 
                     </div>
-                    <div class="dwc--generator-content mt-md mb-sm d-flex fd-column fg-1">
+                    <div class="dwc--generator-content mt-md mb-sm d-flex flex-column flex-grow-1">
                         {{ htmlcode }}
                         <div class="dwc--generator-content-help text-helper small">
                             <i class="ri-information-2-line"></i>
@@ -85,8 +85,8 @@
 
         <div role="tabpanel" class="tab-pane fade" id="dwc--generator-plugins">
             <div class="tile dwc--generator-wrapper">
-                <div class="d-flex fg-1">
-                    <div class="dwc--generator-toolbar pa-xs layer-two d-flex fd-column jc-space-between ai-start mr-md">
+                <div class="d-flex flex-grow-1">
+                    <div class="dwc--generator-toolbar pa-xs layer-two d-flex flex-column justify-content-between align-items-start mr-md">
                         {% include '@MauticCore/Helper/button.html.twig' with {
                         buttons: [
                         {
@@ -96,7 +96,7 @@
                         variant: 'ghost',
                         size: 'sm',
                         attributes: {
-                        'class': 'ma-0',
+                        'class': 'm-0',
                         'type': 'button'
                         }
                         },
@@ -107,7 +107,7 @@
                         variant: 'ghost',
                         size: 'sm',
                         attributes: {
-                        'class': 'ma-0',
+                        'class': 'm-0',
                         'data-toggle': 'popover',
                         'title': 'mautic.dynamiccontent.generator.when_to_change_brackets'|trans,
                         'data-content': 'mautic.dynamiccontent.generator.joomla_syntax_info'|trans,
@@ -119,8 +119,8 @@
                         } %}
 
                     </div>
-                    <div class="dwc--generator-content mt-md mb-sm d-flex fd-column fg-1">
-                        <pre class="dwc--generator-content-code d-flex fd-column fg-1 gap-md pa-0 fs-16 text-helper">{mautic type="content" slot="{{ entity.slotName }}"} <div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 ai-center ml-lg text-primary"> <i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{/mautic}
+                    <div class="dwc--generator-content mt-md mb-sm d-flex flex-column flex-grow-1">
+                        <pre class="dwc--generator-content-code d-flex flex-column flex-grow-1 gap-md p-0 fs-16 text-helper">{mautic type="content" slot="{{ entity.slotName }}"} <div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 align-items-center ml-lg text-primary"> <i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{/mautic}
                         </pre>
                         <div class="dwc--generator-content-help text-helper small">
                             <i class="ri-information-2-line"></i>

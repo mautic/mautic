@@ -29,7 +29,7 @@ Variables
     <div class="col-sm-offset-3 col-sm-6 text-center">
         <div class="row mb-lg">
             {% if not complete %}
-            <div class="col-md-12 ai-start">
+            <div class="col-md-12 align-items-start">
                 {% include '@MauticCore/Components/pictogram.html.twig' with {
                     pictogram: 'data--processing',
                     size: 64
@@ -40,13 +40,13 @@ Variables
                 </div>
             </div>
             {% else %}
-            <div class="col-md-8 ai-start">
+            <div class="col-md-8 align-items-start">
                 {% include '@MauticCore/Components/pictogram.html.twig' with {
                     pictogram: 'data--storage',
                     size: 64
                 } %}
                 <h2 class="mt-lg pb-sm text-left">{{ header|trans({'object': object}) }}</h2>
-                <div class="row-no-gutters ai-center gap-sm">
+                <div class="row-no-gutters align-items-center gap-sm">
                     {% include '@MauticCore/Helper/_tag.html.twig' with {
                         tags: [{
                             label: import.object == 'lead' ? 'mautic.lead.leads'
@@ -61,7 +61,7 @@ Variables
                     <span class="text-secondary">{{ 'mautic.core.now'|trans }}</span>
                 </div>
             </div>
-            <div class="col-md-4 ai-end jc-center">
+            <div class="col-md-4 align-items-end justify-content-center">
                 
             </div>
             {% endif %}
@@ -81,8 +81,8 @@ Variables
             <div class="panel-body">
                 {% if complete %}
                 <h4 class="mb-md text-left fw-sb">{{ 'mautic.lead.segments.contacts.imported_database'|trans }}</h4>
-                <div class="row-no-gutters jc-space-between ai-center mb-sm">
-                    <span class="d-flex ai-center gap-xs"><i class="ri-add-box-fill ri-lg"></i>{{'mautic.lead.import.stats.created'|trans}}</span>
+                <div class="row-no-gutters justify-content-between align-items-center mb-sm">
+                    <span class="d-flex align-items-center gap-xs"><i class="ri-add-box-fill ri-lg"></i>{{'mautic.lead.import.stats.created'|trans}}</span>
                     {% include '@MauticCore/Helper/_tag.html.twig' with {
                         tags: [{
                             label: import.insertedCount,
@@ -91,8 +91,8 @@ Variables
                         }]
                     } %}
                 </div>
-                <div class="row-no-gutters jc-space-between ai-center mb-sm">
-                    <span class="d-flex ai-center gap-xs"><i class="ri-refresh-fill ri-lg"></i>{{'mautic.lead.import.stats.merged'|trans}}</span>
+                <div class="row-no-gutters justify-content-between align-items-center mb-sm">
+                    <span class="d-flex align-items-center gap-xs"><i class="ri-refresh-fill ri-lg"></i>{{'mautic.lead.import.stats.merged'|trans}}</span>
                     {% include '@MauticCore/Helper/_tag.html.twig' with {
                         tags: [{
                             label: import.updatedCount,
@@ -101,8 +101,8 @@ Variables
                         }]
                     } %}
                 </div>
-                <div class="row-no-gutters jc-space-between ai-center mb-sm">
-                    <span class="d-flex ai-center gap-xs"><i class="ri-checkbox-fill ri-lg"></i>{{'mautic.lead.import.stats.ignored'|trans}}</span>
+                <div class="row-no-gutters justify-content-between align-items-center mb-sm">
+                    <span class="d-flex align-items-center gap-xs"><i class="ri-checkbox-fill ri-lg"></i>{{'mautic.lead.import.stats.ignored'|trans}}</span>
                     {% include '@MauticCore/Helper/_tag.html.twig' with {
                         tags: [{
                             label: import.ignoredCount,
@@ -114,8 +114,8 @@ Variables
                 <div class="row-no-gutters">
                     <div class="col-xs-12 mt-lg">
                         {% set tileContent %}
-                            <div class="d-flex jc-space-between">
-                                <div class="row-no-gutters fw-nowrap gap-xs ai-center">
+                            <div class="d-flex justify-content-between">
+                                <div class="row-no-gutters flex-nowrap gap-xs align-items-center">
                                     <i class="ri-file-list-line ri-lg"></i>
                                     <h5>
                                         {% if import.name()|length > 40 %}
@@ -152,7 +152,7 @@ Variables
                 {% endfor %}
             </ul>
             {% endif %}
-            <div class="d-flex gap-1 jc-space-between pa-0">
+            <div class="d-flex gap-1 justify-content-between p-0">
                 {% if not complete %}
                         {% include '@MauticCore/Helper/button.html.twig' with {
                             buttons: [
@@ -175,7 +175,7 @@ Variables
                                     wide: true,
                                     attributes: {
                                         'data-toggle': 'ajax',
-                                        'class': 'ma-0'
+                                        'class': 'm-0'
                                     }
                                 }
                             ]
@@ -184,7 +184,7 @@ Variables
                         {% set indexRouteParams = indexRouteParams|merge({
                             'search': 'mautic.lead.lead.searchcommand.import_id'|trans ~ ':' ~ import.id
                         }) %}
-                        <div class="d-flex ai-start">
+                        <div class="d-flex align-items-start">
                             {% include '@MauticCore/Helper/button.html.twig' with {
                                 buttons: [
                                     {

@@ -1,4 +1,4 @@
-<div class="alert {% if n.type is defined %}alert-{{ n.type }}{% endif %} ma-0 bdr-b notification" id="notification{{ n.id }}">
+<div class="alert {% if n.type is defined %}alert-{{ n.type }}{% endif %} m-0 bdr-b notification" id="notification{{ n.id }}">
     <div class="media-body notification">
         <div class="text-secondary fw-b mb-xs {% if n.type is defined %}ml-lg{% endif %}">
             {{ dateToHumanized(n.dateAdded) }}
