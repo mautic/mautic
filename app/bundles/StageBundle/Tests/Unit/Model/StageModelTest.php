@@ -28,15 +28,12 @@ final class StageModelTest extends TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['getEntities'])
             ->getMock();
-        $model->expects(self::once())
+        $model->expects($this->once())
             ->method('getEntities')
             ->with(['start' => 10, 'limit' => 2, 'withContactCount' => true])
             ->willReturn($paginator);
 
-        self::assertSame(
-            [[$firstStage, $secondStage], [12 => 2, 34 => 0], 25],
-            $model->getEntitiesWithContactCounts(['start' => 10, 'limit' => 2]),
-        );
+        $this->assertSame([[$firstStage, $secondStage], [12 => 2, 34 => 0], 25], $model->getEntitiesWithContactCounts(['start' => 10, 'limit' => 2]));
     }
 
     public function testContactCountsReturnEmptyResultsWhenThereAreNoStages(): void
@@ -45,11 +42,11 @@ final class StageModelTest extends TestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['getEntities'])
             ->getMock();
-        $model->expects(self::once())
+        $model->expects($this->once())
             ->method('getEntities')
             ->with(['withContactCount' => true])
             ->willReturn(new \ArrayIterator());
 
-        self::assertSame([[], [], 0], $model->getEntitiesWithContactCounts());
+        $this->assertSame([[], [], 0], $model->getEntitiesWithContactCounts());
     }
 }
