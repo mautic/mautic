@@ -11,13 +11,21 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 final class ReportSubscriber
 {
     public const string CONTEXT_FOCUS_STATS = 'focus_stats';
+
     public const string CONTEXT_FOCUS_LEADS = 'focus_leads';
+
     public const string FOCUS_GROUP         = 'focus';
+
     public const string PREFIX_FOCUS        = 'f';
+
     public const string PREFIX_STATS        = 'fs';
+
     public const string PREFIX_REDIRECTS    = 'r';
+
     public const string PREFIX_TRACKABLES   = 't';
+
     public const string PREFIX_CATEGORIES   = 'c';
+
     public const string PREFIX_LEADS        = 'l';
 
     /**

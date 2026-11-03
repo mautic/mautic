@@ -13,6 +13,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 final readonly class ProcessUnsubscribeSubscriber
 {
     public const string BUNDLE     = 'EmailBundle';
+
     public const string FOLDER_KEY = 'unsubscribes';
 
     public function __construct(

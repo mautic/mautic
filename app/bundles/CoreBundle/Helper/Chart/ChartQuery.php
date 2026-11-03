@@ -83,40 +83,18 @@ class ChartQuery extends AbstractChart
      */
     public function applyFilters(TrackingQueryBuilder $query, array $filters): void
     {
-<<<<<<< HEAD
-        if ($filters && is_array($filters)) {
-            foreach ($filters as $column => $value) {
-                // The filter array can originate from user input (e.g. the dashboard
-                // widget API). Column identifiers are concatenated straight into the SQL
-                // rather than bound as parameters, so they must be validated against a
-                // strict allow-list before use.
-                $this->assertSafeColumnName((string) $column);
-
-                $valId = $column.'_val';
-
-                // Special case: Lead list filter
-                if ('leadlist_id' === $column) {
-                    $this->assertSafeColumnName((string) $value['list_column_name']);
-                    $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = '.$value['list_column_name']);
-                    $query->andWhere('lll.leadlist_id = :'.$valId);
-                    $query->setParameter($valId, $value['value']);
-                } elseif (isset($value['expression']) && method_exists($query->expr(), $value['expression'])) {
-                    $query->andWhere($query->expr()->{$value['expression']}($column));
-                    if (isset($value['value'])) {
-                        $query->setParameter($valId, $value['value']);
-                    }
-                } elseif (isset($value['subquery'])) {
-                    // A "subquery" is a raw, unparameterised SQL fragment. It must never
-                    // be accepted from a filter array that can be populated by a request.
-                    // Legitimate internal callers apply their server-built subqueries
-                    // directly on the QueryBuilder returned by prepareTimeDataQuery().
-                    throw new \InvalidArgumentException('Chart query filters may not contain a raw "subquery" fragment.');
-=======
         foreach ($filters as $column => $value) {
+            // The filter array can originate from user input (e.g. the dashboard
+            // widget API). Column identifiers are concatenated straight into the SQL
+            // rather than bound as parameters, so they must be validated against a
+            // strict allow-list before use.
+            $this->assertSafeColumnName((string) $column);
+
             $valId = $column.'_val';
 
             // Special case: Lead list filter
             if ('leadlist_id' === $column) {
+                $this->assertSafeColumnName((string) $value['list_column_name']);
                 $query->join('t', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.lead_id = '.$value['list_column_name']);
                 $query->andWhere('lll.leadlist_id = :'.$valId);
                 $query->setParameter($valId, $value['value']);
@@ -126,14 +104,17 @@ class ChartQuery extends AbstractChart
                     $query->setParameter($valId, $value['value']);
                 }
             } elseif (isset($value['subquery'])) {
-                $query->andWhere($value['subquery']);
+                // A "subquery" is a raw, unparameterised SQL fragment. It must never
+                // be accepted from a filter array that can be populated by a request.
+                // Legitimate internal callers apply their server-built subqueries
+                // directly on the QueryBuilder returned by prepareTimeDataQuery().
+                throw new \InvalidArgumentException('Chart query filters may not contain a raw "subquery" fragment.');
             } else {
                 $column = str_replace('t.', '', $column);
                 $valId  = str_replace('t.', '', $valId);
                 if (is_array($value)) {
                     $query->andWhere($query->expr()->in('t.'.$column, ":{$valId}"));
                     $query->setParameter($valId, array_map(strval(...), $value), ArrayParameterType::STRING);
->>>>>>> dc511ce4c7 ([types] Native array/iterable type for ChartQuery and LeadRepository docblocks)
                 } else {
                     $query->andWhere('t.'.$column.' = :'.$valId);
                     $query->setParameter($valId, $value);

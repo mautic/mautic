@@ -27,10 +27,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class CampaignSubscriber
 {
     private ?Event $pseudoEvent = null;
+
     /**
      * @var Collection<int, LeadEventLog>|null
      */
     private ?Collection $mmLogs = null;
+
     /**
      * @var mixed[]
      */

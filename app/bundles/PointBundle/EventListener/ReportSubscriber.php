@@ -14,8 +14,11 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 final class ReportSubscriber
 {
     public const string CONTEXT_GROUP_SCORE = 'group.score';
+
     public const string GROUP_PREFIX        = 'pl';
+
     public const string GROUP_SCORE_PREFIX  = 'ls';
+
     public const array GROUP_COLUMNS = [
         self::GROUP_PREFIX.'.id' => [
             'alias' => 'group_id',
@@ -33,6 +36,7 @@ final class ReportSubscriber
             'type'  => 'int',
         ],
     ];
+
     /**
      * @var string[]
      */

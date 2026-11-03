@@ -9,6 +9,7 @@ use Symfony\Component\Routing\RouterInterface;
 final readonly class RouterSubscriber
 {
     private int $httpsPort;
+
     private int $httpPort;
 
     public function __construct(

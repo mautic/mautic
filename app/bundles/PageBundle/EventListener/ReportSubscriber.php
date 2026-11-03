@@ -18,7 +18,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final readonly class ReportSubscriber
 {
     public const string CONTEXT_PAGES      = 'pages';
+
     public const string CONTEXT_PAGE_HITS  = 'page.hits';
+
     public const string CONTEXT_VIDEO_HITS = 'video.hits';
 
     public function __construct(

@@ -28,7 +28,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 final readonly class CampaignEventSubscriber
 {
     public const int LOOPS_TO_FAIL = 100;
+
     private const int MINIMUM_CONTACTS_FOR_DISABLE = 100;
+
     private const float DISABLE_CAMPAIGN_THRESHOLD   = 0.35;
 
     public function __construct(

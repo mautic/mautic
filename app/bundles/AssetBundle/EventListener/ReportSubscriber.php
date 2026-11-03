@@ -16,6 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final readonly class ReportSubscriber
 {
     public const string CONTEXT_ASSET          = 'assets';
+
     public const string CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
 
     public function __construct(

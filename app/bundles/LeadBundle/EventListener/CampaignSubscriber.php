@@ -64,6 +64,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 final class CampaignSubscriber
 {
     public const string ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
+
     private ?array $fields = null;
 
     public function __construct(

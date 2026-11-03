@@ -17,7 +17,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class OwnerSubscriber
 {
     private const array OWNER_COLUMNS = ['email', 'firstname', 'lastname', 'position', 'signature'];
+
     private string $ownerFieldSprintf = '{ownerfield=%s}';
+
     /**
      * @var array<int, mixed>|null
      */
