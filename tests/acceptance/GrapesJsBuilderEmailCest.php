@@ -16,6 +16,8 @@ final class GrapesJsBuilderEmailCest
 
     public function _before(AcceptanceTester $I): void
     {
+        $I->amOnPage('/s/logout');
+        $I->deleteSessionSnapshot('login');
         $I->login();
     }
 
