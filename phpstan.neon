@@ -113,14 +113,6 @@ parameters:
                 - app/bundles/PluginBundle/Model/IntegrationEntityModel.php
                 - *.html.php
                 - app/config/
-                - plugins/MauticCrmBundle/Api/SalesforceApi.php
-                - plugins/MauticCrmBundle/Api/SugarcrmApi.php
-                - plugins/MauticCrmBundle/Form/Type/IntegrationCampaignsTaskType.php
-                - plugins/MauticCrmBundle/Integration/DynamicsIntegration.php
-                - plugins/MauticCrmBundle/Integration/SalesforceIntegration.php
-                - plugins/MauticCrmBundle/Integration/ZohoIntegration.php
-                - plugins/MauticFocusBundle/Controller/FocusController.php
-                - plugins/MauticTagManagerBundle/Form/Type/TagEntityType.php
 
         -
             path: utils/phpstan/src/Rule/EntityParamConcreteTypeRule.php
