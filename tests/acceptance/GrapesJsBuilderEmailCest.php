@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Facebook\WebDriver\WebDriverKeys;
 use Page\Acceptance\EmailsPage;
-use Step\Acceptance\SegmentStep;
+use Page\Acceptance\SegmentsPage;
 
 final class GrapesJsBuilderEmailCest
 {
@@ -21,12 +21,17 @@ final class GrapesJsBuilderEmailCest
         $I->login();
     }
 
-    public function emailContentSurvivesValidationErrorAndRecovery(AcceptanceTester $I, SegmentStep $segment): void
+    public function emailContentSurvivesValidationErrorAndRecovery(AcceptanceTester $I): void
     {
         $segmentName = 'Issue 17552 '.date('YmdHis');
         $emailName   = 'Issue 17552 recovery '.date('YmdHis');
 
-        $segment->createAContactSegment($segmentName);
+        $I->amOnPage(SegmentsPage::$URL);
+        $I->waitForElementClickable(SegmentsPage::$NEW_BUTTON);
+        $I->click(SegmentsPage::$NEW_BUTTON);
+        $I->waitForElementVisible(SegmentsPage::$SEGMENT_NAME);
+        $I->fillField(SegmentsPage::$SEGMENT_NAME, $segmentName);
+        $I->click(SegmentsPage::$SAVE_AND_CLOSE_BUTTON);
         $I->waitForElementNotVisible('form[name="leadlist"]', AcceptanceTester::TIMEOUT);
 
         $I->amOnPage('/s/emails/new');
