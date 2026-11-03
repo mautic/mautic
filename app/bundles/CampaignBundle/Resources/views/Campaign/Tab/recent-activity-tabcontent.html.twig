@@ -3,8 +3,8 @@
     <div class="table-responsive">
         <table class="table table-hover" id="campaign-auditlog">
             <tr>
-                <th class="timeline-icon np"></th>
-                <th class="table-expand np">
+                <th class="timeline-icon p-0"></th>
+                <th class="table-expand p-0">
                     <a class="table-expand-button" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
                         <span class="ri-arrow-down-s-line"></span>
                     </a>
@@ -34,10 +34,10 @@
                 {% endif %}
                 {% set rowStripe = cycle(['', 'timeline-row-highlighted'], loop.index0) %}
                 <tr class="timeline-row {{ rowStripe }}">
-                    <td class="timeline-icon np">
+                    <td class="timeline-icon p-0">
                         <span class="fa ri-fw {{ icon }}"></span>
                     </td>
-                    <td class="table-expand np">
+                    <td class="table-expand p-0">
                         {% if log.action != 'create' %}
                         <a href="javascript:void(0);"
                            data-activate-details="{{ counter }}"

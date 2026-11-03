@@ -8,7 +8,7 @@
         <div class="panel panel-default">
             <div class="panel-heading pt-sm">
                 <div class="panel-title notification notification-title">
-                    <h6 class="fw-sb d-flex jc-space-between ai-center">{{ 'mautic.core.notifications'|trans }}
+                    <h6 class="fw-sb d-flex justify-content-between align-items-center">{{ 'mautic.core.notifications'|trans }}
                         {% if notifications is not empty %}
                             {% include '@MauticCore/Helper/button.html.twig' with {
                                 buttons: [
@@ -29,14 +29,14 @@
                     </h6>
                 </div>
             </div>
-            <div class="pt-0 pb-xs pl-0 pr-0">
-                <div class="scroll-content slimscroll d-flex fd-column" id="notifications">
+            <div class="pt-0 pb-xs ps-0 pe-0">
+                <div class="scroll-content slimscroll d-flex flex-column" id="notifications">
                     {{ include('@MauticCore/Notification/notification_messages.html.twig', {
                         notifications: notifications,
                         updateMessage: updateMessage
                     }) }}
                     {% set class = notifications is not empty ? ' hide' : '' %}
-                    <div class="{{ class }} mautibot-image pa-lg d-flex fd-column ai-center jc-center" id="notificationMautibot">
+                    <div class="{{ class }} mautibot-image pa-lg d-flex flex-column align-items-center justify-content-center" id="notificationMautibot">
                         <div class="fs-30">🦄</div>
                         <div class="text-secondary fw-sb">{{'mautic.core.notifications.empty'|trans}}</div>
                         <div class="text-secondary">{{'mautic.core.notifications.empty_extra'|trans}}</div>
