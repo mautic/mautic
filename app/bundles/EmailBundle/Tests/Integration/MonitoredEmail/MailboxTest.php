@@ -36,7 +36,7 @@ final class MailboxTest extends TestCase
         }
 
         // An explicitly configured test environment must fail rather than silently skip.
-        self::assertTrue(extension_loaded('imap'), 'The native mailbox baseline requires ext-imap.');
+        $this->assertTrue(extension_loaded('imap'), 'The native mailbox baseline requires ext-imap.');
         $this->host               = $host;
         $this->address            = 'mautic-'.bin2hex(random_bytes(12)).'@example.test';
         $this->temporaryDirectory = sys_get_temp_dir().'/'.$this->address;
@@ -75,44 +75,44 @@ final class MailboxTest extends TestCase
     {
         $this->deliverFixture();
         $ids = $this->mailbox->fetchUnread();
-        self::assertCount(1, $ids);
+        $this->assertCount(1, $ids);
 
         $message = $this->mailbox->getMail($ids[0], false);
-        self::assertSame($ids[0], $message->id);
-        self::assertSame('Příliš žluťoučký', $message->subject);
-        self::assertSame('René', $message->fromName);
-        self::assertSame('sender@example.test', $message->fromAddress);
-        self::assertSame(['recipient@example.test' => 'Test Inbox'], $message->to);
-        self::assertSame(['reply@example.test' => 'Replies'], $message->replyTo);
-        self::assertSame('<original@example.test>', $message->inReplyTo);
-        self::assertSame('mailbox-contract', $message->xHeaders['x-mautic-test']);
-        self::assertSame('Hello, Příliš!', trim($message->textPlain));
-        self::assertSame('<p>Hello</p>', trim($message->textHtml));
-        self::assertSame($ids, $this->mailbox->fetchUnread());
+        $this->assertSame($ids[0], $message->id);
+        $this->assertSame('Příliš žluťoučký', $message->subject);
+        $this->assertSame('René', $message->fromName);
+        $this->assertSame('sender@example.test', $message->fromAddress);
+        $this->assertSame(['recipient@example.test' => 'Test Inbox'], $message->to);
+        $this->assertSame(['reply@example.test' => 'Replies'], $message->replyTo);
+        $this->assertSame('<original@example.test>', $message->inReplyTo);
+        $this->assertSame('mailbox-contract', $message->xHeaders['x-mautic-test']);
+        $this->assertSame('Hello, Příliš!', trim($message->textPlain));
+        $this->assertSame('<p>Hello</p>', trim($message->textHtml));
+        $this->assertSame($ids, $this->mailbox->fetchUnread());
 
         $attachments = array_values($message->getAttachments());
-        self::assertCount(1, $attachments);
-        self::assertSame('report.txt', $attachments[0]->name);
-        self::assertSame("attachment content\n", file_get_contents($attachments[0]->filePath));
+        $this->assertCount(1, $attachments);
+        $this->assertSame('report.txt', $attachments[0]->name);
+        $this->assertSame("attachment content\n", file_get_contents($attachments[0]->filePath));
     }
 
     public function testReadUnreadAndImportantFlags(): void
     {
         $this->deliverFixture();
         $ids = $this->mailbox->fetchUnread();
-        self::assertCount(1, $ids);
+        $this->assertCount(1, $ids);
         $id = $ids[0];
 
         $this->mailbox->getMail($id);
-        self::assertSame([], $this->mailbox->fetchUnread());
-        self::assertTrue($this->mailbox->markMailAsUnread($id));
-        self::assertSame([$id], $this->mailbox->fetchUnread());
-        self::assertTrue($this->mailbox->markMailAsImportant($id));
-        self::assertSame([$id], $this->mailbox->searchMailbox('FLAGGED'));
-        self::assertTrue($this->mailbox->clearFlag([$id], '\\Flagged'));
-        self::assertSame([], $this->mailbox->searchMailbox('FLAGGED'));
-        self::assertTrue($this->mailbox->markMailAsRead($id));
-        self::assertSame([], $this->mailbox->fetchUnread());
+        $this->assertSame([], $this->mailbox->fetchUnread());
+        $this->assertTrue($this->mailbox->markMailAsUnread($id));
+        $this->assertSame([$id], $this->mailbox->fetchUnread());
+        $this->assertTrue($this->mailbox->markMailAsImportant($id));
+        $this->assertSame([$id], $this->mailbox->searchMailbox('FLAGGED'));
+        $this->assertTrue($this->mailbox->clearFlag([$id], '\\Flagged'));
+        $this->assertSame([], $this->mailbox->searchMailbox('FLAGGED'));
+        $this->assertTrue($this->mailbox->markMailAsRead($id));
+        $this->assertSame([], $this->mailbox->fetchUnread());
     }
 
     public function testSearchReturnsStableUidsAfterExpunge(): void
@@ -120,43 +120,43 @@ final class MailboxTest extends TestCase
         $this->deliverFixture();
         $this->deliverFixture();
         $ids = $this->mailbox->searchMailbox();
-        self::assertCount(2, $ids);
+        $this->assertCount(2, $ids);
 
-        self::assertTrue($this->mailbox->deleteMail($ids[0]));
-        self::assertTrue($this->mailbox->expungeDeletedMails());
-        self::assertSame([$ids[1]], $this->mailbox->searchMailbox());
-        self::assertSame([$ids[1]], $this->mailbox->searchMailbox('UID '.$ids[1].':*'));
-        self::assertSame([$ids[1]], $this->mailbox->searchMailbox('FROM "sender@example.test"'));
-        self::assertSame([], $this->mailbox->searchMailbox('FROM "missing@example.test"'));
-        self::assertSame($ids[1], $this->mailbox->getMail($ids[1], false)->id);
-        self::assertSame(1, $this->mailbox->countMails());
+        $this->assertTrue($this->mailbox->deleteMail($ids[0]));
+        $this->assertTrue($this->mailbox->expungeDeletedMails());
+        $this->assertSame([$ids[1]], $this->mailbox->searchMailbox());
+        $this->assertSame([$ids[1]], $this->mailbox->searchMailbox('UID '.$ids[1].':*'));
+        $this->assertSame([$ids[1]], $this->mailbox->searchMailbox('FROM "sender@example.test"'));
+        $this->assertSame([], $this->mailbox->searchMailbox('FROM "missing@example.test"'));
+        $this->assertSame($ids[1], $this->mailbox->getMail($ids[1], false)->id);
+        $this->assertSame(1, $this->mailbox->countMails());
     }
 
     public function testMoveToAnotherFolderAndSaveRawMessage(): void
     {
         $this->deliverFixture();
         $ids = $this->mailbox->searchMailbox();
-        self::assertCount(1, $ids);
+        $this->assertCount(1, $ids);
 
         // Provision a destination through the native API, as an external client would.
         $settings           = $this->mailbox->getMailboxSettings();
         $settings['folder'] = 'Processed';
         $path               = $this->mailbox->getImapPath($settings);
-        self::assertTrue(imap_createmailbox($this->mailbox->getImapStream(), $path['full']));
-        self::assertContains('Processed', $this->mailbox->getListingFolders());
-        self::assertTrue($this->mailbox->moveMail($ids[0], 'Processed'));
-        self::assertSame([], $this->mailbox->searchMailbox());
+        $this->assertTrue(imap_createmailbox($this->mailbox->getImapStream(), $path['full']));
+        $this->assertContains('Processed', $this->mailbox->getListingFolders());
+        $this->assertTrue($this->mailbox->moveMail($ids[0], 'Processed'));
+        $this->assertSame([], $this->mailbox->searchMailbox());
 
         $this->mailbox->switchFolder('Processed');
         $movedIds = $this->mailbox->searchMailbox();
-        self::assertCount(1, $movedIds);
-        self::assertSame('Příliš žluťoučký', $this->mailbox->getMail($movedIds[0], false)->subject);
+        $this->assertCount(1, $movedIds);
+        $this->assertSame('Příliš žluťoučký', $this->mailbox->getMail($movedIds[0], false)->subject);
         $filename = $this->temporaryDirectory.'/saved.eml';
-        self::assertTrue($this->mailbox->saveMail($movedIds[0], $filename));
-        self::assertStringContainsString('Message-ID: <fixture@example.test>', file_get_contents($filename));
-        self::assertTrue($this->mailbox->deleteMail($movedIds[0]));
-        self::assertTrue($this->mailbox->expungeDeletedMails());
-        self::assertSame([], $this->mailbox->searchMailbox());
+        $this->assertTrue($this->mailbox->saveMail($movedIds[0], $filename));
+        $this->assertStringContainsString('Message-ID: <fixture@example.test>', (string) file_get_contents($filename));
+        $this->assertTrue($this->mailbox->deleteMail($movedIds[0]));
+        $this->assertTrue($this->mailbox->expungeDeletedMails());
+        $this->assertSame([], $this->mailbox->searchMailbox());
     }
 
     public function testLegacyConnectionRemainsUsableByNativeImapFunctions(): void
@@ -165,16 +165,16 @@ final class MailboxTest extends TestCase
         $this->mailbox->setConnectionArgs(0, 1, ['DISABLE_AUTHENTICATOR' => 'GSSAPI']);
         $connection = $this->mailbox->getImapStream();
 
-        self::assertInstanceOf(\IMAP\Connection::class, $connection);
-        self::assertTrue(imap_ping($connection));
-        self::assertSame($connection, $this->mailbox->getImapStream());
-        self::assertSame(1, imap_num_msg($connection));
+        $this->assertInstanceOf(\IMAP\Connection::class, $connection);
+        $this->assertTrue(imap_ping($connection));
+        $this->assertSame($connection, $this->mailbox->getImapStream());
+        $this->assertSame(1, imap_num_msg($connection));
     }
 
     private function deliverFixture(): void
     {
         $fixture = file_get_contents(__DIR__.'/Fixtures/multipart.eml');
-        self::assertNotFalse($fixture);
+        $this->assertNotFalse($fixture);
         $fixture = str_replace("\n", "\r\n", str_replace("\r\n", "\n", $fixture));
 
         $transport = new EsmtpTransport($this->host, (int) (getenv('MAUTIC_TEST_SMTP_PORT') ?: 3025), false);
