@@ -56,7 +56,7 @@ class EmailRepository extends CommonRepository
      *
      * @throws Exception
      */
-    public function getDoNotEmailList($leadIds = [], ?array $reasons = null): array
+    public function getDoNotEmailList($leadIds = [], array $reasons = []): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('l.id, l.email')
@@ -65,7 +65,7 @@ class EmailRepository extends CommonRepository
             ->where($q->expr()->eq('dnc.channel', $q->expr()->literal('email')))
             ->andWhere($q->expr()->neq('l.email', $q->expr()->literal('')));
 
-        if (null !== $reasons) {
+        if (count($reasons)) {
             $q->andWhere(
                 $q->expr()->in('dnc.reason', ':reasons')
             )->setParameter('reasons', $reasons, ArrayParameterType::INTEGER);

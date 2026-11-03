@@ -40,13 +40,13 @@ final class EmailPendingQueryOptionsTest extends TestCase
         $this->assertNull($this->emailPendingQueryOptions->getListIds());
         $this->assertSame($listIds, $copy->getListIds());
 
-        $listIds = null;
+        $listIds = [];
         $copy    = $this->emailPendingQueryOptions->setListIds($listIds);
         $this->assertSame($listIds, $copy->getListIds());
 
-        $listIds = 7;
+        $listIds = [7];
         $copy    = $this->emailPendingQueryOptions->setListIds($listIds);
-        $this->assertSame([$listIds], $copy->getListIds());
+        $this->assertSame($listIds, $copy->getListIds());
     }
 
     public function testCountOnly(): void
