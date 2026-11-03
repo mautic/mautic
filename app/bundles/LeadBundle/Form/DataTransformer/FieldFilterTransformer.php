@@ -21,6 +21,8 @@ final class FieldFilterTransformer implements DataTransformerInterface
      */
     private array $relativeDateStrings;
 
+    private string $context = '';
+
     /**
      * @var string[]
      */
@@ -36,6 +38,16 @@ final class FieldFilterTransformer implements DataTransformerInterface
             $this->defaultStrings[$string] = $translator->trans($string, [], null, 'en_US');
             $string                        = $translator->trans($string);
         }
+    }
+
+    public function setContext(string $context): void
+    {
+        $this->context = $context;
+    }
+
+    public function getContext(): string
+    {
+        return $this->context;
     }
 
     /**
