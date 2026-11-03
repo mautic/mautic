@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Facebook\WebDriver\WebDriverKeys;
 use Page\Acceptance\EmailsPage;
-use Page\Acceptance\SegmentsPage;
 
 final class GrapesJsBuilderEmailCest
 {
@@ -26,12 +25,10 @@ final class GrapesJsBuilderEmailCest
         $segmentName = 'Issue 17552 '.date('YmdHis');
         $emailName   = 'Issue 17552 recovery '.date('YmdHis');
 
-        $I->amOnPage(SegmentsPage::$URL);
-        $I->waitForElementClickable(SegmentsPage::$NEW_BUTTON);
-        $I->click(SegmentsPage::$NEW_BUTTON);
-        $I->waitForElementVisible(SegmentsPage::$SEGMENT_NAME);
-        $I->fillField(SegmentsPage::$SEGMENT_NAME, $segmentName);
-        $I->click(SegmentsPage::$SAVE_AND_CLOSE_BUTTON);
+        $I->amOnPage('/s/segments/new');
+        $I->waitForElementVisible('#leadlist_name', AcceptanceTester::TIMEOUT);
+        $I->fillField('#leadlist_name', $segmentName);
+        $I->click('#leadlist_buttons_save_toolbar');
         $I->waitForElementNotVisible('form[name="leadlist"]', AcceptanceTester::TIMEOUT);
 
         $I->amOnPage('/s/emails/new');
