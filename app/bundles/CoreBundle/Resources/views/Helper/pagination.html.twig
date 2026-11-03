@@ -64,7 +64,7 @@
         {% endif %}
 
         <div class="{{ paginationWrapper }} text-center">
-            <ul class="pagination np nm {{ pageClass }}">
+            <ul class="pagination p-0 {{ pageClass }}">
                 {% set action = getPaginationAction(1, page > 1, jsCallback, jsArguments, baseUrl, queryString) %}
                 {% set data = 'javascript:void(0);' in action ? '' : ' data-toggle="' ~ linkType ~ '" data-target="' ~ target ~ '"' ~ menuLink %}
                 <li{% if page <= 1 %} class="disabled"{% endif %}>

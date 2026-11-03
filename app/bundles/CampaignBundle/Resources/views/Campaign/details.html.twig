@@ -203,7 +203,7 @@
                         <div class="col-md-6">
                             <h4 class="text-muted ml-20 mb-md">{{ 'mautic.campaign.email_stats.weekday' | trans }}</h4>
                             <div data-campaign-email-stats-weekdays="{{ path('mautic_campaign_metrics_email_weekdays', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
-                                <div class="d-flex jc-center ai-center">
+                                <div class="d-flex justify-content-center align-items-center">
                                     <div class="spinner fs-42">
                                         <i class="ri-loader-3-line ri-spin"></i>
                                     </div>
@@ -213,7 +213,7 @@
                         <div class="col-md-6">
                             <h4 class="text-muted ml-20 mb-md">{{ 'mautic.campaign.email_stats.hour' | trans }}</h4>
                             <div data-campaign-email-stats-hours="{{ path('mautic_campaign_metrics_email_hours', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
-                                <div class="d-flex jc-center ai-center">
+                                <div class="d-flex justify-content-center align-items-center">
                                     <div class="spinner fs-42">
                                         <i class="ri-loader-3-line ri-spin"></i>
                                     </div>
