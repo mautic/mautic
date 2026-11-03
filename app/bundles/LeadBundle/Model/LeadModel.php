@@ -1333,7 +1333,7 @@ class LeadModel extends FormModel
         }
 
         if (!empty($fields['stage']) && !empty($data[$fields['stage']])) {
-            /** @var Stage[] $stages */
+            /** @var array<string, Stage> $stages */
             static $stages = [];
             $stageName     = $data[$fields['stage']];
             if (!array_key_exists($stageName, $stages)) {
