@@ -13,6 +13,7 @@ use Mautic\DynamicContentBundle\Entity\DynamicContentRepository;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -83,7 +84,8 @@ final readonly class CampaignSubscriber
     {
         $eventConfig  = $event->getConfig();
         $eventDetails = $event->getEventDetails();
-        $lead         = $event->getLead();
+        /** @var Lead $lead */
+        $lead = $event->getLead();
 
         // stop
         if ($eventConfig['dwc_slot_name'] !== $eventDetails) {

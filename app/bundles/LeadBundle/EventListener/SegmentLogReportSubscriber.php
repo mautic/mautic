@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\EventListener;
 
 use DateTime;
@@ -84,7 +86,9 @@ final readonly class SegmentLogReportSubscriber
             )
         );
 
+        /** @var \DateTimeInterface $dateFrom */
         $dateFrom = $event->getOptions()['dateFrom'] ?? (new DateTime('-30 days'));
+        /** @var \DateTimeInterface $dateTo */
         $dateTo   = $event->getOptions()['dateTo'] ?? (new DateTime());
 
         $qb->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'));

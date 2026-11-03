@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\FormEvents;
+use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -26,8 +27,10 @@ final readonly class DetermineWinnerSubscriber
     public function onDetermineSubmissionWinner(DetermineWinnerEvent $event): void
     {
         $parameters = $event->getParameters();
-        $parent     = $parameters['parent'];
-        $children   = $parameters['children'];
+        /** @var Email|Page $parent */
+        $parent = $parameters['parent'];
+        /** @var array<int, Email|Page> $children */
+        $children = $parameters['children'];
 
         // if this is an email A/B test, then link email to page to form submission
         // if it is a page A/B test, then link form submission to page
@@ -66,7 +69,7 @@ final readonly class DetermineWinnerSubscriber
                 if (!in_array($parent->getId(), $hasResults)) {
                     $data[$submissionLabel][] = 0;
                     $data[$hitLabel][]        = 0;
-                    $support['labels'][]      = (('page' === $type) ? $parent->getTitle() : $parent->getName()).' (0%)';
+                    $support['labels'][]      = ($parent instanceof Email ? $parent->getName() : $parent->getTitle()).' (0%)';
                 }
 
                 foreach ($children as $c) {
@@ -74,7 +77,7 @@ final readonly class DetermineWinnerSubscriber
                         if (!in_array($c->getId(), $hasResults)) {
                             $data[$submissionLabel][] = 0;
                             $data[$hitLabel][]        = 0;
-                            $support['labels'][]      = (('page' === $type) ? $c->getTitle() : $c->getName()).' (0%)';
+                            $support['labels'][]      = ($c instanceof Email ? $c->getName() : $c->getTitle()).' (0%)';
                         }
                     }
                 }

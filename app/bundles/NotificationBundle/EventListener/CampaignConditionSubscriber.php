@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\ConditionEvent;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\NotificationBundle\NotificationEvents;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -34,6 +37,7 @@ final class CampaignConditionSubscriber
             return;
         }
 
+        /** @var Lead $lead */
         $lead    = $event->getLead();
         $pushIds = $lead->getPushIDs();
         /** @var PushID $pushID */
