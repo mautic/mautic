@@ -23,7 +23,7 @@
                         danger: true,
                         size: 'xs',
                         attributes: {
-                            'class': 'remove-item as-end',
+                            'class': 'remove-item align-self-end',
                             'type': 'button'
                         }
                     }
@@ -47,7 +47,7 @@
   {%- set objectIcon  = (form.vars.data.object is defined and 'company' == form.vars.data.object) ? 'ri-building-2-line' : 'ri-user-6-fill' %}
   <div class="panel {% if isPrototype or (inGroup and not first) %}in-group{% endif %}">
       <div class="panel-footer {% if not isPrototype and '0' is same as form.vars.name %}hide{% endif %}">
-          <div class="col-sm-2 pl-0">
+          <div class="col-sm-2 ps-0">
               {{ form_widget(form.glue) }}
           </div>
       </div>
@@ -115,7 +115,7 @@
             </div>
             <div class="col-xs-5">
                 <div class="form-group">
-                    <div class="available-filters pl-0">
+                    <div class="available-filters ps-0">
                         <select class="chosen form-control" data-mautic="available_filters">
                             <option value=""></option>
                             {% for object, field in fields %}

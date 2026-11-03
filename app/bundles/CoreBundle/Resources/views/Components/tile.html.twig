@@ -103,7 +103,7 @@
 {# === MINI TYPE === #}
 {% elseif type == 'mini' %}
     <a href="{{ href|default('#') }}" class="tile tile--clickable {{ className|default('') }}" {% if attributes is defined and attributes is not empty %}{% for attr_key, attr_value in attributes %}{{ attr_key }}="{{ attr_value }}" {% endfor %}{% endif %}>
-        <div class="d-flex jc-space-between ai-center">
+        <div class="d-flex justify-content-between align-items-center">
             <div class="tile-title">{{ title|trans }}</div>
             {% if icon is defined %}
                 <div class="tile-icon">
