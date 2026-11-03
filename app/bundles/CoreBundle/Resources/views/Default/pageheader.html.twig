@@ -1,7 +1,7 @@
 <div class="page-header">
-	<div class="row-no-gutters ai-center-md gap-md fw-nowrap-md fd-row-md fd-column-reverse">
+	<div class="row-no-gutters align-items-lg-center gap-md flex-lg-nowrap flex-lg-row flex-column-reverse">
 		<div class="col-xs-12 col-sm-6 col-md-5 align-middle">
-			<div class="d-flex fd-column fw-wrap fw-nowrap-md">
+			<div class="d-flex flex-column flex-wrap flex-lg-nowrap">
 				{{ preHeader|raw }}
 				<h1 class="pull-left page-header-title">{{ headerTitle|purify }}</h1>
 			<div class="mt-lg d-flex gap-xs">{{ publishStatus|raw }}</div>
@@ -10,7 +10,7 @@
 
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-7 align-middle">
-			<div class="d-flex toolbar jc-end-md jc-start" id="toolbar">
+			<div class="d-flex toolbar justify-content-lg-end justify-content-start" id="toolbar">
 				{# only print if it's a string beause that contains HTML,
 						eg. in PointsBundle and FormBundle's 'new' pages it's outputting an Array #}
 				{{ actions is not iterable ? actions|raw }}

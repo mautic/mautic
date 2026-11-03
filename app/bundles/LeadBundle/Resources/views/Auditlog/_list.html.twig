@@ -65,8 +65,8 @@
       <table class="table table-hover" id="contact-auditlog">
           <thead>
           <tr>
-            <th class="timeline-icon np"></th>
-            <th class="table-expand np">
+            <th class="timeline-icon p-0"></th>
+            <th class="table-expand p-0">
                 <a class="table-expand-button" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
                     <span class="ri-arrow-down-s-line"></span>
                 </a>
@@ -114,10 +114,10 @@
                   {% endif %}
               {% endfor %}
               <tr class="timeline-row {{ rowStripe }} {% if event.featured is defined %}timeline-featured{% endif %}">
-                <td class="timeline-icon np">
+                <td class="timeline-icon p-0">
                     <span class="fa ri-fw {{ icon }}"></span>
                 </td>
-                  <td class="table-expand np">
+                  <td class="table-expand p-0">
                       <a href="javascript:void(0);"
                          data-activate-details="{{ counter }}"
                          class="table-expand-button {% if event.contentTemplate is not defined or hasDetails == false %}hide{% endif %}"

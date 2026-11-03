@@ -14,7 +14,7 @@
 {%- if isPrototype or fields[object][filterType].label is defined -%}
 <div class="panel {% if inGroup and false is same as first %}in-group{% endif %}">
     <div class="panel-heading {% if not isPrototype and '0' is same as form.vars.name %}hide{% endif %}">
-        <div class="panel-glue col-sm-2 pl-0 ">
+        <div class="panel-glue col-sm-2 ps-0 ">
             {{ form_widget(form.glue) }}
         </div>
     </div>

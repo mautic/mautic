@@ -49,7 +49,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% block button_group_widget %}
 {# apply attributes to radios #}
 {% set attr = form.vars.attr %}
-<div class="btn-group list-group nav-justified btn-block d-flex fw-nowrap-sm {{ buttonBlockClass }}" data-toggle="buttons" style="{{ (attr.readonly is defined and attr.readonly is not empty) or (attr.disabled is defined and attr.disabled is not empty) ? 'pointer-events: none;' : '' }}">
+<div class="btn-group list-group nav-justified btn-block d-flex flex-md-nowrap {{ buttonBlockClass }}" data-toggle="buttons" style="{{ (attr.readonly is defined and attr.readonly is not empty) or (attr.disabled is defined and attr.disabled is not empty) ? 'pointer-events: none;' : '' }}">
     {% for child in form %}
         {% set class = (child.vars.checked is not empty ? ' active' : '') ~ (child.vars.disabled is not empty or (attribute(attr, 'readonly') is defined and attr.readonly is not empty) ? ' disabled' : '') %}
         <label class="btn {{ class }} btn-block mt-0 list-group-item">
@@ -381,10 +381,10 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     {% endif %}
     <div>
         <div class="row">
-            <div class="col-xs-6 mr-0 pr-0 bdr-r-wdh-0">
+            <div class="col-xs-6 me-0 pe-0 bdr-r-wdh-0">
             {{ form_widget(form.label, {'attr': {'class': 'form-control sortable-label', 'placeholder': form.label.vars.label}}) }}
             </div>
-            <div class="col-xs-6 ml-0 pl-0">
+            <div class="col-xs-6 ms-0 ps-0">
             {{ form_widget(form.value, {'attr': {'class': 'form-control sortable-value', 'placeholder': form.value.vars.label}}) }}
             </div>
         </div>
@@ -656,7 +656,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 {%- endblock alert_widget %}
 
 {% block datespan_widget %}
-    {% set errorAttr = { attr: { blockClass: 'ma-0', itemClass: 'alert alert-danger ma-0' } } %}
+    {% set errorAttr = { attr: { blockClass: 'm-0', itemClass: 'alert alert-danger m-0' } } %}
     <div class="row-no-gutters">
         <div class="col-xs-12 col-lg-8">
             {{ form_widget(form.interval) }}

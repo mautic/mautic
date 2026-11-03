@@ -204,7 +204,7 @@
                 color: 'red',
                 icon_only: true,
                 attributes: {
-                    'class': 'ml-a'
+                    'class': 'ms-auto'
                 }
             }
         ]
@@ -214,7 +214,7 @@
 {% endset %}
 
 {% if footerContent|trim is not empty %}
-    <div class="d-flex ml-sm mr-sm mt-xs as-stretch gap-3 ai-center">
+    <div class="d-flex ml-sm mr-sm mt-xs align-self-stretch gap-3 align-items-center">
         {{ footerContent|raw }}
     </div>
 {% endif %}
