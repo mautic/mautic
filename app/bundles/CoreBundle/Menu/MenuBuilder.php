@@ -36,10 +36,8 @@ final readonly class MenuBuilder
      *
      * @param string $forRouteUri
      * @param string $forRouteName
-     *
-     * @return ItemInterface|null
      */
-    public function getCurrentMenuItem(ItemInterface $menu, $forRouteUri, $forRouteName)
+    public function getCurrentMenuItem(ItemInterface $menu, $forRouteUri, $forRouteName): ?ItemInterface
     {
         try {
             /** @var ItemInterface $item */
