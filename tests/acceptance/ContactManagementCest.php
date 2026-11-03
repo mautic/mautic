@@ -15,8 +15,9 @@ final class ContactManagementCest
         $I->login('admin', 'Maut1cR0cks!');
     }
 
-    public function createContactFromQuickAdd(AcceptanceTester $I): void
-    {
+    public function createContactFromQuickAdd(
+        AcceptanceTester $I,
+    ): void {
         $email = sprintf('quickadd%s@example.com', time());
 
         $I->amOnPage(ContactPage::$URL);
@@ -524,7 +525,7 @@ final class ContactManagementCest
         // Click 'import in browser'
         $I->click(ContactPage::$importInBrowser);
 
-        // Wait for the import completion message
+        // Wait for import completion message
         $I->waitForText('Successful import', AcceptanceTester::TIMEOUT, 'h2');
 
         // Extract the number of contacts created from the progress message
