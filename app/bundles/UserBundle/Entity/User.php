@@ -287,6 +287,8 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();
         if ('role' == $prop) {
+            /** @var Role|null $current */
+            /** @var Role|null $val */
             if ($current && !$val) {
                 $this->changes['role'] = [$current->getName().' ('.$current->getId().')', $val];
             } elseif (!$this->role && $val) {

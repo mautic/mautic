@@ -525,6 +525,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $current = $this->{$getter}();
 
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop || 'list' == $prop) {
+            /** @var VariantEntityInterface|TranslationEntityInterface|Category|null $current */
+            /** @var VariantEntityInterface|TranslationEntityInterface|Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

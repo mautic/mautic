@@ -25,6 +25,12 @@ parameters:
 			path: app/bundles/ApiBundle/Controller/CommonApiController.php
 
 		-
+			message: '#^Unable to resolve the template type TEntity in call to method Mautic\\ApiBundle\\Helper\\BatchIdToEntityHelper\:\:orderByOriginalKey\(\)$#'
+			identifier: argument.templateType
+			count: 1
+			path: app/bundles/ApiBundle/Controller/FetchCommonApiController.php
+
+		-
 			message: '#^Method Mautic\\ApiBundle\\Entity\\oAuth2\\Client\:\:isChanged\(\) has parameter \$prop with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -3890,12 +3896,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadDeviceRepository\:\:getDevice\(\) has parameter \$deviceOss with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadDeviceRepository.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Entity\\LeadDeviceRepository\:\:getDevice\(\) has parameter \$lead with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadDeviceRepository.php

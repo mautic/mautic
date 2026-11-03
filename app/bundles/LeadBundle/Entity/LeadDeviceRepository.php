@@ -30,7 +30,7 @@ final class LeadDeviceRepository extends CommonRepository
         return 'd';
     }
 
-    public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null): array
+    public function getDevice(Lead $lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null): array
     {
         $selectQuery = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $selectQuery->select('es.id as id, es.device as device')
@@ -96,9 +96,10 @@ final class LeadDeviceRepository extends CommonRepository
             $selectQuery->andWhere(
                 $selectQuery->expr()->eq('es.id', $deviceId)
             );
-        } elseif (null !== $lead) {
+        } elseif ($lead) {
+            /** @var Lead $lead */
             $selectQuery->andWhere(
-                $selectQuery->expr()->eq('es.lead_id', $lead->getId())
+                $selectQuery->expr()->eq('es.lead_id', (string) $lead->getId())
             );
         }
 

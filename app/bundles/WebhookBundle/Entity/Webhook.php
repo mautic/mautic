@@ -480,6 +480,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();
         if ('category' == $prop) {
+            /** @var Category|null $current */
+            /** @var Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
