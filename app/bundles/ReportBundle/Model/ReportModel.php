@@ -113,7 +113,7 @@ final class ReportModel extends FormModel implements GlobalSearchInterface
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
