@@ -15,10 +15,12 @@ abstract class CommonStatsSubscriber
      * @var mixed[]
      */
     protected $repositories = [];
+
     /**
      * @var array<string, mixed>
      */
     protected array $selects = [];
+
     /**
      * @var array
      */
@@ -45,6 +47,10 @@ abstract class CommonStatsSubscriber
 
             $permissions  = $this->permissions[$table] ?? [];
             $allowedJoins = [];
+
+            if ([] === $permissions && !$this->security->isAdmin()) {
+                throw new AccessDeniedException(sprintf('You do not have permission to load data from the %s table', $table));
+            }
 
             foreach ($permissions as $tableAlias => $permBase) {
                 // It's an admin, don't check any further

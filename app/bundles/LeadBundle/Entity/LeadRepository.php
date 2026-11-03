@@ -56,7 +56,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
         EventDispatcherInterface $dispatcher,
         ListLeadRepository $listLeadRepository,
     ): void {
-        $this->companyRepository = $companyRepository;
+        $this->companyRepository       = $companyRepository;
         $this->frequencyRuleRepository = $frequencyRuleRepository;
         self::$leadFieldRepository = $leadFieldRepository;
         $this->leadListRepository = $leadListRepository;
@@ -140,7 +140,8 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
      */
     protected function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null)
     {
-        $col = 'l.'.$field;
+        $connection = $this->getEntityManager()->getConnection();
+        $col = $connection->quoteSingleIdentifier('l').'.'.$connection->quoteSingleIdentifier($field);
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')
@@ -158,7 +159,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
              * @see https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/query-builder.html#line-number-0a267d5a2c69797a7656aae33fcc140d16b0a566-72
              */
             $valueParams = [];
-            $counter = count($value);
+            $counter     = count($value);
             for ($i = 0; $i < $counter; ++$i) {
                 $valueParams[':'.$this->generateRandomParameterName()] = $value[$i];
             }
@@ -479,7 +480,7 @@ final class LeadRepository extends CommonRepository implements CustomFieldReposi
 
             if ($withPreferences) {
                 $frequencyRules = $this->frequencyRuleRepository->getFrequencyRules(null, $contactIds);
-                $dncRules = $this->doNotContactRepository->getChannelList(null, $contactIds);
+                $dncRules       = $this->doNotContactRepository->getChannelList(null, $contactIds);
             }
 
             foreach ($contactIds as $id) {

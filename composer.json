@@ -44,7 +44,6 @@
     "phpunit/phpunit": "^13.0",
     "rector/rector": "^2.8.3",
     "symfony/browser-kit": "~8.1.0",
-    "symfony/dom-crawler": "~8.1.0",
     "symfony/maker-bundle": "^1.64",
     "symfony/phpunit-bridge": "~8.1.0",
     "symfony/var-dumper": "~8.1.0",

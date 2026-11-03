@@ -384,6 +384,11 @@ final class DateTimeHelper
         }
     }
 
+    public static function setLocalTimezone(string $timezone): void
+    {
+        self::$defaultLocalTimezone = $timezone;
+    }
+
     /**
      * Ensures a date string has a time component. If no time is present, adds the specified default time.
      */

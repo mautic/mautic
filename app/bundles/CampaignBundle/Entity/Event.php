@@ -406,7 +406,7 @@ class Event implements ChannelInterface, UuidInterface
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();
-        if ('category' === $prop || 'parent' === $prop) {
+        if ('category' === $prop || 'parent' === $prop || 'redirectEvent' === $prop) {
             /** @var Event|null $current */
             /** @var Event|null $val */
             $currentId = ($current) ? $current->getId() : '';
