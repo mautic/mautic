@@ -72,10 +72,23 @@ final class SegmentTranslationEditorFunctionalTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
         $values  = $form->getPhpValues();
         $values['leadlist']['isPreferenceCenter'] = '0';
-        $values['leadlist']['translations']       = [['locale' => 'fr', 'publicName' => 'Tampered value']];
+        $values['leadlist']['translations']       = [['locale' => 'invalid', 'publicName' => '']];
         $this->client->request('POST', $form->getUri(), $values);
         self::assertResponseIsSuccessful();
         self::assertSame(['fr' => 'Actualités'], $this->getTranslations($segment));
+
+        $crawler = $this->client->request('GET', '/s/segments/edit/'.$segment->getId());
+        self::assertNotNull($crawler->filter('#translations-tab')->attr('hidden'));
+        $form   = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $values = $form->getPhpValues();
+        $values['leadlist']['isPreferenceCenter'] = '1';
+        $this->client->request('POST', $form->getUri(), $values);
+        self::assertResponseIsSuccessful();
+        self::assertSame(['fr' => 'Actualités'], $this->getTranslations($segment));
+
+        $crawler = $this->client->request('GET', '/s/segments/edit/'.$segment->getId());
+        self::assertNull($crawler->filter('#translations-tab')->attr('hidden'));
+        self::assertSame('Actualités', $crawler->filter('#leadlist_translations_0_publicName')->attr('value'));
     }
 
     public function testDuplicateLocalesLeaveSegmentUnsaved(): void
