@@ -76,7 +76,8 @@ class IpAddress
     }
 
     public function __construct(
-        #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])] #[ORM\Column(name: 'ip_address', type: 'string', length: 45)]
+        #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
+        #[ORM\Column(name: 'ip_address', type: 'string', length: 45)]
         private ?string $ipAddress = null,
     ) {
     }

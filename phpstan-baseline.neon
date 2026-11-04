@@ -42,11 +42,6 @@ parameters:
 			count: 1
 			path: app/bundles/ApiBundle/Entity/oAuth2/Client.php
 
-		-
-			message: '#^Parameter \#2 \$descriptionColumn of method Mautic\\CoreBundle\\Doctrine\\Mapping\\ClassMetadataBuilder\:\:addIdColumns\(\) expects string, false given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/ApiBundle/Entity/oAuth2/Client.php
 
 		-
 			message: '#^Access to an undefined property Mautic\\ApiBundle\\Entity\\oAuth2\\Client\:\:\$deletedId\.$#'
@@ -1842,11 +1837,6 @@ parameters:
 			count: 1
 			path: app/bundles/CoreBundle/Validator/FileUploadValidator.php
 
-		-
-			message: '#^Parameter \#2 \$descriptionColumn of method Mautic\\CoreBundle\\Doctrine\\Mapping\\ClassMetadataBuilder\:\:addIdColumns\(\) expects string, false given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/DashboardBundle/Entity/Widget.php
 
 		-
 			message: '#^Property Mautic\\DashboardBundle\\Entity\\Widget\:\:\$id \(int\) does not accept null\.$#'
@@ -1896,17 +1886,7 @@ parameters:
 			count: 1
 			path: app/bundles/DynamicContentBundle/Entity/DynamicContent.php
 
-		-
-			message: '#^Parameter \#1 \$nameColumn of method Mautic\\CoreBundle\\Doctrine\\Mapping\\ClassMetadataBuilder\:\:addIdColumns\(\) expects string, false given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/DynamicContentBundle/Entity/DynamicContentLeadData.php
 
-		-
-			message: '#^Parameter \#2 \$descriptionColumn of method Mautic\\CoreBundle\\Doctrine\\Mapping\\ClassMetadataBuilder\:\:addIdColumns\(\) expects string, false given\.$#'
-			identifier: argument.type
-			count: 1
-			path: app/bundles/DynamicContentBundle/Entity/DynamicContentLeadData.php
 
 		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Entity\\DynamicContentRepository\:\:getDynamicContentForSlotFromCampaign\(\) has parameter \$slot with no type specified\.$#'
@@ -6432,11 +6412,6 @@ parameters:
 			count: 1
 			path: app/bundles/UserBundle/Entity/User.php
 
-		-
-			message: '#^Property Mautic\\UserBundle\\Entity\\User\:\:\$activePermissions has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/UserBundle/Entity/User.php
 
 		-
 			message: '#^Method Mautic\\UserBundle\\Entity\\UserRepository\:\:setLastActive\(\) has parameter \$user with no type specified\.$#'

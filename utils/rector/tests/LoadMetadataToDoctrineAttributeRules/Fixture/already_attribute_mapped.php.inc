@@ -43,6 +43,7 @@ class AlreadyAttributeMapped
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->createField('id', 'integer')->makePrimaryKey()->generatedValue()->option('unsigned', true)->build();
+
+        $builder->addId();
     }
 }

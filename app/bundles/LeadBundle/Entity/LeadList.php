@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -59,9 +60,9 @@ class LeadList extends FormEntity implements UuidInterface
 
     use ProjectTrait;
 
-    public const TABLE_NAME  = 'lead_lists';
+    public const string TABLE_NAME = 'lead_lists';
 
-    public const ENTITY_NAME = 'lists';
+    public const string ENTITY_NAME = 'lists';
 
     /**
      * @var int|null
