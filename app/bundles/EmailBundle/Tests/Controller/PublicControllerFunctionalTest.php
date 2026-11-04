@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
 use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -62,8 +63,12 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_preferred_channels'] = 1;
         }
 
-        if (in_array($this->name(), ['testContactPreferencesFormRenderOnUnsubscribePage', 'testContactPreferencesFormUsesLocalizedSegmentNames'], true)) {
+        if (in_array($this->name(), ['testContactPreferencesFormRenderOnUnsubscribePage', 'testContactPreferencesFormUsesLocalizedSegmentNames', 'testPreferenceCenterLoadsTranslationsInOneBatch'], true)) {
             $this->configParams['show_contact_segments'] = 1;
+        }
+
+        if ('testPreferenceCenterLoadsTranslationsInOneBatch' === $this->name()) {
+            $this->clientOptions = ['debug' => true];
         }
 
         switch ($this->name()) {
@@ -1009,6 +1014,44 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::assertSame(['Actualités ('.$first->getId().')', 'Actualités ('.$second->getId().')'], $labels);
         $values = $crawler->filter('#contact-segments input[type="checkbox"]')->each(fn ($node): string => $node->attr('value'));
         self::assertSame([(string) $first->getId(), (string) $second->getId()], $values);
+    }
+
+    public function testPreferenceCenterLoadsTranslationsInOneBatch(): void
+    {
+        $lead = $this->createLead('fr_CH');
+        $stat = $this->getStat(null, $lead);
+        $segments = [];
+        foreach (range(1, 5) as $number) {
+            $segment = $this->createSegment('Segment '.$number, 'Default '.$number, 'batch-'.$number);
+            $this->em->persist(new LeadListTranslation($segment, 'fr', 'French '.$number));
+            $this->em->persist(new LeadListTranslation($segment, 'fr_CH', 'Swiss '.$number));
+            $segments[$number] = $segment;
+        }
+        $this->em->flush();
+
+        $this->client->enableProfiler();
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
+        self::assertResponseIsSuccessful();
+
+        $expectedLabels = [];
+        $expectedValues = [];
+        foreach ($segments as $number => $segment) {
+            $expectedLabels[] = 'Swiss '.$number.' ('.$segment->getId().')';
+            $expectedValues[] = (string) $segment->getId();
+        }
+        $labels = $crawler->filter('#contact-segments label[for]')->each(fn ($node): string => trim($node->text()));
+        $values = $crawler->filter('#contact-segments input[type="checkbox"]')->each(fn ($node): string => $node->attr('value'));
+        self::assertSame($expectedLabels, $labels);
+        self::assertSame($expectedValues, $values);
+
+        $dbCollector = $this->client->getProfile()->getCollector('db');
+        self::assertInstanceOf(DoctrineDataCollector::class, $dbCollector);
+        $translationQueries = array_filter(
+            $dbCollector->getQueries()['default'],
+            static fn (array $query): bool => str_starts_with($query['sql'], 'SELECT')
+                && str_contains($query['sql'], MAUTIC_TABLE_PREFIX.LeadListTranslation::TABLE_NAME),
+        );
+        self::assertCount(1, $translationQueries);
     }
 
     private function createSegment(
