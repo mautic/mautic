@@ -86,7 +86,12 @@ final class BotRatioHelperTest extends TestCase
         $hitRepository = $this->createMock(HitRepository::class);
         $hitRepository->expects($this->once())
             ->method('countDistinctIpsForEmailAndLeadSince')
-            ->with(10, 20, $this->isInstanceOf(\DateTimeInterface::class))
+            ->with(
+                10,
+                20,
+                $this->isInstanceOf(\DateTimeInterface::class),
+                $this->isInstanceOf(\DateTimeInterface::class)
+            )
             ->willReturn(3);
 
         $botRatioHelper = $this->createBotRatioHelper(

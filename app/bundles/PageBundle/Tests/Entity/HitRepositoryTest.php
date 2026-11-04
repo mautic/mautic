@@ -131,27 +131,37 @@ final class HitRepositoryTest extends MauticMysqlTestCase
 
     public function testCountDistinctIpsForEmailAndLeadSince(): void
     {
-        $email     = $this->createEmail();
+        $email      = $this->createEmail();
         $otherEmail = $this->createEmail();
-        $lead      = $this->createLead();
-        $otherLead = $this->createLead();
+        $lead       = $this->createLead();
+        $otherLead  = $this->createLead();
         $this->em->flush();
 
-        $this->createHitWithIp($lead, $email, new \DateTime('-5 seconds'), 'burst-a', '203.0.113.10');
-        $this->createHitWithIp($lead, $email, new \DateTime('-4 seconds'), 'burst-b', '203.0.113.11');
-        $this->createHitWithIp($lead, $email, new \DateTime('-3 seconds'), 'burst-c', '203.0.113.12');
-        $this->createHitWithIp($lead, $email, new \DateTime('-2 hours'), 'burst-old', '203.0.113.13');
-        $this->createHitWithIp($lead, $otherEmail, new \DateTime('-2 seconds'), 'burst-other-email', '203.0.113.14');
-        $this->createHitWithIp($otherLead, $email, new \DateTime('-2 seconds'), 'burst-other-lead', '203.0.113.15');
+        $now   = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $since = $now->modify('-30 seconds');
+
+        $this->createHitWithIp($lead, $email, $this->toUtcDateTime($now->modify('-5 seconds')), 'burst-a', '203.0.113.10');
+        $this->createHitWithIp($lead, $email, $this->toUtcDateTime($now->modify('-4 seconds')), 'burst-b', '203.0.113.11');
+        $this->createHitWithIp($lead, $email, $this->toUtcDateTime($now->modify('-3 seconds')), 'burst-c', '203.0.113.12');
+        $this->createHitWithIp($lead, $email, $this->toUtcDateTime($now->modify('-2 hours')), 'burst-old', '203.0.113.13');
+        $this->createHitWithIp($lead, $otherEmail, $this->toUtcDateTime($now->modify('-2 seconds')), 'burst-other-email', '203.0.113.14');
+        $this->createHitWithIp($otherLead, $email, $this->toUtcDateTime($now->modify('-2 seconds')), 'burst-other-lead', '203.0.113.15');
+        $this->createHitWithIp($lead, $email, $this->toUtcDateTime($now->modify('+10 seconds')), 'burst-future', '203.0.113.16');
         $this->em->flush();
 
         $count = $this->hitRepository->countDistinctIpsForEmailAndLeadSince(
             (int) $email->getId(),
             $lead->getId(),
-            new \DateTime('-30 seconds')
+            $since,
+            $now
         );
 
         $this->assertSame(3, $count);
+    }
+
+    private function toUtcDateTime(\DateTimeImmutable $dateTime): \DateTime
+    {
+        return \DateTime::createFromImmutable($dateTime);
     }
 
     private function assertHitDate(\DateTime $expectedHitDate, Lead $lead, ?string $trackingId): void

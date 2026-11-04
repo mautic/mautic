@@ -66,24 +66,19 @@ class BotRatioHelper
         return $deviceDetector->isBot();
     }
 
-   
     private function isBurstScanner(Stat $emailStat, \DateTimeInterface $emailHitDateTime): bool
     {
-        if ($this->burstMaxDistinctIps <= 0 || null === $this->hitRepository) {
-            return false;
-        }
-
         $email = $emailStat->getEmail();
         $lead  = $emailStat->getLead();
 
-        if (null === $email || null === $lead) {
-            return false;
-        }
-
-        $emailId = $email->getId();
-        $leadId  = $lead->getId();
-
-        if (null === $emailId || $leadId <= 0) {
+        if (
+            $this->burstMaxDistinctIps <= 0
+            || null === $this->hitRepository
+            || null === $email
+            || null === $lead
+            || null === $email->getId()
+            || $lead->getId() <= 0
+        ) {
             return false;
         }
 
@@ -91,9 +86,10 @@ class BotRatioHelper
             ->setTimezone(new \DateTimeZone('UTC'));
 
         $distinctIps = $this->hitRepository->countDistinctIpsForEmailAndLeadSince(
-            (int) $emailId,
-            $leadId,
-            $since
+            (int) $email->getId(),
+            $lead->getId(),
+            $since,
+            $emailHitDateTime
         );
 
         return $distinctIps >= $this->burstMaxDistinctIps;

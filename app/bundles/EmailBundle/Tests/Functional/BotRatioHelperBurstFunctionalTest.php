@@ -6,7 +6,6 @@ namespace Mautic\EmailBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -20,7 +19,7 @@ final class BotRatioHelperBurstFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['bot_helper_burst_max_distinct_ips'] = 3;
-        $this->configParams['bot_helper_burst_window_seconds']   = 30;
+        $this->configParams['bot_helper_burst_window_seconds']   = 300;
         parent::setUp();
 
         $this->emailFixturesHelper = new EmailFixturesHelper($this->em);
@@ -44,6 +43,7 @@ final class BotRatioHelperBurstFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $updatedStat = $this->em->getRepository(Stat::class)->find($stat->getId());
+        $this->assertInstanceOf(Stat::class, $updatedStat);
         $this->assertFalse($updatedStat->getIsRead());
         $this->assertNotInstanceOf(\DateTimeInterface::class, $updatedStat->getLastOpened());
     }
@@ -66,6 +66,7 @@ final class BotRatioHelperBurstFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $updatedStat = $this->em->getRepository(Stat::class)->find($stat->getId());
+        $this->assertInstanceOf(Stat::class, $updatedStat);
         $this->assertTrue($updatedStat->getIsRead());
         $this->assertInstanceOf(\DateTimeInterface::class, $updatedStat->getLastOpened());
     }
@@ -83,6 +84,9 @@ final class BotRatioHelperBurstFunctionalTest extends MauticMysqlTestCase
         $stat->setTrackingHash('burst_hash_'.$distinctIpCount);
         $this->em->persist($stat);
 
+        // Stamp hits from one clock so a slow test setup cannot push them outside the window.
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
         for ($i = 0; $i < $distinctIpCount; ++$i) {
             $ip = new IpAddress(sprintf('203.0.113.%d', 10 + $i));
             $this->em->persist($ip);
@@ -91,7 +95,7 @@ final class BotRatioHelperBurstFunctionalTest extends MauticMysqlTestCase
             $hit->setEmail($email);
             $hit->setLead($contact);
             $hit->setIpAddress($ip);
-            $hit->setDateHit(new \DateTime('-5 seconds'));
+            $hit->setDateHit(\DateTime::createFromImmutable($now));
             $hit->setCode(200);
             $hit->setUrl('https://example.test/click');
             $hit->setTrackingId('burst-track-'.$i);
