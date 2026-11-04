@@ -74,13 +74,7 @@ final class EntityMetadata
 
     private function hasOrmMappingAttribute(\ReflectionClass $reflectionClass): bool
     {
-        foreach ([Entity::class, MappedSuperclass::class, Embeddable::class] as $ormAttribute) {
-            if ([] !== $reflectionClass->getAttributes($ormAttribute)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any([Entity::class, MappedSuperclass::class, Embeddable::class], fn (string $ormAttribute): bool => [] !== $reflectionClass->getAttributes($ormAttribute));
     }
 
     public function getOrmConfig(): array
