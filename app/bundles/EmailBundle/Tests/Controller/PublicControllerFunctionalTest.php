@@ -1002,9 +1002,13 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $stat = $this->getStat(null, $lead);
         $first = $this->createSegment('First segment', 'A default', 'localized-first');
         $second = $this->createSegment('Second segment', 'B default', 'localized-second');
+        $unpublished = $this->createSegment('Draft segment', 'C default', 'localized-draft', false);
+        $private = $this->createSegment('Private segment', 'D default', 'localized-private', true, false);
         $this->em->persist(new LeadListTranslation($first, 'fr', 'Nouvelles'));
         $this->em->persist(new LeadListTranslation($first, 'fr_CH', 'Actualités'));
         $this->em->persist(new LeadListTranslation($second, 'fr_CH', 'Actualités'));
+        $this->em->persist(new LeadListTranslation($unpublished, 'fr_CH', 'Draft in French'));
+        $this->em->persist(new LeadListTranslation($private, 'fr_CH', 'Private in French'));
         $this->em->flush();
 
         $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
@@ -1014,6 +1018,8 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::assertSame(['Actualités ('.$first->getId().')', 'Actualités ('.$second->getId().')'], $labels);
         $values = $crawler->filter('#contact-segments input[type="checkbox"]')->each(fn ($node): string => $node->attr('value'));
         self::assertSame([(string) $first->getId(), (string) $second->getId()], $values);
+        self::assertNotContains((string) $unpublished->getId(), $values);
+        self::assertNotContains((string) $private->getId(), $values);
     }
 
     public function testPreferenceCenterLoadsTranslationsInOneBatch(): void
