@@ -16,6 +16,8 @@ final class SegmentTranslationEditorFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
         self::assertCount(1, $crawler->filter('#translations-tab'));
         self::assertCount(1, $crawler->filter('#leadlist-translation-add'));
+        self::assertStringContainsString('exact locale, then the language, then the default public name', $crawler->filter('#translations')->text());
+        self::assertStringContainsString('Turning off Preference Center availability keeps these translations', $crawler->filter('#translations')->text());
         $prototype = $crawler->filter('#leadlist-translation-rows')->attr('data-prototype');
         self::assertNotNull($prototype);
         self::assertStringContainsString('name="leadlist[translations][__name__][locale]"', $prototype);
