@@ -63,7 +63,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_preferred_channels'] = 1;
         }
 
-        if (in_array($this->name(), ['testContactPreferencesFormRenderOnUnsubscribePage', 'testContactPreferencesFormUsesLocalizedSegmentNames', 'testPreferenceCenterLoadsTranslationsInOneBatch'], true)) {
+        if (in_array($this->name(), ['testContactPreferencesFormRenderOnUnsubscribePage', 'testContactPreferencesFormUsesLocalizedSegmentNames', 'testContactPreferencesFormFallsBackToLanguageAndDefaultPublicNames', 'testPreferenceCenterLoadsTranslationsInOneBatch'], true)) {
             $this->configParams['show_contact_segments'] = 1;
         }
 
@@ -1020,6 +1020,25 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::assertSame([(string) $first->getId(), (string) $second->getId()], $values);
         self::assertNotContains((string) $unpublished->getId(), $values);
         self::assertNotContains((string) $private->getId(), $values);
+    }
+
+    public function testContactPreferencesFormFallsBackToLanguageAndDefaultPublicNames(): void
+    {
+        $lead = $this->createLead('fr_CH');
+        $stat = $this->getStat(null, $lead);
+        $languageFallback = $this->createSegment('Language fallback', 'A default', 'language-fallback');
+        $defaultFallback = $this->createSegment('Default fallback', 'B default', 'default-fallback');
+        $this->em->persist(new LeadListTranslation($languageFallback, 'fr', 'Nouvelles'));
+        $this->em->persist(new LeadListTranslation($defaultFallback, 'it', 'Notizie'));
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
+        self::assertResponseIsSuccessful();
+
+        $labels = $crawler->filter('#contact-segments label[for]')->each(fn ($node): string => trim($node->text()));
+        self::assertSame(['Nouvelles ('.$languageFallback->getId().')', 'B default ('.$defaultFallback->getId().')'], $labels);
+        $values = $crawler->filter('#contact-segments input[type="checkbox"]')->each(fn ($node): string => $node->attr('value'));
+        self::assertSame([(string) $languageFallback->getId(), (string) $defaultFallback->getId()], $values);
     }
 
     public function testPreferenceCenterLoadsTranslationsInOneBatch(): void
