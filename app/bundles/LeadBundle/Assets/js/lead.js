@@ -366,6 +366,55 @@ Mautic.leadlistOnLoad = function(container, response) {
         });
     }
 
+    const translationRows = mQuery('#leadlist-translation-rows');
+    if (translationRows.length) {
+        const preferenceInputs = mQuery('input[name="leadlist[isPreferenceCenter]"]');
+        const translationTab = mQuery('#translations-tab');
+        const translationPane = mQuery('#translations');
+
+        const updateTranslationVisibility = function() {
+            const isPublic = preferenceInputs.filter(':checked').val() === '1';
+            if (!isPublic && translationTab.hasClass('active')) {
+                mQuery('a[href="#details"]').tab('show').trigger('focus');
+            }
+            translationTab.prop('hidden', !isPublic);
+            translationPane.prop('hidden', !isPublic);
+        };
+
+        const updateLocaleChoices = function() {
+            const selects = translationRows.find('select');
+            selects.each(function() {
+                const current = mQuery(this).val();
+                const selectedElsewhere = selects.not(this).map(function() { return mQuery(this).val(); }).get();
+                mQuery(this).find('option').each(function() {
+                    mQuery(this).prop('disabled', this.value !== current && selectedElsewhere.includes(this.value));
+                });
+            });
+        };
+
+        preferenceInputs.on('change', updateTranslationVisibility);
+        translationRows.on('change', 'select', updateLocaleChoices);
+        translationRows.on('click', '.leadlist-translation-remove', function() {
+            mQuery(this).closest('.leadlist-translation-row').remove();
+            updateLocaleChoices();
+        });
+        mQuery('#leadlist-translation-add').on('click', function() {
+            const index = Number(translationRows.attr('data-index'));
+            const row = mQuery('<div class="row leadlist-translation-row"></div>');
+            row.append(translationRows.attr('data-prototype').replace(/__name__/g, index));
+            const remove = mQuery('<button type="button" class="btn btn-default leadlist-translation-remove"><i class="ri-delete-bin-line" aria-hidden="true"></i></button>');
+            remove.attr('title', translationRows.attr('data-remove-label'));
+            remove.attr('aria-label', translationRows.attr('data-remove-label'));
+            row.append(mQuery('<div class="col-md-1"></div>').append(remove));
+            translationRows.append(row);
+            translationRows.attr('data-index', index + 1);
+            updateLocaleChoices();
+        });
+
+        updateTranslationVisibility();
+        updateLocaleChoices();
+    }
+
     // segment contact filters
     var segmentContactForm = mQuery('#segment-contact-filters');
 

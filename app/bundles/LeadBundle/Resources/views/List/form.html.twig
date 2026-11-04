@@ -5,9 +5,28 @@
 {% form_theme form with [
       '@MauticLead/FormTheme/Filter/_leadlist_filters_entry_widget.html.twig',
       '@MauticLead/FormTheme/Filter/_leadlist_filters_widget.html.twig',
+      _self,
 ] %}
 
 {% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block _leadlist_translations_widget %}
+    {% set translationPrototype %}
+        <div class="col-md-5">{{ form_row(form.vars.prototype.locale) }}</div>
+        <div class="col-md-6">{{ form_row(form.vars.prototype.publicName) }}</div>
+    {% endset %}
+    <div id="leadlist-translation-rows" data-prototype="{{ translationPrototype|e('html_attr') }}" data-index="{{ form|length }}" data-remove-label="{{ 'mautic.lead.list.translation.remove'|trans }}">
+        {% for row in form %}
+            <div class="row leadlist-translation-row">
+                <div class="col-md-5">{{ form_row(row.locale) }}</div>
+                <div class="col-md-6">{{ form_row(row.publicName) }}</div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-default leadlist-translation-remove" title="{{ 'mautic.lead.list.translation.remove'|trans }}" aria-label="{{ 'mautic.lead.list.translation.remove'|trans }}"><i class="ri-delete-bin-line" aria-hidden="true"></i></button>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
 
 {% block mauticContent %}leadlist{% endblock %}
 
@@ -21,13 +40,15 @@
 
 {% block content %}
 {% set index = form.filters.vars.value|length > 0 ? max(form.filters.vars.value|keys) : 0 %}
+{% set translationErrors = formContainsErrors(form.translations) %}
 {{ form_start(form) }}
+{{ form_widget(form.translationsSubmitted) }}
 <div class="box-layout">
     <div class="col-md-9 height-auto">
         <div class="row">
             <div class="col-xs-12">
                 <ul class="nav nav-tabs nav-tabs-contained">
-                    <li class="active">
+                    <li class="{% if not translationErrors %}active{% endif %}">
                         <a href="#details" role="tab" data-toggle="tab" class="{% if formContainsErrors(form, ['filters']) %}text-danger{% endif %}">
                             {{ 'mautic.core.details'|trans }}
                             {% if formContainsErrors(form, ['filters']) %}
@@ -43,11 +64,17 @@
                             {% endif %}
                         </a>
                     </li>
+                    <li id="translations-tab" class="{% if translationErrors %}active{% endif %}"{% if not form.vars.data.isPreferenceCenter %} hidden{% endif %}>
+                        <a href="#translations" role="tab" data-toggle="tab" class="{% if translationErrors %}text-danger{% endif %}">
+                            {{ 'mautic.lead.list.translation.tab'|trans }}
+                            {% if translationErrors %}<i class="ri-alert-line"></i>{% endif %}
+                        </a>
+                    </li>
                 </ul>
 
                 <!-- start: tab-content -->
                 <div class="tab-content pa-md">
-                    <div class="tab-pane fade in active bdr-w-0" id="details">
+                    <div class="tab-pane fade {% if not translationErrors %}in active{% endif %} bdr-w-0" id="details">
                         <div class="row">
                             <div class="col-md-6">
                                 {{ form_row(form.name) }}
@@ -99,6 +126,17 @@
                             {{ form_errors(form.filters) }}
                             {{ form_widget(form.filters) }}
                         </div>
+                    </div>
+                    <div class="tab-pane fade {% if translationErrors %}in active{% endif %} bdr-w-0" id="translations"{% if not form.vars.data.isPreferenceCenter %} hidden{% endif %}>
+                        <p class="text-muted">{{ 'mautic.lead.list.translation.help'|trans }}</p>
+                        <div class="well well-sm">
+                            <strong>{{ 'mautic.lead.list.translation.default'|trans }}</strong>
+                            <div>{{ form.vars.data.publicName|default(form.vars.data.name) }}</div>
+                            <small class="text-muted">{{ 'mautic.lead.list.translation.default_help'|trans }}</small>
+                        </div>
+                        {{ form_errors(form.translations) }}
+                        {{ form_widget(form.translations) }}
+                        <button type="button" id="leadlist-translation-add" class="btn btn-default">{{ 'mautic.lead.list.translation.add'|trans }}</button>
                     </div>
                 </div>
             </div>

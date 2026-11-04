@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
 use Mautic\LeadBundle\Segment\Stat\SegmentDependencies;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -337,7 +338,7 @@ final class ListController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     // form is valid so process the data
-                    $segmentModel->saveEntity($segment);
+                    $this->saveSegmentForm($request, $form, $segment, $segmentModel);
 
                     $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $segment->getName().' ('.$segment->getAlias().')',
@@ -399,7 +400,7 @@ final class ListController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     // form is valid so process the data
-                    $segmentModel->saveEntity($segment, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
+                    $this->saveSegmentForm($request, $form, $segment, $segmentModel, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlashMessage('mautic.core.notice.updated', [
                         '%name%'      => $segment->getName().' ('.$segment->getAlias().')',
@@ -457,6 +458,19 @@ final class ListController extends FormController
                 'mauticContent' => 'leadlist',
             ],
         ]);
+    }
+
+    private function saveSegmentForm(Request $request, FormInterface $form, LeadList $segment, ListModel $segmentModel, bool $unlock = true): void
+    {
+        $submitted = $request->request->all('leadlist');
+        if (!isset($submitted['translationsSubmitted'])) {
+            $segmentModel->saveEntity($segment, $unlock);
+
+            return;
+        }
+
+        $translations = $form->get('translations')->getData();
+        $segmentModel->saveEntityWithTranslations($segment, is_array($translations) ? $translations : [], $unlock);
     }
 
     /**

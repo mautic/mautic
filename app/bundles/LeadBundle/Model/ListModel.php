@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadListTranslationRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
@@ -64,10 +65,15 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     private SegmentPublicNameTranslationManager $publicNameTranslationManager;
 
+    private LeadListTranslationRepository $publicNameTranslationRepository;
+
     #[Required]
-    public function autowireListModel(SegmentPublicNameTranslationManager $publicNameTranslationManager): void
-    {
-        $this->publicNameTranslationManager = $publicNameTranslationManager;
+    public function autowireListModel(
+        SegmentPublicNameTranslationManager $publicNameTranslationManager,
+        LeadListTranslationRepository $publicNameTranslationRepository,
+    ): void {
+        $this->publicNameTranslationManager    = $publicNameTranslationManager;
+        $this->publicNameTranslationRepository = $publicNameTranslationRepository;
     }
 
     /**
@@ -254,6 +260,14 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
         if (!empty($action)) {
             $options['action'] = $action;
+        }
+
+        if (!isset($options['translation_rows']) && null !== $entity->getId()) {
+            $translations = $this->publicNameTranslationRepository->findForSegmentIds([$entity->getId()])[$entity->getId()] ?? [];
+            $options['translation_rows'] = [];
+            foreach ($translations as $locale => $publicName) {
+                $options['translation_rows'][] = ['locale' => $locale, 'publicName' => $publicName];
+            }
         }
 
         return $formFactory->create(ListType::class, $entity, $options);

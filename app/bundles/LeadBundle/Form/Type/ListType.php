@@ -17,12 +17,16 @@ use Mautic\LeadBundle\Validator\Constraints\SegmentDate;
 use Mautic\ProjectBundle\Form\Type\ProjectType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -43,6 +47,13 @@ final class ListType extends AbstractType
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html', 'name' => 'string', 'publicName' => 'string', 'filter' => 'raw']));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.list', $options));
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, static function ($event): void {
+            $data = $event->getData();
+            if (is_array($data) && '0' === (string) ($data['isPreferenceCenter'] ?? '')) {
+                unset($data['translations']);
+                $event->setData($data);
+            }
+        });
 
         $builder->add(
             'name',
@@ -130,6 +141,21 @@ final class ListType extends AbstractType
         $builder->add('projects', ProjectType::class);
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
+        $builder->add('translationsSubmitted', HiddenType::class, [
+            'mapped' => false,
+            'data'   => '1',
+        ]);
+        $builder->add('translations', CollectionType::class, [
+            'entry_type'     => LeadListTranslationType::class,
+            'mapped'         => false,
+            'data'           => $options['translation_rows'],
+            'allow_add'      => true,
+            'allow_delete'   => true,
+            'error_bubbling' => false,
+            'label'          => false,
+            'constraints'    => [new Assert\Callback($this->validateTranslationLocales(...))],
+        ]);
+
         $filterModalTransformer = new FieldFilterTransformer($this->translator, $this->relativeDate, ['object' => 'lead']);
         $builder->add(
             $builder->create(
@@ -162,6 +188,7 @@ final class ListType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => LeadList::class,
+                'translation_rows' => [],
             ]
         );
     }
@@ -174,5 +201,27 @@ final class ListType extends AbstractType
     public function getBlockPrefix(): string
     {
         return 'leadlist';
+    }
+
+    public function validateTranslationLocales(mixed $rows, ExecutionContextInterface $context): void
+    {
+        if (!is_array($rows)) {
+            return;
+        }
+
+        $seen = [];
+        foreach ($rows as $index => $row) {
+            if (!is_array($row) || empty($row['locale'])) {
+                continue;
+            }
+
+            $locale = str_replace('-', '_', (string) $row['locale']);
+            if (isset($seen[$locale])) {
+                $context->buildViolation($this->translator->trans('mautic.lead.list.translation.duplicate_locale'))
+                    ->atPath('['.$index.'].locale')
+                    ->addViolation();
+            }
+            $seen[$locale] = true;
+        }
     }
 }
