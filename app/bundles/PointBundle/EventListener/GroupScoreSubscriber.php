@@ -6,22 +6,18 @@ namespace Mautic\PointBundle\EventListener;
 
 use Mautic\PointBundle\Event\GroupScoreChangeEvent;
 use Mautic\PointBundle\Model\TriggerModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class GroupScoreSubscriber implements EventSubscriberInterface
+final readonly class GroupScoreSubscriber
 {
     public function __construct(
         private TriggerModel $triggerModel,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            GroupScoreChangeEvent::class => ['onGroupScoreChange', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: GroupScoreChangeEvent::class,
+    )]
     public function onGroupScoreChange(GroupScoreChangeEvent $event): void
     {
         $this->triggerModel->triggerEvents($event->getContact());

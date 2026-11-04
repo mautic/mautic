@@ -1405,7 +1405,7 @@ final class EmailController extends AbstractStandardFormController
                 'objectAction' => 'view',
                 'objectId'     => $objectId,
             ];
-            $postActionVars['returnUrl']       = $this->generateUrl('mautic_page_action', $postActionVars['viewParameters']);
+            $postActionVars['returnUrl']       = $this->generateUrl('mautic_email_action', $postActionVars['viewParameters']);
             $postActionVars['contentTemplate'] = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
         } // else don't do anything
 
@@ -1766,7 +1766,8 @@ final class EmailController extends AbstractStandardFormController
                 }
 
                 if ($previewForContactId
-                    && (!$security->isAdmin()
+                    && (
+                        !$security->isAdmin()
                         || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $user->getId())
                     )
                 ) {
@@ -1891,6 +1892,10 @@ final class EmailController extends AbstractStandardFormController
         $clonedEmail->setVariantReadCount($cloningEmail->getVariantReadCount());
         $clonedEmail->setVariantStartDate($cloningEmail->getVariantStartDate());
         $clonedEmail->setEmailType($cloningEmail->getEmailType());
+        $clonedEmail->setPlainText($cloningEmail->getPlainText());
+        $clonedEmail->setPublishUp($cloningEmail->getPublishUp());
+        $clonedEmail->setPublishDown($cloningEmail->getPublishDown());
+        $clonedEmail->setContinueSending($cloningEmail->getContinueSending());
         $clonedEmail->setDraft($cloningEmail->getDraft());
     }
 

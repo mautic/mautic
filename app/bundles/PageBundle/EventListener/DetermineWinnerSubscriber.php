@@ -4,11 +4,12 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\HitRepository;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\PageEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class DetermineWinnerSubscriber implements EventSubscriberInterface
+final readonly class DetermineWinnerSubscriber
 {
     public function __construct(
         private HitRepository $hitRepository,
@@ -16,21 +17,18 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER => ['onDetermineBounceRateWinner', 0],
-            PageEvents::ON_DETERMINE_DWELL_TIME_WINNER  => ['onDetermineDwellTimeWinner', 0],
-        ];
-    }
-
     /**
      * Determines the winner of A/B test based on bounce rates.
      */
+    #[AsEventListener(
+        event: PageEvents::ON_DETERMINE_BOUNCE_RATE_WINNER,
+    )]
     public function onDetermineBounceRateWinner(DetermineWinnerEvent $event): void
     {
         // find the hits that did not go any further
-        $parent    = $event->getParameters()['parent'];
+        /** @var Page $parent */
+        $parent = $event->getParameters()['parent'];
+        /** @var array<int, Page> $children */
         $children  = $event->getParameters()['children'];
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();
@@ -113,9 +111,13 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
     /**
      * Determines the winner of A/B test based on dwell time rates.
      */
+    #[AsEventListener(
+        event: PageEvents::ON_DETERMINE_DWELL_TIME_WINNER,
+    )]
     public function onDetermineDwellTimeWinner(DetermineWinnerEvent $event): void
     {
         // find the hits that did not go any further
+        /** @var Page $parent */
         $parent    = $event->getParameters()['parent'];
         $pageIds   = $parent->getRelatedEntityIds();
         $startDate = $parent->getVariantStartDate();

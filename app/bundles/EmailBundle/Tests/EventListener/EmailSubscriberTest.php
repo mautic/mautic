@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -223,7 +224,8 @@ final class EmailSubscriberTest extends TestCase
             </center>
         </div>
 </body></html>
-CONTENT,
+CONTENT
+,
             function (string $content): void {
                 $preheaderTextHtml = EmailSubscriber::PREHEADER_HTML_ELEMENT_BEFORE.'this is a nice preheader text'.EmailSubscriber::PREHEADER_HTML_ELEMENT_AFTER;
                 $this->assertStringContainsString($preheaderTextHtml, $content);
@@ -257,8 +259,8 @@ CONTENT,
             </center>
         </div>
 </body></html>
-CONTENT,
-
+CONTENT
+,
             function (string $content): void {
                 $preheaderTextHtml = EmailSubscriber::PREHEADER_HTML_ELEMENT_BEFORE.'this is a nice preheader text'.EmailSubscriber::PREHEADER_HTML_ELEMENT_AFTER;
                 $this->assertStringContainsString($preheaderTextHtml, $content);
@@ -318,7 +320,7 @@ CONTENT,
         $mailHelper->setEmail($email);
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber($this->subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $this->subscriber);
 
         $event = new EmailSendEvent($mailHelper);
 

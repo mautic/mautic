@@ -34,7 +34,6 @@ final class QueryBuilder extends BaseQueryBuilder
      */
     private array $logicStack = [];
 
-
     public function expr(): ExpressionBuilder
     {
         if (null !== $this->_expr) {
@@ -56,7 +55,6 @@ final class QueryBuilder extends BaseQueryBuilder
 
         return $this;
     }
-
 
     public function getJoinCondition(string $alias): string|false
     {

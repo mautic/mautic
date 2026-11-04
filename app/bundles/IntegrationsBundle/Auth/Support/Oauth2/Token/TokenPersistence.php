@@ -92,7 +92,7 @@ final class TokenPersistence implements TokenPersistenceInterface
      */
     private function getIntegration(): Integration
     {
-        if ($this->integration) {
+        if ($this->integration instanceof Integration) {
             return $this->integration;
         }
 

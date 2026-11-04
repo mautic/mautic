@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use InvalidArgumentException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\ListActionType;
 use Mautic\LeadBundle\Form\Type\ModifyLeadTagsType;
@@ -10,12 +11,14 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
 use Mautic\PointBundle\PointEvents;
+use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Model\StageModel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use UnexpectedValueException;
 
-final readonly class PointSubscriber implements EventSubscriberInterface
+final readonly class PointSubscriber
 {
     public function __construct(
         private LeadModel $leadModel,
@@ -25,15 +28,9 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            TriggerBuilderEvent::class                   => ['onTriggerBuild', 0],
-            PointEvents::TRIGGER_ON_EVENT_EXECUTE        => ['onTriggerExecute', 0],
-            PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE => ['onLeadSegmentsChange', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: TriggerBuilderEvent::class,
+    )]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $event->addEvent(
@@ -76,6 +73,9 @@ final readonly class PointSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: PointEvents::TRIGGER_ON_EVENT_EXECUTE,
+    )]
     public function onTriggerExecute(TriggerExecutedEvent $event): void
     {
         if ('lead.changetags' === $event->getTriggerEvent()->getType()) {
@@ -111,8 +111,8 @@ final readonly class PointSubscriber implements EventSubscriberInterface
 
         try {
             $stage = $this->stageModel->getEntity($stageId);
-            if (null === $stage || false === $stage->isPublished()) {
-                throw new \InvalidArgumentException("Stage for ID {$stageId} not found");
+            if (!$stage instanceof Stage || false === $stage->isPublished()) {
+                throw new InvalidArgumentException("Stage for ID {$stageId} not found");
             }
 
             $this->leadModel->changeStage(
@@ -122,7 +122,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
             );
 
             $event->setSucceded();
-        } catch (\UnexpectedValueException|\InvalidArgumentException $exception) {
+        } catch (UnexpectedValueException|InvalidArgumentException $exception) {
             $event->setFailed();
             $this->logger->info("LeadBundle: Stage not updated for lead {$event->getLead()->getId()} by trigger because: {$exception->getMessage()}");
         }
@@ -132,7 +132,7 @@ final readonly class PointSubscriber implements EventSubscriberInterface
     {
         $stage = $lead->getStage();
 
-        if (null !== $stage) {
+        if ($stage instanceof Stage) {
             $this->leadModel->removeFromStage(
                 $lead,
                 $stage,
@@ -141,6 +141,9 @@ final readonly class PointSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE,
+    )]
     public function onLeadSegmentsChange(TriggerExecutedEvent $event): void
     {
         $lead = $event->getLead();

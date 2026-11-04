@@ -6,17 +6,11 @@ namespace Mautic\StageBundle\EventListener;
 
 use Mautic\ProjectBundle\DTO\DetailRoute;
 use Mautic\ProjectBundle\Event\EntityTypeDetailRouteEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class EntityTypeDetailRouteSubscriber implements EventSubscriberInterface
+final class EntityTypeDetailRouteSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityTypeDetailRouteEvent::class => 'onEntityTypeDetailRoute',
-        ];
-    }
-
+    #[AsEventListener(event: EntityTypeDetailRouteEvent::class)]
     public function onEntityTypeDetailRoute(EntityTypeDetailRouteEvent $event): void
     {
         $event->addRoute('stage', new DetailRoute(

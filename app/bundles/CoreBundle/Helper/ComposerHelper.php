@@ -143,10 +143,12 @@ final readonly class ComposerHelper
     private function runCommand(array $input): ConsoleOutput
     {
         $arrayInput = new ArrayInput(array_merge(
-            $input, [
+            $input,
+            [
                 '--no-interaction',
                 '--working-dir' => $this->kernel->getProjectDir(),
-            ]));
+            ]
+        ));
 
         $application = new Application();
         // We don't want our script to stop after running a Composer command

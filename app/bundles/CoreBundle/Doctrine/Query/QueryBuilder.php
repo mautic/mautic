@@ -536,7 +536,6 @@ class QueryBuilder extends BaseQueryBuilder
         }
     }
 
-
     /**
      * @param list<array-key> $knownAliases
      */

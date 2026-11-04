@@ -20,10 +20,10 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Entity\TrackableRepository;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber
 {
     /**
      * @var array<string, array{array{string, string}, Trackable[]|Redirect[]}>
@@ -43,25 +43,9 @@ final class BuilderSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailOnBuildEvent::class => ['onEmailBuild', 0],
-            EmailSendEvent::class    => [
-                ['fixEmailAccessibility', 10000],
-                ['onEmailGenerate', 0],
-                // Ensure this is done last in order to catch all tokenized URLs
-                ['convertUrlsToTokens', -9999],
-            ],
-            EmailDisplayEvent::class => [
-                ['fixEmailAccessibility', 10000],
-                ['onEmailGenerate', 0],
-                // Ensure this is done last in order to catch all tokenized URLs
-                ['convertUrlsToTokens', -9999],
-            ],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EmailOnBuildEvent::class,
+    )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         if ($event->abTestWinnerCriteriaRequested()) {
@@ -110,6 +94,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: EmailSendEvent::class,
+        priority: 10000
+    )]
+    #[AsEventListener(
+        event: EmailDisplayEvent::class,
+        priority: 10000
+    )]
     public function fixEmailAccessibility(EmailSendEvent $event): void
     {
         if ($event->isDynamicContentParsing() || !$event->getEmail() instanceof Email) {
@@ -148,6 +140,12 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $event->setContent($content);
     }
 
+    #[AsEventListener(
+        event: EmailSendEvent::class,
+    )]
+    #[AsEventListener(
+        event: EmailDisplayEvent::class,
+    )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $idHash = $event->getIdHash();
@@ -196,7 +194,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $event->addToken('{webview_text}', $webviewText);
 
         // Show public email preview if the lead is not known to prevent 404
-        if (empty($lead['id']) && $email) {
+        if (empty($lead['id']) && $email instanceof Email) {
             $event->addToken('{webview_url}', $this->emailModel->buildUrl('mautic_email_preview', ['objectId' => $email->getId()]));
         } else {
             $event->addToken('{webview_url}', $webviewLink);
@@ -205,7 +203,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $signatureText = (string) $this->coreParametersHelper->get('default_signature_text');
 
         // In owner-mailer mode, use the owner's signature for display/send generation.
-        if ($email && $email->getUseOwnerAsMailer() && is_array($lead)) {
+        if ($email instanceof Email && $email->getUseOwnerAsMailer() && is_array($lead)) {
             $this->fromEmailHelper->getFromAddressConsideringOwner($this->fromEmailHelper->getFrom($email), $lead, $email);
             if ($this->fromEmailHelper->hasSignature()) {
                 $signatureText = $this->fromEmailHelper->getSignature();
@@ -223,6 +221,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $event->addToken('{brand=name}', (string) $this->coreParametersHelper->get('brand_name'));
     }
 
+    #[AsEventListener(
+        event: EmailSendEvent::class,
+        priority: -9999
+    )]
+    #[AsEventListener(
+        event: EmailDisplayEvent::class,
+        priority: -9999
+    )]
     public function convertUrlsToTokens(EmailSendEvent $event): void
     {
         if ($event->isInternalSend()) {

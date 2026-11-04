@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Exception;
@@ -200,7 +201,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
      *
      * @return mixed[]
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getFormLeadFields(array $settings = []): array
     {
@@ -304,7 +305,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
 
             if (!$silenceExceptions) {
@@ -423,7 +424,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                             break;
                         default:
                             $this->logIntegrationError(
-                                new \Exception(
+                                new Exception(
                                     sprintf('Received an unexpected object without an internalObjectReference "%s"', $object)
                                 )
                             );
@@ -740,7 +741,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                 // Return success if any Contact or Lead was updated or created
                 return ($personFound) ? $people : false;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($e instanceof ApiErrorException) {
                 $e->setContact($lead);
             }
@@ -811,7 +812,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                 // Return success if any company was updated or created
                 return $companies;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -863,11 +864,11 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                     $query['nextUrl'] = $nextUrl;
                 }
 
-                if ($progress) {
+                if ($progress instanceof ProgressBar) {
                     $progress->finish();
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
 
             $this->failureFetchingLeads = $e->getMessage();
@@ -904,12 +905,12 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
                 $exists = $this->notificationRepository->findOneBy($search);
 
-                if ($exists) {
+                if ($exists instanceof Notification) {
                     continue;
                 }
 
                 $notification = clone $notificationTemplate;
-                $notification->setDateAdded(new \DateTime());   // not sure what date to use
+                $notification->setDateAdded(new DateTime());   // not sure what date to use
             }
 
             $persistEntities[] = $notification;
@@ -942,7 +943,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function pushLeadActivity(array $params = []): ?int
     {
@@ -963,8 +964,8 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         // Ensure that Contact is attempted before Lead
         sort($salesForceObjects);
 
-        $startDate             = new \DateTime($query['start']);
-        $endDate               = new \DateTime($query['end']);
+        $startDate             = new DateTime($query['start']);
+        $endDate               = new DateTime($query['end']);
         $limit                 = 100;
 
         foreach ($salesForceObjects as $object) {
@@ -1047,7 +1048,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                         );
                     }
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->logIntegrationError($e);
             }
         }
@@ -1278,14 +1279,14 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getCampaigns(): array
     {
         $campaigns = [];
         try {
             $campaigns = $this->getApiHelper()->getCampaigns();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -1295,7 +1296,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @return array<mixed>
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getCampaignChoices(): array
     {
@@ -1328,7 +1329,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
         // Get the last time the campaign was synced to prevent resyncing the entire SF campaign; null syncs all records
         $cacheKey     = $this->getName().'.CampaignSync.'.$campaignId;
         $lastSyncDate = $this->getCache()->get($cacheKey);
-        $syncStarted  = new \DateTime()->format('c');
+        $syncStarted  = new DateTime()->format('c');
 
         // Consume in batches
         $paginator      = new ResultsPaginator($this->logger, $this->keys['instance_url']);
@@ -1404,7 +1405,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
                     break;
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->logIntegrationError($e);
 
                 break;
@@ -1434,14 +1435,14 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getCampaignMemberStatus($campaignId): array
     {
         $campaignMemberStatus = [];
         try {
             $campaignMemberStatus = $this->getApiHelper()->getCampaignMemberStatus($campaignId);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -1714,7 +1715,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                     if (!$accountId) {
                         // company was not found so create a new company in Salesforce
                         $lead = $this->leadModel->getEntity($entity['internal_entity_id']);
-                        if ($lead) {
+                        if ($lead instanceof Lead) {
                             $companies = $this->leadModel->getCompanies($lead);
                             if ([] !== $companies) {
                                 foreach ($companies as $companyData) {
@@ -1722,7 +1723,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                                         $company = $this->companyModel->getEntity($companyData['company_id']);
                                     }
                                 }
-                                if ($company) {
+                                if ($company instanceof Company) {
                                     $sfCompany = $this->pushCompany($company);
                                     if ($sfCompany) {
                                         $entity['company'] = key($sfCompany);
@@ -1923,7 +1924,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                     $this->logIntegrationError($exception);
                     $integrationEntity = null;
                     if ($integrationEntityId && 'CampaignMember' !== $object) {
-                        $integrationEntity = $this->integrationEntityModel->getEntityByIdAndSetSyncDate($integrationEntityId, new \DateTime());
+                        $integrationEntity = $this->integrationEntityModel->getEntityByIdAndSetSyncDate($integrationEntityId, new DateTime());
                     } elseif (isset($campaignId)) {
                         $integrationEntity = $this->integrationEntityModel->getEntityByIdAndSetSyncDate($campaignId, $this->getLastSyncDate());
                     } elseif ($contactId) {
@@ -1937,7 +1938,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                         );
                     }
 
-                    if ($integrationEntity) {
+                    if ($integrationEntity instanceof IntegrationEntity) {
                         $integrationEntity->setInternalEntity('ENTITY_IS_DELETED' === $item['body'][0]['errorCode'] ? $internalObject.'-deleted' : $internalObject.'-error')
                             ->setInternal(['error' => $item['body'][0]['message']]);
                         $this->persistIntegrationEntities[] = $integrationEntity;
@@ -1966,7 +1967,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
                     // Record was updated
                     if ($integrationEntityId) {
                         $integrationEntity = $this->integrationEntityModel->getEntityByIdAndSetSyncDate($integrationEntityId, $this->getLastSyncDate());
-                        if ($integrationEntity) {
+                        if ($integrationEntity instanceof IntegrationEntity) {
                             if (isset($this->salesforceIdMapping[$contactId])) {
                                 $integrationEntity->setIntegrationEntityId($this->salesforceIdMapping[$contactId]);
                             }
@@ -2006,7 +2007,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
 
                     if ($integrationEntityId) {
                         $integrationEntity = $this->integrationEntityModel->getEntityByIdAndSetSyncDate($integrationEntityId, $this->getLastSyncDate());
-                        if ($integrationEntity) {
+                        if ($integrationEntity instanceof IntegrationEntity) {
                             if (isset($this->salesforceIdMapping[$contactId])) {
                                 $integrationEntity->setIntegrationEntityId($this->salesforceIdMapping[$contactId]);
                             }
@@ -2992,7 +2993,7 @@ final class SalesforceIntegration extends CrmAbstractIntegration
     /**
      * @throws ApiErrorException
      * @throws ORMException
-     * @throws \Exception
+     * @throws Exception
      */
     private function getSalesforceAccountsByName(array &$checkIdsInSF, string $requiredFieldString): array
     {

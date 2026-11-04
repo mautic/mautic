@@ -344,7 +344,9 @@ final class FieldController extends AbstractFormController
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
-                    array_merge($postActionVars, [
+                    array_merge(
+                        $postActionVars,
+                        [
                         'viewParameters'  => ['objectId' => $field->getId()],
                         'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
                     ]
@@ -503,8 +505,10 @@ final class FieldController extends AbstractFormController
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $flashes = array_merge($flashes,
-                    $this->checkEntityForDeletion($objectId, $deleteIds, $postActionVars));
+                $flashes = array_merge(
+                    $flashes,
+                    $this->checkEntityForDeletion($objectId, $deleteIds, $postActionVars)
+                );
             }
 
             // Delete everything we are able to

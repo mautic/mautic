@@ -12,14 +12,14 @@ use Mautic\IntegrationsBundle\DTO\IntegrationObjectToken as Token;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use Mautic\IntegrationsBundle\Event\MappedIntegrationObjectTokenEvent;
 use Mautic\IntegrationsBundle\Helper\TokenParser;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * This class subscribes to events related to building and providing
  * tokens for emails, particularly the IntegrationObjectToken.
  */
-final readonly class EmailSubscriber implements EventSubscriberInterface
+final readonly class EmailSubscriber
 {
     public function __construct(
         private EventDispatcherInterface $eventDispatcher,
@@ -28,15 +28,9 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailOnBuildEvent::class      => ['onEmailBuild', 0],
-            EmailSendEvent::class         => ['decodeTokens', 0],
-            EmailDisplayEvent::class      => ['decodeTokens', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EmailOnBuildEvent::class,
+    )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         $tokens = [];
@@ -65,6 +59,12 @@ final readonly class EmailSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: EmailSendEvent::class,
+    )]
+    #[AsEventListener(
+        event: EmailDisplayEvent::class,
+    )]
     public function decodeTokens(EmailSendEvent $event): void
     {
         $tokens = $this->tokenParser->findTokens($event->getContent());

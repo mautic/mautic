@@ -85,8 +85,12 @@ final class DynamicContentModel extends FormModel implements AjaxLookupModelInte
         return parent::getEntity($id);
     }
 
-    public function checkEntityBySlotName(string $slotName, ?string $type = null, string $typeCondition = '=',
-        ?int $skipId = null): bool
+    public function checkEntityBySlotName(
+        string $slotName,
+        ?string $type = null,
+        string $typeCondition = '=',
+        ?int $skipId = null
+    ): bool
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
 
@@ -116,11 +120,10 @@ final class DynamicContentModel extends FormModel implements AjaxLookupModelInte
     /**
      * @param DynamicContent|array<string, mixed> $entity
      * @param string|null    $action
-     * @param array          $options
      *
      * @throws \InvalidArgumentException
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof DynamicContent) {
             throw new \InvalidArgumentException('Entity must be of class DynamicContent');

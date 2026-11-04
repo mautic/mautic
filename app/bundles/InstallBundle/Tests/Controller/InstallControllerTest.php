@@ -98,4 +98,19 @@ final class InstallControllerTest extends TestCase
         );
         $this->assertSame(Response::HTTP_FOUND, $response->getStatusCode(), (string) $response->getContent());
     }
+
+    public function testStepActionDoesNotTouchTheFilesystemWhenInstalled(): void
+    {
+        $this->installer->method('checkIfInstalled')->willReturn(true);
+        $this->installer->expects($this->never())->method('prepareDirectories');
+
+        $this->routerMock->method('generate')->willReturn('http://localhost/');
+
+        $this->controller->stepAction(
+            new Request(),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(PathsHelper::class),
+            InstallService::CHECK_STEP
+        );
+    }
 }

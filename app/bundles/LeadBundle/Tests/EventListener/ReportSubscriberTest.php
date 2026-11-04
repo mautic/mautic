@@ -255,7 +255,8 @@ final class ReportSubscriberTest extends TestCase
                             ],
                         ],
                     ],
-                ]);
+                ]
+            );
 
         $this->translatorMock
             ->method('hasId')

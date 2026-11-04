@@ -103,7 +103,8 @@ final class UserController extends AbstractFormController
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir,
-            ]);
+            ]
+        );
 
         // Check to see if the number of pages match the number of users
         $count = count($users);

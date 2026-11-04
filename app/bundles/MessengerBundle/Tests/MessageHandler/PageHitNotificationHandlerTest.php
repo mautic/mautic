@@ -78,7 +78,12 @@ final class PageHitNotificationHandlerTest extends TestCase
         $loggerMock = $this->createStub(LoggerInterface::class);
 
         $handler = new PageHitNotificationHandler(
-            $pageRepoMock, $hitRepoMock, $leadRepoMock, $loggerMock, $redirectRepoMock, $pageModelMock
+            $pageRepoMock,
+            $hitRepoMock,
+            $leadRepoMock,
+            $loggerMock,
+            $redirectRepoMock,
+            $pageModelMock
         );
 
         $handler->__invoke($message);

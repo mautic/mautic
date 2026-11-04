@@ -81,7 +81,7 @@ final class DateBuilderTest extends TestCase
         $this->schedulerBuilder->expects($this->once())
             ->method('getNextEvent')
             ->with($schedulerEntity)
-            ->willReturn([]);
+            ->willReturn(new \Recurr\RecurrenceCollection());
 
         $this->expectException(NoScheduleException::class);
 
@@ -93,7 +93,7 @@ final class DateBuilderTest extends TestCase
         $this->schedulerBuilder->expects($this->once())
             ->method('getNextEvents')
             ->with($this->isInstanceOf(SchedulerEntity::class), 1)
-            ->willReturn([]);
+            ->willReturn(new \Recurr\RecurrenceCollection());
 
         $this->dateBuilder->getPreviewDays(true, SchedulerEnum::UNIT_NOW, '', '');
     }
@@ -103,7 +103,7 @@ final class DateBuilderTest extends TestCase
         $this->schedulerBuilder->expects($this->once())
             ->method('getNextEvents')
             ->with($this->isInstanceOf(SchedulerEntity::class), 10)
-            ->willReturn([]);
+            ->willReturn(new \Recurr\RecurrenceCollection());
 
         $this->dateBuilder->getPreviewDays(true, SchedulerEnum::UNIT_MONTHLY, 'MON', '1');
     }

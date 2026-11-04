@@ -95,6 +95,9 @@ if (!isset($args['repackage'])) {
         'deleted_files.txt'              => true,
         'critical_migrations.txt'        => true,
         'upgrade.php'                    => true,
+        // Generated during packaging and required before the first request after an update.
+        'assets/build/'                   => true,
+        'var/sass/'                       => true,
         // Temp fix for GrapesJs builder
         'plugins/GrapesJsBuilderBundle/' => true,
     ];
@@ -164,7 +167,7 @@ if (!isset($args['repackage'])) {
         'media/bundles/'                              => true,
         'app/bundles/CoreBundle/Assets/pictograms/'   => true,
     ];
-    $modifiedFiles = $modifiedFiles + $assetFiles;
+    $modifiedFiles += $assetFiles;
 
     // Package the vendor folder if the lock changed
     if ($vendorsChanged) {
@@ -222,7 +225,8 @@ if (!isset($args['repackage'])) {
     // Compare the lists
     $result = null;
 
-    exec(sprintf('comm -23 %s %s 2>&1',
+    exec(sprintf(
+        'comm -23 %s %s 2>&1',
         escapeshellarg($oldVendorFiles),
         escapeshellarg($newVendorFiles)
     ), $vendorDeletedFiles, $result);

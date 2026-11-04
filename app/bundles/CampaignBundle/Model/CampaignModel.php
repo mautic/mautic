@@ -90,9 +90,8 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
     /**
      * @param Campaign|array<string, mixed> $entity
      * @param string|null $action
-     * @param array       $options
      */
-    public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Campaign) {
             throw new MethodNotAllowedHttpException(['Campaign']);
@@ -701,11 +700,12 @@ final class CampaignModel extends CommonFormModel implements GlobalSearchInterfa
                             ->where(
                                 $failedSq->expr()->eq('fe.log_id', 't.id')
                             );
-                        $filter['failed_events'] = [
-                            'subquery' => sprintf('NOT EXISTS (%s)', $failedSq->getSQL()),
-                        ];
 
-                        $q       = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
+                        $q = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
+                        // Apply the server-built subquery directly on the QueryBuilder rather
+                        // than routing raw SQL through the filter array, which no longer
+                        // accepts a "subquery" fragment (see ChartQuery::applyFilters()).
+                        $q->andWhere(sprintf('NOT EXISTS (%s)', $failedSq->getSQL()));
                         $rawData = $q->executeQuery()->fetchAllAssociative();
                     }
 

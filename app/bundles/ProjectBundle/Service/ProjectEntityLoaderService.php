@@ -119,7 +119,8 @@ final class ProjectEntityLoaderService
         // Exclude entities already assigned to the specific project if projectId is provided
         if ($projectId) {
             // Use subQuery to handle many to many join scenario to find entities that are NOT in the specific project
-            $qb->andWhere($qb->expr()->notIn('e.id',
+            $qb->andWhere($qb->expr()->notIn(
+                'e.id',
                 $this->em->createQueryBuilder()
                     ->select('e2.id')
                     ->from($entityConfig->entityClass, 'e2')

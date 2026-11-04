@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\ListTypeaheadEvent;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -61,6 +62,8 @@ final class AjaxController extends CommonAjaxController
 
     private FormFieldHelper $formFieldHelper;
 
+    private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
+
     #[Required]
     public function autowireLeadAjaxController(
         LeadRepository $leadRepository,
@@ -70,6 +73,7 @@ final class AjaxController extends CommonAjaxController
         DoNotContactRepository $doNotContactRepository,
         FormFactoryInterface $formFactory,
         FormFieldHelper $formFieldHelper,
+        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ): void {
         $this->leadModel = $leadModel;
         $this->doNotContactRepository = $doNotContactRepository;
@@ -78,6 +82,7 @@ final class AjaxController extends CommonAjaxController
         $this->leadFieldRepository = $leadFieldRepository;
         $this->formFactory = $formFactory;
         $this->formFieldHelper = $formFieldHelper;
+        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
     }
 
     public function userListAction(Request $request): JsonResponse
@@ -119,7 +124,9 @@ final class AjaxController extends CommonAjaxController
         $ignore    = (int) $request->query->get('ignore');
         $dataArray = ['items' => []];
 
-        if ($field && $value) {
+        $allowedFields = array_keys($this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['object' => 'lead']));
+
+        if ($field && $value && in_array($field, $allowedFields, true)) {
             $leads                      = $this->leadRepository->getLeadsByFieldValue($field, $value, $ignore);
             $dataArray['existsMessage'] = $this->translator->trans('mautic.lead.exists.by.field').': ';
 

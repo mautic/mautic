@@ -41,7 +41,10 @@ return ECSConfig::configure()
         ],
     ])
     ->withRules([
+        PhpCsFixer\Fixer\FunctionNotation\MethodArgumentSpaceFixer::class,
         PhpCsFixer\Fixer\Semicolon\MultilineWhitespaceBeforeSemicolonsFixer::class,
+        PhpCsFixer\Fixer\Whitespace\NoExtraBlankLinesFixer::class,
+        PhpCsFixer\Fixer\Whitespace\NoWhitespaceInBlankLineFixer::class,
     ])
     ->withPreparedSets(
         comments: true,
@@ -50,6 +53,5 @@ return ECSConfig::configure()
         cleanup: true,
         controlStructures: true,
         standaloneLine: true,
-        // @todo enable next
-        // spaces: true,
+        spaces: true,
     );

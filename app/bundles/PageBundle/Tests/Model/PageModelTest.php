@@ -109,12 +109,14 @@ final class PageModelTest extends PageTestAbstract
                 'page_language' => 'en',
             ],
         ]);
-        $this->assertEquals([
+        $this->assertEquals(
+            [
             'page_title'    => 'Mautic &#38; PHP',
             'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum&q=this%20has%20spaces',
             'page_language' => 'en',
         ],
-        $res);
+            $res
+        );
     }
 
     /**

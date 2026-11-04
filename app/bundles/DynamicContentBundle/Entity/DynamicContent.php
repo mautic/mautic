@@ -299,6 +299,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $current = $this->{$getter}();
 
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop) {
+            /** @var VariantEntityInterface|TranslationEntityInterface|Category|null $current */
+            /** @var VariantEntityInterface|TranslationEntityInterface|Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

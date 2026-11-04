@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Entity;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -43,7 +45,7 @@ class Stat
     private ?IpAddress $ipAddress = null;
 
     /**
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     private $dateSent;
 
@@ -192,7 +194,7 @@ class Stat
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -200,9 +202,9 @@ class Stat
     }
 
     /**
-     * @param \DateTime $dateSent
+     * @param DateTime $dateSent
      */
-    public function setDateSent(\DateTimeInterface $dateSent): static
+    public function setDateSent(DateTimeInterface $dateSent): static
     {
         $this->dateSent = $dateSent;
 

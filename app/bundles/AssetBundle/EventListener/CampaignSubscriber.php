@@ -9,24 +9,18 @@ use Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber
 {
     public function __construct(
         private RealTimeExecutioner $realTimeExecutioner,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            AssetLoadEvent::class                     => ['onAssetDownload', 0],
-            AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION => ['onCampaignTriggerDecision', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $trigger = [
@@ -44,6 +38,9 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Trigger point actions for asset download.
      */
+    #[AsEventListener(
+        event: AssetLoadEvent::class,
+    )]
     public function onAssetDownload(AssetLoadEvent $event): void
     {
         $asset = $event->getRecord()->getAsset();
@@ -53,6 +50,9 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: AssetEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+    )]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();

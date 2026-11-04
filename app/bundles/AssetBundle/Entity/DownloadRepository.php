@@ -37,7 +37,9 @@ class DownloadRepository extends CommonRepository
         );
 
         $q->select('u.is_unique')
-            ->from(sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()), 'u'
+            ->from(
+                sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()),
+                'u'
             )
             ->setParameter('id', $trackingId);
 
@@ -132,7 +134,7 @@ class DownloadRepository extends CommonRepository
      *
      * @return array<mixed, array<string, mixed>>
      */
-    public function getDownloadCountsByPage(int|array $pageId, ?\DateTime $fromDate = null): array
+    public function getDownloadCountsByPage(int|array $pageId, ?\DateTimeInterface $fromDate = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->select('count(distinct(a.tracking_id)) as count, a.source_id as id, p.title as name, p.hits as total')
@@ -175,7 +177,7 @@ class DownloadRepository extends CommonRepository
      *
      * @return array<mixed, array<string, mixed>>
      */
-    public function getDownloadCountsByEmail(int|array $emailId, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
+    public function getDownloadCountsByEmail(int|array $emailId, ?\DateTimeInterface $fromDate = null, ?\DateTime $toDate = null): array
     {
         // link email to page hit tracking id to download tracking id
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();

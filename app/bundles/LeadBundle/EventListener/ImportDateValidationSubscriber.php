@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateTime;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportRowFailedException;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class ImportDateValidationSubscriber implements EventSubscriberInterface
+final class ImportDateValidationSubscriber
 {
     /**
      * Cached mapping of date/datetime fields.
@@ -27,16 +28,13 @@ final class ImportDateValidationSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ImportProcessEvent::class => ['onImportProcess', 100],
-        ];
-    }
-
     /**
      * @throws ImportRowFailedException
      */
+    #[AsEventListener(
+        event: ImportProcessEvent::class,
+        priority: 100
+    )]
     public function onImportProcess(ImportProcessEvent $event): void
     {
         if (!in_array($event->import->getObject(), ['lead', 'company'], true)) {
@@ -113,9 +111,9 @@ final class ImportDateValidationSubscriber implements EventSubscriberInterface
 
     private function createDate(string $format, string $value, string $alias, string $errorMessage): void
     {
-        $dt = \DateTime::createFromFormat($format, $value);
+        $dt = DateTime::createFromFormat($format, $value);
 
-        $errors = $dt ? \DateTime::getLastErrors() : null;
+        $errors = $dt ? DateTime::getLastErrors() : null;
         if (!$dt || ($errors && ($errors['warning_count'] > 0 || $errors['error_count'] > 0))) {
             $message = sprintf(
                 'Row skipped: invalid value "%s" for field "%s". %s',

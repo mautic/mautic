@@ -2,10 +2,11 @@
 
 namespace Mautic\PluginBundle\Integration;
 
+use Closure;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Exception;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
@@ -41,7 +42,6 @@ use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -89,9 +89,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Used for notifications.
      *
-     * @var Paginator<User>
+     * @var \Doctrine\ORM\Tools\Pagination\Paginator<User>
      */
-    protected ?Paginator $adminUsers = null;
+    protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
     protected array $notifications              = [];
 
@@ -110,7 +110,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
     protected array $commandParameters = [];
 
-    private \Closure $clientFactory;
+    private Closure $clientFactory;
 
     protected IntegrationEntityRepository $integrationEntityRepository;
 
@@ -169,10 +169,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $this->cache;
     }
 
-    /**
-     * @return TranslatorInterface
-     */
-    public function getTranslator()
+    public function getTranslator(): TranslatorInterface
     {
         return $this->translator;
     }
@@ -800,7 +797,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     ]);
                     break;
             }
-        } catch (RequestException $exception) {
+        } catch (\GuzzleHttp\Exception\RequestException $exception) {
             if (!empty($settings['return_raw'])) {
                 return $exception->getResponse();
             }
@@ -835,8 +832,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         ?array $internal = null,
         $persist = true,
     ): ?IntegrationEntity {
-        $date = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
-            : new \DateTime();
+        $date = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
+            : new DateTime();
         $entity = new IntegrationEntity();
         $entity->setDateAdded($date)
             ->setLastSyncDate($date)
@@ -1099,7 +1096,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 $settings['include_verifier'] = true;
 
                 // Get request token returned from Twitter and submit it to get access_token
-                $settings['request_token'] = ($this->request) ? $this->request->attributes->all()['oauth_token'] ?? $this->request->query->all()['oauth_token'] ?? $this->request->request->all()['oauth_token'] ?? null : '';
+                $settings['request_token'] = ($this->request instanceof Request) ? $this->request->attributes->all()['oauth_token'] ?? $this->request->query->all()['oauth_token'] ?? $this->request->request->all()['oauth_token'] ?? null : '';
 
                 break;
         }
@@ -1326,7 +1323,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected function getRefererUrl(): ?string
     {
-        return ($this->request) ? $this->request->getRequestUri() : null;
+        return ($this->request instanceof Request) ? $this->request->getRequestUri() : null;
     }
 
     /**
@@ -1336,7 +1333,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     protected function getUserAgent()
     {
-        return ($this->request) ? $this->request->server->get('HTTP_USER_AGENT') : null;
+        return ($this->request instanceof Request) ? $this->request->server->get('HTTP_USER_AGENT') : null;
     }
 
     /**
@@ -1609,7 +1606,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param string|null $object
      */
-    public function populateMauticLeadData($data, array $config = [], $object = null): array
+    public function populateMauticLeadData($data, ?array $config = [], $object = null): array
     {
         // Glean supported fields from what was returned by the integration
         $gleanedData = $data;
@@ -1897,7 +1894,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $this->notificationModel;
     }
 
-    public function logIntegrationError(\Exception $e, ?Lead $contact = null): void
+    public function logIntegrationError(Exception $e, ?Lead $contact = null): void
     {
         if ($e instanceof ApiErrorException) {
             $this->adminUsers ??= $this->userRepository->getEntities(
@@ -1974,10 +1971,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return $this->lastIntegrationError;
     }
 
-    /**
-     * @return $this
-     */
-    public function resetLastIntegrationError()
+    public function resetLastIntegrationError(): static
     {
         $this->lastIntegrationError = null;
 
@@ -2155,21 +2149,18 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         return Cleaner::clean($value, $fieldType);
     }
 
-    /**
-     * @return Logger|LoggerInterface
-     */
-    public function getLogger()
+    public function getLogger(): \Monolog\Logger|LoggerInterface
     {
         return $this->logger;
     }
 
     /**
-     * @param bool|\Exception $error
+     * @param bool|Exception $error
      *
      * @return int Number ignored due to being duplicates
      *
      * @throws ApiErrorException
-     * @throws \Exception
+     * @throws Exception
      */
     protected function cleanupFromSync(&$leadsToSync = [], $error = false)
     {
@@ -2205,7 +2196,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         $this->integrationEntityRepository->deleteEntities($this->deleteIntegrationEntities);
 
         if ($error) {
-            if ($error instanceof \Exception) {
+            if ($error instanceof Exception) {
                 throw $error;
             }
 
@@ -2264,7 +2255,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * @param bool                 $ignoreEntityChanges
      * @param array<string, mixed> $params
      *
-     * @return bool|\DateTime|null
+     * @return bool|DateTime|null
      */
     protected function getLastSyncDate(?object $entity = null, array $params = [], $ignoreEntityChanges = true)
     {
@@ -2274,11 +2265,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             /** @var FormEntity $entity */
             $changes = $entity->getChanges(true);
             if (empty($changes) || isset($changes['dateModified'])) {
-                $startSyncDate      = \DateTime::createFromFormat(\DateTime::ISO8601, $params['start']);
+                $startSyncDate      = DateTime::createFromFormat(DateTime::ISO8601, $params['start']);
                 $entityDateModified = $entity->getDateModified();
 
                 if (isset($changes['dateModified'])) {
-                    $originalDateModified = \DateTime::createFromFormat(\DateTime::ISO8601, $changes['dateModified'][0]);
+                    $originalDateModified = DateTime::createFromFormat(DateTime::ISO8601, $changes['dateModified'][0]);
                 } elseif ($entityDateModified) {
                     $originalDateModified = $entityDateModified;
                 } else {
@@ -2292,8 +2283,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        return (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
-            : new \DateTime();
+        return (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
+            : new DateTime();
     }
 
     /**
@@ -2340,7 +2331,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function getLeadDoNotContact($leadId, $channel = 'email')
     {
         $isDoNotContact = 0;
-        if ($lead = $this->leadModel->getEntity($leadId)) {
+        if (($lead = $this->leadModel->getEntity($leadId)) instanceof Lead) {
             $isContactableReason = $this->doNotContact->isContactable($lead, $channel);
             if (DoNotContact::IS_CONTACTABLE !== $isContactableReason) {
                 $isDoNotContact = 1;
@@ -2402,7 +2393,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function setClientFactory(callable $clientFactory): void
     {
-        $this->clientFactory = \Closure::fromCallable($clientFactory);
+        $this->clientFactory = Closure::fromCallable($clientFactory);
     }
 
     /**

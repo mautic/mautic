@@ -2,9 +2,12 @@
 
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
+use DateTime;
+use Exception;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticSocialBundle\Entity\LeadRepository;
@@ -79,7 +82,7 @@ final class TwitterCommandHelper
     {
         $leadField = $this->leadFieldRepository->findOneBy(['alias' => $this->twitterHandleField]);
 
-        if (!$leadField) {
+        if (!$leadField instanceof LeadField) {
             // Field has been deleted or something
             $this->output($this->translator->trans('mautic.social.monitoring.twitter.field.not.found'));
 
@@ -196,7 +199,7 @@ final class TwitterCommandHelper
             /** @var Lead $leadEntity */
             if (!isset($processedLeads[$handle])) {
                 $processedLeads[$handle] = 1;
-                $lastActive              = new \DateTime($status['created_at']);
+                $lastActive              = new DateTime($status['created_at']);
 
                 if (isset($namedLeads[$status['user']['name']])) {
                     ++$this->updatedLeads;
@@ -239,7 +242,7 @@ final class TwitterCommandHelper
                     $this->leadModel->setFieldValues($leadEntity, $fields, false);
 
                     // mark as identified just to be sure
-                    $leadEntity->setDateIdentified(new \DateTime());
+                    $leadEntity->setDateIdentified(new DateTime());
                 }
 
                 $leadEntity->setPreferredProfileImage('Twitter');
@@ -264,7 +267,7 @@ final class TwitterCommandHelper
                     $this->output($e->getMessage());
 
                     return 0;
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $this->output($e->getMessage());
 
                     continue;
@@ -330,7 +333,7 @@ final class TwitterCommandHelper
         $monitorLead = new \MauticPlugin\MauticSocialBundle\Entity\Lead();
         $monitorLead->setMonitor($monitor);
         $monitorLead->setLead($lead);
-        $monitorLead->setDateAdded(new \DateTime());
+        $monitorLead->setDateAdded(new DateTime());
 
         $this->monitorLeadRepository->saveEntity($monitorLead);
     }
@@ -342,7 +345,7 @@ final class TwitterCommandHelper
      */
     private function incrementPostCount(Monitoring $monitor, array $tweet): void
     {
-        $date = new \DateTime($tweet['created_at']);
+        $date = new DateTime($tweet['created_at']);
 
         $this->postCountModel->updatePostCount($monitor, $date);
     }

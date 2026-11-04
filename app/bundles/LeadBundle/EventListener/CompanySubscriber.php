@@ -13,9 +13,9 @@ use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\CompanyPreSaveEvent;
 use Mautic\LeadBundle\Event\CompanySoftDeleteEvent;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class CompanySubscriber implements EventSubscriberInterface
+final readonly class CompanySubscriber
 {
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
@@ -27,19 +27,12 @@ final readonly class CompanySubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CompanyPreSaveEvent::class    => ['onCompanyPreSave', 0],
-            CompanyPostSaveEvent::class   => ['onCompanyPostSave', 0],
-            CompanyPostDeleteEvent::class => ['onCompanyDelete', 0],
-            CompanySoftDeleteEvent::class => ['onCompanySoftDelete', 0],
-        ];
-    }
-
     /**
      * Add a company entry to the audit log.
      */
+    #[AsEventListener(
+        event: CompanyPostSaveEvent::class,
+    )]
     public function onCompanyPostSave(Events\CompanyEvent $event): void
     {
         $company = $event->getCompany();
@@ -59,6 +52,9 @@ final readonly class CompanySubscriber implements EventSubscriberInterface
     /**
      * Add a company delete entry to the audit log.
      */
+    #[AsEventListener(
+        event: CompanyPostDeleteEvent::class,
+    )]
     public function onCompanyDelete(Events\CompanyEvent $event): void
     {
         $company = $event->getCompany();
@@ -74,6 +70,9 @@ final readonly class CompanySubscriber implements EventSubscriberInterface
         $this->clearCompanyInLeadsCompanyFields($company->getName());
     }
 
+    #[AsEventListener(
+        event: CompanySoftDeleteEvent::class,
+    )]
     public function onCompanySoftDelete(Events\CompanyEvent $event): void
     {
         if ($details = $event->getChanges()) {
@@ -96,6 +95,9 @@ final readonly class CompanySubscriber implements EventSubscriberInterface
         $this->companyModel->permanentDeleteCompany($event->getCompany());
     }
 
+    #[AsEventListener(
+        event: CompanyPreSaveEvent::class,
+    )]
     public function onCompanyPreSave(Events\CompanyEvent $event): void
     {
         if ($this->coreParametersHelper->get('update_company_mapping_data_in_background', false)) {

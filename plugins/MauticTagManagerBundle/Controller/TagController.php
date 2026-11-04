@@ -399,12 +399,10 @@ final class TagController extends AbstractFormController
     /**
      * Return tag if exists and user has access.
      *
-     * @return Tag
-     *
      * @throws EntityNotFoundException
      * @throws AccessDeniedException
      */
-    private function getTag(int $tagId)
+    private function getTag(int $tagId): Tag
     {
         $tag = $this->leadTagModel->getEntity($tagId);
 

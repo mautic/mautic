@@ -201,6 +201,7 @@ final class BatchIdToEntityHelperTest extends TestCase
             ['id' => 4, 'foo' => 'bar'],
         ];
         $helper          = new BatchIdToEntityHelper($parameters);
+        /** @var Lead[] $orderedEntities */
         $orderedEntities = $helper->orderByOriginalKey($entities);
         $this->assertSame([0, 1, 2, 3], array_keys($orderedEntities));
         foreach ($parameters as $key => $contact) {

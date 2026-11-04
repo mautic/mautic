@@ -236,7 +236,7 @@ final class HitRepository extends CommonRepository
      *
      * @return mixed[]
      */
-    public function getBounces($pageIds, ?\DateTime $fromDate = null, bool $isVariantCheck = false): array
+    public function getBounces($pageIds, ?\DateTimeInterface $fromDate = null, bool $isVariantCheck = false): array
     {
         $inOrEq = (!is_array($pageIds)) ? 'eq' : 'in';
 

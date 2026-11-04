@@ -9,9 +9,9 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\ContactExportEmailSentEvent;
 use Mautic\LeadBundle\Event\ContactExportScheduledEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class ContactExportSchedulerAuditLogSubscriber implements EventSubscriberInterface
+final readonly class ContactExportSchedulerAuditLogSubscriber
 {
     public function __construct(
         private AuditLogModel $auditLogModel,
@@ -19,14 +19,7 @@ final readonly class ContactExportSchedulerAuditLogSubscriber implements EventSu
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ContactExportScheduledEvent::class  => 'onContactExportScheduled',
-            ContactExportEmailSentEvent::class => 'onContactExportEmailSent',
-        ];
-    }
-
+    #[AsEventListener(event: ContactExportScheduledEvent::class)]
     public function onContactExportScheduled(ContactExportSchedulerEvent $event): void
     {
         $this->auditLogModel->writeToLog(
@@ -41,6 +34,7 @@ final readonly class ContactExportSchedulerAuditLogSubscriber implements EventSu
         );
     }
 
+    #[AsEventListener(event: ContactExportEmailSentEvent::class)]
     public function onContactExportEmailSent(ContactExportSchedulerEvent $event): void
     {
         $this->auditLogModel->writeToLog(

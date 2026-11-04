@@ -4,10 +4,10 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class MaintenanceSubscriber implements EventSubscriberInterface
+final readonly class MaintenanceSubscriber
 {
     public function __construct(
         private Connection $db,
@@ -15,13 +15,9 @@ final readonly class MaintenanceSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MaintenanceEvent::class => ['onDataCleanup', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: MaintenanceEvent::class,
+    )]
     public function onDataCleanup(MaintenanceEvent $event): void
     {
         $qb = $this->db->createQueryBuilder()
@@ -39,7 +35,8 @@ final readonly class MaintenanceSubscriber implements EventSubscriberInterface
                     $qb->expr()->and(
                         $qb->expr()->lte('l.date_added', ':date2'),
                         $qb->expr()->isNull('l.last_active')
-                    ));
+                    )
+                );
                 $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
             $rows = $qb->executeQuery()->fetchOne();
@@ -54,7 +51,8 @@ final readonly class MaintenanceSubscriber implements EventSubscriberInterface
                     $qb->expr()->and(
                         $qb->expr()->lte('l.date_added', ':date2'),
                         $qb->expr()->isNull('l.last_active')
-                    ));
+                    )
+                );
                 $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
 
@@ -71,7 +69,8 @@ final readonly class MaintenanceSubscriber implements EventSubscriberInterface
                     $rows += $qb2->delete(MAUTIC_TABLE_PREFIX.'leads')
                       ->where(
                           $qb2->expr()->eq(
-                              'id', $leadId
+                              'id',
+                              $leadId
                           )
                       )->executeStatement();
                 }

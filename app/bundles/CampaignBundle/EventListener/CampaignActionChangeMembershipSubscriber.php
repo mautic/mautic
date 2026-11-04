@@ -12,9 +12,9 @@ use Mautic\CampaignBundle\Form\Validator\Constraints\InfiniteLoopValidator;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Event\EntityValidateEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class CampaignActionChangeMembershipSubscriber implements EventSubscriberInterface
+final readonly class CampaignActionChangeMembershipSubscriber
 {
     public function __construct(
         private MembershipManager $membershipManager,
@@ -23,18 +23,12 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class                          => ['addAction', 0],
-            CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP => ['changeMembership', 0],
-            EntityValidateEvent::class                           => ['validateInfiniteLoop', 0],
-        ];
-    }
-
     /**
      * Add change membership action.
      */
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function addAction(CampaignBuilderEvent $event): void
     {
         $event->addAction(
@@ -51,6 +45,9 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
         );
     }
 
+    #[AsEventListener(
+        event: CampaignEvents::ON_CAMPAIGN_ACTION_CHANGE_MEMBERSHIP,
+    )]
     public function changeMembership(PendingEvent $event): void
     {
         $properties          = $event->getEvent()->getProperties();
@@ -86,6 +83,9 @@ final readonly class CampaignActionChangeMembershipSubscriber implements EventSu
         $event->passAll();
     }
 
+    #[AsEventListener(
+        event: EntityValidateEvent::class,
+    )]
     public function validateInfiniteLoop(EntityValidateEvent $event): void
     {
         $campaignEvent = $event->getEntity();

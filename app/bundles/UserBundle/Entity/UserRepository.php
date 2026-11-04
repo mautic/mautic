@@ -27,6 +27,7 @@ final class UserRepository extends CommonRepository
 
     public function setLastLogin($user): void
     {
+        /** @var User $user */
         $now      = new DateTimeHelper();
         $datetime = $now->toUtcString();
         $conn     = $this->getEntityManager()->getConnection();
@@ -38,6 +39,7 @@ final class UserRepository extends CommonRepository
 
     public function setLastActive($user): void
     {
+        /** @var User $user */
         $now  = new DateTimeHelper();
         $conn = $this->getEntityManager()->getConnection();
         $conn->update(MAUTIC_TABLE_PREFIX.'users', ['last_active' => $now->toUtcString()], ['id' => (int) $user->getId()]);
@@ -97,7 +99,8 @@ final class UserRepository extends CommonRepository
                     $q->expr()->like('u.firstName', ':search'),
                     $q->expr()->like('u.lastName', ':search'),
                     $q->expr()->like(
-                        $q->expr()->concat('u.firstName',
+                        $q->expr()->concat(
+                            'u.firstName',
                             $q->expr()->concat(
                                 $q->expr()->literal(' '),
                                 'u.lastName'

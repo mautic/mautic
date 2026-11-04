@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use DateTime;
+use Exception;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
@@ -316,13 +318,13 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                 if (preg_match('/contacts\((.+)\)/', $header, $out)) {
                     $id                = $out[1];
                     $integrationEntity = new IntegrationEntity();
-                    $integrationEntity->setDateAdded(new \DateTime());
+                    $integrationEntity->setDateAdded(new DateTime());
                     $integrationEntity->setIntegration('Dynamics');
                     $integrationEntity->setIntegrationEntity($object);
                     $integrationEntity->setIntegrationEntityId($id);
                     $integrationEntity->setInternalEntity('lead');
                     $integrationEntity->setInternalEntityId($lead->getId());
-                    $integrationEntity->setLastSyncDate(new \DateTime());
+                    $integrationEntity->setLastSyncDate(new DateTime());
                     $this->em->persist($integrationEntity);
                     $this->em->flush();
 
@@ -331,7 +333,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
 
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -406,7 +408,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     $progress->finish();
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -477,7 +479,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     $progress->finish();
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -512,8 +514,18 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                 if ('accounts' === $object) {
                     $recordId = $entityData['accountid'];
                     // first try to find integration entity
-                    $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object, 'company',
-                        null, null, null, false, 0, 0, "'".$recordId."'");
+                    $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId(
+                        'Dynamics',
+                        $object,
+                        'company',
+                        null,
+                        null,
+                        null,
+                        false,
+                        0,
+                        0,
+                        "'".$recordId."'"
+                    );
                     if (count($integrationId)) { // company exists, then update local fields
                         /** @var Company $entity */
                         $entity        = $this->companyModel->getEntity($integrationId[0]['internal_entity_id']);
@@ -562,8 +574,18 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                 } elseif ('contacts' === $object) {
                     $recordId = $entityData['contactid'];
                     // first try to find integration entity
-                    $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object, 'lead',
-                        null, null, null, false, 0, 0, "'".$recordId."'");
+                    $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId(
+                        'Dynamics',
+                        $object,
+                        'lead',
+                        null,
+                        null,
+                        null,
+                        false,
+                        0,
+                        0,
+                        "'".$recordId."'"
+                    );
                     if (count($integrationId)) { // lead exists, then update
                         /** @var Lead $entity */
                         $entity        = $this->leadModel->getEntity($integrationId[0]['internal_entity_id']);
@@ -626,7 +648,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     $mauticObjectReference = 'lead';
                 } else {
                     $this->logIntegrationError(
-                        new \Exception(
+                        new Exception(
                             sprintf('Received an unexpected object "%s"', $object)
                         )
                     );
@@ -643,7 +665,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
 
                     if (0 === count($integrationId)) {
                         $integrationEntity = new IntegrationEntity();
-                        $integrationEntity->setDateAdded(new \DateTime());
+                        $integrationEntity->setDateAdded(new DateTime());
                         $integrationEntity->setIntegration('Dynamics');
                         $integrationEntity->setIntegrationEntity($object);
                         $integrationEntity->setIntegrationEntityId($recordId);
@@ -653,7 +675,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     } else {
                         $integrationEntity = $this->integrationEntityRepository->getEntity($integrationId[0]['id']);
                         if ($isModified) {
-                            $integrationEntity->setLastSyncDate(new \DateTime());
+                            $integrationEntity->setLastSyncDate(new DateTime());
                             $integrationEntities[] = $integrationEntity;
                         }
                     }
@@ -738,7 +760,7 @@ final class DynamicsIntegration extends CrmAbstractIntegration
                     $lead['integration_entity'] = $object;
                     $leadsToUpdateInD[$key]     = $lead;
                     $integrationEntity          = $this->em->getReference(IntegrationEntity::class, $lead['id']);
-                    $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
+                    $integrationEntities[]      = $integrationEntity->setLastSyncDate(new DateTime());
                 }
             }
         }
@@ -852,8 +874,16 @@ final class DynamicsIntegration extends CrmAbstractIntegration
     {
         foreach ($ids as $oid => $leadId) {
             $this->logger->debug('CREATE INTEGRATION ENTITY: '.$oid);
-            $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId('Dynamics', $object,
-                'lead', null, null, null, false, 0, 0,
+            $integrationId = $this->integrationEntityRepository->getIntegrationsEntityId(
+                'Dynamics',
+                $object,
+                'lead',
+                null,
+                null,
+                null,
+                false,
+                0,
+                0,
                 "'".$oid."'"
             );
 

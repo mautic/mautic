@@ -12,9 +12,9 @@ use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class NotificationSubscriber implements EventSubscriberInterface
+final readonly class NotificationSubscriber
 {
     public function __construct(
         private AuditLogModel $auditLogModel,
@@ -24,18 +24,12 @@ final readonly class NotificationSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            NotificationEvents::NOTIFICATION_POST_SAVE   => ['onPostSave', 0],
-            NotificationEvents::NOTIFICATION_POST_DELETE => ['onDelete', 0],
-            NotificationEvents::TOKEN_REPLACEMENT        => ['onTokenReplacement', 0],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[AsEventListener(
+        event: NotificationEvents::NOTIFICATION_POST_SAVE,
+    )]
     public function onPostSave(NotificationEvent $event): void
     {
         $entity = $event->getNotification();
@@ -54,6 +48,9 @@ final readonly class NotificationSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
+    #[AsEventListener(
+        event: NotificationEvents::NOTIFICATION_POST_DELETE,
+    )]
     public function onDelete(NotificationEvent $event): void
     {
         $entity = $event->getNotification();
@@ -67,6 +64,9 @@ final readonly class NotificationSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
+    #[AsEventListener(
+        event: NotificationEvents::TOKEN_REPLACEMENT,
+    )]
     public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         /** @var Lead $lead */

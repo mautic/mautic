@@ -35,7 +35,6 @@ final class EventCollector
         return $this->events;
     }
 
-    
     public function getEventConfig(Event $event): AbstractEventAccessor
     {
         return $this->getEvents()->getEvent($event->getEventType(), $event->getType());

@@ -371,9 +371,11 @@ jobs:
         elif [[ "${{ matrix.commands }}" == "Class Leak" ]]; then
           # skip-type entries are false positives: Symfony autodiscovered services and test helpers class-leak cannot see referenced
           vendor/bin/class-leak check app plugins \
+            --skip-attribute "Symfony\Component\EventDispatcher\Attribute\AsEventListener" \
             --skip-type "Mautic\CoreBundle\Doctrine\QueryFormatter\MysqlFormatter" \
             --skip-type "Mautic\CoreBundle\Factory\PageHelperFactory" \
             --skip-type "Mautic\IntegrationsBundle\Migrations\Version_0_0_1" \
+            --skip-type "Mautic\CoreBundle\EventListener\CommonStatsSubscriber" \
             --skip-path "plugins/MauticFullContactBundle/Services/" \
             --skip-path "plugins/MauticEmailMarketingBundle/Api/"
         elif [[ "${{ matrix.commands }}" == "composer lock check" ]]; then

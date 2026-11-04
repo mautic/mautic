@@ -101,15 +101,25 @@ final class FieldFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Try deleting single field.
-        $this->client->request(Request::METHOD_POST,
-            '/s/contacts/fields/delete/'.$field_first->getId(), [], [], $this->createAjaxHeaders());
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/contacts/fields/delete/'.$field_first->getId(),
+            [],
+            [],
+            $this->createAjaxHeaders()
+        );
 
         $this->assertStringContainsString('please go back and check mentioned resource(s) before deleting.', strip_tags($this->client->getResponse()->getContent()));
 
         // Try deleting multiple fields.
         $parameters = 'ids=["'.$field_first->getId().'","'.$field_second->getId().'"]';
-        $this->client->request(Request::METHOD_POST,
-            '/s/contacts/fields/batchDelete?'.$parameters, [], [], $this->createAjaxHeaders());
+        $this->client->request(
+            Request::METHOD_POST,
+            '/s/contacts/fields/batchDelete?'.$parameters,
+            [],
+            [],
+            $this->createAjaxHeaders()
+        );
 
         $this->assertStringContainsString('cannot be deleted because they are in use by other entities.', strip_tags($this->client->getResponse()->getContent()));
     }

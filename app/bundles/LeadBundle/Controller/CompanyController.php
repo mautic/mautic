@@ -446,7 +446,8 @@ final class CompanyController extends AbstractFormController
         if (!$this->security->hasEntityAccess(
             'lead:leads:editown',
             'lead:leads:editother',
-            $entity->getPermissionUser())) {
+            $entity->getPermissionUser()
+        )) {
             $this->throwAccessDenied();
         } elseif ($this->companyModel->isLocked($entity)) {
             // deny access if the entity is locked

@@ -33,11 +33,9 @@ final readonly class ReplyHelper
     }
 
     /**
-     * @return Response
-     *
      * @throws \Exception
      */
-    public function handleRequest(CallbackInterface $handler, Request $request)
+    public function handleRequest(CallbackInterface $handler, Request $request): Response
     {
         // Set the default response
         $response = new Response();

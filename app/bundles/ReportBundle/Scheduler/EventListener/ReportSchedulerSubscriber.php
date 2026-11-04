@@ -5,20 +5,18 @@ namespace Mautic\ReportBundle\Scheduler\EventListener;
 use Mautic\ReportBundle\Event\ReportEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class ReportSchedulerSubscriber implements EventSubscriberInterface
+final readonly class ReportSchedulerSubscriber
 {
     public function __construct(
         private SchedulerPlanner $schedulerPlanner,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [ReportEvents::REPORT_POST_SAVE => ['onReportSave', 0]];
-    }
-
+    #[AsEventListener(
+        event: ReportEvents::REPORT_POST_SAVE,
+    )]
     public function onReportSave(ReportEvent $event): void
     {
         $report = $event->getReport();

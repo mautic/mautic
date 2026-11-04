@@ -55,8 +55,11 @@ final readonly class SerializerSubscriber implements EventSubscriberInterface
         if ($visitor instanceof JsonSerializationVisitor && !empty($grapesJsBuilder->getCustomMjml())) {
             $visitor->visitProperty(
                 new StaticPropertyMetadata(
-                    '', 'grapesjsbuilder', ['customMjml' => $grapesJsBuilder->getCustomMjml()]
-                ), ['customMjml' => $grapesJsBuilder->getCustomMjml()]
+                    '',
+                    'grapesjsbuilder',
+                    ['customMjml' => $grapesJsBuilder->getCustomMjml()]
+                ),
+                ['customMjml' => $grapesJsBuilder->getCustomMjml()]
             );
         }
     }

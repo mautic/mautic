@@ -218,7 +218,8 @@ final class EmailControllerTest extends TestCase
 
         $this->formFactoryMock->expects($this->once())
             ->method('create')
-            ->with(ExampleSendType::class,
+            ->with(
+                ExampleSendType::class,
                 [
                     'emails' => [
                         'list' => [

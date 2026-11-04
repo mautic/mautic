@@ -65,7 +65,7 @@ final class CompanyRepository extends CommonRepository implements CustomFieldRep
             $entity = null;
         }
 
-        if (null === $entity) {
+        if (! $entity instanceof Company) {
             return null;
         }
 

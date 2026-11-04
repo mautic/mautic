@@ -8,25 +8,23 @@ use ApiPlatform\Symfony\EventListener\EventPriorities;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final readonly class MauticWriteSubscriber implements EventSubscriberInterface
+final readonly class MauticWriteSubscriber
 {
     public function __construct(
         private UserHelper $userHelper,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::VIEW => ['addData', EventPriorities::PRE_WRITE],
-        ];
-    }
-
+    #[AsEventListener(
+        event: KernelEvents::VIEW,
+        priority: EventPriorities::PRE_WRITE
+    )]
     public function addData(ViewEvent $event): void
     {
         $entity = $event->getControllerResult();
@@ -54,7 +52,7 @@ final readonly class MauticWriteSubscriber implements EventSubscriberInterface
         }
 
         $entity->setDateModified($now->getUtcDateTime());
-        if ($user) {
+        if ($user instanceof User) {
             $entity->setModifiedBy($user);
             $entity->setModifiedByUser($user->getName());
         }

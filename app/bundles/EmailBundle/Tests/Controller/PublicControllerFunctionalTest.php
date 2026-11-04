@@ -751,7 +751,8 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         string $publicName,
         string $alias,
         bool $isPublished = true,
-        bool $isPreferenceCenter = true): LeadList
+        bool $isPreferenceCenter = true
+    ): LeadList
     {
         $segment = new LeadList();
         $segment->setName($name);

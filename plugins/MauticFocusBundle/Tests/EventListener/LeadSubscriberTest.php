@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -74,7 +75,11 @@ final class LeadSubscriberTest extends TestCase
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_NOTIFICATION, self::FOCUS_NAME, 'getStatsViewByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
-            FocusEventTypes::FOCUS_ON_VIEW, self::EVENT_TYPE_VIEW_NAME, self::FOCUS_NAME, $date, $lead
+            FocusEventTypes::FOCUS_ON_VIEW,
+            self::EVENT_TYPE_VIEW_NAME,
+            self::FOCUS_NAME,
+            $date,
+            $lead
         );
 
         $leadEvent  = new LeadTimelineEvent($lead);
@@ -85,7 +90,7 @@ final class LeadSubscriberTest extends TestCase
         );
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber($subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $subscriber);
         $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
@@ -98,7 +103,10 @@ final class LeadSubscriberTest extends TestCase
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_NOTIFICATION, self::FOCUS_NAME, 'getStatsViewByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
-            FocusEventTypes::FOCUS_ON_VIEW, self::EVENT_TYPE_VIEW_NAME, self::FOCUS_NAME, $date
+            FocusEventTypes::FOCUS_ON_VIEW,
+            self::EVENT_TYPE_VIEW_NAME,
+            self::FOCUS_NAME,
+            $date
         );
 
         $leadEvent  = new LeadTimelineEvent();
@@ -109,7 +117,7 @@ final class LeadSubscriberTest extends TestCase
         );
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber($subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $subscriber);
         $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
@@ -127,7 +135,11 @@ final class LeadSubscriberTest extends TestCase
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_CLICK, self::FOCUS_NAME, 'getStatsClickByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
-            FocusEventTypes::FOCUS_ON_CLICK, self::EVENT_TYPE_CLICK_NAME, self::FOCUS_NAME, $date, $lead
+            FocusEventTypes::FOCUS_ON_CLICK,
+            self::EVENT_TYPE_CLICK_NAME,
+            self::FOCUS_NAME,
+            $date,
+            $lead
         );
 
         $leadEvent  = new LeadTimelineEvent($lead);
@@ -138,7 +150,7 @@ final class LeadSubscriberTest extends TestCase
         );
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber($subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $subscriber);
         $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
@@ -151,7 +163,10 @@ final class LeadSubscriberTest extends TestCase
         $this->mockFocusModelGetStatsByLead(Stat::TYPE_CLICK, self::FOCUS_NAME, 'getStatsClickByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
-            FocusEventTypes::FOCUS_ON_CLICK, self::EVENT_TYPE_CLICK_NAME, self::FOCUS_NAME, $date
+            FocusEventTypes::FOCUS_ON_CLICK,
+            self::EVENT_TYPE_CLICK_NAME,
+            self::FOCUS_NAME,
+            $date
         );
 
         $leadEvent  = new LeadTimelineEvent();
@@ -162,7 +177,7 @@ final class LeadSubscriberTest extends TestCase
         );
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber($subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $subscriber);
         $dispatcher->dispatch($leadEvent);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());

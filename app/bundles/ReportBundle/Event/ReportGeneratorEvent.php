@@ -223,7 +223,10 @@ final class ReportGeneratorEvent extends AbstractReportEvent
     public function applyDateFilters(QueryBuilder $queryBuilder, string $dateColumn, string $tablePrefix = 't', bool $dateOnly = false): self
     {
         $this->setDateRangeQueryFilters(
-            $queryBuilder, $tablePrefix, $dateOnly, $dateColumn,
+            $queryBuilder,
+            $tablePrefix,
+            $dateOnly,
+            $dateColumn,
             '%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)',
             '%1$s IS NULL OR (%1$s BETWEEN :dateFrom AND :dateTo)'
         );
@@ -234,7 +237,10 @@ final class ReportGeneratorEvent extends AbstractReportEvent
     public function applyDateFiltersWithoutNullValues(QueryBuilder $queryBuilder, string $dateColumn, string $tablePrefix = 't', bool $dateOnly = false): self
     {
         $this->setDateRangeQueryFilters(
-            $queryBuilder, $tablePrefix, $dateOnly, $dateColumn,
+            $queryBuilder,
+            $tablePrefix,
+            $dateOnly,
+            $dateColumn,
             'DATE(%1$s) BETWEEN :dateFrom AND :dateTo',
             '%1$s BETWEEN :dateFrom AND :dateTo'
         );
@@ -356,7 +362,7 @@ final class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         $this->sortedFilters = [];
-        $filters             = (array) $this->getReport()->getFilters();
+        $filters             = $this->getReport()->getFilters();
 
         foreach ($filters as $field) {
             $this->sortedFilters[$field['column']] = true;

@@ -170,6 +170,14 @@ final class ResultController extends CommonFormController
                     'page'           => $page,
                     'totalCount'     => $count,
                     'limit'          => $limit,
+                    // Must be explicit; otherwise the JS fallback rewrites the trailing URL segment
+                    'baseUrl'        => $this->generateUrl(
+                        'mautic_form_results',
+                        [
+                            'objectId' => $objectId,
+                            'page'     => $page,
+                        ]
+                    ),
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'canDelete'      => $this->security->hasEntityAccess(
                         'form:forms:editown',
@@ -216,7 +224,8 @@ final class ResultController extends CommonFormController
         if (empty($fieldEntity->getProperties()['public']) && !$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
-            $submission->getForm()->getCreatedBy())
+            $submission->getForm()->getCreatedBy()
+        )
         ) {
             $this->throwAccessDenied();
         }
@@ -250,7 +259,8 @@ final class ResultController extends CommonFormController
         if (empty($fieldEntity->getProperties()['public']) && !$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
-            $fieldEntity->getForm()->getCreatedBy())
+            $fieldEntity->getForm()->getCreatedBy()
+        )
         ) {
             $this->throwAccessDenied();
         }

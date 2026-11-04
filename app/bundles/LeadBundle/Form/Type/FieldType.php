@@ -695,6 +695,7 @@ final class FieldType extends AbstractType
             return;
         }
 
+        /** @var FormInterface $root */
         $root = $context->getRoot();
         /** @var LeadField $field */
         $field = $root->getViewData();

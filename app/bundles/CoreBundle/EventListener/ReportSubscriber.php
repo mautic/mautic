@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
+use DateTimeInterface;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -11,9 +12,9 @@ use Mautic\ReportBundle\Event\AbstractReportEvent;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber
 {
     public const string CONTEXT_AUDIT_LOG = 'audit.log';
 
@@ -22,15 +23,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-            ReportDataEvent::class      => ['onReportDisplay', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: ReportBuilderEvent::class,
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$this->allowAuditLogReportBuild($event)) {
@@ -131,6 +126,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: ReportGeneratorEvent::class,
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$this->allowAuditLogReportBuild($event)) {
@@ -144,12 +142,12 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         $dateTo   = $options['dateTo'];
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'audit_log', 'al');
 
-        if ($dateFrom instanceof \DateTimeInterface) {
+        if ($dateFrom instanceof DateTimeInterface) {
             $queryBuilder->andWhere($queryBuilder->expr()->gte('al.date_added', ':dateFrom'));
             $queryBuilder->setParameter('dateFrom', $dateFrom->format(DateTimeHelper::FORMAT_DB));
         }
 
-        if ($dateTo instanceof \DateTimeInterface) {
+        if ($dateTo instanceof DateTimeInterface) {
             $queryBuilder->andWhere($queryBuilder->expr()->lte('al.date_added', ':dateTo'));
             $queryBuilder->setParameter('dateTo', $dateTo->format(DateTimeHelper::FORMAT_DB));
         }
@@ -157,6 +155,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         $event->setQueryBuilder($queryBuilder);
     }
 
+    #[AsEventListener(
+        event: ReportDataEvent::class,
+    )]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         if (!$this->security->isAdmin() || !$event->checkContext([self::CONTEXT_AUDIT_LOG])) {

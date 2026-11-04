@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use DateTime;
+use Exception;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyRepository;
@@ -222,7 +224,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getAvailableLeadFields(array $settings = []): array
     {
@@ -268,13 +270,19 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                                     // 6.x/community
 
                                     foreach ($fields['module_fields'] as $fieldInfo) {
-                                        if (isset($fieldInfo['name']) && (!in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'link', 'relate']) || ('id' == $fieldInfo['type'] && 'id' == $fieldInfo['name'])
+                                        if (isset($fieldInfo['name']) && (
+                                            !in_array($fieldInfo['type'], ['id', 'assigned_user_name', 'link', 'relate']) || ('id' == $fieldInfo['type'] && 'id' == $fieldInfo['name'])
                                         )
                                         ) {
                                             $type      = 'string';
-                                            $fieldName = (!str_contains($fieldInfo['name'],
-                                                'webtolead_email')) ? $fieldInfo['name'] : str_replace('webtolead_',
-                                                    '', $fieldInfo['name']);
+                                            $fieldName = (!str_contains(
+                                                $fieldInfo['name'],
+                                                'webtolead_email'
+                                            )) ? $fieldInfo['name'] : str_replace(
+                                                'webtolead_',
+                                                '',
+                                                $fieldInfo['name']
+                                            );
                                             // make these congruent as some come in with colons and some do not
                                             $label = str_replace(':', '', $fieldInfo['label']);
                                             if ('company' !== $sObject) {
@@ -298,10 +306,11 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                                     // 7.x
                                     foreach ($fields['fields'] as $fieldInfo) {
                                         if (isset($fieldInfo['name']) && empty($fieldInfo['readonly'])
-                                            && (!in_array(
-                                                $fieldInfo['type'],
-                                                ['id', 'team_list', 'link', 'relate']
-                                            )
+                                            && (
+                                                !in_array(
+                                                    $fieldInfo['type'],
+                                                    ['id', 'team_list', 'link', 'relate']
+                                                )
                                                 || ('id' == $fieldInfo['type'] && 'id' == $fieldInfo['name'])
                                             )
                                         ) {
@@ -350,7 +359,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
 
             if (!$silenceExceptions) {
@@ -396,7 +405,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
                 return $executed;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -404,7 +413,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      *                    To be modified
      */
     public function pushLeadActivity(array $params = []): ?int
@@ -423,8 +432,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
             $sugarObjects = $config['objects'];
         }
 
-        $startDate             = new \DateTime($query['start']);
-        $endDate               = new \DateTime($query['end']);
+        $startDate             = new DateTime($query['start']);
+        $endDate               = new DateTime($query['end']);
         $limit                 = 100;
 
         foreach ($sugarObjects as $object) {
@@ -495,7 +504,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                         );
                     }
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->logIntegrationError($e);
             }
         }
@@ -533,7 +542,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
                 return $executed;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -741,18 +750,18 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                             $dataObject[$item['name'].$newName] = $item['value'];
                         }
                         if ('date_entered' == $item['name']) {
-                            $itemDateEntered = new \DateTime($item['value']);
+                            $itemDateEntered = new DateTime($item['value']);
                         }
                         if ('date_modified' == $item['name']) {
-                            $itemDateModified = new \DateTime($item['value']);
+                            $itemDateModified = new DateTime($item['value']);
                         }
                     }
                 } else {
                     if (isset($record['date_entered']) && '' != $record['date_entered']) {
-                        $itemDateEntered = new \DateTime($record['date_entered']);
+                        $itemDateEntered = new DateTime($record['date_entered']);
                     }
                     if (isset($record['date_modified']) && '' != $record['date_modified']) {
-                        $itemDateEntered = new \DateTime($record['date_modified']);
+                        $itemDateEntered = new DateTime($record['date_modified']);
                     }
                     foreach ($record as $k => $item) {
                         $dataObject[$k.$newName] = $item;
@@ -800,7 +809,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                         $mauticObjectReference = 'company';
                     } else {
                         $this->logIntegrationError(
-                            new \Exception(
+                            new Exception(
                                 sprintf('Received an unexpected object without an internalObjectReference "%s"', $object)
                             )
                         );
@@ -818,8 +827,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
 
                         if (null == $integrationId) {
                             $integrationEntity = new IntegrationEntity();
-                            $integrationEntity->setDateAdded(new \DateTime());
-                            $integrationEntity->setLastSyncDate(new \DateTime());
+                            $integrationEntity->setDateAdded(new DateTime());
+                            $integrationEntity->setLastSyncDate(new DateTime());
                             $integrationEntity->setIntegration('Sugarcrm');
                             $integrationEntity->setIntegrationEntity($object);
                             $integrationEntity->setIntegrationEntityId($record['id']);
@@ -828,7 +837,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                             $integrationEntities[] = $integrationEntity;
                         } else {
                             $integrationEntity = $this->integrationEntityRepository->getEntity($integrationId[0]['id']);
-                            $integrationEntity->setLastSyncDate(new \DateTime());
+                            $integrationEntity->setLastSyncDate(new DateTime());
                             $integrationEntities[] = $integrationEntity;
                         }
                         $this->em->detach($entity);
@@ -1043,8 +1052,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                 if (isset($createdLeadData['id'])) {
                     if ([] === $integrationId) {
                         $integrationEntity = new IntegrationEntity();
-                        $integrationEntity->setDateAdded(new \DateTime());
-                        $integrationEntity->setLastSyncDate(new \DateTime());
+                        $integrationEntity->setDateAdded(new DateTime());
+                        $integrationEntity->setLastSyncDate(new DateTime());
                         $integrationEntity->setIntegration('Sugarcrm');
                         $integrationEntity->setIntegrationEntity($object);
                         $integrationEntity->setIntegrationEntityId($createdLeadData['id']);
@@ -1053,14 +1062,14 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                     } else {
                         $integrationEntity = $this->integrationEntityRepository->getEntity($integrationId[0]['id']);
                     }
-                    $integrationEntity->setLastSyncDate(new \DateTime());
+                    $integrationEntity->setLastSyncDate(new DateTime());
                     $this->em->persist($integrationEntity);
                     $this->em->flush();
                 }
 
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -1265,7 +1274,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
      */
     private function fetchDncToMautic(?Lead $lead = null, array $data = []): void
     {
-        if (null === $lead) {
+        if (!$lead instanceof Lead) {
             return;
         }
 
@@ -1489,17 +1498,17 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                 }
 
                 if (isset($item['ko']) && $item['ko']) {
-                    $this->logIntegrationError(new \Exception($item['error']));
+                    $this->logIntegrationError(new Exception($item['error']));
 
                     if ($integrationEntityId) {
                         $integrationEntity = $this->em->getReference(IntegrationEntity::class, $integrationEntityId);
-                        $integrationEntity->setLastSyncDate(new \DateTime());
+                        $integrationEntity->setLastSyncDate(new DateTime());
 
                         $persistEntities[] = $integrationEntity;
                     } elseif ($contactId) {
                         $integrationEntity = new IntegrationEntity();
-                        $integrationEntity->setDateAdded(new \DateTime());
-                        $integrationEntity->setLastSyncDate(new \DateTime());
+                        $integrationEntity->setDateAdded(new DateTime());
+                        $integrationEntity->setLastSyncDate(new DateTime());
                         $integrationEntity->setIntegration($this->getName());
                         $integrationEntity->setIntegrationEntity($object);
                         $integrationEntity->setInternalEntity('lead-error');
@@ -1513,8 +1522,8 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                     if ($item['new']) {
                         // New object created
                         $integrationEntity = new IntegrationEntity();
-                        $integrationEntity->setDateAdded(new \DateTime());
-                        $integrationEntity->setLastSyncDate(new \DateTime());
+                        $integrationEntity->setDateAdded(new DateTime());
+                        $integrationEntity->setLastSyncDate(new DateTime());
                         $integrationEntity->setIntegration($this->getName());
                         $integrationEntity->setIntegrationEntity($object);
                         $integrationEntity->setIntegrationEntityId($item['id']);
@@ -1527,12 +1536,12 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                         // Record was updated
                         if ($integrationEntityId) {
                             $integrationEntity = $this->em->getReference(IntegrationEntity::class, $integrationEntityId);
-                            $integrationEntity->setLastSyncDate(new \DateTime());
+                            $integrationEntity->setLastSyncDate(new DateTime());
                         } else {
                             // Found in Sugarcrm so create a new record for it
                             $integrationEntity = new IntegrationEntity();
-                            $integrationEntity->setDateAdded(new \DateTime());
-                            $integrationEntity->setLastSyncDate(new \DateTime());
+                            $integrationEntity->setDateAdded(new DateTime());
+                            $integrationEntity->setLastSyncDate(new DateTime());
                             $integrationEntity->setIntegration($this->getName());
                             $integrationEntity->setIntegrationEntity($object);
                             $integrationEntity->setIntegrationEntityId($item['id']);
@@ -1546,7 +1555,7 @@ final class SugarcrmIntegration extends CrmAbstractIntegration
                 } else {
                     $error = 'Unknown status code '.$item['httpStatusCode'];
                     // @phpstan-ignore-next-line $item is mixed from untyped $response array; structure is guaranteed by SugarCRM API
-                    $this->logIntegrationError(new \Exception($error.' ('.$item['reference_id'].')'));
+                    $this->logIntegrationError(new Exception($error.' ('.$item['reference_id'].')'));
                 }
             }
 

@@ -3,30 +3,24 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-final readonly class EnvironmentSubscriber implements EventSubscriberInterface
+final readonly class EnvironmentSubscriber
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::REQUEST => [
-                // Cannot be called earlier than priority 128 or the session is not populated leading to Doctrine's UTCDateTimeType leaving
-                // entity DateTime values in UTC
-                ['onKernelRequestSetTimezone', 128],
-                // Must be 101 to load after Symfony's default Locale listener
-                ['onKernelRequestSetLocale', 101],
-            ],
-        ];
-    }
-
+    // priority 127 so this runs after Symfony's session_listener (priority 128);
+    // hasPreviousSession() needs the session started first
+    #[AsEventListener(
+        event: KernelEvents::REQUEST,
+        priority: 127
+    )]
     public function onKernelRequestSetTimezone(RequestEvent $event): void
     {
         $request = $event->getRequest();
@@ -35,13 +29,18 @@ final readonly class EnvironmentSubscriber implements EventSubscriberInterface
         }
 
         // Set date/time
-        date_default_timezone_set($request->getSession()->get('_timezone',
-            $this->coreParametersHelper->getDefaultTimezone()));
+        $timezone = $request->getSession()->get('_timezone', $this->coreParametersHelper->getDefaultTimezone());
+        date_default_timezone_set($timezone);
+        DateTimeHelper::setLocalTimezone($timezone);
     }
 
     /**
      * Set default locale.
      */
+    #[AsEventListener(
+        event: KernelEvents::REQUEST,
+        priority: 101
+    )]
     public function onKernelRequestSetLocale(RequestEvent $event): void
     {
         $request = $event->getRequest();

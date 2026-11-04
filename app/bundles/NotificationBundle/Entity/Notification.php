@@ -233,7 +233,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
 
         $builder->createField('mobileSettings', 'array')->build();
 
-
         self::addTranslationMetadata($builder, self::class);
     }
 
@@ -324,6 +323,8 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         $current = $this->{$getter}();
 
         if ('category' == $prop || 'list' == $prop) {
+            /** @var Category|null $current */
+            /** @var Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

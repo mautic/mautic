@@ -261,6 +261,8 @@ final class LeadListTest extends TestCase
                     'display' => null,
                 ],
             ],
-            $entity->getFilters(), 'The first filter glue must be "and".');
+            $entity->getFilters(),
+            'The first filter glue must be "and".'
+        );
     }
 }

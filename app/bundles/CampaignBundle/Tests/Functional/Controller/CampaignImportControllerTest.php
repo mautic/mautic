@@ -20,7 +20,6 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-
     public function testNewAction(): void
     {
         $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);

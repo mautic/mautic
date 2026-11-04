@@ -17,7 +17,8 @@ final class FormSubmitActionUserEmailType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('useremail',
+        $builder->add(
+            'useremail',
             EmailSendType::class,
             [
                 'label' => 'mautic.email.emails',

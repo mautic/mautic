@@ -74,6 +74,7 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
         $this->failures->set($log->getId(), $log);
     }
+
     public function failAll(string $reason): void
     {
         foreach ($this->logs as $log) {

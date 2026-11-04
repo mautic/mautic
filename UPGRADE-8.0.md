@@ -414,6 +414,10 @@
 
 ## Changed code
 
+- Most core event subscribers no longer implement `Symfony\Component\EventDispatcher\EventSubscriberInterface`. Listener methods now carry a `#[AsEventListener]` attribute instead of being declared in `getSubscribedEvents()`, and are registered through service autoconfiguration. Two consequences for plugins:
+    - A plugin service that extends an abstract base such as `Mautic\CoreBundle\EventListener\CommonStatsSubscriber` or `Mautic\NotificationBundle\EventListener\CampaignSubscriber` must be an autoconfigured service for its inherited `#[AsEventListener]` methods to register. Services defined with `autoconfigure: true` (the default in Mautic's `config/services.php` loader) get this automatically; a service registered without autoconfiguration no longer receives its events.
+    - PHP does not inherit attributes onto an overridden method. A child class that overrides a listener method (e.g. `onStatsFetch()`) loses the `#[AsEventListener]` from the parent, so that override is not registered. Re-add the `#[AsEventListener]` attribute on the overriding method.
+    - Execution order at equal priority changes. `RegisterListenersPass` registers `kernel.event_listener` services before `kernel.event_subscriber` ones, and attribute listeners now run in method-declaration order rather than the old `getSubscribedEvents()` array order. A plugin that relied on a core listener running before or after its own at the same priority should set an explicit `priority` on its `#[AsEventListener]`.
 - CampaignBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\CampaignBundle\CampaignEvents` string constants. Update any subscriber or listener that keys on one of the converted `CampaignEvents::*` constants (or the raw string name such as `mautic.campaign_on_build`) to key on the event class instead:
 - IntegrationsBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\IntegrationsBundle\IntegrationEvents` string constants. Update any subscriber or listener that keys on one of the converted `IntegrationEvents::*` constants to key on the event class instead:
 - CoreBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\CoreBundle\CoreEvents` string constants. Update any subscriber or listener that keys on a `CoreEvents::*` constant (or the raw string name such as `mautic.build_menu`) to key on the event class instead:
@@ -1198,3 +1202,11 @@
     ```
 
     `CommonApiController` and `FetchCommonApiController` also renamed their `@template`/`@extends` generic type parameter from `E` to `TEntity`; this only matters for static-analysis consumers that referenced the generic by name.
+- Many getters and setters now declare a native return type promoted from their `@return` docblock (entity getters returning the related entity, fluent setters returning `static`, and similar). A subclass that overrides one of these methods must declare the matching native return type, otherwise PHP raises an incompatible-signature error.
+
+- The `$options` parameter of `createForm()` now declares the native `array` type (previously only a `@param array` docblock). This affects `Mautic\CoreBundle\Model\FormModel::createForm()` and every model override across the bundles (`LeadModel`, `EmailModel`, `PageModel`, `CampaignModel`, `ReportModel`, …). If you extend one of these and override `createForm()`, an untyped `$options` override stays compatible with PHP - leaving a parameter untyped is a valid widening, so no incompatible-declaration error occurs. Add `array $options` to satisfy the `mautic.nativeTypeForArrayOrIterableDocblock` PHPStan rule and keep the signature aligned with the parent:
+
+    ```diff
+    -public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    +public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
+    ```

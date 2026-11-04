@@ -32,13 +32,11 @@ abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispat
         $this->extractContacts();
     }
 
-    
     public function getConfig(): AbstractEventAccessor
     {
         return $this->config;
     }
 
-    
     public function getEvent(): Event
     {
         return $this->event;

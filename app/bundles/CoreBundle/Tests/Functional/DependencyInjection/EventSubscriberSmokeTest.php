@@ -56,6 +56,7 @@ use MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber;
 use MauticPlugin\MauticFocusBundle\EventListener\ReportSubscriber;
 use MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber;
 use MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
@@ -226,7 +227,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
         $eventSubscriberClasses = [];
 
         foreach ($this->resolveEventSubscribers() as $eventSubscriber) {
-            foreach (array_keys($eventSubscriber::getSubscribedEvents()) as $eventName) {
+            foreach ($this->resolveSubscribedEventNames($eventSubscriber) as $eventName) {
                 $eventSubscriberClasses[$eventName][] = $eventSubscriber::class;
             }
         }
@@ -244,13 +245,51 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
     }
 
     /**
-     * @return array<int, EventSubscriberInterface>
+     * @return array<int, object>
      */
     private function resolveEventSubscribers(): array
     {
         return array_filter(
             $this->createAllServices(),
-            fn (object $service): bool => $service instanceof EventSubscriberInterface && $this->isLocalService($service)
+            fn (object $service): bool => $this->isEventListener($service) && $this->isLocalService($service)
         );
+    }
+
+    private function isEventListener(object $service): bool
+    {
+        if ($service instanceof EventSubscriberInterface) {
+            return true;
+        }
+
+        return $this->resolveAttributeEventNames($service) !== [];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function resolveSubscribedEventNames(object $service): array
+    {
+        if ($service instanceof EventSubscriberInterface) {
+            return array_keys($service::getSubscribedEvents());
+        }
+
+        return $this->resolveAttributeEventNames($service);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function resolveAttributeEventNames(object $service): array
+    {
+        $eventNames = [];
+
+        $reflectionClass = new \ReflectionClass($service);
+        foreach ($reflectionClass->getMethods() as $reflectionMethod) {
+            foreach ($reflectionMethod->getAttributes(AsEventListener::class) as $reflectionAttribute) {
+                $eventNames[] = $reflectionAttribute->newInstance()->event;
+            }
+        }
+
+        return array_unique($eventNames);
     }
 }

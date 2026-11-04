@@ -6,10 +6,11 @@ use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\EmailBundle\Entity\Email;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class DetermineWinnerSubscriber implements EventSubscriberInterface
+final readonly class DetermineWinnerSubscriber
 {
     public function __construct(
         private DownloadRepository $downloadRepository,
@@ -17,21 +18,19 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            AssetEvents::ON_DETERMINE_DOWNLOAD_RATE_WINNER => ['onDetermineDownloadRateWinner', 0],
-        ];
-    }
-
     /**
      * Determines the winner of A/B test based on number of asset downloads.
      */
+    #[AsEventListener(
+        event: AssetEvents::ON_DETERMINE_DOWNLOAD_RATE_WINNER,
+    )]
     public function onDetermineDownloadRateWinner(DetermineWinnerEvent $event): void
     {
         $parameters = $event->getParameters();
-        $parent     = $parameters['parent'];
-        $children   = $parameters['children'];
+        /** @var Email|Page $parent */
+        $parent = $parameters['parent'];
+        /** @var array<int, Email|Page> $children */
+        $children = $parameters['children'];
 
         // if this is an email A/B test, then link email to page to form submission
         // if it is a page A/B test, then link form submission to page
@@ -69,7 +68,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
                 if (!in_array($parent->getId(), $hasResults)) {
                     $data[$downloadsLabel][] = 0;
                     $data[$hitsLabel][]      = 0;
-                    $support['labels'][]     = $parent->getId().':'.(('page' === $type) ? $parent->getTitle() : $parent->getName()).' (0%)';
+                    $support['labels'][]     = $parent->getId().':'.($parent instanceof Email ? $parent->getName() : $parent->getTitle()).' (0%)';
                 }
 
                 foreach ($children as $c) {
@@ -77,7 +76,7 @@ final readonly class DetermineWinnerSubscriber implements EventSubscriberInterfa
                         if (!in_array($c->getId(), $hasResults)) {
                             $data[$downloadsLabel][] = 0;
                             $data[$hitsLabel][]      = 0;
-                            $support['labels'][]     = $c->getId().':'.(('page' === $type) ? $c->getTitle() : $c->getName()).' (0%)';
+                            $support['labels'][]     = $c->getId().':'.($c instanceof Email ? $c->getName() : $c->getTitle()).' (0%)';
                         }
                     }
                 }

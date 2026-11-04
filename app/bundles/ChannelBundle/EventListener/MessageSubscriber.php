@@ -7,26 +7,21 @@ namespace Mautic\ChannelBundle\EventListener;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\MessageEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class MessageSubscriber implements EventSubscriberInterface
+final readonly class MessageSubscriber
 {
     public function __construct(
         private AuditLogModel $auditLogModel,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ChannelEvents::MESSAGE_POST_SAVE   => ['onPostSave', 0],
-            ChannelEvents::MESSAGE_POST_DELETE => ['onDelete', 0],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[AsEventListener(
+        event: ChannelEvents::MESSAGE_POST_SAVE,
+    )]
     public function onPostSave(MessageEvent $event): void
     {
         $entity = $event->getMessage();
@@ -45,6 +40,9 @@ final readonly class MessageSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
+    #[AsEventListener(
+        event: ChannelEvents::MESSAGE_POST_DELETE,
+    )]
     public function onDelete(MessageEvent $event): void
     {
         $entity = $event->getMessage();

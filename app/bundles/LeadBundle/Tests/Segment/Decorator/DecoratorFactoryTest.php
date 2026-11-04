@@ -46,7 +46,8 @@ final class DecoratorFactoryTest extends TestCase
             $this->createStub(CustomMappedDecorator::class),
             $this->dateOptionFactory,
             $this->createStub(CompanyDecorator::class),
-            $this->eventDispatcherMock);
+            $this->eventDispatcherMock
+        );
     }
 
     public function testBaseDecorator(): void

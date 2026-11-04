@@ -18,9 +18,10 @@ final class StatsSubscriber extends CommonStatsSubscriber
         IpAddressRepository $ipAddressRepository,
     ) {
         parent::__construct($security, $entityManager);
-        $this->repositories['MauticCoreBundle:AuditLog'] = $auditLogRepository;
-        $this->permissions['MauticCoreBundle:AuditLog']  = ['admin'];
+        $this->repositories[]                                   = $auditLogRepository;
+        $this->permissions[$auditLogRepository->getTableName()] = ['admin'];
 
-        $this->repositories['MauticCoreBundle:IpAddress'] = $ipAddressRepository;
+        $this->repositories[]                                    = $ipAddressRepository;
+        $this->permissions[$ipAddressRepository->getTableName()] = ['admin'];
     }
 }
