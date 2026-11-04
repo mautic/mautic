@@ -27,6 +27,10 @@ use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\Event\DncEvent;
 use Mautic\SmsBundle\Event\FilterEvent;
 use Mautic\SmsBundle\Event\QueueEvent;
+use Mautic\SmsBundle\Event\SmsPostDeleteEvent;
+use Mautic\SmsBundle\Event\SmsPostSaveEvent;
+use Mautic\SmsBundle\Event\SmsPreDeleteEvent;
+use Mautic\SmsBundle\Event\SmsPreSaveEvent;
 use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
 use Mautic\SmsBundle\Form\Type\SmsType;
@@ -38,6 +42,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -390,6 +395,34 @@ final class SmsModel extends FormModel implements AjaxLookupModelInterface, Glob
         }
 
         return $stat;
+    }
+
+    /**
+     * @param Sms $entity
+     *
+     * @throws MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    {
+        if (!$entity instanceof Sms) {
+            throw new MethodNotAllowedHttpException(['Sms']);
+        }
+
+        $event = match ($action) {
+            'pre_save'    => new SmsPreSaveEvent($entity, $isNew),
+            'post_save'   => new SmsPostSaveEvent($entity, $isNew),
+            'pre_delete'  => new SmsPreDeleteEvent($entity, $isNew),
+            'post_delete' => new SmsPostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
+        }
+
+        $this->dispatcher->dispatch($event);
+
+        return $event;
     }
 
     /**

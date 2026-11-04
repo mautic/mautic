@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use Mautic\PageBundle\Event\PageOnTogglePublishEvent;
-use Mautic\PageBundle\PageEvents;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -31,7 +30,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
         self::getContainer()
             ->get(EventDispatcherInterface::class)
-            ->addListener(PageEvents::PAGE_ON_TOGGLE_PUBLISH, function (PageOnTogglePublishEvent $event) use (&$dispatchedEvent): void {
+            ->addListener(PageOnTogglePublishEvent::class, function (PageOnTogglePublishEvent $event) use (&$dispatchedEvent): void {
                 $dispatchedEvent = $event;
             });
 

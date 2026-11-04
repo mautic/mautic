@@ -344,10 +344,21 @@ parameters:
             paths:
                 - app/bundles/CampaignBundle/Executioner/Dispatcher/ConditionDispatcher.php
                 - app/bundles/CampaignBundle/Executioner/Dispatcher/DecisionDispatcher.php
+                - app/bundles/CategoryBundle/Model/CategoryModel.php
+                - app/bundles/ChannelBundle/Model/MessageModel.php
                 - app/bundles/ChannelBundle/Tests/EventListener/CampaignSubscriberTest.php
+                - app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
+                - app/bundles/FormBundle/Model/FieldModel.php
+                - app/bundles/FormBundle/Model/FormModel.php
                 - app/bundles/LeadBundle/Tests/EventListener/CampaignSubscriberFunctionalTest.php
                 - app/bundles/NotificationBundle/EventListener/CampaignSubscriber.php
+                - app/bundles/PageBundle/Model/PageModel.php
+                - app/bundles/PointBundle/Model/PointGroupModel.php
+                - app/bundles/PointBundle/Model/PointModel.php
+                - app/bundles/PointBundle/Model/TriggerModel.php
+                - app/bundles/ReportBundle/Model/ReportModel.php
                 - app/bundles/SmsBundle/Model/SmsModel.php
+                - app/bundles/StageBundle/Model/StageModel.php
                 - plugins/MauticFocusBundle/Model/FocusModel.php
 
         # base common model fetches its repository directly by design
