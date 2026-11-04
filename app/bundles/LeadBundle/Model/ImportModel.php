@@ -4,7 +4,6 @@ namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
-use Mautic\CoreBundle\Event\AbstractEntityEvent;
 use Mautic\CoreBundle\Exception\OrmException as MauticOrmException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -588,7 +587,7 @@ class ImportModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Import) {
             throw new MethodNotAllowedHttpException(['Import']);

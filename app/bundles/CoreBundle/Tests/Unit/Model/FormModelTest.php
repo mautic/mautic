@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Event\AbstractEntityEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
@@ -67,7 +66,7 @@ final class FormModelTest extends TestCase
              */
             private array $actions = [];
 
-            protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?AbstractEntityEvent $event = null): ?AbstractEntityEvent
+            protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
             {
                 $this->actions[] = $action;
 

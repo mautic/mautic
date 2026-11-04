@@ -5,7 +5,6 @@ namespace Mautic\CoreBundle\Model;
 use Doctrine\ORM\UnitOfWork;
 use Mautic\CoreBundle\Doctrine\ReservedWords;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
-use Mautic\CoreBundle\Event\AbstractEntityEvent;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
 use Mautic\CoreBundle\Event\EntityPostDelete;
 use Mautic\CoreBundle\Event\EntityPostSave;
@@ -396,10 +395,9 @@ class FormModel extends AbstractCommonModel
     /**
      * Dispatches events for child classes.
      *
-     * @param "pre_save"|"post_save"|"pre_delete"|"post_delete" $action
      * @param TEntity $entity
      */
-    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?AbstractEntityEvent $entityEvent = null): ?AbstractEntityEvent
+    protected function dispatchEvent(string $action, object &$entity, bool $isNew = false, ?Event $entityEvent = null): ?Event
     {
         $eventClass = match ($action) {
             'pre_save'    => EntityPreSave::class,

@@ -151,5 +151,4 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
 
         return $clone;
     }
-
 }

@@ -66,5 +66,4 @@ final class DeviceModel extends FormModel
 
         return $this->formFactory->create(DeviceType::class, $entity, $options);
     }
-
 }

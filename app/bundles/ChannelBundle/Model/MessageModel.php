@@ -217,5 +217,4 @@ final class MessageModel extends FormModel implements AjaxLookupModelInterface, 
 
         return $result[$nameColumn] ?? null;
     }
-
 }
