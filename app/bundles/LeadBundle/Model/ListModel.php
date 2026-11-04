@@ -36,6 +36,7 @@ use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Form\Type\ListType;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
+use Mautic\LeadBundle\Helper\SegmentPublicNameResolver;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
@@ -67,13 +68,17 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     private LeadListTranslationRepository $publicNameTranslationRepository;
 
+    private SegmentPublicNameResolver $publicNameResolver;
+
     #[Required]
     public function autowireListModel(
         SegmentPublicNameTranslationManager $publicNameTranslationManager,
         LeadListTranslationRepository $publicNameTranslationRepository,
+        SegmentPublicNameResolver $publicNameResolver,
     ): void {
         $this->publicNameTranslationManager    = $publicNameTranslationManager;
         $this->publicNameTranslationRepository = $publicNameTranslationRepository;
+        $this->publicNameResolver              = $publicNameResolver;
     }
 
     /**
@@ -409,9 +414,25 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *      alias: string
      *   }>
      */
-    public function getPreferenceCenterLists(): array
+    public function getPreferenceCenterLists(?string $preferredLocale = null): array
     {
-        return $this->leadListRepository->getPreferenceCenterList();
+        $lists = $this->leadListRepository->getPreferenceCenterList();
+        if (null === $preferredLocale || '' === trim($preferredLocale) || [] === $lists) {
+            return $lists;
+        }
+
+        $ids = array_map('intval', array_column($lists, 'id'));
+        $translationsBySegmentId = $this->publicNameTranslationRepository->findForSegmentIds($ids);
+        foreach ($lists as &$list) {
+            $list['publicName'] = $this->publicNameResolver->resolve(
+                $preferredLocale,
+                $list['publicName'],
+                $list['name'],
+                $translationsBySegmentId[$list['id']] ?? [],
+            );
+        }
+
+        return $lists;
     }
 
     /**

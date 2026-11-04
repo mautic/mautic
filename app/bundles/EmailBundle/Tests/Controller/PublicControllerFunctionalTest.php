@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListTranslation;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\PageRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -61,7 +62,7 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
             $this->configParams['show_contact_preferred_channels'] = 1;
         }
 
-        if ('testContactPreferencesFormRenderOnUnsubscribePage' === $this->name()) {
+        if (in_array($this->name(), ['testContactPreferencesFormRenderOnUnsubscribePage', 'testContactPreferencesFormUsesLocalizedSegmentNames'], true)) {
             $this->configParams['show_contact_segments'] = 1;
         }
 
@@ -988,6 +989,26 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
                 );
             }
         );
+    }
+
+    public function testContactPreferencesFormUsesLocalizedSegmentNames(): void
+    {
+        $lead = $this->createLead('fr_CH');
+        $stat = $this->getStat(null, $lead);
+        $first = $this->createSegment('First segment', 'A default', 'localized-first');
+        $second = $this->createSegment('Second segment', 'B default', 'localized-second');
+        $this->em->persist(new LeadListTranslation($first, 'fr', 'Nouvelles'));
+        $this->em->persist(new LeadListTranslation($first, 'fr_CH', 'Actualités'));
+        $this->em->persist(new LeadListTranslation($second, 'fr_CH', 'Actualités'));
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', $this->buildUnsubscribeUrl($stat));
+        self::assertResponseIsSuccessful();
+
+        $labels = $crawler->filter('#contact-segments label[for]')->each(fn ($node): string => trim($node->text()));
+        self::assertSame(['Actualités ('.$first->getId().')', 'Actualités ('.$second->getId().')'], $labels);
+        $values = $crawler->filter('#contact-segments input[type="checkbox"]')->each(fn ($node): string => $node->attr('value'));
+        self::assertSame([(string) $first->getId(), (string) $second->getId()], $values);
     }
 
     private function createSegment(

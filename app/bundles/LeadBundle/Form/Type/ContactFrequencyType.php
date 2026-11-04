@@ -54,6 +54,7 @@ final class ContactFrequencyType extends AbstractType
                 LeadListType::class,
                 [
                     'preference_center_only' => $options['preference_center_only'],
+                    'preferred_locale'       => $options['preferred_locale'],
                     'label'                  => 'mautic.lead.form.list',
                     'label_attr'             => ['class' => 'form-label'],
                     'multiple'               => true,
@@ -102,6 +103,7 @@ final class ContactFrequencyType extends AbstractType
             [
                 'public_view'               => false,
                 'preference_center_only'    => false,
+                'preferred_locale'          => null,
             ]
         );
     }
