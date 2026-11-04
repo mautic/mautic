@@ -32,7 +32,7 @@ final class StatRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->createStat($childEmail, '2026-03-20 09:00:00');
         $this->em->flush();
 
-        $this->assertSame('2026-03-20 09:00:00', $this->statRepository->getEmailSentLastDate((int) $parentEmail->getId()));
+        $this->assertSame('2026-03-20 09:00:00.000', $this->statRepository->getEmailSentLastDate((int) $parentEmail->getId()));
     }
 
     public function testGetEmailSentLastDateReturnsNullWithoutStats(): void
