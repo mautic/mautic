@@ -20,6 +20,7 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
     use DashboardWidgetPermissionTrait;
 
     private const string OWN_CONTACT   = 'widget-own@mautic-test.com';
+
     private const string OTHER_CONTACT = 'widget-other@mautic-test.com';
 
     private User $withoutViewOther;

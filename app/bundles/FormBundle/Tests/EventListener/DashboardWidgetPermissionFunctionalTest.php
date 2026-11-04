@@ -22,9 +22,11 @@ final class DashboardWidgetPermissionFunctionalTest extends MauticMysqlTestCase
     use DashboardWidgetPermissionTrait;
 
     private const string OWN_SUBMITTER   = 'submitter-own@mautic-test.com';
+
     private const string OTHER_SUBMITTER = 'submitter-other@mautic-test.com';
 
     private const string OWN_REFERRER    = 'https://own-referrer.mautic-test.com/page';
+
     private const string OTHER_REFERRER  = 'https://other-referrer.mautic-test.com/page';
 
     private User $withoutViewOther;
