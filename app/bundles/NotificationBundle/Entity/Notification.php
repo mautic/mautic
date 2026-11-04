@@ -143,9 +143,9 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     private $sentCount = 0;
 
     #[Groups(['notification:read', 'notification:write'])]
-    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
-    private ?\Mautic\CategoryBundle\Entity\Category $category = null;
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<int, LeadList>

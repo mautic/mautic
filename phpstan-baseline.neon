@@ -42,7 +42,6 @@ parameters:
 			count: 1
 			path: app/bundles/ApiBundle/Entity/oAuth2/Client.php
 
-
 		-
 			message: '#^Access to an undefined property Mautic\\ApiBundle\\Entity\\oAuth2\\Client\:\:\$deletedId\.$#'
 			identifier: property.notFound
@@ -1837,7 +1836,6 @@ parameters:
 			count: 1
 			path: app/bundles/CoreBundle/Validator/FileUploadValidator.php
 
-
 		-
 			message: '#^Property Mautic\\DashboardBundle\\Entity\\Widget\:\:\$id \(int\) does not accept null\.$#'
 			identifier: assign.propertyType
@@ -1885,8 +1883,6 @@ parameters:
 			identifier: assign.propertyType
 			count: 1
 			path: app/bundles/DynamicContentBundle/Entity/DynamicContent.php
-
-
 
 		-
 			message: '#^Method Mautic\\DynamicContentBundle\\Entity\\DynamicContentRepository\:\:getDynamicContentForSlotFromCampaign\(\) has parameter \$slot with no type specified\.$#'
@@ -6411,7 +6407,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/UserBundle/Entity/User.php
-
 
 		-
 			message: '#^Method Mautic\\UserBundle\\Entity\\UserRepository\:\:setLastActive\(\) has parameter \$user with no type specified\.$#'
