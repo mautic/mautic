@@ -129,6 +129,31 @@ final class HitRepositoryTest extends MauticMysqlTestCase
         $this->assertSame(1, $counts[$pageThree->getId()]['count']);
     }
 
+    public function testCountDistinctIpsForEmailAndLeadSince(): void
+    {
+        $email     = $this->createEmail();
+        $otherEmail = $this->createEmail();
+        $lead      = $this->createLead();
+        $otherLead = $this->createLead();
+        $this->em->flush();
+
+        $this->createHitWithIp($lead, $email, new \DateTime('-5 seconds'), 'burst-a', '203.0.113.10');
+        $this->createHitWithIp($lead, $email, new \DateTime('-4 seconds'), 'burst-b', '203.0.113.11');
+        $this->createHitWithIp($lead, $email, new \DateTime('-3 seconds'), 'burst-c', '203.0.113.12');
+        $this->createHitWithIp($lead, $email, new \DateTime('-2 hours'), 'burst-old', '203.0.113.13');
+        $this->createHitWithIp($lead, $otherEmail, new \DateTime('-2 seconds'), 'burst-other-email', '203.0.113.14');
+        $this->createHitWithIp($otherLead, $email, new \DateTime('-2 seconds'), 'burst-other-lead', '203.0.113.15');
+        $this->em->flush();
+
+        $count = $this->hitRepository->countDistinctIpsForEmailAndLeadSince(
+            (int) $email->getId(),
+            $lead->getId(),
+            new \DateTime('-30 seconds')
+        );
+
+        $this->assertSame(3, $count);
+    }
+
     private function assertHitDate(\DateTime $expectedHitDate, Lead $lead, ?string $trackingId): void
     {
         $hitDate = $this->hitRepository->getLatestHitDateByLead($lead->getId(), $trackingId);
@@ -159,6 +184,24 @@ final class HitRepositoryTest extends MauticMysqlTestCase
             $hit->setSource('page');
         }
 
+        $this->em->persist($hit);
+
+        return $hit;
+    }
+
+    private function createHitWithIp(Lead $lead, Email $email, \DateTime $dateHit, string $trackingId, string $ip): Hit
+    {
+        $ipAddress = new IpAddress($ip);
+        $this->em->persist($ipAddress);
+
+        $hit = new Hit();
+        $hit->setLead($lead);
+        $hit->setEmail($email);
+        $hit->setIpAddress($ipAddress);
+        $hit->setDateHit($dateHit);
+        $hit->setTrackingId($trackingId);
+        $hit->setCode(200);
+        $hit->setSource('email');
         $this->em->persist($hit);
 
         return $hit;

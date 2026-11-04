@@ -205,6 +205,8 @@ return [
             'LinkedInBot/1.0 (compatible; Mozilla/5.0; Jakarta Commons-HttpClient/3.1 +http://www.linkedin.com)',
         ],
         'bot_helper_blocked_ip_addresses'                                   => [],
+        'bot_helper_burst_max_distinct_ips'                                 => 0, // 0 disables the burst scanner signal
+        'bot_helper_burst_window_seconds'                                   => 30,
         'smime_signing_enabled'                                             => false,
         'smime_certificates_path'                                           => '%kernel.project_dir%/var/smime_certificates',
     ],

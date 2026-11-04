@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Helper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
+use Mautic\PageBundle\Entity\HitRepository;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class BotRatioHelper
@@ -29,6 +30,14 @@ class BotRatioHelper
 
         #[Autowire(env: 'json:MAUTIC_BOT_HELPER_BLOCKED_IP_ADDRESSES')]
         private readonly array $blockedIPAddresses = [],
+
+        #[Autowire(env: 'int:MAUTIC_BOT_HELPER_BURST_MAX_DISTINCT_IPS')]
+        private readonly int $burstMaxDistinctIps = 0,
+
+        #[Autowire(env: 'int:MAUTIC_BOT_HELPER_BURST_WINDOW_SECONDS')]
+        private readonly int $burstWindowSeconds = 30,
+
+        private readonly ?HitRepository $hitRepository = null,
     ) {
     }
 
@@ -38,6 +47,10 @@ class BotRatioHelper
         IpAddress $ipAddress,
         string $userAgent,
     ): bool {
+        if ($this->isBurstScanner($emailStat, $emailHitDateTime)) {
+            return true;
+        }
+
         $totalPoints = (int) $this->isUnderTimeThreshold($emailStat, $emailHitDateTime) +
             (int) $this->isIpInIgnoreList($ipAddress) +
             (int) $this->isUserAgentInIgnoreList($userAgent);
@@ -51,6 +64,39 @@ class BotRatioHelper
         $deviceDetector->parse();
 
         return $deviceDetector->isBot();
+    }
+
+   
+    private function isBurstScanner(Stat $emailStat, \DateTimeInterface $emailHitDateTime): bool
+    {
+        if ($this->burstMaxDistinctIps <= 0 || null === $this->hitRepository) {
+            return false;
+        }
+
+        $email = $emailStat->getEmail();
+        $lead  = $emailStat->getLead();
+
+        if (null === $email || null === $lead) {
+            return false;
+        }
+
+        $emailId = $email->getId();
+        $leadId  = $lead->getId();
+
+        if (null === $emailId || $leadId <= 0) {
+            return false;
+        }
+
+        $since = (new \DateTimeImmutable('@'.($emailHitDateTime->getTimestamp() - $this->burstWindowSeconds)))
+            ->setTimezone(new \DateTimeZone('UTC'));
+
+        $distinctIps = $this->hitRepository->countDistinctIpsForEmailAndLeadSince(
+            (int) $emailId,
+            $leadId,
+            $since
+        );
+
+        return $distinctIps >= $this->burstMaxDistinctIps;
     }
 
     private function isUnderTimeThreshold(Stat $emailStat, \DateTimeInterface $emailHitDateTime): bool
