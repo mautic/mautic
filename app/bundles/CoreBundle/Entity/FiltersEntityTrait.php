@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Entity;
 
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 trait FiltersEntityTrait
@@ -11,15 +11,8 @@ trait FiltersEntityTrait
      * @var array
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private $filters = [];
-
-    protected static function addFiltersMetadata(ClassMetadataBuilder $builder): void
-    {
-        $builder->createField('filters', 'array')
-            ->columnName('filters')
-            ->nullable()
-            ->build();
-    }
 
     public function getFilters(): array
     {
