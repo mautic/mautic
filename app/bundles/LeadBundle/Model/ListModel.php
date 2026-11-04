@@ -42,6 +42,7 @@ use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\TableNotFoundException;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
+use Mautic\LeadBundle\Services\SegmentPublicNameTranslationManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -52,6 +53,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<LeadList>
@@ -59,6 +61,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ListModel extends FormModel implements GlobalSearchInterface
 {
     use OperatorListTrait;
+
+    private SegmentPublicNameTranslationManager $publicNameTranslationManager;
+
+    #[Required]
+    public function autowireListModel(SegmentPublicNameTranslationManager $publicNameTranslationManager): void
+    {
+        $this->publicNameTranslationManager = $publicNameTranslationManager;
+    }
 
     /**
      * @var mixed[]
@@ -156,6 +166,22 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $event = $this->dispatchEvent('pre_save', $entity, $isNew);
         $repo->saveEntity($entity);
         $this->dispatchEvent('post_save', $entity, $isNew, $event);
+    }
+
+    /**
+     * Save a Segment and its public name translations in the same Doctrine flush.
+     *
+     * @param list<array{locale: string, publicName: string}> $translations
+     */
+    public function saveEntityWithTranslations(LeadList $entity, array $translations, bool $unlock = true): void
+    {
+        $this->em->getConnection()->transactional(function () use ($entity, $translations, $unlock): void {
+            if ($entity->getIsPreferenceCenter()) {
+                $this->publicNameTranslationManager->sync($entity, $translations);
+            }
+
+            $this->saveEntity($entity, $unlock);
+        });
     }
 
     /**

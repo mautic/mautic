@@ -20,7 +20,7 @@ final class SegmentPublicNameTranslationManager
     }
 
     /**
-     * Replace the translations for a persisted, public Segment. The caller flushes the changes.
+     * Replace the translations for a public Segment. The caller persists the Segment and flushes the changes.
      *
      * @param list<array{locale: string, publicName: string}> $translations
      */
@@ -29,10 +29,6 @@ final class SegmentPublicNameTranslationManager
         if (!$segment->getIsPreferenceCenter()) {
             throw new \LogicException('Translations can only be edited for Preference Center segments.');
         }
-        if (null === $segment->getId()) {
-            throw new \LogicException('The segment must be persisted before editing translations.');
-        }
-
         $requested = [];
         foreach ($translations as $translation) {
             $locale     = $this->localeNormalizer->normalize($translation['locale']);
@@ -46,7 +42,8 @@ final class SegmentPublicNameTranslationManager
             $requested[$locale] = $publicName;
         }
 
-        foreach ($this->translationRepository->findBy(['leadList' => $segment]) as $stored) {
+        $storedTranslations = null === $segment->getId() ? [] : $this->translationRepository->findBy(['leadList' => $segment]);
+        foreach ($storedTranslations as $stored) {
             $locale = $stored->getLocale();
             if (!array_key_exists($locale, $requested)) {
                 $this->entityManager->remove($stored);
