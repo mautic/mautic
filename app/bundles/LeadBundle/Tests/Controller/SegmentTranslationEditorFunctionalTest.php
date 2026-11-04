@@ -110,6 +110,29 @@ final class SegmentTranslationEditorFunctionalTest extends MauticMysqlTestCase
         self::assertSame(0, $this->em->getRepository(LeadList::class)->count(['alias' => 'duplicate-locale-editor']));
     }
 
+    public function testInvalidTranslationKeepsEnteredRowsWithoutSavingSegment(): void
+    {
+        $crawler = $this->client->request('GET', '/s/segments/new');
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $values  = $form->getPhpValues();
+        $values['leadlist']['name']               = 'Correct translation';
+        $values['leadlist']['alias']              = 'correct-translation';
+        $values['leadlist']['isPreferenceCenter'] = '1';
+        $values['leadlist']['translations']       = [
+            ['locale' => 'fr', 'publicName' => ''],
+            ['locale' => 'it', 'publicName' => 'Notizie Mautic'],
+        ];
+
+        $crawler = $this->client->request('POST', $form->getUri(), $values);
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(0, $this->em->getRepository(LeadList::class)->count(['alias' => 'correct-translation']));
+        self::assertStringContainsString('This value should not be blank.', (string) $this->client->getResponse()->getContent());
+        self::assertSame('fr', $crawler->filter('#leadlist_translations_0_locale option:selected')->attr('value'));
+        self::assertSame('it', $crawler->filter('#leadlist_translations_1_locale option:selected')->attr('value'));
+        self::assertSame('Notizie Mautic', $crawler->filter('#leadlist_translations_1_publicName')->attr('value'));
+    }
+
     public function testRemovingLastTranslationDeletesIt(): void
     {
         $segment = new LeadList();
