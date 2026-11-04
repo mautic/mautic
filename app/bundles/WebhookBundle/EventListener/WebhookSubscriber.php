@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\WebhookBundle\EventListener;
 
+use Mautic\CoreBundle\Event\EntityPostDelete;
+use Mautic\CoreBundle\Event\EntityPostSave;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\Event\WebhookKillEvent;
-use Mautic\WebhookBundle\Event\WebhookPostDeleteEvent;
-use Mautic\WebhookBundle\Event\WebhookPostSaveEvent;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
@@ -25,12 +26,13 @@ final readonly class WebhookSubscriber
     /**
      * Add an entry to the audit log.
      */
-    #[AsEventListener(
-        event: WebhookPostSaveEvent::class,
-    )]
-    public function onWebhookSave(WebhookEvent $event): void
+    #[AsEventListener]
+    public function onWebhookSave(EntityPostSave $event): void
     {
-        $webhook = $event->getWebhook();
+        $webhook = $event->getEntity();
+        if (!$webhook instanceof Webhook) {
+            return;
+        }
 
         if ($details = $event->getChanges()) {
             $log = [
@@ -48,16 +50,18 @@ final readonly class WebhookSubscriber
     /**
      * Add a delete entry to the audit log.
      */
-    #[AsEventListener(
-        event: WebhookPostDeleteEvent::class,
-    )]
-    public function onWebhookDelete(WebhookEvent $event): void
+    #[AsEventListener]
+    public function onWebhookDelete(EntityPostDelete $event): void
     {
-        $webhook = $event->getWebhook();
-        $log     = [
+        $webhook = $event->getEntity();
+        if (!$webhook instanceof Webhook) {
+            return;
+        }
+
+        $log = [
             'bundle'    => 'webhook',
             'object'    => 'webhook',
-            'objectId'  => $event->getWebhook()->deletedId,
+            'objectId'  => $webhook->deletedId,
             'action'    => 'delete',
             'details'   => ['name' => $webhook->getName()],
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
