@@ -414,6 +414,7 @@
 
 ## Changed code
 
+- `Mautic\CategoryBundle\Entity\CategoryRepository::getCategoryList()` now types `$search` as `string|array` (a title prefix, or a list of category ids). Passing `null` or an integer now throws a `TypeError`; pass `''` for no search.
 - Most core event subscribers no longer implement `Symfony\Component\EventDispatcher\EventSubscriberInterface`. Listener methods now carry a `#[AsEventListener]` attribute instead of being declared in `getSubscribedEvents()`, and are registered through service autoconfiguration. Two consequences for plugins:
     - A plugin service that extends an abstract base such as `Mautic\CoreBundle\EventListener\CommonStatsSubscriber` or `Mautic\NotificationBundle\EventListener\CampaignSubscriber` must be an autoconfigured service for its inherited `#[AsEventListener]` methods to register. Services defined with `autoconfigure: true` (the default in Mautic's `config/services.php` loader) get this automatically; a service registered without autoconfiguration no longer receives its events.
     - PHP does not inherit attributes onto an overridden method. A child class that overrides a listener method (e.g. `onStatsFetch()`) loses the `#[AsEventListener]` from the parent, so that override is not registered. Re-add the `#[AsEventListener]` attribute on the overriding method.
@@ -849,6 +850,7 @@
     | `CampaignBundle\Model\CampaignModel` | `getLeadSources()` | `Campaign\|int\|string` |
     | `CampaignBundle\Model\CampaignModel` | `getCampaignsByForm()` | `Form\|int` |
     | `CampaignBundle\Model\CampaignModel` | `getCampaignIdsWithDependenciesOnSegment()` | `int` |
+    | `CampaignBundle\Model\CampaignModel` | `rebuildCampaignLeads()` | `int` (`$limit`), `int` (`$maxLeads`, was `bool`; pass `0` instead of `false`) |
     | `ChannelBundle\Model\MessageModel` | `getMessageChannels()`, `getChannelMessageByChannelId()` | `int` |
     | `ChannelBundle\Model\MessageQueueModel` | `processMessageQueue()` | `array\|MessageQueue` |
     | `ConfigBundle\Model\SysinfoModel` | `getLogTail()` | `int` |
