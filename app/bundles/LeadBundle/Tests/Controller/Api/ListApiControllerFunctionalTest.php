@@ -826,23 +826,25 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         ];
 
         $segment = $this->createSegment($filters);
+        $now     = new \DateTime();
+        $inLast  = OperatorOptions::IN_LAST === $operator;
 
         $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
 
         $contactA = new Lead();
-        $contactA->setDateModified(\DateTime::createFromImmutable($now->modify('-1 hour')));
+        $contactA->setDateModified(\DateTime::createFromImmutable($now->modify($inLast ? '-1 hour' : '+1 hour')));
 
         $contactB = new Lead();
-        $contactB->setDateModified(\DateTime::createFromImmutable($now->modify('+1 day')));
+        $contactB->setDateModified(\DateTime::createFromImmutable($now->modify($inLast ? '+2 days' : '+23 hours')));
 
         $contactC = new Lead();
-        $contactC->setDateModified(\DateTime::createFromImmutable($now->modify('-1 day')));
+        $contactC->setDateModified(\DateTime::createFromImmutable($now->modify($inLast ? '-23 hours' : '-1 day')));
 
         $contactD = new Lead();
-        $contactD->setDateModified(\DateTime::createFromImmutable($now->modify('-2 day')));
+        $contactD->setDateModified(\DateTime::createFromImmutable($now->modify('-2 days')));
 
         $contactE = new Lead();
-        $contactE->setDateModified(\DateTime::createFromImmutable($now->modify('+2 day')));
+        $contactE->setDateModified(\DateTime::createFromImmutable($now->modify('+3 days')));
 
         $this->em->persist($contactA);
         $this->em->persist($contactB);
@@ -962,9 +964,9 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $timeStamp = new \DateTime();
         if (OperatorOptions::IN_LAST === $operator) {
-            $timeStamp->modify('-1 day');
+            $timeStamp->modify('-23 hours');
         } elseif (OperatorOptions::IN_NEXT === $operator) {
-            $timeStamp->modify('+1 day');
+            $timeStamp->modify('+23 hours');
         }
 
         /** @var CompanyRepository $companyRepo */

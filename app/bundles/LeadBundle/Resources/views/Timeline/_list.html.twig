@@ -3,8 +3,8 @@
     <table class="table table-hover" id="contact-timeline">
         <thead>
         <tr>
-            <th class="timeline-icon np"></th>
-            <th class="table-expand np">
+            <th class="timeline-icon p-0"></th>
+            <th class="table-expand p-0">
                 <a class="table-expand-button" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
                     <span class="ri-arrow-down-s-line"></span>
                 </a>
@@ -68,10 +68,10 @@
             {% endif %}
 
             <tr class="timeline-row {% if loop.index is divisible by(2) %}timeline-row-highlighted{% endif %} {% if event.featured is defined and event.featured is not empty %}timeline-featured{% endif %}">
-                <td class="timeline-icon np">
+                <td class="timeline-icon p-0">
                     <span class="fa ri-fw {{ icon }}"></span>
                 </td>
-                <td class="table-expand np">
+                <td class="table-expand p-0">
                     <a href="javascript:void(0);"
                        data-activate-details="{{ loop.index }}"
                        class="table-expand-button {% if details is empty %}hide{% endif %}"
