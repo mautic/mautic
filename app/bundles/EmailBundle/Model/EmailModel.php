@@ -1397,7 +1397,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface, GlobalSe
         // get email settings such as templates, weights, etc
         $emailSettings = &$this->getEmailSettings($email);
 
-        $dnc = $this->emailRepository->getDoNotEmailList($leadIds, $ignoreDNC ? [DoNotContact::BOUNCED] : null);
+        $dnc = $this->emailRepository->getDoNotEmailList($leadIds, $ignoreDNC ? [DoNotContact::BOUNCED] : []);
 
         foreach ($dnc as $removeMeId => $removeMeEmail) {
             if ($dncAsError) {
