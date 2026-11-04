@@ -28,7 +28,7 @@ final class Version20261104090000 extends PreUpAssertionMigration
         $table->addColumn('locale', 'string', ['length' => 16]);
         $table->addColumn('public_name', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['leadlist_id', 'locale'], 'lead_list_translation_locale');
+        $table->addUniqueIndex(['leadlist_id', 'locale'], $this->prefix.'lead_list_translation_locale');
         $table->addForeignKeyConstraint($this->getPrefixedTableName('lead_lists'), ['leadlist_id'], ['id'], ['onDelete' => 'CASCADE']);
     }
 
