@@ -28,9 +28,9 @@ final class LoadMetadataRepositoryToDoctrineAttributeRector extends AbstractLoad
 
         $this->initHybridState($node);
 
-        // Already declared on the existing #[ORM\Entity]: leave the call for a follow-up.
+        // Already declared on the existing #[ORM\Entity]: only drop a call that repeats it.
         if ($this->isHybrid && $this->hybridEntityHasRepositoryClass) {
-            return null;
+            return $this->removeCallDuplicatedByAttribute($node, $loadMetadata, 'setCustomRepositoryClass', 'Entity', 'repositoryClass');
         }
 
         $owned          = [];

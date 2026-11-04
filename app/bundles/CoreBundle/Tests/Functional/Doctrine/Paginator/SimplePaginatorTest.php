@@ -70,6 +70,6 @@ final class SimplePaginatorTest extends MauticMysqlTestCase
 
         $this->assertCount(5, $queries, 'There should be exactly 5 queries executed.');
         $this->assertMatchesRegularExpression("/^SELECT count\(\*\) AS sclr_0 FROM {$prefix}ip_addresses .{2}_$/", $queries[3]['sql'], 'Simple paginator should not use either a DISTINCT keyword or sub-queries.');
-        $this->assertMatchesRegularExpression("/^SELECT (.{2}_)\.id AS id_0, \\1\.ip_address AS ip_address_1, \\1\.ip_details AS ip_details_2 FROM {$prefix}ip_addresses \\1 ORDER BY \\1\.id ASC LIMIT 5 OFFSET 1$/", $queries[4]['sql'], 'Ordering and limit/offset have to be reflected.');
+        $this->assertMatchesRegularExpression("/^SELECT (.{2}_)\.id AS id_0, \\1\.ip_details AS ip_details_1, \\1\.ip_address AS ip_address_2 FROM {$prefix}ip_addresses \\1 ORDER BY \\1\.id ASC LIMIT 5 OFFSET 1$/", $queries[4]['sql'], 'Ordering and limit/offset have to be reflected.');
     }
 }

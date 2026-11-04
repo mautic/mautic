@@ -1,13 +1,13 @@
 <?php
 
-namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRules\Fixture;
+namespace Utils\Rector\Tests\LoadMetadataMauticHelperToAttributeRector\Fixture;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'already_mapped')]
-class SkipAlreadyAttributeMapped
+class AlreadyMappedEntity
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]

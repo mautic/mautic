@@ -44,7 +44,7 @@ use Mautic\ProjectBundle\Entity\ProjectTrait;
 class PageEntity
 {
     use ProjectTrait;
-    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['merge', 'persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
+    #[ORM\ManyToMany(targetEntity: \Mautic\ProjectBundle\Entity\Project::class, cascade: ['persist', 'detach'], fetch: 'LAZY', indexBy: 'name')]
     #[ORM\JoinTable(name: 'page_projects_xref')]
     #[ORM\JoinColumn(name: 'page_id', nullable: false, onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'project_id', nullable: false, onDelete: 'CASCADE')]

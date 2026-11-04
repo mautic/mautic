@@ -82,11 +82,11 @@ class AssocEntity
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'CASCADE')]
     protected $lead;
 
-    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['merge', 'detach'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
     #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     protected $category;
 
-    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'merge', 'detach'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
     #[ORM\JoinColumn(name: 'ip_id', nullable: false, onDelete: 'SET NULL')]
     protected $ipAddress;
 }

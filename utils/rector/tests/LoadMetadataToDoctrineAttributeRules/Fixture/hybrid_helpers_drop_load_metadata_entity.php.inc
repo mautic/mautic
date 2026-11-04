@@ -1,25 +1,27 @@
 <?php
 
-namespace Utils\Rector\Tests\LoadMetadataMauticHelperToAttributeRector\Fixture;
+namespace Utils\Rector\Tests\LoadMetadataToDoctrineAttributeRules\Fixture;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity]
-#[ORM\Table(name: 'already_mapped')]
-class SkipAlreadyMappedEntity
+#[ORM\Table(name: 'hybrid_helpers')]
+#[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
+class HybridHelpersDropLoadMetadataEntity
 {
-    #[ORM\Id]
-    #[ORM\Column(type: 'integer')]
-    #[ORM\GeneratedValue]
     private $id;
+
+    private $name;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('already_mapped');
-
         $builder->addId();
+
+        $builder->addNullableField('name', 'string');
     }
 }
+
+?>

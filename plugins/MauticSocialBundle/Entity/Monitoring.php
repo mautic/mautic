@@ -13,7 +13,6 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -51,6 +50,9 @@ class Monitoring extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['monitoring:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -58,21 +60,26 @@ class Monitoring extends FormEntity implements UuidInterface
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
     #[Assert\NotBlank(message: 'mautic.core.title.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $title;
 
     /**
      * @var string|null
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
     /**
      * @var array
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private $lists = [];
 
     /**
@@ -80,59 +87,43 @@ class Monitoring extends FormEntity implements UuidInterface
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
     #[Assert\NotBlank(message: 'mautic.social.network.type')]
+    #[ORM\Column(name: 'network_type', type: 'string', length: 191, nullable: true)]
     private $networkType;
 
     /**
      * @var int
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(type: 'integer')]
     private $revision = 1;
 
     /**
      * @var array
      */
     #[Groups(['monitoring:read'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private $stats = [];
 
     /**
      * @var array
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private $properties = [];
 
     /**
      * @var DateTimeInterface
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var DateTimeInterface
      */
     #[Groups(['monitoring:read', 'monitoring:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addCategory();
-
-        $builder->addIdColumns('title');
-
-        $builder->addNullableField('lists', 'array');
-
-        $builder->addNamedField('networkType', 'string', 'network_type', true);
-
-        $builder->addField('revision', 'integer');
-
-        $builder->addNullableField('stats', 'array');
-
-        $builder->addNullableField('properties', 'array');
-
-        $builder->addPublishDates();
-
-    }
 
     /**
      * Constraints for required fields.
