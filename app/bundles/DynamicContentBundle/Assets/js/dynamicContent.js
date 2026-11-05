@@ -457,7 +457,7 @@ Mautic.convertDwcFilterInput = function(el) {
 
     // Reset has-error
     if (mQuery(filterId).parent().hasClass('has-error')) {
-        mQuery(filterId).parent().find('div.help-block').hide();
+        mQuery(filterId).parent().find('div.form-text').hide();
         mQuery(filterId).parent().removeClass('has-error');
     }
 
