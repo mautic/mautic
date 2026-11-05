@@ -31,6 +31,7 @@
 {% set isWinner = abTestResults.winners is defined and variant.id in abTestResults.winners and variants.parent.variantStartDate and isPublished %}
 {% set actionUrl = path(actionRoute, {'objectAction': 'view', 'objectId': variant.id}) %}
 {% set isCurrent = (variant.id is same as activeEntity.id) %}
+{% set canMakeWinner = variants.parent.variantStartDate and isPublished %}
 
 <li class="list-group-item bg-{% if isCurrent %}dark{% else %}light{% endif %}-xs">
     <div class="box-layout">
@@ -49,15 +50,15 @@
                     {% endif %}
                 </div>
                 <div class="col-xs-11">
-                    {% if isWinner %}
-                        <div class="mr-xs pull-left" data-toggle="tooltip" title="{{ 'mautic.core.ab_test.make_winner'|trans }}">
+                    {% if canMakeWinner %}
+                        <div class="mr-xs float-start" data-bs-toggle="tooltip" title="{{ 'mautic.core.ab_test.make_winner'|trans }}">
                             {% include '@MauticCore/Helper/button.html.twig' with {
                                 buttons: [
                                     {
                                         label: 'mautic.core.ab_test.make_winner',
                                         variant: 'warning',
                                         icon_only: true,
-                                        icon: 'ri-trophy-fill',
+                                        icon: isWinner ? 'ri-trophy-fill' : 'ri-trophy-line',
                                         href: path(actionRoute, {'objectAction': 'winner', 'objectId': variant.id}),
                                         attributes: {
                                             'data-toggle': 'confirmation',
@@ -82,7 +83,7 @@
                             &nbsp;<span class="label label-warning">{{ 'mautic.core.parent'|trans }}</span>
                         {% endif %}
                         {% if variant is instanceof('\\Mautic\\CoreBundle\\Entity\\TranslationEntityInterface') and variant.isTranslation %}
-                            &nbsp;<span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
+                            &nbsp;<span data-bs-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
                                 <i class="ri-fw ri-translate"></i>
                             </span>
                         {% endif %}
@@ -93,7 +94,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4 align-top text-right">
+        <div class="col-md-4 align-top text-end">
             <em class="text-white dark-sm">
                 {% if true == variants['configurationError'] %}
                     <div class="text-danger" data-toggle="label label-danger" title="{{ 'mautic.core.variant.misconfiguration'|trans }}">

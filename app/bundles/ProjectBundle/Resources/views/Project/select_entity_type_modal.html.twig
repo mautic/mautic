@@ -9,7 +9,7 @@
                 <div class="col-md-6 mb-sm">
                     {% include '@MauticCore/Components/tile.html.twig' with {
                         type: 'clickable',
-                        content: '<div class="d-flex jc-space-between ai-center"><div class="tile-title">' ~ entityData.label|trans ~ '</div></div>',
+                        content: '<div class="d-flex justify-content-between align-items-center"><div class="tile-title">' ~ entityData.label|trans ~ '</div></div>',
                         href: path('mautic_project_action', {'objectAction': 'addEntity', 'objectId': project.getId(), 'entityType': entityType}),
                         icon: 'ri-add-line',
                         attributes: {

@@ -71,7 +71,8 @@ export default class ButtonApplyCommand {
 
     if (response.validationError !== null) {
       const title = Mautic.translate('grapesjsbuilder.panelsViewsCommandModalTitleError');
-      ButtonApplyCommand.showModal(editor, title, response.validationError);
+      const reassurance = Mautic.translate('grapesjsbuilder.formValidationContentPreserved');
+      ButtonApplyCommand.showModal(editor, title, `${response.validationError}\n\n${reassurance}`);
     } else {
       if (response.route) {
         // update URL in address bar
