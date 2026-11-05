@@ -536,11 +536,19 @@ class LeadListRepository extends CommonRepository
         $emptyParameter = $this->generateRandomParameterName();
         $nullParameter  = $this->generateRandomParameterName();
 
-        $expr = $q->expr()->orX(
-            $q->expr()->isNull($column),
-            $q->expr()->eq($column, ":$emptyParameter"),
-            $q->expr()->eq($column, ":$nullParameter")
-        );
+        if ($q instanceof \Doctrine\ORM\QueryBuilder) {
+            $expr = $q->expr()->orX(
+                $q->expr()->isNull($column),
+                $q->expr()->eq($column, ":$emptyParameter"),
+                $q->expr()->eq($column, ":$nullParameter")
+            );
+        } else {
+            $expr = $q->expr()->or(
+                $q->expr()->isNull($column),
+                $q->expr()->eq($column, ":$emptyParameter"),
+                $q->expr()->eq($column, ":$nullParameter")
+            );
+        }
 
         return [
             $expr,

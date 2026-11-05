@@ -38,18 +38,7 @@ final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentTypeSearchCommands(): void
     {
-        $dynamicFilters = [
-            [
-                'object'   => 'lead',
-                'glue'     => 'and',
-                'field'    => 'email',
-                'type'     => 'email',
-                'operator' => '=',
-                'filter'   => 'dynamic@example.com',
-            ],
-        ];
-
-        $dynamicSegment = $this->createSegment('DynamicSearch', $dynamicFilters);
+        $dynamicSegment = $this->createSegment('DynamicSearch');
         $staticSegment  = $this->createSegment('StaticSearch');
 
         /** @var LeadListRepository $leadListRepository */
@@ -63,14 +52,14 @@ final class LeadListRepositoryFunctionalTest extends MauticMysqlTestCase
             'filter'           => ['string' => sprintf('ids:%d is:dynamic', $dynamicSegment->getId())],
             'ignore_paginator' => true,
         ]);
-        $dynamicIds = array_map('intval', array_keys($dynamicResults));
+        $dynamicIds = array_map(intval(...), array_keys($dynamicResults));
         $this->assertSame([$dynamicSegment->getId()], $dynamicIds);
 
         $staticResults = $leadListRepository->getEntities([
             'filter'           => ['string' => sprintf('ids:%d is:static', $staticSegment->getId())],
             'ignore_paginator' => true,
         ]);
-        $staticIds = array_map('intval', array_keys($staticResults));
+        $staticIds = array_map(intval(...), array_keys($staticResults));
         $this->assertSame([$staticSegment->getId()], $staticIds);
     }
 
