@@ -64,7 +64,7 @@ final class WebhookRepositoryTest extends MauticMysqlTestCase
             [],
             $this->getSearchResultNames('event:email event:form')
         );
-        
+
         // But this should work because Hybrid Webhook has both email AND page events
         Assert::assertSame(
             ['Hybrid Webhook'],

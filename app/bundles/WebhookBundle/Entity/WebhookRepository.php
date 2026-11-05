@@ -3,7 +3,6 @@
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -19,8 +18,8 @@ use Mautic\SmsBundle\SmsEvents;
 class WebhookRepository extends CommonRepository
 {
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param object                                                       $filter
+     * @param QueryBuilder|DbalQueryBuilder $q
+     * @param object                        $filter
      *
      * @return array{0: mixed, 1: array<string, mixed>}
      */
@@ -30,8 +29,8 @@ class WebhookRepository extends CommonRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param object                                                       $filter
+     * @param QueryBuilder|DbalQueryBuilder $q
+     * @param object                        $filter
      *
      * @return array{0: mixed, 1: array<string, mixed>}
      */
