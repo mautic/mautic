@@ -55,17 +55,21 @@ final class SortableListTransformer implements DataTransformerInterface
             return ['list' => []];
         }
 
-        // Reindex the array before processing
-        $array['list'] = array_values($array['list']);
-
-        $array['list'] = AbstractFormFieldHelper::parseList($array['list']);
-
-        if (!$this->withLabels) {
+        if ($this->withLabels) {
+            $array['list'] = AbstractFormFieldHelper::parseListForChoices(array_values($array['list']));
+            $formatted     = [];
+            foreach ($array['list'] as $label => $value) {
+                $formatted[] = [
+                    'label' => $label,
+                    'value' => $value,
+                ];
+            }
+            $array['list'] = $formatted;
+        } else {
+            $array['list'] = AbstractFormFieldHelper::parseList(array_values($array['list']));
             $array['list'] = array_keys($array['list']);
+            $array['list'] = AbstractFormFieldHelper::formatList(AbstractFormFieldHelper::FORMAT_SIMPLE_ARRAY, $array['list']);
         }
-
-        $format        = ($this->withLabels) ? AbstractFormFieldHelper::FORMAT_ARRAY : AbstractFormFieldHelper::FORMAT_SIMPLE_ARRAY;
-        $array['list'] = AbstractFormFieldHelper::formatList($format, $array['list']);
 
         return $array;
     }

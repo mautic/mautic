@@ -21,7 +21,7 @@ final class PermissionListType extends AbstractType
         $resolver->setDefaults([
             'multiple'          => true,
             'expanded'          => true,
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => fn (Options $options): array => [
                 'data-permission' => $options['bundle'].':'.$options['level'],
                 'onchange'        => 'Mautic.onPermissionChange(this, \''.$options['bundle'].'\')',

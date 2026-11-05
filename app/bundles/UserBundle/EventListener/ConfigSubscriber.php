@@ -1,13 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\UserBundle\Entity\OidcSubjectIdRepository;
 use Mautic\UserBundle\Form\Type\ConfigType;
+use Mautic\UserBundle\Security\OIDC\ClientCredentials;
+use Mautic\UserBundle\Security\OIDC\Factory\ClientFactoryInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ConfigSubscriber implements EventSubscriberInterface
 {
@@ -20,11 +27,20 @@ final class ConfigSubscriber implements EventSubscriberInterface
         'saml_idp_own_private_key',
     ];
 
+    public function __construct(
+        private readonly ClientFactoryInterface $clientFactory,
+        private readonly TranslatorInterface $translator,
+        private readonly LoggerInterface $logger,
+        private readonly OidcSubjectIdRepository $subjectIdRepository,
+    ) {
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
             ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
             ConfigEvents::CONFIG_PRE_SAVE    => ['onConfigSave', 0],
+            ConfigEvents::CONFIG_POST_SAVE   => ['onConfigPostSave', 0],
         ];
     }
 
@@ -43,6 +59,40 @@ final class ConfigSubscriber implements EventSubscriberInterface
     }
 
     public function onConfigSave(ConfigEvent $event): void
+    {
+        $this->validateOidcConnection($event);
+        $this->processSamlConfig($event);
+    }
+
+    public function onConfigPostSave(ConfigEvent $event): void
+    {
+        $this->deleteOidcLinksIfMappingFieldChanged($event);
+    }
+
+    private function validateOidcConnection(ConfigEvent $event): void
+    {
+        $config = $event->getConfig();
+
+        if (!isset($config['userconfig']['open_id_is_enabled']) || 1 !== $config['userconfig']['open_id_is_enabled']) {
+            return;
+        }
+
+        $credentials = new ClientCredentials(
+            $config['userconfig']['open_id_client_url'],
+            $config['userconfig']['open_id_client_id'],
+            $config['userconfig']['open_id_client_secret'],
+            $config['userconfig']['open_id_mapping_field']
+        );
+        $client = $this->clientFactory->create($credentials);
+
+        if ($error = $client->testConnection()) {
+            $message = $this->translator->trans('mautic.open_id.config.exception.test_connection_failed');
+            $this->logger->debug($message, ['error' => $error]);
+            $event->setError($message, [], 'userconfig', 'open_id_is_enabled');
+        }
+    }
+
+    private function processSamlConfig(ConfigEvent $event): void
     {
         // Preserve existing value
         $event->unsetIfEmpty('saml_idp_own_password');
@@ -90,6 +140,25 @@ final class ConfigSubscriber implements EventSubscriberInterface
         }
 
         $event->setConfig($data, 'userconfig');
+    }
+
+    private function deleteOidcLinksIfMappingFieldChanged(ConfigEvent $event): void
+    {
+        $originalData = $event->getOriginalNormData();
+        $newData      = $event->getConfig('userconfig');
+
+        $originalMappingField = $originalData['userconfig']['open_id_mapping_field'] ?? null;
+        $newMappingField      = $newData['open_id_mapping_field'] ?? null;
+
+        // Only delete links if:
+        // 1. The new mapping field is not null/empty (OIDC is actually configured)
+        // 2. The mapping field has changed
+        if (!empty($newMappingField) && $newMappingField !== $originalMappingField) {
+            $this->subjectIdRepository->createQueryBuilder('s')
+                ->delete()
+                ->getQuery()
+                ->execute();
+        }
     }
 
     private function validateXml(string $content): bool

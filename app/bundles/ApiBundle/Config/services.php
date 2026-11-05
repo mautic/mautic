@@ -27,6 +27,8 @@ return function (ContainerConfigurator $configurator): void {
     $services->set('mautic.api.helper.entity_result', Mautic\ApiBundle\Helper\EntityResultHelper::class);
 
     $services->set(Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class);
+    $services->alias('mautic.api.oauth.event_listener', Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class)
+        ->deprecate('mautic/mautic', '7.2', 'The "%alias_id%" service alias is deprecated. Use the "'.Mautic\ApiBundle\EventListener\PreAuthorizationEventListener::class.'" service instead.');
 
     $services->set('mautic.validator.oauthcallback', Mautic\ApiBundle\Form\Validator\Constraints\OAuthCallbackValidator::class)->tag('validator.constraint_validator');
     $services->set('mautic.api.security.voter.permission', Mautic\ApiBundle\Security\Voter\ApiPermissionVoter::class)->tag('security.voter');

@@ -9,7 +9,7 @@
     {% set classes = classes|merge(['gap-5']) %}
 {% endif %}
 
-<span data-toggle="tooltip" title="{{ tooltip|default('mautic.core.toggletip')|trans }}" data-placement="left">
+<span data-bs-toggle="tooltip" title="{{ tooltip|default('mautic.core.toggletip')|trans }}" data-bs-placement="left">
     <button type="button"
         class="{{ classes|join(' ') }}"
         data-toggle="popover"

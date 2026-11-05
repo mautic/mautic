@@ -220,6 +220,62 @@ Mautic.campaignOnLoad = function (container, response) {
     }
 
     Mautic.campaignAuditlogOnLoad(container, response);
+    Mautic.campaignShareOnLoad(container, response);
+};
+
+Mautic.campaignShareOnLoad = function (container, response) {
+    const headlineInput = document.querySelector('[data-share-headline]');
+    const counter = document.getElementById('headline-counter');
+    if (headlineInput && counter) {
+        const updateCounter = function () {
+            counter.textContent = headlineInput.value.length + '/60';
+        };
+        headlineInput.addEventListener('input', updateCounter);
+        updateCounter();
+    }
+
+    const addBtn = document.getElementById('add-gallery-slot');
+    const maxSlots = 8;
+    if (addBtn) {
+        addBtn.addEventListener('click', function () {
+            const slots = document.querySelectorAll('[data-gallery-slot]');
+            let shown = 0;
+            let nextHidden = null;
+            for (let i = 0; i < slots.length; i++) {
+                if (slots[i].style.display !== 'none') {
+                    shown++;
+                } else if (!nextHidden) {
+                    nextHidden = slots[i];
+                }
+            }
+            if (nextHidden) {
+                nextHidden.style.display = '';
+                nextHidden.style.marginTop = '10px';
+                shown++;
+            }
+            if (shown >= maxSlots) {
+                addBtn.style.display = 'none';
+            }
+        });
+    }
+
+    const $shareForm = mQuery('form[name="campaign_share"]');
+    const $downloadBtn = $shareForm.find('#campaign_share_download');
+    if ($shareForm.length && $downloadBtn.length) {
+        $downloadBtn.off('click.shareDownload').on('click.shareDownload', function (e) {
+            e.preventDefault();
+
+            $shareForm.find('input.button-clicked').remove();
+            mQuery('<input type="hidden" class="button-clicked">')
+                .attr({
+                    name: $downloadBtn.attr('name'),
+                    value: $downloadBtn.attr('value') || ''
+                })
+                .appendTo($shareForm);
+
+            $shareForm.get(0).submit();
+        });
+    }
 };
 
 Mautic.lazyLoadContactListOnCampaignDetail = function() {
@@ -421,6 +477,8 @@ Mautic.handleCampaignEventAjaxClick = function (event) {
  * @param response
  */
 Mautic.campaignEventOnLoad = function (container, response) {
+    Mautic.messageSendOnLoad(container);
+
     if (mQuery('#campaignevent_triggerHour').length) {
         Mautic.campaignEventUpdateIntervalHours();
         mQuery('#campaignevent_triggerHour').on('change', Mautic.campaignEventUpdateIntervalHours);
@@ -515,7 +573,7 @@ Mautic.campaignEventOnLoad = function (container, response) {
             });
 
         //initialize tooltips
-        mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
+        mQuery(eventId + " *[data-toggle='tooltip'], " + eventId + " *[data-bs-toggle='tooltip']").tooltip({html: true});
 
         // Connect into last anchor clicked
         Mautic.campaignBuilderInstance.connect({
@@ -705,7 +763,7 @@ Mautic.campaignSourceOnLoad = function (container, response) {
             });
 
         //initialize tooltipslist-campaign-event
-        mQuery(eventId + " *[data-toggle='tooltip']").tooltip({html: true});
+        mQuery(eventId + " *[data-toggle='tooltip'], " + eventId + " *[data-bs-toggle='tooltip']").tooltip({html: true});
         if (autoConnect) {
             // Connect into last anchor clicked
             if (Mautic.campaignBuilderAnchorClicked.search('left') !== -1) {

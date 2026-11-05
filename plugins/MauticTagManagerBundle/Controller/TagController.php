@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
 use MauticPlugin\MauticTagManagerBundle\Form\Type\TagMergeType;
+use MauticPlugin\MauticTagManagerBundle\Helper\TagSearchScopeProvider;
 use MauticPlugin\MauticTagManagerBundle\Model\TagModel as TagManagerModel;
 use MauticPlugin\MauticTagManagerBundle\Stats\TagDependencies;
 use Symfony\Component\Form\FormInterface;
@@ -53,7 +54,7 @@ final class TagController extends FormController
      *
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, TagSearchScopeProvider $tagSearchScopeProvider, $page = 1): Response
     {
         // Use overwritten tag model so overwritten repository can be fetched,
         // we need it to define table alias so we can define sort order.
@@ -135,15 +136,16 @@ final class TagController extends FormController
         $tagsCount = ([] !== $tagIds) ? $this->tagRepository->countByLeads($tagIds) : [];
 
         $parameters = [
-            'items'       => $items,
-            'tagsCount'   => $tagsCount,
-            'page'        => $page,
-            'limit'       => $limit,
-            'permissions' => $permissions,
-            'security'    => $this->security,
-            'tmpl'        => $tmpl,
-            'currentUser' => $this->user,
-            'searchValue' => $search,
+            'items'           => $items,
+            'tagsCount'       => $tagsCount,
+            'page'            => $page,
+            'limit'           => $limit,
+            'permissions'     => $permissions,
+            'security'        => $this->security,
+            'tmpl'            => $tmpl,
+            'currentUser'     => $this->user,
+            'searchValue'     => $search,
+            'searchScopes'    => $tagSearchScopeProvider->getScopes(),
         ];
 
         return $this->delegateView([
@@ -206,15 +208,15 @@ final class TagController extends FormController
         if (!$cancelled = $this->isFormCancelled($form)) {
             if ($valid = $this->isFormValid($form)) {
                 // form is valid so process the data
-                $found = $this->tagRepository->countOccurrences($tag->getTag());
-                if (0 !== $found) {
+                $existingTag = $this->tagRepository->getTagByName($tag->getTag());
+                if (null !== $existingTag) {
                     $valid = false;
-                    $this->addFlashMessage('mautic.core.notice.updated', [
-                        '%name%'      => $tag->getTag(),
+                    $this->addFlashMessage('mautic.tagmanager.tag.already.exists', [
+                        '%name%'      => $existingTag->getTag(),
                         '%menu_link%' => 'mautic_tagmanager_index',
                         '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
                             'objectAction' => 'edit',
-                            'objectId'     => $tag->getId(),
+                            'objectId'     => $existingTag->getId(),
                         ]),
                     ]);
                 } else {

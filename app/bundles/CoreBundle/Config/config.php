@@ -121,6 +121,20 @@ return [
                 'iconClass' => 'ri-remote-control-fill',
                 'priority'  => 40,
             ],
+            'mautic.contribute.menu.index' => [
+                'uri'            => 'https://mau.tc/support',
+                'iconClass'      => 'ri-hand-coin-fill',
+                'priority'       => 0,
+                'linkAttributes' => [
+                    'target' => '_blank',
+                    'rel'    => 'noopener noreferrer',
+                ],
+                'checks' => [
+                    'parameters' => [
+                        'support_mautic_enabled' => true,
+                    ],
+                ],
+            ],
         ],
         'admin' => [
             'mautic.core.general' => [
@@ -248,6 +262,7 @@ return [
         'brand_name'                      => 'Your Brand (configurable)',
         'primary_brand_color'             => '000000',
         'rounded_corners'                 => '0',
+        'gravatar_enabled'                => false,
         'db_driver'                       => 'pdo_mysql',
         'db_host'                         => '127.0.0.1',
         'db_port'                         => 3306,
@@ -793,5 +808,6 @@ return [
         'redis_primary_only'                                      => false,
         Mautic\CoreBundle\Shortener\Shortener::SHORTENER_SERVICE  => null,
         'gdpr_user_purge_threshold'                               => 1095, // Minimum no. of days a user has to be inactive to get picked up by `mautic:maintenance:cleanup --gdpr`
+        'support_mautic_enabled'                                  => true,
     ],
 ];

@@ -1,0 +1,68 @@
+{
+    "package": {
+        "name": "koco\/mautic-recaptcha-bundle",
+        "description": "This plugin brings reCAPTCHA integration to mautic.",
+        "time": "2018-01-10T09:30:31+00:00",
+        "maintainers": [
+            {
+                "name": "koco",
+                "avatar_url": "https:\/\/www.gravatar.com\/avatar\/73ad638ac9373ee1580bf6fb59e7538f?d=identicon"
+            }
+        ],
+        "versions": {
+            "3.0.1": {
+                "name": "koco\/mautic-recaptcha-bundle",
+                "description": "This plugin brings reCAPTCHA integration to mautic.",
+                "keywords": [],
+                "homepage": "",
+                "version": "3.0.1",
+                "version_normalized": "3.0.1.0",
+                "license": [
+                    "GPL-3.0-only"
+                ],
+                "authors": [
+                    {
+                        "name": "Konstantin Scheumann",
+                        "email": "info@konstantin.codes"
+                    }
+                ],
+                "source": {
+                    "type": "git",
+                    "url": "https:\/\/github.com\/KonstantinCodes\/mautic-recaptcha.git",
+                    "reference": "4855321ffa22e8c8435cd4a5ec45afec9857df84"
+                },
+                "dist": {
+                    "type": "zip",
+                    "url": "https:\/\/api.github.com\/repos\/KonstantinCodes\/mautic-recaptcha\/zipball\/4855321ffa22e8c8435cd4a5ec45afec9857df84",
+                    "reference": "4855321ffa22e8c8435cd4a5ec45afec9857df84",
+                    "shasum": ""
+                },
+                "type": "mautic-plugin",
+                "support": {
+                    "source": "https:\/\/github.com\/KonstantinCodes\/mautic-recaptcha\/tree\/3.0.1",
+                    "issues": "https:\/\/github.com\/KonstantinCodes\/mautic-recaptcha\/issues"
+                },
+                "time": "2020-07-22T10:07:15+00:00",
+                "require": {
+                    "mautic\/composer-plugin": "^1.0"
+                }
+            }
+        },
+        "type": "mautic-plugin",
+        "repository": "https:\/\/github.com\/KonstantinCodes\/mautic-recaptcha",
+        "github_stars": 23,
+        "github_watchers": 9,
+        "github_forks": 17,
+        "github_open_issues": 9,
+        "language": "PHP",
+        "dependents": 0,
+        "suggesters": 0,
+        "downloads": {
+            "total": 2662,
+            "monthly": 430,
+            "daily": 6
+        },
+        "favers": 24,
+        "reviews": {}
+    }
+}

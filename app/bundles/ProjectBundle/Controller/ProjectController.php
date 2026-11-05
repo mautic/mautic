@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Form\Type\ProjectAddEntityType;
 use Mautic\ProjectBundle\Form\Type\ProjectEntityType;
+use Mautic\ProjectBundle\Helper\ProjectSearchScopeProvider;
 use Mautic\ProjectBundle\Model\ProjectModel;
 use Mautic\ProjectBundle\Security\Permissions\ProjectPermissions;
 use Mautic\ProjectBundle\Service\ProjectEntityLoaderService;
@@ -31,7 +32,7 @@ final class ProjectController extends AbstractFormController
 
     private const TEMPLATE_FORM  = '@MauticProject/Project/form.html.twig';
 
-    public function indexAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader, int $page = 1): Response
+    public function indexAction(Request $request, ProjectModel $projectModel, CorePermissions $corePermissions, ProjectEntityLoaderService $entityLoader, ProjectSearchScopeProvider $projectSearchScopeProvider, int $page = 1): Response
     {
         $session = $request->getSession();
 
@@ -117,14 +118,15 @@ final class ProjectController extends AbstractFormController
 
         return $this->delegateView([
             'viewParameters'  => [
-                'items'         => $items,
-                'page'          => $page,
-                'limit'         => $limit,
-                'permissions'   => $permissions,
-                'security'      => $corePermissions,
-                'tmpl'          => $tmpl,
-                'currentUser'   => $this->user,
-                'searchValue'   => $search,
+                'items'           => $items,
+                'page'            => $page,
+                'limit'           => $limit,
+                'permissions'     => $permissions,
+                'security'        => $corePermissions,
+                'tmpl'            => $tmpl,
+                'currentUser'     => $this->user,
+                'searchValue'     => $search,
+                'searchScopes'    => $projectSearchScopeProvider->getScopes(),
             ],
             'contentTemplate' => '@MauticProject/Project/list.html.twig',
             'passthroughVars' => [
@@ -351,6 +353,7 @@ final class ProjectController extends AbstractFormController
         }
 
         $entityTypes     = $entityLoader->getEntityTypesWithViewPermissions();
+        $editableTypes   = $entityLoader->getEntityTypesWithEditPermissions();
         $projectEntities = $entityLoader->getProjectEntities($project, $entityTypes);
 
         return $this->delegateView([
@@ -359,6 +362,7 @@ final class ProjectController extends AbstractFormController
                 'project'         => $project,
                 'projectEntities' => $projectEntities,
                 'entityTypes'     => $entityTypes,
+                'editableTypes'   => $editableTypes,
             ],
             'contentTemplate' => '@MauticProject/Project/details.html.twig',
             'passthroughVars' => [

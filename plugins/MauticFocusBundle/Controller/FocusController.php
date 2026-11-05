@@ -4,9 +4,11 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
+use MauticPlugin\MauticFocusBundle\Helper\FocusSearchScopeProvider;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,6 +16,18 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 final class FocusController extends AbstractStandardFormController
 {
+    use CategoryListFiltersTrait;
+
+    /**
+     * @var array<string, mixed>
+     */
+    private array $listFilters = [];
+
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
+
     private CacheProviderTagAwareInterface $cacheProvider;
 
     private FocusModel $focusModel;
@@ -42,10 +56,31 @@ final class FocusController extends AbstractStandardFormController
     }
 
     /**
+     * @param mixed   $start
+     * @param mixed   $limit
+     * @param mixed   $filter
+     * @param mixed   $orderBy
+     * @param mixed   $orderByDir
+     * @param mixed[] $args
+     *
+     * @return array{0: int, 1: array<int, mixed>}
+     */
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
+    {
+        $request           = $this->getCurrentRequest();
+        $categoryFilters   = $this->applyCategoryListFilter($request, 'mautic.'.$this->getSessionBase().'.list_filters', 'plugin:focus', 'c.id', $filter);
+        $this->listFilters = $categoryFilters['filters'];
+
+        return parent::getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, $args);
+    }
+
+    /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, FocusSearchScopeProvider $focusSearchScopeProvider, $page = 1): Response
     {
+        $this->indexSearchScopes = $focusSearchScopeProvider->getScopes();
+
         return parent::indexStandard($request, $page);
     }
 
@@ -109,7 +144,16 @@ final class FocusController extends AbstractStandardFormController
      */
     public function getViewArguments(array $args, $action): array
     {
+        if ('index' === $action) {
+            $args['viewParameters']['filters'] = $this->listFilters;
+        }
+
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+
+        if ('index' === $action && null !== $this->indexSearchScopes) {
+            $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+            $this->indexSearchScopes                = null;
+        }
 
         if ('view' == $action) {
             /** @var Focus $item */
@@ -141,6 +185,7 @@ final class FocusController extends AbstractStandardFormController
             } else {
                 // invalidate cache for entire focus item to keep AJAX loaded data consistent
                 $this->cacheProvider->invalidateTags(["focus.{$item->getId()}"]);
+
                 $stats = $this->focusModel->getStats(
                     $item,
                     null,

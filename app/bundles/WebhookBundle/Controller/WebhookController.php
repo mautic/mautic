@@ -3,6 +3,7 @@
 namespace Mautic\WebhookBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Controller\CategoryListFiltersTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -11,6 +12,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\WebhookBundle\Helper\WebhookSearchScopeProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +21,18 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class WebhookController extends FormController
 {
+    use CategoryListFiltersTrait;
+
+    /**
+     * @var array<string, mixed>
+     */
+    private array $listFilters = [];
+
+    /**
+     * @var list<array{command: string, label: string, suffix?: string, default?: bool, translate?: bool}>|null
+     */
+    private ?array $indexSearchScopes = null;
+
     public function __construct(
         FormFactoryInterface $formFactory,
         FormFieldHelper $fieldHelper,
@@ -49,9 +63,51 @@ final class WebhookController extends FormController
     /**
      * @param int $page
      */
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, WebhookSearchScopeProvider $webhookSearchScopeProvider, $page = 1): Response
     {
+        $this->indexSearchScopes = $webhookSearchScopeProvider->getScopes();
+
         return parent::indexStandard($request, $page);
+    }
+
+    /**
+     * @param mixed   $start
+     * @param mixed   $limit
+     * @param mixed   $filter
+     * @param mixed   $orderBy
+     * @param mixed   $orderByDir
+     * @param mixed[] $args
+     *
+     * @return array{0: int, 1: array<int, mixed>}
+     */
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
+    {
+        $request           = $this->getCurrentRequest();
+        $categoryFilters   = $this->applyCategoryListFilter($request, 'mautic.'.$this->getSessionBase().'.list_filters', 'Webhook', 'cat.id', $filter);
+        $this->listFilters = $categoryFilters['filters'];
+
+        return parent::getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, $args);
+    }
+
+    /**
+     * @param array<string, mixed> $args
+     * @param string               $action
+     *
+     * @return array<string, mixed>
+     */
+    public function getViewArguments(array $args, $action): array
+    {
+        if ('index' === $action) {
+            $args['viewParameters']['filters'] = $this->listFilters;
+        }
+
+        if ('index' === $action && null !== $this->indexSearchScopes) {
+            $args['viewParameters']['searchScopes'] = $this->indexSearchScopes;
+            $this->indexSearchScopes                = null;
+        }
+
+        // @phpstan-ignore-next-line FormController extends deprecated AbstractStandardFormController; fix requires class hierarchy refactoring
+        return parent::getViewArguments($args, $action);
     }
 
     /**

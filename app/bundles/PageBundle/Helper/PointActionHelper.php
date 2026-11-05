@@ -2,6 +2,8 @@
 
 namespace Mautic\PageBundle\Helper;
 
+use Mautic\EmailBundle\Helper\UrlMatcher;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 
@@ -39,13 +41,13 @@ class PointActionHelper
         $url          = $eventDetails->getUrl();
         $limitToUrl   = html_entity_decode(trim($action['properties']['page_url']));
 
-        if (!$limitToUrl || !fnmatch($limitToUrl, $url)) {
+        if (!$limitToUrl || !UrlMatcher::hasMatch([$limitToUrl], $url)) {
             // no points change
             return false;
         }
 
         $lead          = $eventDetails->getLead();
-        $urlWithSqlWC  = str_replace('*', '%', $limitToUrl);
+        $urlWithSqlWC  = $this->getSqlLikePattern($limitToUrl);
 
         if (isset($action['properties']['first_time']) && true === $action['properties']['first_time']) {
             $hitStats = $this->hitRepository->getDwellTimesForUrl($urlWithSqlWC, ['leadId' => $lead->getId()]);
@@ -98,5 +100,16 @@ class PointActionHelper
 
         // return true only if all configured options are true
         return !in_array(false, $changePoints);
+    }
+
+    private function getSqlLikePattern(string $url): string
+    {
+        $url = \addcslashes($url, '\\_%');
+
+        if (false !== \strpbrk($url, '*?')) {
+            return \str_replace(['*', '?'], ['%', '_'], $url);
+        }
+
+        return '%'.$url.'%';
     }
 }

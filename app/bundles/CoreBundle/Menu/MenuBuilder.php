@@ -87,7 +87,7 @@ final readonly class MenuBuilder
 
             //  Clean menu items: remove dropdown menu entry if empty (need to do it after all events are dispatched)
             foreach ($menuItems['children'] as $key => $item) {
-                if (empty($item['route']) && empty($item['children'])) {
+                if (empty($item['route']) && empty($item['uri']) && empty($item['children'])) {
                     unset($menuItems['children'][$key]);
                 }
             }

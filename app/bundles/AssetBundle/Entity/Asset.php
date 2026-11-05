@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Validator\SafeRemoteUrl;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -758,12 +759,24 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Returns absolute path to the file.
+     *
+     * Local assets must stay within the upload dir, so a path resolving outside it is refused.
      */
     public function getAbsolutePath(): ?string
     {
-        return null === $this->path
-            ? null
-            : $this->getUploadDir().'/'.$this->path;
+        if (null === $this->path || '' === $this->path || str_contains($this->path, "\0")) {
+            return null;
+        }
+
+        $uploadDir    = Path::canonicalize($this->getUploadDir());
+        $absolutePath = Path::canonicalize($uploadDir.'/'.$this->path);
+
+        // isBasePath() accepts the upload dir itself, which is never an asset.
+        if ($absolutePath === $uploadDir || !Path::isBasePath($uploadDir, $absolutePath)) {
+            return null;
+        }
+
+        return $absolutePath;
     }
 
     /**
@@ -1059,8 +1072,8 @@ class Asset extends FormEntity implements UuidInterface
     public function getFileContents(): string|bool
     {
         $path = $this->getFilePath();
-        if (!file_exists($path)) {
-            throw new FileNotFoundException(sprintf('Asset file not found at path: "%s"', $path));
+        if (null === $path || !file_exists($path)) {
+            throw new FileNotFoundException(sprintf('Asset file not found at path: "%s"', (string) $path));
         }
 
         return file_get_contents($path);

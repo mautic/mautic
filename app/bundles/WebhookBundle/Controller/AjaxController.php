@@ -82,7 +82,7 @@ final class AjaxController extends CommonAjaxController
         int $status = Response::HTTP_OK,
     ): JsonResponse {
         $html = sprintf(
-            '<div class="%s"><span class="help-block">%s</span></div>',
+            '<div class="%s"><span class="form-text">%s</span></div>',
             $cssClass,
             $this->translator->trans($message)
         );

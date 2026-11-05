@@ -118,6 +118,10 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $report = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC']);
         $this->assertInstanceOf(Report::class, $report);
 
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        self::assertResponseIsSuccessful();
+        $this->assertCount(1, $crawler->filter('a#clone'));
+
         $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
         self::assertResponseIsSuccessful();
 
@@ -462,6 +466,36 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('<small><b>This is allowed HTML</b></small>', (string) $clientResponseContent);
     }
 
+    public function testScheduledReportsSearchCommand(): void
+    {
+        $scheduled = $this->createReport('Scheduled delivery report', 'email', []);
+        $scheduled->setIsScheduled(true);
+        $unscheduled = $this->createReport('Manual delivery report', 'email', []);
+        $this->getContainer()->get(ReportModel::class)->saveEntity($scheduled);
+        $this->em->refresh($scheduled);
+        $this->assertTrue($scheduled->isScheduled());
+
+        foreach (['', '&tmpl=list'] as $template) {
+            $this->client->request('GET', '/s/reports?search=is:scheduled'.$template);
+            self::assertResponseIsSuccessful();
+            $content = (string) $this->client->getResponse()->getContent();
+            $this->assertStringContainsString($scheduled->getName(), $content);
+            $this->assertStringNotContainsString($unscheduled->getName(), $content);
+        }
+
+        $this->client->request('GET', '/s/reports?search=!is:scheduled');
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($unscheduled->getName(), $content);
+        $this->assertStringNotContainsString($scheduled->getName(), $content);
+
+        $this->client->request('GET', '/s/reports?search=');
+        self::assertResponseIsSuccessful();
+        $content = (string) $this->client->getResponse()->getContent();
+        $this->assertStringContainsString($scheduled->getName(), $content);
+        $this->assertStringContainsString($unscheduled->getName(), $content);
+    }
+
     public function testXssUrlFromQuery(): void
     {
         $report = new Report();
@@ -516,7 +550,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(SchedulerRepository::class, $schedulerRepository);
         $scheduler = $schedulerRepository->getSchedulerByReport($report);
 
-        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/config/edit/messengerconfig');
         self::assertResponseIsSuccessful();
 
         // Find save & close button

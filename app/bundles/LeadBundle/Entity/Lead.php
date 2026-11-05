@@ -304,7 +304,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->addLifecycleEvent('checkDateAdded', 'prePersist')
             ->addIndex(['date_added'], 'lead_date_added')
             ->addIndex(['date_modified'], 'lead_date_modified')
-            ->addIndex(['date_identified'], 'date_identified');
+            ->addIndex(['date_identified'], 'date_identified')
+            ->addIndex(['last_active'], 'last_active');
 
         $builder->addBigIntIdField();
 
@@ -898,7 +899,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Creates a points change entry.
      */
-    public function addPointsChangeLogEntry(string $type, string $name, string $action, int $pointChanges, IpAddress $ip, ?Group $group = null): void
+    public function addPointsChangeLogEntry(string $type, string $name, string $action, int $pointChanges, ?IpAddress $ip, ?Group $group = null): void
     {
         if (0 === $pointChanges) {
             // No need to record no change

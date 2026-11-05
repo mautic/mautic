@@ -542,7 +542,6 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
 
                 // no break
             case 'forms':
-            case null:
                 $choices['forms'] = [];
                 $viewOther        = $this->security->isGranted('form:forms:viewother');
                 $this->formRepository->setCurrentUser($this->userHelper->getUser());
@@ -744,11 +743,12 @@ class CampaignModel extends CommonFormModel implements GlobalSearchInterface
                             ->where(
                                 $failedSq->expr()->eq('fe.log_id', 't.id')
                             );
-                        $filter['failed_events'] = [
-                            'subquery' => sprintf('NOT EXISTS (%s)', $failedSq->getSQL()),
-                        ];
 
-                        $q       = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
+                        $q = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
+                        // Apply the server-built subquery directly on the QueryBuilder rather
+                        // than routing raw SQL through the filter array, which no longer
+                        // accepts a "subquery" fragment (see ChartQuery::applyFilters()).
+                        $q->andWhere(sprintf('NOT EXISTS (%s)', $failedSq->getSQL()));
                         $rawData = $q->executeQuery()->fetchAllAssociative();
                     }
 

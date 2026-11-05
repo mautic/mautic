@@ -171,7 +171,7 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
-                public function import(array $fields, array $data, $owner = null, bool $skipIfExists = false): bool
+                public function import(array $fields, array $data, $owner = null, bool $skipIfExists = false, bool $createNew = true): bool
                 {
                     return true;
                 }

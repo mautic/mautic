@@ -169,8 +169,6 @@
 
 .ma-0 { margin: 0px !important; }
 .mr-0 { margin-right: 0px !important; }
-.mt-0 { margin-top: 0px !important; }
-.mb-0 { margin-bottom: 0px !important; }
 .ml-0 { margin-left: 0px !important; }
 
 .ma-1 { margin: 1px !important; }
@@ -291,8 +289,6 @@
 // ---------------------------------------------
 .pa-0, .np { padding: 0px !important; }
 .pr-0 { padding-right: 0px !important; }
-.pt-0 { padding-top: 0px !important; }
-.pb-0 { padding-bottom: 0px !important; }
 .pl-0 { padding-left: 0px !important; }
 
 .pa-1 { padding: 1px !important; }
@@ -512,8 +508,6 @@
 }
 
 // Flex container properties
-.d-inline-flex { display: inline-flex; }
-.d-flex { display: flex; }
 .fd-row { flex-direction: row; }
 .fd-row-reverse { flex-direction: row-reverse; }
 .fd-column { flex-direction: column; }
@@ -564,7 +558,6 @@
 .gap-3 { gap: 3px !important; }
 .gap-2 { gap: 2px !important; }
 .gap-1 { gap: 1px !important; }
-.gap-0 { gap: 0px !important; }
 
 .row-gap-20, .row-gap-lg { row-gap: 20px !important; }
 .row-gap-15, .row-gap-md { row-gap: 15px !important; }

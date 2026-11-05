@@ -373,12 +373,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Controller/Api/CampaignApiController.php
 
 		-
-			message: '#^Method Mautic\\CampaignBundle\\Controller\\CampaignController\:\:getIndexItems\(\) has no return type specified\.$#'
-			identifier: missingType.return
-			count: 1
-			path: app/bundles/CampaignBundle/Controller/CampaignController.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 2
@@ -1522,24 +1516,6 @@ parameters:
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
 
 		-
-			message: '#^Method Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/bundles/CoreBundle/Entity/CommonRepository.php
-
-		-
-			message: '#^Method Doctrine\\ORM\\Query\\Expr\:\:andX\(\) invoked with 2 parameters, 0\-1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/bundles/CoreBundle/Entity/CommonRepository.php
-
-		-
-			message: '#^Method Doctrine\\ORM\\Query\\Expr\:\:orX\(\) invoked with 2 parameters, 0\-1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: app/bundles/CoreBundle/Entity/CommonRepository.php
-
-		-
 			message: '#^Method Mautic\\CoreBundle\\Entity\\CommonRepository\:\:appendExpression\(\) has no return type specified\.$#'
 			identifier: missingType.return
 			count: 1
@@ -1637,12 +1613,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\CoreBundle\\Entity\\CommonRepository\:\:getIdsExpr\(\) has parameter \$q with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/CoreBundle/Entity/CommonRepository.php
-
-		-
-			message: '#^Method Mautic\\CoreBundle\\Entity\\CommonRepository\:\:getPublishedByDateExpression\(\) has parameter \$q with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
@@ -2378,36 +2348,6 @@ parameters:
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/CoreBundle/Helper/DateTimeHelper.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\EmojiMap\\HtmlToUnicodeEmojiMap\:\:\$map has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiMap/HtmlToUnicodeEmojiMap.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\EmojiMap\\ShortToUnicodeEmojiMap\:\:\$exceptions has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiMap/ShortToUnicodeEmojiMap.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\EmojiMap\\ShortToUnicodeEmojiMap\:\:\$map has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiMap/ShortToUnicodeEmojiMap.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\EmojiMap\\UnicodeToHtmlEmojiMap\:\:\$map has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiMap/UnicodeToHtmlEmojiMap.php
-
-		-
-			message: '#^Property Mautic\\CoreBundle\\Helper\\EmojiMap\\UnicodeToShortEmojiMap\:\:\$map has no type specified\.$#'
-			identifier: missingType.property
-			count: 1
-			path: app/bundles/CoreBundle/Helper/EmojiMap/UnicodeToShortEmojiMap.php
 
 		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
@@ -3310,18 +3250,6 @@ parameters:
 			path: app/bundles/EmailBundle/Entity/Email.php
 
 		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setVariantReadCount\(\) has parameter \$variantReadCount with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Entity\\Email\:\:setVariantSentCount\(\) has parameter \$variantSentCount with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Entity/Email.php
-
-		-
 			message: '#^Parameter \#1 \$prefix of function uniqid expects string, int\<0, max\> given\.$#'
 			identifier: argument.type
 			count: 1
@@ -3700,12 +3628,6 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/MailHelper.php
 
 		-
-			message: '#^Property Mautic\\EmailBundle\\Helper\\MailHelper\:\:\$lead \(array\|Mautic\\LeadBundle\\Entity\\Lead\) does not accept null\.$#'
-			identifier: assign.propertyType
-			count: 1
-			path: app/bundles/EmailBundle/Helper/MailHelper.php
-
-		-
 			message: '#^Method Mautic\\EmailBundle\\Helper\\PointEventHelper\:\:validateEmail\(\) has parameter \$eventDetails with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
@@ -3767,12 +3689,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:getEmailStati\(\) has parameter \$leadId with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/EmailBundle/Model/EmailModel.php
-
-		-
-			message: '#^Method Mautic\\EmailBundle\\Model\\EmailModel\:\:getEmailStatus\(\) has parameter \$idHash with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/EmailBundle/Model/EmailModel.php
@@ -4569,7 +4485,7 @@ parameters:
 		-
 			message: '#^Parameter \#1 \$response of method Mautic\\FormBundle\\EventListener\\FormSubscriber\:\:parseResponse\(\) expects GuzzleHttp\\Psr7\\Response, Psr\\Http\\Message\\ResponseInterface given\.$#'
 			identifier: argument.type
-			count: 2
+			count: 1
 			path: app/bundles/FormBundle/EventListener/FormSubscriber.php
 
 		-
@@ -6770,18 +6686,6 @@ parameters:
 
 		-
 			message: '#^Method Mautic\\LeadBundle\\Model\\LeadModel\:\:removeFromLists\(\) has parameter \$lists with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Model/LeadModel.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\LeadModel\:\:removeFromStages\(\) has parameter \$lead with no type specified\.$#'
-			identifier: missingType.parameter
-			count: 1
-			path: app/bundles/LeadBundle/Model/LeadModel.php
-
-		-
-			message: '#^Method Mautic\\LeadBundle\\Model\\LeadModel\:\:removeFromStages\(\) has parameter \$stage with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
 			path: app/bundles/LeadBundle/Model/LeadModel.php
