@@ -41,6 +41,11 @@ class BotRatioHelper
     ) {
     }
 
+    public function isBurstDetectionEnabled(): bool
+    {
+        return $this->burstMaxDistinctIps > 0 && null !== $this->hitRepository;
+    }
+
     public function isHitByBot(
         Stat $emailStat,
         \DateTimeInterface $emailHitDateTime,

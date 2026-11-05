@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\EmailBundle\Helper\BotRatioHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
@@ -15,6 +16,7 @@ final readonly class PageSubscriber implements EventSubscriberInterface
         private EmailModel $emailModel,
         private RealTimeExecutioner $realTimeExecutioner,
         private RequestStack $requestStack,
+        private BotRatioHelper $botRatioHelper,
     ) {
     }
 
@@ -53,12 +55,8 @@ final readonly class PageSubscriber implements EventSubscriberInterface
                 }
             }
 
-            if (!empty($stat)) {
-                // Check to see if it has been marked as opened
-                if (!$stat->isRead()) {
-                    // Mark it as read
-                    $this->emailModel->hitEmail($stat, $this->requestStack->getCurrentRequest() ?: $event->getRequest());
-                }
+            if (!empty($stat) && !$stat->isRead() && !$this->botRatioHelper->isBurstDetectionEnabled()) {
+                $this->emailModel->hitEmail($stat, $this->requestStack->getCurrentRequest() ?: $event->getRequest());
             }
         }
     }

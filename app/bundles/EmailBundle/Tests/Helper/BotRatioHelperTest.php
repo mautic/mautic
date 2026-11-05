@@ -76,9 +76,20 @@ final class BotRatioHelperTest extends TestCase
         $botRatioHelper = $this->createBotRatioHelper(hitRepository: $hitRepository);
         $emailStat      = $this->createHumanEmailStat();
 
+        $this->assertFalse($botRatioHelper->isBurstDetectionEnabled());
         $this->assertFalse(
             $botRatioHelper->isHitByBot($emailStat, new \DateTime(), new IpAddress('203.0.113.10'), 'Mozilla/5.0')
         );
+    }
+
+    public function testBurstDetectionIsEnabledWhenThresholdAndRepositoryAreSet(): void
+    {
+        $botRatioHelper = $this->createBotRatioHelper(
+            burstMaxDistinctIps: 3,
+            hitRepository: $this->createStub(HitRepository::class)
+        );
+
+        $this->assertTrue($botRatioHelper->isBurstDetectionEnabled());
     }
 
     public function testBurstScannerFlagsDistributedGatewayHits(): void
