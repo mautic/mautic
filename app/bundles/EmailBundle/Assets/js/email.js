@@ -120,7 +120,7 @@ Mautic.insertEmailBuilderToken = function(editorId, token) {
 Mautic.getEmailAbTestWinnerForm = function(abKey) {
     if (abKey && mQuery(abKey).val() && mQuery(abKey).closest('.form-group').hasClass('has-error')) {
         mQuery(abKey).closest('.form-group').removeClass('has-error');
-        if (mQuery(abKey).next().hasClass('help-block')) {
+        if (mQuery(abKey).next().hasClass('form-text')) {
             mQuery(abKey).next().remove();
         }
     }
@@ -196,7 +196,7 @@ Mautic.sendEmailBatch = function () {
             if (response.progress[0] > 0) {
                 mQuery('.imported-count').html(response.progress[0]);
                 mQuery('.progress-bar-send').attr('aria-valuenow', response.progress[0]).css('width', response.percent + '%');
-                mQuery('.progress-bar-send span.sr-only').html(response.percent + '%');
+                mQuery('.progress-bar-send span.visually-hidden').html(response.percent + '%');
             }
 
             if (response.progress[0] >= response.progress[1]) {
@@ -524,7 +524,7 @@ Mautic.initDynamicContentItem = function (tabId, jQueryVariant, tokenName) {
 Mautic.updateDynamicContentDropdown = function () {
     var options = [];
 
-    mQuery('#dynamicContentTabs').find('a[data-toggle="tab"]').each(function () {
+    mQuery('#dynamicContentTabs').find('a[data-toggle="tab"], a[data-bs-toggle="tab"]').each(function () {
         var prototype       = '<li><a class="fr-command" data-cmd="dynamicContent" data-param1="__tokenName__">__tokenName__</a></li>';
         var newOption       = prototype.replace(/__tokenName__/g, mQuery(this).text());
 
