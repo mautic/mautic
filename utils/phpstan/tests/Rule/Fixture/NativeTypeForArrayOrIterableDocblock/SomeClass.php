@@ -82,4 +82,35 @@ final class SomeClass
     public function skipByRef(&$items): void
     {
     }
+
+    /**
+     * @param string[]|null $items
+     */
+    public function nullableArrayParam($items): void
+    {
+    }
+
+    /**
+     * @return string[]|null
+     */
+    public function nullableArrayReturn()
+    {
+        return null;
+    }
+
+    /**
+     * @return string[]|int[]
+     */
+    public function unionArrayReturn()
+    {
+        return [];
+    }
+
+    /**
+     * @return string[]|string
+     */
+    public function skipMixedUnionReturn()
+    {
+        return [];
+    }
 }

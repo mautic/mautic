@@ -14,6 +14,7 @@ use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 use PHPStan\Type\FileTypeMapper;
 use PHPStan\Type\Type;
+use PHPStan\Type\TypeCombinator;
 
 /**
  * A "@param"/"@return" docblock typed as an array (e.g. "Foo[]", "array") or "iterable" must be
@@ -155,14 +156,18 @@ final readonly class NativeTypeForArrayOrIterableDocblockRule implements Rule
 
     private function resolveRequiredNativeType(Type $type): ?string
     {
-        // "Foo[]" / "array" / "array<...>" resolve to an array type
-        if ($type->isArray()->yes()) {
-            return 'array';
+        // a "|null" member widens the required native type to its nullable form
+        $prefix = TypeCombinator::containsNull($type) ? '?' : '';
+        $withoutNull = TypeCombinator::removeNull($type);
+
+        // "Foo[]" / "array" / "array<...>" (and a "Foo[]|Bar[]" union of only arrays) resolve to an array type
+        if ($withoutNull->isArray()->yes()) {
+            return $prefix.'array';
         }
 
         // the "iterable" pseudo-type only; a concrete Traversable object (Generator, Collection) is skipped
-        if ($type->isIterable()->yes() && !$type->isObject()->yes()) {
-            return 'iterable';
+        if ($withoutNull->isIterable()->yes() && !$withoutNull->isObject()->yes()) {
+            return $prefix.'iterable';
         }
 
         return null;

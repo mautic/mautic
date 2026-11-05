@@ -44,6 +44,18 @@ final class NativeTypeForArrayOrIterableDocblockRuleTest extends RuleTestCase
                 'Method "missingIterableReturn()" has a "iterable" return docblock, so it must declare the native "iterable" return type.',
                 41,
             ],
+            [
+                'Param "$items" of "nullableArrayParam()" has a "?array" docblock, so it must declare the native "?array" type.',
+                89,
+            ],
+            [
+                'Method "nullableArrayReturn()" has a "?array" return docblock, so it must declare the native "?array" return type.',
+                96,
+            ],
+            [
+                'Method "unionArrayReturn()" has a "array" return docblock, so it must declare the native "array" return type.',
+                104,
+            ],
         ]);
     }
 
