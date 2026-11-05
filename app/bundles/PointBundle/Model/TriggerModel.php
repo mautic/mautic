@@ -35,14 +35,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends CommonFormModel<Trigger>
  */
-class TriggerModel extends CommonFormModel implements GlobalSearchInterface
+final class TriggerModel extends CommonFormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
         return 'point.trigger';
     }
 
-    protected $triggers = [];
+    private array $triggers = [];
 
     /**
      * @var array<string, mixed[]>
@@ -50,9 +50,9 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     private array $cachedEvents = [];
 
     public function __construct(
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadModel $leadModel,
-        protected TriggerEventModel $pointTriggerEventModel,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly LeadModel $leadModel,
+        private readonly TriggerEventModel $pointTriggerEventModel,
         private readonly ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
@@ -80,9 +80,11 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Trigger|array<string, mixed> $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -98,7 +100,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * @param Trigger $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
 
@@ -191,9 +193,11 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Trigger $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Trigger) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -229,10 +233,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
         return null;
     }
 
-    /**
-     * @param array $sessionEvents
-     */
-    public function setEvents(Trigger $entity, $sessionEvents): void
+    public function setEvents(Trigger $entity, array $sessionEvents): void
     {
         $order           = 1;
         $existingActions = $entity->getEvents();
@@ -272,7 +273,7 @@ class TriggerModel extends CommonFormModel implements GlobalSearchInterface
     {
         if ([] === $this->cachedEvents) {
             $event = new TriggerBuilderEvent($this->translator);
-            $this->dispatcher->dispatch($event, PointEvents::TRIGGER_ON_BUILD);
+            $this->dispatcher->dispatch($event);
             $this->cachedEvents = $event->getEvents();
         }
 

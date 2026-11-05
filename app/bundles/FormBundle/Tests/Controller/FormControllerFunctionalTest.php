@@ -12,6 +12,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\ProjectBundle\Entity\Project;
@@ -245,7 +246,9 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
         $this->assertJson($response->getContent());
 
-        $content = json_decode($response->getContent())->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($response->getContent());
+        $content = $decodedContent->newContent;
         $crawler = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $options = $crawler->filterXPath('//select[@name="formfield[mappedField]"]')->html();
         $this->assertStringContainsString('<option value="email">Email</option>', $options, 'Email option should not be pre-selected.');
@@ -302,7 +305,9 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($form);
 
         // Fetch the form
-        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/forms/action/new',
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/forms/action/new',
             [
                 'formId' => $form->getId(),
                 'type'   => 'lead.addutmtags',
@@ -310,7 +315,9 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        $content     = json_decode($content)->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
         $this->assertCount(1, $formCrawler);
@@ -372,7 +379,9 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $content     = $this->client->getResponse()->getContent();
-        $content     = json_decode($content)->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
         $this->assertCount(1, $formCrawler);
@@ -656,7 +665,7 @@ final class FormControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $forms = $this->em->getRepository(Form::class)->findBy([], ['id' => 'ASC']);
+        $forms = $this->getContainer()->get(FormRepository::class)->findBy([], ['id' => 'ASC']);
         $this->assertCount(2, $forms);
 
         $originalForm = $forms[0];

@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Exception\ContactNotFoundException;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Psr\Log\LoggerInterface;
@@ -21,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ContactRequestHelper
+final class ContactRequestHelper
 {
     private ?Lead $trackedContact = null;
 
@@ -150,14 +149,12 @@ class ContactRequestHelper
     /**
      * Identify a contact through a clickthrough URL.
      *
-     * @return Lead
-     *
      * @throws ContactNotFoundException
      */
-    private function getContactFromClickthrough(array $clickthrough)
+    private function getContactFromClickthrough(array $clickthrough): Lead
     {
         $event = new ContactIdentificationEvent($clickthrough);
-        $this->eventDispatcher->dispatch($event, LeadEvents::ON_CLICKTHROUGH_IDENTIFICATION);
+        $this->eventDispatcher->dispatch($event);
 
         if ($contact = $event->getIdentifiedContact()) {
             $this->logger->debug("LEAD: Contact ID# {$contact->getId()} tracked through clickthrough query by the ".$event->getIdentifier().' channel');
@@ -202,10 +199,7 @@ class ContactRequestHelper
         }
     }
 
-    /**
-     * @return Lead
-     */
-    private function mergeWithTrackedContact(Lead $foundContact)
+    private function mergeWithTrackedContact(Lead $foundContact): Lead
     {
         if ($this->trackedContact && $this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
             try {

@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -28,6 +29,8 @@ use Mautic\WebhookBundle\Entity\LogRepository;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Entity\WebhookQueueRepository;
 use Mautic\WebhookBundle\Entity\WebhookRepository;
+use Mautic\WebhookBundle\Event\WebhookPostSaveEvent;
+use Mautic\WebhookBundle\Event\WebhookPreSaveEvent;
 use Mautic\WebhookBundle\Event\WebhookQueueEvent;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\Model\WebhookModel;
@@ -135,11 +138,9 @@ final class WebhookControllerTest extends TestCase
         $changes = ['dateIdentified' => $isNew];
 
         // Now send the lead update event.
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->once())->method('isAnonymous')->willReturn(false);
-        $lead->expects($this->once())->method('getChanges')
-            ->with(true)
-            ->willReturn($changes);
+        $lead = new Lead();
+        $lead->setEmail('contact@example.com');
+        $lead->setChanges($changes);
 
         $event = new LeadEvent($lead, $isNew);
 
@@ -170,19 +171,14 @@ final class WebhookControllerTest extends TestCase
                 return $clientResponse;
             });
 
-        $webhook = $this->createMock(Webhook::class);
-        $webhook->method('getId')
-            ->willReturn($webhookId);
-        $webhook->expects($this->once())->method('getMarkedUnhealthyAt')
-            ->willReturn(null);
-        $webhook->expects($this->once())->method('getWebhookUrl')
-            ->willReturn($url);
-        $webhook->expects($this->exactly(2))->method('getSecret')
-            ->willReturn($secret);
+        $webhook = new Webhook();
+        ReflectionHelper::setEntityId($webhook, $webhookId);
+        $webhook->setWebhookUrl($url);
+        $webhook->setSecret($secret);
 
-        $webhookEvent = $this->createMock(Event::class);
-        $webhookEvent->expects($this->once())->method('getWebhook')->willReturn($webhook);
-        $webhookEvent->expects($this->once())->method('getEventType')->willReturn($eventUnderTest);
+        $webhookEvent = new Event();
+        $webhookEvent->setWebhook($webhook);
+        $webhookEvent->setEventType($eventUnderTest);
 
         $webhookEventRepository = $this->createMock(EventRepository::class);
         $webhookEventRepository->expects($this->once())
@@ -218,18 +214,17 @@ final class WebhookControllerTest extends TestCase
             ->method('hasListeners')
             ->willReturnMap([
                 [WebhookQueueEvent::class, false],
-                ['mautic.webhook_pre_save', false],
-                ['mautic.webhook_post_save', false],
+                [WebhookPreSaveEvent::class, false],
+                [WebhookPostSaveEvent::class, false],
             ])
             ->willReturn(false);
 
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->expects($this->exactly(10))->method('get')
+        $coreParametersHelper->expects($this->exactly(9))->method('get')
             ->willReturnMap([
                 ['webhook_limit', 10, 5],
                 ['webhook_time_limit', 600, 500],
                 ['webhook_disable_limit', 100, $disableLimit],
-                ['webhook_timeout', 15, 25],
                 ['webhook_log_max', WebhookModel::WEBHOOK_LOG_MAX, 50],
                 ['queue_mode', null, WebhookModel::IMMEDIATE_PROCESS],
                 ['events_orderby_dir', Order::Ascending, Order::Ascending],

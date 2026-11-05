@@ -12,6 +12,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
 {
     public function testLeadReportWithDncListColumn(): void
     {
+        $leads   = [];
         $leads[] = $this->createContact('test1@example.com');
         $leads[] = $this->createContact('test2@example.com');
         $leads[] = $this->createContact('test3@example.com');
@@ -41,6 +42,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
 
     public function testLeadReportWithDncListFilterIn(): void
     {
+        $leads   = [];
         $leads[] = $this->createContact('test1@example.com');
         $leads[] = $this->createContact('test2@example.com');
         $leads[] = $this->createContact('test3@example.com');
@@ -80,6 +82,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
 
     public function testLeadReportWithDncListFilterNotIn(): void
     {
+        $leads   = [];
         $leads[] = $this->createContact('test1@example.com');
         $leads[] = $this->createContact('test2@example.com');
         $leads[] = $this->createContact('test3@example.com');
@@ -115,6 +118,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
 
     public function testLeadReportWithDncListFilterEmpty(): void
     {
+        $leads   = [];
         $leads[] = $this->createContact('test1@example.com');
         $leads[] = $this->createContact('test2@example.com');
         $leads[] = $this->createContact('test3@example.com');
@@ -149,6 +153,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
 
     public function testLeadReportWithDncListFilterNotEmpty(): void
     {
+        $leads   = [];
         $leads[] = $this->createContact('test1@example.com');
         $leads[] = $this->createContact('test2@example.com');
         $leads[] = $this->createContact('test3@example.com');
@@ -184,6 +189,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
 
     public function testLeadReportWithEmailDomainColumn(): void
     {
+        $leads   = [];
         $leads[] = $this->createContact('test1@d1.example.com');
         $leads[] = $this->createContact('test2@d2.example.com');
         $leads[] = $this->createContact('test3@d3.example.com');

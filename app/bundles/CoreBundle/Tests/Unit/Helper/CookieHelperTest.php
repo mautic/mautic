@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
@@ -15,7 +14,6 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
@@ -47,22 +45,10 @@ final class CookieHelperTest extends TestCase
 
         $cookieHelper->setCookie($cookieName, 'test');
 
-        $headers = $this->createMock(ResponseHeaderBag::class);
-        $headers->expects($this->once())
-            ->method('setCookie')
-            ->willReturnCallback(static function (Cookie $cookie): void {
-                Assert::assertStringContainsString('samesite=lax', (string) $cookie);
-                Assert::assertStringContainsString('secure', (string) $cookie);
-            });
+        $cookie = $this->cookieSetByOnResponse($cookieHelper);
 
-        $response          = $this->createStub(Response::class);
-        $response->headers = $headers;
-        $kernel            = new \AppKernel(MAUTIC_ENV, false);
-        $request           = $this->createStub(Request::class);
-
-        $event   = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
-
-        $cookieHelper->onResponse($event);
+        $this->assertStringContainsString('samesite=lax', (string) $cookie);
+        $this->assertStringContainsString('secure', (string) $cookie);
     }
 
     #[TestDox('The helper is instantiated correctly when not secure and contain samesite=lax')]
@@ -77,22 +63,10 @@ final class CookieHelperTest extends TestCase
 
         $cookieHelper->setCookie($cookieName, 'test');
 
-        $headers = $this->createMock(ResponseHeaderBag::class);
-        $headers->expects($this->once())
-            ->method('setCookie')
-            ->willReturnCallback(static function (Cookie $cookie): void {
-                Assert::assertStringContainsString('samesite=lax', (string) $cookie);
-                Assert::assertStringNotContainsString('secure', (string) $cookie);
-            });
+        $cookie = $this->cookieSetByOnResponse($cookieHelper);
 
-        $response          = $this->createStub(Response::class);
-        $response->headers = $headers;
-        $kernel            = new \AppKernel(MAUTIC_ENV, false);
-        $request           = $this->createStub(Request::class);
-
-        $event             = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
-
-        $cookieHelper->onResponse($event);
+        $this->assertStringContainsString('samesite=lax', (string) $cookie);
+        $this->assertStringNotContainsString('secure', (string) $cookie);
     }
 
     public function testSetCookieWhenSecureAndSameSiteNone(): void
@@ -110,20 +84,35 @@ final class CookieHelperTest extends TestCase
             sameSite: Cookie::SAMESITE_NONE
         );
 
-        $headers = $this->createMock(ResponseHeaderBag::class);
-        $headers->expects($this->once())
-            ->method('setCookie')
-            ->willReturnCallback(static function (Cookie $cookie): void {
-                Assert::assertStringContainsString('samesite=none', (string) $cookie);
-                Assert::assertStringContainsString('secure', (string) $cookie);
-            });
+        $cookie = $this->cookieSetByOnResponse($cookieHelper);
 
-        $response          = $this->createStub(Response::class);
-        $response->headers = $headers;
-        $kernel            = new \AppKernel(MAUTIC_ENV, false);
-        $request           = $this->createStub(Request::class);
-        $event             = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
+        $this->assertStringContainsString('samesite=none', (string) $cookie);
+        $this->assertStringContainsString('secure', (string) $cookie);
+    }
+
+    /**
+     * Dispatches onResponse() against a real Response and returns the single cookie it set.
+     *
+     * Symfony 8 made HttpFoundation's InputBag final and tightened the value objects
+     * around Response, so doubling Response and asserting on a mocked header bag no
+     * longer works. Asserting on the cookie that actually lands is both simpler and a
+     * closer test of the behaviour.
+     */
+    private function cookieSetByOnResponse(CookieHelper $cookieHelper): Cookie
+    {
+        $response = new Response();
+        $event    = new ResponseEvent(
+            new \AppKernel(MAUTIC_ENV, false),
+            new Request(),
+            HttpKernelInterface::MAIN_REQUEST,
+            $response
+        );
 
         $cookieHelper->onResponse($event);
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+
+        return $cookies[0];
     }
 }

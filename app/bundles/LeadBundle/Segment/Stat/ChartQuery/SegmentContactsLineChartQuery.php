@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Segment\Stat\ChartQuery;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -82,10 +82,8 @@ final class SegmentContactsLineChartQuery extends ChartQuery
 
     /**
      * Get data about add/remove from segment based on LeadEventLog.
-     *
-     * @param string $action
      */
-    public function getDataFromLeadEventLog($action): array
+    public function getDataFromLeadEventLog(string $action): array
     {
         $qb = $this->prepareTimeDataQuery(
             'lead_event_log',

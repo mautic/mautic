@@ -11,6 +11,7 @@ use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,14 +25,6 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
         $this->setUpMailer();
-    }
-
-    protected function beforeTearDown(): void
-    {
-        // Clear owners cache (to leave a clean environment for future tests):
-        /** @var MailHelper $mailHelper */
-        $mailHelper = self::getContainer()->get(MailHelper::class);
-        ReflectionHelper::setValue($mailHelper, 'leadOwners', []);
     }
 
     public function testEmailSendWithCompanyTokens(): void
@@ -85,7 +78,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         );
         $this->client->submit($form);
 
-        return $this->em->getRepository(Lead::class)->findOneBy(
+        return $this->getContainer()->get(LeadRepository::class)->findOneBy(
             [
                 'firstname' => $firstName,
                 'email'     => $email,
@@ -172,10 +165,10 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_POST, "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
         self::assertResponseIsSuccessful();
-        $this->assertSame(json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR), [
+        $this->assertSame([
             'success'          => 1,
             'sentCount'        => 1,
             'failedRecipients' => 0,
-        ], (string) $clientResponse->getContent());
+        ], json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR), (string) $clientResponse->getContent());
     }
 }

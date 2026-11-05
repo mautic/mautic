@@ -8,9 +8,10 @@ use MauticPlugin\MauticCrmBundle\Api\Zoho\Exception\MatchingKeyNotFoundException
 use MauticPlugin\MauticCrmBundle\Api\Zoho\Mapper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Mapper::class)]
-final class MapperTest extends \PHPUnit\Framework\TestCase
+final class MapperTest extends TestCase
 {
     /**
      * @var array<string, array<string, array<string, mixed>>>

@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class FieldPaginationController extends CommonController
 {
     #[Route(
-        '/s/integration/{integration}/config/{object}/{page}',
+        path: '/s/integration/{integration}/config/{object}/{page}',
         name: 'mautic_integration_config_field_pagination',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 1],
@@ -38,8 +38,8 @@ final class FieldPaginationController extends CommonController
 
         // Find the integration
         try {
-            /** @var ConfigFormSyncInterface $integrationObject */
             $integrationObject        = $integrationsHelper->getIntegration($integration);
+            \assert($integrationObject instanceof ConfigFormSyncInterface);
             $integrationConfiguration = $integrationObject->getIntegrationConfiguration();
         } catch (IntegrationNotFoundException) {
             return $this->notFound();

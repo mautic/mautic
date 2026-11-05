@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\PageBundle\Controller\Api\PageApiController;
+use Mautic\PageBundle\Entity\Page;
+
 return [
     'routes' => [
         'api' => [
@@ -9,7 +12,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'pages',
                 'path'            => '/pages',
-                'controller'      => Mautic\PageBundle\Controller\Api\PageApiController::class,
+                'controller'      => PageApiController::class,
             ],
         ],
     ],
@@ -29,7 +32,7 @@ return [
 
     'categories' => [
         'page' => [
-            'class' => Mautic\PageBundle\Entity\Page::class,
+            'class' => Page::class,
         ],
     ],
 

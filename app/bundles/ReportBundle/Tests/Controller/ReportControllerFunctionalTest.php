@@ -11,8 +11,10 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Hit;
+use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Entity\ReportRepository;
 use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Model\ReportFileWriter;
 use Mautic\ReportBundle\Model\ReportModel;
@@ -38,7 +40,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $query->from(MAUTIC_TABLE_PREFIX.'page_hits', 'ph');
         $query->leftJoin('ph', MAUTIC_TABLE_PREFIX.'pages', 'p', 'ph.page_id = p.id');
 
-        $res = $this->em->getRepository(Hit::class)->getMostVisited($query);
+        $res = $this->getContainer()->get(HitRepository::class)->getMostVisited($query);
 
         foreach ($res as $hit) {
             $this->assertNotNull($hit['id']);
@@ -112,7 +114,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
-        $report = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC']);
+        $report = $this->getContainer()->get(ReportRepository::class)->findOneBy(['name' => 'Report ABC']);
         $this->assertInstanceOf(Report::class, $report);
 
         $crawler = $this->client->request(Request::METHOD_GET, "/s/reports/clone/{$report->getId()}");
@@ -124,7 +126,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
-        $reportClone = $this->em->getRepository(Report::class)->findOneBy(['name' => 'Report ABC - cloned']);
+        $reportClone = $this->getContainer()->get(ReportRepository::class)->findOneBy(['name' => 'Report ABC - cloned']);
         $this->assertInstanceOf(Report::class, $reportClone);
 
         $this->assertSame($report->getId() + 1, $reportClone->getId());
@@ -320,7 +322,8 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             'l.firstname',
         ];
         $report->setColumns($coulmns);
-        $report->setFilters([
+        $report->setFilters(
+            [
             [
                 'column'    => 'l.firstname',
                 'glue'      => 'and',
@@ -349,7 +352,8 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
             'utm.utm_campaign',
         ];
         $report->setColumns($coulmns);
-        $report->setFilters([
+        $report->setFilters(
+            [
             [
                 'column'    => 'utm.utm_campaign',
                 'glue'      => 'and',
@@ -410,7 +414,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $report   = $this->em->getRepository(Report::class)->find($report->getId());
+        $report   = $this->getContainer()->get(ReportRepository::class)->find($report->getId());
         $schedule = $report->getSchedule();
         $this->getContainer()->get(ReportModel::class)->saveEntity($report);
 
@@ -564,6 +568,7 @@ final class ReportControllerFunctionalTest extends MauticMysqlTestCase
         $result = [];
         $dom    = new \DOMDocument('1.0', 'utf-8');
         $dom->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
+        /** @var \DOMElement $tbody */
         $tbody = $dom->getElementById('reportTable')->getElementsByTagName('tbody')[0];
         $rows  = $tbody->getElementsByTagName('tr');
 

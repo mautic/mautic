@@ -2,13 +2,16 @@
 
 namespace Mautic\LeadBundle\Segment;
 
+use DateTime;
+use Exception;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\LeadBatchLimiterTrait;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Psr\Log\LoggerInterface;
 
-readonly class ContactSegmentService
+final readonly class ContactSegmentService
 {
     use LeadBatchLimiterTrait;
 
@@ -24,7 +27,7 @@ readonly class ContactSegmentService
      *
      * @return array<int,mixed[]>
      *
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
     public function getNewLeadListLeadsCount(LeadList $segment, array $batchLimiters): array
@@ -62,7 +65,7 @@ readonly class ContactSegmentService
     /**
      * @param array|null $batchLimiters for debug purpose only
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function getTotalLeadListLeadsCount(LeadList $segment, ?array $batchLimiters = null): array
     {
@@ -95,14 +98,12 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @param int $limit
-     *
      * @return array<int,mixed[]>
      *
      * @throws \Doctrine\DBAL\Exception
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      */
-    public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000): array
+    public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, int $limit = 1000): array
     {
         $queryBuilder = $this->getNewLeadListLeadsQueryBuilder($segment, $batchLimiters);
         $queryBuilder->setMaxResults($limit);
@@ -115,7 +116,7 @@ readonly class ContactSegmentService
     /**
      * @param array<string, mixed> $batchLimiters
      *
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
     public function hasNewLeadListLeads(LeadList $segment, array $batchLimiters): bool
@@ -129,7 +130,7 @@ readonly class ContactSegmentService
     /**
      * @param array<string, mixed> $batchLimiters
      *
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
     public function hasOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = []): bool
@@ -164,7 +165,7 @@ readonly class ContactSegmentService
         // Make sure that leads.id is the first column
         array_unshift($select, $distinct.$leadsTableAlias.'.id');
         $queryBuilder->resetQueryPart('select');
-        $queryBuilder->select($select);
+        $queryBuilder->select(...$select);
 
         $this->logger->debug('Segment QB: Create Leads SQL: '.$queryBuilder->getDebugOutput(), ['segmentId' => $segment->getId()]);
 
@@ -188,7 +189,7 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
     public function getOrphanedLeadListLeadsCount(LeadList $segment, array $batchLimiters = []): array
@@ -204,12 +205,10 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @param int|null $limit
-     *
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], $limit = null): array
+    public function getOrphanedLeadListLeads(LeadList $segment, array $batchLimiters = [], ?int $limit = null): array
     {
         $queryBuilder = $this->getOrphanedLeadListLeadsQueryBuilder($segment, $batchLimiters, $limit);
 
@@ -223,8 +222,8 @@ readonly class ContactSegmentService
     /**
      * @param array<string, mixed> $batchLimiters
      *
-     * @throws Exception\SegmentQueryException
-     * @throws \Exception
+     * @throws SegmentQueryException
+     * @throws Exception
      */
     private function getNewSegmentContactsQuery(LeadList $segment, array $batchLimiters = [], bool $addNewContactsRestrictions = true): QueryBuilder
     {
@@ -243,8 +242,8 @@ readonly class ContactSegmentService
     }
 
     /**
-     * @throws Exception\SegmentQueryException
-     * @throws \Exception
+     * @throws SegmentQueryException
+     * @throws Exception
      */
     private function getTotalSegmentContactsQuery(LeadList $segment): QueryBuilder
     {
@@ -259,12 +258,10 @@ readonly class ContactSegmentService
     /**
      * @param int|null $limit
      *
-     * @return QueryBuilder
-     *
-     * @throws Exception\SegmentQueryException
+     * @throws SegmentQueryException
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [], $limit = null)
+    public function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [], $limit = null): QueryBuilder
     {
         $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters);
 
@@ -280,7 +277,7 @@ readonly class ContactSegmentService
         $qbO->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
         $qbO->setParameters($queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
         $qbO->andWhere($expr->eq('orp.leadlist_id', ':orpsegid'));
-        $qbO->andWhere($expr->eq('orp.manually_added', $expr->literal(0)));
+        $qbO->andWhere($expr->eq('orp.manually_added', $expr->literal('0')));
         $qbO->andWhere($expr->notIn('orp.lead_id', $queryBuilder->getSQL()));
         $qbO->setParameter('orpsegid', $segment->getId());
         $this->addLeadAndMinMaxLimiters($qbO, $batchLimiters, 'lead_lists_leads');
@@ -299,25 +296,20 @@ readonly class ContactSegmentService
     }
 
     /* DEBUG */
-
     /**
      * Formatting helper.
-     *
-     * @return string
      */
-    private function formatPeriod(float $inputSeconds)
+    private function formatPeriod(float $inputSeconds): string
     {
-        $now = \DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
+        $now = DateTime::createFromFormat('U.u', number_format($inputSeconds, 6, '.', ''));
 
         return $now->format('H:i:s.u');
     }
 
     /**
-     * @return mixed
-     *
-     * @throws \Exception
+     * @throws Exception
      */
-    private function timedFetch(QueryBuilder $qb, ?int $segmentId)
+    private function timedFetch(QueryBuilder $qb, ?int $segmentId): array|false
     {
         try {
             $start = microtime(true);
@@ -327,7 +319,7 @@ readonly class ContactSegmentService
             $end = microtime(true) - $start;
 
             $this->logger->debug('Segment QB: Query took: '.$this->formatPeriod($end).', Result count: '.count($result), ['segmentId' => $segmentId]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error(
                 'Segment QB: Query Exception: '.$e->getMessage(),
                 [
@@ -344,7 +336,7 @@ readonly class ContactSegmentService
     /**
      * @return mixed
      *
-     * @throws \Exception
+     * @throws Exception
      */
     private function timedFetchAll(QueryBuilder $qb, ?int $segmentId)
     {
@@ -358,7 +350,7 @@ readonly class ContactSegmentService
                 'Segment QB: Query took: '.$this->formatPeriod($end).'ms. Result count: '.count($result),
                 ['segmentId' => $segmentId]
             );
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error(
                 'Segment QB: Query Exception: '.$e->getMessage(),
                 [

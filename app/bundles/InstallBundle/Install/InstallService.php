@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Loader\ParameterLoader;
@@ -28,33 +29,35 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class InstallService
+final readonly class InstallService
 {
-    public const CHECK_STEP = 0;
+    public const int CHECK_STEP = 0;
 
-    public const DOCTRINE_STEP = 1;
+    public const int DOCTRINE_STEP = 1;
 
-    public const USER_STEP = 2;
+    public const int USER_STEP = 2;
 
-    public const FINAL_STEP = 3;
+    public const int FINAL_STEP = 3;
 
     public function __construct(
-        private readonly Configurator $configurator,
-        private readonly CacheHelper $cacheHelper,
-        protected PathsHelper $pathsHelper,
-        private readonly EntityManagerInterface $entityManager,
-        private readonly TranslatorInterface $translator,
-        private readonly KernelInterface $kernel,
-        private readonly ValidatorInterface $validator,
-        private readonly UserPasswordHasherInterface $hasher,
-        private readonly FixturesLoaderInterface $fixturesLoader,
-        private readonly UserRepository $userRepository,
+        private Configurator $configurator,
+        private CacheHelper $cacheHelper,
+        private PathsHelper $pathsHelper,
+        private EntityManagerInterface $entityManager,
+        private TranslatorInterface $translator,
+        private KernelInterface $kernel,
+        private ValidatorInterface $validator,
+        private UserPasswordHasherInterface $hasher,
+        private FixturesLoaderInterface $fixturesLoader,
+        private UserRepository $userRepository,
+        private Filesystem $filesystem,
     ) {
     }
 
@@ -185,6 +188,29 @@ class InstallService
         $messages = $step->checkOptionalSettings();
 
         return $this->translateMessages($messages);
+    }
+
+    /**
+     * Creates the directories the requirements check tests, so a fresh Composer install
+     * does not fail purely because they have not been created yet.
+     *
+     * is_writable() returns false for a path that does not exist, and a project built
+     * from mautic/recommended-project has no var/logs until something writes a log line.
+     *
+     * This lives here rather than in CheckStep::checkRequirements() because that method
+     * also backs the System Info page, and CheckStep's path properties are bound form
+     * fields on the installer's check step.
+     */
+    public function prepareDirectories(): void
+    {
+        try {
+            $this->filesystem->mkdir([
+                $this->pathsHelper->getCachePath(),
+                $this->pathsHelper->getLogsPath(),
+            ]);
+        } catch (IOException) {
+            // Nothing to do here. The requirements check reports the path as unwritable.
+        }
     }
 
     public function saveConfiguration($params, ?StepInterface $step = null, $clearCache = false): array
@@ -368,6 +394,11 @@ class InstallService
      */
     public function installDatabaseFixtures(): void
     {
+        // The schema was just created, so whatever the manager still holds refers to rows
+        // that are gone. ORM 3 refuses to register a second object for an id already in the
+        // identity map, which the fixtures would hit as soon as they insert the first row.
+        $this->entityManager->clear();
+
         $fixtures = $this->fixturesLoader->getFixtures(['group_install']);
 
         if ([] === $fixtures) {

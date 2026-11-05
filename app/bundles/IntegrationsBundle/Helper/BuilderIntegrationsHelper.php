@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-class BuilderIntegrationsHelper
+final class BuilderIntegrationsHelper
 {
     /**
      * @var BuilderInterface[]
@@ -21,7 +21,7 @@ class BuilderIntegrationsHelper
      */
     public function __construct(
         private readonly IntegrationsHelper $integrationsHelper,
-        #[AutowireIterator('mautic.builder_integration')]
+        #[AutowireIterator(tag: 'mautic.builder_integration')]
         iterable $integrations = [],
     ) {
         foreach ($integrations as $integration) {

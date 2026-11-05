@@ -6,13 +6,15 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-final class CompanyLeadRepositoryTest extends \PHPUnit\Framework\TestCase
+final class CompanyLeadRepositoryTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|CompanyLeadRepository
+     * @var MockObject|CompanyLeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $repoMock;
+    private MockObject $repoMock;
 
     protected function setUp(): void
     {

@@ -4,8 +4,8 @@ namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -110,11 +110,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * @return QueryBuilder
-     *
      * @throws InvalidReportQueryException
      */
-    public function getQuery(array $options)
+    public function getQuery(array $options): TrackingQueryBuilder
     {
         $queryBuilder = $this->configureBuilder($options);
 
@@ -136,11 +134,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * This method configures the ReportBuilder. It has to return a configured Doctrine DBAL QueryBuilder.
      *
-     * @param array<string, mixed> $options Options array
-     *
-     * @return QueryBuilder
+     * @param array<string, mixed> $options
      */
-    private function configureBuilder(array $options)
+    private function configureBuilder(array $options): TrackingQueryBuilder
     {
         $event = new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder(), $this->channelListHelper);
 
@@ -192,7 +188,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         // Build WHERE clause
-        if (!empty($standardFilters)) {
+        if ($standardFilters !== []) {
             if (!$filterExpr = $event->getFilterExpression()) {
                 $this->applyFilters($standardFilters, $queryBuilder, $options['filters']);
             } else {
@@ -254,9 +250,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 }
             }
 
-            $queryBuilder->addGroupBy($groupByColumns);
-        } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
-            $queryBuilder->addGroupBy($options['groupby']);
+            if ([] !== $groupByColumns) {
+                $queryBuilder->addGroupBy(...$groupByColumns);
+            }
+        } elseif (!empty($options['groupby'])) {
+            $queryBuilder->addGroupBy(...array_values((array) $options['groupby']));
         }
 
         // Build LIMIT clause
@@ -288,7 +286,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build SELECT clause
         if (!$event->getSelectColumns()) {
             $fields           = $this->entity->getColumns();
-            $groupByFieldKeys = $groupByOptions ? array_flip($groupByOptions) : [];
+            $groupByFieldKeys = $groupByOptions !== [] ? array_flip($groupByOptions) : [];
 
             foreach ($fields as $field) {
                 // With GROUP BY + aggregators, a column listed only for COUNT/AVG must not
@@ -404,7 +402,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         });
 
-        $queryBuilder->addSelect($selectColumns);
+        // DBAL 4 requires at least one expression, so an empty list is skipped
+        if ([] !== $selectColumns) {
+            $queryBuilder->addSelect(...$selectColumns);
+        }
 
         // Add Aggregators
         $aggregatorSelect = [];
@@ -422,7 +423,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 $aggregatorSelect[] = sprintf("%s AS '%s %s'", $selectText, $aggregator['function'], $aggregator['column']);
             }
 
-            $queryBuilder->addSelect($aggregatorSelect);
+            $queryBuilder->addSelect(...$aggregatorSelect);
         }
 
         return $queryBuilder;
@@ -579,7 +580,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         return strtolower((string) preg_replace('/[`"\s]+/', '', $column));
     }
 
-    private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions): void
+    private function applyFilters(array $filters, TrackingQueryBuilder $queryBuilder, array $filterDefinitions): void
     {
         $expr     = $queryBuilder->expr();
         $orGroups = [];
@@ -734,7 +735,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx');
 
         if (in_array($filter['condition'], ['in', 'notIn']) && !empty($filter['value'])) {
-            $tagSubQuery->where($tagSubQuery->expr()->in('ltx.tag_id', $filter['value']));
+            // Cast every tag id to an integer so the inlined IN list can never carry SQL.
+            $tagIds = array_map(static fn ($value): string => (string) (int) $value, (array) $filter['value']);
+            $tagSubQuery->where($tagSubQuery->expr()->in('ltx.tag_id', $tagIds));
         }
 
         if (in_array($filter['condition'], ['in', 'notEmpty'])) {

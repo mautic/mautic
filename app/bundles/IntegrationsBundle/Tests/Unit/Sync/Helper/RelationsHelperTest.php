@@ -15,26 +15,27 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
 use Mautic\IntegrationsBundle\Sync\Helper\RelationsHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class RelationsHelperTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&MappingHelper
+     * @var MockObject&MappingHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
+    private MockObject $mappingHelper;
 
     private RelationsHelper $relationsHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ReportDAO
+     * @var MockObject&ReportDAO
      */
-    private \PHPUnit\Framework\MockObject\MockObject $syncReport;
+    private MockObject $syncReport;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&MappingManualDAO
+     * @var MockObject&MappingManualDAO
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mappingManual;
+    private MockObject $mappingManual;
 
     protected function setUp(): void
     {
@@ -134,7 +135,9 @@ final class RelationsHelperTest extends TestCase
         $objectsToSynchronize = $this->relationsHelper->getObjectsToSynchronize();
 
         $this->assertCount(0, $objectsToSynchronize);
-        $this->assertEquals($internalRelObjectId, $objectDao->getField($relFieldName)->getValue()->getNormalizedValue()->getValue());
-        $this->assertEquals(MauticSyncDataExchange::OBJECT_COMPANY, $objectDao->getField($relFieldName)->getValue()->getNormalizedValue()->getType());
+        /** @var ReferenceValueDAO $normalizedValue */
+        $normalizedValue = $objectDao->getField($relFieldName)->getValue()->getNormalizedValue();
+        $this->assertEquals($internalRelObjectId, $normalizedValue->getValue());
+        $this->assertEquals(MauticSyncDataExchange::OBJECT_COMPANY, $normalizedValue->getType());
     }
 }

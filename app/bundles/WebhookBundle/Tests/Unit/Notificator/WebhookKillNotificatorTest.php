@@ -17,12 +17,13 @@ use Mautic\WebhookBundle\Notificator\WebhookNotificationSender;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
+final class WebhookKillNotificatorTest extends TestCase
 {
     /**
      * @var MockObject&TranslatorInterface
@@ -44,10 +45,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $mailHelperMock;
 
-    /**
-     * @var MockObject&Webhook
-     */
-    private MockObject $webhook;
+    private Webhook $webhook;
 
     /**
      * @var MockObject&CoreParametersHelper
@@ -66,13 +64,13 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
 
     private string $details = 'details';
 
-    private string $createdBy = 'createdBy';
+    private int $createdBy = 1;
 
-    private MockObject&User $owner;
+    private User $owner;
 
     private string $ownerEmail = 'toEmail';
 
-    private ?string $modifiedBy = null;
+    private ?int $modifiedBy = null;
 
     private WebhookNotificationSender $webhookNotificationSender;
 
@@ -83,7 +81,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $this->entityManagerMock     = $this->createMock(EntityManager::class);
         $this->mailHelperMock        = $this->createMock(MailHelper::class);
         $this->coreParamHelperMock   = $this->createMock(CoreParametersHelper::class);
-        $this->webhook               = $this->createMock(Webhook::class);
+        $this->webhook               = new Webhook();
         $twig                        = $this->createMock(Environment::class);
         $eventDispatcher             = $this->createMock(EventDispatcherInterface::class);
 
@@ -112,15 +110,8 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
     public function testSendToOwner(): void
     {
         $this->mockCommonMethods(1);
-        $this->webhook
-            ->expects($this->once())
-            ->method('getCreatedBy')
-            ->willReturn($this->createdBy);
-
-        $this->webhook
-            ->expects($this->once())
-            ->method('getModifiedBy')
-            ->willReturn($this->modifiedBy);
+        $this->webhook->setCreatedBy($this->createdBy);
+        $this->webhook->setModifiedBy($this->modifiedBy);
 
         $this->entityManagerMock
             ->expects($this->once())
@@ -152,34 +143,27 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
     public function testSendToModifier(): void
     {
         $this->ownerEmail     = 'ownerEmail';
-        $this->modifiedBy     = 'modifiedBy';
-        $modifier             = $this->createMock(User::class);
+        $this->modifiedBy     = 2;
+        $modifier             = new User();
         $modifierEmail        = 'modifierEmail';
 
         $this->mockCommonMethods(1);
-        $this->webhook
-            ->expects($this->exactly(2))
-            ->method('getCreatedBy')
-            ->willReturn($this->createdBy);
-        $this->webhook
-            ->expects($this->exactly(3))
-            ->method('getModifiedBy')
-            ->willReturn($this->modifiedBy);
+        $this->webhook->setCreatedBy($this->createdBy);
+        $this->webhook->setModifiedBy($this->modifiedBy);
         $matcher = $this->exactly(2);
 
         $this->entityManagerMock->expects($matcher)
-            ->method('getReference')->willReturnCallback(function (string $entityClass, string|int $entityId) use ($matcher, $modifier) {
+            ->method('getReference')->willReturnCallback(function (string $entityClass, string|int $entityId) use ($matcher, $modifier): object {
                 $this->assertSame(User::class, $entityClass);
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame($this->createdBy, $entityId);
 
                     return $this->owner;
                 }
-                if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame($this->modifiedBy, $entityId);
 
-                    return $modifier;
-                }
+                $this->assertSame($this->modifiedBy, $entityId);
+
+                return $modifier;
             });
 
         $this->notificationModelMock
@@ -195,10 +179,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                 $modifier
             );
 
-        $modifier
-            ->expects($this->once())
-            ->method('getEmail')
-            ->willReturn($modifierEmail);
+        $modifier->setEmail($modifierEmail);
 
         $this->mailHelperMock
             ->expects($this->once())
@@ -222,7 +203,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
             $this->webhookNotificationSender,
             $this->translatorMock
         );
-        $this->owner                  = $this->createMock(User::class);
+        $this->owner                  = new User();
 
         $htmlUrl = '<a href="'.$this->generatedRoute.'" data-toggle="ajax">'.$this->webhookName.'</a>';
         $matcher = $this->exactly(2);
@@ -248,15 +229,10 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                 throw new Exception(sprintf('Method not be called for %dth time', $matcher->numberOfInvocations()));
             });
 
-        $this->webhook->expects($this->once())
-            ->method('getUnHealthySince')
-            ->willReturn(new \DateTimeImmutable());
+        $this->webhook->setUnHealthySince(new \DateTimeImmutable());
 
         if ($sentToAuthor) {
-            $this->owner
-                ->expects($this->once())
-                ->method('getEmail')
-                ->willReturn($this->ownerEmail);
+            $this->owner->setEmail($this->ownerEmail);
         }
 
         $this->mailHelperMock
@@ -277,10 +253,10 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $generatedRoute  = 'generatedRoute';
         $details         = 'details';
         $createdById     = 1;
-        $owner           = $this->createMock(User::class);
+        $owner           = new User();
         $ownerEmail      = 'owner-email@email.com';
         $modifiedById    = 2;
-        $modifiedBy      = $this->createMock(User::class);
+        $modifiedBy      = new User();
         $modifiedByEmail = 'modified-by@email.com';
         $htmlUrl         = '<a href="'.$generatedRoute.'" data-toggle="ajax">'.$webhookName.'</a>';
 
@@ -301,18 +277,9 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->webhook->expects($this->once())
-            ->method('getUnHealthySince')
-            ->willReturn(new \DateTimeImmutable());
-
-        $this->webhook
-            ->expects($this->exactly(2))
-            ->method('getCreatedBy')
-            ->willReturn($createdById);
-        $this->webhook
-            ->expects($this->exactly(3))
-            ->method('getModifiedBy')
-            ->willReturn($modifiedById);
+        $this->webhook->setUnHealthySince(new \DateTimeImmutable());
+        $this->webhook->setCreatedBy($createdById);
+        $this->webhook->setModifiedBy($modifiedById);
 
         $this->entityManagerMock->expects($this->exactly(2))
             ->method('getReference')
@@ -334,8 +301,8 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                 $modifiedBy
             );
 
-        $modifiedBy->expects($this->atLeastOnce())->method('getEmail')->willReturn($modifiedByEmail);
-        $owner->expects($this->atLeastOnce())->method('getEmail')->willReturn($ownerEmail);
+        $modifiedBy->setEmail($modifiedByEmail);
+        $owner->setEmail($ownerEmail);
 
         $this->mailHelperMock
             ->expects($this->once())
@@ -376,7 +343,7 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
         $generatedRoute = 'generatedRoute';
         $details        = 'details';
         $createdById    = 1;
-        $owner          = $this->createStub(User::class);
+        $owner          = new User();
         $ownerEmail     = 'owner@email.com';
         $modifiedBy     = null;
         $htmlUrl        = '<a href="'.$generatedRoute.'" data-toggle="ajax">'.$webhookName.'</a>';
@@ -398,18 +365,9 @@ final class WebhookKillNotificatorTest extends \PHPUnit\Framework\TestCase
                 ],
             ]);
 
-        $this->webhook->expects($this->once())
-            ->method('getUnHealthySince')
-            ->willReturn(new \DateTimeImmutable());
-
-        $this->webhook
-            ->expects($this->once())
-            ->method('getCreatedBy')
-            ->willReturn($createdById);
-        $this->webhook
-            ->expects($this->once())
-            ->method('getModifiedBy')
-            ->willReturn($modifiedBy);
+        $this->webhook->setUnHealthySince(new \DateTimeImmutable());
+        $this->webhook->setCreatedBy($createdById);
+        $this->webhook->setModifiedBy($modifiedBy);
 
         $this->entityManagerMock
             ->expects($this->once())

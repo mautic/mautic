@@ -24,6 +24,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\IntegrationSyncProcess;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -32,24 +33,24 @@ final class IntegrationSyncProcessTest extends TestCase
     private const string INTEGRATION_NAME = 'Test';
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&SyncDateHelper
+     * @var MockObject&SyncDateHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $syncDateHelper;
+    private MockObject $syncDateHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&MappingHelper
+     * @var MockObject&MappingHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $mappingHelper;
+    private MockObject $mappingHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ObjectChangeGenerator
+     * @var MockObject&ObjectChangeGenerator
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectChangeGenerator;
+    private MockObject $objectChangeGenerator;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&SyncDataExchangeInterface
+     * @var MockObject&SyncDataExchangeInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $syncDataExchange;
+    private MockObject $syncDataExchange;
 
     private InputOptionsDAO $inputOptionsDAO;
 
@@ -68,11 +69,10 @@ final class IntegrationSyncProcessTest extends TestCase
     public function testThatIntegrationGetSyncReportIsCalledBasedOnRequest(): void
     {
         $objectName    = 'Contact';
-        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
-        $mappingManual->addObjectMapping($objectMapping);
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME, [$objectMapping]);
 
         $fromSyncDateTime = new \DateTimeImmutable();
         $this->syncDateHelper->expects($this->once())
@@ -109,7 +109,7 @@ final class IntegrationSyncProcessTest extends TestCase
     public function testThatIntegrationGetSyncReportIsNotCalledBasedOnRequest(): void
     {
         $objectName    = 'Contact';
-        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME, []);
 
         $this->syncDateHelper->expects($this->never())
             ->method('getSyncFromDateTime')
@@ -127,11 +127,10 @@ final class IntegrationSyncProcessTest extends TestCase
     public function testOrderIsBuiltBasedOnMapping(): void
     {
         $objectName    = 'Contact';
-        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
-        $mappingManual->addObjectMapping($objectMapping);
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME, [$objectMapping]);
 
         $toSyncDateTime = new \DateTimeImmutable();
         $this->syncDateHelper->expects($this->once())
@@ -174,7 +173,6 @@ final class IntegrationSyncProcessTest extends TestCase
 
     public function testThatItDoesntSyncOtherEntityTypesWhenIDsForSomeEntityAreSpecified(): void
     {
-        $mappingManual         = new MappingManualDAO(self::INTEGRATION_NAME);
         $this->inputOptionsDAO = new InputOptionsDAO([
             'integration'      => self::INTEGRATION_NAME,
             'mautic-object-id' => ['contact:1'],
@@ -182,15 +180,14 @@ final class IntegrationSyncProcessTest extends TestCase
 
         $contactMapping = new ObjectMappingDAO(Contact::NAME, 'Contact');
         $contactMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
-        $mappingManual->addObjectMapping($contactMapping);
 
         $leadMapping = new ObjectMappingDAO(Contact::NAME, 'Lead');
         $leadMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
-        $mappingManual->addObjectMapping($leadMapping);
 
         $companyMapping = new ObjectMappingDAO(Company::NAME, 'Account');
         $companyMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
-        $mappingManual->addObjectMapping($companyMapping);
+
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME, [$contactMapping, $leadMapping, $companyMapping]);
 
         $fromSyncDateTime = new \DateTimeImmutable();
         $matcher          = $this->exactly(2);

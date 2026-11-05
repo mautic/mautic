@@ -2,6 +2,7 @@
 
 namespace Mautic\StageBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
@@ -12,7 +13,7 @@ class StageRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder($this->getTableAlias())
@@ -42,12 +43,8 @@ class StageRepository extends CommonRepository
 
     /**
      * Get array of published actions based on type.
-     *
-     * @param string $type
-     *
-     * @return array
      */
-    public function getPublishedByType($type)
+    public function getPublishedByType(string $type): array
     {
         $q = $this->createQueryBuilder('s')
             ->select('partial s.{id, name}')
@@ -75,7 +72,7 @@ class StageRepository extends CommonRepository
         // make sure the published up and down dates are good
         $q->where(
             $q->expr()->and(
-                $q->expr()->eq('x.lead_id', (int) $leadId)
+                $q->expr()->eq('x.lead_id', (string) ((int) $leadId))
             )
         );
 
@@ -90,7 +87,7 @@ class StageRepository extends CommonRepository
         return $return;
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             's.name',
@@ -98,7 +95,7 @@ class StageRepository extends CommonRepository
         ]);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'), $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(
@@ -134,8 +131,7 @@ class StageRepository extends CommonRepository
             $user = $user->getId();
         }
 
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(Stage::class, 's', 's.id');
+        $q = $this->createQueryBuilder('s', 's.id');
 
         $q->select('partial s.{id, name}')
             ->andWhere($q->expr()->eq('s.isPublished', ':true'))
@@ -163,8 +159,7 @@ class StageRepository extends CommonRepository
             return null;
         }
 
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->from(Stage::class, 's', 's.id');
+        $q = $this->createQueryBuilder('s', 's.id');
 
         $q->select('partial s.{id, name}')
             ->andWhere($q->expr()->eq('s.isPublished', ':true'))
@@ -183,16 +178,9 @@ class StageRepository extends CommonRepository
         return null;
     }
 
-    /**
-     * @param string|int $value
-     *
-     * @return Stage|null
-     */
-    public function findByIdOrName($value)
+    public function findByIdOrName(string|int $value): ?Stage
     {
-        $qb = $this->getEntityManager()->createQueryBuilder()
-            ->select('s')
-            ->from(Stage::class, 's');
+        $qb = $this->createQueryBuilder('s');
 
         if (is_numeric($value)) {
             // This is numeric value so check id and name

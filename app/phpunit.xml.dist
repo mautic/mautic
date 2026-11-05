@@ -2,7 +2,7 @@
 <!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     colors="true"
-    bootstrap="../vendor/autoload.php"
+    bootstrap="tests/bootstrap.php"
     xsi:noNamespaceSchemaLocation="../vendor/phpunit/phpunit/phpunit.xsd"
     failOnRisky="true"
     failOnWarning="true"
@@ -52,12 +52,7 @@
     <testsuite name="Middleware tests">
       <directory>middlewares/Tests</directory>
     </testsuite>
-    <testsuite name="Static analysis rule tests">
-      <directory>./../utils/rector/tests</directory>
-      <directory>./../utils/phpstan/tests</directory>
-      <exclude>./../utils/rector/tests/*/Fixture</exclude>
-      <exclude>./../utils/phpstan/tests/Rule/Fixture</exclude>
-    </testsuite>
+    <!-- Static analysis rule tests run from app/phpunit.static-analysis.xml.dist (no BypassFinals) -->
   </testsuites>
   <php>
     <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>

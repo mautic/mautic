@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Event\EntityImportEvent;
 use Mautic\CoreBundle\Helper\ImportHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,15 +18,11 @@ use Symfony\Component\HttpFoundation\Response;
 #[AllowMockObjectsWithoutExpectations]
 final class CampaignImportControllerTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        $this->useCleanupRollback = false;
-        parent::setUp();
-    }
+    protected $useCleanupRollback = false;
 
     public function testNewAction(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -38,7 +35,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
     public function testCancelAction(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -53,7 +50,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
     public function testProgressAction(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -69,7 +66,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
     public function testUndoAction(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -98,7 +95,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
     public function testUndoActionWithoutUndoData(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -127,7 +124,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
     public function testProgressActionAnalyzeDataErrors(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -149,7 +146,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
     public function testProgressActionAnalyzeDataValid(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
         $this->client->request(Request::METHOD_GET, '/');
@@ -180,7 +177,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
     public function testProgressActionImportEmptyFile(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 
@@ -202,7 +199,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
     public function testProgressActionImportValidData(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->loginUser($user);
 
         $this->client->request(Request::METHOD_GET, '/');
@@ -233,7 +230,7 @@ final class CampaignImportControllerTest extends MauticMysqlTestCase
 
     public function testUploadActionWithValidFile(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $user);
         $this->loginUser($user);
 

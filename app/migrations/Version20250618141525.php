@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250618141525 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = 'point_trigger_projects_xref';
+    protected const string TABLE_NAME = 'point_trigger_projects_xref';
 
     protected function preUpAssertions(): void
     {
@@ -27,7 +27,7 @@ final class Version20250618141525 extends PreUpAssertionMigration
         $table = $schema->createTable($this->prefix.'point_trigger_projects_xref');
         $table->addColumn('point_trigger_id', 'integer', ['unsigned' => 'UNSIGNED' === $targetIdDataType, 'notnull' => true]);
         $table->addColumn('project_id', 'integer', ['unsigned' => 'UNSIGNED' === $projectIdDataType, 'notnull' => true]);
-        $table->setPrimaryKey(['point_trigger_id', 'project_id']);
+        $this->setPrimaryKey($table, ['point_trigger_id', 'project_id']);
         $table->addForeignKeyConstraint($this->prefix.'point_triggers', ['point_trigger_id'], ['id'], ['onDelete' => 'CASCADE']);
         $table->addForeignKeyConstraint($this->prefix.'projects', ['project_id'], ['id'], ['onDelete' => 'CASCADE']);
     }

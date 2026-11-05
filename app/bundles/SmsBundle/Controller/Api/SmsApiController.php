@@ -65,19 +65,19 @@ final class SmsApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/smses/{id}/contact/{contactId}/send',
+        path: '/api/smses/{id}/contact/{contactId}/send',
         name: 'mautic_api_smses_send',
         requirements: ['id' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function sendAction(TransportChain $transportChain, LoggerInterface $mauticLogger, $id, $contactId): JsonResponse|Response
+    public function sendAction(TransportChain $transportChain, LoggerInterface $mauticLogger, int $id, int|string $contactId): JsonResponse|Response
     {
         if (!$transportChain->getEnabledTransports()) {
             return new JsonResponse(json_encode(['error' => ['message' => 'SMS transport is disabled.', 'code' => Response::HTTP_EXPECTATION_FAILED]]));
         }
 
-        $message = $this->model->getEntity((int) $id);
+        $message = $this->model->getEntity($id);
 
         if (null === $message) {
             return $this->notFound();

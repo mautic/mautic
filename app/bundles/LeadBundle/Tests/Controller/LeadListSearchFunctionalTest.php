@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Tests\Controller;
 
 use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector;
 use Doctrine\Bundle\DoctrineBundle\Twig\DoctrineExtension;
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -112,7 +112,7 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $previousQueries   = $allQueries;
         $doctrineExtension = new DoctrineExtension();
 
-        $queries = array_map(fn (array $query) => $doctrineExtension->replaceQueryParameters($query['sql'], $query['params']), $queries);
+        $queries = array_map(fn (array $query): string => $doctrineExtension->replaceQueryParameters($query['sql'], $query['params']), $queries);
 
         foreach ($expectedQueries as $expectedQuery) {
             $matchedQueries = array_filter($queries, fn (string $query): bool => $expectedQuery === $query);

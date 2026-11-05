@@ -6,7 +6,6 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\ArrayParameterType;
-use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -14,7 +13,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonRepository<LeadCategory>
  */
-class LeadCategoryRepository extends CommonRepository
+final class LeadCategoryRepository extends CommonRepository
 {
     private CategoryRepository $categoryRepository;
 

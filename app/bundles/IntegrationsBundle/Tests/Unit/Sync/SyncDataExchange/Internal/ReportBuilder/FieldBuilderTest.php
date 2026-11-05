@@ -11,6 +11,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FieldBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
@@ -19,19 +20,19 @@ use Symfony\Component\Routing\Router;
 final class FieldBuilderTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Router
+     * @var MockObject&Router
      */
-    private \PHPUnit\Framework\MockObject\MockObject $router;
+    private MockObject $router;
 
     /**
-     * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var FieldHelper|MockObject
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldHelper;
+    private MockObject $fieldHelper;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ContactObjectHelper
+     * @var MockObject&ContactObjectHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $contactObjectHelper;
+    private MockObject $contactObjectHelper;
 
     protected function setUp(): void
     {

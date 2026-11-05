@@ -10,9 +10,6 @@ interface EmailReplyRepositoryInterface
 {
     /**
      * @param int|Lead $leadId
-     * @param array    $options
-     *
-     * @return array
      */
-    public function getByLeadIdForTimeline($leadId, $options);
+    public function getByLeadIdForTimeline($leadId, array $options): array;
 }

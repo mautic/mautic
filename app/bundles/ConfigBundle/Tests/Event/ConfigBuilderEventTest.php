@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Mautic\ConfigBundle\Tests\Event;
 
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
-use Mautic\CoreBundle\Tests\CommonMocks;
+use Mautic\CoreBundle\Helper\BundleHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ConfigBuilderEventTest extends CommonMocks
+final class ConfigBuilderEventTest extends TestCase
 {
     public function testAddForm(): void
     {
@@ -38,6 +39,6 @@ final class ConfigBuilderEventTest extends CommonMocks
 
     protected function initEvent(): ConfigBuilderEvent
     {
-        return new ConfigBuilderEvent($this->getBundleHelperMock());
+        return new ConfigBuilderEvent($this->createStub(BundleHelper::class));
     }
 }

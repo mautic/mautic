@@ -3,17 +3,16 @@
 namespace Mautic\LeadBundle\Segment\Stat;
 
 use Mautic\LeadBundle\Entity\LeadListRepository;
-use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 
-readonly class SegmentChartQueryFactory
+final readonly class SegmentChartQueryFactory
 {
     public function __construct(
         private LeadListRepository $leadListRepository,
     ) {
     }
 
-    public function getContactsTotal(SegmentContactsLineChartQuery $query, ListModel $listModel): array
+    public function getContactsTotal(SegmentContactsLineChartQuery $query): array
     {
         $total = $this->leadListRepository->getLeadCount($query->getSegmentId());
 

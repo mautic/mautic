@@ -8,12 +8,14 @@ use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Event\GenerateWidgetDetailEvent;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
+final class WidgetDetailEventTest extends TestCase
 {
     private WidgetDetailEvent $widgetDetailEvent;
 
@@ -22,19 +24,16 @@ final class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $translator;
 
-    /**
-     * @var MockObject&Widget
-     */
-    private MockObject $widget;
+    private Widget $widget;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->translator            = $this->createMock(Translator::class);
-        $this->widget                = $this->createMock(Widget::class);
+        $this->widget                = new Widget();
 
-        $this->widgetDetailEvent = new WidgetDetailEvent(
+        $this->widgetDetailEvent = new GenerateWidgetDetailEvent(
             $this->translator,
             $this->createStub(CorePermissions::class),
             $this->widget,
@@ -44,9 +43,7 @@ final class WidgetDetailEventTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCacheKey(): void
     {
-        $this->widget
-            ->method('getParams')
-            ->willReturn(['dateFrom' => '', 'dateTo' => '']);
+        $this->widget->setParams(['dateFrom' => '', 'dateTo' => '']);
 
         $this->translator->expects($this->once())
             ->method('getLocale')

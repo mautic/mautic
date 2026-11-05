@@ -15,15 +15,16 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Helper\ValueHelper;
 use Mautic\IntegrationsBundle\Sync\SyncProcess\Direction\Integration\ObjectChangeGenerator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
 final class ObjectChangeGeneratorTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ValueHelper
+     * @var MockObject&ValueHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $valueHelper;
+    private MockObject $valueHelper;
 
     protected function setUp(): void
     {
@@ -133,7 +134,7 @@ final class ObjectChangeGeneratorTest extends TestCase
 
         $integrationName   = 'Integration A';
         $reportDAO         = new ReportDAO($integrationName);
-        $mappingManualDAO  = new MappingManualDAO($integrationName);
+        $mappingManualDAO  = new MappingManualDAO($integrationName, []);
         $objectMappingDAO  = new ObjectMappingDAO(Contact::NAME, 'Lead');
         $internalObject    = new ReportObjectDAO(Contact::NAME, 123);
         $integrationObject = new ReportObjectDAO('Lead', 'integration-id-1');
@@ -163,13 +164,11 @@ final class ObjectChangeGeneratorTest extends TestCase
 
     private function getMappingManual(string $integration, string $objectName): MappingManualDAO
     {
-        $mappingManual = new MappingManualDAO($integration);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
-        $mappingManual->addObjectMapping($objectMapping);
 
-        return $mappingManual;
+        return new MappingManualDAO($integration, [$objectMapping]);
     }
 
     private function getInternalSyncReport(bool $includeFirstNameField = true): ReportDAO

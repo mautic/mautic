@@ -39,6 +39,9 @@ final class MobileNotificationType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('notification.notification', $options));
 
+        /** @var Notification $notification */
+        $notification = $options['data'];
+
         $builder->add(
             'name',
             TextType::class,
@@ -160,9 +163,9 @@ final class MobileNotificationType extends AbstractType
                 'multiple'       => false,
                 'placeholder'    => 'mautic.core.form.translation_parent.empty',
                 'top_level'      => 'translation',
-                'ignore_ids'     => [(int) $options['data']->getId()],
+                'ignore_ids'     => [(int) $notification->getId()],
                 'mapped'         => false,
-                'data'           => ($options['data']->getTranslationParent()) ? $options['data']->getTranslationParent()->getId() : null,
+                'data'           => ($notification->getTranslationParent()) ? $notification->getTranslationParent()->getId() : null,
             ]
         );
 

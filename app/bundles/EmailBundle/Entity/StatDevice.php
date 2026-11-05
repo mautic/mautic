@@ -6,53 +6,39 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\LeadDevice;
 
 #[ORM\Entity(repositoryClass: StatDeviceRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['date_opened'], name: 'date_opened_search')]
+#[ORM\Index(name: 'date_opened_search', columns: ['date_opened'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class StatDevice
 {
-    public const TABLE_NAME = 'email_stats_devices';
+    public const string TABLE_NAME = 'email_stats_devices';
 
     /**
-     * @var string
+     * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     #[ORM\ManyToOne(targetEntity: Stat::class)]
     #[ORM\JoinColumn(name: 'stat_id', onDelete: 'CASCADE')]
     private ?Stat $stat = null;
 
-    /**
-     * @var LeadDevice|null
-     */
     #[ORM\ManyToOne(targetEntity: LeadDevice::class)]
     #[ORM\JoinColumn(name: 'device_id', onDelete: 'CASCADE')]
-    private $device;
+    private ?LeadDevice $device = null;
 
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private ?IpAddress $ipAddress = null;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateOpened;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('dateOpened', 'datetime')
-            ->columnName('date_opened')
-            ->build();
-    }
+    #[ORM\Column(name: 'date_opened', type: 'datetime')]
+    private ?\DateTimeInterface $dateOpened = null;
 
     /**
      * Prepares the metadata for API usage.
@@ -81,7 +67,7 @@ class StatDevice
         return $this->ipAddress;
     }
 
-    public function setIpAddress(?IpAddress $ip): void
+    public function setIpAddress(IpAddress $ip): void
     {
         $this->ipAddress = $ip;
     }
@@ -91,31 +77,22 @@ class StatDevice
         return $this->stat;
     }
 
-    public function setStat(?Stat $stat): void
+    public function setStat(Stat $stat): void
     {
         $this->stat = $stat;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateOpened()
+    public function getDateOpened(): ?\DateTimeInterface
     {
         return $this->dateOpened;
     }
 
-    /**
-     * @param mixed $dateOpened
-     */
-    public function setDateOpened($dateOpened): void
+    public function setDateOpened(?\DateTimeInterface $dateOpened): void
     {
         $this->dateOpened = $dateOpened;
     }
 
-    /**
-     * @return LeadDevice|null
-     */
-    public function getDevice()
+    public function getDevice(): ?LeadDevice
     {
         return $this->device;
     }

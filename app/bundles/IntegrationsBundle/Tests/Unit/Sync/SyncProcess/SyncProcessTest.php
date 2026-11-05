@@ -6,7 +6,6 @@ namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncProcess;
 
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Event\CompletedSyncIterationEvent;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
@@ -162,7 +161,6 @@ final class SyncProcessTest extends TestCase
                         $this->assertCount(1, $orderResult->getRemappedObjects('bar'));
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC, $parameters[1]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $callback = function (CompletedSyncIterationEvent $event): void {
@@ -171,7 +169,6 @@ final class SyncProcessTest extends TestCase
                         $this->assertCount(1, $orderResult->getUpdatedObjectMappings('foo'));
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION, $parameters[1]);
                 }
 
                 return $parameters[0];

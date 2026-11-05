@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormEvent;
@@ -12,9 +13,10 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
+final class FormConditionalSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&FormModel
@@ -41,24 +43,24 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnFormPostSaveForNewForm(): void
     {
-        $parentField = $this->createMock(Field::class);
-        $childField  = $this->createMock(Field::class);
+        $parentField = new Field();
+        $childField  = new Field();
         $parentId    = 'new_parent_id';
         $childId     = 'new_child_id';
         $form        = new Form();
 
-        $parentField->method('getId')->willReturn($parentId);
-        $parentField->method('getSessionId')->willReturn($parentId);
-        $childField->method('getId')->willReturn($childId);
-        $childField->method('getSessionId')->willReturn($childId);
-        $childField->method('getParent')->willReturn($parentId);
+        ReflectionHelper::setEntityId($parentField, $parentId);
+        $parentField->setSessionId($parentId);
+        ReflectionHelper::setEntityId($childField, $childId);
+        $childField->setSessionId($childId);
+        $childField->setParent($parentId);
 
         $form->addField(0, $parentField);
         $form->addField(1, $childField);
 
         $this->fieldModel->expects($this->once())
             ->method('saveEntity')
-            ->with($parentField);
+            ->with($childField);
 
         $this->formModel->expects($this->never())
             ->method('deleteFields');
@@ -71,14 +73,14 @@ final class FormConditionalSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnFormPostSaveForDeletedParent(): void
     {
-        $childField  = $this->createMock(Field::class);
+        $childField  = new Field();
         $parentId    = 123;
         $childId     = 456;
         $form        = new Form();
 
-        $childField->method('getId')->willReturn($childId);
-        $childField->method('getSessionId')->willReturn($childId);
-        $childField->method('getParent')->willReturn($parentId);
+        ReflectionHelper::setEntityId($childField, $childId);
+        $childField->setSessionId($childId);
+        $childField->setParent((string) $parentId);
 
         $form->addField(1, $childField);
 

@@ -10,7 +10,6 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\PreloadedExtension;
@@ -20,10 +19,7 @@ use Symfony\Component\Validator\Validation;
 #[AllowMockObjectsWithoutExpectations]
 final class MobileNotificationDetailsTypeTest extends TypeTestCase
 {
-    /**
-     * @var MockObject&Integration
-     */
-    private MockObject $integrationSettings;
+    private Integration $integrationSettings;
 
     /**
      * @return array<FormExtensionInterface>
@@ -33,7 +29,7 @@ final class MobileNotificationDetailsTypeTest extends TypeTestCase
         $validatorBuilder = Validation::createValidatorBuilder();
         $validatorBuilder->addMethodMapping('loadValidatorMetadata');
 
-        $this->integrationSettings = $this->createMock(Integration::class);
+        $this->integrationSettings = new Integration();
 
         // @phpstan-ignore-next-line
         $integration = $this->createMock(AbstractIntegration::class);
@@ -55,8 +51,7 @@ final class MobileNotificationDetailsTypeTest extends TypeTestCase
 
     public function testNoPlatformsSelected(): void
     {
-        $this->integrationSettings->method('getFeatureSettings')
-            ->willReturn([]);
+        $this->integrationSettings->setFeatureSettings([]);
 
         $form = $this->factory->create(MobileNotificationDetailsType::class);
 
@@ -73,8 +68,7 @@ final class MobileNotificationDetailsTypeTest extends TypeTestCase
     #[DataProvider('platformProvider')]
     public function testPlatformSelected(array $platforms, array $settings): void
     {
-        $this->integrationSettings->method('getFeatureSettings')
-            ->willReturn(['platforms' => $platforms]);
+        $this->integrationSettings->setFeatureSettings(['platforms' => $platforms]);
 
         $form = $this->factory->create(MobileNotificationDetailsType::class);
 

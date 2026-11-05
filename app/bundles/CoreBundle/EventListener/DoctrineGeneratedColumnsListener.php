@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Doctrine\ORM\Tools\ToolEvents;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Type\GeneratedType;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
+#[AsDoctrineListener(event: ToolEvents::postGenerateSchema)]
 final readonly class DoctrineGeneratedColumnsListener
 {
     public function __construct(
         private GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        #[Autowire(service: 'monolog.logger.mautic')]
         private LoggerInterface $logger,
     ) {
     }

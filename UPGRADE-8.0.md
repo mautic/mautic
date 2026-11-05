@@ -21,8 +21,137 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
 ### Other removed code
 
-- Unused service aliases `mautic.integration.clearbit.config`, `mautic.integration.gmail.config` and `mautic.integration.tagmanager.config` were removed. Inject the corresponding bundle’s `Integration\Support\ConfigSupport` class instead; the services and integrations remain available.
+- Unused service aliases `mautic.integration.gmail.config` and `mautic.integration.tagmanager.config` were removed. Inject the corresponding bundle’s `Integration\Support\ConfigSupport` class instead; the services and integrations remain available.
+- The ClearbitBundle was removed as the service was sunset.
+- Constant `ON_AFTER_EVENTS_DELETE` removed from `Mautic\CampaignBundle\CampaignEvents`. The after-events-delete event is now dispatched by its own event class `Mautic\CampaignBundle\Event\AfterEventsDeleteEvent`, dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `AfterEventsDeleteEvent::class` instead of the constant. The pre-existing `Mautic\CampaignBundle\Event\DeleteEvent` (dispatched when event logs are deleted) is unchanged.
+- Constants `EMAIL_PARSE` and `EMAIL_PRE_FETCH` removed from `Mautic\EmailBundle\EmailEvents`. These two events used to share one `Mautic\EmailBundle\Event\ParseEmailEvent` object dispatched under both names; the pre-fetch phase (setting search criteria) is now a dedicated `Mautic\EmailBundle\Event\PreFetchEmailEvent` and the parse phase keeps `ParseEmailEvent` (messages only). Both are dispatched by the event object alone (Symfony 4.3+), so their names are the event classes. The criteria methods (`setCriteriaRequest`, `getCriteriaRequests`, `getMarkAsSeenInstructions`) moved from `ParseEmailEvent` to `PreFetchEmailEvent`. Subscribe to the event class instead of the constant.
+
+    | Removed `EmailEvents` constant | New event class |
+    |---|---|
+    | `EMAIL_PRE_FETCH` | `PreFetchEmailEvent` |
+    | `EMAIL_PARSE` | `ParseEmailEvent` |
+- Constants `CAMPAIGN_ON_LEADCHANGE` and `LEAD_CAMPAIGN_BATCH_CHANGE` removed from `Mautic\CampaignBundle\CampaignEvents`. These events are now dispatched by their own event class (under `Mautic\CampaignBundle\Event`). They used to share one `CampaignLeadChangeEvent` object; `CampaignLeadChangeEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `CampaignSingleLeadChangeEvent::class => 'onChange'`.
+
+    | Removed `CampaignEvents` constant | New event class |
+    |---|---|
+    | `CAMPAIGN_ON_LEADCHANGE` | `CampaignSingleLeadChangeEvent` |
+    | `LEAD_CAMPAIGN_BATCH_CHANGE` | `CampaignBatchLeadChangeEvent` |
+- Constants `CAMPAIGN_PRE_SAVE`, `CAMPAIGN_POST_SAVE`, `CAMPAIGN_PRE_DELETE` and `CAMPAIGN_POST_DELETE` removed from `Mautic\CampaignBundle\CampaignEvents`. These lifecycle events are now dispatched by their own event class (all under `Mautic\CampaignBundle\Event`), each extending `CampaignEvent` so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `CampaignPostSaveEvent::class => 'onCampaignPostSave'`.
+
+    | Removed `CampaignEvents` constant | New event class |
+    |---|---|
+    | `CAMPAIGN_PRE_SAVE` | `CampaignPreSaveEvent` |
+    | `CAMPAIGN_POST_SAVE` | `CampaignPostSaveEvent` |
+    | `CAMPAIGN_PRE_DELETE` | `CampaignPreDeleteEvent` |
+    | `CAMPAIGN_POST_DELETE` | `CampaignPostDeleteEvent` |
+- Constant `CONFIG_ON_GENERATE` removed from `Mautic\ConfigBundle\ConfigEvents`. The config-generate event is now dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `Mautic\ConfigBundle\Event\ConfigBuilderEvent::class` instead of the constant, e.g. `ConfigBuilderEvent::class => 'onConfigGenerate'`. The `CONFIG_PRE_SAVE` and `CONFIG_POST_SAVE` constants were also removed - see the `ConfigEvents` entry below.
+- Class `Mautic\IntegrationsBundle\IntegrationEvents` removed entirely, along with its constants `INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES`, `INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES`, `INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD`, `INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD`, `INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC` and `INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION`. These events are now dispatched by their own event class (all under `Mautic\IntegrationsBundle\Event`). `InternalContactEvent`, `InternalCompanyEvent` and `CompletedSyncIterationEvent` each used to be dispatched under two different constants; they are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `InternalContactFieldChangesEvent::class => 'onContactFieldChanges'`.
+
+    | Removed `IntegrationEvents` constant | New event class |
+    |---|---|
+    | `INTEGRATION_BEFORE_CONTACT_FIELD_CHANGES` | `InternalContactFieldChangesEvent` |
+    | `INTEGRATION_BEFORE_COMPANY_FIELD_CHANGES` | `InternalCompanyFieldChangesEvent` |
+    | `INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD` | `InternalContactFullReportBuildEvent` |
+    | `INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD` | `InternalCompanyFullReportBuildEvent` |
+    | `INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC` | `IntegrationToMauticSyncCompletedEvent` |
+    | `INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION` | `MauticToIntegrationSyncCompletedEvent` |
+- Constants `WEBHOOK_PRE_SAVE`, `WEBHOOK_POST_SAVE`, `WEBHOOK_PRE_DELETE`, `WEBHOOK_POST_DELETE` and `WEBHOOK_KILL` removed from `Mautic\WebhookBundle\WebhookEvents`. These events are now dispatched by their own event class (all under `Mautic\WebhookBundle\Event`). They used to share one `WebhookEvent` object; `WebhookEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `WebhookPostSaveEvent::class => 'onWebhookSave'`.
+
+    | Removed `WebhookEvents` constant | New event class |
+    |---|---|
+    | `WEBHOOK_PRE_SAVE` | `WebhookPreSaveEvent` |
+    | `WEBHOOK_POST_SAVE` | `WebhookPostSaveEvent` |
+    | `WEBHOOK_PRE_DELETE` | `WebhookPreDeleteEvent` |
+    | `WEBHOOK_POST_DELETE` | `WebhookPostDeleteEvent` |
+    | `WEBHOOK_KILL` | `WebhookKillEvent` |
+- Class `Mautic\UserBundle\UserEvents` removed entirely. Its events are now dispatched by their own event class (Symfony 4.3+) instead of the string constant, so subscribe to the event class instead of the constant. `AuthenticationEvent` used to be dispatched under both `USER_PRE_AUTHENTICATION` and `USER_FORM_AUTHENTICATION`; it is now `abstract` and each case has a dedicated subclass (both under `Mautic\UserBundle\Event`), so listener type hints keep working. The `USER_FORM_POST_LOCAL_PASSWORD_AUTHENTICATION` constant was unused (never dispatched) and has been removed with no replacement.
+
+    | Removed `UserEvents` constant | New event class |
+    |---|---|
+    | `USER_LOGIN` | `LoginEvent` |
+    | `USER_PRE_AUTHENTICATION` | `PreAuthenticationEvent` |
+    | `USER_FORM_AUTHENTICATION` | `FormAuthenticationEvent` |
+    | `USER_LOGOUT` | `LogoutEvent` |
+    | `USER_AUTHENTICATION_CONTENT` | `AuthenticationContentEvent` |
+    | `USER_PASSWORD_STRENGTH_VALIDATION` | `PasswordStrengthValidateEvent` |
+- Class `Mautic\UserBundle\Event\AuthenticationEvent` is now `abstract` and can no longer be instantiated directly. Dispatch `PreAuthenticationEvent` or `FormAuthenticationEvent` instead.
+- Constants `SMS_PRE_SAVE`, `SMS_POST_SAVE`, `SMS_PRE_DELETE`, `SMS_POST_DELETE` and `ON_REPLY` removed from `Mautic\SmsBundle\SmsEvents`. These events are now dispatched by their own event class (all under `Mautic\SmsBundle\Event`). The lifecycle events used to share one `SmsEvent` object; `SmsEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `SmsPostSaveEvent::class => 'onPostSave'`.
+
+    | Removed `SmsEvents` constant | New event class |
+    |---|---|
+    | `SMS_PRE_SAVE` | `SmsPreSaveEvent` |
+    | `SMS_POST_SAVE` | `SmsPostSaveEvent` |
+    | `SMS_PRE_DELETE` | `SmsPreDeleteEvent` |
+    | `SMS_POST_DELETE` | `SmsPostDeleteEvent` |
+    | `ON_REPLY` | `ReplyEvent` |
+- Unused constants `ON_CAMPAIGN_TRIGGER_ACTION`, `ON_SMS_TOKENS_BUILD`, `DNC_FILTER_CONTACTS_ON_SEND`, `QUEUE_FILTER_CONTACTS_ON_SEND` and `FILTER_CONTACTS_ON_SEND` removed from `Mautic\SmsBundle\SmsEvents`; they had no dispatcher or listener.
+- Constants removed from `Mautic\LeadBundle\LeadEvents`, these events are now dispatched by their own event class (all under `Mautic\LeadBundle\Event`). Subscribe to the event class instead of the constant, e.g. `LeadPostMergeEvent::class => 'onLeadMerge'`. Lifecycle events that used to share one event object now get a dedicated subclass of the former shared class (`CompanyEvent`, `TagEvent`, `LeadNoteEvent`, `LeadDeviceEvent`, `ImportEvent`, `LeadFieldEvent`, `LeadListEvent`, `LeadMergeEvent`, `CompanyMergeEvent`, `TagMergeEvent`, `SaveBatchLeadsEvent` and `ContactExportSchedulerEvent` are now `abstract`, instantiate one of the subclasses instead; `LeadEvent` and `ListChangeEvent` are no longer `final`), so listener type hints keep working; pre and post events are now separate objects.
+
+    | Removed `LeadEvents` constant | New event class |
+    |---|---|
+    | `LEAD_PRE_SAVE` | `LeadPreSaveEvent` |
+    | `LEAD_PRE_DELETE` | `LeadPreDeleteEvent` |
+    | `LEAD_PRE_MERGE` | `LeadPreMergeEvent` |
+    | `LEAD_POST_MERGE` | `LeadPostMergeEvent` |
+    | `LEAD_IDENTIFIED` | `LeadIdentifiedEvent` |
+    | `LEAD_LIST_BATCH_CHANGE` | `ListBatchChangeEvent` |
+    | `LEAD_PRE_BATCH_SAVE` | `LeadPreBatchSaveEvent` |
+    | `LEAD_POST_BATCH_SAVE` | `LeadPostBatchSaveEvent` |
+    | `CURRENT_LEAD_CHANGED` | `LeadChangeEvent` |
+    | `LIST_PRE_SAVE` | `ListPreSaveEvent` |
+    | `LIST_POST_SAVE` | `ListPostSaveEvent` |
+    | `LIST_PRE_UNPUBLISH` | `ListPreUnpublishEvent` |
+    | `LIST_PRE_DELETE` | `ListPreDeleteEvent` |
+    | `ON_LIST_DELETE` | `ListDeleteEvent` |
+    | `LIST_POST_DELETE` | `ListPostDeleteEvent` |
+    | `FIELD_PRE_SAVE` | `FieldPreSaveEvent` |
+    | `FIELD_POST_SAVE` | `FieldPostSaveEvent` |
+    | `FIELD_PRE_DELETE` | `FieldPreDeleteEvent` |
+    | `FIELD_POST_DELETE` | `FieldPostDeleteEvent` |
+    | `NOTE_PRE_SAVE` | `NotePreSaveEvent` |
+    | `NOTE_POST_SAVE` | `NotePostSaveEvent` |
+    | `NOTE_PRE_DELETE` | `NotePreDeleteEvent` |
+    | `NOTE_POST_DELETE` | `NotePostDeleteEvent` |
+    | `IMPORT_PRE_SAVE` | `ImportPreSaveEvent` |
+    | `IMPORT_POST_SAVE` | `ImportPostSaveEvent` |
+    | `IMPORT_PRE_DELETE` | `ImportPreDeleteEvent` |
+    | `IMPORT_POST_DELETE` | `ImportPostDeleteEvent` |
+    | `IMPORT_BATCH_PROCESSED` | `ImportBatchProcessedEvent` |
+    | `DEVICE_PRE_SAVE` | `DevicePreSaveEvent` |
+    | `DEVICE_POST_SAVE` | `DevicePostSaveEvent` |
+    | `DEVICE_PRE_DELETE` | `DevicePreDeleteEvent` |
+    | `DEVICE_POST_DELETE` | `DevicePostDeleteEvent` |
+    | `TAG_PRE_SAVE` | `TagPreSaveEvent` |
+    | `TAG_POST_SAVE` | `TagPostSaveEvent` |
+    | `TAG_PRE_DELETE` | `TagPreDeleteEvent` |
+    | `TAG_POST_DELETE` | `TagPostDeleteEvent` |
+    | `TAG_PRE_MERGE` | `TagPreMergeEvent` |
+    | `TAG_POST_MERGE` | `TagPostMergeEvent` |
+    | `COMPANY_PRE_SAVE` | `CompanyPreSaveEvent` |
+    | `COMPANY_PRE_DELETE` | `CompanyPreDeleteEvent` |
+    | `COMPANY_SOFT_DELETE` | `CompanySoftDeleteEvent` |
+    | `COMPANY_PRE_MERGE` | `CompanyPreMergeEvent` |
+    | `COMPANY_POST_MERGE` | `CompanyPostMergeEvent` |
+    | `LIST_FILTERS_CHOICES_ON_GENERATE` | `LeadListFiltersChoicesEvent` |
+    | `SEGMENT_DICTIONARY_ON_GENERATE` | `SegmentDictionaryGenerationEvent` |
+    | `LIST_FILTERS_ON_FILTERING` | `LeadListFilteringEvent` |
+    | `LIST_PRE_PROCESS_LIST` | `ListPreProcessListEvent` |
+    | `ON_CLICKTHROUGH_IDENTIFICATION` | `ContactIdentificationEvent` |
+    | `POST_CONTACT_EXPORT` | `ContactExportEvent` |
+    | `POST_CONTACT_EXPORT_SCHEDULED` | `ContactExportScheduledEvent` |
+    | `CONTACT_EXPORT_PREPARE_FILE` | `ContactExportPrepareFileEvent` |
+    | `CONTACT_EXPORT_SEND_EMAIL` | `ContactExportSendEmailEvent` |
+    | `POST_CONTACT_EXPORT_SEND_EMAIL` | `ContactExportEmailSentEvent` |
+
+- Events behind `LeadEvents::LEAD_POST_SAVE`, `LEAD_POST_DELETE`, `LEAD_POINTS_CHANGE`, `LEAD_COMPANY_CHANGE`, `LEAD_LIST_CHANGE`, `COMPANY_POST_SAVE` and `COMPANY_POST_DELETE` are now dispatched as `LeadPostSaveEvent`, `LeadPostDeleteEvent`, `PointsChangeEvent`, `LeadChangeCompanyEvent`, `ListChangeEvent`, `CompanyPostSaveEvent`, `CompanyPostDeleteEvent`. The constants stay, as they are still used as webhook event type identifiers, but listeners must key on the event class.
+- `Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher::dispatchEvent()` now takes the `LeadFieldEvent` to dispatch instead of an event name, entity and `isNew` flag.
+- Constants `USER_PRE_SAVE`, `USER_POST_SAVE`, `USER_PRE_DELETE`, `USER_POST_DELETE`, `ROLE_PRE_SAVE`, `ROLE_POST_SAVE`, `ROLE_PRE_DELETE` and `ROLE_POST_DELETE` removed from `Mautic\UserBundle\UserEvents`. These lifecycle events are now dispatched as dedicated event classes: `PreSaveUserEvent`, `PostSaveUserEvent`, `PreDeleteUserEvent`, `PostDeleteUserEvent`, `PreSaveRoleEvent`, `PostSaveRoleEvent`, `PreDeleteRoleEvent` and `PostDeleteRoleEvent` (all under `Mautic\UserBundle\Event`, extending `UserEvent` / `RoleEvent`, which are now `abstract`). Subscribe to the event class instead of the constant, e.g. `PostSaveUserEvent::class => 'onUserPostSave'`.
+- Classes `Mautic\UserBundle\Event\UserEvent` and `Mautic\UserBundle\Event\RoleEvent` are now `abstract` and can no longer be instantiated directly. Dispatch one of the concrete `Pre*/Post*` subclasses listed above instead.
+- Method `setEntityManager()` and the `protected $em` property removed from `Mautic\CoreBundle\Event\CommonEvent`. The entity manager was set on the event by every model but never read. `Mautic\LeadBundle\Event\LeadListFilteringEvent` was the only reader; it now holds its own `$em` property (unchanged constructor and `getEntityManager()`). Remove any `$event->setEntityManager(...)` calls.
+- Legacy `services` config group removed from bundle `Config/config.php` handling. `Mautic\CoreBundle\DependencyInjection\Builder\Metadata\ConfigMetadata` no longer reads a `services` array from `Config/config.php`. Register services as Symfony services in each bundle's `Config/services.php` instead.
 - Deprecated method `addLead()` removed from `Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder`. The 28 entities that used it now map their `lead` association with native `#[ORM\ManyToOne]` / `#[ORM\JoinColumn]` attributes (column `lead_id`, unchanged). Any custom entity calling `$builder->addLead(...)` in `loadMetadata()` must declare the mapping with Doctrine attributes instead.
+- Column mappings moved from `loadMetadata()` to native Doctrine attributes across 106 entities, so 82 entities (including `Mautic\CoreBundle\Entity\FormEntity`) no longer declare a public `loadMetadata()`. Code that called `loadMetadata()` to read an entity's column mappings now sees only the fields still declared that way and will miss the attribute-mapped columns. Read mappings through `Doctrine\ORM\EntityManagerInterface::getClassMetadata()` instead. The resolved mappings are otherwise unchanged; column order may differ, which only affects freshly created tables.
+- Method `addProjectsField()` removed from `Mautic\ProjectBundle\Entity\ProjectTrait`. The 14 entities using the trait now map their `projects` many-to-many association with a native `#[ORM\ManyToMany]` on the trait plus a per-entity `#[ORM\AssociationOverrides]` for the join table and columns (all `*_projects_xref` tables and join columns unchanged). Any custom entity using `ProjectTrait` and calling `self::addProjectsField(...)` in `loadMetadata()` must declare the mapping with Doctrine attributes instead.
 - Deprecated entity `Mautic\CoreBundle\Entity\Cache` removed with no replacement. It mapped the `cache_items` table but was never read or written anywhere in the codebase.
 - Deprecated methods `getResult()` and `setResult()` removed from `Mautic\CampaignBundle\Event\ConditionEvent` and `Mautic\CampaignBundle\Event\DecisionEvent`. Campaign condition/decision listeners must type their event argument as `ConditionEvent` / `DecisionEvent` (not the deprecated parent `CampaignExecutionEvent`) and use the real API: conditions call `pass()` / `fail()` (read back with `wasConditionSatisfied()`), decisions call `setAsApplicable()` (read back with `wasDecisionApplicable()`). The broken `setChannel()` overrides on both events were also removed; they now inherit the working `CampaignExecutionEvent::setChannel()`. The executioners already read the applicability via `wasConditionSatisfied()` / `wasDecisionApplicable()`, so behaviour is unchanged.
 - Deprecated class `Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher` removed. It dispatched the per-contact, deprecated `CampaignExecutionEvent` for campaign actions registered with the legacy `'eventName'`/`'callback'` config keys. `Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher` no longer takes it as a constructor argument and only dispatches the batch `Mautic\CampaignBundle\Event\PendingEvent` for actions declaring `'batchEventName'`. Campaign actions must register `'batchEventName'` and listen on a `PendingEvent` — the `'eventName'`/`'callback'` action path no longer runs.
@@ -34,6 +163,9 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Deprecated form type removed from `Mautic\FormBundle\Entity\Form`. Form types were no longer used, so the `$formType` property, the `getFormType()` method, the `form_type` ORM mapping and the `formType` API field are gone. The `form_type` database column is dropped by a migration. The `formType`/`form_type` key is no longer read from or written to the API, and is dropped from form export payloads.
 - Deprecated Mautic v1 theme fallback removed from `Mautic\PageBundle\Controller\PublicController::indexAction()`. Public pages are now rendered solely from `Page::getCustomHtml()`; the legacy path that rendered `Page::getContent()` through a `@themes/<template>/html/page.html.twig` theme template (used when `customHtml` was empty) is gone. The unused `ThemeHelper` argument was dropped from `indexAction()`.
 - Deprecated method `Mautic\LeadBundle\Model\LeadModel::isContactable()` removed. Use `Mautic\LeadBundle\Model\DoNotContact::isContactable()` instead.
+- Builder helper `Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder::addContact()` removed. Map the `contact` association with Doctrine attributes instead: `#[ORM\ManyToOne(targetEntity: Lead::class)]` plus `#[ORM\JoinColumn(name: 'contact_id', nullable: false, onDelete: 'CASCADE')]`.
+- Deprecated constant `MauticPlugin\MauticFocusBundle\FocusEvents::TOKEN_REPLACEMENT` (`mautic.focus_token_replacement`) removed. The focus token replacement is now dispatched as `MauticPlugin\MauticFocusBundle\Event\FocusTokenReplacementEvent` (extends `Mautic\CoreBundle\Event\AbstractTokenReplacementEvent`). Subscribe to the event class instead of the constant, e.g. `FocusTokenReplacementEvent::class => 'onTokenReplacement'`.
+- Deprecated class `Mautic\CoreBundle\Controller\FormController` removed (deprecated since 2.3). It was a thin layer over `AbstractStandardFormController` that added the `setStandardParameters()` glue and default getters. Controllers that used no standard-form machinery now extend `Mautic\CoreBundle\Controller\AbstractFormController`; controllers using the standard CRUD/lock helpers now extend `Mautic\CoreBundle\Controller\AbstractStandardFormController` directly and declare their own `getModelName()` and related getters (previously supplied via `setStandardParameters()`). The generic `mautic_core_form_action` route (entity unlock) is now hosted by the new concrete `Mautic\CoreBundle\Controller\LockController`. Any custom controller extending `FormController` must switch to one of these two parents.
 - Removed `Mautic\EmailBundle\EmailEvents` constants for events that now dispatch by class name (Symfony 4.3+): dispatch the event object alone and key any subscriber or listener on the event class instead of the string constant. The removed constants and their event class (all in `Mautic\EmailBundle\Event` unless noted):
 
   | Removed `EmailEvents` constant | Event class |
@@ -78,7 +210,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Deprecated class `Mautic\CoreBundle\Helper\EmojiMap\UnicodeToShortEmojiMap` removed with no replacement.
 - Class `Mautic\CoreBundle\Helper\EmojiHelper` removed with no replacement. All emoji conversion calls were dropped; emoji are stored and rendered as UTF-8 (`utf8mb4`) directly.
 - Emoji sprite stylesheet `app/bundles/CoreBundle/Assets/css/libraries/emoji/` (`_emoji.scss` + `emoji.png`) removed together with its `@import` in `_libraries.scss`. It styled the `span.emoji-sizer`/`.emoji-outer`/`.emoji-inner` markup that `EmojiHelper::toHtml()` used to emit, which is no longer produced. Custom themes relying on those classes must ship their own CSS.
-- Deprecated constant `Mautic\CampaignBundle\CampaignEvents::ON_EVENT_EXECUTION` (`mautic.campaign_on_event_execution`) removed. Listen to `CampaignEvents::ON_EVENT_EXECUTED` and `CampaignEvents::ON_EVENT_FAILED` instead.
+- Deprecated constant `Mautic\CampaignBundle\CampaignEvents::ON_EVENT_EXECUTION` (`mautic.campaign_on_event_execution`) removed. Listen to the `Mautic\CampaignBundle\Event\ExecutedEvent` and `FailedEvent` event classes instead.
 - Deprecated constant `Mautic\CampaignBundle\CampaignEvents::ON_EVENT_DECISION_TRIGGER` (`mautic.campaign_on_event_decision_trigger`) removed. Listen to `CampaignEvents::ON_EVENT_DECISION_EVALUATION` instead.
 - Deprecated class `Mautic\CampaignBundle\Event\CampaignDecisionEvent` removed. It was only dispatched with the removed `ON_EVENT_DECISION_TRIGGER` event. Use `Mautic\CampaignBundle\Event\DecisionEvent` instead.
 - Methods `Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher::dispatchExecutionEvents()` and `::dispatchDecisionEvent()` removed, as they only dispatched the removed events.
@@ -123,7 +255,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Deprecated action `Mautic\LeadBundle\Controller\AjaxController::addLeadUtmTagsAction()` (ajax action `lead:addLeadUtmTags`) removed with no replacement. Its only caller, the unused JavaScript function `Mautic.createLeadUtmTag()`, was removed as well.
 - Deprecated interface `Mautic\CoreBundle\Entity\PublishStatusIconAttributesInterface` removed with no replacement. Nothing implemented it. Use the `CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE` event to change template params instead.
 - Deprecated method `Mautic\CoreBundle\Helper\AbstractFormFieldHelper::setTranslator()` removed. The translator is autowired via the `#[Required] autowireFormFieldHelper()` method, so there is nothing to pass manually.
-- Deprecated method `Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::reschedule()` removed. Use `EventScheduler::rescheduleLogs()` instead, which takes an `ArrayCollection` of logs.
+- Deprecated method `Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler::reschedule()` removed. Use `EventScheduler::rescheduleLogs()` instead, which takes a `Doctrine\Common\Collections\Collection` of logs. Overrides of `rescheduleLogs()` must accept `Collection` (or a wider type), rather than narrowing the parameter to `ArrayCollection`.
 - Deprecated method `Mautic\CoreBundle\Model\VariantModelTrait::convertVariant()` removed. Use `Mautic\CoreBundle\Model\VariantConverterService` instead.
 - Deprecated method `Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns::getForOriginalDateColumnAndUnit()` removed. Use `getGeneratedColumnForDateColumn()` instead — it takes the table name as its first argument and matches on it, while the removed method ignored the table and returned the last matching column of any table:
 
@@ -213,11 +345,100 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
   Non-model services that happen to live under the same `mautic.<bundle>.model.*` namespace (e.g. `mautic.lead.model.dnc` was a model but `mautic.report.model.report_exporter` is a helper) are unaffected — only aliases pointing at `MauticModelInterface` models were removed.
 - Dead routes removed from bundle route config. `mautic_receive_notification` (`/notification/receive`), `mautic_campaign_import_index` (`/s/campaign/import`) and `mautic_integration_companies` (`/plugin/{integration}/company_data`, CRM plugin) pointed at controller actions that do not exist (`NotificationApiController::receiveAction`, `ImportController::indexAction`, `MauticCrmBundle\Controller\PublicController::companyDataAction`), so they returned an error on every request.
 
+- Method `Mautic\CoreBundle\Doctrine\Mapping\AssociationBuilder::isOwnershipParent()` removed. It wrote an `isOwnershipParent` key into the association mapping, and ORM 3 maps associations onto typed `AssociationMapping` objects that reject unknown keys. Mark the entity class with `#[Mautic\CoreBundle\Entity\Attribute\OwnershipParent]` instead, naming the association that carries the owner:
+
+```diff
++#[OwnershipParent('form')]
+ class Field
+ {
+     public static function loadMetadata(ORM\ClassMetadata $metadata): void
+     {
+         $builder->createManyToOne('form', 'Form')
+-            ->isOwnershipParent()
+             ->build();
+```
+
+- Classes `Mautic\CoreBundle\Doctrine\Mapping\ManyToManyAssociationBuilder` and `Mautic\CoreBundle\Doctrine\Mapping\OneToManyAssociationBuilder` removed, along with the `ClassMetadataBuilder::createManyToMany()` and `createOneToMany()` overrides that returned them. They only existed to add `orphanRemoval()`, which Doctrine's own builders have carried for years. Both `createManyToMany()` and `createOneToMany()` still work; they now return Doctrine's builders.
+- Entity `MauticPlugin\MauticTagManagerBundle\Entity\Tag` removed. It mapped the same `lead_tags` table as `Mautic\LeadBundle\Entity\Tag`, declared no fields of its own and existed only to point at the plugin's repository, and ORM 3 rejects a subclass of a mapped entity that declares no inheritance mapping. Use `Mautic\LeadBundle\Entity\Tag`; the plugin's `TagRepository` is a service and is unchanged.
+- Method `Mautic\CoreBundle\Doctrine\Type\GeneratedType::getName()` removed, following DBAL 4's removal of `Doctrine\DBAL\Types\Type::getName()`. A type is identified by the name it is registered under.
+- Method `Mautic\PageBundle\Entity\HitRepository::getHitCountForSource()` removed as dead code. Nothing in Mautic has called it since it was added in 2014. Build the query with `createQueryBuilder()` if you need the count.
+- Constants `PAGE_ON_BUILD` and `PAGE_ON_DISPLAY` removed from `Mautic\PageBundle\PageEvents`. These events are now dispatched by their own event class (all under `Mautic\PageBundle\Event`). Subscribe to the event class instead of the constant, e.g. `PageBuilderEvent::class => 'onPageBuild'`.
+
+    | Removed `PageEvents` constant | New event class |
+    |---|---|
+    | `PAGE_ON_BUILD` | `PageBuilderEvent` |
+    | `PAGE_ON_DISPLAY` | `PageDisplayEvent` |
+- Constant `AGGREGATE_STAT_REQUEST` removed from `Mautic\StatsBundle\StatEvents`. The event is now dispatched by its own event class, `Mautic\StatsBundle\Event\AggregateStatRequestEvent`. Subscribe to the event class instead of the constant, e.g. `AggregateStatRequestEvent::class => 'onStatRequest'`.
+- Constants `DASHBOARD_ON_MODULE_LIST_GENERATE`, `DASHBOARD_ON_MODULE_FORM_GENERATE`, `DASHBOARD_ON_MODULE_DETAIL_GENERATE` and `DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD` removed from `Mautic\DashboardBundle\DashboardEvents`. These events are now dispatched by their own event class (all under `Mautic\DashboardBundle\Event`). The two detail events used to share one `WidgetDetailEvent` object; `WidgetDetailEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `GenerateWidgetDetailEvent::class => 'onWidgetDetailGenerate'`.
+
+    | Removed `DashboardEvents` constant | New event class |
+    |---|---|
+    | `DASHBOARD_ON_MODULE_LIST_GENERATE` | `WidgetTypeListEvent` |
+    | `DASHBOARD_ON_MODULE_FORM_GENERATE` | `WidgetFormEvent` |
+    | `DASHBOARD_ON_MODULE_DETAIL_GENERATE` | `GenerateWidgetDetailEvent` |
+    | `DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD` | `PreLoadWidgetDetailEvent` |
+- Constants `CLIENT_POST_SAVE`, `CLIENT_POST_DELETE`, `API_ON_ENTITY_PRE_SAVE`, `API_ON_ENTITY_POST_SAVE`, `API_PRE_SERIALIZATION_CONTEXT` and `API_POST_SERIALIZATION_CONTEXT` removed from `Mautic\ApiBundle\ApiEvents`. These events are now dispatched by their own event class (all under `Mautic\ApiBundle\Event`). The client events used to share one `ClientEvent` object, the API entity events one `ApiEntityEvent` object, and the serialization-context events one `ApiSerializationContextEvent` object; all three are now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ClientPostSaveEvent::class => 'onClientPostSave'`.
+
+    | Removed `ApiEvents` constant | New event class |
+    |---|---|
+    | `CLIENT_POST_SAVE` | `ClientPostSaveEvent` |
+    | `CLIENT_POST_DELETE` | `ClientPostDeleteEvent` |
+    | `API_ON_ENTITY_PRE_SAVE` | `PreSaveApiEntityEvent` |
+    | `API_ON_ENTITY_POST_SAVE` | `PostSaveApiEntityEvent` |
+    | `API_PRE_SERIALIZATION_CONTEXT` | `PreSerializationContextEvent` |
+    | `API_POST_SERIALIZATION_CONTEXT` | `PostSerializationContextEvent` |
+- Unused constants `CLIENT_PRE_SAVE`, `BUILD_ROUTE` and `API_PLATFORM_PERMISSION_CONTEXT` removed from `Mautic\ApiBundle\ApiEvents`; they had no dispatcher or listener.
+- Class `Mautic\ApiBundle\ApiEvents` removed; it held only the constants listed above and is now empty. Reference the event classes directly.
+- Constants `INTEGRATION_CONFIG_BEFORE_SAVE` and `INTEGRATION_CONFIG_AFTER_SAVE` removed from `Mautic\IntegrationsBundle\IntegrationEvents`. These events are now dispatched by their own event class (all under `Mautic\IntegrationsBundle\Event`). The two events used to share one `ConfigSaveEvent` object; `ConfigSaveEvent` is now `abstract` and each event gets a dedicated subclass, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ConfigAfterSaveEvent::class => 'onConfigAfterSave'`.
+
+    | Removed `IntegrationEvents` constant | New event class |
+    |---|---|
+    | `INTEGRATION_CONFIG_BEFORE_SAVE` | `ConfigBeforeSaveEvent` |
+    | `INTEGRATION_CONFIG_AFTER_SAVE` | `ConfigAfterSaveEvent` |
+- Class `Mautic\ConfigBundle\ConfigEvents` removed with its `CONFIG_PRE_SAVE` and `CONFIG_POST_SAVE` constants. These events are now dispatched by their own event class (both under `Mautic\ConfigBundle\Event`). The two events used to share one `ConfigEvent` object; each event now gets a dedicated subclass of `ConfigEvent`, so listener type hints keep working. Subscribe to the event class instead of the constant, e.g. `ConfigPreSaveEvent::class => 'onConfigSave'`.
+
+    | Removed `ConfigEvents` constant | New event class |
+    |---|---|
+    | `CONFIG_PRE_SAVE` | `ConfigPreSaveEvent` |
+    | `CONFIG_POST_SAVE` | `ConfigPostSaveEvent` |
+- Constants removed from `Mautic\CampaignBundle\CampaignEvents`. These events are dispatched by their own event class (Symfony 4.3+, all under `Mautic\CampaignBundle\Event`), so the constants were only backwards-compatibility shims and are now gone. Subscribe to the event class instead of the constant, e.g. `CampaignBuilderEvent::class => 'onCampaignBuild'`.
+
+    | Removed `CampaignEvents` constant | New event class |
+    |---|---|
+    | `ON_CAMPAIGN_DELETE` | `DeleteCampaign` |
+    | `CAMPAIGN_ON_BUILD` | `CampaignBuilderEvent` |
+    | `CAMPAIGN_ON_TRIGGER` | `CampaignTriggerEvent` |
+    | `ON_EVENT_EXECUTED` | `ExecutedEvent` |
+    | `ON_EVENT_DELETE` | `DeleteEvent` |
+    | `ON_EVENT_EXECUTED_BATCH` | `ExecutedBatchEvent` |
+    | `ON_EVENT_SCHEDULED` | `ScheduledEvent` |
+    | `ON_EVENT_SCHEDULED_BATCH` | `ScheduledBatchEvent` |
+    | `ON_EVENT_FAILED` | `FailedEvent` |
+    | `ON_EVENT_DECISION_EVALUATION_RESULTS` | `DecisionResultsEvent` |
+    | `ON_CAMPAIGN_FAILURE_NOTIFY` | `NotifyOfFailureEvent` |
+    | `ON_CAMPAIGN_UNPUBLISH_NOTIFY` | `NotifyOfUnpublishEvent` |
+- Constants removed from `Mautic\DynamicContentBundle\DynamicContentEvents`:
+    - `ON_CONTACTS_FILTER_EVALUATE` - the event is dispatched by its event class, so subscribe to `Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent::class` instead.
+    - `CATEGORY_PRE_SAVE`, `CATEGORY_POST_SAVE`, `CATEGORY_PRE_DELETE` and `CATEGORY_POST_DELETE` - unused duplicates of the `Mautic\CategoryBundle\CategoryEvents` constants (same string values); key on `CategoryEvents` instead.
+- Constant `PLUGIN_ON_INTEGRATION_REQUEST` removed from `Mautic\PluginBundle\PluginEvents`; it was unused, with no dispatcher or listener.
+- Constants `ADD_DONOT_CONTACT` and `REMOVE_DONOT_CONTACT` removed from `Mautic\LeadBundle\Event\DoNotContactAddEvent` and `DoNotContactRemoveEvent`; they were unused, with no dispatcher or listener.
+- Class `Mautic\PluginBundle\Integration\AbstractSsoFormIntegration` removed. Extend `Mautic\PluginBundle\Integration\AbstractSsoServiceIntegration` instead and reproduce the two overrides the removed class provided, otherwise form authentication breaks: `getSupportedFeatures()` must return `['sso_form']` (so `SsoAuthenticator::authenticate()` still selects the integration), and `getFormSettings()` must return `['requires_callback' => false, 'requires_authorization' => false]`.
+- Trait `Mautic\CoreBundle\Tests\Twig\TwigIntegrationTestTrait` removed; it was never used.
+- Trait `Mautic\IntegrationsBundle\Integration\DefaultConfigFormTrait` removed; each method only returned `null`. Implement `getConfigFormName()` and `getConfigFormContentTemplate()` directly on your integration (return `null` to keep the default).
+- Method `Mautic\CampaignBundle\Entity\CampaignRepository::getCampaignLeads()` removed as dead code. Nothing in Mautic calls it, and its `$limit` parameter was typed `bool`, so any truthy limit (such as `50`) became `setMaxResults(1)`, while `false` or `0` returned every row. `CampaignModel::getCampaignLeads()` is unrelated and unchanged.
+
 ## Changed code
 
+- `Mautic\CategoryBundle\Entity\CategoryRepository::getCategoryList()` now types `$search` as `string|array` (a title prefix, or a list of category ids). Passing `null` or an integer now throws a `TypeError`; pass `''` for no search.
+- Most core event subscribers no longer implement `Symfony\Component\EventDispatcher\EventSubscriberInterface`. Listener methods now carry a `#[AsEventListener]` attribute instead of being declared in `getSubscribedEvents()`, and are registered through service autoconfiguration. Two consequences for plugins:
+    - A plugin service that extends an abstract base such as `Mautic\CoreBundle\EventListener\CommonStatsSubscriber` or `Mautic\NotificationBundle\EventListener\CampaignSubscriber` must be an autoconfigured service for its inherited `#[AsEventListener]` methods to register. Services defined with `autoconfigure: true` (the default in Mautic's `config/services.php` loader) get this automatically; a service registered without autoconfiguration no longer receives its events.
+    - PHP does not inherit attributes onto an overridden method. A child class that overrides a listener method (e.g. `onStatsFetch()`) loses the `#[AsEventListener]` from the parent, so that override is not registered. Re-add the `#[AsEventListener]` attribute on the overriding method.
+    - Execution order at equal priority changes. `RegisterListenersPass` registers `kernel.event_listener` services before `kernel.event_subscriber` ones, and attribute listeners now run in method-declaration order rather than the old `getSubscribedEvents()` array order. A plugin that relied on a core listener running before or after its own at the same priority should set an explicit `priority` on its `#[AsEventListener]`.
 - CampaignBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\CampaignBundle\CampaignEvents` string constants. Update any subscriber or listener that keys on one of the converted `CampaignEvents::*` constants (or the raw string name such as `mautic.campaign_on_build`) to key on the event class instead:
 - IntegrationsBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\IntegrationsBundle\IntegrationEvents` string constants. Update any subscriber or listener that keys on one of the converted `IntegrationEvents::*` constants to key on the event class instead:
 - CoreBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\CoreBundle\CoreEvents` string constants. Update any subscriber or listener that keys on a `CoreEvents::*` constant (or the raw string name such as `mautic.build_menu`) to key on the event class instead:
+- `Mautic\LeadBundle\Event\LeadListFilteringEvent` is now dispatched by the event object alone (Symfony 4.3+). Update any subscriber keying on `LeadEvents::LIST_FILTERS_ON_FILTERING` (or the raw string `mautic.list_filters_on_filtering`) to key on `LeadListFilteringEvent::class`.
+- `Mautic\UserBundle\Event\AuthenticationContentEvent` is now dispatched by the event object alone (Symfony 4.3+). Update any subscriber keying on `UserEvents::USER_AUTHENTICATION_CONTENT` (or the raw string `mautic.user_authentication_content`) to key on `AuthenticationContentEvent::class`.
 
     ```diff
      public static function getSubscribedEvents(): array
@@ -229,7 +450,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
      }
     ```
 
-    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, CampaignEvents::CAMPAIGN_ON_BUILD)` becomes `$dispatcher->dispatch($event)`. The `Mautic\CampaignBundle\CampaignEvents` constants are kept for backwards compatibility but are no longer used internally for these events.
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, CampaignEvents::CAMPAIGN_ON_BUILD)` becomes `$dispatcher->dispatch($event)`. The `Mautic\CampaignBundle\CampaignEvents` constants for these events have been removed (see the Removed code section); key on the event class.
 
     Full mapping of old event name to new event class (all in the `Mautic\CampaignBundle\Event` namespace):
 
@@ -319,7 +540,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
      }
     ```
 
-    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, PluginEvents::ON_PLUGIN_INSTALL)` becomes `$dispatcher->dispatch($event)`. The `Mautic\PluginBundle\PluginEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class (e.g. the `PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT` / `_KEYS_DECRYPT` / `_KEYS_MERGE` group and the `PLUGIN_ON_INTEGRATION_REQUEST` / `_RESPONSE` pair) are unchanged.
+    Dispatching drops the redundant second argument, e.g. `$dispatcher->dispatch($event, PluginEvents::ON_PLUGIN_INSTALL)` becomes `$dispatcher->dispatch($event)`. The `Mautic\PluginBundle\PluginEvents` constants are kept for backwards compatibility but are no longer used internally for the events below. Constants that share an event class (the `PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT` / `_KEYS_DECRYPT` / `_KEYS_MERGE` group) are unchanged. The unused `PLUGIN_ON_INTEGRATION_REQUEST` constant has been removed (see the Removed code section).
 
     Full mapping of the converted constants to their event class (all in the `Mautic\PluginBundle\Event` namespace):
 
@@ -357,7 +578,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `ChannelEvents::MESSAGE_QUEUED` | `MessageQueueEvent` |
     | `ChannelEvents::PROCESS_MESSAGE_QUEUE` | `MessageQueueProcessEvent` |
     | `ChannelEvents::PROCESS_MESSAGE_QUEUE_BATCH` | `MessageQueueBatchProcessEvent` |
-- DynamicContentBundle's `ON_CONTACTS_FILTER_EVALUATE` event is now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\DynamicContentBundle\DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE` string constant. Update any subscriber or listener that keys on that constant to key on `Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent::class` instead, e.g. `$dispatcher->dispatch($event, DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)` becomes `$dispatcher->dispatch($event)`. The constant is kept for backwards compatibility but is no longer used internally. The `DynamicContentEvent` CRUD group (`PRE_SAVE` / `POST_SAVE` / `PRE_DELETE` / `POST_DELETE`) shares one event class under four names and is unchanged, as are the cross-bundle `CategoryEvent`, `TokenReplacementEvent` and campaign event constants.
+- DynamicContentBundle's `ON_CONTACTS_FILTER_EVALUATE` event is now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\DynamicContentBundle\DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE` string constant. Update any subscriber or listener that keys on that constant to key on `Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent::class` instead, e.g. `$dispatcher->dispatch($event, DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE)` becomes `$dispatcher->dispatch($event)`. The `ON_CONTACTS_FILTER_EVALUATE` constant has been removed (see the Removed code section), together with the unused `CATEGORY_PRE_SAVE` / `CATEGORY_POST_SAVE` / `CATEGORY_PRE_DELETE` / `CATEGORY_POST_DELETE` constants. The `DynamicContentEvent` CRUD group (`PRE_SAVE` / `POST_SAVE` / `PRE_DELETE` / `POST_DELETE`) shares one event class under four names and is unchanged.
 - WebhookBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\WebhookBundle\WebhookEvents` string constants. Update any subscriber or listener that keys on one of the converted `WebhookEvents::*` constants to key on the event class instead:
 - PageBundle events are now dispatched by the event object alone, so the event name is the event class (Symfony 4.3+) instead of the `Mautic\PageBundle\PageEvents` string constants. Update any subscriber or listener that keys on one of the converted `PageEvents::*` constants (or the raw string name such as `mautic.page_on_hit`) to key on the event class instead:
 
@@ -622,6 +843,10 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     +    public function isLocked(object $entity): bool
     -    public function isNewEntity($entity): bool
     +    public function isNewEntity(object $entity): bool
+    -    public function saveEntity($entity, bool $unlock = true): void
+    +    public function saveEntity(object $entity, bool $unlock = true): void
+    -    public function saveAndDetachEntity($entity, bool $unlock = true): void
+    +    public function saveAndDetachEntity(object $entity, bool $unlock = true): void
     -    public function togglePublishStatus($entity): bool
     +    public function togglePublishStatus(object $entity): bool
     -    public function deleteEntity($entity): void
@@ -629,6 +854,8 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     -    public function deleteEntities($ids): array
     +    public function deleteEntities(array $ids): array
     ```
+
+    The `saveEntity()` overrides in `AssetModel`, `CategoryModel`, `MessageModel`, `DashboardModel`, `DynamicContentModel`, `EmailModel`, `Form\FormModel`, `CompanyModel`, `Lead\FieldModel`, `LeadModel`, `ListModel`, `NotificationModel`, `PageModel`, `TriggerModel`, `SmsModel`, `RoleModel`, `UserModel`, `WebhookModel`, `FocusModel` and `MonitoringModel` use the `object` type too.
 
     The `deleteEntity()` / `deleteEntities()` overrides in `CampaignModel`, `EmailModel`, `Form\FormModel`, `SubmissionModel`, `CompanyModel`, `Lead\FieldModel`, `LeadModel`, `ListModel`, `PageModel` and `RoleModel` use the same `object` / `array` types (the concrete entity stays in the `@param` docblock). Other typed methods per model:
 
@@ -638,6 +865,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `CampaignBundle\Model\CampaignModel` | `getLeadSources()` | `Campaign\|int\|string` |
     | `CampaignBundle\Model\CampaignModel` | `getCampaignsByForm()` | `Form\|int` |
     | `CampaignBundle\Model\CampaignModel` | `getCampaignIdsWithDependenciesOnSegment()` | `int` |
+    | `CampaignBundle\Model\CampaignModel` | `rebuildCampaignLeads()` | `int` (`$limit`), `int` (`$maxLeads`, was `bool`; pass `0` instead of `false`) |
     | `ChannelBundle\Model\MessageModel` | `getMessageChannels()`, `getChannelMessageByChannelId()` | `int` |
     | `ChannelBundle\Model\MessageQueueModel` | `processMessageQueue()` | `array\|MessageQueue` |
     | `ConfigBundle\Model\SysinfoModel` | `getLogTail()` | `int` |
@@ -649,7 +877,7 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
     | `FormBundle\Model\ActionModel` | `getFormsIdsWithDependenciesOnSegment()` | `int` |
     | `FormBundle\Model\FieldModel` | `getSessionFields()` | `int\|string` |
     | `FormBundle\Model\FormModel` | `getFilterExpressionFunctions()` | `?string` |
-    | `LeadBundle\Model\CompanyModel` | `companyMerge()` (second parameter) | `object` |
+    | `LeadBundle\Model\CompanyModel` | `companyMerge()` (both parameters, now also returns `Company`) | `Company` |
     | `LeadBundle\Model\FieldModel` | `reorderFieldsByEntity()` | `LeadField` |
     | `LeadBundle\Model\FieldModel` | `getPublishedFieldArrays()` | `string` |
     | `LeadBundle\Model\FieldModel` | `getFieldListWithProperties()` | `string\|bool` |
@@ -719,4 +947,281 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 
     -[$company, $companyEntities] = IdentifyCompanyHelper::identifyLeadsCompany($data, $lead, $companyModel);
     +[$company, $companyEntities] = $this->identifyCompanyHelper->identifyLeadsCompany($data, $lead);
+    ```
+
+- Doctrine was upgraded to ORM 3.7, DBAL 4.4, doctrine-bundle 3.3, doctrine-migrations-bundle 4.0 and persistence 4.2 (`doctrine/cache` and `doctrine/common` are gone). Plugins that touch Doctrine directly need the same treatment the core bundles got. The changes that reach plugin code most often:
+
+    | Was | Now |
+    | --- | --- |
+    | `Doctrine\ORM\Mapping\ClassMetadataInfo` | `Doctrine\ORM\Mapping\ClassMetadata` |
+    | `Doctrine\ORM\ORMException` | `Doctrine\ORM\Exception\ORMException` (an interface) |
+    | `Doctrine\DBAL\Exception` as a class to throw | an interface - throw `Mautic\CoreBundle\Exception\DbalException` |
+    | `EntityRepository::$_em` | `getEntityManager()` |
+    | `EntityManager::merge()`, cascade `merge` | gone, with no replacement |
+    | `ExpressionBuilder::andX()` / `orX()` (DBAL) | `and()` / `or()`, or `CompositeExpression::and()` / `or()` |
+    | `CompositeExpression::add()` | immutable - build the composite from the finished list of parts |
+    | `Connection::ARRAY_PARAM_OFFSET`, `Connection::PARAM_*_ARRAY` | `Doctrine\DBAL\ArrayParameterType` |
+    | `AbstractPlatform::quoteIdentifier()` | `quoteSingleIdentifier()` |
+    | `AbstractSchemaManager::listTableColumns()` / `listTableNames()` | `introspectTableColumnsByUnquotedName()` / `introspectTableNames()`, which return lists and name objects |
+    | `AbstractAsset::getName()` | `getObjectName()`, whose `toString()` is quoted |
+    | `Doctrine\DBAL\Logging\SQLLogger` | a middleware given to the connection when it is built |
+
+- `Doctrine\DBAL\Connection::createQueryBuilder()` returns `Mautic\CoreBundle\Doctrine\Query\QueryBuilder` on every Mautic connection. DBAL 4 made its builder's state private and dropped the query-part API, and Mautic reads a query back after building it - resolving a table name from an alias, attaching an index hint, rewriting a join condition. The returned builder is a `Doctrine\DBAL\Query\QueryBuilder`, so existing type hints keep working, and it keeps `getQueryPart()`, `getQueryParts()` and `resetQueryPart()`. Code that builds its own DBAL builder with `new QueryBuilder($connection)` loses those methods; take the builder from the connection instead.
+- `Mautic\LeadBundle\Segment\Query\QueryBuilder` now extends `Mautic\CoreBundle\Doctrine\Query\QueryBuilder` rather than carrying its own copy of the query-part bookkeeping. Its public API is unchanged.
+- `Mautic\CoreBundle\Entity\CommonRepository::appendExpression()` takes the list of parts by reference and returns nothing: `appendExpression(array &$parts, $expr): void`. Build the composite from the finished list with the new `createCompositeExpression($queryBuilder, 'and'|'or', $parts)`, which returns `null` when there is nothing to combine. A repository that overrode `addSearchCommandWhereClause()` and appended to a composite needs the same shape:
+
+```diff
+-$expr = $q->expr()->andX();
+-$expr->add($q->expr()->eq('a.b', ':c'));
++$parts = [];
++$this->appendExpression($parts, $q->expr()->eq('a.b', ':c'));
++$expr = $this->createCompositeExpression($q, 'and', $parts);
+```
+
+- `Mautic\CoreBundle\Cache\ResultCacheHelper::getCache()` returns a PSR-6 `CacheItemPoolInterface` instead of a `Doctrine\Common\Cache\CacheProvider`, which doctrine-bundle 3 no longer accepts.
+- `Mautic\LeadBundle\Field\SchemaDefinition::getSchemaDefinition()` now returns an explicit `length` for a unique identifier field, where it previously left the length to DBAL. DBAL 4 refuses a VARCHAR without one. The value is the 255 DBAL 3 applied implicitly, so the column is unchanged.
+- `Mautic\CoreBundle\Model\FormModel::cleanAlias()` and `Mautic\FormBundle\Entity\SubmissionRepository` check a generated alias against `Mautic\CoreBundle\Doctrine\ReservedWords` instead of the platform's keyword list, which DBAL 4 deprecated with no replacement. The list is the union of the newest MySQL and MariaDB reserved words, so a handful of aliases that were left alone before are now prefixed.
+- `Mautic\CoreBundle\Entity\CommonRepository` and `Mautic\CoreBundle\Event\CommonEvent` are now `abstract`. They were only ever used as base classes; if you instantiate either directly, create your own subclass instead.
+- `Mautic\CoreBundle\Entity\CommonEntity` and `MauticPlugin\MauticFullContactBundle\Services\FullContact_Base` are now `abstract`. They were only ever used as base classes; if you instantiate either directly, create your own subclass instead.
+- All class and interface constants now declare a native type (PHP 8.3 typed class constants), e.g. `public const string NAME = ...`. If a plugin class overrides one of them, add a compatible type to the overriding constant, otherwise PHP fails with "Type of X::NAME must be compatible with Y::NAME". `AbstractMauticMigration::TABLE_NAME` is `?string`, so migrations declare `protected const string TABLE_NAME`.
+- Base entity properties now declare native types. A plugin entity that redeclares any of these properties without a compatible type causes a PHP fatal error. Add the matching type to the overriding property:
+
+    | Class | Property | Type |
+    | --- | --- | --- |
+    | `CoreBundle\Entity\CommonEntity` | `$changes` | `array` |
+    | `CoreBundle\Entity\CommonEntity` | `$pastChanges` | `array` |
+    | `CoreBundle\Entity\FormEntity` | `$new` | `bool` |
+
+- `Mautic\DashboardBundle\Entity\Widget::getParams()` and `::getTemplateData()` now declare a native `array` return type instead of a `@return array` docblock. If a plugin class extends `Widget` and overrides either method, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::getParams() must be compatible with Widget::getParams(): array".
+- Methods in Core and shared base classes, interfaces and traits that documented `@return array` now declare a native return type. If a plugin class implements one of these interfaces or overrides one of these methods, add a compatible return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with Y::method(): array". The return type is `array` unless noted:
+
+    | Class | Methods |
+    | --- | --- |
+    | `CoreBundle\Configurator\Step\StepInterface` | `checkRequirements()`, `checkOptionalSettings()`, `update()` |
+    | `CoreBundle\Helper\ThemeHelperInterface`, `CoreBundle\Helper\ThemeHelper` | `getDefaultThemes()`, `getOptionalSettings()`, `getInstalledThemes()` |
+    | `CoreBundle\IpLookup\IpLookupFormInterface` | `getConfigFormThemes()` |
+    | `CoreBundle\Model\SearchCommandListInterface` | `getCommandList()` |
+    | `StatsBundle\Aggregate\Collection\Stats\StatInterface` | `getStats()` |
+    | `CoreBundle\Model\AbstractCommonModel` | `getSupportedSearchCommands()`, `getCommandList()`, `getEntities()` (`iterable`) |
+    | `CoreBundle\Controller\AbstractFormController` | `refererPostActionVars()` |
+    | `CoreBundle\Controller\AbstractStandardFormController` | `afterEntityClone()`, `getEntityFormOptions()`, `getUpdateSelectParams()`, `getViewDateRange()`, `getIndexItems()` |
+    | `CoreBundle\Doctrine\AbstractMauticMigration` | `generateKeys()` |
+    | `CoreBundle\Security\Permissions\AbstractPermissions` | `getPermissions()`, `getSynonym()`, `getPermissionRatio()` |
+    | `CoreBundle\Helper\AbstractFormFieldHelper` | `parseList()` |
+    | `CoreBundle\IpLookup\AbstractLookup` | `getDetails()` |
+    | `CoreBundle\IpLookup\AbstractLocalDataLookup` | `getConfigFormThemes()` |
+    | `CoreBundle\IpLookup\AbstractMaxmindLookup` | `getHeaders()` |
+    | `CoreBundle\IpLookup\AbstractRemoteDataLookup` | `getHeaders()`, `getParameters()` |
+    | `CoreBundle\Entity\CommonEntity` | `getChanges()` |
+    | `CoreBundle\Entity\DynamicContentEntityTrait` | `getDynamicContent()`, `getDefaultDynamicContent()` |
+    | `CoreBundle\Entity\FiltersEntityTrait` | `getFilters()` |
+    | `CoreBundle\Model\BuilderModelTrait` | `getCommonBuilderComponents()` |
+    | `CoreBundle\Event\BuilderEvent` | `getTokens()`, `filterTokens()` |
+    | `CoreBundle\Event\TokenReplacementEvent` | `getTokens()` |
+    | `ApiBundle\Controller\FetchCommonApiController` | `getWhereFromRequest()` |
+    | `EmailBundle\Model\EmailModel` | `getEntities()` (`iterable`), `getBuilderComponents()`, `getEmailSettings()` |
+    | `LeadBundle\Model\LeadModel` | `getEntities()` (`iterable`), `getLeadsByIds()`, `getLeadDetails()`, `getPreferredChannel()` |
+    | `PageBundle\Entity\Page` | `getContent()` (`?array`) |
+    | `PageBundle\Entity\Hit`, `PageBundle\Entity\VideoHit` | `getBrowserLanguages()`, `getQuery()` |
+    | `ReportBundle\Entity\Report` | `getColumns()`, `getFilters()`, `getTableOrder()`, `getGraphs()`, `getGroupBy()`, `getAggregators()`, `getSettings()` (`?array`) |
+    | `CampaignBundle\Entity\Campaign` | `getChanges()` |
+    | `ChannelBundle\Entity\Channel` | `getProperties()` |
+    | `ChannelBundle\Entity\MessageQueue` | `getMetadata()` |
+    | `CoreBundle\Entity\AuditLog` | `getDetails()` |
+    | `CampaignBundle\Controller\CampaignController` | `getIndexItems()` |
+    | `CoreBundle\Entity\IpAddress` | `getIpDetails()` (`?array`) |
+    | `ApiBundle\Entity\oAuth2\Client` | `getChanges()` |
+    | `FormBundle\Entity\Action` | `getChanges()` |
+    | `FormBundle\Entity\Field` | `getChanges()` (`?array`) |
+    | `UserBundle\Entity\Role` | `getRawPermissions()` (`?array`) |
+    | `WebhookBundle\Entity\Webhook` | `getPayload()` (`?array`) |
+- Methods in Campaign, Email, Point, Notification, DynamicContent and Sms bundle base classes, entities, events and interfaces that documented `@return array` now declare a native return type. If a plugin class implements one of these interfaces or overrides one of these methods, add a compatible return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with Y::method(): array". The return type is `array` unless noted:
+
+    | Class | Methods |
+    | --- | --- |
+    | `EmailBundle\Entity\EmailReplyRepositoryInterface` | `getByLeadIdForTimeline()` |
+    | `CampaignBundle\Event\AbstractLogCollectionEvent` | `getContactIds()` |
+    | `CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor` | `getFormTypeOptions()`, `getConnectionRestrictions()`, `getExtraProperties()` |
+    | `EmailBundle\Stats\Helper\AbstractHelper` | `fetchStats()` |
+    | `CampaignBundle\Event\CampaignExecutionEvent` | `getLeadFields()`, `getEvent()`, `getEventArray()`, `getConfig()` |
+    | `CampaignBundle\Entity\Event` | `getProperties()` |
+    | `CampaignBundle\Entity\LeadEventLog` | `getMetadata()` |
+    | `EmailBundle\Entity\Email` | `getContent()` (`array\|string`), `getUtmTags()`, `getHeaders()` |
+    | `EmailBundle\Entity\Stat` | `getOpenDetails()` |
+    | `EmailBundle\Event\EmailSendEvent` | `getSource()` |
+    | `NotificationBundle\Entity\Notification` | `getUtmTags()`, `getMobileSettings()` |
+    | `NotificationBundle\Entity\Stat` | `getTokens()`, `getClickDetails()` |
+    | `DynamicContentBundle\Entity\Stat` | `getSentDetails()`, `getTokens()` |
+    | `SmsBundle\Entity\Stat` | `getTokens()`, `getDetails()` |
+    | `PointBundle\Entity\Point`, `PointBundle\Entity\TriggerEvent` | `getProperties()` |
+    | `PointBundle\Entity\PointInsight` | `getPointGroups()` |
+
+- Public methods in the Lead, Notification, Sms and Stage bundles now carry native parameter types instead of docblock-only types. Callers that pass a value of another type, e.g. a string to an `int` parameter or `null` to a non-nullable one, now hit a `TypeError`. If you extend one of the non-final classes below and override one of these methods, the override must stay compatible with the parent - either drop the parameter type or use the parent's type (or a wider one).
+
+    | Class | Method | New parameter types |
+    | --- | --- | --- |
+    | `LeadBundle\Controller\CompanyController`, `FieldController`, `LeadController` | `editAction()` (`$objectId`) | `int` |
+    | `LeadBundle\Entity\CompanyRepository` | `getMostCompanies()` | `Mautic\CoreBundle\Doctrine\Query\QueryBuilder`, `int`, `int` |
+    | `LeadBundle\Entity\FrequencyRuleRepository` | `getPreferredChannel()` | `int` |
+    | `LeadBundle\Entity\ImportRepository` | `getQueryForStatuses()` | `array` |
+    | `LeadBundle\Entity\LeadDeviceRepository` | `getByTrackingId()` | `string` |
+    | `LeadBundle\Entity\LeadDeviceRepository`, `LeadEventLogRepository`, `LeadNoteRepository`, `ListLeadRepository`, `PointsChangeLogRepository` | `updateLead()` | `int`, `int` |
+    | `LeadBundle\Entity\LeadFieldRepository` | `getFieldAliases()`, `getFieldsByType()` | `string` |
+    | `LeadBundle\Entity\LeadFieldRepository` | `getPropertyByField()` | `string`, `Mautic\CoreBundle\Doctrine\Query\QueryBuilder` |
+    | `LeadBundle\Entity\LeadFieldRepository` | `compareDateValue()` (second parameter) | `string` |
+    | `LeadBundle\Entity\MergeRecordRepository` | `moveMergeRecord()` | `int`, `int` |
+    | `LeadBundle\Entity\StagesChangeLogRepository` | `getCurrentLeadStage()` | `int` |
+    | `LeadBundle\Event\ContactIdentificationEvent` | `setIdentifiedContact()` (second parameter) | `string` |
+    | `LeadBundle\Event\LeadListFiltersOperatorsEvent` | `addOperator()` | `string`, `array` |
+    | `LeadBundle\Event\ListPreProcessListEvent` | `setResult()` | `bool` |
+    | `LeadBundle\Model\FieldModel` | `getLookupResults()` | `string`, `string` |
+    | `LeadBundle\Model\ImportModel` | `beginImport()` (third parameter) | `int` |
+    | `LeadBundle\Model\ImportModel` | `getFailedRows()` | `?int`, `string` |
+    | `LeadBundle\Model\LeadModel` | `organizeFieldsByGroup()` | `iterable` |
+    | `LeadBundle\Model\LeadModel` | `getEngagementCount()` (fourth parameter) | `string` |
+    | `LeadBundle\Report\FieldsBuilder` | `getLeadFilter()` | `string`, `string` |
+    | `LeadBundle\Segment\ContactSegmentService` | `getOrphanedLeadListLeads()` (third parameter) | `?int` |
+    | `LeadBundle\Segment\Decorator\Date\TimezoneResolver` | `getDefaultDate()` | `bool` |
+    | `LeadBundle\Segment\Query\Expression\ExpressionBuilder` | `notExists()` | `string` |
+    | `LeadBundle\Segment\Query\QueryBuilder` | `replaceJoinCondition()` | `string`, `string` |
+    | `LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery` | `getDataFromLeadEventLog()` | `string` |
+    | `LeadBundle\Tracker\ContactTracker` | `setUseSystemContact()` | `bool` (no longer nullable) |
+    | `LeadBundle\Twig\Helper\AvatarHelper` | `createAvatarFromFile()` (second parameter) | `string` |
+    | `NotificationBundle\Entity\Notification` | `setName()`, `setButton()`, `setMessage()` | `?string` |
+    | `NotificationBundle\Entity\Notification` | `setUtmTags()` | `array` |
+    | `NotificationBundle\Entity\Notification` | `setNotificationType()` | `string` |
+    | `NotificationBundle\Entity\Notification`, `PushID` | `setMobile()` | `bool` |
+    | `NotificationBundle\Entity\PushID` | `setEnabled()` | `bool` |
+    | `NotificationBundle\Entity\Stat`, `SmsBundle\Entity\Stat` | `setDateSent()` | `\DateTimeInterface` |
+    | `NotificationBundle\Entity\StatRepository` | `getNotificationStatus()` | `string` |
+    | `SmsBundle\Entity\Sms` | `setName()` | `?string` |
+    | `SmsBundle\Entity\Sms` | `setSmsType()` | `string` |
+    | `SmsBundle\Entity\Stat` | `setTrackingHash()` | `string` |
+    | `SmsBundle\Entity\Stat` | `setIsFailed()` | `bool` |
+    | `SmsBundle\Entity\StatRepository` | `getSmsStatus()` | `string` |
+    | `SmsBundle\Sms\TransportChain` | `sendSms()` (second parameter) | `string` |
+    | `StageBundle\Entity\LeadStageLog` | `setDateFired()` | `\DateTimeInterface` |
+    | `StageBundle\Entity\LeadStageLog` | `setIpAddress()` | `IpAddress` |
+    | `StageBundle\Entity\LeadStageLog` | `setLead()` | `Lead` |
+    | `StageBundle\Entity\LeadStageLog` | `setStage()` | `Stage` |
+    | `StageBundle\Entity\Stage` | `setDescription()` | `?string` |
+    | `StageBundle\Entity\Stage` | `setCategory()` | `?Category` |
+
+    `ContactIdentificationEvent::getIdentifier()` now returns `?string` and `ListPreProcessListEvent::getResult()` returns `?bool`.
+
+- Public methods across several bundles now carry native `array` parameter types for `$parameters` arguments instead of docblock-only types. Plugins that extend these classes and override these methods must keep their overrides compatible - either drop the parameter type or use the parent's type (or a wider one). Callers that pass a value of another type (e.g. `null` to a non-nullable `array` parameter) now hit a `TypeError`.
+
+    | Class | Method | New parameter types |
+    | --- | --- | --- |
+    | `PluginBundle\Integration\AbstractIntegration` | `makeRequest()` (`$parameters`) | `array` |
+    | `PluginBundle\Integration\AbstractIntegration` | `prepareRequest()` (`$parameters`) | `array` |
+    | `ApiBundle\Controller\CommonApiController` | `prePopulateForm()` (`$parameters`) | `array` |
+    | `ApiBundle\Controller\CommonApiController` | `preSaveEntity()` (`$parameters`) | `array` |
+    | `ApiBundle\Controller\CommonApiController` | `processForm()` (`$parameters`) | `?array` |
+    | `ApiBundle\Controller\CommonApiController` | `processBatchForm()` (`$params`) | `?array` |
+    | `ApiBundle\Controller\FetchCommonApiController` | `getBatchEntities()` (`$parameters`) | `array` |
+    | `CoreBundle\Entity\CommonRepository` | `parseSearchFilters()` (`&$parameters`) | `array` |
+    | `PluginBundle\Helper\oAuthHelper` | `getAuthorizationHeader()` (`$parameters`) | `array` |
+    | `FormBundle\Entity\Field` | `setCustomParameters()` (`$customParameters`) | `array` |
+    | `LeadBundle\Segment\Query\QueryBuilder` | `setParametersPairs()` (`$parameters`, `$filterParameters`) | `array\|string`, `array\|string\|bool\|null` |
+    | `LeadBundle\Controller\FrequencyRuleTrait` | `getFrequencyRuleForm()` (`&$viewParameters`) | `array` |
+    | `LeadBundle\Controller\Api\CustomFieldsApiControllerTrait` | `setCustomFieldValues()` (`$parameters`) | `array` |
+
+- Methods in `Mautic\PluginBundle\Integration\AbstractIntegration` and `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration` that documented `@return array` now declare a native `array` return type. Most third-party integrations extend one of these classes, so if yours overrides one of the methods below, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with AbstractIntegration::method(): array":
+
+    | Class | Methods |
+    | --- | --- |
+    | `AbstractIntegration` | `encryptApiKeys()`, `decryptApiKeys()`, `getSecretKeys()`, `getRefreshTokenKeys()`, `getRequiredKeyFields()`, `prepareRequest()`, `cleanUpFields()`, `getRequiredFields()`, `populateLeadData()`, `populateCompanyData()`, `populateMauticLeadData()`, `matchUpData()`, `getFormNotes()`, `getFormDisplaySettings()`, `getFormLeadFields()`, `getFormCompanyFields()`, `dispatchIntegrationKeyEvent()`, `formatMatchedFields()` |
+    | `CrmAbstractIntegration` | `getFormFieldsByObject()`, `getPriorityFieldsForMautic()`, `getPriorityFieldsForIntegration()`, `getFieldsByPriority()`, `cleanPriorityFields()`, `prepareFieldsForPush()` |
+
+- Further methods that documented `@return array` now declare a native `array` (or `?array`) return type. If you extend one of these classes or implement the interface and override the method, add the matching return type to the override, otherwise PHP fails with an incompatible-declaration error:
+
+    | Class or interface | Method | Return type |
+    | --- | --- | --- |
+    | `Mautic\CoreBundle\Helper\ThemeHelperInterface` / `ThemeHelper` | `getInstalledThemes()` | `array` |
+    | `Mautic\CoreBundle\Controller\AbstractStandardFormController` | `getIndexItems()` | `array` |
+    | `Mautic\PluginBundle\Integration\AbstractIntegration` | `mergeApiKeys()` | `?array` |
+    | `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration` | `getSyncTimeframeDates()` | `array` |
+    | `Mautic\CoreBundle\Entity\IpAddress` | `getIpDetails()` | `?array` |
+    | `Mautic\DynamicContentBundle\Entity\DynamicContent` | `getUtmTags()` | `?array` |
+    | `Mautic\EmailBundle\Entity\Stat` | `getTokens()` | `?array` |
+    | `Mautic\LeadBundle\Entity\Import` | `getProperties()` | `?array` |
+    | `Mautic\LeadBundle\Entity\LeadEventLog` | `getProperties()` | `?array` |
+    | `Mautic\PointBundle\Entity\TriggerEvent` | `getChanges()` | `?array` |
+    | `Mautic\ReportBundle\Entity\Report` | `getSettings()` | `?array` |
+    | `Mautic\UserBundle\Entity\Role` | `getRawPermissions()` | `?array` |
+
+- The following overridable methods no longer pass the listed parameters by reference. Remove `&` from the corresponding parameters in plugin overrides to avoid incompatible-declaration errors:
+
+    | Class | Methods | Parameters no longer passed by reference |
+    | --- | --- | --- |
+    | `Mautic\PluginBundle\Integration\AbstractIntegration` | `appendToForm()` | `$builder` |
+    | `Mautic\CoreBundle\Security\Permissions\AbstractPermissions` | `addCustomFormFields()`, `addStandardFormFields()`, `addManageFormFields()`, `addExtendedFormFields()` | `$builder` |
+    | `Mautic\CoreBundle\Security\Permissions\AbstractPermissions` | `parseForJavascript()` | `$perms` |
+    | `Mautic\ApiBundle\Controller\CommonApiController` | `prePopulateForm()` | `$entity` |
+    | `Mautic\CoreBundle\Entity\CommonRepository` | `getIdsExpr()` | `$queryBuilder` |
+    | `Mautic\CoreBundle\Model\FormModel`, `Mautic\LeadBundle\Model\LeadModel` | `dispatchBatchEvent()` | `$entitiesBatchParams` |
+    | `Mautic\EmailBundle\Model\EmailModel` | `limitQueryToCreator()` | `$q` |
+    | `Mautic\CoreBundle\Helper\Chart\AbstractChart` | `addOneUnitMinusOneSec()` | `$date` |
+
+    Object mutations still affect the same object, but reassigning these parameters no longer replaces the caller's variable. Changes to the arrays in `parseForJavascript()` and `dispatchBatchEvent()` no longer propagate to the caller through a reference. Use the return value of `addOneUnitMinusOneSec()`, especially when passing a `DateTimeImmutable`.
+
+- Additional extension points now declare native parameter types. Keep plugin overrides compatible by accepting the parent's type or a wider type. Update callers that pass values outside these types:
+
+    | Class or trait | Method | New parameter types |
+    | --- | --- | --- |
+    | `Mautic\CoreBundle\Entity\CommonRepository` | `buildWhereClauseFromArray()` | `?Doctrine\ORM\Query\Expr\Composite $expr = null` |
+    | `Mautic\CoreBundle\Entity\TranslationEntityTrait` | `getAccumulativeTranslationCount()` | `string $getter`, `?Mautic\CoreBundle\Entity\TranslationEntityInterface $variantParent = null` |
+    | `Mautic\CoreBundle\Controller\AbstractStandardFormController` | `getUpdateSelectParams()` | `string $updateSelect`, `object $entity`, `string $nameMethod = 'getName'`, `string $groupMethod = 'getLanguage'` |
+    | `Mautic\CoreBundle\Controller\AbstractStandardFormController` | `indexStandard()` | `?int $page = null` |
+    | `Mautic\CoreBundle\Security\Permissions\AbstractPermissions` | `isGranted()` | `array $userPermissions` |
+    | `Mautic\CoreBundle\Security\Permissions\AbstractPermissions` | `addStandardFormFields()`, `addManageFormFields()`, `addExtendedFormFields()` | `array $data` |
+    | `Mautic\CoreBundle\Security\Permissions\AbstractPermissions` | `addStandardPermissions()`, `addExtendedPermissions()`, `addStandardFormFields()`, `addExtendedFormFields()` | `bool $includePublish = true` |
+    | `Mautic\CoreBundle\Security\Permissions\AbstractPermissions` | `analyzePermissions()` | `bool $isSecondRound = false` |
+
+- Additional methods now declare native return types. Plugin overrides and interface implementations must declare a compatible return type:
+
+    | Class or trait | Method | Return type |
+    | --- | --- | --- |
+    | `Mautic\CoreBundle\Entity\TranslationEntityTrait` | `getAccumulativeTranslationCount()` | `int` |
+    | `Mautic\LeadBundle\Controller\LeadAccessTrait` | `checkLeadAccess()` | `Symfony\Component\HttpFoundation\Response\|Mautic\LeadBundle\Entity\Lead` |
+    | `Mautic\CampaignBundle\Entity\LeadEventLog` | `getLead()` | `?Mautic\LeadBundle\Entity\Lead` |
+    | `Mautic\CampaignBundle\Entity\LeadEventLog` | `getCampaign()` | `?Mautic\CampaignBundle\Entity\Campaign` |
+    | `Mautic\CampaignBundle\Entity\LeadEventLog` | `getIpAddress()` | `?Mautic\CoreBundle\Entity\IpAddress` |
+    | `Mautic\CampaignBundle\Entity\Event` | `getCampaign()` | `?Mautic\CampaignBundle\Entity\Campaign` |
+    | `Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter` | `createFormatter()` | `self` (`AbstractFormatter`) |
+
+- `Mautic\CoreBundle\Entity\VariantEntityInterface` and `VariantEntityTrait` now declare `getVariantStartDate(): ?\DateTimeInterface` and `setVariantStartDate(?\DateTimeInterface $variantStartDate): static`. The date getter's return type and setter's parameter type were previously `mixed`. Update implementations and overrides accordingly; pass a mutable `DateTimeInterface` or `null`, not a `DateTimeImmutable` or another value.
+- `Mautic\LeadBundle\Controller\FrequencyRuleTrait` now declares `protected array $leadLists = []` (previously untyped and initialized to `null`) and `protected bool $isPublicView = false`. Any class that redeclares these trait properties must use compatible types and defaults; code must no longer assign `null` to `$leadLists`.
+- `Mautic\CoreBundle\Test\AbstractMauticTestCase::$router` now has the native type `Symfony\Component\Routing\RouterInterface`. Plugin tests that redeclare this protected property must use the same type, and assigned test doubles must implement that interface.
+
+- Methods with a parameter named `$entity` now declare a native type on it instead of only a `@param` docblock: `object`, `object|array` (where an array is also accepted, e.g. `createForm()`), or `?object` (where the value may be null). A new PHPStan rule (`mautic.entityParamMustHaveType`) enforces this type on new code. If you extend one of these classes and override such a method, an untyped `$entity` override stays compatible with PHP - leaving a parameter untyped is always a valid widening, so no incompatible-declaration error occurs. Add the matching native type to satisfy the PHPStan rule and to keep the signature aligned with the parent; just do not declare a type narrower than the parent, which would break PHP compatibility:
+
+    ```diff
+    -public function createForm($entity, $action = null, $options = []): FormInterface
+    +public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+
+    -protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    +protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    ```
+
+    Affected base classes include `Mautic\CoreBundle\Model\FormModel` (`createForm()`, `dispatchEvent()`, `setTimestamps()`, `unlockEntity()`, `getUserContactSubject()`), `Mautic\ApiBundle\Controller\CommonApiController` (`createEntityForm()`, `processForm()`, `prePopulateForm()`, `preSaveEntity()`, `processBatchForm()`, `saveEntity()`, `setCategory()`), `Mautic\ApiBundle\Controller\FetchCommonApiController` (`checkEntityAccess()`, now `?object`), `Mautic\CoreBundle\Controller\AbstractStandardFormController` and `AbstractFormController` (`afterEntityClone()`, `afterEntitySave()`, `afterFormProcessed()`, `beforeEntitySave()`, `beforeFormProcessed()`, `checkActionPermission()`, `setOptimisticLockVersion()`, `checkOptimisticLockVersion()`, `isLocked()`, `canEdit()`), `Mautic\CoreBundle\Entity\CommonRepository` (`checkUniqueAlias()`) and `Mautic\CoreBundle\Model\VariantModelTrait` (`resetVariants()`).
+
+- A few `$entity` parameters that never held an entity object were renamed to describe their real value: `Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer::transform()` and `Mautic\LeadBundle\Form\DataTransformer\TagEntityModelTransformer::reverseTransform()` now take `$value`, and `Mautic\CampaignBundle\EventListener\CampaignImportExportSubscriber::updateFormRelatedData()` / `getSubDependencies()` now take `$entityName`. Only callers that passed these by name (named arguments) are affected.
+
+- The API controller form hooks gained native types on their remaining parameters: `$form` is now `Symfony\Component\Form\FormInterface`, and `$action` / `$method` are now `string`. This affects `Mautic\ApiBundle\Controller\CommonApiController::prePopulateForm()`, `preSaveEntity()` and `processForm()`. A subclass overriding one of these (`EmailApiController`, `FormApiController`, `CompanyApiController`, `DeviceApiController`, `FieldApiController`, `LeadApiController`, `NoteApiController`, `CampaignApiController`, `TriggerApiController`, `RoleApiController`, `UserApiController`, `WebhookApiController`, …) keeps working with untyped parameters - leaving them untyped is a valid widening, so PHP raises no incompatible-declaration error. Add the matching native types to satisfy the PHPStan rule and stay aligned with the parent:
+
+    ```diff
+    -protected function preSaveEntity(object &$entity, $form, array $parameters, $action = 'edit')
+    +protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit')
+    ```
+
+    `CommonApiController` and `FetchCommonApiController` also renamed their `@template`/`@extends` generic type parameter from `E` to `TEntity`; this only matters for static-analysis consumers that referenced the generic by name.
+- Many getters and setters now declare a native return type promoted from their `@return` docblock (entity getters returning the related entity, fluent setters returning `static`, and similar). A subclass that overrides one of these methods must declare the matching native return type, otherwise PHP raises an incompatible-signature error.
+
+- The `$options` parameter of `createForm()` now declares the native `array` type (previously only a `@param array` docblock). This affects `Mautic\CoreBundle\Model\FormModel::createForm()` and every model override across the bundles (`LeadModel`, `EmailModel`, `PageModel`, `CampaignModel`, `ReportModel`, …). If you extend one of these and override `createForm()`, an untyped `$options` override stays compatible with PHP - leaving a parameter untyped is a valid widening, so no incompatible-declaration error occurs. Add `array $options` to satisfy the `mautic.nativeTypeForArrayOrIterableDocblock` PHPStan rule and keep the signature aligned with the parent:
+
+    ```diff
+    -public function createForm(object|array $entity, $action = null, $options = []): FormInterface
+    +public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     ```

@@ -2,6 +2,8 @@
 
 namespace Mautic\ChannelBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
@@ -14,9 +16,9 @@ final class MessageRepository extends CommonRepository
     use ProjectRepositoryTrait;
 
     /**
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $qb = $this->createQueryBuilder($this->getTableAlias());
         // Because of this inner join pagination is not working properly. Removing this doesn't seem to break any feature.
@@ -35,13 +37,9 @@ final class MessageRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
+     * @param string|array<int|string> $search
      */
-    public function getMessageList($search = '', $limit = 10, $start = 0)
+    public function getMessageList(string|array $search = '', int $limit = 10, int $start = 0): array
     {
         $alias = $this->getTableAlias();
         $q     = $this->createQueryBuilder($this->getTableAlias());
@@ -74,7 +72,7 @@ final class MessageRepository extends CommonRepository
             ->select('id, channel, channel_id, properties')
             ->where($q->expr()->eq('message_id', ':messageId'))
             ->setParameter('messageId', $messageId)
-            ->andWhere($q->expr()->eq('is_enabled', true));
+            ->andWhere($q->expr()->eq('is_enabled', '1'));
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
@@ -88,16 +86,16 @@ final class MessageRepository extends CommonRepository
     }
 
     /**
-     * @return array
+     * @return array<string, int|string|null>|false
      */
-    public function getChannelMessageByChannelId($channelId)
+    public function getChannelMessageByChannelId($channelId): array|false
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->from(MAUTIC_TABLE_PREFIX.'message_channels', 'mc')
             ->select('id, channel, channel_id, properties, message_id')
             ->where($q->expr()->eq('id', ':channelId'))
             ->setParameter('channelId', $channelId)
-            ->andWhere($q->expr()->eq('is_enabled', true));
+            ->andWhere($q->expr()->eq('is_enabled', '1'));
 
         return $q->executeQuery()->fetchAssociative();
     }
@@ -105,7 +103,7 @@ final class MessageRepository extends CommonRepository
     /**
      * @return mixed[]
      */
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'),

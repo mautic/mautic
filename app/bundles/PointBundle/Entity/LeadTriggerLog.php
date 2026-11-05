@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -14,7 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadTriggerLog
 {
-    public const TABLE_NAME = 'point_lead_event_log';
+    public const string TABLE_NAME = 'point_lead_event_log';
 
     /**
      * @var TriggerEvent
@@ -25,33 +24,22 @@ class LeadTriggerLog
     private $event;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_fired', type: 'datetime')]
     private $dateFired;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('dateFired', 'datetime')
-            ->columnName('date_fired')
-            ->build();
-    }
 
     /**
      * @return \DateTimeInterface|null
@@ -69,24 +57,18 @@ class LeadTriggerLog
         $this->dateFired = $dateFired;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @param IpAddress $ipAddress
-     */
-    public function setIpAddress($ipAddress): void
+    public function setIpAddress(?IpAddress $ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\Lead|null
+     * @return Lead|null
      */
     public function getLead()
     {

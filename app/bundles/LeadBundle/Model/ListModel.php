@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
@@ -29,13 +30,18 @@ use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
-use Mautic\LeadBundle\Event\LeadListEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
+use Mautic\LeadBundle\Event\ListBatchChangeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
+use Mautic\LeadBundle\Event\ListDeleteEvent;
+use Mautic\LeadBundle\Event\ListPostDeleteEvent;
+use Mautic\LeadBundle\Event\ListPostSaveEvent;
+use Mautic\LeadBundle\Event\ListPreDeleteEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
+use Mautic\LeadBundle\Event\ListPreSaveEvent;
+use Mautic\LeadBundle\Event\ListPreUnpublishEvent;
 use Mautic\LeadBundle\Form\Type\ListType;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Exception\FieldNotFoundException;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
@@ -111,9 +117,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * @param LeadList $entity
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
 
@@ -211,12 +217,12 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param LeadList|array<string, mixed>    $entity
      * @param string|null $action
-     * @param array       $options
      *
      * @return FormInterface<LeadList>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
@@ -247,48 +253,33 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param LeadList $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = LeadEvents::LIST_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = LeadEvents::LIST_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = LeadEvents::LIST_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = LeadEvents::LIST_POST_DELETE;
-                break;
-            case 'pre_unpublish':
-                $name = LeadEvents::LIST_PRE_UNPUBLISH;
-                break;
-            case 'on_list_delete':
-                $name = LeadEvents::ON_LIST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'       => new ListPreSaveEvent($entity, $isNew),
+            'post_save'      => new ListPostSaveEvent($entity, $isNew),
+            'pre_delete'     => new ListPreDeleteEvent($entity, $isNew),
+            'post_delete'    => new ListPostDeleteEvent($entity, $isNew),
+            'pre_unpublish'  => new ListPreUnpublishEvent($entity, $isNew),
+            'on_list_delete' => new ListDeleteEvent($entity, $isNew),
+            default          => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new LeadListEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
-            }
-            $this->dispatcher->dispatch($event, $name);
+        $this->dispatcher->dispatch($event);
 
-            return $event;
-        }
-
-        return null;
+        return $event;
     }
 
     /**
@@ -315,9 +306,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
             ];
 
         // Add custom choices
-        if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
+        if ($this->dispatcher->hasListeners(LeadListFiltersChoicesEvent::class)) {
             $event = new LeadListFiltersChoicesEvent([], $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest(), $search);
-            $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE);
+            $this->dispatcher->dispatch($event);
             $choices = $event->getChoices();
         }
 
@@ -333,10 +324,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         return $choices;
     }
 
-    /**
-     * @return array
-     */
-    public function getUserLists(string $alias = '')
+    public function getUserLists(string $alias = ''): array
     {
         $user = !$this->security->isGranted('lead:lists:viewother') ? $this->userHelper->getUser() : null;
 
@@ -345,10 +333,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of global lead lists.
-     *
-     * @return mixed
      */
-    public function getGlobalLists()
+    public function getGlobalLists(): array
     {
         return $this->leadListRepository->getGlobalLists();
     }
@@ -369,11 +355,9 @@ class ListModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param int $limit
-     *
      * @throws \Exception
      */
-    public function rebuildListLeads(LeadList $leadList, $limit = 100, int|bool|null $maxLeads = false, ?OutputInterface $output = null): int
+    public function rebuildListLeads(LeadList $leadList, ?int $limit = 100, int|bool|null $maxLeads = false, ?OutputInterface $output = null): int
     {
         defined('MAUTIC_REBUILDING_LEAD_LISTS') || define('MAUTIC_REBUILDING_LEAD_LISTS', 1);
 
@@ -384,9 +368,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $batchLimiters = ['dateTime' => $dtHelper->toUtcString()];
         $list          = ['id' => $segmentId, 'filters' => $leadList->getFilters()];
 
-        $this->dispatcher->dispatch(
-            new ListPreProcessListEvent($list, false), LeadEvents::LIST_PRE_PROCESS_LIST
-        );
+        $this->dispatcher->dispatch(new ListPreProcessListEvent($list, false));
 
         try {
             // Get a count of leads to add
@@ -464,11 +446,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 $start += $limit;
 
                 // Dispatch batch event
-                if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
-                    $this->dispatcher->dispatch(
-                        new ListChangeEvent($newLeadList[$segmentId], $leadList, true),
-                        LeadEvents::LEAD_LIST_BATCH_CHANGE
-                    );
+                if ($this->dispatcher->hasListeners(ListBatchChangeEvent::class)) {
+                    $this->dispatcher->dispatch(new ListBatchChangeEvent($newLeadList[$segmentId], $leadList, true));
                 }
 
                 unset($newLeadList);
@@ -543,11 +522,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 }
 
                 // Dispatch batch event
-                if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
-                    $this->dispatcher->dispatch(
-                        new ListChangeEvent($processedLeads, $leadList, false),
-                        LeadEvents::LEAD_LIST_BATCH_CHANGE
-                    );
+                if (count($processedLeads) && $this->dispatcher->hasListeners(ListBatchChangeEvent::class)) {
+                    $this->dispatcher->dispatch(new ListBatchChangeEvent($processedLeads, $leadList, false));
                 }
 
                 $start += $limit;
@@ -672,6 +648,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 ]);
 
                 foreach ($listEntities as $list) {
+                    /** @var LeadList $list */
                     $this->leadChangeLists[$list->getId()] = $list;
                 }
             }
@@ -706,7 +683,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
                     ]
                 );
             } else {
-                $listLead = $this->em->getReference(ListLead::class,
+                $listLead = $this->em->getReference(
+                    ListLead::class,
                     [
                         'lead' => $leadId,
                         'list' => $listId,
@@ -755,10 +733,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
-        } elseif ([] !== $dispatchEvents && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+        } elseif ([] !== $dispatchEvents && $this->dispatcher->hasListeners(ListChangeEvent::class)) {
             foreach ($dispatchEvents as $listId) {
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$listId]);
-                $this->dispatcher->dispatch($event, LeadEvents::LEAD_LIST_CHANGE);
+                $this->dispatcher->dispatch($event);
 
                 unset($event);
             }
@@ -805,6 +783,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
                 ]);
 
                 foreach ($listEntities as $list) {
+                    /** @var LeadList $list */
                     $this->leadChangeLists[$list->getId()] = $list;
                 }
             }
@@ -880,10 +859,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
             $this->em->detach($lead);
-        } elseif ([] !== $dispatchEvents && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE)) {
+        } elseif ([] !== $dispatchEvents && $this->dispatcher->hasListeners(ListChangeEvent::class)) {
             foreach ($dispatchEvents as $listId) {
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$listId], false);
-                $this->dispatcher->dispatch($event, LeadEvents::LEAD_LIST_CHANGE);
+                $this->dispatcher->dispatch($event);
 
                 unset($event);
             }
@@ -920,12 +899,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of top (by leads added) lists.
-     *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
      */
-    public function getTopLists($limit = 10, $dateFrom = null, $dateTo = null, bool $canViewOthers = true): array
+    public function getTopLists(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(t.date_added) AS leads, ll.id, ll.name, ll.alias')
@@ -951,17 +926,13 @@ class ListModel extends FormModel implements GlobalSearchInterface
     /**
      * Get a list of top (by leads added) lists.
      *
-     * @param int                 $limit
-     * @param ?\DateTimeInterface $dateFrom
-     * @param ?\DateTimeInterface $dateTo
-     * @param bool                $canViewOthers
      * @param int[]               $segments
      *
      * @return mixed[]
      */
-    public function getLifeCycleSegments($limit, $dateFrom, $dateTo, $canViewOthers, $segments)
+    public function getLifeCycleSegments(int $limit, ?\DateTimeInterface $dateFrom, ?\DateTimeInterface $dateTo, bool $canViewOthers, array $segments): array
     {
-        if (!empty($segments)) {
+        if ($segments !== []) {
             $segmentlist = "'".implode("','", $segments)."'";
         }
         $q = $this->em->getConnection()->createQueryBuilder();
@@ -977,7 +948,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         if ($limit) {
             $q->setMaxResults($limit);
         }
-        if (!empty($segments)) {
+        if ($segments !== []) {
             $q->andWhere('ll.id IN ('.$segmentlist.')');
         }
         if ($dateFrom instanceof \DateTimeInterface) {
@@ -1033,7 +1004,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         }
 
         $allLists   = $query->getCountQuery('leads', 'id', 'date_added');
-        $lists      = $query->count('leads', 'id', 'date_added', $filter, null);
+        $lists      = $query->count('leads', 'id', 'date_added', $filter, []);
         $all        = $query->fetchCount($allLists);
         $identified = $lists;
 
@@ -1056,6 +1027,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getStagesBarChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
+        $data           = [];
         $data['values'] = [];
         $data['labels'] = [];
 
@@ -1100,6 +1072,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         ];
 
         $chart      = new BarChart($data['labels']);
+        $datasets   = [];
         $datasets[] = array_merge($baseData, $chart->generateColors(3));
 
         return [
@@ -1118,6 +1091,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function getDeviceGranularityData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
+        $data           = [];
         $data['values'] = [];
         $data['labels'] = [];
 
@@ -1164,6 +1138,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         ];
 
         $chart      = new BarChart($data['labels']);
+        $datasets   = [];
         $datasets[] = array_merge($baseData, $chart->generateColors(2));
 
         return [
@@ -1181,9 +1156,8 @@ class ListModel extends FormModel implements GlobalSearchInterface
      *
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
-     * @param array  $filter
      */
-    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = []): array
+    public function getSegmentContactsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = []): array
     {
         $chart    = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query    = new SegmentContactsLineChartQuery($this->em->getConnection(), $dateFrom, $dateTo, $filter);
@@ -1191,7 +1165,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         // added line everytime
         $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.added'), $this->segmentChartQueryFactory->getContactsAdded($query));
         $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.removed'), $this->segmentChartQueryFactory->getContactsRemoved($query));
-        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.total'), $this->segmentChartQueryFactory->getContactsTotal($query, $this));
+        $chart->setDataset($this->translator->trans('mautic.lead.segments.contacts.total'), $this->segmentChartQueryFactory->getContactsTotal($query));
 
         return $chart->render();
     }
@@ -1201,10 +1175,10 @@ class ListModel extends FormModel implements GlobalSearchInterface
      */
     public function isFieldUsed(LeadField $field): bool
     {
-        return 0 < $this->getFieldSegments($field)->count();
+        return 0 < count($this->getFieldSegments($field));
     }
 
-    public function getFieldSegments(LeadField $field)
+    public function getFieldSegments(LeadField $field): \Countable
     {
         $alias       = $field->getAlias();
         $aliasLength = mb_strlen($alias);
@@ -1237,6 +1211,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $dependents = [];
         $accessor   = PropertyAccess::createPropertyAccessor();
         foreach ($entities as $entity) {
+            /** @var LeadList $entity */
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
                 // BC support for old filters where the field existed outside of properties.
@@ -1277,6 +1252,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $emailFilterTypes = ['lead_email_received', 'lead_email_sent'];
 
         $dependents = [];
+        /** @var LeadList $entity */
         foreach ($entities as $entity) {
             foreach ($entity->getFilters() as $entityFilter) {
                 // BC support for old filters where the field existed outside of properties.
@@ -1311,6 +1287,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         );
 
         $dependents = [];
+        /** @var LeadList $entity */
         foreach ($entities as $entity) {
             foreach ($entity->getFilters() as $entityFilter) {
                 // BC support for old filters where the field existed outside of properties.
@@ -1345,6 +1322,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
         $dependency          = [];
 
         foreach ($entities as $entity) {
+            /** @var LeadList $entity */
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
                 if ('leadlist' !== $eachFilter['type']) {

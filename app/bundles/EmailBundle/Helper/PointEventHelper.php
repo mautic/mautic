@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Helper;
 
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -15,7 +16,7 @@ final readonly class PointEventHelper
     /**
      * @param array<string, mixed> $action
      */
-    public static function validateEmail($eventDetails, array $action): bool
+    public static function validateEmail(?Email $eventDetails, array $action): bool
     {
         if (null === $eventDetails) {
             return false;

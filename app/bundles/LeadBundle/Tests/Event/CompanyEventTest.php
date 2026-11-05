@@ -5,23 +5,24 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Event;
 
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Event\CompanyEvent;
+use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
+use PHPUnit\Framework\TestCase;
 
-final class CompanyEventTest extends \PHPUnit\Framework\TestCase
+final class CompanyEventTest extends TestCase
 {
     public function testConstructGettersSetters(): void
     {
         $company = new Company();
         $isNew   = false;
         $score   = 1;
-        $event   = new CompanyEvent($company, $isNew, $score);
+        $event   = new CompanyPostSaveEvent($company, $isNew, $score);
 
         $this->assertEquals($company, $event->getCompany());
         $this->assertEquals($isNew, $event->isNew());
         $this->assertSame($score, $event->getScore());
 
         $isNew = true;
-        $event = new CompanyEvent($company, $isNew, $score);
+        $event = new CompanyPostSaveEvent($company, $isNew, $score);
         $this->assertEquals($isNew, $event->isNew());
 
         $company2 = new Company();

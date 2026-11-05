@@ -26,7 +26,6 @@ final readonly class ORMPurgerFactory implements PurgerFactory
     ): PurgerInterface {
         $this->eventDispatcher->dispatch(
             new PreExecuteEvent(
-                $em,
                 $purgeWithTruncate ? ORMPurger::PURGE_MODE_TRUNCATE : ORMPurger::PURGE_MODE_DELETE
             )
         );

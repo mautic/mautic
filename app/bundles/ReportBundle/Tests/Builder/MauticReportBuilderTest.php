@@ -7,8 +7,8 @@ namespace Mautic\ReportBundle\Tests\Builder;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
@@ -44,8 +44,8 @@ final class MauticReportBuilderTest extends TestCase
             new QueryBuilder($this->connection),
             new QueryBuilder($this->connection),
         );
-        $this->connection->method('getExpressionBuilder')->willReturn(new ExpressionBuilder($this->connection));
-        $this->connection->method('quote')->willReturnMap([['', null, "''"]]);
+        $this->connection->method('createExpressionBuilder')->willReturn(new ExpressionBuilder($this->connection));
+        $this->connection->method('quote')->willReturnMap([['', "''"]]);
     }
 
     public function testColumnSanitization(): void
@@ -585,6 +585,21 @@ final class MauticReportBuilderTest extends TestCase
         $groupExpr = CompositeExpression::and($builder->getTagCondition($filters[0]), $builder->getTagCondition($filters[1]));
         $this->assertSame('(l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))', $groupExpr->__toString());
         $this->assertNull($builder->getTagCondition($filters[2]));
+    }
+
+    public function testTagFilterValuesAreCastToIntegers(): void
+    {
+        $filter = [
+            'column'    => 'tag',
+            'glue'      => 'and',
+            'value'     => ['1', 'abc', '2def'],
+            'condition' => 'in',
+        ];
+
+        $builder   = $this->buildBuilder(new Report());
+        $condition = $builder->getTagCondition($filter);
+
+        $this->assertSame('l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 0, 2))', $condition);
     }
 
     private function buildBuilder(Report $report): MauticReportBuilder

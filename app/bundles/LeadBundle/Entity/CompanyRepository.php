@@ -5,6 +5,8 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Event\CompanyBuildSearchEvent;
@@ -15,7 +17,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonRepository<Company>
  */
-class CompanyRepository extends CommonRepository implements CustomFieldRepositoryInterface
+final class CompanyRepository extends CommonRepository implements CustomFieldRepositoryInterface
 {
     use CustomFieldRepositoryTrait;
     use ProjectRepositoryTrait;
@@ -63,7 +65,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $entity = null;
         }
 
-        if (null === $entity) {
+        if (! $entity instanceof Company) {
             return null;
         }
 
@@ -80,18 +82,13 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get a list of leads.
-     *
-     * @return array
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         return $this->getEntitiesWithCustomFields('company', $args);
     }
 
-    /**
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    public function getEntitiesDbalQueryBuilder()
+    public function getEntitiesDbalQueryBuilder(): \Mautic\CoreBundle\Doctrine\Query\QueryBuilder
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -101,14 +98,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * @param mixed[] $args
-     *
-     * @return QueryBuilder
      */
-    public function getEntitiesOrmQueryBuilder($order, array $args=[])
+    public function getEntitiesOrmQueryBuilder($order, array $args=[]): QueryBuilder
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
+        $q = $this->createQueryBuilder($this->getTableAlias(), $this->getTableAlias().'.id');
         $q->select($this->getTableAlias().','.$order)
-            ->from(Company::class, $this->getTableAlias(), $this->getTableAlias().'.id')
             ->andWhere($q->expr()->isNull($this->getTableAlias().'.deleted'));
 
         return $q;
@@ -169,7 +163,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         );
     }
 
-    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Mautic\CoreBundle\Doctrine\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         [$expr, $parameters]     = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         $unique                  = $this->generateRandomParameterName();
@@ -231,10 +225,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * @param string $id
-     *
-     * @return array|mixed
      */
-    public function getCompanies(bool $user = false, $id = '')
+    public function getCompanies(bool $user = false, $id = ''): array
     {
         $q                = $this->getEntityManager()->getConnection()->createQueryBuilder();
         static $companies = [];
@@ -278,7 +270,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      *
      * @return array
      */
-    public function getLeadCount($companyIds)
+    public function getLeadCount($companyIds): array|int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -313,10 +305,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * Get a list of lists.
-     *
-     * @return array
      */
-    public function identifyCompany($companyName, $city = null, $country = null, $state = null)
+    public function identifyCompany($companyName, $city = null, $country = null, $state = null): ?array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         if (empty($companyName)) {
@@ -347,7 +337,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
-        return ($results) ? $results[0] : null;
+        return ($results !== []) ? $results[0] : null;
     }
 
     public function getCompaniesForContacts(array $contacts): array
@@ -386,12 +376,10 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
     /**
      * Get companies grouped by column.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
-    public function getCompaniesByGroup($query, $column): array
+    public function getCompaniesByGroup(\Doctrine\DBAL\Query\QueryBuilder $query, string $column): array
     {
         $query->select('count(comp.id) as companies, '.$column)
             ->addGroupBy($column)
@@ -406,13 +394,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         return $query->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @param int $limit
-     * @param int $offset
-     *
-     * @return mixed
-     */
-    public function getMostCompanies($query, $limit = 10, $offset = 0)
+    public function getMostCompanies(\Mautic\CoreBundle\Doctrine\Query\QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -492,7 +474,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      *
      * @return array<array{id: string}>
      */
-    public function getCompanyIdsByUniqueFields($uniqueFieldsWithData, ?int $companyId = null, ?int $limit = null): array
+    public function getCompanyIdsByUniqueFields(iterable $uniqueFieldsWithData, ?int $companyId = null, ?int $limit = null): array
     {
         return $this->getCompanyFieldsByUniqueFields($uniqueFieldsWithData, 'c.id', $companyId, $limit);
     }
@@ -506,7 +488,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
      *
      * @return array<array{id: string}>
      */
-    public function getCompanyFieldsByUniqueFields($uniqueFieldsWithData, string $select, ?int $companyId = null, ?int $limit = null): array
+    public function getCompanyFieldsByUniqueFields(iterable $uniqueFieldsWithData, string $select, ?int $companyId = null, ?int $limit = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select($select)
@@ -514,8 +496,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         // loop through the fields and
         foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->{$this->getUniqueIdentifiersWherePart()}("c.{$col} = :".$col)
-                ->setParameter($col, $val);
+            $q->{$this->getUniqueIdentifiersWherePart()}("c.{$col} = :".$col);
+            $q->setParameter($col, $val);
         }
 
         // if we have a company ID lets use it
@@ -546,9 +528,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $companies[(int) $r['id']] = $r;
         }
 
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->select('c')
-            ->from(Company::class, 'c');
+        $q = $this->createQueryBuilder('c');
 
         $q->where(
             $q->expr()->in('c.id', ':ids')
@@ -579,7 +559,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         $q->select('id, companyname, companycity, companystate')
             ->from(MAUTIC_TABLE_PREFIX.Company::TABLE_NAME)
-            ->where($q->expr()->eq('is_published', true))
+            ->where($q->expr()->eq('is_published', '1'))
             ->andWhere($q->expr()->like('companyname', ':filterVar'))
             ->setParameter('filterVar', '%'.$filterVal.'%')
             ->andWhere($q->expr()->isNull('deleted'))

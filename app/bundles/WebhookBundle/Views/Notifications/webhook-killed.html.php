@@ -1,3 +1,4 @@
+<?php /** @var \Mautic\WebhookBundle\Entity\Webhook $webhook */ ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

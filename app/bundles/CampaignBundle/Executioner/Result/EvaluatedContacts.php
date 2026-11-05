@@ -5,15 +5,26 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Executioner\Result;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\LeadBundle\Entity\Lead;
 
 final readonly class EvaluatedContacts
 {
-    private ArrayCollection $passed;
+    /**
+     * @var Collection<int, Lead>
+     */
+    private Collection $passed;
 
-    private ArrayCollection $failed;
+    /**
+     * @var Collection<int, Lead>
+     */
+    private Collection $failed;
 
-    public function __construct(?ArrayCollection $passed = null, ?ArrayCollection $failed = null)
+    /**
+     * @param Collection<int, Lead>|null $passed
+     * @param Collection<int, Lead>|null $failed
+     */
+    public function __construct(?Collection $passed = null, ?Collection $failed = null)
     {
         $this->passed = $passed ?? new ArrayCollection();
         $this->failed = $failed ?? new ArrayCollection();
@@ -30,17 +41,17 @@ final readonly class EvaluatedContacts
     }
 
     /**
-     * @return ArrayCollection<int, Lead>
+     * @return Collection<int, Lead>
      */
-    public function getPassed(): ArrayCollection
+    public function getPassed(): Collection
     {
         return $this->passed;
     }
 
     /**
-     * @return ArrayCollection<int, Lead>
+     * @return Collection<int, Lead>
      */
-    public function getFailed(): ArrayCollection
+    public function getFailed(): Collection
     {
         return $this->failed;
     }

@@ -1,14 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\FormEvents;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber
 {
     public function __construct(
         private FocusModel $model,
@@ -16,28 +19,24 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormEvents::FORM_POST_DELETE => ['onFormDelete', 0],
-        ];
-    }
-
     /**
      * Add a delete entry to the audit log.
      */
+    #[AsEventListener(
+        event: FormEvents::FORM_POST_DELETE,
+    )]
     public function onFormDelete(Events\FormEvent $event): void
     {
         $form   = $event->getForm();
         $formId = $form->deletedId;
         $foci   = $this->focusRepository->findByForm($formId);
 
-        if (empty($foci)) {
+        if ($foci === []) {
             return;
         }
 
         // Rebuild each focus
-        /** @var \MauticPlugin\MauticFocusBundle\Entity\Focus $focus */
+        /** @var Focus $focus */
         foreach ($foci as $focus) {
             $focus->setForm(null);
         }

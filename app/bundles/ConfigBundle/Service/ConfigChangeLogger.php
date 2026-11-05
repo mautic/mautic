@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 /**
  * Compare normalized for data and log changes.
  */
-class ConfigChangeLogger
+final class ConfigChangeLogger
 {
     /**
      * Keys to remove from log.
@@ -108,7 +108,10 @@ class ConfigChangeLogger
     {
         $keys = $this->filterKeys;
 
-        return array_filter($data, fn ($key): bool => !in_array($key, $keys),
-            ARRAY_FILTER_USE_KEY);
+        return array_filter(
+            $data,
+            fn ($key): bool => !in_array($key, $keys),
+            ARRAY_FILTER_USE_KEY
+        );
     }
 }

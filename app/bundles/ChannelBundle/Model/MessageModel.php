@@ -22,18 +22,18 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @implements AjaxLookupModelInterface<Message>
  */
-class MessageModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+final class MessageModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     public static function getName(): string
     {
         return 'channel.message';
     }
 
-    public const CHANNEL_FEATURE = 'marketing_messages';
+    public const string CHANNEL_FEATURE = 'marketing_messages';
 
-    protected static $channels;
+    private static ?array $channels = null;
 
-    protected ChannelListHelper $channelListHelper;
+    private ChannelListHelper $channelListHelper;
 
     private LeadEventLogRepository $leadEventLogRepository;
 
@@ -53,7 +53,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     /**
      * @param Message $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $isNew = $entity->isNew();
 
@@ -89,12 +89,12 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     }
 
     /**
-     * @param object  $entity
+     * @param Message|array<string, mixed> $entity
      * @param mixed[] $options
      *
      * @return FormInterface<mixed>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!empty($action)) {
             $options['action'] = $action;
@@ -103,10 +103,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
         return $this->formFactory->create(MessageType::class, $entity, $options);
     }
 
-    /**
-     * @return array
-     */
-    public function getChannels()
+    public function getChannels(): array
     {
         if (!self::$channels) {
             $channels = $this->channelListHelper->getFeatureChannels(self::CHANNEL_FEATURE);
@@ -169,9 +166,9 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     }
 
     /**
-     * @return array
+     * @return array<string, int|string|null>|false
      */
-    public function getChannelMessageByChannelId(int $channelId)
+    public function getChannelMessageByChannelId(int $channelId): array|false
     {
         return $this->messageRepository->getChannelMessageByChannelId($channelId);
     }
@@ -226,9 +223,11 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface, Global
     }
 
     /**
+     * @param Message $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Message) {
             throw new MethodNotAllowedHttpException(['Message']);

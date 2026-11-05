@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\EventListener;
 
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ServerException;
@@ -10,20 +11,20 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Helper\MailHelper;
-use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event as Events;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber
 {
     private MailHelper $mailer;
 
@@ -38,22 +39,12 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $this->mailer = $mailer->getMailer();
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormEvents::FORM_POST_SAVE           => ['onFormPostSave', 0],
-            FormEvents::FORM_POST_DELETE         => ['onFormDelete', 0],
-            Events\FormBuilderEvent::class       => ['onFormBuilder', 0],
-            FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
-                ['onFormSubmitActionSendEmail', 0],
-                ['onFormSubmitActionRepost', 0],
-            ],
-        ];
-    }
-
     /**
      * Add an entry to the audit log.
      */
+    #[AsEventListener(
+        event: FormEvents::FORM_POST_SAVE,
+    )]
     public function onFormPostSave(Events\FormEvent $event): void
     {
         $form = $event->getForm();
@@ -76,6 +67,9 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
+    #[AsEventListener(
+        event: FormEvents::FORM_POST_DELETE,
+    )]
     public function onFormDelete(Events\FormEvent $event): void
     {
         $form = $event->getForm();
@@ -93,6 +87,9 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     /**
      * Add a simple email form.
      */
+    #[AsEventListener(
+        event: Events\FormBuilderEvent::class,
+    )]
     public function onFormBuilder(Events\FormBuilderEvent $event): void
     {
         $event->addSubmitAction('form.email', [
@@ -123,6 +120,9 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         ]);
     }
 
+    #[AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+    )]
     public function onFormSubmitActionSendEmail(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.email')) {
@@ -139,7 +139,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
 
         $config    = $event->getActionConfig();
         $lead      = $event->getSubmission()->getLead();
-        $leadEmail = null !== $lead ? $lead->getEmail() : null;
+        $leadEmail = $lead?->getEmail();
         $ccEmails  = $bccEmails = [];
         $emails    = $this->getEmailsFromString($config['to']);
 
@@ -180,8 +180,8 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             $this->mailer->send(true);
         }
 
-        $owner = null !== $lead ? $lead->getOwner() : null;
-        if (!empty($config['email_to_owner']) && null !== $owner) {
+        $owner = $lead?->getOwner();
+        if (!empty($config['email_to_owner']) && $owner instanceof User) {
             // Send copy to owner
             $this->setMailer($config, $tokens, [$owner->getEmail() => null], $lead);
 
@@ -189,6 +189,9 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+    )]
     public function onFormSubmitActionRepost(Events\SubmissionEvent $event): void
     {
         if (!$event->checkContext('form.repost')) {
@@ -257,7 +260,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
             }
         } catch (ClientException|ServerException $exception) {
             $this->parseResponse($exception->getResponse(), $matchedFields);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             if ($exception instanceof ValidationException) {
                 if ($violations = $exception->getViolations()) {
                     throw $exception;
@@ -404,7 +407,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $this->mailer->setBody($config['message']);
         $this->mailer->parsePlainText($config['message']);
 
-        if ($lead) {
+        if ($lead instanceof Lead) {
             $this->mailer->setLead($lead->getProfileFields(), $internalSend);
         }
     }

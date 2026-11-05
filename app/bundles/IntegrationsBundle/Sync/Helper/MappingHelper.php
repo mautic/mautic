@@ -21,7 +21,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-readonly class MappingHelper
+final readonly class MappingHelper
 {
     public function __construct(
         private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
@@ -225,7 +225,7 @@ readonly class MappingHelper
 
         $this->saveObjectMapping($objectMapping);
 
-        // Make the ObjectMapping available to the IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_* events
+        // Make the ObjectMapping available to the IntegrationToMauticSyncCompletedEvent / MauticToIntegrationSyncCompletedEvent events
         $updatedObjectMappingDAO->setObjectMapping($objectMapping);
     }
 }

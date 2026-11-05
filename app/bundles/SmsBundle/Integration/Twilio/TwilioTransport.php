@@ -13,7 +13,7 @@ use Twilio\Exceptions\ConfigurationException;
 use Twilio\Exceptions\TwilioException;
 use Twilio\Rest\Client;
 
-class TwilioTransport implements TransportInterface, MMSTransportInterface
+final class TwilioTransport implements TransportInterface, MMSTransportInterface
 {
     private ?Client $client = null;
 

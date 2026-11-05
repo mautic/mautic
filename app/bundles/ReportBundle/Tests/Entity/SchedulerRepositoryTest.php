@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Entity;
 
-use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
+final class SchedulerRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -72,7 +73,7 @@ final class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
             }))
             ->willReturn($queryBuilderMock);
 
-        $abstractQueryMock = $this->createMock(AbstractQuery::class);
+        $abstractQueryMock = $this->createMock(Query::class);
 
         $queryBuilderMock->expects($this->once())
             ->method('getQuery')

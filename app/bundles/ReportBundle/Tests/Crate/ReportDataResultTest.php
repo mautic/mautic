@@ -7,8 +7,9 @@ namespace Mautic\ReportBundle\Tests\Crate;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Tests\Fixtures;
+use PHPUnit\Framework\TestCase;
 
-final class ReportDataResultTest extends \PHPUnit\Framework\TestCase
+final class ReportDataResultTest extends TestCase
 {
     public function testValidData(): void
     {

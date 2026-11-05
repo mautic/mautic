@@ -4,26 +4,23 @@ namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
+use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class MessageQueueSubscriber implements EventSubscriberInterface
+final readonly class MessageQueueSubscriber
 {
     public function __construct(
         private SmsModel $model,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            MessageQueueBatchProcessEvent::class => ['onProcessMessageQueueBatch', 0],
-        ];
-    }
-
     /**
      * Sends campaign emails.
      */
+    #[AsEventListener(
+        event: MessageQueueBatchProcessEvent::class,
+    )]
     public function onProcessMessageQueueBatch(MessageQueueBatchProcessEvent $event): void
     {
         if (!$event->checkContext('sms')) {
@@ -38,7 +35,7 @@ final readonly class MessageQueueSubscriber implements EventSubscriberInterface
 
         /** @var MessageQueue $message */
         foreach ($messages as $message) {
-            if ($sms && $message->getLead() && $sms->isPublished()) {
+            if ($sms instanceof Sms && $message->getLead() && $sms->isPublished()) {
                 $contact = $message->getLead();
                 $mobile  = $contact->getMobile();
                 $phone   = $contact->getPhone();
@@ -54,7 +51,7 @@ final readonly class MessageQueueSubscriber implements EventSubscriberInterface
         }
 
         if (count($sendTo)) {
-            $options['resend_message_queue'] = $messagesByContact;
+            $options                         = ['resend_message_queue' => $messagesByContact];
             $results                         = $this->model->sendSms($sms, $sendTo, $options);
 
             foreach ($messagesByContact as $contactId => $message) {

@@ -14,7 +14,7 @@
             <i class="ri-lg ri-fw {{ switch }} {{ bgClass }}"
                id="companyLeadsToggle{{ company.id }}"
                onclick="Mautic.toggleCompanyLead('companyLeadsToggle{{ company.id }}', {{ leadId }}, {{ company.id }});"></i>
-            <span>{{ company.companyname|purify }}</span>
+            <span>{{ htmlEntityDecode(company.companyname)|purify }}</span>
         </li>
     {% endfor %}
 </ul>

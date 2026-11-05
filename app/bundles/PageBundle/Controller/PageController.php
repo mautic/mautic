@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
@@ -24,7 +24,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class PageController extends FormController
+final class PageController extends AbstractStandardFormController
 {
     use FormErrorMessagesTrait;
 
@@ -38,7 +38,7 @@ final class PageController extends FormController
     }
 
     #[Route(
-        '/s/pages/{objectAction}/{objectId}',
+        path: '/s/pages/{objectAction}/{objectId}',
         name: 'mautic_page_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -49,7 +49,7 @@ final class PageController extends FormController
     }
 
     #[Route(
-        '/s/pages/{page}',
+        path: '/s/pages/{page}',
         name: 'mautic_page_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -217,11 +217,15 @@ final class PageController extends FormController
             ]);
         }
         if (!$this->security->hasEntityAccess(
-            'page:pages:viewown', 'page:pages:viewother', $activePage->getCreatedBy()
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $activePage->getCreatedBy()
         )
             || ($activePage->getIsPreferenceCenter()
             && !$this->security->hasEntityAccess(
-                'page:preference_center:viewown', 'page:preference_center:viewother', $activePage->getCreatedBy()
+                'page:preference_center:viewown',
+                'page:preference_center:viewother',
+                $activePage->getCreatedBy()
             ))) {
             $this->throwAccessDenied();
         }
@@ -232,11 +236,11 @@ final class PageController extends FormController
         $variantError            = false;
         $weight                  = 0;
         if (count($children)) {
-            foreach ($children as $c) {
-                $variantSettings = $c->getVariantSettings();
+            foreach ($children as $child) {
+                $variantSettings = $child->getVariantSettings();
 
                 if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
-                    if ($c->isPublished()) {
+                    if ($child->isPublished()) {
                         $lastCriteria ??= $variantSettings['winnerCriteria'];
 
                         // make sure all the variants are configured with the same criteria
@@ -251,7 +255,7 @@ final class PageController extends FormController
                     $variantSettings['weight']         = 0;
                 }
 
-                $properties[$c->getId()] = $variantSettings;
+                $properties[$child->getId()] = $variantSettings;
             }
 
             $properties[$parent->getId()]['weight']         = 100 - $weight;
@@ -325,7 +329,9 @@ final class PageController extends FormController
         ];
 
         return $this->delegateView([
-            'returnUrl' => $this->generateUrl('mautic_page_action', [
+            'returnUrl' => $this->generateUrl(
+                'mautic_page_action',
+                [
                 'objectAction' => 'view',
                 'objectId'     => $activePage->getId(), ]
             ),
@@ -383,7 +389,7 @@ final class PageController extends FormController
      *
      * @param Page|null $entity
      */
-    public function newAction(Request $request, PageConfig $pageConfig, ThemeHelper $themeHelper, PageModel $model, $entity = null): Response
+    public function newAction(Request $request, PageConfig $pageConfig, ThemeHelper $themeHelper, PageModel $model, ?object $entity = null): Response
     {
         if (!$entity instanceof Page) {
             $entity = $model->getEntity();
@@ -534,10 +540,14 @@ final class PageController extends FormController
             );
         }
         if (!$this->security->hasEntityAccess(
-            'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $entity->getCreatedBy()
         )
             || ($entity->getIsPreferenceCenter() && !$this->security->hasEntityAccess(
-                'page:preference_center:viewown', 'page:preference_center:viewother', $entity->getCreatedBy()
+                'page:preference_center:viewown',
+                'page:preference_center:viewother',
+                $entity->getCreatedBy()
             ))) {
             $this->throwAccessDenied();
         } elseif ($model->isLocked($entity)) {
@@ -700,7 +710,9 @@ final class PageController extends FormController
         if (null != $entity) {
             if (!$this->security->isGranted('page:pages:create')
                 || !$this->security->hasEntityAccess(
-                    'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+                    'page:pages:viewown',
+                    'page:pages:viewother',
+                    $entity->getCreatedBy()
                 )
             ) {
                 $this->throwAccessDenied();
@@ -814,7 +826,9 @@ final class PageController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    'page:pages:deleteown', 'page:pages:deleteother', $entity->getCreatedBy()
+                    'page:pages:deleteown',
+                    'page:pages:deleteother',
+                    $entity->getCreatedBy()
                 )) {
                     $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($this->pageModel->isLocked($entity)) {
@@ -864,7 +878,9 @@ final class PageController extends FormController
             $isNew  = false;
             $entity = $model->getEntity($objectId);
             if (null == $entity || !$this->security->hasEntityAccess(
-                'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+                'page:pages:viewown',
+                'page:pages:viewother',
+                $entity->getCreatedBy()
             )) {
                 $this->throwAccessDenied();
             }
@@ -905,7 +921,9 @@ final class PageController extends FormController
 
         if ($parent || !$this->security->isGranted('page:pages:create')
                 || !$this->security->hasEntityAccess(
-                    'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
+                    'page:pages:viewown',
+                    'page:pages:viewother',
+                    $entity->getCreatedBy()
                 )
         ) {
             $this->throwAccessDenied();
@@ -994,15 +1012,14 @@ final class PageController extends FormController
      * Show submissions inside page.
      *
      * @param int $objectId
-     * @param int $page
      */
     #[Route(
-        '/s/pages/results/{objectId}/{page}',
+        path: '/s/pages/results/{objectId}/{page}',
         name: 'mautic_page_results',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
     )]
-    public function resultsAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, $page = 1): Response
+    public function resultsAction(Request $request, PageModel $pageModel, SubmissionModel $submissionModel, $objectId, int $page = 1): Response
     {
         $activePage   = $pageModel->getEntity($objectId);
         $session      = $request->getSession();
@@ -1045,8 +1062,6 @@ final class PageController extends FormController
 
         // set limits
         $limit = $session->get('mautic.pageresult.'.$objectId.'.limit', $this->coreParametersHelper->get('default_pagelimit'));
-
-        $page  = $page ?: 0;
         $start = ($page <= 1) ? 0 : (($page - 1) * $limit);
 
         // Set order direction to desc if not set
@@ -1141,7 +1156,7 @@ final class PageController extends FormController
      * @throws \Exception
      */
     #[Route(
-        '/s/pages/results/{objectId}/export/{format}',
+        path: '/s/pages/results/{objectId}/export/{format}',
         name: 'mautic_page_export',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['format' => 'csv', 'objectId' => 0],
@@ -1198,7 +1213,7 @@ final class PageController extends FormController
         return $submissionModel->exportResultsForPage($format, $activePage, $args);
     }
 
-    public function getModelName(): string
+    protected function getModelName(): string
     {
         return 'page';
     }

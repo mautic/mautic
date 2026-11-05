@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\AssetBundle\Controller\Api\AssetApiController;
+use Mautic\AssetBundle\Entity\Asset;
+
 return [
     'routes' => [
         'api' => [
@@ -9,7 +12,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'assets',
                 'path'            => '/assets',
-                'controller'      => Mautic\AssetBundle\Controller\Api\AssetApiController::class,
+                'controller'      => AssetApiController::class,
             ],
         ],
     ],
@@ -29,7 +32,7 @@ return [
 
     'categories' => [
         'asset' => [
-            'class' => Mautic\AssetBundle\Entity\Asset::class,
+            'class' => Asset::class,
         ],
     ],
 

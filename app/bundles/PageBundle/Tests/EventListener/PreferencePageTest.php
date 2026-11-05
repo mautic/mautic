@@ -6,6 +6,7 @@ namespace Mautic\PageBundle\Tests\EventListener;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Translation\MauticResourceTranslator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
@@ -15,7 +16,6 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorBagInterface;
 
 final class PreferencePageTest extends MauticMysqlTestCase
 {
@@ -242,7 +242,7 @@ final class PreferencePageTest extends MauticMysqlTestCase
         $this->assertStringNotContainsString('mautic.lead.form.list', $content);
     }
 
-    private function disableTranslations(TranslatorBagInterface $translator): void
+    private function disableTranslations(MauticResourceTranslator $translator): void
     {
         $translator->getCatalogue()->replace([]);
     }

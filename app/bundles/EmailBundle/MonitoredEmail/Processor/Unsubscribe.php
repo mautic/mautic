@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class Unsubscribe implements ProcessorInterface
+final class Unsubscribe implements ProcessorInterface
 {
     private ?Message $message = null;
 

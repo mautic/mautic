@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Event\CommonEvent;
 
 class LeadBuildSearchEvent extends CommonEvent
@@ -85,10 +85,7 @@ class LeadBuildSearchEvent extends CommonEvent
         return $this->subQuery;
     }
 
-    /**
-     * @param array $string
-     */
-    public function setString($string): void
+    public function setString(array $string): void
     {
         $this->string = $string;
     }

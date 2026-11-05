@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class PluginToken extends AbstractToken
+final class PluginToken extends AbstractToken
 {
     private ?string $providerKey;
 

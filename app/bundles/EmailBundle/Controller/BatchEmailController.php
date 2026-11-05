@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Controller;
 
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\EmailBundle\Entity\Email;
@@ -20,7 +21,7 @@ final class BatchEmailController extends AbstractFormController
      * Adds or removes categories to multiple emails defined by email ID.
      */
     #[Route(
-        '/s/emails/batch/categories/set',
+        path: '/s/emails/batch/categories/set',
         name: 'mautic_email_batch_categories_set',
     )]
     public function execAction(Request $request, EmailActionModel $actionModel, CategoryModel $categoryModel): JsonResponse
@@ -46,8 +47,8 @@ final class BatchEmailController extends AbstractFormController
             'flashes'     => $this->getFlashContent(),
             'affected'    => !empty($affected) ? array_map(fn (Email $affected) => $affected->getId(), $affected) : [],
             'newCategory' => [
-                'name'  => $newCategory instanceof \Mautic\CategoryBundle\Entity\Category ? $newCategory->getTitle() : null,
-                'color' => $newCategory instanceof \Mautic\CategoryBundle\Entity\Category ? $newCategory->getColor() : null,
+                'name'  => $newCategory instanceof Category ? $newCategory->getTitle() : null,
+                'color' => $newCategory instanceof Category ? $newCategory->getColor() : null,
             ],
             'callback' => 'emailBatchSubmitCallback',
         ]);
@@ -57,7 +58,7 @@ final class BatchEmailController extends AbstractFormController
      * View the modal form for adding contacts into categories in batches.
      */
     #[Route(
-        '/s/emails/batch/categories/view',
+        path: '/s/emails/batch/categories/view',
         name: 'mautic_email_batch_categories_view',
     )]
     public function indexAction(): Response

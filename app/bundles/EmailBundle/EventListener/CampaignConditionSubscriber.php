@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
@@ -7,24 +9,20 @@ use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-final readonly class CampaignConditionSubscriber implements EventSubscriberInterface
+final readonly class CampaignConditionSubscriber
 {
     public function __construct(
         private EmailValidator $validator,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            EmailEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $event->addCondition(
@@ -37,10 +35,16 @@ final readonly class CampaignConditionSubscriber implements EventSubscriberInter
         );
     }
 
+    #[AsEventListener(
+        event: EmailEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+    )]
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
+        /** @var Lead $lead */
+        $lead = $event->getLead();
+
         try {
-            $this->validator->validate($event->getLead()->getEmail(), true);
+            $this->validator->validate($lead->getEmail(), true);
         } catch (UnexpectedValueException|InvalidEmailException) {
             $event->fail();
 

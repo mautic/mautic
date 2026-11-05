@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\SmsBundle\Entity\Sms;
@@ -11,14 +12,16 @@ use Mautic\SmsBundle\Entity\Stat;
 use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\EventListener\TrackingSubscriber;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
+final class TrackingSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&StatRepository
+     * @var MockObject&StatRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $statRepository;
+    private MockObject $statRepository;
 
     protected function setUp(): void
     {
@@ -35,13 +38,11 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             'stat'    => 'abc123',
         ];
 
-        $sms = $this->createMock(Sms::class);
-        $sms->method('getId')
-            ->willReturn(1);
+        $sms = new Sms();
+        ReflectionHelper::setEntityId($sms, 1);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(2);
+        $lead = new Lead();
+        $lead->setId(2);
 
         $stat = new Stat();
         $stat->setSms($sms);
@@ -56,7 +57,7 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->getSubscriber()->onIdentifyContact($event);
 
-        $this->assertEquals($lead->getId(), $event->getIdentifiedContact()->getId());
+        $this->assertSame($lead->getId(), $event->getIdentifiedContact()->getId());
     }
 
     public function testChannelMismatchDoesNotIdentify(): void
@@ -86,13 +87,11 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             'stat'    => 'abc123',
         ];
 
-        $sms = $this->createMock(Sms::class);
-        $sms->method('getId')
-            ->willReturn(1);
+        $sms = new Sms();
+        ReflectionHelper::setEntityId($sms, 1);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(2);
+        $lead = new Lead();
+        $lead->setId(2);
 
         $stat = new Stat();
         $stat->setSms($sms);
@@ -120,9 +119,8 @@ final class TrackingSubscriberTest extends \PHPUnit\Framework\TestCase
             'stat'    => 'abc123',
         ];
 
-        $sms = $this->createMock(Sms::class);
-        $sms->method('getId')
-            ->willReturn(1);
+        $sms = new Sms();
+        ReflectionHelper::setEntityId($sms, 1);
 
         $stat = new Stat();
         $stat->setSms($sms);

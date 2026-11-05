@@ -16,7 +16,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-readonly class OrderExecutioner
+final readonly class OrderExecutioner
 {
     public function __construct(
         private MappingHelper $mappingHelper,
@@ -90,7 +90,7 @@ readonly class OrderExecutioner
         $this->mappingHelper->updateObjectMappings($updatedObjectMappings);
 
         // The ObjectMapping entity is pushed into UpdatedObjectMappingDAO in MappingHelper::updateObjectMapping in order
-        // to make it available to the IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_* events
+        // to make it available to the IntegrationToMauticSyncCompletedEvent / MauticToIntegrationSyncCompletedEvent events
         foreach ($updatedObjectMappings as $updatedObjectMapping) {
             if (!$updatedObjectMapping->getObjectMapping()) {
                 continue;
@@ -140,7 +140,7 @@ readonly class OrderExecutioner
         $createdObjectMappings = $event->getObjectMappings();
         $this->mappingHelper->saveObjectMappings($createdObjectMappings);
 
-        // Make ObjectMappings available to the IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_* events
+        // Make ObjectMappings available to the IntegrationToMauticSyncCompletedEvent / MauticToIntegrationSyncCompletedEvent events
         foreach ($createdObjectMappings as $createdObjectMapping) {
             $objectMappings->addNewObjectMapping($createdObjectMapping);
         }

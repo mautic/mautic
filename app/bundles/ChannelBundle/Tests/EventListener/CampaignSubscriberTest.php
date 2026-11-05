@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ChannelBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -17,6 +18,8 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\EventListener\CampaignSubscriber;
 use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
+use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Form\Type\EmailListType;
@@ -28,11 +31,12 @@ use Mautic\SmsBundle\Form\Type\SmsSendType;
 use Mautic\SmsBundle\SmsEvents;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSubscriberTest extends TestCase
 {
     private EventDispatcher $dispatcher;
 
@@ -138,7 +142,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(Translator::class)
         );
 
-        $this->dispatcher->addSubscriber($campaignSubscriber);
+        AttributeEventListenerRegistrar::register($this->dispatcher, $campaignSubscriber);
         $this->dispatcher->addListener(EmailEvents::ON_CAMPAIGN_BATCH_ACTION, $this->sendMarketingMessageEmail(...));
         $this->dispatcher->addListener(SmsEvents::ON_CAMPAIGN_TRIGGER_BATCH_ACTION, $this->sendMarketingMessageSms(...));
     }
@@ -261,32 +265,31 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                 'marketingMessage'    => '1',
             ]
         );
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->method('getId')
-            ->willReturn(1);
+        $campaign = new Campaign();
+        ReflectionHelper::setEntityId($campaign, 1);
 
         $event->setCampaign($campaign);
 
         return $event;
     }
 
-    private function getLogs(): ArrayCollection
+    /**
+     * @return Collection<int, LeadEventLog>
+     */
+    private function getLogs(): Collection
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(1);
-        $lead->expects($this->once())
-            ->method('getChannelRules')
-            ->willReturn(
-                [
-                    'sms' => [
-                        'dnc' => DoNotContact::IS_CONTACTABLE,
-                    ],
-                    'email' => [
-                        'dnc' => DoNotContact::IS_CONTACTABLE,
-                    ],
-                ]
-            );
+        $lead = new Lead();
+        $lead->setId(1);
+        $lead->setChannelRules(
+            [
+                'sms' => [
+                    'dnc' => DoNotContact::IS_CONTACTABLE,
+                ],
+                'email' => [
+                    'dnc' => DoNotContact::IS_CONTACTABLE,
+                ],
+            ]
+        );
 
         $log = $this->getMockBuilder(LeadEventLog::class)
             ->onlyMethods(['getLead', 'getId'])
@@ -296,21 +299,18 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $log->method('getId')
             ->willReturn(1);
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->method('getId')
-            ->willReturn(2);
-        $lead2->expects($this->once())
-            ->method('getChannelRules')
-            ->willReturn(
-                [
-                    'email' => [
-                        'dnc' => DoNotContact::IS_CONTACTABLE,
-                    ],
-                    'sms' => [
-                        'dnc' => DoNotContact::UNSUBSCRIBED,
-                    ],
-                ]
-            );
+        $lead2 = new Lead();
+        $lead2->setId(2);
+        $lead2->setChannelRules(
+            [
+                'email' => [
+                    'dnc' => DoNotContact::IS_CONTACTABLE,
+                ],
+                'sms' => [
+                    'dnc' => DoNotContact::UNSUBSCRIBED,
+                ],
+            ]
+        );
 
         $log2 = $this->getMockBuilder(LeadEventLog::class)
             ->onlyMethods(['getLead', 'getId'])
@@ -320,6 +320,9 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $log2->method('getId')
             ->willReturn(2);
 
-        return new ArrayCollection([1 => $log, 2 => $log2]);
+        /** @var Collection<int, LeadEventLog> $logs */
+        $logs = new ArrayCollection([1 => $log, 2 => $log2]);
+
+        return $logs;
     }
 }

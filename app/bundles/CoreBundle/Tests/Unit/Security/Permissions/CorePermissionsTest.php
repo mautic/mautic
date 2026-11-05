@@ -12,9 +12,10 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class CorePermissionsTest extends \PHPUnit\Framework\TestCase
+final class CorePermissionsTest extends TestCase
 {
     private CorePermissions $corePermissions;
 

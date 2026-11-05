@@ -79,7 +79,7 @@ final class FieldApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    protected function saveEntity($entity, int $statusCode): int
+    protected function saveEntity(object $entity, int $statusCode): int
     {
         try {
             return parent::saveEntity($entity, $statusCode);
@@ -94,10 +94,8 @@ final class FieldApiController extends CommonApiController
 
     /**
      * Sanitizes and returns an array of where statements from the request.
-     *
-     * @return array
      */
-    protected function getWhereFromRequest(Request $request)
+    protected function getWhereFromRequest(Request $request): array
     {
         $where = parent::getWhereFromRequest($request);
 
@@ -128,9 +126,8 @@ final class FieldApiController extends CommonApiController
      * @param LeadField            $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): Response|array|null
     {
         if (isset($parameters['properties'])) {
             $result = $this->model->setFieldProperties($entity, $parameters['properties']);
@@ -139,5 +136,7 @@ final class FieldApiController extends CommonApiController
                 return $this->returnError($this->translator->trans($result, [], 'validators'), Response::HTTP_BAD_REQUEST);
             }
         }
+
+        return null;
     }
 }

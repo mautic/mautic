@@ -5,21 +5,23 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\PointBundle\Entity\Group;
 
 #[ORM\Entity(repositoryClass: PointsChangeLogRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['date_added'], name: 'point_date_added')]
+#[ORM\Index(name: 'point_date_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PointsChangeLog
 {
-    public const TABLE_NAME = 'lead_points_change_log';
+    public const string TABLE_NAME = 'lead_points_change_log';
 
     /**
-     * @var string
+     * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -29,64 +31,43 @@ class PointsChangeLog
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'text', length: 50)]
     private $type;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_name', type: 'string', length: 191)]
     private $eventName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'action_name', type: 'string', length: 191)]
     private $actionName;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     private $delta;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     #[ORM\ManyToOne(targetEntity: Group::class)]
     #[ORM\JoinColumn(name: 'group_id', onDelete: 'CASCADE')]
     private ?Group $group = null;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('type', 'text')
-            ->length(50)
-            ->build();
-
-        $builder->createField('eventName', 'string')
-            ->columnName('event_name')
-            ->build();
-
-        $builder->createField('actionName', 'string')
-            ->columnName('action_name')
-            ->build();
-
-        $builder->addField('delta', 'integer');
-
-        $builder->addDateAdded();
-    }
 
     public function getId(): int
     {
@@ -190,10 +171,7 @@ class PointsChangeLog
         return $this;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->lead;
     }
@@ -205,10 +183,7 @@ class PointsChangeLog
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }

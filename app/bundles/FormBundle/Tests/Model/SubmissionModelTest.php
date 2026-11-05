@@ -47,6 +47,7 @@ use Mautic\UserBundle\Entity\UserRepository;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,7 +57,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
+final class SubmissionModelTest extends TestCase
 {
     /**
      * @var MockObject&IpLookupHelper
@@ -165,9 +166,6 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $schemaManager = $this->createMock(AbstractSchemaManager::class);
         $schemaManager->method('tablesExist')->willReturn(true);
         $connection->method('createSchemaManager')->willReturn($schemaManager);
-        $connection->method('beginTransaction')->willReturn(true);
-        $connection->method('commit')->willReturn(true);
-        $connection->method('rollBack')->willReturn(true);
         $connection->method('executeStatement')->willReturn(1);
         $classMetadata = $this->createMock(ClassMetadata::class);
         $classMetadata->method('getTableName')->willReturn('forms');
@@ -182,7 +180,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $userRepository                   = $this->createMock(UserRepository::class);
 
         $entityManager->method('getRepository')
-            ->willReturnCallback(fn (string $class): ?\PHPUnit\Framework\MockObject\MockObject => match ($class) {
+            ->willReturnCallback(fn (string $class): ?MockObject => match ($class) {
                 Submission::class => $this->submissioRepository,
                 Lead::class       => $this->leadRepository,
                 User::class       => $userRepository,
@@ -249,6 +247,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->method('getUser')
             ->willReturn(new User());
 
+        $mockLeadField          = [];
         $mockLeadField['email'] = [
             'label'        => 'Email',
             'alias'        => 'email',
@@ -273,7 +272,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->leadRepository
             ->method('getLeadsByUniqueFields')
-            ->willReturn(null);
+            ->willReturn([]);
 
         $this->file1Mock
             ->method('getClientOriginalName')
@@ -328,6 +327,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $reflection            = new \ReflectionClass(SubmissionModel::class);
         $method                = $reflection->getMethod('normalizeValue');
         $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fields                = [];
         $fields[$fieldSession] = [
             'label'        => 'Email',
             'showLabel'    => 1,
@@ -374,6 +374,7 @@ final class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private function getTestFormFields(): array
     {
         $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fields                = [];
         $fields[$fieldSession] = [
             'label'        => 'Email',
             'showLabel'    => 1,

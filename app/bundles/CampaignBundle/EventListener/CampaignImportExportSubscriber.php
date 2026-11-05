@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
@@ -25,12 +26,13 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PointBundle\Entity\Group;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignImportExportSubscriber implements EventSubscriberInterface
+final readonly class CampaignImportExportSubscriber
 {
     use ImportExportTrait;
 
@@ -46,16 +48,9 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onCampaignExport', 0],
-            EntityImportEvent::class        => ['onCampaignImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EntityExportEvent::class,
+    )]
     public function onCampaignExport(EntityExportEvent $event): void
     {
         if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
@@ -83,6 +78,9 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         $event->addEntity('dependencies', $event->getDependencies());
     }
 
+    #[AsEventListener(
+        event: EntityImportEvent::class,
+    )]
     public function onCampaignImport(EntityImportEvent $event): void
     {
         if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
@@ -110,7 +108,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
     private function fetchCampaignData(int $campaignId): array
     {
         $campaign = $this->campaignModel->getEntity($campaignId);
-        if (!$campaign) {
+        if (!$campaign instanceof Campaign) {
             $this->logger->warning("Campaign not found for ID: {$campaignId}");
 
             return [];
@@ -188,10 +186,10 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
 
             $object ??= new Campaign();
             if ($isNew) {
-                $object->setDateAdded(new \DateTime());
+                $object->setDateAdded(new DateTime());
             }
             $object->setUuid($campaignData['uuid']);
-            $object->setDateModified(new \DateTime());
+            $object->setDateModified(new DateTime());
 
             if ($isNew) {
                 $object->setCreatedByUser($user);
@@ -223,6 +221,9 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(
@@ -337,7 +338,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         }
 
         $user = $this->userModel->getEntity($userId);
-        if (!$user) {
+        if (!$user instanceof User) {
             $this->logger->warning("User ID {$userId} not found. Campaigns will not have a created_by_user field set.");
 
             return '';
@@ -409,12 +410,12 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      * @param array<string, mixed> $data
      * @param array<int, int>      $campaignIdMap
      */
-    private function persistUpdatedCanvasSettings(array &$data, array $campaignIdMap): void
+    private function persistUpdatedCanvasSettings(array $data, array $campaignIdMap): void
     {
         foreach ($data[Campaign::ENTITY_NAME] as $campaignData) {
             $campaign = $this->campaignRepository->find($campaignIdMap[$campaignData['id']] ?? null);
 
-            if ($campaign) {
+            if ($campaign instanceof Campaign) {
                 $campaign->setCanvasSettings($campaignData['canvas_settings'] ?? '');
                 $this->entityManager->persist($campaign);
                 $this->entityManager->flush();
@@ -584,7 +585,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      * @param array<string, mixed>             $data
      * @param array<int, array<string, mixed>> $dependencies
      */
-    private function updateFormRelatedData(array &$data, array $dependencies, string $entity): void
+    private function updateFormRelatedData(array &$data, array $dependencies, string $entityName): void
     {
         if (empty($data[Form::ENTITY_NAME])) {
             return;
@@ -595,9 +596,9 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
             return;
         }
 
-        foreach ($data[$entity] as &$item) {
+        foreach ($data[$entityName] as &$item) {
             foreach ($formDependencies as $dependency) {
-                if (isset($dependency[$entity]) && isset($item['id']) && $item['id'] === $dependency[$entity]) {
+                if (isset($dependency[$entityName]) && isset($item['id']) && $item['id'] === $dependency[$entityName]) {
                     if (isset($item['form']) && isset($dependency[Form::ENTITY_NAME])) {
                         $item['form'] = $dependency[Form::ENTITY_NAME];
                     }
@@ -769,17 +770,20 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
      *
      * @return array<int, array<string, mixed>>
      */
-    private function getSubDependencies(array $dependencies, string $entity): array
+    private function getSubDependencies(array $dependencies, string $entityName): array
     {
         foreach ($dependencies as $dependencyGroup) {
-            if (isset($dependencyGroup[$entity])) {
-                return $dependencyGroup[$entity];
+            if (isset($dependencyGroup[$entityName])) {
+                return $dependencyGroup[$entityName];
             }
         }
 
         return [];
     }
 
+    #[AsEventListener(
+        event: EntityImportUndoEvent::class,
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Campaign::ENTITY_NAME !== $event->getEntityName()) {
@@ -794,7 +798,7 @@ final readonly class CampaignImportExportSubscriber implements EventSubscriberIn
         foreach ($summary['ids'] as $id) {
             $entity = $this->campaignRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof Campaign) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, []);
             }

@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: CompanyChangeLogRepository::class)]
 #[ORM\Table(name: 'lead_companies_change_log')]
-#[ORM\Index(columns: ['date_added'], name: 'company_date_added')]
+#[ORM\Index(name: 'company_date_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class CompanyChangeLog
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -28,52 +30,32 @@ class CompanyChangeLog
     /**
      * @var string
      */
+    #[ORM\Column(type: 'text', length: 50)]
     private $type;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_name', type: 'string', length: 191)]
     private $eventName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'action_name', type: 'string', length: 191)]
     private $actionName;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'company_id', type: 'integer')]
     private $company;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->createField('type', 'text')
-            ->length(50)
-            ->build();
-
-        $builder->createField('eventName', 'string')
-            ->columnName('event_name')
-            ->build();
-
-        $builder->createField('actionName', 'string')
-            ->columnName('action_name')
-            ->build();
-
-        $builder->createField('company', 'integer')
-            ->columnName('company_id')
-            ->build();
-
-        $builder->addDateAdded();
-    }
 
     /**
      * @return int
@@ -182,10 +164,7 @@ class CompanyChangeLog
         return $this;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->lead;
     }

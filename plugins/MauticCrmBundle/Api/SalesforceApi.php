@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Api;
 
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
+use Exception;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Exception\RetryRequestException;
 use MauticPlugin\MauticCrmBundle\Api\Salesforce\Helper\RequestUrl;
@@ -44,7 +45,6 @@ final class SalesforceApi extends CrmApi
     }
 
     /**
-     * @param array  $elementData
      * @param string $method
      * @param bool   $isRetry
      *
@@ -52,7 +52,7 @@ final class SalesforceApi extends CrmApi
      *
      * @throws ApiErrorException
      */
-    public function request($operation, $elementData = [], $method = 'GET', $isRetry = false, $object = null, $queryUrl = null)
+    public function request($operation, array $elementData = [], $method = 'GET', $isRetry = false, $object = null, $queryUrl = null)
     {
         if (!$object) {
             $object = $this->object;
@@ -658,7 +658,7 @@ final class SalesforceApi extends CrmApi
     private function handleQueryAll(string $baseQuery, array $fields, string $queryUrl, int $tries = 0, bool $isRetry = false): mixed
     {
         if (10 === $tries) {
-            $this->integration->logIntegrationError(new \Exception(
+            $this->integration->logIntegrationError(new Exception(
                 'Maximum tries exceeded for handling missing field scenarios'
             ));
         }

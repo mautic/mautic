@@ -14,10 +14,10 @@ use Mautic\PluginBundle\Entity\IntegrationRepository;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class IntegrationsHelper
+final class IntegrationsHelper
 {
     /**
-     * @var IntegrationInterface[]
+     * @var array<string, IntegrationInterface>
      */
     private array $integrations = [];
 
@@ -30,7 +30,7 @@ class IntegrationsHelper
         private readonly IntegrationRepository $integrationRepository,
         private readonly EncryptionService $encryptionService,
         private readonly EventDispatcherInterface $eventDispatcher,
-        #[AutowireIterator('mautic.basic_integration')]
+        #[AutowireIterator(tag: 'mautic.basic_integration')]
         iterable $integrations = [],
     ) {
         foreach ($integrations as $integration) {
@@ -44,11 +44,9 @@ class IntegrationsHelper
     }
 
     /**
-     * @return IntegrationInterface
-     *
      * @throws IntegrationNotFoundException
      */
-    public function getIntegration(string $integration)
+    public function getIntegration(string $integration): IntegrationInterface
     {
         if (!isset($this->integrations[$integration])) {
             throw new IntegrationNotFoundException("{$integration} either doesn't exist or has not been tagged with mautic.basic_integration");

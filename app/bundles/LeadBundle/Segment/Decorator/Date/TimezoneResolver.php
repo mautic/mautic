@@ -7,17 +7,14 @@ namespace Mautic\LeadBundle\Segment\Decorator\Date;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
-readonly class TimezoneResolver
+final readonly class TimezoneResolver
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
-    /**
-     * @param bool $hasTimePart
-     */
-    public function getDefaultDate($hasTimePart): DateTimeHelper
+    public function getDefaultDate(bool $hasTimePart): DateTimeHelper
     {
         /**
          * $hasTimePart tells us if field in a database is date or datetime

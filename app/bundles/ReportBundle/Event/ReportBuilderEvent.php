@@ -265,10 +265,7 @@ class ReportBuilderEvent extends AbstractReportEvent
         return $channelColumns;
     }
 
-    /**
-     * @param array $options
-     */
-    public function addGraph($context, $type, $graphId, $options = []): static
+    public function addGraph($context, $type, $graphId, array $options = []): static
     {
         if (in_array($type, $this->supportedGraphs)) {
             $this->graphArray[$context][$graphId] = [

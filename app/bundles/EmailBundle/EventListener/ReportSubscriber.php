@@ -5,7 +5,9 @@ namespace Mautic\EmailBundle\EventListener;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use LogicException;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder as TrackingQueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -21,9 +23,10 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber
 {
     public const string CONTEXT_EMAILS       = 'emails';
 
@@ -173,19 +176,12 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-            ReportGraphEvent::class     => ['onReportGraphGenerate', 0],
-            ReportDataEvent::class      => ['onReportDisplay', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[AsEventListener(
+        event: ReportBuilderEvent::class,
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_EMAILS, self::CONTEXT_EMAIL_STATS])) {
@@ -347,10 +343,13 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGeneratorEvent::class,
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
-        $qb         = $event->getQueryBuilder();
+        $qb         = $this->trackingBuilder($event->getQueryBuilder());
         $hasGroupBy = $event->hasGroupBy();
 
         $qbcut                  = $this->db->createQueryBuilder(); // channel_url_trackables subquery
@@ -482,6 +481,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGraphEvent::class,
+    )]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         $graphs = $event->getRequestedGraphs();
@@ -497,9 +499,12 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $qb = $event->getQueryBuilder();
+        $qb = $this->trackingBuilder($event->getQueryBuilder());
+
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
+            /** @var TranslatorInterface $translator */
+            $translator = $options['translator'];
             $queryBuilder = clone $qb;
             /** @var ChartQuery $chartQuery */
             $chartQuery   = clone $options['chartQuery'];
@@ -526,9 +531,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $sends  = $chartQuery->loadAndBuildTimeData($sendQuery);
                     $reads  = $chartQuery->loadAndBuildTimeData($readQuery);
                     $failes = $chartQuery->loadAndBuildTimeData($failedQuery);
-                    $chart->setDataset($options['translator']->trans('mautic.email.sent.emails'), $sends);
-                    $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $reads);
-                    $chart->setDataset($options['translator']->trans('mautic.email.failed.emails'), $failes);
+                    $chart->setDataset($translator->trans('mautic.email.sent.emails'), $sends);
+                    $chart->setDataset($translator->trans('mautic.email.read.emails'), $reads);
+                    $chart->setDataset($translator->trans('mautic.email.failed.emails'), $failes);
                     $data         = $chart->render();
                     $data['name'] = $g;
 
@@ -536,13 +541,13 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     break;
 
                 case 'mautic.email.graph.pie.ignored.read.failed':
-                    $queryBuilder->resetQueryPart('groupBy');
+                    $queryBuilder->resetGroupBy();
                     $counts = $this->statRepository->getIgnoredReadFailed($queryBuilder);
                     $chart  = new PieChart();
-                    $chart->setDataset($options['translator']->trans('mautic.email.read.emails'), $counts['read']);
-                    $chart->setDataset($options['translator']->trans('mautic.email.failed.emails'), $counts['failed']);
+                    $chart->setDataset($translator->trans('mautic.email.read.emails'), $counts['read']);
+                    $chart->setDataset($translator->trans('mautic.email.failed.emails'), $counts['failed']);
                     $chart->setDataset(
-                        $options['translator']->trans('mautic.email.ignored.emails'),
+                        $translator->trans('mautic.email.ignored.emails'),
                         $counts['ignored']
                     );
                     $event->setGraph(
@@ -565,11 +570,11 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $chart  = new SeriesPieChart();
                     $chart->setTotalCount($counts['sent_count']);
                     $chart->setLabels([
-                        $chart->buildFullLabel($options['translator']->trans('mautic.email.report.unsubscribed'), $unsubCount['unsubscribed']),
-                        $chart->buildFullLabel($options['translator']->trans('mautic.email.clicked'), $clicked),
-                        $chart->buildFullLabel($options['translator']->trans('mautic.email.stat.read'), $counts['read_count']),
-                        $chart->buildFullLabel($options['translator']->trans('mautic.email.stat.notread'), $counts['not_read']),
-                        $chart->buildFullLabel($options['translator']->trans('mautic.email.stat.sent'), $counts['sent_count']),
+                        $chart->buildFullLabel($translator->trans('mautic.email.report.unsubscribed'), $unsubCount['unsubscribed']),
+                        $chart->buildFullLabel($translator->trans('mautic.email.clicked'), $clicked),
+                        $chart->buildFullLabel($translator->trans('mautic.email.stat.read'), $counts['read_count']),
+                        $chart->buildFullLabel($translator->trans('mautic.email.stat.notread'), $counts['not_read']),
+                        $chart->buildFullLabel($translator->trans('mautic.email.stat.sent'), $counts['sent_count']),
                     ]);
 
                     $chart->setDataset([$unsubCount['unsubscribed'], 0, $unsubCount['vsRead'], $unsubCount['vsNotRead'], 0]);
@@ -587,7 +592,8 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     );
                     break;
                 case 'mautic.email.graph.bar.read.clicked.unsubscribed.bounced':
-                    $queryBuilder->select('e.id, e.name, e.sent_count, e.read_count,
+                    $queryBuilder->select(
+                        'e.id, e.name, e.sent_count, e.read_count,
                         count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
                         count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
                     )
@@ -627,29 +633,30 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     }
                     break;
                 case 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced':
-                    $queryBuilder->select('SUM(DISTINCT e.sent_count) as sent_count,
+                    $queryBuilder->select(
+                        'SUM(DISTINCT e.sent_count) as sent_count,
                         SUM(DISTINCT e.read_count) as read_count,
                         count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
                         count(CASE WHEN '.self::DNC_PREFIX.'.id and '.self::DNC_PREFIX.'.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
                     );
                     $this->addDNCTableForEmails($queryBuilder);
-                    $queryBuilder->resetQueryPart('groupBy');
+                    $queryBuilder->resetGroupBy();
                     $counts = $queryBuilder->executeQuery()->fetchAssociative();
                     $chart  = new PieChart();
                     $chart->setDataset(
-                        $options['translator']->trans('mautic.email.stat.read'),
+                        $translator->trans('mautic.email.stat.read'),
                         $counts['read_count'] ?? 0
                     );
                     $chart->setDataset(
-                        $options['translator']->trans('mautic.email.graph.pie.ignored.read.failed.ignored'),
+                        $translator->trans('mautic.email.graph.pie.ignored.read.failed.ignored'),
                         ($counts['sent_count'] ?? 0) - ($counts['read_count'] ?? 0)
                     );
                     $chart->setDataset(
-                        $options['translator']->trans('mautic.email.unsubscribed'),
+                        $translator->trans('mautic.email.unsubscribed'),
                         $counts['unsubscribed'] ?? 0
                     );
                     $chart->setDataset(
-                        $options['translator']->trans('mautic.email.bounced'),
+                        $translator->trans('mautic.email.bounced'),
                         $counts['bounced'] ?? 0
                     );
 
@@ -797,6 +804,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: ReportDataEvent::class,
+    )]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();
@@ -816,6 +826,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
      */
     private function countVsRead(int $value, string $label, array $emailCounts): array
     {
+        $result = [];
         if (($emailCounts['read_count'] - $value) > 0) {
             $result['vsRead']    = $emailCounts['read_count'] - $value;
             $result['vsNotRead'] = $emailCounts['not_read'];
@@ -829,7 +840,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         return $result;
     }
 
-    private function joinEmailsTableIfMissing(QueryBuilder $queryBuilder, ReportGraphEvent $event): void
+    private function joinEmailsTableIfMissing(TrackingQueryBuilder $queryBuilder, ReportGraphEvent $event): void
     {
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS) && !$this->isJoined($queryBuilder, MAUTIC_TABLE_PREFIX.'emails', self::EMAIL_STATS_PREFIX, self::EMAILS_PREFIX)) {
             $queryBuilder->leftJoin(self::EMAIL_STATS_PREFIX, MAUTIC_TABLE_PREFIX.'emails', self::EMAILS_PREFIX, 'e.id = es.email_id');
@@ -839,7 +850,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add the Do Not Contact table to the query builder.
      */
-    private function addDNCTableForEmails(QueryBuilder $qb): void
+    private function addDNCTableForEmails(TrackingQueryBuilder $qb): void
     {
         $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
 
@@ -853,7 +864,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function addTrackableTablesForEmailStats(QueryBuilder $qb): void
+    private function addTrackableTablesForEmailStats(TrackingQueryBuilder $qb): void
     {
         $trTable = MAUTIC_TABLE_PREFIX.'channel_url_trackables';
         $prTable = MAUTIC_TABLE_PREFIX.'page_redirects';
@@ -879,7 +890,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Add the Do Not Contact table to the query builder.
      */
-    private function addDNCTableForEmailStats(QueryBuilder $qb): void
+    private function addDNCTableForEmailStats(TrackingQueryBuilder $qb): void
     {
         $table = MAUTIC_TABLE_PREFIX.'lead_donotcontact';
 
@@ -893,7 +904,22 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
+    /**
+     * Only Mautic's builder records its parts, and this subscriber reads a query back to
+     * see whether a table is already joined. Connections hand out the tracking builder,
+     * so this never fires in practice; it is here because the event types its builder as
+     * the DBAL one, which cannot be read back.
+     */
+    private function trackingBuilder(QueryBuilder $queryBuilder): TrackingQueryBuilder
+    {
+        if (!$queryBuilder instanceof TrackingQueryBuilder) {
+            throw new LogicException(sprintf('%s needs a query builder that records its parts, got %s.', self::class, $queryBuilder::class));
+        }
+
+        return $queryBuilder;
+    }
+
+    private function isJoined(TrackingQueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
         $joins = $query->getQueryParts()['join'];
         if (empty($joins) || empty($joins[$fromAlias])) {

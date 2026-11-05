@@ -42,7 +42,8 @@ final class AssetsHelper
         private readonly AssetGenerationHelper $assetHelper,
         private readonly BuilderIntegrationsHelper $builderIntegrationsHelper,
         private readonly InstallService $installService,
-        #[Autowire(param: 'mautic.site_url')] ?string $siteUrl,
+        #[Autowire(param: 'mautic.site_url')]
+        ?string $siteUrl,
     ) {
         $siteUrl ??= '';
 
@@ -492,7 +493,7 @@ final class AssetsHelper
      * @param array<string>         $protocols  http/https, ftp, mail, twitter
      * @param array<string, string> $attributes
      */
-    public function makeLinks(string $text, $protocols = ['http', 'mail'], array $attributes = []): ?string
+    public function makeLinks(string $text, array $protocols = ['http', 'mail'], array $attributes = []): ?string
     {
         // clear tags in text
         $text = InputHelper::url($text, false, $protocols);
@@ -511,7 +512,7 @@ final class AssetsHelper
         }, $text);
 
         // Extract text links for each protocol
-        foreach ((array) $protocols as $protocol) {
+        foreach ($protocols as $protocol) {
             $text = match ($protocol) {
                 'http', 'https' => preg_replace_callback('~(?:(https?)://([^\s<]+)|(www\.[^\s<]+?\.[^\s<]+))(?<![\.,:])~i', function ($match) use ($protocol, &$links, $attr): string {
                     if ($match[1]) {

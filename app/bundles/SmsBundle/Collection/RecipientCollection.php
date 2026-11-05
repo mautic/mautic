@@ -8,6 +8,9 @@ use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Exception\RecipientNotFoundException;
 use Mautic\SmsBundle\Helper\DTO\SmsRecipientDTO;
 
+/**
+ * @extends \ArrayIterator<int, SmsRecipientDTO>
+ */
 final class RecipientCollection extends \ArrayIterator
 {
     /**

@@ -11,8 +11,9 @@ use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\CampaignMember;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Contact;
 use MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object\Lead;
 use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\TestCase;
 
-final class FetcherTest extends \PHPUnit\Framework\TestCase
+final class FetcherTest extends TestCase
 {
     public function testEntitiesAreFetchedFromOrganizerResults(): void
     {

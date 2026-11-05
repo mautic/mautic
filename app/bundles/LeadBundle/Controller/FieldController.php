@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Exception\SchemaException;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class FieldController extends FormController
+final class FieldController extends AbstractFormController
 {
     private FieldModel $fieldModel;
 
@@ -31,7 +31,7 @@ final class FieldController extends FormController
     }
 
     #[Route(
-        '/s/contacts/fields/{objectAction}/{objectId}',
+        path: '/s/contacts/fields/{objectAction}/{objectId}',
         name: 'mautic_contactfield_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -43,16 +43,14 @@ final class FieldController extends FormController
 
     /**
      * Generate's default list view.
-     *
-     * @param int $page
      */
     #[Route(
-        '/s/contacts/fields/{page}',
+        path: '/s/contacts/fields/{page}',
         name: 'mautic_contactfield_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, FieldModel $fieldModel, FieldSearchScopeProvider $fieldSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, FieldModel $fieldModel, FieldSearchScopeProvider $fieldSearchScopeProvider, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(['lead:fields:view', 'lead:fields:full'], 'RETURN_ARRAY');
@@ -258,7 +256,7 @@ final class FieldController extends FormController
     /**
      * Generate's edit form and processes post data.
      */
-    public function editAction(Request $request, $objectId, bool $ignorePost = false): Response
+    public function editAction(Request $request, int $objectId, bool $ignorePost = false): Response
     {
         if (!$this->security->isGranted('lead:fields:full')) {
             $this->throwAccessDenied();
@@ -346,7 +344,9 @@ final class FieldController extends FormController
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
-                    array_merge($postActionVars, [
+                    array_merge(
+                        $postActionVars,
+                        [
                         'viewParameters'  => ['objectId' => $field->getId()],
                         'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
                     ]
@@ -505,8 +505,10 @@ final class FieldController extends FormController
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
-                $flashes = array_merge($flashes,
-                    $this->checkEntityForDeletion($objectId, $deleteIds, $postActionVars));
+                $flashes = array_merge(
+                    $flashes,
+                    $this->checkEntityForDeletion($objectId, $deleteIds, $postActionVars)
+                );
             }
 
             // Delete everything we are able to

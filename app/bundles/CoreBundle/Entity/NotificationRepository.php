@@ -3,18 +3,19 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
+use Doctrine\DBAL\Exception\InvalidArgumentException;
 
 /**
  * @extends CommonRepository<Notification>
  */
-class NotificationRepository extends CommonRepository
+final class NotificationRepository extends CommonRepository
 {
     public function getTableAlias(): string
     {
         return 'n';
     }
 
-    public function getDefaultOrder(): array
+    protected function getDefaultOrder(): array
     {
         return [
             ['n.dateAdded', 'DESC'],
@@ -30,7 +31,7 @@ class NotificationRepository extends CommonRepository
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function clearNotificationsForUser($userId, $id = null, $limit = null): void
     {
@@ -64,10 +65,7 @@ class NotificationRepository extends CommonRepository
         }
     }
 
-    /**
-     * @return mixed|null
-     */
-    public function getUpstreamLastDate()
+    public function getUpstreamLastDate(): ?\DateTimeInterface
     {
         $qb = $this->createQueryBuilder('n')
             ->select('partial n.{id, dateAdded}')
@@ -78,15 +76,13 @@ class NotificationRepository extends CommonRepository
         /** @var Notification $result */
         $result = $qb->getQuery()->getOneOrNullResult();
 
-        return null === $result ? null : $result->getDateAdded();
+        return $result?->getDateAdded();
     }
 
     /**
      * Fetch notifications for this user.
-     *
-     * @return array
      */
-    public function getNotifications($userId, $afterId = null, bool $includeRead = false, $type = null, $limit = null)
+    public function getNotifications($userId, $afterId = null, bool $includeRead = false, $type = null, $limit = null): array
     {
         $qb = $this->createQueryBuilder('n');
 

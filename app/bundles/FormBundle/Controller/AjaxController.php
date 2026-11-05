@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\FieldCollectorInterface;
 use Mautic\FormBundle\Crate\FieldCrate;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -87,7 +88,7 @@ final class AjaxController extends CommonAjaxController
         $formId     = (int) $request->request->get('formId');
         $dataArray  = ['success' => 0];
         $entity     = $this->formModel->getEntity($formId);
-        $formFields = $entity instanceof \Mautic\FormBundle\Entity\Form ? $entity->getFields() : [];
+        $formFields = $entity instanceof Form ? $entity->getFields() : [];
         $fields     = [];
 
         foreach ($formFields as $field) {
@@ -137,7 +138,7 @@ final class AjaxController extends CommonAjaxController
      * Ajax submit for forms.
      */
     #[Route(
-        '/form/submit/ajax',
+        path: '/form/submit/ajax',
         name: 'mautic_form_postresults_ajax',
     )]
     public function submitAction(Request $request): JsonResponse

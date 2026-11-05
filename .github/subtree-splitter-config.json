@@ -11,11 +11,6 @@
             "target": "git@github.com:mautic/plugin-grapesjs-builder.git"
         },
         {
-            "name": "MauticClearbitBundle",
-            "directory": "plugins/MauticClearbitBundle",
-            "target": "git@github.com:mautic/plugin-clearbit.git"
-        },
-        {
             "name": "MauticCloudStorageBundle",
             "directory": "plugins/MauticCloudStorageBundle",
             "target": "git@github.com:mautic/plugin-cloudstorage.git"

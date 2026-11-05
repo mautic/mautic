@@ -51,7 +51,7 @@ final class Oauth2Authenticator extends \FOS\OAuthServerBundle\Security\Authenti
                 }
             }
 
-            $roles = (null !== $user) ? $user->getRoles() : [];
+            $roles = $user?->getRoles() ?? [];
             $scope = $accessToken->getScope();
 
             if (!empty($scope)) {

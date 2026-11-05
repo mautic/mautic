@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Contracts\EventDispatcher\Event;
 
 final class IconEvent extends Event
@@ -14,31 +13,18 @@ final class IconEvent extends Event
      */
     private $icons = [];
 
-    public function __construct(
-        private readonly CorePermissions $security,
-    ) {
-    }
-
-    public function getSecurity(): CorePermissions
-    {
-        return $this->security;
-    }
-
     /**
-     * @param string $type
      * @param string $icon
      */
-    public function addIcon($type, $icon): void
+    public function addIcon(string $type, $icon): void
     {
         $this->icons[$type] = $icon;
     }
 
     /**
      * Return the icons.
-     *
-     * @return array
      */
-    public function getIcons()
+    public function getIcons(): array
     {
         return $this->icons;
     }

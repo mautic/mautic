@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\IpLookup;
 
-class MaxmindOmniLookup extends AbstractMaxmindLookup
+final class MaxmindOmniLookup extends AbstractMaxmindLookup
 {
     protected function getName(): string
     {

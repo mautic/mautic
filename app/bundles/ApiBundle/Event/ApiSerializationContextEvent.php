@@ -8,7 +8,7 @@ use FOS\RestBundle\Context\Context;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Symfony\Component\HttpFoundation\Request;
 
-final class ApiSerializationContextEvent extends CommonEvent
+abstract class ApiSerializationContextEvent extends CommonEvent
 {
     public function __construct(
         private Context $context,

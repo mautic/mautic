@@ -11,9 +11,10 @@ use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CompanyDeduperTest extends \PHPUnit\Framework\TestCase
+final class CompanyDeduperTest extends TestCase
 {
     /**
      * @var MockObject&FieldList

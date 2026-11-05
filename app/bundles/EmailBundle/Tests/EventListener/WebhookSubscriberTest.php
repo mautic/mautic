@@ -13,9 +13,10 @@ use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
+final class WebhookSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&WebhookModel
@@ -75,8 +76,8 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnEmailSend(): void
     {
         $event   = $this->createMock(EmailSendEvent::class);
-        $contact = $this->createStub(Lead::class);
-        $email   = $this->createStub(Email::class);
+        $contact = new Lead();
+        $email   = new Email();
         $tokens  = ['{unsubscribe_text}' => '<a href=\"https://...'];
         $headers = ['List-Unsubscribe' => '<a href=\"https://...'];
         $source  = ['List-Unsubscribe' => '<a href=\"https://...']; // todo find out real source example

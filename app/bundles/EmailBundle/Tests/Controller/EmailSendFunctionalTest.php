@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
@@ -60,7 +61,7 @@ final class EmailSendFunctionalTest extends MauticMysqlTestCase
             preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $body, $match);
             $this->assertArrayHasKey(1, $match, $body);
             parse_str(parse_url($match[1], PHP_URL_QUERY), $queryParams);
-            $clickThrough = \Mautic\CoreBundle\Helper\Serializer::decode(base64_decode($queryParams['ct']));
+            $clickThrough = Serializer::decode(base64_decode($queryParams['ct']));
             $this->assertArrayHasKey($message->getTo()[0]->toString(), $leads);
             $this->assertSame($leads[$message->getTo()[0]->toString()]->getId(), (int) $clickThrough['lead']);
         }

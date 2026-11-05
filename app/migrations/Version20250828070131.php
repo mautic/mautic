@@ -6,10 +6,11 @@ namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 
 final class Version20250828070131 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = 'sms_messages';
+    protected const string TABLE_NAME = 'sms_messages';
 
     protected function preUpAssertions(): void
     {
@@ -31,7 +32,7 @@ final class Version20250828070131 extends PreUpAssertionMigration
             $table->addIndex(['translation_parent_id'], 'IDX_SMS_TRANSLATION_PARENT');
 
             $table->addForeignKeyConstraint(
-                $table,
+                AssetName::of($table),
                 ['translation_parent_id'],
                 ['id'],
                 ['onDelete' => 'CASCADE'],

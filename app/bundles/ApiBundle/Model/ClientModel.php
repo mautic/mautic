@@ -2,10 +2,11 @@
 
 namespace Mautic\ApiBundle\Model;
 
-use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
 use Mautic\ApiBundle\Event\ClientEvent;
+use Mautic\ApiBundle\Event\ClientPostDeleteEvent;
+use Mautic\ApiBundle\Event\ClientPostSaveEvent;
 use Mautic\ApiBundle\Form\Type\ClientType;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
@@ -74,9 +75,11 @@ final class ClientModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Client|array<string, mixed> $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(['Client']);
@@ -97,31 +100,33 @@ final class ClientModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Client $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Client) {
             throw new MethodNotAllowedHttpException(['Client']);
         }
 
-        switch ($action) {
-            case 'post_save':
-                $name = ApiEvents::CLIENT_POST_SAVE;
-                break;
-            case 'post_delete':
-                $name = ApiEvents::CLIENT_POST_DELETE;
-                break;
-            default:
-                return null;
+        $name = match ($action) {
+            'post_save'   => ClientPostSaveEvent::class,
+            'post_delete' => ClientPostDeleteEvent::class,
+            default       => null,
+        };
+
+        if (null === $name) {
+            return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new ClientEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
+            if (!$event instanceof ClientEvent) {
+                $event = 'post_save' === $action
+                    ? new ClientPostSaveEvent($entity, $isNew)
+                    : new ClientPostDeleteEvent($entity, $isNew);
             }
-            $this->dispatcher->dispatch($event, $name);
+            $this->dispatcher->dispatch($event);
 
             return $event;
         }
@@ -135,6 +140,8 @@ final class ClientModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Client $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
     public function revokeAccess(object $entity): void

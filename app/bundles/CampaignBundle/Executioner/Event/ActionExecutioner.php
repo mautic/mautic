@@ -2,13 +2,14 @@
 
 namespace Mautic\CampaignBundle\Executioner\Event;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\Logger\EventLogger;
 use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
@@ -16,9 +17,9 @@ use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-readonly class ActionExecutioner implements EventInterface
+final readonly class ActionExecutioner implements EventInterface
 {
-    public const TYPE = 'action';
+    public const string TYPE = 'action';
 
     public function __construct(
         private ActionDispatcher $dispatcher,
@@ -31,10 +32,11 @@ readonly class ActionExecutioner implements EventInterface
 
     /**
      * @throws CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @param Collection<int, LeadEventLog> $logs
      */
-    public function execute(AbstractEventAccessor $config, ArrayCollection $logs): EvaluatedContacts
+    public function execute(AbstractEventAccessor $config, Collection $logs): EvaluatedContacts
     {
         \assert($config instanceof ActionAccessor);
 

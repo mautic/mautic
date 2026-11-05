@@ -12,9 +12,10 @@ use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DateDayToday::class)]
-final class DateDayTodayTest extends \PHPUnit\Framework\TestCase
+final class DateDayTodayTest extends TestCase
 {
     public function testGetOperatorBetween(): void
     {

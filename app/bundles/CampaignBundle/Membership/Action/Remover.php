@@ -11,9 +11,9 @@ use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaign
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-readonly class Remover
+final readonly class Remover
 {
-    public const NAME = 'removed';
+    public const string NAME = 'removed';
 
     private string $unscheduledMessage;
 

@@ -11,7 +11,7 @@ use Mautic\FormBundle\Entity\Submission;
 
 final class Version20260604000000 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = Form::TABLE_NAME;
+    protected const string TABLE_NAME = Form::TABLE_NAME;
 
     protected function preUpAssertions(): void
     {

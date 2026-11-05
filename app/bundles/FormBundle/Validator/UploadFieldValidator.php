@@ -11,7 +11,7 @@ use Mautic\FormBundle\Form\Type\FormFieldFileType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
-readonly class UploadFieldValidator
+final readonly class UploadFieldValidator
 {
     public function __construct(
         private FileUploadValidator $fileUploadValidator,
@@ -19,12 +19,10 @@ readonly class UploadFieldValidator
     }
 
     /**
-     * @return UploadedFile
-     *
      * @throws FileValidationException
      * @throws NoFileGivenException
      */
-    public function processFileValidation(Field $field, Request $request)
+    public function processFileValidation(Field $field, Request $request): UploadedFile
     {
         $files = $request->files->get('mauticform');
 

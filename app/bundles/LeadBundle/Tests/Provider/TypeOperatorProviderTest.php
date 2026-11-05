@@ -11,10 +11,11 @@ use Mautic\LeadBundle\Provider\TypeOperatorProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TypeOperatorProviderTest extends \PHPUnit\Framework\TestCase
+final class TypeOperatorProviderTest extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface

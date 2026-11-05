@@ -14,14 +14,15 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class ThemeController extends FormController
+final class ThemeController extends AbstractFormController
 {
     #[Route(
-        '/s/themes/{objectAction}/{objectId}',
+        path: '/s/themes/{objectAction}/{objectId}',
         name: 'mautic_themes_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -32,7 +33,7 @@ final class ThemeController extends FormController
     }
 
     #[Route(
-        '/s/themes',
+        path: '/s/themes',
         name: 'mautic_themes_index',
     )]
     public function indexAction(Request $request, ThemeHelperInterface $themeHelper, BuilderIntegrationsHelper $builderIntegrationsHelper, PathsHelper $pathsHelper, ThemeSearchScopeProvider $themeSearchScopeProvider, ThemeSearchFilter $themeSearchFilter): Response
@@ -63,6 +64,7 @@ final class ThemeController extends FormController
         if ('POST' === $request->getMethod()) {
             if (!$this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
+                    /** @var UploadedFile|null $fileData */
                     $fileData = $form['file']->getData();
 
                     if (!$fileData) {
@@ -241,6 +243,7 @@ final class ThemeController extends FormController
                 $flashNumber = count($flashes);
                 unset($flashes);
 
+                $flashes   = [];
                 $flashes[] = [
                     'type'    => 'notice',
                     'msg'     => 'mautic.core.theme.notice.batch_deleted',
@@ -262,7 +265,7 @@ final class ThemeController extends FormController
         );
     }
 
-    public function deleteTheme(ThemeHelperInterface $themeHelper, $themeName): array
+    private function deleteTheme(ThemeHelperInterface $themeHelper, $themeName): array
     {
         $flashes = [];
 
@@ -310,7 +313,7 @@ final class ThemeController extends FormController
      *
      * @return array{returnUrl: string, contentTemplate: string, passthroughVars: array{activeLink: string, mauticContent: string}}
      */
-    public function getIndexPostActionVars(): array
+    private function getIndexPostActionVars(): array
     {
         return [
             'returnUrl'       => $this->generateUrl('mautic_themes_index'),

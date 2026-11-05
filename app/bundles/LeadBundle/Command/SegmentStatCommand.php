@@ -38,7 +38,8 @@ final class SegmentStatCommand extends ModeratedCommand
         if (empty($event->getResults())) {
             $io->write('There is no segment to show!!');
         } else {
-            $io->table([
+            $io->table(
+                [
                 'Title',
                 'Id',
                 'IsPublished',

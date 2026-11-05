@@ -16,7 +16,7 @@ final class FullContact_Icon extends FullContact_Base
 
     protected $_resourceUri      = '/icon/';
 
-    public function available()
+    public function available(): ?\stdClass
     {
         $this->_execute(['method' => 'available']);
 

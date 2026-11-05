@@ -10,9 +10,10 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class PointEventHelperTest extends \PHPUnit\Framework\TestCase
+final class PointEventHelperTest extends TestCase
 {
     public function testSendEmail(): void
     {

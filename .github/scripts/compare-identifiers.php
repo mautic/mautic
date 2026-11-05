@@ -51,6 +51,12 @@ $other = [];
  */
 function compareIndexes(string $entity, string $kind, array $was, array $now, array &$reordered, array &$other): void
 {
+    foreach ($was as $name => $columns) {
+        if (!isset($now[$name])) {
+            $other[] = sprintf('  %s drops %s %s(%s)', $entity, $kind, $name, implode(', ', $columns));
+        }
+    }
+
     foreach ($now as $name => $columns) {
         if (!isset($was[$name])) {
             $other[] = sprintf('  %s adds %s %s(%s)', $entity, $kind, $name, implode(', ', $columns));
@@ -135,6 +141,18 @@ foreach ($afterEntities as $entity => $now) {
         }
     }
 
+    foreach ($was['columns'] as $field => $column) {
+        if (!isset($now['columns'][$field])) {
+            $other[] = sprintf('  %s drops column %s', $short, $column);
+        }
+    }
+
+    foreach ($was['joinColumns'] as $field => $joinColumns) {
+        if (!isset($now['joinColumns'][$field])) {
+            $other[] = sprintf('  %s drops join column %s', $short, implode(', ', $joinColumns));
+        }
+    }
+
     foreach ($now['joinColumns'] as $field => $joinColumns) {
         if (isset($was['joinColumns'][$field]) && $was['joinColumns'][$field] !== $joinColumns) {
             $renames[] = sprintf(
@@ -149,6 +167,12 @@ foreach ($afterEntities as $entity => $now) {
 
     compareIndexes($short, 'index', $was['indexes'], $now['indexes'], $reorderedIndexes, $other);
     compareIndexes($short, 'unique constraint', $was['uniqueConstraints'], $now['uniqueConstraints'], $reorderedIndexes, $other);
+}
+
+foreach ($beforeEntities as $entity => $was) {
+    if (!isset($afterEntities[$entity])) {
+        $other[] = sprintf('  removes entity %s', $entity);
+    }
 }
 
 printf(

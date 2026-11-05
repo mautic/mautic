@@ -6,6 +6,7 @@ namespace Mautic\ReportBundle\Tests\Form\Type;
 
 use Mautic\ReportBundle\Form\Type\FilterSelectorType;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -14,7 +15,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
-final class FilterSelectorTypeTest extends \PHPUnit\Framework\TestCase
+final class FilterSelectorTypeTest extends TestCase
 {
     /**
      * @var MockObject&FormBuilderInterface

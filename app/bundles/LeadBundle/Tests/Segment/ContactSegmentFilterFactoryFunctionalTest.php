@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 
@@ -39,7 +40,7 @@ final class ContactSegmentFilterFactoryFunctionalTest extends MauticMysqlTestCas
         $applicationTester = new ApplicationTester($application);
 
         /** @var LeadRepository $leadRepository */
-        $leadRepository = $this->em->getRepository(Lead::class);
+        $leadRepository = $this->getContainer()->get(LeadRepository::class);
 
         // Create leads with different date_identified values
         $leadToday = new Lead();
@@ -116,8 +117,8 @@ final class ContactSegmentFilterFactoryFunctionalTest extends MauticMysqlTestCas
         $this->assertSame(0, $exitCode, 'Segment update command should complete successfully without TypeError: '.$applicationTester->getDisplay());
 
         // Verify segment membership - get all leads in the segment
-        $segmentMembers = $this->em->getRepository(ListLead::class)->findBy(['list' => $segment->getId()]);
-        $memberLeadIds  = array_map(fn (ListLead $member) => $member->getLead()->getId(), $segmentMembers);
+        $segmentMembers = $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment->getId()]);
+        $memberLeadIds  = array_map(fn (ListLead $member): int => $member->getLead()->getId(), $segmentMembers);
 
         // Leads matching the date filters should be in the segment
         $this->assertContains($leadToday->getId(), $memberLeadIds, 'Lead identified today should be in segment');

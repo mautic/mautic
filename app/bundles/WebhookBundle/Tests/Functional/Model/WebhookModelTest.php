@@ -34,7 +34,7 @@ final class WebhookModelTest extends MauticMysqlTestCase
         $counter = 1;
 
         foreach ($queueArray as $queuedEvent) {
-            $this->assertSame((string) $counter, $queuedEvent->getId());
+            $this->assertSame($counter, $queuedEvent->getId());
 
             $payload = json_decode($queuedEvent->getPayload(), true);
             $this->assertSame($counter, $payload['spoof']);
@@ -54,7 +54,7 @@ final class WebhookModelTest extends MauticMysqlTestCase
         // Order should be 10 to 1
         $counter = 10;
         foreach ($queueArray as $queuedEvent) {
-            $this->assertSame((string) $counter, $queuedEvent->getId());
+            $this->assertSame($counter, $queuedEvent->getId());
 
             $payload = json_decode($queuedEvent->getPayload(), true);
             $this->assertSame($counter, $payload['spoof']);

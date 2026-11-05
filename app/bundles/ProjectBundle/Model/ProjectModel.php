@@ -6,6 +6,7 @@ namespace Mautic\ProjectBundle\Model;
 
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\ProjectBundle\Entity\Project;
 use Mautic\ProjectBundle\Entity\ProjectRepository;
 use Mautic\ProjectBundle\Service\ProjectEntityLoaderService;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -33,6 +34,14 @@ final class ProjectModel extends FormModel implements AjaxLookupModelInterface
     public function getRepository(): ProjectRepository
     {
         return $this->projectRepository;
+    }
+
+    /**
+     * @return iterable<Project>
+     */
+    public function getEntities(array $args = []): iterable
+    {
+        return parent::getEntities($args);
     }
 
     public function getLookupResults(string $type, string|array $filter = '', int $limit = 10, int $start = 0, array $options = []): array

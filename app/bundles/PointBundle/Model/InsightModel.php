@@ -50,11 +50,12 @@ final class InsightModel extends CommonFormModel
     }
 
     /**
+     * @param PointInsight|array<string, mixed>         $entity
      * @param array<string, mixed> $options
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof PointInsight) {
             throw new MethodNotAllowedHttpException(['PointInsight']);
@@ -104,7 +105,7 @@ final class InsightModel extends CommonFormModel
         $pointGroupIds = $insight->getPointGroups();
         $customField   = $insight->getCustomField();
 
-        if (empty($pointGroupIds) || empty($customField)) {
+        if ($pointGroupIds === [] || empty($customField)) {
             return false;
         }
 
@@ -126,7 +127,7 @@ final class InsightModel extends CommonFormModel
             ->getQuery()
             ->getArrayResult();
 
-        if (empty($results)) {
+        if ($results === []) {
             return false;
         }
 

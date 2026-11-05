@@ -7,7 +7,7 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CoreBundle\Event\CommonEvent;
 
-final class CampaignEvent extends CommonEvent
+class CampaignEvent extends CommonEvent
 {
     public function __construct(Campaign &$campaign, bool $isNew = false)
     {

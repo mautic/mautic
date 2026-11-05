@@ -2,14 +2,14 @@
 
 namespace Mautic\LeadBundle\Segment\Query;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
 use Mautic\LeadBundle\Event\LeadListQueryBuilderGeneratedEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use Mautic\LeadBundle\Segment\Exception\PluginHandledFilterException;
@@ -38,15 +38,12 @@ final class ContactSegmentQueryBuilder
     }
 
     /**
-     * @param ContactSegmentFilters $segmentFilters
-     *
      * @throws SegmentQueryException
      */
-    public function assembleContactsSegmentQueryBuilder(int $segmentId, $segmentFilters, bool $changeAlias = false): QueryBuilder
+    public function assembleContactsSegmentQueryBuilder(int $segmentId, ContactSegmentFilters $segmentFilters, bool $changeAlias = false): QueryBuilder
     {
-        /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
-        if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
+        if ($connection instanceof PrimaryReadReplicaConnection) {
             // Prefer a replica connection if available.
             $connection->ensureConnectedToReplica();
         }
@@ -89,13 +86,12 @@ final class ContactSegmentQueryBuilder
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function wrapInCount(QueryBuilder $qb): QueryBuilder
     {
-        /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
-        if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
+        if ($connection instanceof PrimaryReadReplicaConnection) {
             // Prefer a replica connection if available.
             $connection->ensureConnectedToReplica();
         }
@@ -225,13 +221,13 @@ final class ContactSegmentQueryBuilder
      */
     private function dispatchPluginFilteringEvent(ContactSegmentFilter $filter, QueryBuilder $queryBuilder): void
     {
-        if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_ON_FILTERING)) {
+        if ($this->dispatcher->hasListeners(LeadListFilteringEvent::class)) {
             //  This has to run for every filter
             $filterCrate = $filter->contactSegmentFilterCrate->getArray();
 
             $alias = $this->generateRandomParameterName();
             $event = new LeadListFilteringEvent($filterCrate, null, $alias, $filterCrate['operator'], $queryBuilder, $this->entityManager);
-            $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_ON_FILTERING);
+            $this->dispatcher->dispatch($event);
             if ($event->isFilteringDone()) {
                 $queryBuilder->addLogic($event->getSubQuery(), $filter->getGlue());
 

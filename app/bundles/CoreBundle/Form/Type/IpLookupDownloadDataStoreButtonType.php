@@ -25,7 +25,9 @@ final class IpLookupDownloadDataStoreButtonType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $localDataExists = file_exists($options['ip_lookup_service']->getLocalDataStoreFilepath());
+        /** @var AbstractLocalDataLookup $ipLookupService */
+        $ipLookupService = $options['ip_lookup_service'];
+        $localDataExists = file_exists($ipLookupService->getLocalDataStoreFilepath());
 
         $builder->add(
             'fetch_button',

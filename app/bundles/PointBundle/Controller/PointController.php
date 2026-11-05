@@ -24,7 +24,7 @@ final class PointController extends AbstractFormController
     }
 
     #[Route(
-        '/s/points/{objectAction}/{objectId}',
+        path: '/s/points/{objectAction}/{objectId}',
         name: 'mautic_point_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -35,7 +35,7 @@ final class PointController extends AbstractFormController
     }
 
     #[Route(
-        '/s/points/{page}',
+        path: '/s/points/{page}',
         name: 'mautic_point_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -122,7 +122,7 @@ final class PointController extends AbstractFormController
      *
      * @param Point $entity
      */
-    public function newAction(Request $request, $entity = null): Response
+    public function newAction(Request $request, ?object $entity = null): Response
     {
         if (!$entity instanceof Point) {
             /** @var Point $entity */
@@ -207,7 +207,9 @@ final class PointController extends AbstractFormController
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
-                'route'         => $this->generateUrl('mautic_point_action', [
+                'route'         => $this->generateUrl(
+                    'mautic_point_action',
+                    [
                     'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
                     'objectId'     => $entity->getId(),
                 ]
@@ -337,7 +339,9 @@ final class PointController extends AbstractFormController
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
-                'route'         => $this->generateUrl('mautic_point_action', [
+                'route'         => $this->generateUrl(
+                    'mautic_point_action',
+                    [
                     'objectAction' => 'edit',
                     'objectId'     => $entity->getId(),
                 ]

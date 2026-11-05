@@ -18,10 +18,10 @@ use Mautic\DashboardBundle\Model\DashboardModel;
 use Mautic\PageBundle\Model\PageModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -31,12 +31,9 @@ use Symfony\Component\Routing\RouterInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
+final class DashboardControllerTest extends TestCase
 {
-    /**
-     * @var MockObject&Request
-     */
-    private MockObject $requestMock;
+    private Request $request;
 
     /**
      * @var MockObject&Translator
@@ -64,17 +61,12 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->requestMock        = $this->createMock(Request::class);
+        $this->request            = Request::create('/');
         $this->dashboardModelMock = $this->createMock(DashboardModel::class);
         $this->routerMock         = $this->createMock(RouterInterface::class);
         $this->containerMock      = $this->createMock(Container::class);
         $this->translatorMock     = $this->createMock(Translator::class);
-        $requestStack             = new RequestStack([$this->requestMock]);
-
-        // The mock does not run the Request constructor, so initialize the bags manually.
-        $this->requestMock->attributes = new InputBag();
-        $this->requestMock->query      = new InputBag();
-        $this->requestMock->request    = new InputBag();
+        $requestStack             = new RequestStack([$this->request]);
 
         $this->controller = new DashboardController(
             $this->createStub(ManagerRegistry::class),
@@ -102,45 +94,34 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    private function makeAjaxPostRequest(): void
+    {
+        $this->request->setMethod(Request::METHOD_POST);
+        $this->request->headers->set('X-Requested-With', 'XMLHttpRequest');
+        $this->request->query->set('name', 'mockName');
+    }
+
     public function testSaveWithGetWillCallAccessDenied(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('isMethod')
-            ->willReturn(true);
-
-        $this->requestMock->expects($this->once())
-            ->method('isXmlHttpRequest')
-            ->willReturn(false);
-
         $this->expectException(AccessDeniedHttpException::class);
-        $this->controller->saveAction($this->requestMock);
+        $this->controller->saveAction($this->request);
     }
 
     public function testSaveWithPostNotAjaxWillCallAccessDenied(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('isMethod')
-            ->willReturn(true);
-
-        $this->requestMock->method('isXmlHttpRequest')
-            ->willReturn(false);
+        $this->request->setMethod(Request::METHOD_POST);
 
         $this->translatorMock->expects($this->once())
             ->method('trans')
             ->with('mautic.core.url.error.401');
 
         $this->expectException(AccessDeniedHttpException::class);
-        $this->controller->saveAction($this->requestMock);
+        $this->controller->saveAction($this->request);
     }
 
     public function testSaveWithPostAjaxWillSave(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('isMethod')
-            ->willReturn(true);
-
-        $this->requestMock->method('isXmlHttpRequest')->willReturn(true);
-        $this->requestMock->query = new InputBag(['name' => 'mockName']);
+        $this->makeAjaxPostRequest();
 
         $twig = $this->createStub(Environment::class);
         $twig->method('render')->willReturn('');
@@ -166,23 +147,16 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.dashboard.notice.save');
 
-        $this->controller->saveAction($this->requestMock);
+        $this->controller->saveAction($this->request);
     }
 
     public function testSaveWithPostAjaxWillNotBeAbleToSave(): void
     {
-        $this->requestMock->expects($this->once())
-            ->method('isMethod')
-            ->willReturn(true);
-
-        $this->requestMock->method('isXmlHttpRequest')
-            ->willReturn(true);
+        $this->makeAjaxPostRequest();
 
         $this->routerMock
             ->method('generate')
             ->willReturn('https://some.url');
-
-        $this->requestMock->query = new InputBag(['name' => 'mockName']);
 
         $twig = $this->createStub(Environment::class);
         $twig->method('render')->willReturn('');
@@ -204,16 +178,13 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.dashboard.error.save');
 
-        $this->controller->saveAction($this->requestMock);
+        $this->controller->saveAction($this->request);
     }
 
     public function testWidgetDirectRequest(): void
     {
-        $this->requestMock->method('isXmlHttpRequest')
-            ->willReturn(false);
-
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->widgetAction($this->requestMock, $this->createStub(Widget::class), $this->createStub(Environment::class), 1);
+        $this->controller->widgetAction($this->request, $this->createStub(Widget::class), $this->createStub(Environment::class), 1);
     }
 
     public function testWidgetNotFound(): void
@@ -221,13 +192,12 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $widgetId = '1';
         $twig     = $this->createStub(Environment::class);
 
-        $this->requestMock->method('isXmlHttpRequest')
-            ->willReturn(true);
+        $this->request->headers->set('X-Requested-With', 'XMLHttpRequest');
 
         $widgetService = $this->createMock(Widget::class);
         $widgetService->expects($this->once())
             ->method('setFilter')
-            ->with($this->requestMock);
+            ->with($this->request);
         $widgetService->expects($this->once())
             ->method('get')
             ->with((int) $widgetId)
@@ -237,7 +207,7 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('get');
 
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->widgetAction($this->requestMock, $widgetService, $twig, $widgetId);
+        $this->controller->widgetAction($this->request, $widgetService, $twig, $widgetId);
     }
 
     public function testWidget(): void
@@ -251,19 +221,18 @@ final class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('render')
             ->willReturn($renderedContent);
 
-        $this->requestMock->method('isXmlHttpRequest')
-            ->willReturn(true);
+        $this->request->headers->set('X-Requested-With', 'XMLHttpRequest');
 
         $widgetService = $this->createMock(Widget::class);
         $widgetService->expects($this->once())
             ->method('setFilter')
-            ->with($this->requestMock);
+            ->with($this->request);
         $widgetService->expects($this->once())
             ->method('get')
             ->with((int) $widgetId)
             ->willReturn($widget);
 
-        $response = $this->controller->widgetAction($this->requestMock, $widgetService, $twig, $widgetId);
+        $response = $this->controller->widgetAction($this->request, $widgetService, $twig, $widgetId);
 
         $this->assertSame('{"success":1,"widgetId":"1","widgetHtml":"lfsadkdhf\u016fasfjds","widgetWidth":null,"widgetHeight":null}', $response->getContent());
     }

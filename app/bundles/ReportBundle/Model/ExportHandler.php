@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\ReportBundle\Exception\FileIOException;
 
-class ExportHandler
+final class ExportHandler
 {
     /**
      * @var string
@@ -22,7 +22,7 @@ class ExportHandler
     }
 
     /**
-     * @return bool|resource
+     * @return resource
      *
      * @throws FileIOException
      */

@@ -309,7 +309,7 @@ final class CampaignRotationTest extends MauticMysqlTestCase
     private function clearEm(): void
     {
         foreach ([Campaign::class, Event::class, LeadEventLog::class] as $entity) {
-            $this->em->clear($entity);
+            $this->em->clear();
         }
     }
 }

@@ -13,21 +13,22 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
+final class AbstractFormControllerTest extends TestCase
 {
     private AbstractFormController $classFromAbstractFormController;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Form
+     * @var MockObject&Form
      */
-    private \PHPUnit\Framework\MockObject\MockObject $formMock;
+    private MockObject $formMock;
 
     private RequestStack $requestStack;
 
@@ -90,10 +91,14 @@ final class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
         return (bool) $method->invoke($this->classFromAbstractFormController, $form);
     }
 
-    private function prepareRequestStack(mixed $inputBagParameters): void
+    /**
+     * A real request rather than a mock: Request::$request is typed InputBag, which
+     * Symfony 8 made final, so PHPUnit can no longer double it for the typed property.
+     *
+     * @param array<string, mixed> $inputBagParameters
+     */
+    private function prepareRequestStack(array $inputBagParameters): void
     {
-        $requestMock          = $this->createMock(Request::class);
-        $requestMock->request = new InputBag($inputBagParameters);
-        $this->requestStack->push($requestMock);
+        $this->requestStack->push(new Request([], $inputBagParameters));
     }
 }

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 /**
  * @extends CommonRepository<StatDevice>
  */
-class StatDeviceRepository extends CommonRepository
+final class StatDeviceRepository extends CommonRepository
 {
     public function getDeviceStats($emailIds, ?\DateTime $fromDate = null, ?\DateTime $toDate = null): array
     {

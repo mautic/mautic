@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Event\EmailOnTogglePublishEvent;
@@ -325,7 +327,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->em->getRepository(Email::class)->find($email->getId());
+        $email = $this->getContainer()->get(EmailRepository::class)->find($email->getId());
         $this->assertInstanceOf(Email::class, $email);
         $this->assertFalse($email->isPublished(), 'The email should not be published.');
         $this->assertInstanceOf(EmailEvent::class, $dispatchedEvent, 'The event should have been dispatched.');
@@ -370,7 +372,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<int, mixed> $segments
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
      */
     private function createEmailWithParams(string $name, string $subject, string $emailType, string $template, string $customHtml, array $segments = []): Email
     {

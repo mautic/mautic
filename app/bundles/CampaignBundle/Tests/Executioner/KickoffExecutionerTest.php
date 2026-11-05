@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
@@ -20,29 +21,32 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
-final class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
+#[AllowMockObjectsWithoutExpectations]
+final class KickoffExecutionerTest extends TestCase
 {
     private MockObject&KickoffContactFinder $kickoffContactFinder;
 
-    private \PHPUnit\Framework\MockObject\Stub&Translator $translator;
+    private Stub&Translator $translator;
 
     private MockObject&EventExecutioner $executioner;
 
     private MockObject&EventScheduler $scheduler;
 
-    private \PHPUnit\Framework\MockObject\Stub&CoreParametersHelper $coreParametersHelper;
+    private Stub&CoreParametersHelper $coreParametersHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&EventRedirectionHelper $redirectionHelper;
+    private Stub&EventRedirectionHelper $redirectionHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&EntityManagerInterface $entityManager;
+    private Stub&EntityManagerInterface $entityManager;
 
-    private \PHPUnit\Framework\MockObject\Stub&EventDispatcherInterface $eventDispatcher;
+    private Stub&EventDispatcherInterface $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -58,10 +62,7 @@ final class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
 
     public function testNoContactsResultInEmptyResults(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->expects($this->once())
-            ->method('getRootEvents')
-            ->willReturn(new ArrayCollection());
+        $campaign = new Campaign();
 
         $limiter = new ContactLimiter(0, 0, 0, 0);
 
@@ -89,14 +90,14 @@ final class KickoffExecutionerTest extends \PHPUnit\Framework\TestCase
         $event2   = new Event();
         $campaign = new class() extends Campaign {
             /**
-             * @var ArrayCollection<int,Event>
+             * @var Collection<int,Event>
              */
-            public ArrayCollection $rootEvents;
+            public Collection $rootEvents;
 
             /**
-             * @return ArrayCollection<int,Event>
+             * @return Collection<int,Event>
              */
-            public function getRootEvents(): ArrayCollection
+            public function getRootEvents(): Collection
             {
                 return $this->rootEvents;
             }

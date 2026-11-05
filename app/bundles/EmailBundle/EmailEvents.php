@@ -23,21 +23,6 @@ final class EmailEvents
     public const string EMAIL_ON_SEND = 'mautic.email_on_send';
 
     /**
-     * The mautic.on_email_parse event is dispatched when a monitored email box retrieves messages.
-     *
-     * The event listener receives a Mautic\EmailBundle\Event\ParseEmailEvent instance.
-     */
-    public const string EMAIL_PARSE = 'mautic.on_email_parse';
-
-    /**
-     * The mautic.on_email_pre_fetch event is dispatched prior to fetching email through a configured monitored inbox in order to set
-     * search criteria for the mail to be fetched.
-     *
-     * The event listener receives a Mautic\EmailBundle\Event\ParseEmailEvent instance.
-     */
-    public const string EMAIL_PRE_FETCH = 'mautic.on_email_pre_fetch';
-
-    /**
      * The mautic.on_email_failed event is dispatched when an email has failed to clear the queue and is about to be deleted
      * in order to give a bundle a chance to do an action based on failed email if required.
      *

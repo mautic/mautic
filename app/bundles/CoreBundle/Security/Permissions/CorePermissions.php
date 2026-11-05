@@ -19,6 +19,9 @@ class CorePermissions implements ResetInterface
 
     private array $permissionObjectsByClass = [];
 
+    /**
+     * @var array<string, AbstractPermissions>
+     */
     private array $permissionObjectsByName = [];
 
     private array $grantedPermissions = [];
@@ -36,7 +39,7 @@ class CorePermissions implements ResetInterface
         private readonly CoreParametersHelper $coreParametersHelper,
         private readonly array $bundles,
         private readonly array $pluginBundles,
-        #[AutowireIterator('mautic.permissions')]
+        #[AutowireIterator(tag: 'mautic.permissions')]
         iterable $permissionObjects = [],
     ) {
         $this->registerPermissionClasses();
@@ -59,6 +62,8 @@ class CorePermissions implements ResetInterface
 
     /**
      * Retrieves all permission objects.
+     *
+     * @return array<string, AbstractPermissions>
      */
     public function getPermissionObjects(): array
     {

@@ -8,14 +8,14 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<LeadDevice>
  */
-class LeadDeviceRepository extends CommonRepository
+final class LeadDeviceRepository extends CommonRepository
 {
     /**
      * {@inhertidoc}.
      *
      * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder($this->getTableAlias())
@@ -30,10 +30,7 @@ class LeadDeviceRepository extends CommonRepository
         return 'd';
     }
 
-    /**
-     * @return array
-     */
-    public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null)
+    public function getDevice(Lead $lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null): array
     {
         $selectQuery = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $selectQuery->select('es.id as id, es.device as device')
@@ -45,7 +42,7 @@ class LeadDeviceRepository extends CommonRepository
             }
 
             $or = $selectQuery->expr()->or(
-                ...array_map(fn ($key, $deviceName) => $selectQuery->expr()->eq('es.device', ':device'.$key), array_keys($deviceNames), $deviceNames)
+                ...array_map(fn ($key, $deviceName): string => $selectQuery->expr()->eq('es.device', ':device'.$key), array_keys($deviceNames), $deviceNames)
             );
             $selectQuery->andWhere($or);
             foreach ($deviceNames as $key => $deviceName) {
@@ -59,7 +56,7 @@ class LeadDeviceRepository extends CommonRepository
             }
 
             $or = $selectQuery->expr()->or(
-                ...array_map(fn ($key, $deviceBrand) => $selectQuery->expr()->eq('es.device_brand', ':deviceBrand'.$key), array_keys($deviceBrands), $deviceBrands)
+                ...array_map(fn ($key, $deviceBrand): string => $selectQuery->expr()->eq('es.device_brand', ':deviceBrand'.$key), array_keys($deviceBrands), $deviceBrands)
             );
             $selectQuery->andWhere($or);
             foreach ($deviceBrands as $key => $deviceBrand) {
@@ -73,7 +70,7 @@ class LeadDeviceRepository extends CommonRepository
             }
 
             $or = $selectQuery->expr()->or(
-                ...array_map(fn ($key, $deviceModel) => $selectQuery->expr()->eq('es.device_model', ':deviceModel'.$key), array_keys($deviceModels), $deviceModels)
+                ...array_map(fn ($key, $deviceModel): string => $selectQuery->expr()->eq('es.device_model', ':deviceModel'.$key), array_keys($deviceModels), $deviceModels)
             );
             $selectQuery->andWhere($or);
             foreach ($deviceModels as $key => $deviceModel) {
@@ -87,7 +84,7 @@ class LeadDeviceRepository extends CommonRepository
             }
 
             $or = $selectQuery->expr()->or(
-                ...array_map(fn ($key, $deviceOs) => $selectQuery->expr()->eq('es.device_os_name', ':deviceOs'.$key), array_keys($deviceOss), $deviceOss)
+                ...array_map(fn ($key, $deviceOs): string => $selectQuery->expr()->eq('es.device_os_name', ':deviceOs'.$key), array_keys($deviceOss), $deviceOss)
             );
             $selectQuery->andWhere($or);
             foreach ($deviceOss as $key => $deviceOs) {
@@ -99,9 +96,10 @@ class LeadDeviceRepository extends CommonRepository
             $selectQuery->andWhere(
                 $selectQuery->expr()->eq('es.id', $deviceId)
             );
-        } elseif (null !== $lead) {
+        } elseif ($lead) {
+            /** @var Lead $lead */
             $selectQuery->andWhere(
-                $selectQuery->expr()->eq('es.lead_id', $lead->getId())
+                $selectQuery->expr()->eq('es.lead_id', (string) $lead->getId())
             );
         }
 
@@ -111,19 +109,11 @@ class LeadDeviceRepository extends CommonRepository
         return $device[0] ?? [];
     }
 
-    /**
-     * @param string $trackingId
-     *
-     * @return LeadDevice|null
-     */
-    public function getByTrackingId($trackingId)
+    public function getByTrackingId(string $trackingId): ?LeadDevice
     {
-        /** @var LeadDevice $leadDevice */
-        $leadDevice = $this->findOneBy([
+        return $this->findOneBy([
             'trackingId' => $trackingId,
         ]);
-
-        return $leadDevice;
     }
 
     /**
@@ -162,12 +152,12 @@ class LeadDeviceRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_devices')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId)
+            ->set('lead_id', $toLeadId)
+            ->where('lead_id = '.$fromLeadId)
             ->executeStatement();
     }
 

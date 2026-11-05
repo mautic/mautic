@@ -7,41 +7,54 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Service\Attribute\Required;
 
 trait FrequencyRuleTrait
 {
-    protected $leadLists;
+    /**
+     * @var array<LeadList>
+     */
+    protected array $leadLists = [];
 
     protected $dncChannels;
 
-    /**
-     * @var bool
-     */
-    protected $isPublicView = false;
+    protected bool $isPublicView = false;
 
     private \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel;
 
     private RequestStack $requestStack;
 
+    private LeadModel $frequencyRuleLeadModel;
+
+    private EmailModel $frequencyRuleEmailModel;
+
+    #[Required]
+    public function autowireFrequencyRuleTrait(
+        \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
+        RequestStack $requestStack,
+        LeadModel $frequencyRuleLeadModel,
+        EmailModel $frequencyRuleEmailModel,
+    ): void {
+        $this->doNotContactModel = $doNotContactModel;
+        $this->requestStack = $requestStack;
+        $this->frequencyRuleLeadModel = $frequencyRuleLeadModel;
+        $this->frequencyRuleEmailModel = $frequencyRuleEmailModel;
+    }
+
     /**
-     * @param array $viewParameters
-     *
      * @return true|FormInterface
      */
-    protected function getFrequencyRuleForm(Lead $lead, &$viewParameters = [], &$data = null, bool $isPublic = false, $action = null, bool $isPreferenceCenter = false)
+    protected function getFrequencyRuleForm(Lead $lead, array &$viewParameters = [], &$data = null, bool $isPublic = false, $action = null, bool $isPreferenceCenter = false)
     {
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead');
 
-        $leadChannels = $model->getContactChannels($lead);
-        $allChannels  = $model->getPreferenceChannels();
-        $leadLists    = $model->getLists($lead, true, true, $isPublic, $isPreferenceCenter);
+        $leadChannels = $this->frequencyRuleLeadModel->getContactChannels($lead);
+        $allChannels  = $this->frequencyRuleLeadModel->getPreferenceChannels();
+        $leadLists    = $this->frequencyRuleLeadModel->getLists($lead, true, true, $isPublic, $isPreferenceCenter);
 
         $viewParameters = array_merge(
             $viewParameters,
@@ -55,9 +68,7 @@ trait FrequencyRuleTrait
         // find the email
         $currentChannelId = null;
         if (!empty($viewParameters['idHash'])) {
-            $emailModel = $this->getModel('email');
-            \assert($emailModel instanceof EmailModel);
-            if ($stat = $emailModel->getEmailStatus($viewParameters['idHash'])) {
+            if ($stat = $this->frequencyRuleEmailModel->getEmailStatus($viewParameters['idHash'])) {
                 if ($email = $stat->getEmail()) {
                     $currentChannelId = $email->getId();
                 }
@@ -100,13 +111,11 @@ trait FrequencyRuleTrait
     {
         $data = [];
 
-        /** @var LeadModel $model */
-        $model = $this->getModel('lead');
-        $allChannels ??= $model->getPreferenceChannels();
+        $allChannels ??= $this->frequencyRuleLeadModel->getPreferenceChannels();
 
-        $leadChannels ??= $model->getContactChannels($lead);
+        $leadChannels ??= $this->frequencyRuleLeadModel->getContactChannels($lead);
 
-        $frequencyRules ??= $model->getFrequencyRules($lead);
+        $frequencyRules ??= $this->frequencyRuleLeadModel->getFrequencyRules($lead);
 
         foreach ($allChannels as $channel) {
             if (isset($frequencyRules[$channel])) {
@@ -127,11 +136,14 @@ trait FrequencyRuleTrait
             }
         }
 
-        $data['global_categories'] = $frequencyRules['global_categories'] ?? $model->getSubscribedAndNewCategoryIds(
-            $lead, ['global', 'email']);
+        $data['global_categories'] = $frequencyRules['global_categories'] ?? $this->frequencyRuleLeadModel->getSubscribedAndNewCategoryIds(
+            $lead,
+            ['global', 'email']
+        );
 
-        $this->leadLists    = $model->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
+        $this->leadLists    = $this->frequencyRuleLeadModel->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
+
         foreach ($this->leadLists as $leadList) {
             $data['lead_lists'][] = $leadList->getId();
         }
@@ -148,8 +160,6 @@ trait FrequencyRuleTrait
      */
     protected function persistFrequencyRuleFormData(Lead $lead, array $formData, array $allChannels, array $leadChannels, $currentChannelId = null): void
     {
-        /** @var LeadModel $leadModel */
-        $leadModel = $this->getModel('lead.lead');
 
         $request = $this->requestStack->getCurrentRequest();
         \assert(null !== $request);
@@ -171,15 +181,6 @@ trait FrequencyRuleTrait
                 $this->doNotContactModel->addDncForContact($lead->getId(), $channel, ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL, 'user');
             }
         }
-        $leadModel->setFrequencyRules($lead, $formData, $this->leadLists);
-    }
-
-    #[Required]
-    public function autowireFrequencyRuleTrait(
-        \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
-        RequestStack $requestStack,
-    ): void {
-        $this->doNotContactModel = $doNotContactModel;
-        $this->requestStack = $requestStack;
+        $this->frequencyRuleLeadModel->setFrequencyRules($lead, $formData, $this->leadLists);
     }
 }

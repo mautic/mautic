@@ -18,7 +18,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CampaignBundle\Validator\Constraints\NoOrphanEvents;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
@@ -55,6 +54,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     ]
 )]
 #[NoOrphanEvents]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'campaign_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'campaign_projects_xref'),
+)])]
 class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterface
 {
     use UuidTrait;
@@ -63,14 +68,17 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
 
     use ProjectTrait;
 
-    public const TABLE_NAME  = 'campaigns';
+    public const string TABLE_NAME  = 'campaigns';
 
-    public const ENTITY_NAME = 'campaign';
+    public const string ENTITY_NAME = 'campaign';
 
     /**
      * @var int
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -78,27 +86,26 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      */
     #[Groups(['campaign:read', 'campaign:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['campaign:read', 'campaign:write'])]
-    private $publishUp;
-
-    /**
-     * @var \DateTimeInterface|null
-     */
-    #[Groups(['campaign:read', 'campaign:write'])]
-    private $publishDown;
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $publishUp = null;
 
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $publishDown = null;
+
+    #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     public ?\DateTimeInterface $deleted = null;
 
     // see Mautic\CampaignBundle\Enum\RepublishBehavior for available values.
@@ -106,25 +113,24 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     #[ORM\Column(name: 'republish_behavior', type: Types::STRING, length: 32, nullable: true)]
     private ?string $republishBehavior = null;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['campaign:read', 'campaign:write'])]
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     /**
      * @var Collection<int, Event>|ArrayCollection<int, Event>
      */
     #[Groups(['campaign:read', 'campaign:write'])]
-    #[ORM\OneToMany(mappedBy: 'campaign', targetEntity: Event::class, cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
-    #[ORM\OrderBy(['order' => 'ASC'])]
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'campaign', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OrderBy(value: ['order' => 'ASC'])]
     private $events;
 
     /**
      * @var ArrayCollection<int, Lead>
      */
     #[Groups(['campaign:read', 'campaign:write'])]
-    #[ORM\OneToMany(mappedBy: 'campaign', targetEntity: Lead::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: Lead::class, mappedBy: 'campaign', fetch: 'EXTRA_LAZY')]
     private Collection $leads;
 
     /**
@@ -155,6 +161,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     private array $canvasSettings = [];
 
     #[Groups(['campaign:read', 'campaign:write'])]
+    #[ORM\Column(name: 'allow_restart', type: 'boolean')]
     private bool $allowRestart = false;
 
     public function __construct()
@@ -175,22 +182,6 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         $this->id     = null;
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->addPublishDates();
-
-        $builder->addCategory();
-
-        $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
-        $builder->addNullableField('deleted', 'datetime');
-
-        self::addProjectsField($builder, 'campaign_projects_xref', 'campaign_id');
     }
 
     /**
@@ -251,6 +242,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();
         if ('category' == $prop) {
+            /** @var Category|null $current */
+            /** @var Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -259,7 +252,8 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         } elseif ('projects' === $prop) {
             // Initialize project tracking on first change
             if (!isset($this->changes['projects']['old'])) {
-                $currentProjects           = array_map(fn ($project) => $project->getName(), iterator_to_array($current));
+                /** @var Collection<int, Project> $current */
+                $currentProjects = array_map(fn (Project $project): ?string => $project->getName(), $current->toArray());
                 $this->changes['projects'] = [
                     'old' => $currentProjects,
                     'new' => $currentProjects,
@@ -292,7 +286,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * Override to convert projects changes to final format.
      */
-    public function getChanges(bool $includePast = false)
+    public function getChanges(bool $includePast = false): array
     {
         $changes = parent::getChanges($includePast);
 
@@ -374,12 +368,15 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @return Collection<int, Event>
      */
-    public function getEvents()
+    public function getEvents(): Collection
     {
         return $this->events;
     }
 
-    public function getRootEvents(): ArrayCollection
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getRootEvents(): Collection
     {
         $criteria = Criteria::create()->where(
             Criteria::expr()->andX(
@@ -392,7 +389,10 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return $this->reindexEventsByIdKey($events);
     }
 
-    public function getInactionBasedEvents(): ArrayCollection
+    /**
+     * @return Collection<int, Event>
+     */
+    public function getInactionBasedEvents(): Collection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('decisionPath', Event::PATH_INACTION));
         $events   = $this->events->matching($criteria);
@@ -403,9 +403,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @param string $type
      *
-     * @return ArrayCollection<int,Event>
+     * @return Collection<int, Event>
      */
-    public function getEventsByType($type): ArrayCollection
+    public function getEventsByType($type): Collection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
         $events   = $this->events->matching($criteria);
@@ -414,9 +414,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     }
 
     /**
-     * @return ArrayCollection<int, Event>
+     * @return Collection<int, Event>
      */
-    public function getEmailSendEvents(): ArrayCollection
+    public function getEmailSendEvents(): Collection
     {
         $criteria = Criteria::create()->where(Criteria::expr()->eq('type', 'email.send'));
         $events   = $this->events->matching($criteria);
@@ -443,7 +443,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @param ?\DateTime $publishUp
      */
-    public function setPublishUp($publishUp): static
+    public function setPublishUp(?\DateTimeInterface $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -451,10 +451,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getPublishUp()
+    public function getPublishUp(): ?\DateTimeInterface
     {
         return $this->publishUp;
     }
@@ -462,7 +459,7 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
     /**
      * @param ?\DateTime $publishDown
      */
-    public function setPublishDown($publishDown): static
+    public function setPublishDown(?\DateTimeInterface $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -483,26 +480,17 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getPublishDown()
+    public function getPublishDown(): ?\DateTimeInterface
     {
         return $this->publishDown;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category): void
+    public function setCategory(?Category $category): void
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -655,6 +643,9 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
         return null !== $this->deleted;
     }
 
+    /**
+     * @return Collection<int, Lead>
+     */
     public function getContactMembership(Contact $contact): Collection
     {
         return $this->leads->matching(
@@ -668,8 +659,11 @@ class Campaign extends FormEntity implements OptimisticLockInterface, UuidInterf
      * Re-index collection by event ID to work around Doctrine's indexBy mapping issue.
      *
      * @see https://github.com/doctrine/doctrine2/issues/4693
+     *
+     * @return Collection<int, Event>
+     * @param Collection<int, Event> $events
      */
-    private function reindexEventsByIdKey(Collection $events): ArrayCollection
+    private function reindexEventsByIdKey(Collection $events): Collection
     {
         // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
         // @see https://github.com/doctrine/doctrine2/issues/4693

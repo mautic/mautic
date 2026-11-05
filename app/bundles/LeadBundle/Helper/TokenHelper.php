@@ -16,13 +16,12 @@ final class TokenHelper
 
     /**
      * @param string $content
-     * @param array  $lead
      * @param bool   $replace If true, search/replace will be executed on $content and the modified $content returned
      *                        rather than an array of found matches
      *
      * @return array|string
      */
-    public static function findLeadTokens($content, $lead, bool $replace = false)
+    public static function findLeadTokens($content, array|null $lead, bool $replace = false)
     {
         if (!$lead) {
             return $replace ? $content : [];

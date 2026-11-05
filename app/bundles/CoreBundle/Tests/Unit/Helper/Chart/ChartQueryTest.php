@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Chart;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -340,6 +340,70 @@ final class ChartQueryTest extends TestCase
 
         $this->createChartQuery();
         $query = $this->chartQuery->prepareTimeDataQuery($table, $column, $filters);
-        $this->assertInstanceOf(QueryBuilder::class, $query);
+        $this->assertSame($this->queryBuilder, $query);
+    }
+
+    public function testApplyFiltersRejectsRawSubquery(): void
+    {
+        $this->createChartQuery();
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $filters = [
+            'x' => [
+                'subquery' => '(SELECT IF(ASCII(SUBSTRING(database(),1,1))=109,SLEEP(3),0))',
+            ],
+        ];
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $this->chartQuery->applyFilters($queryBuilder, $filters);
+    }
+
+    public function testApplyFiltersRejectsInjectedColumnKey(): void
+    {
+        $this->createChartQuery();
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $filters = ['SLEEP(3)' => '1'];
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $this->chartQuery->applyFilters($queryBuilder, $filters);
+    }
+
+    public function testApplyFiltersRejectsInjectedLeadListColumnName(): void
+    {
+        $this->createChartQuery();
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $filters = [
+            'leadlist_id' => [
+                'value'            => '1',
+                'list_column_name' => 't.id OR SLEEP(3)',
+            ],
+        ];
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $this->chartQuery->applyFilters($queryBuilder, $filters);
+    }
+
+    /**
+     * Regression test using the exact extraction-oracle payload shape from the
+     * original security report (boolean-based blind exfiltration of
+     * users.password via a nested scalar subquery with a SLEEP() timing side
+     * channel). Quote-free on purpose: the payload must be rejected even when
+     * it survives input cleaning unchanged.
+     */
+    public function testApplyFiltersRejectsReportedExtractionOracle(): void
+    {
+        $this->createChartQuery();
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $filters = [
+            'x' => [
+                'subquery' => '(SELECT IF(SUBSTRING((SELECT password FROM users WHERE id=1),1,1)=CHAR(36),SLEEP(2),0))',
+            ],
+        ];
+        $queryBuilder = $this->createStub(QueryBuilder::class);
+        $this->chartQuery->applyFilters($queryBuilder, $filters);
     }
 }

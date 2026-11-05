@@ -25,6 +25,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -103,16 +104,16 @@ final class EmailApiController extends CommonApiController
      *
      * @param int $id Email ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/emails/{id}/send',
+        path: '/api/emails/{id}/send',
         name: 'mautic_api_sendemail',
         requirements: ['id' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function sendAction(Request $request, $id): Response
+    public function sendAction(Request $request, int $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -146,18 +147,17 @@ final class EmailApiController extends CommonApiController
      * Sends the email to a specific lead.
      *
      * @param int $id     Email ID
-     * @param int $leadId Lead ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/emails/{id}/contact/{leadId}/send',
+        path: '/api/emails/{id}/contact/{leadId}/send',
         name: 'mautic_api_sendcontactemail',
         requirements: ['id' => '\d+', 'leadId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function sendLeadAction(Request $request, $id, $leadId): Response
+    public function sendLeadAction(Request $request, int $id, int|string $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -224,7 +224,7 @@ final class EmailApiController extends CommonApiController
      * @param string $trackingHash
      */
     #[Route(
-        '/api/emails/reply/{trackingHash}',
+        path: '/api/emails/reply/{trackingHash}',
         name: 'mautic_api_reply',
         defaults: ['_format' => 'json'],
         methods: ['POST']
@@ -256,11 +256,10 @@ final class EmailApiController extends CommonApiController
      *
      * @param Email        $entity
      * @param mixed[]|null $parameters
-     * @param string       $method
      *
      * @return mixed
      */
-    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, object $entity, ?array $parameters = null, string $method = 'PUT')
     {
         if (array_key_exists('sendToDnc', $parameters)
             && !$this->security->isGranted('email:emails:sendtodnc')) {
@@ -271,6 +270,11 @@ final class EmailApiController extends CommonApiController
         if (Request::METHOD_PUT === $method && !array_key_exists('sendToDnc', $parameters)) {
             // use default value, in case of PUT method it does not use default value if entity is already exist and tried to call setter method with null value.
             $parameters['sendToDnc'] = false;
+        }
+
+        if (Request::METHOD_PATCH === $method && !array_key_exists('dynamicContent', $parameters)) {
+            // EmailType replaces a missing dynamicContent with the default one, so a partial update must send the current one.
+            $parameters['dynamicContent'] = $entity->getDynamicContent();
         }
 
         return parent::processForm($request, $entity, $parameters, $method);

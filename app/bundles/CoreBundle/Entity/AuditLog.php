@@ -5,105 +5,76 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: AuditLogRepository::class)]
 #[ORM\Table(name: 'audit_log')]
-#[ORM\Index(columns: ['object', 'object_id'], name: 'object_search')]
-#[ORM\Index(columns: ['bundle', 'object', 'action', 'object_id'], name: 'timeline_search')]
-#[ORM\Index(columns: ['date_added'], name: 'date_added_index')]
+#[ORM\Index(name: 'object_search', columns: ['object', 'object_id'])]
+#[ORM\Index(name: 'timeline_search', columns: ['bundle', 'object', 'action', 'object_id'])]
+#[ORM\Index(name: 'date_added_index', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class AuditLog
 {
     /**
-     * @var string
+     * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     protected $id;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'user_id', type: 'integer')]
     protected $userId;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'user_name', type: 'string', length: 191)]
     protected $userName;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 50)]
     protected $bundle;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 50)]
     protected $object;
 
     /**
-     * @var string
+     * @var int|string
      */
+    #[ORM\Column(name: 'object_id', type: 'bigint', options: ['unsigned' => true])]
     protected $objectId;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 50)]
     protected $action;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     protected $details = [];
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     protected $dateAdded;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'ip_address', type: 'string', length: 45)]
     protected $ipAddress;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->createField('userId', 'integer')
-            ->columnName('user_id')
-            ->build();
-
-        $builder->createField('userName', 'string')
-            ->columnName('user_name')
-            ->build();
-
-        $builder->createField('bundle', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('object', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->addBigIntIdField('objectId', 'object_id', false);
-
-        $builder->createField('action', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('details', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->addDateAdded();
-
-        $builder->createField('ipAddress', 'string')
-            ->columnName('ip_address')
-            ->length(45)
-            ->build();
-    }
 
     public function getId(): int
     {
@@ -186,10 +157,7 @@ class AuditLog
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getDetails()
+    public function getDetails(): array
     {
         return $this->details;
     }

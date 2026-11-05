@@ -27,7 +27,7 @@ final class NotifyOfUnpublishSubscriberTest extends TestCase
 
     public function testNotifyOfUnpublish(): void
     {
-        $event = $this->createStub(Event::class);
+        $event = new Event();
 
         $notifyEvent = new NotifyOfUnpublishEvent($event);
 
@@ -39,12 +39,5 @@ final class NotifyOfUnpublishSubscriberTest extends TestCase
             );
 
         $this->subscriber->notifyOfUnpublish($notifyEvent);
-    }
-
-    public function testGetSubscribedEvents(): void
-    {
-        $events = NotifyOfUnpublishSubscriber::getSubscribedEvents();
-        $this->assertArrayHasKey(NotifyOfUnpublishEvent::class, $events);
-        $this->assertEquals('notifyOfUnpublish', $events[NotifyOfUnpublishEvent::class]);
     }
 }

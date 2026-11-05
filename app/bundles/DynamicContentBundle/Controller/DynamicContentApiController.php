@@ -26,7 +26,7 @@ final class DynamicContentApiController extends CommonController
     }
 
     #[Route(
-        '/dwc/{objectAlias}',
+        path: '/dwc/{objectAlias}',
         name: 'mautic_api_dynamicContent_action',
     )]
     public function processAction(Request $request, $objectAlias): Response
@@ -49,7 +49,7 @@ final class DynamicContentApiController extends CommonController
     }
 
     #[Route(
-        '/dwc',
+        path: '/dwc',
         name: 'mautic_api_dynamicContent_index',
     )]
     public function getAction(
@@ -62,7 +62,7 @@ final class DynamicContentApiController extends CommonController
         $lead          = $contactRequestHelper->getContactFromQuery($this->pageModel->getHitQuery($request));
         $content       = $helper->getDynamicContentForLead($objectAlias, $lead);
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
-        $deviceId      = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+        $deviceId      = ($trackedDevice?->getTrackingId());
 
         return empty($content)
             ? new Response('', Response::HTTP_NO_CONTENT)

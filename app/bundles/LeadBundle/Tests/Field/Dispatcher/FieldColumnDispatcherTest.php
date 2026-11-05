@@ -12,9 +12,10 @@ use Mautic\LeadBundle\Field\Event\UpdateColumnEvent;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class FieldColumnDispatcherTest extends \PHPUnit\Framework\TestCase
+final class FieldColumnDispatcherTest extends TestCase
 {
     public function testNoBackground(): void
     {

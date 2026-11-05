@@ -7,9 +7,12 @@ namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection;
 use FOS\OAuthServerBundle\Event\OAuthEvent;
 use Mautic\ApiBundle\EventListener\ApiSubscriber;
 use Mautic\ApiBundle\EventListener\PreAuthorizationEventListener;
+use Mautic\AssetBundle\EventListener\BuilderSubscriber;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\EventListener\CampaignActionChangeMembershipSubscriber;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
+use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
+use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\CoreBundle\EventListener\AssetsSubscriber;
 use Mautic\CoreBundle\EventListener\ConfigThemeSubscriber;
 use Mautic\CoreBundle\EventListener\CoreSubscriber;
@@ -20,13 +23,18 @@ use Mautic\CoreBundle\EventListener\RequestSubscriber;
 use Mautic\CoreBundle\EventListener\RouterSubscriber;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\EventListener\CampaignConditionSubscriber;
 use Mautic\EmailBundle\EventListener\DateTimeTokenSubscriber;
+use Mautic\EmailBundle\EventListener\EmailSubscriber;
 use Mautic\EmailBundle\EventListener\PointSubscriber;
 use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
 use Mautic\EmailBundle\EventListener\TokenSubscriber;
+use Mautic\EmailBundle\EventListener\WebhookSubscriber;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\EventListener\FormValidationSubscriber;
 use Mautic\IntegrationsBundle\EventListener\ControllerSubscriber;
+use Mautic\IntegrationsBundle\EventListener\LeadSubscriber;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\EventListener\CampaignActionDeleteContactSubscriber;
 use Mautic\LeadBundle\EventListener\CampaignActionDNCSubscriber;
 use Mautic\LeadBundle\EventListener\OwnerSubscriber;
@@ -43,7 +51,10 @@ use Mautic\UserBundle\EventListener\ApiUserSubscriber;
 use Mautic\UserBundle\EventListener\LogoutListener;
 use Mautic\UserBundle\EventListener\PasswordStrengthSubscriber;
 use Mautic\UserBundle\EventListener\PasswordSubscriber;
+use MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber;
 use MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber;
+use MauticPlugin\MauticFocusBundle\EventListener\ReportSubscriber;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
@@ -52,7 +63,7 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
 {
     /**
-     * There are 299 local event subscribers in the container, keep a small reserve for removed ones.
+     * There are 300 local event subscribers in the container, keep a small reserve for removed ones.
      */
     private const int MINIMAL_EVENT_SUBSCRIBER_COUNT = 297;
 
@@ -104,13 +115,13 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             CoreSubscriber::class,
         ],
         CampaignBuilderEvent::class => [
-            \MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber::class,
+            CampaignSubscriber::class,
             \Mautic\AssetBundle\EventListener\CampaignSubscriber::class,
             CampaignActionChangeMembershipSubscriber::class,
             CampaignActionJumpToEventSubscriber::class,
             \Mautic\ChannelBundle\EventListener\CampaignSubscriber::class,
             \Mautic\DynamicContentBundle\EventListener\CampaignSubscriber::class,
-            \Mautic\EmailBundle\EventListener\CampaignConditionSubscriber::class,
+            CampaignConditionSubscriber::class,
             \Mautic\EmailBundle\EventListener\CampaignSubscriber::class,
             \Mautic\FormBundle\EventListener\CampaignSubscriber::class,
             CampaignActionDNCSubscriber::class,
@@ -127,7 +138,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
         ],
         ReportBuilderEvent::class => [
             FocusSubscriber::class,
-            \MauticPlugin\MauticFocusBundle\EventListener\ReportSubscriber::class,
+            ReportSubscriber::class,
             \Mautic\AssetBundle\EventListener\ReportSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ReportSubscriber::class,
             \Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
@@ -144,7 +155,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\PageBundle\EventListener\ReportSubscriber::class,
             \Mautic\PointBundle\EventListener\ReportSubscriber::class,
         ],
-        'mautic.config_on_generate' => [
+        ConfigBuilderEvent::class => [
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\AssetBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
@@ -161,7 +172,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
             \Mautic\WebhookBundle\EventListener\ConfigSubscriber::class,
         ],
-        'mautic.config_pre_save' => [
+        ConfigPreSaveEvent::class => [
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
@@ -170,14 +181,14 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
         ],
         EmailSendEvent::class => [
-            \Mautic\AssetBundle\EventListener\BuilderSubscriber::class,
+            BuilderSubscriber::class,
             \Mautic\EmailBundle\EventListener\BuilderSubscriber::class,
             DateTimeTokenSubscriber::class,
-            \Mautic\EmailBundle\EventListener\EmailSubscriber::class,
+            EmailSubscriber::class,
             PointSubscriber::class,
             ProcessUnsubscribeSubscriber::class,
             TokenSubscriber::class,
-            \Mautic\EmailBundle\EventListener\WebhookSubscriber::class,
+            WebhookSubscriber::class,
             \Mautic\IntegrationsBundle\EventListener\EmailSubscriber::class,
             \Mautic\LeadBundle\EventListener\EmailSubscriber::class,
             OwnerSubscriber::class,
@@ -191,8 +202,8 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\LeadBundle\EventListener\FormSubscriber::class,
             \Mautic\PluginBundle\EventListener\FormSubscriber::class,
         ],
-        'mautic.lead_post_save' => [
-            \Mautic\IntegrationsBundle\EventListener\LeadSubscriber::class,
+        LeadPostSaveEvent::class => [
+            LeadSubscriber::class,
             \Mautic\LeadBundle\EventListener\LeadSubscriber::class,
             \Mautic\LeadBundle\EventListener\WebhookSubscriber::class,
             \Mautic\PluginBundle\EventListener\LeadSubscriber::class,
@@ -210,7 +221,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
         $eventSubscriberClasses = [];
 
         foreach ($this->resolveEventSubscribers() as $eventSubscriber) {
-            foreach (array_keys($eventSubscriber::getSubscribedEvents()) as $eventName) {
+            foreach ($this->resolveSubscribedEventNames($eventSubscriber) as $eventName) {
                 $eventSubscriberClasses[$eventName][] = $eventSubscriber::class;
             }
         }
@@ -228,13 +239,51 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
     }
 
     /**
-     * @return array<int, EventSubscriberInterface>
+     * @return array<int, object>
      */
     private function resolveEventSubscribers(): array
     {
         return array_filter(
             $this->createAllServices(),
-            fn (object $service): bool => $service instanceof EventSubscriberInterface && $this->isLocalService($service)
+            fn (object $service): bool => $this->isEventListener($service) && $this->isLocalService($service)
         );
+    }
+
+    private function isEventListener(object $service): bool
+    {
+        if ($service instanceof EventSubscriberInterface) {
+            return true;
+        }
+
+        return $this->resolveAttributeEventNames($service) !== [];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function resolveSubscribedEventNames(object $service): array
+    {
+        if ($service instanceof EventSubscriberInterface) {
+            return array_keys($service::getSubscribedEvents());
+        }
+
+        return $this->resolveAttributeEventNames($service);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function resolveAttributeEventNames(object $service): array
+    {
+        $eventNames = [];
+
+        $reflectionClass = new \ReflectionClass($service);
+        foreach ($reflectionClass->getMethods() as $reflectionMethod) {
+            foreach ($reflectionMethod->getAttributes(AsEventListener::class) as $reflectionAttribute) {
+                $eventNames[] = $reflectionAttribute->newInstance()->event;
+            }
+        }
+
+        return array_unique($eventNames);
     }
 }

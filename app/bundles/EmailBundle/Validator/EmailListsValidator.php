@@ -49,7 +49,7 @@ final class EmailListsValidator extends ConstraintValidator
         $violations = $this->context->getValidator()->validate(
             $email->getExcludedLists(),
             [
-                new LeadListAccess(['allowEmpty' => true]),
+                new LeadListAccess(allowEmpty: true),
             ]
         );
         $this->addViolationsAtPath($violations, 'excludedLists');

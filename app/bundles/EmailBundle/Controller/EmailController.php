@@ -3,9 +3,10 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -30,13 +31,14 @@ use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class EmailController extends FormController
+final class EmailController extends AbstractStandardFormController
 {
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
@@ -68,7 +70,7 @@ final class EmailController extends FormController
     private bool $invalidHtmlError = false;
 
     #[Route(
-        '/s/emails/{objectAction}/{objectId}',
+        path: '/s/emails/{objectAction}/{objectId}',
         name: 'mautic_email_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -79,12 +81,12 @@ final class EmailController extends FormController
     }
 
     #[Route(
-        '/s/emails/{page}',
+        path: '/s/emails/{page}',
         name: 'mautic_email_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, EmailSearchScopeProvider $emailSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, EmailModel $model, EmailConfig $emailConfig, ThemeHelper $themeHelper, EmailSearchScopeProvider $emailSearchScopeProvider, int $page = 1): Response
     {
         $isDraftEnabled = $emailConfig->isDraftEnabled();
         // set some permissions
@@ -304,8 +306,6 @@ final class EmailController extends FormController
      */
     public function viewAction(Request $request, EmailModel $model, EmailConfig $emailConfig, AbTestSettingsService $abTestSettingsService, AbTestResultService $abTestResultService, $objectId): Response
     {
-        $security = $this->security;
-
         /** @var Email $email */
         $email   = $model->getEntity($objectId);
         $session = $request->getSession();
@@ -429,10 +429,10 @@ final class EmailController extends FormController
                 'criteria'                   => $criteria['criteria'],
                 'winnerCriteria'             => $abTestSettings ? $abTestSettings['winnerCriteria'] : null,
                 'configurationError'         => $abTestSettings ? $abTestSettings['configurationError'] : null,
-                'hoursLeftToDetermineWinner' => $parent ? $model->timeLeftToDetermineWinner(
+                'hoursLeftToDetermineWinner' => $model->timeLeftToDetermineWinner(
                     $parent->getId(),
                     $abTestSettings['sendWinnerDelay'] ?? null
-                ) : null,
+                ),
                 'abTestSettings'             => $abTestSettings ?? [],
             ];
 
@@ -457,7 +457,7 @@ final class EmailController extends FormController
                     'clickCountsSorting' => $clickCountsSorting,
                     'variants'           => $variants,
                     'translations'       => $translations,
-                    'permissions'        => $security->isGranted(
+                    'permissions'        => $this->security->isGranted(
                         [
                             'email:emails:viewown',
                             'email:emails:viewother',
@@ -474,7 +474,7 @@ final class EmailController extends FormController
                         'RETURN_ARRAY'
                     ),
                     'abTestResults'   => $abTestResults,
-                    'security'        => $security,
+                    'security'        => $this->security,
                     'draftPreviewUrl' => $draftPreviewUrl,
                     'previewUrl'      => $this->generateUrl(
                         'mautic_email_preview',
@@ -524,7 +524,7 @@ final class EmailController extends FormController
         EmailConfig $emailConfig,
         EmailModel $model,
         ThemeHelper $themeHelper,
-        $entity = null,
+        ?object $entity = null,
     ): Response {
         if (!$entity instanceof Email) {
             $entity = $model->getEntity();
@@ -1104,7 +1104,7 @@ final class EmailController extends FormController
     /**
      * Clone an email and its translation/variant family.
      */
-    public function cloneWithTranslationsAction(Request $request, EmailModel $model, int $objectId): JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function cloneWithTranslationsAction(Request $request, EmailModel $model, int $objectId): JsonResponse|RedirectResponse|Response
     {
         $page = $request->getSession()->get('mautic.email.page', 1);
 
@@ -1260,7 +1260,7 @@ final class EmailController extends FormController
      * Activate the builder.
      *
      * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function builderAction(Request $request, ThemeHelper $themeHelper, $objectId): Response
     {
@@ -1383,8 +1383,10 @@ final class EmailController extends FormController
             }
 
             // setting parent here, as the parent will be removed by the code below.
-            $parent = $entity->getVariantParent() ?? $entity;
-            \assert($parent instanceof Email);
+            $parent = $entity->getVariantParent();
+            if (!$parent instanceof Email) {
+                $parent = $entity;
+            }
 
             $this->emailModel->convertWinnerVariant($entity);
 
@@ -1403,7 +1405,7 @@ final class EmailController extends FormController
                 'objectAction' => 'view',
                 'objectId'     => $objectId,
             ];
-            $postActionVars['returnUrl']       = $this->generateUrl('mautic_page_action', $postActionVars['viewParameters']);
+            $postActionVars['returnUrl']       = $this->generateUrl('mautic_email_action', $postActionVars['viewParameters']);
             $postActionVars['contentTemplate'] = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
         } // else don't do anything
 
@@ -1420,7 +1422,7 @@ final class EmailController extends FormController
     /**
      * Manually sends emails.
      */
-    public function sendAction(Request $request, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
+    public function sendAction(Request $request, $objectId): Response|RedirectResponse
     {
         $entity  = $this->emailModel->getEntity($objectId);
         $session = $request->getSession();
@@ -1764,7 +1766,8 @@ final class EmailController extends FormController
                 }
 
                 if ($previewForContactId
-                    && (!$security->isAdmin()
+                    && (
+                        !$security->isAdmin()
                         || !$security->hasEntityAccess('lead:leads:viewown', 'lead:leads:viewother', $user->getId())
                     )
                 ) {
@@ -1830,11 +1833,8 @@ final class EmailController extends FormController
         );
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
-        '/s/emails/view/{objectId}/contact/{page}',
+        path: '/s/emails/view/{objectId}/contact/{page}',
         name: 'mautic_email_contacts',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+', 'page' => '\d+'],
         defaults: ['objectId' => 0, 'page' => 0],
@@ -1843,7 +1843,7 @@ final class EmailController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1,
+        int $page = 1,
     ): Response {
         $permissions = [
             'lead:leads:viewown',
@@ -1865,7 +1865,7 @@ final class EmailController extends FormController
         );
     }
 
-    public function getModelName(): string
+    protected function getModelName(): string
     {
         return 'email';
     }
@@ -1892,6 +1892,10 @@ final class EmailController extends FormController
         $clonedEmail->setVariantReadCount($cloningEmail->getVariantReadCount());
         $clonedEmail->setVariantStartDate($cloningEmail->getVariantStartDate());
         $clonedEmail->setEmailType($cloningEmail->getEmailType());
+        $clonedEmail->setPlainText($cloningEmail->getPlainText());
+        $clonedEmail->setPublishUp($cloningEmail->getPublishUp());
+        $clonedEmail->setPublishDown($cloningEmail->getPublishDown());
+        $clonedEmail->setContinueSending($cloningEmail->getContinueSending());
         $clonedEmail->setDraft($cloningEmail->getDraft());
     }
 

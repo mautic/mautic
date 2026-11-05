@@ -6,6 +6,7 @@ namespace Mautic\FormBundle\Command;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\FormBundle\Entity\FormRepository;
 use Psr\Log\LoggerInterface;
@@ -82,7 +83,7 @@ final class DeleteOrphanFormResultsTableCommand extends Command
 
         $validFormTables = $tempTables;
 
-        $allTables = $this->conn->createSchemaManager()->listTableNames();
+        $allTables = array_map(AssetName::fromName(...), $this->conn->createSchemaManager()->introspectTableNames());
 
         $inValidFormResultsTable = [];
 

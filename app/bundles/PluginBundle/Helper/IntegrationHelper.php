@@ -3,6 +3,7 @@
 namespace Mautic\PluginBundle\Helper;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -20,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Twig\Environment;
 
-class IntegrationHelper
+final class IntegrationHelper
 {
     /**
      * @var array<string, mixed>
@@ -44,12 +45,12 @@ class IntegrationHelper
 
     public function __construct(
         private readonly ContainerInterface $container,
-        protected EntityManagerInterface $em,
-        protected PathsHelper $pathsHelper,
-        protected BundleHelper $bundleHelper,
-        protected CoreParametersHelper $coreParametersHelper,
-        protected Environment $twig,
-        protected PluginModel $pluginModel,
+        private readonly EntityManagerInterface $em,
+        private readonly PathsHelper $pathsHelper,
+        private readonly BundleHelper $bundleHelper,
+        private readonly CoreParametersHelper $coreParametersHelper,
+        private readonly Environment $twig,
+        private readonly PluginModel $pluginModel,
         private readonly IntegrationRepository $integrationRepository,
         private readonly LeadRepository $leadRepository,
     ) {
@@ -58,15 +59,15 @@ class IntegrationHelper
     /**
      * Get a list of integration helper classes.
      *
-     * @param array|string $specificIntegrations
-     * @param array        $withFeatures
+     * @param array|string      $specificIntegrations
+     * @param string[]|string|null $withFeatures
      * @param bool         $alphabetical
      * @param int|null     $pluginFilter
      * @param bool|false   $publishedOnly
      *
      * @return array<AbstractIntegration>
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
      */
     public function getIntegrationObjects($specificIntegrations = null, $withFeatures = null, $alphabetical = false, $pluginFilter = null, $publishedOnly = false): array
     {
@@ -120,11 +121,14 @@ class IntegrationHelper
                             if ($this->container->has($integrationContainerKey)) {
                                 $this->integrations[$integrationName] = $this->container->get($integrationContainerKey);
 
-                                $features = $this->integrations[$integrationName]->getSupportedFeatures();
+                                /** @var AbstractIntegration $integration */
+                                $integration = $this->integrations[$integrationName];
+
+                                $features = $integration->getSupportedFeatures();
                                 $newIntegration->setSupportedFeatures($features);
 
                                 // Go ahead and stash it since it's built already
-                                $this->integrations[$integrationName]->setIntegrationSettings($newIntegration);
+                                $integration->setIntegrationSettings($newIntegration);
 
                                 $newIntegrations[] = $newIntegration;
 
@@ -180,11 +184,15 @@ class IntegrationHelper
                             // Initiate the class in order to get the features supported
                             if ($this->container->has($integrationContainerKey)) {
                                 $this->integrations[$integrationName] = $this->container->get($integrationContainerKey);
-                                $features                             = $this->integrations[$integrationName]->getSupportedFeatures();
+
+                                /** @var AbstractIntegration $integration */
+                                $integration = $this->integrations[$integrationName];
+
+                                $features = $integration->getSupportedFeatures();
                                 $newIntegration->setSupportedFeatures($features);
 
                                 // Go ahead and stash it since it's built already
-                                $this->integrations[$integrationName]->setIntegrationSettings($newIntegration);
+                                $integration->setIntegrationSettings($newIntegration);
 
                                 $newIntegrations[] = $newIntegration;
                             } else {
@@ -258,7 +266,10 @@ class IntegrationHelper
 
                 if ($this->container->has($integrationContainerKey)) {
                     $this->integrations[$integrationName] = $this->container->get($integrationContainerKey);
-                    $this->integrations[$integrationName]->setIntegrationSettings($integration['settings']);
+
+                    /** @var AbstractIntegration $integrationObject */
+                    $integrationObject = $this->integrations[$integrationName];
+                    $integrationObject->setIntegrationSettings($integration['settings']);
                 }
             }
 
@@ -276,6 +287,8 @@ class IntegrationHelper
         if (empty($alphabetical)) {
             // Sort by priority
             uasort($returnServices, function ($a, $b): int {
+                /** @var AbstractIntegration $a */
+                /** @var AbstractIntegration $b */
                 $aP = (int) $a->getPriority();
                 $bP = (int) $b->getPriority();
 
@@ -284,6 +297,8 @@ class IntegrationHelper
         } else {
             // Sort by display name
             uasort($returnServices, function ($a, $b): int {
+                /** @var AbstractIntegration $a */
+                /** @var AbstractIntegration $b */
                 $aName = $a->getDisplayName();
                 $bName = $b->getDisplayName();
 
@@ -394,15 +409,12 @@ class IntegrationHelper
      * Get the user's social profile data from cache or integrations if indicated.
      *
      * @param Lead   $lead
-     * @param array  $fields
      * @param bool   $refresh
      * @param string $specificIntegration
      * @param bool   $persistLead
      * @param bool   $returnSettings
-     *
-     * @return array
      */
-    public function getUserProfiles(object $lead, $fields = [], $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false)
+    public function getUserProfiles(object $lead, array $fields = [], $refresh = false, $specificIntegration = null, $persistLead = true, $returnSettings = false): array
     {
         $socialCache     = $lead->getSocialCache();
         $featureSettings = [];
@@ -472,10 +484,8 @@ class IntegrationHelper
 
     /**
      * @param bool $integration
-     *
-     * @return array
      */
-    public function clearIntegrationCache(object $lead, $integration = false)
+    public function clearIntegrationCache(object $lead, $integration = false): array
     {
         $socialCache = $lead->getSocialCache();
         if (!empty($integration)) {

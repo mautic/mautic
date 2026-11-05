@@ -3,20 +3,26 @@
 namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\InactiveContactFinder;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\Exception\NoEventsFoundException;
 use Mautic\CampaignBundle\Executioner\Helper\EventRedirectionHelper;
 use Mautic\CampaignBundle\Executioner\Helper\InactiveHelper;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
+use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -32,11 +38,14 @@ class InactiveExecutioner implements ExecutionerInterface
 
     private ?OutputInterface $output = null;
 
-    private ?\Symfony\Component\Console\Helper\ProgressBar $progressBar = null;
+    private ?ProgressBar $progressBar = null;
 
     private ?Counter $counter = null;
 
-    private ?ArrayCollection $decisions = null;
+    /**
+     * @var Collection<int, Event>|null
+     */
+    private ?Collection $decisions = null;
 
     protected ?\DateTime $now = null;
 
@@ -54,10 +63,10 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      */
     public function execute(Campaign $campaign, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
@@ -87,10 +96,10 @@ class InactiveExecutioner implements ExecutionerInterface
     /**
      * @param int $decisionId
      *
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      */
     public function validate($decisionId, ContactLimiter $limiter, ?OutputInterface $output = null): ?Counter
     {
@@ -122,11 +131,12 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private function checkCampaignIsPublished(): void
     {
-        if (!$this->decisions->count()) {
+        $firstDecision = $this->decisions->first();
+        if (false === $firstDecision) {
             throw new NoEventsFoundException();
         }
 
-        $this->campaign = $this->decisions->first()->getCampaign();
+        $this->campaign = $firstDecision->getCampaign();
         if (!$this->campaign->isPublished()) {
             throw new NoEventsFoundException();
         }
@@ -176,10 +186,10 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
      */
     private function executeEvents(): void
     {
@@ -257,12 +267,14 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
-     * @throws Dispatcher\Exception\LogNotProcessedException
-     * @throws Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws Exception\CannotProcessEventException
-     * @throws Scheduler\Exception\NotSchedulableException
+     * @throws NotSchedulableException
+     * @param Collection<int, Lead> $contacts
+     * @param Collection<int, Event> $events
      */
-    private function executeLogsForInactiveEvents(ArrayCollection $events, ArrayCollection $contacts, Counter $childrenCounter, \DateTimeInterface $earliestLastActiveDateTime): void
+    private function executeLogsForInactiveEvents(Collection $events, Collection $contacts, Counter $childrenCounter, \DateTimeInterface $earliestLastActiveDateTime): void
     {
         $events              = clone $events;
         $eventExecutionDates = $this->scheduler->getSortedExecutionDates($events, $earliestLastActiveDateTime);

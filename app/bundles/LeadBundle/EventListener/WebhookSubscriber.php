@@ -5,17 +5,22 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\CompanyEvent;
+use Mautic\LeadBundle\Event\CompanyPostDeleteEvent;
+use Mautic\LeadBundle\Event\CompanyPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\LeadPostDeleteEvent;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
+use Mautic\LeadBundle\Event\ListBatchChangeEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class WebhookSubscriber implements EventSubscriberInterface
+final readonly class WebhookSubscriber
 {
     public function __construct(
         private WebhookModel $webhookModel,
@@ -24,25 +29,12 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            WebhookBuilderEvent::class               => ['onWebhookBuild', 0],
-            LeadEvents::LEAD_POST_SAVE               => ['onLeadNewUpdate', 0],
-            LeadEvents::LEAD_POINTS_CHANGE           => ['onLeadPointChange', 0],
-            LeadEvents::LEAD_POST_DELETE             => ['onLeadDelete', 0],
-            ChannelSubscriptionChange::class => ['onChannelSubscriptionChange', 0],
-            LeadEvents::LEAD_COMPANY_CHANGE          => ['onLeadCompanyChange', 0],
-            LeadEvents::COMPANY_POST_SAVE            => ['onCompanySave', 0],
-            LeadEvents::COMPANY_POST_DELETE          => ['onCompanyDelete', 0],
-            LeadEvents::LEAD_LIST_CHANGE             => ['onSegmentChange', 0],
-            LeadEvents::LEAD_LIST_BATCH_CHANGE       => ['onSegmentBatchChange', 0],
-        ];
-    }
-
     /**
      * Add event triggers and actions.
      */
+    #[AsEventListener(
+        event: WebhookBuilderEvent::class,
+    )]
     public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
@@ -127,6 +119,9 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: LeadPostSaveEvent::class,
+    )]
     public function onLeadNewUpdate(LeadEvent $event): void
     {
         $lead = $event->getLead();
@@ -137,7 +132,7 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
 
         $changes = $lead->getChanges(true);
 
-        if (empty($changes)) {
+        if ($changes === []) {
             return;
         }
 
@@ -158,6 +153,9 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: PointsChangeEvent::class,
+    )]
     public function onLeadPointChange(PointsChangeEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
@@ -180,6 +178,9 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: LeadPostDeleteEvent::class,
+    )]
     public function onLeadDelete(LeadEvent $event): void
     {
         $lead = $event->getLead();
@@ -199,6 +200,9 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: ChannelSubscriptionChange::class,
+    )]
     public function onChannelSubscriptionChange(ChannelSubscriptionChange $event): void
     {
         $this->webhookModel->queueWebhooksByType(
@@ -220,6 +224,9 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: LeadChangeCompanyEvent::class,
+    )]
     public function onLeadCompanyChange(LeadChangeCompanyEvent $event): void
     {
         $leads = $event->getLeads();
@@ -240,6 +247,9 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: CompanyPostSaveEvent::class,
+    )]
     public function onCompanySave(CompanyEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
@@ -250,6 +260,9 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: CompanyPostDeleteEvent::class,
+    )]
     public function onCompanyDelete(CompanyEvent $event): void
     {
         $company = $event->getCompany();
@@ -262,11 +275,17 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: ListChangeEvent::class,
+    )]
     public function onSegmentChange(ListChangeEvent $changeEvent): void
     {
         $this->doSegmentChange($changeEvent);
     }
 
+    #[AsEventListener(
+        event: ListBatchChangeEvent::class,
+    )]
     public function onSegmentBatchChange(ListChangeEvent $changeEvent): void
     {
         $this->doSegmentChange($changeEvent);

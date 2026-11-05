@@ -3,12 +3,13 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Event as Events;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final readonly class PageSubscriber implements EventSubscriberInterface
+final readonly class PageSubscriber
 {
     public function __construct(
         private EmailModel $emailModel,
@@ -17,16 +18,12 @@ final readonly class PageSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            Events\PageHitEvent::class => ['onPageHit', 0],
-        ];
-    }
-
     /**
      * Trigger point actions for page hits.
      */
+    #[AsEventListener(
+        event: Events\PageHitEvent::class,
+    )]
     public function onPageHit(Events\PageHitEvent $event): void
     {
         $hit      = $event->getHit();
@@ -38,11 +35,12 @@ final readonly class PageSubscriber implements EventSubscriberInterface
             // Check for an email stat
             $clickthrough = $event->getClickthroughData();
 
+            $stat = null;
             if (isset($clickthrough['stat'])) {
                 $stat = $this->emailModel->getEmailStatus($clickthrough['stat']);
             }
 
-            if (empty($stat)) {
+            if (! $stat instanceof Stat) {
                 if ($lead = $hit->getLead()) {
                     // Try searching by email and lead IDs
                     $stats = $this->emailModel->getEmailStati($hit->getSourceId(), $lead->getId());

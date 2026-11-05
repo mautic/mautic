@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -33,12 +34,15 @@ use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidOptionsException;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: DynamicContentRepository::class)]
 #[ORM\Table(name: 'dynamic_content')]
-#[ORM\Index(columns: ['is_campaign_based'], name: 'is_campaign_based_index')]
-#[ORM\Index(columns: ['slot_name'], name: 'slot_name_index')]
+#[ORM\Index(name: 'is_campaign_based_index', columns: ['is_campaign_based'])]
+#[ORM\Index(name: 'slot_name_index', columns: ['slot_name'])]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
@@ -60,85 +64,104 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-/**
- * @use TranslationEntityTrait<DynamicContent>
- * @use VariantEntityTrait<DynamicContent>
- */
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'dynamic_content_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'dynamic_content_projects_xref'),
+)])]
 class DynamicContent extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface
 {
+    /** @use TranslationEntityTrait<DynamicContent> */
     use TranslationEntityTrait;
+    /** @use VariantEntityTrait<DynamicContent> */
     use VariantEntityTrait;
     use FiltersEntityTrait;
     use UuidTrait;
     use ProjectTrait;
 
-    public const ENTITY_NAME = 'dynamic_content';
+    public const string ENTITY_NAME = 'dynamic_content';
 
     /**
      * @var int
      */
     #[Groups(['dynamicContent:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private ?string $name = null;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(type: Types::STRING, length: 191, options: ['default' => TypeList::HTML])]
     private string $type = TypeList::HTML;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var string|null
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $content;
 
     /**
      * @var array|null
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'utm_tags', type: Types::JSON, nullable: true)]
     private $utmTags = [];
 
     /**
      * @var int
      */
     #[Groups(['dynamicContent:read'])]
+    #[ORM\Column(name: 'sent_count', type: 'integer')]
     private $sentCount = 0;
 
     /**
      * @var ArrayCollection<Stat>
      */
     #[Groups(['dynamicContent:read'])]
-    #[ORM\OneToMany(mappedBy: 'dynamicContent', targetEntity: Stat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: Stat::class, mappedBy: 'dynamicContent', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**
      * @var bool
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'is_campaign_based', type: 'boolean', options: ['default' => 1])]
     private $isCampaignBased = true;
 
     /**
      * @var string|null
      */
     #[Groups(['dynamicContent:read', 'dynamicContent:write'])]
+    #[ORM\Column(name: 'slot_name', type: 'string', length: 191, nullable: true)]
     private $slotName;
 
     public function __construct()
@@ -169,56 +192,16 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->addIdColumns();
-
-        $builder->addCategory();
-
-        $builder->addField(
-            'type',
-            Types::STRING,
-            [
-                'length'  => 10,
-                'default' => TypeList::HTML,
-            ]
-        );
-
-        $builder->addPublishDates();
-
-        $builder->createField('sentCount', 'integer')
-            ->columnName('sent_count')
-            ->build();
-
-        $builder->createField('content', 'text')
-            ->columnName('content')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmTags', Types::JSON)
-            ->columnName('utm_tags')
-            ->nullable()
-            ->build();
-
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
         self::addFiltersMetadata($builder);
 
-        $builder->createField('isCampaignBased', 'boolean')
-                ->columnName('is_campaign_based')
-                ->option('default', 1)
-                ->build();
-
-        $builder->createField('slotName', 'string')
-                ->columnName('slot_name')
-                ->nullable()
-                ->build();
-
-        self::addProjectsField($builder, 'dynamic_content_projects_xref', 'dynamic_content_id');
     }
 
     /**
-     * @throws \Symfony\Component\Validator\Exception\ConstraintDefinitionException
-     * @throws \Symfony\Component\Validator\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\Validator\Exception\MissingOptionsException
+     * @throws ConstraintDefinitionException
+     * @throws InvalidOptionsException
+     * @throws MissingOptionsException
      */
     public static function loadValidatorMetaData(ClassMetadata $metadata): void
     {
@@ -297,6 +280,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $current = $this->{$getter}();
 
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop) {
+            /** @var VariantEntityInterface|TranslationEntityInterface|Category|null $current */
+            /** @var VariantEntityInterface|TranslationEntityInterface|Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -438,9 +423,9 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection<int, Stat>
      */
-    public function getStats()
+    public function getStats(): Collection
     {
         return $this->stats;
     }
@@ -503,10 +488,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         return $this;
     }
 
-    /**
-     * @return array|null
-     */
-    public function getUtmTags()
+    public function getUtmTags(): ?array
     {
         return $this->utmTags;
     }

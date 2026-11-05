@@ -6,17 +6,18 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
+final class LeadRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -71,6 +72,26 @@ final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         $parameters = $dbalMock->getQueryPart('parameters');
 
         $this->assertCount(2, $parameters, 'There should be two parameters bound because that\'s the number of emails we passed into the method.');
+    }
+
+    public function testBuildQueryForGetLeadsByFieldValueQuotesFieldIdentifier(): void
+    {
+        $dbalMock = new DBALMocker($this);
+
+        $repository = $this->getMockBuilder(LeadRepository::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getEntityManager'])
+            ->getMock();
+
+        $repository->method('getEntityManager')->willReturn($dbalMock->getMockEm());
+
+        $reflection = new \ReflectionClass(LeadRepository::class);
+        $method     = $reflection->getMethod('buildQueryForGetLeadsByFieldValue');
+        $method->invoke($repository, 'email OR 1=1-- -', 'a');
+
+        $where = $dbalMock->getQueryPart('where');
+
+        $this->assertSame('`l`.`email OR 1=1-- -` = :search', (string) $where[0][0]);
     }
 
     /**
@@ -141,7 +162,7 @@ final class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
             'somebody2@anywhere.com',
         ];
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $query->expects($this->once())
             ->method('setParameter')
             ->with('emails', $emails, ArrayParameterType::STRING)

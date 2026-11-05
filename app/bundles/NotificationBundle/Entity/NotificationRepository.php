@@ -3,7 +3,7 @@
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -11,17 +11,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 final class NotificationRepository extends CommonRepository
 {
-    /**
-     * Get a list of entities.
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('e')
-            ->from(Notification::class, 'e', 'e.id');
+        $q = $this->createQueryBuilder('e', 'e.id');
         if (empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
         }
@@ -33,14 +25,11 @@ final class NotificationRepository extends CommonRepository
 
     /**
      * Get amounts of sent and read notifications.
-     *
-     * @return array
      */
-    public function getSentReadCount()
+    public function getSentReadCount(): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
-        $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count')
-            ->from(Notification::class, 'e');
+        $q = $this->createQueryBuilder('e');
+        $q->select('SUM(e.sentCount) as sent_count, SUM(e.readCount) as read_count');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         $results['sent_count'] ??= 0;
@@ -49,7 +38,7 @@ final class NotificationRepository extends CommonRepository
         return $results;
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
@@ -145,14 +134,9 @@ final class NotificationRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param string $notificationType
-     *
-     * @return array
+     * @param string|array<int|string> $search
      */
-    public function getNotificationList($search = '', $limit = 10, $start = 0, bool $viewOther = false, $notificationType = null)
+    public function getNotificationList(string|array $search = '', int $limit = 10, int $start = 0, bool $viewOther = false, ?string $notificationType = null): array
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');

@@ -56,7 +56,7 @@ final class Mapper
     }
 
     /**
-     * @param int      $mauticContactId Mautic Contact ID
+     * @param int      $mauticContactId
      * @param int|null $zohoId          Zoho ID if known
      *
      * @return int If any single field is mapped, return 1 to count as one contact to be updated

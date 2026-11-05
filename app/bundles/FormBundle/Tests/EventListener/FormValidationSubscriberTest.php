@@ -11,11 +11,12 @@ use Mautic\FormBundle\EventListener\FormValidationSubscriber;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[CoversClass(FormValidationSubscriber::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
+final class FormValidationSubscriberTest extends TestCase
 {
     private const string MINIMUM_TWO_OPTIONS_MESSAGE = 'You must select at least 2 options.';
 

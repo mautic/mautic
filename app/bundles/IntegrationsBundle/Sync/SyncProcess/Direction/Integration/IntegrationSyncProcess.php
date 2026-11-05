@@ -18,7 +18,7 @@ use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\SyncDataExchangeInterface;
 
-class IntegrationSyncProcess
+final class IntegrationSyncProcess
 {
     private ?InputOptionsDAO $inputOptionsDAO = null;
 

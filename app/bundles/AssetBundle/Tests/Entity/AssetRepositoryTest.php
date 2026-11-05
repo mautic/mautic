@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Tests\Entity;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\AssetRepository;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;

@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 
 interface CustomFieldRepositoryInterface
 {
     /**
      * Return an array of groups supported by the custom fields for this entity.
-     *
-     * @return array
      */
-    public function getFieldGroups();
+    public function getFieldGroups(): array;
 
     /**
      * Get the base DBAL query builder for entities.
      *
-     * @return DbalQueryBuilder
+     * @return QueryBuilder
      */
     public function getEntitiesDbalQueryBuilder();
 

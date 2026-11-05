@@ -41,17 +41,15 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
      *
      * @return mixed[]
      */
-    public function getSupportedSearchCommands()
+    public function getSupportedSearchCommands(): array
     {
         return [];
     }
 
     /**
      * Retrieve the search command list for a repository.
-     *
-     * @return array
      */
-    public function getCommandList()
+    public function getCommandList(): array
     {
         $repo = $this->getRepository();
 
@@ -85,9 +83,9 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return object[]|array<int,mixed>|iterable<object>|\Doctrine\ORM\Internal\Hydration\IterableResult<object>|Paginator<object>|SimplePaginator<mixed>
+     * @return iterable<T>|Paginator<T>|SimplePaginator<T>
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         // set the translator
         $repository = $this->getRepository();
@@ -101,6 +99,7 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
      * Get a specific entity.
      *
      * @param string|int|mixed[]|null $id
+     * @return T|null
      */
     public function getEntity($id = null): ?object
     {
@@ -141,20 +140,19 @@ abstract class AbstractCommonModel implements MauticModelInterface, SearchComman
     }
 
     /**
-     * @param array $clickthrough
-     *
      * @return string
      */
-    public function buildUrl(string $route, array $routeParams = [], bool $absolute = true, $clickthrough = [])
+    public function buildUrl(string $route, array $routeParams = [], bool $absolute = true, array $clickthrough = [])
     {
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate($route, $routeParams, $referenceType);
 
-        return $url.((!empty($clickthrough)) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '');
+        return $url.(($clickthrough !== []) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '');
     }
 
     /**
      * Retrieve entity based on id/alias slugs.
+     * @return T|null
      */
     public function getEntityBySlugs(string $slug): ?object
     {

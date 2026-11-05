@@ -7,6 +7,7 @@ namespace Mautic\CampaignBundle\Event;
 use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
+use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
 final class ScheduledEvent extends Event
@@ -18,22 +19,13 @@ final class ScheduledEvent extends Event
      */
     private array $eventArray = [];
 
-    /**
-     * @var \Mautic\LeadBundle\Entity\Lead
-     */
-    private $lead;
+    private readonly ?Lead $lead;
 
-    /**
-     * @var CampaignEvent|null
-     */
-    private $event;
+    private readonly ?CampaignEvent $event;
 
     private bool $systemTriggered = true;
 
-    /**
-     * @var \DateTimeInterface
-     */
-    private $dateScheduled;
+    private readonly ?\DateTimeInterface $dateScheduled;
 
     /**
      * @var array
@@ -66,26 +58,17 @@ final class ScheduledEvent extends Event
         return $this->isReschedule;
     }
 
-    /**
-     * @return \Mautic\LeadBundle\Entity\Lead
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
 
-    /**
-     * @return array
-     */
-    public function getEvent()
+    public function getEvent(): array
     {
         return ($this->event instanceof CampaignEvent) ? $this->getEventArray($this->event) : $this->event;
     }
 
-    /**
-     * @return array
-     */
-    public function getConfig()
+    public function getConfig(): array
     {
         return $this->getEvent()['properties'];
     }
@@ -100,10 +83,7 @@ final class ScheduledEvent extends Event
         return $this->systemTriggered;
     }
 
-    /**
-     * @return \DateTimeInterface
-     */
-    public function getDateScheduled()
+    public function getDateScheduled(): ?\DateTimeInterface
     {
         return $this->dateScheduled;
     }

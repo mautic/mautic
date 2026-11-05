@@ -10,10 +10,12 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldsApiControllerTraitTest extends TestCase
 {
     public function testGetEntityFormOptions(): void
     {
@@ -30,7 +32,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
 
         $paginator = $this->createMock(Paginator::class);
         $paginator->method('getIterator')
-            ->willReturn($result);
+            ->willReturn(new \ArrayIterator($result));
 
         $modelFake = $this->createMock(FieldModel::class);
         $modelFake->expects($this->once())
@@ -54,12 +56,8 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             {
                 return $this->getEntityFormOptions();
             }
-
-            public function getModel(?string $name): object
-            {
-                return $this->model;
-            }
         };
+        $controller->autowireCustomFieldsApiControllerTrait($modelFake, new RequestStack());
 
         $this->assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling once, should be live
         $this->assertSame($result, (array) $controller->getEntityFormOptionsPublic()['fields']); // Calling twice, should be cached
@@ -96,7 +94,7 @@ final class CustomFieldsApiControllerTraitTest extends \PHPUnit\Framework\TestCa
             ) {
             }
 
-            public function getModel(?string $name): object
+            public function getModel(string $name): object
             {
                 return $this->model;
             }

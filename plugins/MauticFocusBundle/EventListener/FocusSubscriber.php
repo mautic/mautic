@@ -3,7 +3,6 @@
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
-use Mautic\CoreBundle\Event as MauticEvents;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
@@ -14,16 +13,17 @@ use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
+use MauticPlugin\MauticFocusBundle\Event\FocusTokenReplacementEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
-final readonly class FocusSubscriber implements EventSubscriberInterface
+final readonly class FocusSubscriber
 {
     public function __construct(
         private RouterInterface $router,
@@ -37,20 +37,12 @@ final readonly class FocusSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            KernelEvents::REQUEST          => ['onKernelRequest', 0],
-            FocusEvents::POST_SAVE         => ['onFocusPostSave', 0],
-            FocusEvents::POST_DELETE       => ['onFocusDelete', 0],
-            FocusEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
-            ReportBuilderEvent::class => ['onReportBuild', -10],
-        ];
-    }
-
     /**
      * Check and hijack the form's generate link if the ID has mf- in it.
      */
+    #[AsEventListener(
+        event: KernelEvents::REQUEST,
+    )]
     public function onKernelRequest(RequestEvent $event): void
     {
         if ($event->isMainRequest()) {
@@ -75,6 +67,9 @@ final readonly class FocusSubscriber implements EventSubscriberInterface
     /**
      * Add an entry to the audit log.
      */
+    #[AsEventListener(
+        event: FocusEvents::POST_SAVE,
+    )]
     public function onFocusPostSave(FocusEvent $event): void
     {
         $entity = $event->getFocus();
@@ -94,6 +89,9 @@ final readonly class FocusSubscriber implements EventSubscriberInterface
     /**
      * Add a delete entry to the audit log.
      */
+    #[AsEventListener(
+        event: FocusEvents::POST_DELETE,
+    )]
     public function onFocusDelete(FocusEvent $event): void
     {
         $entity = $event->getFocus();
@@ -108,6 +106,10 @@ final readonly class FocusSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
+    #[AsEventListener(
+        event: ReportBuilderEvent::class,
+        priority: -10
+    )]
     public function onReportBuild(ReportBuilderEvent $event): void
     {
         $tables = $event->getTables();
@@ -121,7 +123,10 @@ final readonly class FocusSubscriber implements EventSubscriberInterface
         $event->addTable('audit.log', $tables['audit.log']);
     }
 
-    public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event): void
+    #[AsEventListener(
+        event: FocusTokenReplacementEvent::class,
+    )]
+    public function onTokenReplacement(FocusTokenReplacementEvent $event): void
     {
         /** @var Lead $lead */
         $lead         = $event->getLead();

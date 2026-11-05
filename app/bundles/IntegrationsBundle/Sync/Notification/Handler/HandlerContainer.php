@@ -15,7 +15,7 @@ final class HandlerContainer
      * @param iterable<HandlerInterface> $handlers
      */
     public function __construct(
-        #[AutowireIterator('mautic.sync.notification_handler')]
+        #[AutowireIterator(tag: 'mautic.sync.notification_handler')]
         iterable $handlers = [],
     ) {
         foreach ($handlers as $handler) {

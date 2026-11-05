@@ -12,6 +12,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\HttpFoundation\Request;
 
 final readonly class FileManager
 {
@@ -27,7 +28,7 @@ final readonly class FileManager
     /**
      * @throws FileUploadException
      */
-    public function uploadFiles($request): array
+    public function uploadFiles(Request $request): array
     {
         $uploadedFiles = [];
 

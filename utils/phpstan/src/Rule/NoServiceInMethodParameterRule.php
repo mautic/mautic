@@ -4,16 +4,20 @@ declare(strict_types=1);
 
 namespace Utils\PHPStan\Rule;
 
+use FOS\OAuthServerBundle\Controller\AuthorizeController;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Translation\Translator;
 use PhpParser\Node;
 use PhpParser\Node\Name;
 use PhpParser\Node\Stmt\ClassMethod;
 use PHPStan\Analyser\Scope;
-use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Service\Attribute\Required;
+use Twig\Extension\AbstractExtension;
+use Utils\PHPStan\ServiceTypeDetector;
 
 /**
  * A shared service must be injected, not passed around as a method parameter.
@@ -26,53 +30,11 @@ use PHPStan\Rules\RuleErrorBuilder;
  * Only the injection entry points are allowed to take a service: "__construct()" and "autowire*()"/#[Required] methods.
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoServiceInMethodParameterRuleTest
  */
 final readonly class NoServiceInMethodParameterRule implements Rule
 {
-    /**
-     * Services that are always container-provided singletons. Subtypes are matched too, so RouterInterface covers
-     * UrlGeneratorInterface implementations as well. Value objects that Symfony passes by design - Request, Response,
-     * events, form builders, console input/output - are deliberately absent.
-     *
-     * @var string[]
-     */
-    private const array SERVICE_TYPES = [
-        \Doctrine\ORM\EntityManagerInterface::class,
-        \Doctrine\Persistence\ManagerRegistry::class,
-        \Psr\Cache\CacheItemPoolInterface::class,
-        \Psr\Log\LoggerInterface::class,
-        \Symfony\Component\Filesystem\Filesystem::class,
-        \Symfony\Component\Form\FormFactoryInterface::class,
-        \Symfony\Component\HttpFoundation\RequestStack::class,
-        \Symfony\Component\HttpKernel\KernelInterface::class,
-        \Symfony\Component\Mailer\MailerInterface::class,
-        \Symfony\Component\Messenger\MessageBusInterface::class,
-        \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface::class,
-        \Symfony\Component\Routing\Generator\UrlGeneratorInterface::class,
-        \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface::class,
-        \Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface::class,
-        \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface::class,
-        \Symfony\Component\Serializer\SerializerInterface::class,
-        \Symfony\Component\Validator\Validator\ValidatorInterface::class,
-        \Symfony\Contracts\Cache\CacheInterface::class,
-        \Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class,
-        \Symfony\Contracts\HttpClient\HttpClientInterface::class,
-        \Symfony\Contracts\Translation\TranslatorInterface::class,
-        \Twig\Environment::class,
-    ];
-
-    /**
-     * The container builder is only ever handed to a DI extension or a compiler pass, both of which get it as a
-     * method parameter by Symfony design - there is nothing to inject there. The Mautic translator is a different
-     * kind of translator than the contract one, and is passed around on purpose.
-     *
-     * @var string[]
-     */
-    private const array SKIPPED_TYPES = [
-        \Symfony\Component\DependencyInjection\ContainerBuilder::class,
-        Translator::class,
-    ];
-
     /**
      * Methods whose signature is dictated by a shared parent class, so a single child cannot drop the service
      * parameter on its own.
@@ -85,7 +47,7 @@ final readonly class NoServiceInMethodParameterRule implements Rule
      * A test case has no container to inject from - it fetches services itself and hands them to its own data
      * builders and helper methods.
      */
-    private const string TEST_CASE_CLASS = \PHPUnit\Framework\TestCase::class;
+    private const string TEST_CASE_CLASS = TestCase::class;
 
     /**
      * An event or an entity is created by the code that uses it, never by the container, so a service it needs can
@@ -96,11 +58,11 @@ final readonly class NoServiceInMethodParameterRule implements Rule
      * @var string[]
      */
     private const array SKIPPED_CLASS_TYPES = [
-        \Symfony\Contracts\EventDispatcher\Event::class,
+        Event::class,
         'Symfony\\Component\\EventDispatcher\\Event',
         CommonEntity::class,
-        \Twig\Extension\AbstractExtension::class,
-        \FOS\OAuthServerBundle\Controller\AuthorizeController::class,
+        AbstractExtension::class,
+        AuthorizeController::class,
     ];
 
     /**
@@ -119,10 +81,10 @@ final readonly class NoServiceInMethodParameterRule implements Rule
 
     private const string AUTOWIRE_PREFIX = 'autowire';
 
-    private const string REQUIRED_ATTRIBUTE = \Symfony\Contracts\Service\Attribute\Required::class;
+    private const string REQUIRED_ATTRIBUTE = Required::class;
 
     public function __construct(
-        private ReflectionProvider $reflectionProvider,
+        private ServiceTypeDetector $serviceTypeDetector,
     ) {
     }
 
@@ -182,7 +144,7 @@ final readonly class NoServiceInMethodParameterRule implements Rule
             }
 
             $paramType = $scope->resolveName($param->type);
-            if (!$this->isServiceType($paramType)) {
+            if (!$this->serviceTypeDetector->isServiceType($paramType)) {
                 continue;
             }
 
@@ -274,22 +236,5 @@ final readonly class NoServiceInMethodParameterRule implements Rule
         }
 
         return $classReflection->is(self::TEST_CASE_CLASS);
-    }
-
-    private function isServiceType(string $className): bool
-    {
-        if (!$this->reflectionProvider->hasClass($className)) {
-            return false;
-        }
-
-        $classReflection = $this->reflectionProvider->getClass($className);
-
-        foreach (self::SKIPPED_TYPES as $skippedType) {
-            if ($classReflection->is($skippedType)) {
-                return false;
-            }
-        }
-
-        return array_any(self::SERVICE_TYPES, fn (string $serviceType): bool => $classReflection->is($serviceType));
     }
 }

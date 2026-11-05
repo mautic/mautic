@@ -13,21 +13,23 @@ use Mautic\LeadBundle\Helper\FieldAliasHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Services\ContactSegmentFilterDictionary;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
+final class FieldAliasKeywordValidatorTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ExecutionContextInterface
+     * @var MockObject&ExecutionContextInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $executionContextMock;
+    private MockObject $executionContextMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&UnitOfWork
+     * @var MockObject&UnitOfWork
      */
-    private \PHPUnit\Framework\MockObject\MockObject $unitOfWorkMock;
+    private MockObject $unitOfWorkMock;
 
     private FieldAliasKeywordValidator $validator;
 
@@ -78,7 +80,6 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
             $translatorMock,
             $contactSegmentFilterDictionary
         );
-        $this->validator->initialize($this->executionContextMock);
     }
 
     public function testAddValidationFailure(): void
@@ -95,7 +96,7 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->executionContextMock->expects($this->once())->method('addViolation')->with('mautic.lead.field.keyword.invalid');
 
-        $this->validator->validate($field, new FieldAliasKeyword());
+        $this->validator->validateInContext($field, new FieldAliasKeyword(), $this->executionContextMock);
     }
 
     public function testAddValidationSuccess(): void
@@ -112,7 +113,7 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->executionContextMock->expects($this->never())->method('addViolation');
 
-        $this->validator->validate($field, new FieldAliasKeyword());
+        $this->validator->validateInContext($field, new FieldAliasKeyword(), $this->executionContextMock);
     }
 
     public function testEditValidationFailure(): void
@@ -131,7 +132,7 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->executionContextMock->expects($this->once())->method('addViolation')->with('mautic.lead.field.keyword.invalid');
 
-        $this->validator->validate($field, new FieldAliasKeyword());
+        $this->validator->validateInContext($field, new FieldAliasKeyword(), $this->executionContextMock);
     }
 
     public function testEditValidationSuccess(): void
@@ -150,7 +151,7 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->executionContextMock->expects($this->never())->method('addViolation');
 
-        $this->validator->validate($field, new FieldAliasKeyword());
+        $this->validator->validateInContext($field, new FieldAliasKeyword(), $this->executionContextMock);
     }
 
     public function testEditWithoutChangesValidationSuccess(): void
@@ -169,7 +170,7 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
 
         $this->executionContextMock->expects($this->never())->method('addViolation');
 
-        $this->validator->validate($field, new FieldAliasKeyword());
+        $this->validator->validateInContext($field, new FieldAliasKeyword(), $this->executionContextMock);
     }
 
     public function testFailureReservedKeyWords(): void
@@ -188,6 +189,6 @@ final class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
         $field->setObject('lead');
         $field->setAlias('contact_id');
 
-        $this->validator->validate($field, new FieldAliasKeyword());
+        $this->validator->validateInContext($field, new FieldAliasKeyword(), $this->executionContextMock);
     }
 }

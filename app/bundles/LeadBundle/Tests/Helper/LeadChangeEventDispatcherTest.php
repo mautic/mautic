@@ -8,14 +8,15 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ChannelSubscriptionChange;
 use Mautic\LeadBundle\Event\LeadEvent;
+use Mautic\LeadBundle\Event\LeadIdentifiedEvent;
 use Mautic\LeadBundle\Event\LeadUtmTagsEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
-use Mautic\LeadBundle\LeadEvents;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-final class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
+final class LeadChangeEventDispatcherTest extends TestCase
 {
     #[TestDox('Test that date identified change dispatches correct event')]
     public function testDateIdentifiedEventIsDispatched(): void
@@ -27,10 +28,7 @@ final class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
         $dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(
-                $event,
-                LeadEvents::LEAD_IDENTIFIED
-            );
+            ->with(new LeadIdentifiedEvent($lead, false, $event->getChanges()));
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);
 
@@ -47,10 +45,7 @@ final class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $pointsEvent = new PointsChangeEvent($lead, 10, 20);
         $dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(
-                $pointsEvent,
-                LeadEvents::LEAD_POINTS_CHANGE
-            );
+            ->with($pointsEvent);
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);
 
@@ -101,10 +96,7 @@ final class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $pointsEvent = new PointsChangeEvent($lead, 10, 0);
         $dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(
-                $pointsEvent,
-                LeadEvents::LEAD_POINTS_CHANGE
-            );
+            ->with($pointsEvent);
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);
 

@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +25,7 @@ final class EmailGraphStatsController extends AbstractController
      * @throws \Exception
      */
     #[Route(
-        '/s/emails-graph-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
+        path: '/s/emails-graph-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
         name: 'mautic_email_graph_stats',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -38,7 +39,7 @@ final class EmailGraphStatsController extends AbstractController
         $dateFrom = null,
         $dateTo = null,
     ): Response {
-        /** @var \Mautic\EmailBundle\Entity\Email $email */
+        /** @var Email $email */
         $email = $model->getEntity($objectId);
 
         // Init the date range filter form

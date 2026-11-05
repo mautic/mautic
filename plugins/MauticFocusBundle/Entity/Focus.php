@@ -11,9 +11,9 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use DateTimeInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -24,10 +24,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: FocusRepository::class)]
 #[ORM\Table(name: 'focus')]
-#[ORM\Index(columns: ['focus_type'], name: 'focus_type')]
-#[ORM\Index(columns: ['style'], name: 'focus_style')]
-#[ORM\Index(columns: ['form_id'], name: 'focus_form')]
-#[ORM\Index(columns: ['name'], name: 'focus_name')]
+#[ORM\Index(name: 'focus_type', columns: ['focus_type'])]
+#[ORM\Index(name: 'focus_style', columns: ['style'])]
+#[ORM\Index(name: 'focus_form', columns: ['form_id'])]
+#[ORM\Index(name: 'focus_name', columns: ['name'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -47,6 +47,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'focus_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'focus_projects_xref'),
+)])]
 class Focus extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -56,30 +62,37 @@ class Focus extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['focus:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string|null
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string|null
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $editor;
 
     /**
      * @var string|null
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $html;
 
     /**
      * @var string|null
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(name: 'html_mode', type: 'string', length: 191, nullable: true)]
     private $htmlMode;
 
     /**
@@ -87,9 +100,12 @@ class Focus extends FormEntity implements UuidInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private $category;
 
     /**
@@ -97,12 +113,14 @@ class Focus extends FormEntity implements UuidInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
     #[NotBlank(message: 'mautic.focus.error.select_type')]
+    #[ORM\Column(name: 'focus_type', type: 'string', length: 191)]
     private $type;
 
     /**
      * @var string|null
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $website;
 
     /**
@@ -110,40 +128,47 @@ class Focus extends FormEntity implements UuidInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
     #[NotBlank(message: 'mautic.focus.error.select_style')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $style;
 
     /**
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var array<mixed>
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private $properties = [];
 
     /**
      * @var array
      */
     #[Groups(['focus:read', 'focus:write'])]
+    #[ORM\Column(name: 'utm_tags', type: 'array', nullable: true)]
     private $utmTags = [];
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'form_id', type: 'integer', nullable: true)]
     private $form;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $cache;
 
     public function __construct()
@@ -156,45 +181,6 @@ class Focus extends FormEntity implements UuidInterface
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->addCategory();
-
-        $builder->addNamedField('type', 'string', 'focus_type');
-
-        $builder->addField('style', 'string');
-
-        $builder->addNullableField('website', 'string');
-
-        $builder->addPublishDates();
-
-        $builder->addNullableField('properties', 'array');
-
-        $builder->createField('utmTags', 'array')
-            ->columnName('utm_tags')
-            ->nullable()
-            ->build();
-
-        $builder->addNamedField('form', 'integer', 'form_id', true);
-
-        $builder->addNullableField('cache', 'text');
-
-        $builder->createField('htmlMode', 'string')
-            ->columnName('html_mode')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('editor', 'text');
-
-        $builder->addNullableField('html', 'text');
-
-        self::addProjectsField($builder, 'focus_projects_xref', 'focus_id');
     }
 
     /**
@@ -399,7 +385,7 @@ class Focus extends FormEntity implements UuidInterface
     /**
      * @return array<mixed>
      */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -407,7 +393,7 @@ class Focus extends FormEntity implements UuidInterface
     /**
      * @param array<mixed> $properties
      */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -416,18 +402,12 @@ class Focus extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getUtmTags()
+    public function getUtmTags(): array
     {
         return $this->utmTags;
     }
 
-    /**
-     * @param array $utmTags
-     */
-    public function setUtmTags($utmTags): static
+    public function setUtmTags(array $utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;

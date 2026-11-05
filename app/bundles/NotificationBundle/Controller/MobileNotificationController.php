@@ -2,7 +2,7 @@
 
 namespace Mautic\NotificationBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class MobileNotificationController extends FormController
+final class MobileNotificationController extends AbstractFormController
 {
     use EntityContactsTrait;
 
@@ -34,7 +34,7 @@ final class MobileNotificationController extends FormController
     }
 
     #[Route(
-        '/s/mobile_notifications/{objectAction}/{objectId}',
+        path: '/s/mobile_notifications/{objectAction}/{objectId}',
         name: 'mautic_mobile_notification_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -44,16 +44,13 @@ final class MobileNotificationController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
-        '/s/mobile_notifications/{page}',
+        path: '/s/mobile_notifications/{page}',
         name: 'mautic_mobile_notification_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -174,8 +171,6 @@ final class MobileNotificationController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        $security = $this->security;
-
         $notification = $this->notificationModel->getEntity($objectId);
 
         // set the page we came from
@@ -237,7 +232,7 @@ final class MobileNotificationController extends FormController
                 'notification' => $notification,
                 'trackables'   => $trackableLinks,
                 'logs'         => $logs,
-                'permissions'  => $security->isGranted([
+                'permissions'  => $this->security->isGranted([
                     'notification:mobile_notifications:viewown',
                     'notification:mobile_notifications:viewother',
                     'notification:mobile_notifications:create',
@@ -248,7 +243,7 @@ final class MobileNotificationController extends FormController
                     'notification:mobile_notifications:publishown',
                     'notification:mobile_notifications:publishother',
                 ], 'RETURN_ARRAY'),
-                'security'    => $security,
+                'security'    => $this->security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
                     'Mautic\NotificationBundle\Controller\MobileNotificationController::contactsAction',
@@ -277,7 +272,7 @@ final class MobileNotificationController extends FormController
      *
      * @param Notification $entity
      */
-    public function newAction(Request $request, IntegrationHelper $integrationHelper, $entity = null): Response
+    public function newAction(Request $request, IntegrationHelper $integrationHelper, ?object $entity = null): Response
     {
         if (!$entity instanceof Notification) {
             /** @var Notification $entity */
@@ -739,11 +734,8 @@ final class MobileNotificationController extends FormController
         );
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
-        '/s/mobile_notifications/view/{objectId}/contact/{page}',
+        path: '/s/mobile_notifications/view/{objectId}/contact/{page}',
         name: 'mautic_mobile_notification_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
@@ -752,7 +744,7 @@ final class MobileNotificationController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1,
+        int $page = 1,
     ): Response {
         return $this->generateContactsGrid(
             $request,

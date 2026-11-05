@@ -2,7 +2,7 @@
 
 namespace Mautic\DynamicContentBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class DynamicContentController extends FormController
+final class DynamicContentController extends AbstractFormController
 {
     private TrackableModel $trackableModel;
 
@@ -57,7 +57,7 @@ final class DynamicContentController extends FormController
     }
 
     #[Route(
-        '/s/dwc/{objectAction}/{objectId}',
+        path: '/s/dwc/{objectAction}/{objectId}',
         name: 'mautic_dynamicContent_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -68,12 +68,12 @@ final class DynamicContentController extends FormController
     }
 
     #[Route(
-        '/s/dwc/{page}',
+        path: '/s/dwc/{page}',
         name: 'mautic_dynamicContent_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, DynamicContentSearchScopeProvider $dynamicContentSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, DynamicContentSearchScopeProvider $dynamicContentSearchScopeProvider, int $page = 1): Response
     {
         $permissions = $this->getPermissions();
 
@@ -143,7 +143,10 @@ final class DynamicContentController extends FormController
         );
     }
 
-    public function newAction(Request $request, $entity = null): Response
+    /**
+     * @param DynamicContent $entity
+     */
+    public function newAction(Request $request, ?object $entity = null): Response
     {
         if (!$this->security->isGranted('dynamiccontent:dynamiccontents:create')) {
             $this->throwAccessDenied();
@@ -362,8 +365,7 @@ final class DynamicContentController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        $security = $this->security;
-        $entity   = $this->dynamicContentModel->getEntity($objectId);
+        $entity = $this->dynamicContentModel->getEntity($objectId);
 
         // set the page we came from
         $page = $request->getSession()->get('mautic.dynamicContent.page', 1);
@@ -391,7 +393,7 @@ final class DynamicContentController extends FormController
                 ]
             );
         }
-        if (!$security->hasEntityAccess(
+        if (!$this->security->hasEntityAccess(
             'dynamiccontent:dynamiccontents:viewown',
             'dynamiccontent:dynamiccontents:viewother',
             $entity->getCreatedBy()

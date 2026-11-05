@@ -9,8 +9,9 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\ReportBundle\Exception\FileIOException;
 use Mautic\ReportBundle\Model\ExportHandler;
+use PHPUnit\Framework\TestCase;
 
-final class ExportHandlerTest extends \PHPUnit\Framework\TestCase
+final class ExportHandlerTest extends TestCase
 {
     public function testHandler(): void
     {

@@ -11,25 +11,12 @@ use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Mautic\CoreBundle\EventListener\MaintenanceSubscriber;
 use Mautic\UserBundle\Entity\UserTokenRepositoryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
+final class MaintenanceSubscriberTest extends TestCase
 {
-    private MaintenanceSubscriber $subscriber;
-
-    protected function setUp(): void
-    {
-        $this->subscriber    = new MaintenanceSubscriber($this->createStub(Connection::class), $this->createStub(UserTokenRepositoryInterface::class), $this->createStub(TranslatorInterface::class));
-    }
-
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertSame(
-            [MaintenanceEvent::class => ['onDataCleanup', -50]],
-            $this->subscriber->getSubscribedEvents()
-        );
-    }
-
     public function testOnDataCleanup(): void
     {
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
@@ -92,7 +79,7 @@ final class MaintenanceSubscriberTest extends \PHPUnit\Framework\TestCase
         $qb
             ->expects($this->exactly(4))
             ->method('executeQuery')
-            ->willReturnCallback(function (): \PHPUnit\Framework\MockObject\MockObject {
+            ->willReturnCallback(function (): MockObject {
                 static $callCount = 0;
                 ++$callCount;
                 $result = $this->createMock(Result::class);

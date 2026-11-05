@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\StageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -14,7 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadStageLog
 {
-    public const TABLE_NAME = 'stage_lead_action_log';
+    public const string TABLE_NAME = 'stage_lead_action_log';
 
     /**
      * @var Stage
@@ -25,33 +24,22 @@ class LeadStageLog
     private $stage;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
+    private ?IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_fired', type: 'datetime')]
     private $dateFired;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('dateFired', 'datetime')
-            ->columnName('date_fired')
-            ->build();
-    }
 
     /**
      * @return \DateTimeInterface|null
@@ -61,42 +49,30 @@ class LeadStageLog
         return $this->dateFired;
     }
 
-    /**
-     * @param mixed $dateFired
-     */
-    public function setDateFired($dateFired): void
+    public function setDateFired(\DateTimeInterface $dateFired): void
     {
         $this->dateFired = $dateFired;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @param IpAddress $ipAddress
-     */
-    public function setIpAddress($ipAddress): void
+    public function setIpAddress(IpAddress $ipAddress): void
     {
         $this->ipAddress = $ipAddress;
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\Lead|null
+     * @return Lead|null
      */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
-    public function setLead($lead): void
+    public function setLead(Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -109,10 +85,7 @@ class LeadStageLog
         return $this->stage;
     }
 
-    /**
-     * @param mixed $stage
-     */
-    public function setStage($stage): void
+    public function setStage(Stage $stage): void
     {
         $this->stage = $stage;
     }

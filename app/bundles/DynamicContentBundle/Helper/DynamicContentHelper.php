@@ -2,9 +2,9 @@
 
 namespace Mautic\DynamicContentBundle\Helper;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
@@ -14,25 +14,19 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DynamicContentHelper
+final readonly class DynamicContentHelper
 {
     use MatchFilterForLeadTrait;
 
-    /**
-     * @var string
-     */
-    public const DYNAMIC_CONTENT_REGEX = '/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is';
+    public const string DYNAMIC_CONTENT_REGEX = '/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is';
 
-    /**
-     * @var string
-     */
-    public const DYNAMIC_WEB_CONTENT_REGEX = '/{dwc=(.*?)}/';
+    public const string DYNAMIC_WEB_CONTENT_REGEX = '/{dwc=(.*?)}/';
 
     public function __construct(
-        protected DynamicContentModel $dynamicContentModel,
-        protected RealTimeExecutioner $realTimeExecutioner,
-        protected EventDispatcherInterface $dispatcher,
-        protected LeadModel $leadModel,
+        private DynamicContentModel $dynamicContentModel,
+        private RealTimeExecutioner $realTimeExecutioner,
+        private EventDispatcherInterface $dispatcher,
+        private LeadModel $leadModel,
     ) {
     }
 
@@ -43,7 +37,7 @@ class DynamicContentHelper
     {
         // Attempt campaign slots first
         $dwcActionResponse = $this->realTimeExecutioner->execute('dwc.decision', $slot, 'dynamicContent')->getActionResponses('dwc.push_content');
-        if (!empty($dwcActionResponse)) {
+        if ($dwcActionResponse !== []) {
             return array_shift($dwcActionResponse);
         }
 
@@ -69,7 +63,7 @@ class DynamicContentHelper
      *
      * @return string
      */
-    public function getDynamicContentSlotForLead($slotName, $lead)
+    public function getDynamicContentSlotForLead($slotName, $lead): string|array
     {
         $leadArray = [];
         if ($lead instanceof Lead) {
@@ -157,7 +151,7 @@ class DynamicContentHelper
      *
      * @return string
      */
-    public function getRealDynamicContent($slot, Lead|array|null $lead, DynamicContent $dwc)
+    public function getRealDynamicContent($slot, Lead|array|null $lead, DynamicContent $dwc): string|array
     {
         $content = $dwc->getContent();
         // Determine a translation based on contact's preferred locale
@@ -170,20 +164,20 @@ class DynamicContentHelper
         }
         $stat = $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
-        $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
-        $tokenEvent->setStat($stat);
-        $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
+        $tokenReplacementEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
+        $tokenReplacementEvent->setStat($stat);
+        $this->dispatcher->dispatch($tokenReplacementEvent);
 
-        return $tokenEvent->getContent();
+        return $tokenReplacementEvent->getContent();
     }
 
     /**
      * @param string $slotName
      * @param bool   $publishedOnly
      *
-     * @return array|\Doctrine\ORM\Tools\Pagination\Paginator
+     * @return array|Paginator
      */
-    public function getDwcsBySlotName($slotName, $publishedOnly = false)
+    public function getDwcsBySlotName($slotName, $publishedOnly = false): iterable
     {
         $filter = [
             'where' => [
@@ -211,10 +205,7 @@ class DynamicContentHelper
         );
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function convertLeadToArray($lead): array
+    public function convertLeadToArray(Lead $lead): array
     {
         return array_merge(
             $lead->getProfileFields(),

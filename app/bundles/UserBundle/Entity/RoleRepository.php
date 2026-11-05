@@ -3,6 +3,7 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
@@ -10,14 +11,9 @@ use Mautic\CoreBundle\Event\GlobalSearchEvent;
 /**
  * @extends CommonRepository<Role>
  */
-class RoleRepository extends CommonRepository
+final class RoleRepository extends CommonRepository
 {
-    /**
-     * Get a list of roles.
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this->createQueryBuilder('r');
         $q->select('r');
@@ -54,18 +50,13 @@ class RoleRepository extends CommonRepository
     /**
      * Get a list of roles.
      *
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
+     * $search arrives as null from UserModel::getLookupResults().
      */
-    public function getRoleList($search = '', $limit = 10, $start = 0)
+    public function getRoleList(?string $search = '', int $limit = 10, int $start = 0): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
+        $q = $this->createQueryBuilder('r');
 
-        $q->select('partial r.{id, name}')
-            ->from(Role::class, 'r');
+        $q->select('partial r.{id, name}');
 
         if (!empty($search)) {
             $q->where('r.name LIKE :search')
@@ -82,7 +73,7 @@ class RoleRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $queryBuilder,
@@ -94,7 +85,7 @@ class RoleRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
@@ -128,12 +119,7 @@ class RoleRepository extends CommonRepository
         ];
     }
 
-    /**
-     * Get a count of users that belong to the role.
-     *
-     * @return array
-     */
-    public function getUserCount($roleIds)
+    public function getUserCount($roleIds): mixed
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

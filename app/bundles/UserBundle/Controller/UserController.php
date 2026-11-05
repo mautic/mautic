@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\UserBundle\Controller;
 
 use JMS\Serializer\SerializerInterface;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -25,12 +25,13 @@ use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Security\SAML\Helper as SAMLHelper;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class UserController extends FormController
+final class UserController extends AbstractFormController
 {
     private RoleRepository $roleRepository;
 
@@ -55,7 +56,7 @@ final class UserController extends FormController
     }
 
     #[Route(
-        '/s/users/{objectAction}/{objectId}',
+        path: '/s/users/{objectAction}/{objectId}',
         name: 'mautic_user_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -69,7 +70,7 @@ final class UserController extends FormController
      * Generate's default user list.
      */
     #[Route(
-        '/s/users/{page}',
+        path: '/s/users/{page}',
         name: 'mautic_user_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -102,7 +103,8 @@ final class UserController extends FormController
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir,
-            ]);
+            ]
+        );
 
         // Check to see if the number of pages match the number of users
         $count = count($users);
@@ -546,7 +548,7 @@ final class UserController extends FormController
      *
      * @param int $objectId
      */
-    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, IpLookupHelper $ipLookupHelper, $objectId): Response|\Symfony\Component\HttpFoundation\RedirectResponse
+    public function contactAction(Request $request, SerializerInterface $serializer, MailHelper $mailer, IpLookupHelper $ipLookupHelper, $objectId): Response|RedirectResponse
     {
         $user  = $this->userModel->getEntity($objectId);
 

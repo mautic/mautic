@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 #[ORM\Table(name: 'webhook_events')]
@@ -17,41 +17,33 @@ class Event
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var Webhook
      */
-    #[ORM\ManyToOne(targetEntity: Webhook::class, cascade: ['detach', 'merge'], inversedBy: 'events')]
+    #[ORM\ManyToOne(targetEntity: Webhook::class, cascade: ['detach'], inversedBy: 'events')]
     #[ORM\JoinColumn(name: 'webhook_id', nullable: false, onDelete: 'CASCADE')]
     private $webhook;
 
     /**
      * @var ArrayCollection<int, WebhookQueue>
      */
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: WebhookQueue::class, cascade: ['detach', 'merge'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: WebhookQueue::class, mappedBy: 'event', cascade: ['detach'], fetch: 'EXTRA_LAZY')]
     private $queues;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_type', type: 'string', length: 50)]
     private $eventType;
 
     public function __construct()
     {
         $this->queues = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->createField('eventType', 'string')
-            ->columnName('event_type')
-            ->length(50)
-            ->build();
     }
 
     /**
@@ -107,9 +99,9 @@ class Event
     }
 
     /**
-     * @param ArrayCollection $queues
+     * @param Collection<int, WebhookQueue> $queues
      */
-    public function setQueues($queues): static
+    public function setQueues(Collection $queues): static
     {
         $this->queues = $queues;
 
@@ -117,9 +109,9 @@ class Event
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection<int, WebhookQueue>
      */
-    public function getQueues()
+    public function getQueues(): Collection
     {
         return $this->queues;
     }

@@ -115,7 +115,7 @@ final class FocusController extends AbstractStandardFormController
     /**
      * @throws \Exception
      */
-    public function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, $action): array
     {
         $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
 
@@ -234,11 +234,10 @@ final class FocusController extends AbstractStandardFormController
      * Return array of options update select response.
      *
      * @param string $updateSelect HTML id of the select
-     * @param object $entity
      * @param string $nameMethod   name of the entity method holding the name
      * @param string $groupMethod  name of the entity method holding the select group
      */
-    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = 'getLanguage'): array
+    protected function getUpdateSelectParams(string $updateSelect, object $entity, string $nameMethod = 'getName', string $groupMethod = 'getLanguage'): array
     {
         return [
             'updateSelect' => $updateSelect,

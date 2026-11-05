@@ -12,22 +12,24 @@ use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactor
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[CoversClass(IpLookupHelper::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
+final class IpLookupHelperTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&DeviceDetector
+     * @var MockObject&DeviceDetector
      */
-    private \PHPUnit\Framework\MockObject\MockObject $deviceDetector;
+    private MockObject $deviceDetector;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&DeviceDetectorFactoryInterface
+     * @var MockObject&DeviceDetectorFactoryInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $deviceDetectorFactory;
+    private MockObject $deviceDetectorFactory;
 
     protected function setUp(): void
     {
@@ -66,7 +68,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
     {
         $ip = $this->getIpHelper()->getIpAddress();
 
-        $this->assertEquals('127.0.0.1', $ip->getIpAddress());
+        $this->assertSame('127.0.0.1', $ip->getIpAddress());
     }
 
     #[TestDox('Check that the first IP is returned when the request is a proxy')]
@@ -75,7 +77,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $request = new Request([], [], [], [], [], ['HTTP_X_FORWARDED_FOR' => '73.77.245.52,10.8.0.2,192.168.0.1']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
 
-        $this->assertEquals('73.77.245.52', $ip->getIpAddress());
+        $this->assertSame('73.77.245.52', $ip->getIpAddress());
     }
 
     #[TestDox('Check that the first IP is returned with a web proxy')]
@@ -84,7 +86,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '73.77.245.53']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
 
-        $this->assertEquals('73.77.245.53', $ip->getIpAddress());
+        $this->assertSame('73.77.245.53', $ip->getIpAddress());
     }
 
     #[TestDox('Check that a local IP is returned for internal IPs')]
@@ -93,7 +95,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $request = new Request([], [], [], [], [], ['REMOTE_ADDR' => '192.168.0.1']);
         $ip      = $this->getIpHelper($request)->getIpAddress();
 
-        $this->assertEquals('127.0.0.1', $ip->getIpAddress());
+        $this->assertSame('127.0.0.1', $ip->getIpAddress());
     }
 
     #[TestDox('Check that internal IP is returned if track_private_ip_ranges is set to true')]
@@ -108,7 +110,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
             );
         $ip = $this->getIpHelper($request, $mockCoreParametersHelper)->getIpAddress();
 
-        $this->assertEquals('192.168.0.1', $ip->getIpAddress());
+        $this->assertSame('192.168.0.1', $ip->getIpAddress());
     }
 
     #[TestDox('Check that prefetch requests are not trackable')]
@@ -208,7 +210,7 @@ final class IpLookupHelperTest extends \PHPUnit\Framework\TestCase
         $this->deviceDetectorFactory
             ->method('create')
             ->willReturnCallback(
-                fn (): \PHPUnit\Framework\MockObject\MockObject => $this->deviceDetector
+                fn (): MockObject => $this->deviceDetector
             );
 
         $helper = new IpLookupHelper($requestStack, $mockRepository, $mockCoreParametersHelper, $this->deviceDetectorFactory);

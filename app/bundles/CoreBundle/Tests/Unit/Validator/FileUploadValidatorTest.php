@@ -7,9 +7,10 @@ namespace Mautic\CoreBundle\Tests\Unit\Validator;
 use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Validator\FileUploadValidator;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class FileUploadValidatorTest extends \PHPUnit\Framework\TestCase
+final class FileUploadValidatorTest extends TestCase
 {
     #[TestDox('Check that extension is valid')]
     public function testValidExtension(): void

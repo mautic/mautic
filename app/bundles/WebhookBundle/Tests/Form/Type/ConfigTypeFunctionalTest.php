@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\WebhookBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
 final class ConfigTypeFunctionalTest extends MauticMysqlTestCase

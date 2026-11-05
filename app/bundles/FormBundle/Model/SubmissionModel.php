@@ -3,12 +3,10 @@
 namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\ORMException;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Exception\FileUploadException;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -154,7 +152,7 @@ final class SubmissionModel extends CommonFormModel
         }
 
         // clean the referer by removing mauticError and mauticMessage
-        $referer = InputHelper::url($referer, null, null, ['mauticError', 'mauticMessage']);
+        $referer = InputHelper::url($referer, null, null, null, ['mauticError', 'mauticMessage']);
         $submission->setReferer($referer);
 
         // Create an event to be dispatched through the processes
@@ -335,8 +333,10 @@ final class SubmissionModel extends CommonFormModel
             $lead = $this->createLeadFromSubmit($form, $leadFieldMatches, $leadFields, $company);
         }
 
+        $lead = $this->getManagedLeadForSubmission($lead);
+
         $trackedDevice = $this->deviceTrackingService->getTrackedDevice();
-        $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+        $trackingId    = ($trackedDevice?->getTrackingId());
 
         // set tracking ID for stats purposes to determine unique hits
         $submission->setTrackingId($trackingId)
@@ -387,7 +387,7 @@ final class SubmissionModel extends CommonFormModel
         // Find and add the lead to the associated campaigns
         $campaigns = $this->campaignModel->getCampaignsByForm($form);
         /** @var Campaign $campaign */
-        foreach ($campaigns ?? [] as $campaign) {
+        foreach ($campaigns as $campaign) {
             if ($campaign->isPublished()) {
                 $this->membershipManager->addContact($lead, $campaign);
             }
@@ -409,6 +409,30 @@ final class SubmissionModel extends CommonFormModel
         // made it to the end so return the submission event to give the calling method access to tokens, results, etc
         // otherwise return false that no errors were encountered (to keep BC really)
         return ($returnEvent) ? ['submission' => $submissionEvent] : false;
+    }
+
+    /**
+     * Ensure a lead assigned to a submission is managed by Doctrine.
+     */
+    private function getManagedLeadForSubmission(?Lead $lead): ?Lead
+    {
+        if (null === $lead) {
+            return null;
+        }
+
+        if ($this->em->contains($lead)) {
+            return $lead;
+        }
+
+        if (!$lead->getId()) {
+            $this->em->persist($lead);
+
+            return $lead;
+        }
+
+        $managedLead = $this->em->find(Lead::class, $lead->getId());
+
+        return $managedLead instanceof Lead ? $managedLead : null;
     }
 
     /**
@@ -449,10 +473,8 @@ final class SubmissionModel extends CommonFormModel
 
     /**
      * @param array<string,mixed> $args
-     *
-     * @return Submission[]|array<int,Submission>|iterable<Submission>|\Doctrine\ORM\Internal\Hydration\IterableResult<Submission>|Paginator<Submission>|SimplePaginator<Submission>
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         return $this->submissionRepository->getEntities($args);
     }
@@ -472,7 +494,7 @@ final class SubmissionModel extends CommonFormModel
      *
      * @throws \Exception
      */
-    public function exportResults($format, $form, array $queryArgs): StreamedResponse|Response
+    public function exportResults($format, Form $form, array $queryArgs): StreamedResponse|Response
     {
         $viewOnlyFields              = $this->formModel->getCustomComponents()['viewOnlyFields'];
         $queryArgs['viewOnlyFields'] = $viewOnlyFields;
@@ -496,6 +518,7 @@ final class SubmissionModel extends CommonFormModel
 
                         // build the data rows
                         foreach ($results as $k => $s) {
+                            /** @var array<string, mixed> $s */
                             $row = $this->getExportRow($s, $viewOnlyFields);
                             $this->putCsvExportRow($handle, $row);
 
@@ -543,6 +566,7 @@ final class SubmissionModel extends CommonFormModel
                             // build the data rows
                             $count = 2;
                             foreach ($results as $k => $s) {
+                                /** @var array<string, mixed> $s */
                                 $row = $this->getExportRow($s, $viewOnlyFields);
 
                                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$count}");
@@ -798,14 +822,13 @@ final class SubmissionModel extends CommonFormModel
      *
      * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string      $dateFormat
-     * @param array       $filter
      */
     public function getSubmissionsLineChartData(
         ?string $unit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         $dateFormat = null,
-        $filter = [],
+        array $filter = [],
         bool $canViewOthers = true,
     ): array {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
@@ -827,12 +850,10 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get a list of top submission referrers.
      *
-     * @param int    $limit
      * @param string $dateFrom
      * @param string $dateTo
-     * @param array  $filters
      */
-    public function getTopSubmissionReferrers($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmissionReferrers(int $limit = 10, $dateFrom = null, $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.referer')
@@ -857,12 +878,10 @@ final class SubmissionModel extends CommonFormModel
     /**
      * Get a list of the most submisions per lead.
      *
-     * @param int    $limit
      * @param string $dateFrom
      * @param string $dateTo
-     * @param array  $filters
      */
-    public function getTopSubmitters($limit = 10, $dateFrom = null, $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getTopSubmitters(int $limit = 10, $dateFrom = null, $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS submissions, t.lead_id, l.firstname, l.lastname, l.email')

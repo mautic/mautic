@@ -42,14 +42,12 @@ final class BotRatioHelperTest extends TestCase
         $emailHitDateTime = new \DateTime();
         $emailSent        = clone $emailHitDateTime;
         $emailSent->modify($sentBefore);
-        $emailStatMock = $this->createMock(Stat::class);
-        $emailStatMock->expects($this->once())
-            ->method('getDateSent')
-            ->willReturn($emailSent);
+        $emailStat = new Stat();
+        $emailStat->setDateSent($emailSent);
         // IP
         $ipAddress        = new IpAddress($ipAddressString);
         $botRatioHelper   = new BotRatioHelper($deviceDetectorFactoryMock, $botHelperBotRatioThreshold, $botHelperTimeEmailThreshold, $blockedUserAgents, $ipDoNotTrackList);
-        $isEvaluatedAsBot = $botRatioHelper->isHitByBot($emailStatMock, $emailHitDateTime, $ipAddress, $userAgent);
+        $isEvaluatedAsBot = $botRatioHelper->isHitByBot($emailStat, $emailHitDateTime, $ipAddress, $userAgent);
         $this->assertSame($isBot, $isEvaluatedAsBot);
     }
 

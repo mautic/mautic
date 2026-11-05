@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher;
 use Mautic\InstallBundle\Configurator\Form\CheckStepType;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final class CheckStep implements StepInterface
@@ -47,7 +48,6 @@ final class CheckStep implements StepInterface
     /**
      * @param Configurator $configurator Configurator service
      * @param string       $projectDir   Kernel root path
-     * @param RequestStack $requestStack Request stack
      */
     public function __construct(
         Configurator $configurator,
@@ -58,7 +58,7 @@ final class CheckStep implements StepInterface
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
-        if ($request instanceof \Symfony\Component\HttpFoundation\Request) {
+        if ($request instanceof Request) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
     }

@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Event;
 use Mautic\PluginBundle\Entity\Integration;
 use Symfony\Contracts\EventDispatcher\Event;
 
-final class ConfigSaveEvent extends Event
+abstract class ConfigSaveEvent extends Event
 {
     public function __construct(
         private readonly Integration $integrationConfiguration,

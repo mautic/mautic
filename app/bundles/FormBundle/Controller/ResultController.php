@@ -2,16 +2,8 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController as CommonFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Translation\Translator;
-use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
@@ -19,51 +11,36 @@ use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Model\ListModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Service\Attribute\Required;
 
 final class ResultController extends CommonFormController
 {
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        FormFieldHelper $fieldHelper,
-        ManagerRegistry $doctrine,
-        ModelFactory $modelFactory,
-        UserHelper $userHelper,
-        CoreParametersHelper $coreParametersHelper,
-        EventDispatcherInterface $dispatcher,
-        Translator $translator,
-        FlashBag $flashBag,
-        RequestStack $requestStack,
-        CorePermissions $security,
-        private readonly FormModel $formModel,
-        private readonly SubmissionResultLoader $submissionResultLoader,
-        private readonly SubmissionModel $submissionModel,
-    ) {
-        $this->setStandardParameters(
-            'form.submission', // model name
-            'form:forms', // permission base
-            'mautic_form', // route base
-            'mautic.formresult', // session base
-            'mautic.form.result', // lang string base
-            '@MauticForm/Result', // template base
-            'mautic_form', // activeLink
-            'formresult' // mauticContent
-        );
+    private FormModel $formModel;
 
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+    private SubmissionResultLoader $submissionResultLoader;
+
+    private SubmissionModel $submissionModel;
+
+    #[Required]
+    public function autowireResultController(
+        FormModel $formModel,
+        SubmissionResultLoader $submissionResultLoader,
+        SubmissionModel $submissionModel,
+    ): void {
+        $this->formModel              = $formModel;
+        $this->submissionResultLoader = $submissionResultLoader;
+        $this->submissionModel        = $submissionModel;
     }
 
     #[Route(
-        '/s/forms/results/{formId}/{objectAction}/{objectId}',
+        path: '/s/forms/results/{formId}/{objectAction}/{objectId}',
         name: 'mautic_form_results_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -74,7 +51,7 @@ final class ResultController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/results/{objectId}/{page}',
+        path: '/s/forms/results/{objectId}/{page}',
         name: 'mautic_form_results',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+', 'page' => '\d+'],
         defaults: ['objectId' => 0, 'page' => 0],
@@ -193,6 +170,14 @@ final class ResultController extends CommonFormController
                     'page'           => $page,
                     'totalCount'     => $count,
                     'limit'          => $limit,
+                    // Must be explicit; otherwise the JS fallback rewrites the trailing URL segment
+                    'baseUrl'        => $this->generateUrl(
+                        'mautic_form_results',
+                        [
+                            'objectId' => $objectId,
+                            'page'     => $page,
+                        ]
+                    ),
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->attributes->all()['tmpl'] ?? $request->query->all()['tmpl'] ?? $request->request->all()['tmpl'] ?? 'index' : 'index',
                     'canDelete'      => $this->security->hasEntityAccess(
                         'form:forms:editown',
@@ -218,10 +203,10 @@ final class ResultController extends CommonFormController
     }
 
     #[Route(
-        '/forms/results/file/{submissionId}/{field}',
+        path: '/forms/results/file/{submissionId}/{field}',
         name: 'mautic_form_file_download',
     )]
-    public function downloadFileAction(int $submissionId, string $field, FormUploader $formUploader): BinaryFileResponse
+    public function downloadFileAction(int|string $submissionId, string $field, FormUploader $formUploader): BinaryFileResponse
     {
         $submission             = $this->submissionResultLoader->getSubmissionWithResult($submissionId);
 
@@ -239,7 +224,8 @@ final class ResultController extends CommonFormController
         if (empty($fieldEntity->getProperties()['public']) && !$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
-            $submission->getForm()->getCreatedBy())
+            $submission->getForm()->getCreatedBy()
+        )
         ) {
             $this->throwAccessDenied();
         }
@@ -263,7 +249,7 @@ final class ResultController extends CommonFormController
     }
 
     #[Route(
-        '/forms/results/file/{fieldId}/filename/{fileName}',
+        path: '/forms/results/file/{fieldId}/filename/{fileName}',
         name: 'mautic_form_file_download_by_name',
     )]
     public function downloadFileByFileNameAction(string $fieldId, string $fileName, FieldModel $fieldModel, FormUploader $formUploader): BinaryFileResponse
@@ -273,7 +259,8 @@ final class ResultController extends CommonFormController
         if (empty($fieldEntity->getProperties()['public']) && !$this->security->hasEntityAccess(
             'form:forms:viewown',
             'form:forms:viewother',
-            $fieldEntity->getForm()->getCreatedBy())
+            $fieldEntity->getForm()->getCreatedBy()
+        )
         ) {
             $this->throwAccessDenied();
         }
@@ -302,7 +289,7 @@ final class ResultController extends CommonFormController
      * @throws \Exception
      */
     #[Route(
-        '/s/forms/results/{objectId}/export/{format}',
+        path: '/s/forms/results/{objectId}/export/{format}',
         name: 'mautic_form_export',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['format' => 'csv', 'objectId' => 0],
@@ -438,6 +425,36 @@ final class ResultController extends CommonFormController
         return 'mautic_form_results_action';
     }
 
+    protected function getPermissionBase(): string
+    {
+        return 'form:forms';
+    }
+
+    protected function getRouteBase(): string
+    {
+        return 'mautic_form';
+    }
+
+    protected function getSessionBase($objectId = null): string
+    {
+        return 'mautic.formresult';
+    }
+
+    protected function getTranslationBase(): string
+    {
+        return 'mautic.form.result';
+    }
+
+    protected function getTemplateBase(): string
+    {
+        return '@MauticForm/Result';
+    }
+
+    protected function getJsLoadMethodPrefix(): string
+    {
+        return 'formresult';
+    }
+
     /**
      * Set the main form ID as the objectId.
      */
@@ -456,7 +473,7 @@ final class ResultController extends CommonFormController
         return parent::generateUrl($route, $parameters, $referenceType);
     }
 
-    public function getPostActionRedirectArguments(array $args, $action): array
+    protected function getPostActionRedirectArguments(array $args, $action): array
     {
         if ('batchDelete' === $action) {
             $formId                             = $this->getFormIdFromRequest();
@@ -487,7 +504,7 @@ final class ResultController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/results/{objectId}/add-to-segment',
+        path: '/s/forms/results/{objectId}/add-to-segment',
         name: 'mautic_form_results_add_segment',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

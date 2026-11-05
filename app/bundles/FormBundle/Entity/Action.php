@@ -11,7 +11,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ActionRepository::class)]
 #[ORM\Table(name: 'form_actions')]
-#[ORM\Index(columns: ['type'], name: 'form_action_type_search')]
+#[ORM\Index(name: 'form_action_type_search', columns: ['type'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -39,28 +39,34 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent(association: 'form')]
 class Action implements UuidInterface
 {
     use UuidTrait;
 
-    public const ENTITY_NAME = 'form_action';
+    public const string ENTITY_NAME = 'form_action';
 
     /**
      * @var int
      */
     #[Groups(['action:read', 'form:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -68,59 +74,34 @@ class Action implements UuidInterface
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required', groups: ['action'])]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var int
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(name: 'action_order', type: 'integer')]
     private $order = 0;
 
     /**
      * @var array
      */
     #[Groups(['action:read', 'action:write', 'form:read'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
-    /**
-     * @var Form|null
-     */
     #[Groups(['action:read', 'action:write', 'form:read'])]
-    private $form;
+    #[ORM\ManyToOne(targetEntity: Form::class, inversedBy: 'actions')]
+    #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
+    private ?Form $form = null;
 
-    /**
-     * @var array
-     */
-    private $changes;
+    private ?array $changes = null;
 
     public function __clone()
     {
         $this->id   = null;
         $this->form = null;
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('order', 'integer')
-            ->columnName('action_order')
-            ->build();
-
-        $builder->addField('properties', 'array');
-
-        $builder->createManyToOne('form', 'Form')
-            ->inversedBy('actions')
-            ->addJoinColumn('form_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
-            ->build();
-
     }
 
     /**
@@ -149,10 +130,7 @@ class Action implements UuidInterface
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getChanges()
+    public function getChanges(): ?array
     {
         return $this->changes;
     }
@@ -185,10 +163,7 @@ class Action implements UuidInterface
         return $this->order;
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -197,10 +172,7 @@ class Action implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -212,10 +184,7 @@ class Action implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return Form|null
-     */
-    public function getForm()
+    public function getForm(): ?Form
     {
         return $this->form;
     }

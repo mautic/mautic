@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -7,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<UtmTag>
  */
-class UtmTagRepository extends CommonRepository
+final class UtmTagRepository extends CommonRepository
 {
     use TimelineTrait;
 
@@ -15,10 +17,8 @@ class UtmTagRepository extends CommonRepository
      * Get tag entities by lead.
      *
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getUtmTagsByLead(?Lead $lead = null, array $options = [])
+    public function getUtmTagsByLead(?Lead $lead = null, array $options = []): array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('*')

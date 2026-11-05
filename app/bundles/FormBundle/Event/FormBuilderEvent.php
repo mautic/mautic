@@ -5,7 +5,6 @@ namespace Mautic\FormBundle\Event;
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;

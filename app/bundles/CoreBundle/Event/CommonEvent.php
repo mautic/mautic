@@ -2,19 +2,13 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class CommonEvent extends Event
+abstract class CommonEvent extends Event
 {
     /**
-     * @var EntityManagerInterface
-     */
-    protected $em;
-
-    /**
-     * @var object
+     * @var object|null
      */
     protected $entity;
 
@@ -29,16 +23,6 @@ class CommonEvent extends Event
      * @var string
      */
     protected $failed;
-
-    /**
-     * Sets the entity manager for the event to use.
-     *
-     * @param EntityManagerInterface $em
-     */
-    public function setEntityManager($em): void
-    {
-        $this->em = $em;
-    }
 
     /**
      * Returns if a saved lead is new or not.

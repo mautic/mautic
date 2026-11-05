@@ -10,21 +10,24 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\Exception\ContactCannotBeAddedToCampaignException;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class AdderTest extends \PHPUnit\Framework\TestCase
+final class AdderTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
+     * @var MockObject&LeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
+    private MockObject $leadRepository;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadEventLogRepository
+     * @var MockObject&LeadEventLogRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
+    private MockObject $leadEventLogRepository;
 
     protected function setUp(): void
     {
@@ -34,15 +37,12 @@ final class AdderTest extends \PHPUnit\Framework\TestCase
 
     public function testNewMemberAdded(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->method('getId')
-            ->willReturn(1);
-        $campaign->method('allowRestart')
-            ->willReturn(true);
+        $campaign   = new Campaign();
+        ReflectionHelper::setEntityId($campaign, 1);
+        $campaign->setAllowRestart(true);
 
-        $contact = $this->createMock(Lead::class);
-        $contact->method('getId')
-            ->WillReturn(2);
+        $contact = new Lead();
+        $contact->setId(2);
 
         $this->leadEventLogRepository->expects($this->once())
             ->method('hasBeenInCampaignRotation')

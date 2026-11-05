@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Tests\Unit\ErrorHandler;
 
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Twig\Error\LoaderError;
 
 final class ErrorHandlerTest extends TestCase
@@ -52,6 +53,10 @@ final class ErrorHandlerTest extends TestCase
         ErrorHandler::register('prod');
         $handler = ErrorHandler::getHandler();
         $handler->setDisplayErrors(false);
+        // handleException() logs the exception at ERROR level. Without a logger
+        // the handler falls back to error_log(), which PHPUnit writes to stderr
+        // in the middle of the progress output.
+        $handler->setLogger(new NullLogger());
 
         chdir(sys_get_temp_dir());
 

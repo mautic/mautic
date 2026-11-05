@@ -43,7 +43,7 @@ final class CampaignSubscriberTest extends TestCase
         $event->setProperties(['integration' => 'Foo']);
 
         $log = new LeadEventLog();
-        $log->setLead($this->createStub(Lead::class));
+        $log->setLead(new Lead());
         $log->setEvent($event);
 
         return new PendingEvent(new ActionAccessor([]), $event, new ArrayCollection([$log]));

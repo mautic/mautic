@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticTagManagerBundle\Model;
 
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel as BaseTagModel;
-use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
 use MauticPlugin\MauticTagManagerBundle\Form\Type\TagEntityType;
 use Symfony\Component\Form\FormInterface;
@@ -33,13 +35,12 @@ final class TagModel extends BaseTagModel implements GlobalSearchInterface
     }
 
     /**
-     * @param Tag         $entity
+     * @param Tag|array<string, mixed>         $entity
      * @param string|null $action
-     * @param array       $options
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
-        if (!$entity instanceof \Mautic\LeadBundle\Entity\Tag) {
+        if (!$entity instanceof Tag) {
             throw new MethodNotAllowedHttpException(['Tag']);
         }
 

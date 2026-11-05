@@ -61,11 +61,10 @@ final class MauticSyncProcessTest extends TestCase
     public function testThatMauticGetSyncReportIsCalledBasedOnRequest(): void
     {
         $objectName    = 'Contact';
-        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
-        $mappingManual->addObjectMapping($objectMapping);
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME, [$objectMapping]);
 
         $fromSyncDateTime = new \DateTimeImmutable();
         $this->syncDateHelper->expects($this->once())
@@ -102,7 +101,7 @@ final class MauticSyncProcessTest extends TestCase
     public function testThatMauticGetSyncReportIsNotCalledBasedOnRequest(): void
     {
         $objectName    = 'Contact';
-        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME, []);
 
         $this->syncDateHelper->expects($this->never())
             ->method('getSyncFromDateTime')
@@ -120,11 +119,10 @@ final class MauticSyncProcessTest extends TestCase
     public function testGetSyncOrder(): void
     {
         $objectName    = 'Contact';
-        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
-        $mappingManual->addObjectMapping($objectMapping);
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME, [$objectMapping]);
 
         $toSyncDateTime = new \DateTimeImmutable();
         $this->syncDateHelper->expects($this->once())
@@ -161,11 +159,10 @@ final class MauticSyncProcessTest extends TestCase
     public function testGetSyncOrderObjectDeleted(): void
     {
         $objectName    = 'Contact';
-        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
-        $mappingManual->addObjectMapping($objectMapping);
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME, [$objectMapping]);
 
         $toSyncDateTime = new \DateTimeImmutable();
         $this->syncDateHelper->expects($this->once())
@@ -191,11 +188,10 @@ final class MauticSyncProcessTest extends TestCase
     public function testGetSyncOrderObjectSkipped(): void
     {
         $objectName    = 'Contact';
-        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $objectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('firstname', 'first_name');
-        $mappingManual->addObjectMapping($objectMapping);
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME, [$objectMapping]);
 
         $toSyncDateTime = new \DateTimeImmutable();
         $this->syncDateHelper->expects($this->once())
@@ -230,7 +226,6 @@ final class MauticSyncProcessTest extends TestCase
 
     public function testThatItDoesntSyncOtherEntityTypesWhenIDsForSomeEntityAreSpecified(): void
     {
-        $mappingManual         = new MappingManualDAO(self::INTEGRATION_NAME);
         $this->inputOptionsDAO = new InputOptionsDAO([
             'integration'      => self::INTEGRATION_NAME,
             'mautic-object-id' => ['contact:1'],
@@ -238,15 +233,14 @@ final class MauticSyncProcessTest extends TestCase
 
         $contactMapping = new ObjectMappingDAO(Contact::NAME, 'Contact');
         $contactMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
-        $mappingManual->addObjectMapping($contactMapping);
 
         $leadMapping = new ObjectMappingDAO(Contact::NAME, 'Lead');
         $leadMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
-        $mappingManual->addObjectMapping($leadMapping);
 
         $companyMapping = new ObjectMappingDAO(Company::NAME, 'Account');
         $companyMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
-        $mappingManual->addObjectMapping($companyMapping);
+
+        $mappingManual = new MappingManualDAO(self::INTEGRATION_NAME, [$contactMapping, $leadMapping, $companyMapping]);
 
         $fromSyncDateTime = new \DateTimeImmutable();
         $this->syncDateHelper->expects($this->once())

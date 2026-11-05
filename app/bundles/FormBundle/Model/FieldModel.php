@@ -20,14 +20,12 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonFormModel<Field>
  */
-class FieldModel extends CommonFormModel
+final class FieldModel extends CommonFormModel
 {
     public static function getName(): string
     {
         return 'form.field';
     }
-
-    protected LeadFieldModel $leadFieldModel;
 
     private RequestStack $requestStack;
 
@@ -42,7 +40,6 @@ class FieldModel extends CommonFormModel
         ColumnSchemaHelper $columnSchemaHelper,
         FieldRepository $fieldRepository,
     ): void {
-        $this->leadFieldModel     = $leadFieldModel;
         $this->requestStack       = $requestStack;
         $this->columnSchemaHelper = $columnSchemaHelper;
         $this->fieldRepository    = $fieldRepository;
@@ -54,13 +51,12 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @param object|array<mixed> $entity
-     * @param string|null         $action
-     * @param array               $options
+     * @param Field|array<string, mixed> $entity
+     * @param string|null                $action
      *
      * @return FormInterface<mixed>
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if ($action) {
             $options['action'] = $action;
@@ -130,9 +126,11 @@ class FieldModel extends CommonFormModel
     }
 
     /**
+     * @param Field $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Field) {
             throw new MethodNotAllowedHttpException(['Form']);

@@ -45,6 +45,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  *     }
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoParentConstructorForwardingRuleTest
  */
 final class NoParentConstructorForwardingRule implements Rule
 {

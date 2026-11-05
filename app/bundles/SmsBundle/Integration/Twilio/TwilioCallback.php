@@ -2,7 +2,8 @@
 
 namespace Mautic\SmsBundle\Integration\Twilio;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Callback\CallbackInterface;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\Helper\ContactHelper;
@@ -26,9 +27,11 @@ final readonly class TwilioCallback implements CallbackInterface
     }
 
     /**
+     * @return Collection<int, Lead>
+     *
      * @throws NumberNotFoundException
      */
-    public function getContacts(Request $request): ArrayCollection
+    public function getContacts(Request $request): Collection
     {
         $this->validateRequest($request->request);
 

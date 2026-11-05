@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field\Dispatcher;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Event\FieldPostSaveEvent;
+use Mautic\LeadBundle\Event\FieldPreSaveEvent;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Exception\NoListenerException;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-readonly class FieldSaveDispatcher
+final readonly class FieldSaveDispatcher
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,
-        private EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -24,7 +23,7 @@ readonly class FieldSaveDispatcher
      */
     public function dispatchPreSaveEvent(LeadField $entity, bool $isNew): LeadFieldEvent
     {
-        return $this->dispatchEvent(LeadEvents::FIELD_PRE_SAVE, $entity, $isNew);
+        return $this->dispatchEvent(new FieldPreSaveEvent($entity, $isNew));
     }
 
     /**
@@ -32,24 +31,19 @@ readonly class FieldSaveDispatcher
      */
     public function dispatchPostSaveEvent(LeadField $entity, bool $isNew): LeadFieldEvent
     {
-        return $this->dispatchEvent(LeadEvents::FIELD_POST_SAVE, $entity, $isNew);
+        return $this->dispatchEvent(new FieldPostSaveEvent($entity, $isNew));
     }
 
     /**
      * @throws NoListenerException
      */
-    public function dispatchEvent(string $action, LeadField $entity, bool $isNew, ?LeadFieldEvent $event = null): LeadFieldEvent
+    public function dispatchEvent(LeadFieldEvent $event): LeadFieldEvent
     {
-        if (!$this->dispatcher->hasListeners($action)) {
-            throw new NoListenerException('There is no Listener for '.$action.' event');
+        if (!$this->dispatcher->hasListeners($event::class)) {
+            throw new NoListenerException('There is no Listener for '.$event::class.' event');
         }
 
-        if (null === $event) {
-            $event = new LeadFieldEvent($entity, $isNew);
-            $event->setEntityManager($this->entityManager);
-        }
-
-        $this->dispatcher->dispatch($event, $action);
+        $this->dispatcher->dispatch($event);
 
         return $event;
     }

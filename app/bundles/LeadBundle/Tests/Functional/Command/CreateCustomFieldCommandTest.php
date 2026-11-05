@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\Command;
 
-use Doctrine\DBAL\Schema\Column;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
+use Mautic\CoreBundle\Doctrine\Schema\ColumnIntrospector;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -16,12 +17,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->useCleanupRollback = false;
-    }
+    protected $useCleanupRollback = false;
 
     public function testWithIdAndUserArgs(): void
     {
@@ -58,9 +54,9 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
-        $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);
+        $columnsSchema = ColumnIntrospector::listColumns($this->em->getConnection()->createSchemaManager(), $leadTableName);
         $columnNames   = array_map(
-            static fn (Column $column) => $column->getName(),
+            AssetName::of(...),
             $columnsSchema
         );
 
@@ -109,9 +105,9 @@ final class CreateCustomFieldCommandTest extends MauticMysqlTestCase
         $this->assertSame(0, $commandTester->getStatusCode(), $commandTester->getDisplay());
 
         $leadTableName = $this->em->getClassMetadata(Lead::class)->getTableName();
-        $columnsSchema = $this->em->getConnection()->createSchemaManager()->listTableColumns($leadTableName);
+        $columnsSchema = ColumnIntrospector::listColumns($this->em->getConnection()->createSchemaManager(), $leadTableName);
         $columnNames   = array_map(
-            static fn (Column $column) => $column->getName(),
+            AssetName::of(...),
             $columnsSchema
         );
 

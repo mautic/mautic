@@ -44,19 +44,28 @@ use Symfony\Component\Validator\Constraints as Assert;
     ]
 )]
 #[UniqueCustomField(object: 'company')]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'company_projects_xref'),
+)])]
 class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
     use ProjectTrait;
 
-    public const FIELD_ALIAS = 'company';
+    public const string FIELD_ALIAS = 'company';
 
-    public const TABLE_NAME  = 'companies';
+    public const string TABLE_NAME  = 'companies';
 
     /**
      * @var int
      */
     #[Groups(['company:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -64,10 +73,11 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      */
     #[Groups(['company:read', 'company:write'])]
     #[Assert\Range(min: 0, max: 2147483647)]
+    #[ORM\Column(type: 'integer', nullable: true)]
     private $score = 0;
 
     #[Groups(['company:read', 'company:write'])]
-    #[ORM\ManyToOne(targetEntity: User::class, cascade: ['merge'])]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'owner_id', onDelete: 'SET NULL')]
     private ?User $owner = null;
 
@@ -75,6 +85,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
      * @var mixed[]
      */
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(name: 'social_cache', type: 'array', nullable: true)]
     private $socialCache = [];
 
     /**
@@ -150,6 +161,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     private $description;
 
     #[Groups(['company:read', 'company:write'])]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $deleted = null;
 
     public function __construct()
@@ -167,7 +179,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     /**
      * @return mixed[]
      */
-    public function getSocialCache()
+    public function getSocialCache(): array
     {
         return $this->socialCache;
     }
@@ -175,7 +187,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     /**
      * @param mixed[] $cache
      */
-    public function setSocialCache($cache): void
+    public function setSocialCache(array $cache): void
     {
         $this->socialCache = $cache;
     }
@@ -183,22 +195,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createField('id', 'integer')
-            ->makePrimaryKey()
-            ->generatedValue()
-            ->build();
-
-        $builder->createField('socialCache', 'array')
-            ->columnName('social_cache')
-            ->nullable()
-            ->build();
-
-        $builder->createField('score', 'integer')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('deleted', Types::DATETIME_MUTABLE);
 
         self::loadFixedFieldMetadata(
             $builder,
@@ -219,7 +215,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             FieldModel::$coreCompanyFields
         );
 
-        self::addProjectsField($builder, 'company_projects_xref', 'company_id');
     }
 
     /**
@@ -283,14 +278,16 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             }
         } elseif ('owner' === $prop) {
             $current = $this->owner;
-            if ($current && !$val) {
-                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
-            } elseif (!$current && $val) {
-                $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
-            } elseif ($current && $current->getId() != $val->getId()) {
+            /** @var User|null $owner */
+            $owner = $val;
+            if ($current && !$owner) {
+                $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $owner];
+            } elseif (!$current && $owner) {
+                $this->changes['owner'] = [$current, $owner->getName().' ('.$owner->getId().')'];
+            } elseif ($current && $current->getId() != $owner->getId()) {
                 $this->changes['owner'] = [
                     $current->getName().'('.$current->getId().')',
-                    $val->getName().'('.$val->getId().')',
+                    $owner->getName().'('.$owner->getId().')',
                 ];
             }
         } else {

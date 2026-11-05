@@ -234,21 +234,20 @@ class AjaxController extends CommonController
         if (null !== $entity) {
             $permissionBase = $model->getPermissionBase();
 
-            $security  = $this->security;
             $createdBy = (method_exists($entity, 'getCreatedBy')) ? $entity->getCreatedBy() : null;
 
-            if ($security->checkPermissionExists($permissionBase.':publishown')) {
-                $hasPermission = $security->hasEntityAccess($permissionBase.':publishown', $permissionBase.':publishother', $createdBy);
-            } elseif ($security->checkPermissionExists($permissionBase.':publish')) {
-                $hasPermission = $security->isGranted($permissionBase.':publish');
-            } elseif ($security->checkPermissionExists($permissionBase.':manage')) {
-                $hasPermission = $security->isGranted($permissionBase.':manage');
-            } elseif ($security->checkPermissionExists($permissionBase.':full')) {
-                $hasPermission = $security->isGranted($permissionBase.':full');
-            } elseif ($security->checkPermissionExists($permissionBase.':editown')) {
-                $hasPermission = $security->hasEntityAccess($permissionBase.':editown', $permissionBase.':editother', $createdBy);
-            } elseif ($security->checkPermissionExists($permissionBase.':edit')) {
-                $hasPermission = $security->isGranted($permissionBase.':edit');
+            if ($this->security->checkPermissionExists($permissionBase.':publishown')) {
+                $hasPermission = $this->security->hasEntityAccess($permissionBase.':publishown', $permissionBase.':publishother', $createdBy);
+            } elseif ($this->security->checkPermissionExists($permissionBase.':publish')) {
+                $hasPermission = $this->security->isGranted($permissionBase.':publish');
+            } elseif ($this->security->checkPermissionExists($permissionBase.':manage')) {
+                $hasPermission = $this->security->isGranted($permissionBase.':manage');
+            } elseif ($this->security->checkPermissionExists($permissionBase.':full')) {
+                $hasPermission = $this->security->isGranted($permissionBase.':full');
+            } elseif ($this->security->checkPermissionExists($permissionBase.':editown')) {
+                $hasPermission = $this->security->hasEntityAccess($permissionBase.':editown', $permissionBase.':editother', $createdBy);
+            } elseif ($this->security->checkPermissionExists($permissionBase.':edit')) {
+                $hasPermission = $this->security->isGranted($permissionBase.':edit');
             } else {
                 $hasPermission = false;
             }

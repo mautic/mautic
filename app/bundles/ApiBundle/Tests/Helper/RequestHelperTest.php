@@ -6,17 +6,17 @@ namespace Mautic\ApiBundle\Tests\Helper;
 
 use Mautic\ApiBundle\Helper\RequestHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 
 #[AllowMockObjectsWithoutExpectations]
 final class RequestHelperTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Request
+     * @var MockObject&Request
      */
-    private \PHPUnit\Framework\MockObject\MockObject $request;
+    private MockObject $request;
 
     protected function setUp(): void
     {
@@ -25,23 +25,21 @@ final class RequestHelperTest extends TestCase
 
     public function testIsBasicAuthWithValidBasicAuth(): void
     {
-        $this->request->headers = new HeaderBag(['Authorization' => 'Basic dXNlcm5hbWU6cGFzc3dvcmQ=']);
-
-        $this->assertTrue(RequestHelper::hasBasicAuth($this->request));
+        $this->assertTrue(RequestHelper::hasBasicAuth(
+            $this->requestWithAuthorization('Basic dXNlcm5hbWU6cGFzc3dvcmQ=')
+        ));
     }
 
     public function testIsBasicAuthWithInvalidBasicAuth(): void
     {
-        $this->request->headers = new HeaderBag(['Authorization' => 'Invalid Basic Auth value']);
-
-        $this->assertFalse(RequestHelper::hasBasicAuth($this->request));
+        $this->assertFalse(RequestHelper::hasBasicAuth(
+            $this->requestWithAuthorization('Invalid Basic Auth value')
+        ));
     }
 
     public function testIsBasicAuthWithMissingBasicAuth(): void
     {
-        $this->request->headers = new HeaderBag([]);
-
-        $this->assertFalse(RequestHelper::hasBasicAuth($this->request));
+        $this->assertFalse(RequestHelper::hasBasicAuth(new Request()));
     }
 
     public function testIsApiRequestWithOauthUrl(): void
@@ -69,5 +67,17 @@ final class RequestHelperTest extends TestCase
             ->willReturn('/s/dashboard');
 
         $this->assertFalse(RequestHelper::isApiRequest($this->request));
+    }
+
+    /**
+     * A real request rather than the mock: hasBasicAuth() reads the header bag, and
+     * assigning one onto a doubled Request does not survive on Symfony 8.
+     */
+    private function requestWithAuthorization(string $value): Request
+    {
+        $request = new Request();
+        $request->headers->set('Authorization', $value);
+
+        return $request;
     }
 }

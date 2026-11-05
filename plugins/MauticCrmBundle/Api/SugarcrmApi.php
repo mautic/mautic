@@ -106,11 +106,9 @@ final class SugarcrmApi extends CrmApi
     /**
      * @param array<string, mixed> $fields
      *
-     * @return array
-     *
      * @throws ApiErrorException
      */
-    public function createLead(array $fields, $lead)
+    public function createLead(array $fields, $lead): array
     {
         $tokenData       = $this->integration->getKeys();
         $createdLeadData = [];
@@ -483,6 +481,7 @@ final class SugarcrmApi extends CrmApi
         }
         // TODO
 
+        $filter = [];
         if (isset($query['emails'])) {
             $filter[] = ['email_addresses.email_address' => ['$in' => $query['emails']]];
             $filter[] = ['deleted' => '0'];

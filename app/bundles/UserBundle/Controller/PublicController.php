@@ -2,7 +2,8 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Doctrine\DBAL\Exception;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Form\Type\PasswordResetConfirmType;
@@ -17,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class PublicController extends FormController
+final class PublicController extends AbstractFormController
 {
     private UserRepository $userRepository;
 
@@ -36,7 +37,7 @@ final class PublicController extends FormController
      * Generates a new password for the user and emails it to them.
      */
     #[Route(
-        '/passwordreset',
+        path: '/passwordreset',
         name: 'mautic_user_passwordreset',
     )]
     public function passwordResetAction(Request $request, LoggerInterface $logger): RedirectResponse|Response
@@ -92,7 +93,7 @@ final class PublicController extends FormController
     }
 
     #[Route(
-        '/passwordresetconfirm',
+        path: '/passwordresetconfirm',
         name: 'mautic_user_passwordresetconfirm',
     )]
     public function passwordResetConfirmAction(Request $request): RedirectResponse|Response
@@ -161,7 +162,7 @@ final class PublicController extends FormController
     }
 
     #[Route(
-        '/invite/{token}',
+        path: '/invite/{token}',
         name: 'mautic_user_invite_register',
     )]
     public function inviteAction(Request $request, UserModel $model, LoggerInterface $logger): RedirectResponse|Response
@@ -207,7 +208,7 @@ final class PublicController extends FormController
                         $this->addFlashMessage('mautic.user.invite.account_created', [], 'notice', 'flashes');
 
                         $response = $this->redirectToRoute('login');
-                    } catch (\Doctrine\DBAL\Exception $e) {
+                    } catch (Exception $e) {
                         $logger->error($this->translator->trans('mautic.user.invite.registration.database.error', [], 'messages').': '.$e->getMessage());
                         $this->addFlashMessage('mautic.user.invite.error.database', [], 'error', 'flashes');
                     }

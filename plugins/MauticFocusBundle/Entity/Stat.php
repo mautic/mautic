@@ -5,27 +5,29 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: 'focus_stats')]
-#[ORM\Index(columns: ['type'], name: 'focus_type')]
-#[ORM\Index(columns: ['type', 'type_id'], name: 'focus_type_id')]
-#[ORM\Index(columns: ['date_added'], name: 'focus_date_added')]
+#[ORM\Index(name: 'focus_type', columns: ['type'])]
+#[ORM\Index(name: 'focus_type_id', columns: ['type', 'type_id'])]
+#[ORM\Index(name: 'focus_date_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
     // Used for querying stats
-    public const TYPE_FORM         = 'submission';
+    public const string TYPE_FORM         = 'submission';
 
-    public const TYPE_CLICK        = 'click';
+    public const string TYPE_CLICK        = 'click';
 
-    public const TYPE_NOTIFICATION = 'view';
+    public const string TYPE_NOTIFICATION = 'view';
 
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -38,38 +40,24 @@ class Stat
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $type;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'type_id', type: 'integer', nullable: true)]
     private $typeId;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
-    /**
-     * @var ?Lead
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->addField('type', 'string');
-
-        $builder->addNamedField('typeId', 'integer', 'type_id', true);
-
-        $builder->addNamedField('dateAdded', 'datetime', 'date_added');
-
-    }
+    private ?Lead $lead = null;
 
     /**
      * @return mixed
@@ -151,10 +139,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return ?Lead
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }

@@ -22,12 +22,13 @@ return RectorConfig::configure()
         phpunitNarrowAsserts: true,
     )
     ->withPhpSets(php84: true)
+    // ->withImportNames(importShortClasses: false)
     ->withCache(__DIR__.'/var/cache/rector')
     ->withRules([
         // to be used next on loadMetadata()
-        // \Utils\Rector\LoadMetadataMauticHelperToAttributeRector::class,
+        \Utils\Rector\LoadMetadataMauticHelperToAttributeRector::class,
         // \Utils\Rector\LoadMetadataStaticHelperToAttributeRector::class,
-        // \Utils\Rector\LoadMetadataColumnToDoctrineAttributeRector::class,
+        \Utils\Rector\LoadMetadataColumnToDoctrineAttributeRector::class,
         \Utils\Rector\LoadMetadataAssociationToDoctrineAttributeRector::class,
         \Utils\Rector\LoadMetadataManyToManyToDoctrineAttributeRector::class,
         \Utils\Rector\LoadMetadataTableToDoctrineAttributeRector::class,
@@ -44,24 +45,47 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class,
         Utils\Rector\AssertTrueResponseIsOkToAssertResponseIsSuccessfulRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class,
+        Utils\Rector\TestGetRepositoryToContainerGetRector::class,
+        Utils\Rector\RouteRequirementParamTypeRector::class,
     ])
     ->withComposerBased(phpunit: true, symfony: true)
     ->withSkip([
         '*/Fixture/*',
 
+        // form event subscribers register on the Form dispatcher via addEventSubscriber(), which needs EventSubscriberInterface;
+        // SecurityController listens on kernel.request but a controller cannot expose a public non-action method;
+        // DashboardSubscriber base defines listener methods that subclasses override, and method attributes do not inherit to an override
+        Rector\Symfony\CodeQuality\Rector\Class_\EventSubscriberToAttributeRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Form/EventListener',
+            __DIR__.'/app/bundles/UserBundle/Controller/SecurityController.php',
+            __DIR__.'/app/bundles/DashboardBundle/EventListener/DashboardSubscriber.php',
+        ],
+
+        // widening the public return types to \DateTime|bool|null is out of scope for this bump
+        __DIR__.'/app/bundles/CoreBundle/Helper/DateTimeHelper.php',
+
         // prefer implicit compare on object|null
-        Rector\TypeDeclaration\Rector\BooleanAnd\BinaryOpNullableToInstanceofRector::class,
-        Rector\CodeQuality\Rector\If_\ObjectExplicitBoolCompareRector::class,
-        Rector\CodeQuality\Rector\Identical\FlipTypeControlToUseExclusiveTypeRector::class,
+        Rector\CodeQuality\Rector\If_\ExplicitNullableObjectInstanceRector::class,
+
+        // importing Lead/Exception short names here shadows the local Entity\Lead and Executioner\Exception sub-namespaces
+        Rector\PostRector\Rector\NameImportingPostRector::class => [
+            __DIR__.'/app/bundles/CampaignBundle/Entity/LeadRepository.php',
+            __DIR__.'/app/bundles/CampaignBundle/Executioner/EventExecutioner.php',
+        ],
+
+        // createFromFormat() leaks a \DateTime|bool|null union that breaks the getDateTime() return contract
+        Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector::class => [
+            __DIR__.'/app/bundles/CoreBundle/Helper/DateTimeHelper.php',
+        ],
+
+        // adds dead "return false" after self::fail(); fixed upstream in rector-phpunit #801, drop after next tag
+        Rector\PHPUnit\CodeQuality\Rector\MethodCall\WillReturnCallbackFallbackToReturnFalseRector::class => [
+            __DIR__.'/app/bundles/UserBundle/Tests/EventListener/ApiUserSubscriberTest.php',
+        ],
 
         // Rector\Symfony\CodeQuality\Rector\Class_\LoadValidatorMetadataToAttributeRector::class,
         Utils\Rector\ModelGetRepositoryToRepositoryServiceRector::class => [
             __DIR__.'/app/bundles/PageBundle/Form/Type/PreferenceCenterListType.php',
-        ],
-
-        Rector\CodeQuality\Rector\Isset_\IssetOnPropertyObjectToPropertyExistsRector::class => [
-            // doctrine magic
-            __DIR__.'/app/bundles/CoreBundle/EventListener/DoctrineEventsSubscriber.php',
         ],
 
         // test fixtures
@@ -71,6 +95,11 @@ return RectorConfig::configure()
         UnserializeToSerializerDecodeRector::class => [
             // tests
             __DIR__.'/app/bundles/UserBundle/Tests/Entity/UserTest.php',
+            // reproduces what DBAL's own ArrayType did before DBAL 4 removed it: the objects
+            // have to be unserialized so that convertToPHPValue can drop the ones that would
+            // carry null bytes. Serializer::decode() refuses the whole value instead, which
+            // loses array fields that legitimately hold one.
+            __DIR__.'/app/bundles/CoreBundle/Doctrine/Type/ArrayType.php',
         ],
 
         // streamed response above
@@ -81,11 +110,13 @@ return RectorConfig::configure()
         Rector\Privatization\Rector\ClassMethod\PrivatizeFinalClassMethodRector::class => [
             __DIR__.'/app/bundles/PageBundle/Controller/AjaxController.php',
             __DIR__.'/app/bundles/EmailBundle/Controller/AjaxController.php',
+            // protected methods are mocked in tests
+            __DIR__.'/app/bundles/PageBundle/Model/TrackableModel.php',
+            __DIR__.'/plugins/MauticCrmBundle/Integration/SalesforceIntegration.php',
         ],
 
         // modified with reflection
         Rector\Php81\Rector\Property\ReadOnlyPropertyRector::class => [
-            __DIR__.'/app/bundles/EmailBundle/Entity/EmailDraft.php',
             __DIR__.'/app/bundles/EmailBundle/Helper/MailHelper.php',
         ],
 

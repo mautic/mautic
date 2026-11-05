@@ -40,7 +40,7 @@ final class IsPostActionRedirectUrlValidator extends ConstraintValidator
 
     private function validateRegularUrl(string $url, string $invalidUrlMessage): void
     {
-        $urlConstraint = new Url(message: $invalidUrlMessage);
+        $urlConstraint = new Url(message: $invalidUrlMessage, requireTld: false);
         $violationList = $this->validator->validate($url, $urlConstraint);
 
         if (0 === $violationList->count()) {

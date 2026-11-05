@@ -17,7 +17,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -49,12 +48,15 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 )]
 class Webhook extends FormEntity implements SkipModifiedInterface
 {
-    public const LOGS_DISPLAY_LIMIT = 100;
+    public const int LOGS_DISPLAY_LIMIT = 100;
 
     /**
      * @var ?int
      */
     #[Groups(['webhook:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -62,12 +64,14 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      */
     #[Groups(['webhook:read', 'webhook:write'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -75,33 +79,34 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      */
     #[Groups(['webhook:read', 'webhook:write'])]
     #[NotBlank(message: 'mautic.core.valid_url_required')]
-    #[Assert\Url(message: 'mautic.core.valid_url_required')]
+    #[Assert\Url(message: 'mautic.core.valid_url_required', requireTld: false)]
+    #[ORM\Column(name: 'webhook_url', type: Types::TEXT)]
     private $webhookUrl;
 
     /**
      * @var ?string
      */
     #[Groups(['webhook:read', 'webhook:write'])]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $secret;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['webhook:read', 'webhook:write'])]
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     /**
      * @var Collection<int, Event>
      */
     #[Groups(['webhook:read', 'webhook:write'])]
-    #[ORM\OneToMany(mappedBy: 'webhook', targetEntity: Event::class, cascade: ['persist', 'merge', 'detach'], orphanRemoval: true, indexBy: 'eventType')]
+    #[ORM\OneToMany(targetEntity: Event::class, mappedBy: 'webhook', cascade: ['persist', 'detach'], orphanRemoval: true, indexBy: 'eventType')]
     private $events;
 
     /**
      * @var ArrayCollection<int, Log>
      */
-    #[ORM\OneToMany(mappedBy: 'webhook', targetEntity: Log::class, cascade: ['persist', 'merge', 'detach'], fetch: 'EXTRA_LAZY')]
-    #[ORM\OrderBy(['dateAdded' => Order::Descending->value])]
+    #[ORM\OneToMany(targetEntity: Log::class, mappedBy: 'webhook', cascade: ['persist', 'detach'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OrderBy(value: ['dateAdded' => Order::Descending->value])]
     private $logs;
 
     /**
@@ -110,7 +115,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     private array $removedEvents = [];
 
     /**
-     * @var mixed[]
+     * @var mixed[]|null
      */
     #[Groups(['webhook:read', 'webhook:write'])]
     private $payload;
@@ -131,39 +136,27 @@ class Webhook extends FormEntity implements SkipModifiedInterface
      * @var string|null
      */
     #[Groups(['webhook:read', 'webhook:write'])]
-    #[Assert\Choice([
+    #[Assert\Choice(choices: [
         null,
         Order::Ascending->value,
         Order::Descending->value,
     ])]
+    #[ORM\Column(name: 'events_orderby_dir', type: Types::STRING, length: 191, nullable: true)]
     private $eventsOrderbyDir;
 
+    #[ORM\Column(name: 'marked_unhealthy_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $markedUnhealthyAt      = null;
 
+    #[ORM\Column(name: 'unhealthy_since', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $unHealthySince         = null;
 
+    #[ORM\Column(name: 'last_notification_sent_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $lastNotificationSentAt = null;
 
     public function __construct()
     {
         $this->events = new ArrayCollection();
         $this->logs   = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->addCategory();
-
-        $builder->addNamedField('webhookUrl', Types::TEXT, 'webhook_url');
-        $builder->addField('secret', Types::STRING);
-        $builder->addNullableField('eventsOrderbyDir', Types::STRING, 'events_orderby_dir');
-        $builder->addNullableField('markedUnhealthyAt', Types::DATETIME_IMMUTABLE, 'marked_unhealthy_at');
-        $builder->addNullableField('unHealthySince', Types::DATETIME_IMMUTABLE, 'unhealthy_since');
-        $builder->addNullableField('lastNotificationSentAt', Types::DATETIME_IMMUTABLE, 'last_notification_sent_at');
     }
 
     /**
@@ -279,10 +272,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
@@ -290,7 +280,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * @return Collection<int, Event>
      */
-    public function getEvents()
+    public function getEvents(): Collection
     {
         return $this->events;
     }
@@ -298,7 +288,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * @param Collection<int, Event> $events
      */
-    public function setEvents($events): static
+    public function setEvents(Collection $events): static
     {
         $this->isChanged('events', $events);
 
@@ -406,9 +396,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     /**
      * Get log entities.
      *
-     * @return ArrayCollection<int,Log>
+     * @return Collection<int,Log>
      */
-    public function getLogs()
+    public function getLogs(): Collection
     {
         return $this->logs;
     }
@@ -425,9 +415,9 @@ class Webhook extends FormEntity implements SkipModifiedInterface
     }
 
     /**
-     * @param ArrayCollection<int,Log> $logs
+     * @param Collection<int, Log> $logs
      */
-    public function addLogs($logs): static
+    public function addLogs(Collection $logs): static
     {
         $this->logs = $logs;
 
@@ -453,10 +443,7 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getPayload()
+    public function getPayload(): ?array
     {
         return $this->payload;
     }
@@ -489,6 +476,8 @@ class Webhook extends FormEntity implements SkipModifiedInterface
         $getter  = 'get'.ucfirst($prop);
         $current = $this->{$getter}();
         if ('category' == $prop) {
+            /** @var Category|null $current */
+            /** @var Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {

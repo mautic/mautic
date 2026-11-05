@@ -9,6 +9,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event as CampaignEvent;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
@@ -409,7 +410,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
     public function testNotificationsSentInBatches(): void
     {
         $subscriber = new class(self::getContainer()->get(IntegrationHelper::class), self::getContainer()->get(NotificationModel::class), self::getContainer()->get(OneSignalApi::class), self::getContainer()->get(EventDispatcherInterface::class), self::getContainer()->get(DoNotContactModel::class), self::getContainer()->get(TranslatorInterface::class), self::getContainer()->get(NotificationRepository::class)) extends CampaignSubscriber {
-            protected const MAX_PLAYER_IDS_PER_REQUEST = 2;
+            protected const int MAX_PLAYER_IDS_PER_REQUEST = 2;
         };
         self::getContainer()->set(CampaignSubscriber::class, $subscriber);
 
@@ -579,7 +580,7 @@ final class CampaignSubscriberTest extends MauticMysqlTestCase
 
     private function findEventLog(CampaignEvent $event, Lead $leadOne): LeadEventLog
     {
-        $log = $this->em->getRepository(LeadEventLog::class)->findOneBy([
+        $log = $this->getContainer()->get(LeadEventLogRepository::class)->findOneBy([
             'event'    => $event->getId(),
             'lead'     => $leadOne,
             'rotation' => 1,

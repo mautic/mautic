@@ -10,7 +10,7 @@ use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Service\OptimisticLockServiceInterface;
 
-#[AsDoctrineListener(Events::postUpdate)]
+#[AsDoctrineListener(event: Events::postUpdate)]
 final readonly class OptimisticLockSubscriber
 {
     public function __construct(

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\LeadBundle\Entity\Lead;
@@ -33,7 +34,7 @@ final class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     private Lead $lead;
 
     /**
-     * @var mixed[]
+     * @var array<string, Category>
      */
     private array $categories;
 
@@ -170,7 +171,7 @@ final class LeadCategoryRepositoryFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return mixed[]
+     * @return array<string, Category>
      */
     private function createCategories(): array
     {

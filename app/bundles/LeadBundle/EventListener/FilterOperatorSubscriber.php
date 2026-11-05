@@ -10,15 +10,14 @@ use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\Exception\ChoicesNotFoundException;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\FieldChoicesProviderInterface;
 use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Segment\SegmentFilterIconTrait;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class FilterOperatorSubscriber implements EventSubscriberInterface
+final class FilterOperatorSubscriber
 {
     use SegmentFilterIconTrait;
 
@@ -69,19 +68,9 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadListFiltersOperatorsEvent::class => ['onListOperatorsGenerate', 0],
-            LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE   => [
-                ['onGenerateSegmentFiltersAddStaticFields', 0],
-                ['onGenerateSegmentFiltersAddCustomFields', 0],
-                ['onGenerateSegmentFiltersAddBehaviors', 0],
-                ['onGenerateSegmentFiltersNormalizeOperatorLabels', -1000],
-            ],
-        ];
-    }
-
+    #[AsEventListener(
+        event: LeadListFiltersOperatorsEvent::class,
+    )]
     public function onListOperatorsGenerate(LeadListFiltersOperatorsEvent $event): void
     {
         foreach ($this->operatorOptions->getFilterExpressionFunctionsNonStatic() as $operatorName => $operatorOptions) {
@@ -89,6 +78,9 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadListFiltersChoicesEvent::class,
+    )]
     public function onGenerateSegmentFiltersAddCustomFields(LeadListFiltersChoicesEvent $event): void
     {
         $this->leadFieldRepository->getListablePublishedFields()->map(function (LeadField $field) use ($event): void {
@@ -125,6 +117,11 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         });
     }
 
+    // priority 1 so static fields register before custom fields; addChoice() is first-wins
+    #[AsEventListener(
+        event: LeadListFiltersChoicesEvent::class,
+        priority: 1
+    )]
     public function onGenerateSegmentFiltersAddStaticFields(LeadListFiltersChoicesEvent $event): void
     {
         $event->addChoice(
@@ -362,6 +359,9 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadListFiltersChoicesEvent::class,
+    )]
     public function onGenerateSegmentFiltersAddBehaviors(LeadListFiltersChoicesEvent $event): void
     {
         // Only show for segments and not dynamic content addressed by https://github.com/mautic/mautic/pull/9260
@@ -576,6 +576,10 @@ final class FilterOperatorSubscriber implements EventSubscriberInterface
         return $this->typeOperatorProvider->getOperatorsIncluding($this->behaviorOperators[$fieldType]);
     }
 
+    #[AsEventListener(
+        event: LeadListFiltersChoicesEvent::class,
+        priority: -1000
+    )]
     public function onGenerateSegmentFiltersNormalizeOperatorLabels(LeadListFiltersChoicesEvent $event): void
     {
         $choices = $event->getChoices();

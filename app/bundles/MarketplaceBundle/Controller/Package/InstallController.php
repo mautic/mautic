@@ -33,7 +33,7 @@ final class InstallController extends CommonController
     }
 
     #[Route(
-        '/s/marketplace/install/{vendor}/{package}',
+        path: '/s/marketplace/install/{vendor}/{package}',
         name: 'mautic_marketplace_install',
         methods: ['GET', 'POST'],
     )]

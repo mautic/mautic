@@ -13,12 +13,12 @@ use Mautic\AssetBundle\Event\AssetLoadEvent;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CategoryBundle\Entity\CategoryRepository;
-use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\LeadBundle\Entity\Lead;
@@ -31,6 +31,8 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -39,15 +41,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class AssetModelTest extends \PHPUnit\Framework\TestCase
+final class AssetModelTest extends TestCase
 {
     private AssetModel $assetModel;
 
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private LeadModel&\PHPUnit\Framework\MockObject\Stub $leadModel;
-
-    private CategoryModel&\PHPUnit\Framework\MockObject\Stub $categoryModel;
+    private LeadModel&Stub $leadModel;
 
     private RequestStack&MockObject $requestStack;
 
@@ -67,13 +67,13 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
     private EventDispatcherInterface&MockObject $eventDispatcher;
 
-    private \PHPUnit\Framework\MockObject\Stub&UrlGeneratorInterface $urlGenerator;
+    private Stub&UrlGeneratorInterface $urlGenerator;
 
-    private Translator&\PHPUnit\Framework\MockObject\Stub $translator;
+    private Translator&Stub $translator;
 
-    private UserHelper&\PHPUnit\Framework\MockObject\Stub $userHelper;
+    private UserHelper&Stub $userHelper;
 
-    private LoggerInterface&\PHPUnit\Framework\MockObject\Stub $logger;
+    private LoggerInterface&Stub $logger;
 
     private AssetRepository&MockObject $assetRepository;
 
@@ -88,7 +88,6 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn('2MB');
         $cacheProvider               = new CacheProvider($this->coreParametersHelper, $this->createStub(ContainerInterface::class));
         $this->leadModel             = $this->createStub(LeadModel::class);
-        $this->categoryModel         = $this->createStub(CategoryModel::class);
         $this->requestStack          = $this->createMock(RequestStack::class);
         $this->ipLookupHelper        = $this->createMock(IpLookupHelper::class);
         $this->deviceDetectorFactory = new DeviceDetectorFactory($cacheProvider);
@@ -106,7 +105,6 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->assetModel = new AssetModel(
             $this->leadModel,
-            $this->categoryModel,
             $this->requestStack,
             $this->ipLookupHelper,
             $this->deviceCreatorService,
@@ -161,9 +159,7 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
     public function testTrackDownload(): void
     {
         $asset = new Asset();
-        $reflection = new \ReflectionClass($asset);
-        $idProperty = $reflection->getProperty('id');
-        $idProperty->setValue($asset, 1);
+        ReflectionHelper::setEntityId($asset, 1);
 
         $lead  = new Lead();
 
@@ -195,8 +191,8 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $trackedDevice = $this->createMock(LeadDevice::class);
-        $trackedDevice->method('getTrackingId')->willReturn('test-tracking-id');
+        $trackedDevice = new LeadDevice();
+        $trackedDevice->setTrackingId('test-tracking-id');
         $this->deviceTrackingService->expects($this->once())
             ->method('getTrackedDevice')
             ->willReturn($trackedDevice);
@@ -225,23 +221,19 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
 
         $this->entityManager->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function ($downloadPersist) use (&$download): bool {
+            ->willReturnCallback(function (object $downloadPersist) use (&$download): void {
                 $download = $downloadPersist;
                 $this->assertInstanceOf(Download::class, $download);
-
-                return true;
-            }));
+            });
 
         $this->entityManager->expects($this->once())
             ->method('flush');
 
         $this->entityManager->expects($this->once())
             ->method('detach')
-            ->with($this->callback(function ($downloadDetach) use (&$download): true {
+            ->willReturnCallback(function (object $downloadDetach) use (&$download): void {
                 $this->assertSame($downloadDetach, $download);
-
-                return true;
-            }));
+            });
 
         $this->assetModel->trackDownload($asset);
 
@@ -274,7 +266,6 @@ final class AssetModelTest extends \PHPUnit\Framework\TestCase
         $model = $this->getMockBuilder(AssetModel::class)
             ->setConstructorArgs([
                 $this->leadModel,
-                $this->categoryModel,
                 $this->requestStack,
                 $this->ipLookupHelper,
                 $this->deviceCreatorService,

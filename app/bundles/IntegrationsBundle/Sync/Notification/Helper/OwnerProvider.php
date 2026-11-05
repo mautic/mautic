@@ -11,7 +11,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-readonly class OwnerProvider
+final readonly class OwnerProvider
 {
     public function __construct(
         private EventDispatcherInterface $dispatcher,

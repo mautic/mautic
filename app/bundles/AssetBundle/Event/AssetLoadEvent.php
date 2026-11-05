@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Event;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
 use Mautic\CoreBundle\Event\CommonEvent;
 
@@ -25,7 +26,7 @@ final class AssetLoadEvent extends CommonEvent
     }
 
     /**
-     * @return \Mautic\AssetBundle\Entity\Asset
+     * @return Asset
      */
     public function getAsset()
     {

@@ -6,11 +6,12 @@ namespace Mautic\CoreBundle\Tests\Unit\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\DynamicListType;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-final class DynamicListTypeTest extends \PHPUnit\Framework\TestCase
+final class DynamicListTypeTest extends TestCase
 {
     /**
      * @var MockObject&FormBuilderInterface

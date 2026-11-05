@@ -7,8 +7,9 @@ namespace Mautic\ReportBundle\Tests\Entity;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\ScheduleNotValidException;
+use PHPUnit\Framework\TestCase;
 
-final class ReportTest extends \PHPUnit\Framework\TestCase
+final class ReportTest extends TestCase
 {
     public function testNotScheduled(): void
     {

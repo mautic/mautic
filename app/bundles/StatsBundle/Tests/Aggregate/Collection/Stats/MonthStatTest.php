@@ -27,7 +27,6 @@ final class MonthStatTest extends TestCase
     public function testGetDay(): void
     {
         $day = $this->monthStat->getDay($this->day);
-        $this->assertInstanceOf(DayStat::class, $day);
         $this->assertSame([], $day->getStats());
         $this->assertSame(1, $this->monthStat->getCount());
 

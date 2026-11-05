@@ -4,6 +4,7 @@ namespace Mautic\DashboardBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetFormEvent;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -99,6 +100,7 @@ final class WidgetType extends AbstractType
 
         // function to add a form for specific widget type dynamically
         $func = function (FormEvent $e): void {
+            /** @var Widget|array<string, mixed> $data */
             $data   = $e->getData();
             $form   = $e->getForm();
             $event  = new WidgetFormEvent();

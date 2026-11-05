@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\DynamicContentBundle\DynamicContent\TypeList;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
 use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
@@ -23,13 +25,13 @@ use Mautic\ProjectBundle\Entity\Project;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\RoleModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
-use function Symfony\Component\Clock\now;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterInterface;
 
 final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -630,7 +632,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $emails = $this->em->getRepository(Email::class)->findBy([], ['id' => 'ASC']);
+        $emails = $this->getContainer()->get(EmailRepository::class)->findBy([], ['id' => 'ASC']);
         $this->assertCount(2, $emails);
 
         $firstEmail  = $emails[0];
@@ -702,7 +704,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         $this->em->clear();
-        $emailRepository = $this->em->getRepository(Email::class);
+        $emailRepository = $this->getContainer()->get(EmailRepository::class);
         $emails          = $emailRepository->findBy([], ['id' => 'ASC']);
 
         $this->assertCount(8, $emails);
@@ -773,7 +775,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $email->addList($secondSegment);
         $this->em->flush();
 
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'sales']);
         $this->assertInstanceOf(User::class, $user);
 
         foreach ($user->getRole()->getPermissions() as $permission) {
@@ -829,7 +831,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         // Verify the parent email was updated with AB test settings
         $this->em->clear();
-        $updatedEmail = $this->em->getRepository(Email::class)->find($email->getId());
+        $updatedEmail = $this->getContainer()->get(EmailRepository::class)->find($email->getId());
         $this->assertInstanceOf(Email::class, $updatedEmail);
 
         $settings = $updatedEmail->getVariantSettings();
@@ -837,6 +839,65 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(24, $settings['sendWinnerDelay']);
         $this->assertEquals(10, $settings['totalWeight']);
         $this->assertEquals(1, $settings['enableAbTest']);
+    }
+
+    public function testManualWinnerActionIsAvailableForPublishedStartedVariant(): void
+    {
+        [$parent, $variant] = $this->createManualWinnerEmailPair(true, true);
+        $router             = self::getContainer()->get(RouterInterface::class);
+        $winnerUrl          = $router->generate('mautic_email_action', [
+            'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+        $viewUrl            = $router->generate('mautic_email_action', [
+            'objectAction' => 'view',
+            'objectId'     => $variant->getId(),
+        ]);
+
+        $this->client->request(Request::METHOD_GET, "/s/emails/view/{$parent->getId()}");
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
+
+        $this->client->followRedirects(false);
+        $this->client->request(Request::METHOD_POST, $winnerUrl);
+        $this->assertResponseRedirects($viewUrl);
+
+        $this->em->clear();
+        $winner = $this->em->find(Email::class, $variant->getId());
+        $oldParent = $this->em->find(Email::class, $parent->getId());
+
+        $this->assertInstanceOf(Email::class, $winner);
+        $this->assertInstanceOf(Email::class, $oldParent);
+        $this->assertNotInstanceOf(VariantEntityInterface::class, $winner->getVariantParent());
+        $this->assertTrue($winner->isPublished(false));
+        $this->assertFalse($oldParent->isPublished(false));
+        $this->assertSame(100, $winner->getVariantSettings()['totalWeight']);
+    }
+
+    public function testManualWinnerActionIsUnavailableForUnpublishedVariant(): void
+    {
+        [$parent, $variant] = $this->createManualWinnerEmailPair(false, true);
+        $winnerUrl          = self::getContainer()->get(RouterInterface::class)->generate('mautic_email_action', [
+            'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+
+        $this->client->request(Request::METHOD_GET, "/s/emails/view/{$parent->getId()}");
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
+    }
+
+    public function testManualWinnerActionIsUnavailableBeforeAbTestStarts(): void
+    {
+        [$parent, $variant] = $this->createManualWinnerEmailPair(true, false);
+        $winnerUrl          = self::getContainer()->get(RouterInterface::class)->generate('mautic_email_action', [
+            'objectAction' => 'winner',
+            'objectId'     => $variant->getId(),
+        ]);
+
+        $this->client->request(Request::METHOD_GET, "/s/emails/view/{$parent->getId()}");
+        $this->assertResponseIsSuccessful();
+        $this->assertStringNotContainsString('href="'.$winnerUrl.'"', (string) $this->client->getResponse()->getContent());
     }
 
     #[DataProvider('dwcTokenTypeDataProvider')]
@@ -920,7 +981,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     /**
      * @param array<mixed> $emails
      *
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      */
     private function addContactsToSegment(LeadList $segment, array $emails, ?callable $contactCallback = null): void
     {
@@ -984,7 +1045,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
+        $email = $this->getContainer()->get(EmailRepository::class)->findOneBy(['name' => 'Email publish test']);
         $this->assertInstanceOf(Email::class, $email);
         $this->assertTrue($email->getIsPublished());
     }
@@ -996,7 +1057,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     public function testPublishPermissionOnCreate(array $permissions, bool $expectDisabled, bool $publishedByDefault, bool $publishAfterSave): void
     {
         // Set user to be able to create emails, but not publish them.
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'sales']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'sales']);
         $this->assertInstanceOf(User::class, $user);
         $this->setPermission($user->getRole(), ['email:emails' => $permissions]);
         $this->loginUser($user);
@@ -1029,7 +1090,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
+        $email = $this->getContainer()->get(EmailRepository::class)->findOneBy(['name' => 'Email publish test']);
         $this->assertInstanceOf(Email::class, $email);
         $this->assertSame($publishAfterSave, $email->getIsPublished());
     }
@@ -1083,14 +1144,14 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('editPermissionDataProvider')]
     public function testPublishPermissionOnEdit(string $owner, string $user, array $permissions, bool $expectDisabled, bool $publishAfterSave): void
     {
-        $ownerUser  = $this->em->getRepository(User::class)->findOneBy(['username' => $owner]);
+        $ownerUser  = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => $owner]);
         $email      = $this->createEmail('Email A', 'Email A Subject', 'template', 'blank', 'Test html');
         $this->assertInstanceOf(User::class, $ownerUser);
         $email->setCreatedBy($ownerUser);
         $this->em->flush();
 
         // Set user to be able to create emails, but not publish them.
-        $loggedInUser = $this->em->getRepository(User::class)->findOneBy(['username' => $user]);
+        $loggedInUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => $user]);
         $this->assertInstanceOf(User::class, $loggedInUser);
         $this->setPermission($loggedInUser->getRole(), ['email:emails' => $permissions]);
 
@@ -1127,7 +1188,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->em->getRepository(Email::class)->findOneBy(['name' => 'Email publish test']);
+        $email = $this->getContainer()->get(EmailRepository::class)->findOneBy(['name' => 'Email publish test']);
         $this->assertInstanceOf(Email::class, $email);
         $this->assertSame($publishAfterSave, $email->getIsPublished());
     }
@@ -1256,7 +1317,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $commandTester = $this->testSymfonyCommand('mautic:broadcast:send', ['--channel' => 'email', '--id' => $email->getId()]);
 
-        $email = $this->em->getRepository(Email::class)->find($email->getId());
+        $email = $this->getContainer()->get(EmailRepository::class)->find($email->getId());
         $this->assertFalse($email->getIsPublished(), $commandTester->getDisplay());
     }
 
@@ -1303,7 +1364,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
 
         $commandTester = $this->testSymfonyCommand('mautic:broadcast:send', ['--channel' => 'email', '--id' => $email->getId()]);
 
-        $email = $this->em->getRepository(Email::class)->find($email->getId());
+        $email = $this->getContainer()->get(EmailRepository::class)->find($email->getId());
         $this->assertTrue($email->getIsPublished(), $commandTester->getDisplay());
     }
 
@@ -1330,7 +1391,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $form    = $crawler->selectButton('schedule_send[buttons][apply]')->form();
         $this->client->submit($form);
 
-        $email = $this->em->getRepository(Email::class)->find($email->getId());
+        $email = $this->getContainer()->get(EmailRepository::class)->find($email->getId());
         $this->assertInstanceOf(Email::class, $email);
         $this->assertNotInstanceOf(\DateTimeInterface::class, $email->getPublishUp());
     }
@@ -1360,7 +1421,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws ORMException
      * @throws OptimisticLockException
      * @throws TransactionRequiredException
      */
@@ -1395,7 +1456,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         /** @var Email $updatedChild */
         $updatedChild      = $this->em->find(Email::class, $childEmail->getId());
         $translationParent = $updatedChild->getTranslationParent();
-        \assert($translationParent instanceof Email || null === $translationParent);
+        $this->assertTrue($translationParent instanceof Email || null === $translationParent);
 
         $this->assertInstanceOf(Email::class, $translationParent, 'Translation parent should be set.');
         $this->assertSame(
@@ -1466,7 +1527,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->em->getRepository(Email::class)->findOneBy(['name' => $name]);
+        $email = $this->getContainer()->get(EmailRepository::class)->findOneBy(['name' => $name]);
 
         if ($expectSaved) {
             $this->assertInstanceOf(Email::class, $email);
@@ -1549,7 +1610,7 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
-        $email = $this->em->getRepository(Email::class)->findOneBy(['name' => $name]);
+        $email = $this->getContainer()->get(EmailRepository::class)->findOneBy(['name' => $name]);
 
         $this->assertNotInstanceOf(Email::class, $email);
         $this->assertStringContainsString('The email contains an invalid URL: ://example.com', $crawler->text());
@@ -1614,6 +1675,49 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($segment);
 
         return $segment;
+    }
+
+    /**
+     * @return array{0: Email, 1: Email}
+     */
+    private function createManualWinnerEmailPair(bool $variantPublished, bool $testStarted): array
+    {
+        $parent = $this->createEmail(
+            'Manual winner parent',
+            'Manual winner parent subject',
+            'list',
+            'blank',
+            'Manual winner parent html',
+            null,
+            [
+                'enableAbTest'    => true,
+                'totalWeight'     => 100,
+                'winnerCriteria'  => 'email.openrate',
+                'sendWinnerDelay' => 24,
+            ]
+        );
+        $parent->setIsPublished(true);
+        $parent->setVariantStartDate($testStarted ? new \DateTime('-1 hour') : null);
+
+        $variant = $this->createEmail(
+            'Manual winner variant',
+            'Manual winner variant subject',
+            'list',
+            'blank',
+            'Manual winner variant html',
+            null,
+            [
+                'weight'         => 50,
+                'winnerCriteria' => 'email.openrate',
+            ]
+        );
+        $variant->setIsPublished($variantPublished);
+        $variant->setVariantParent($parent);
+        $parent->addVariantChild($variant);
+
+        $this->em->flush();
+
+        return [$parent, $variant];
     }
 
     private function createCategory(string $title, string $alias, string $bundle): Category

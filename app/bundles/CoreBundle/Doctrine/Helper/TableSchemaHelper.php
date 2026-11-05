@@ -3,6 +3,8 @@
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaConfig;
@@ -11,38 +13,29 @@ use Mautic\CoreBundle\Exception\SchemaException;
 /**
  * Used to manipulate creation/removal of tables.
  */
-class TableSchemaHelper
+final class TableSchemaHelper
 {
     /**
-     * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @var AbstractSchemaManager<AbstractMySQLPlatform>
      */
-    protected AbstractSchemaManager $sm;
+    private readonly AbstractSchemaManager $sm;
 
-    /**
-     * @var Schema
-     */
-    protected $schema;
+    private ?Schema $schema = null;
 
     /**
      * @var string[]
      */
-    protected array $dropTables = [];
-
-    /**
-     * @var string[]
-     */
-    protected array $addTables = [];
+    private array $dropTables = [];
 
     public function __construct(
-        protected Connection $db,
-        protected ?string $prefix,
-        protected ColumnSchemaHelper $columnHelper,
+        private readonly Connection $db,
+        private readonly ?string $prefix,
     ) {
         $this->sm = $db->createSchemaManager();
     }
 
     /**
-     * @return AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @return AbstractSchemaManager<AbstractMySQLPlatform>
      */
     public function getSchemaManager(): AbstractSchemaManager
     {
@@ -67,7 +60,6 @@ class TableSchemaHelper
 
         // now add the tables
         foreach ($tables as $table) {
-            $this->addTables[] = $table;
             $this->addTable($table, false);
         }
 
@@ -109,8 +101,6 @@ class TableSchemaHelper
                 $this->deleteTable($table['name']);
             }
         }
-
-        $this->addTables[] = $table;
 
         $options = $table['options'] ?? [];
         $columns = $table['columns'] ?? [];
@@ -173,7 +163,7 @@ class TableSchemaHelper
 
         // reset schema
         $this->schema     = new Schema([], [], $this->sm->createSchemaConfig());
-        $this->dropTables = $this->addTables = [];
+        $this->dropTables = [];
     }
 
     /**
@@ -202,7 +192,7 @@ class TableSchemaHelper
             return $this->schema;
         }
 
-        if ($this->db instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
+        if ($this->db instanceof PrimaryReadReplicaConnection) {
             $params       = $this->db->getParams();
             $schemaConfig = new SchemaConfig();
             $schemaConfig->setName($params['master']['dbname']);

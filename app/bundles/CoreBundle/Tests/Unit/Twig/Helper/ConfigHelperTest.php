@@ -7,8 +7,9 @@ namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\ConfigHelper;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 
-final class ConfigHelperTest extends \PHPUnit\Framework\TestCase
+final class ConfigHelperTest extends TestCase
 {
     public function testGet(): void
     {

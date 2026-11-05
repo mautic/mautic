@@ -2,7 +2,11 @@
 
 namespace Mautic\FormBundle\Entity;
 
+use Doctrine\DBAL\Exception;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
@@ -11,11 +15,11 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Form>
  */
-class FormRepository extends CommonRepository
+final class FormRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this->createQueryBuilder('f');
         $q->select('f');
@@ -53,12 +57,7 @@ class FormRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     */
-    public function getFormList($search = '', $limit = 10, $start = 0, bool $viewOther = false): array
+    public function getFormList(string $search = '', int $limit = 10, int $start = 0, bool $viewOther = false): array
     {
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, alias}');
@@ -83,7 +82,7 @@ class FormRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'f.name',
@@ -91,7 +90,7 @@ class FormRepository extends CommonRepository
         ]);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         [$expr, $standardSearchParameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
@@ -129,7 +128,9 @@ class FormRepository extends CommonRepository
                 $sq       = $this->getEntityManager()->createQueryBuilder();
                 $subquery = $sq->select('count(s.id)')
                     ->from(Submission::class, 's')
-                    ->leftJoin(Form::class, 'f2',
+                    ->leftJoin(
+                        Form::class,
+                        'f2',
                         Join::WITH,
                         $sq->expr()->eq('s.form', 'f2')
                     )
@@ -178,8 +179,8 @@ class FormRepository extends CommonRepository
      *
      * @param array<string, mixed> $options
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getFormResults(Form $form, array $options = []): array
     {
@@ -211,7 +212,7 @@ class FormRepository extends CommonRepository
     /**
      * @return array<int, array<string,string>>
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function getValidFormResultsTable(): array
     {

@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use Composer\Autoload\ClassLoader;
 use Mautic\CoreBundle\Loader\ParameterLoader;
+use Mautic\UserBundle\Entity\User;
 
 class PathsHelper
 {
@@ -31,7 +32,7 @@ class PathsHelper
 
     private readonly string $temporaryDir;
 
-    private readonly ?\Mautic\UserBundle\Entity\User $user;
+    private readonly ?User $user;
 
     private readonly string $importLeadsDir;
 
@@ -69,7 +70,6 @@ class PathsHelper
         // Get local_root (webroot) from parameters - this is auto-detected from composer.json
         // for recommended-project installations, or can be explicitly set in paths_local.php
         $localRootParam = $this->removeTrailingSlash((string) $coreParametersHelper->get('local_root'));
-        // @phpstan-ignore nullCoalesce.offset (paths['root'] is always set by paths_helper.php include)
         $this->localRoot = '' !== $localRootParam ? $localRootParam : ($this->paths['root'] ?? $rootDir);
     }
 

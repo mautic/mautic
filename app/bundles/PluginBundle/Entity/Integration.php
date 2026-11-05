@@ -3,7 +3,6 @@
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
@@ -12,74 +11,49 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Integration extends CommonEntity implements CacheInvalidateInterface
 {
-    public const CACHE_NAMESPACE = 'IntegrationSettings';
+    public const string CACHE_NAMESPACE = 'IntegrationSettings';
 
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var Plugin|null
-     */
     #[ORM\ManyToOne(targetEntity: Plugin::class, inversedBy: 'integrations')]
     #[ORM\JoinColumn(name: 'plugin_id', onDelete: 'CASCADE')]
-    private $plugin;
+    private ?Plugin $plugin = null;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_published', type: 'boolean')]
     private $isPublished = false;
 
     /**
      * @var array
      */
+    #[ORM\Column(name: 'supported_features', type: 'array', nullable: true)]
     private $supportedFeatures = [];
 
     /**
-     * @var array
+     * @var array<array-key, mixed>
      */
-    private $apiKeys = [];
+    #[ORM\Column(name: 'api_keys', type: 'array')]
+    private array $apiKeys = [];
 
     /**
      * @var array
      */
+    #[ORM\Column(name: 'feature_settings', type: 'array', nullable: true)]
     private $featureSettings = [];
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createField('id', 'integer')
-            ->makePrimaryKey()
-            ->generatedValue()
-            ->build();
-
-        $builder->addField('name', 'string');
-
-        $builder->createField('isPublished', 'boolean')
-            ->columnName('is_published')
-            ->build();
-
-        $builder->createField('supportedFeatures', 'array')
-            ->columnName('supported_features')
-            ->nullable()
-            ->build();
-
-        $builder->createField('apiKeys', 'array')
-            ->columnName('api_keys')
-            ->build();
-
-        $builder->createField('featureSettings', 'array')
-            ->columnName('feature_settings')
-            ->nullable()
-            ->build();
-    }
 
     /**
      * @return int|null
@@ -89,18 +63,12 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
         return $this->id;
     }
 
-    /**
-     * @return Plugin|null
-     */
-    public function getPlugin()
+    public function getPlugin(): ?Plugin
     {
         return $this->plugin;
     }
 
-    /**
-     * @param mixed $plugin
-     */
-    public function setPlugin($plugin): static
+    public function setPlugin(?Plugin $plugin): static
     {
         $this->plugin = $plugin;
 
@@ -175,15 +143,15 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getApiKeys()
+    public function getApiKeys(): array
     {
         return $this->apiKeys;
     }
 
     /**
-     * @param mixed $apiKeys
+     * @param array<array-key, mixed> $apiKeys
      */
-    public function setApiKeys($apiKeys): static
+    public function setApiKeys(array $apiKeys): static
     {
         $this->apiKeys = $apiKeys;
 
@@ -193,7 +161,7 @@ class Integration extends CommonEntity implements CacheInvalidateInterface
     /**
      * @return array<array-key, mixed>
      */
-    public function getFeatureSettings()
+    public function getFeatureSettings(): array
     {
         return $this->featureSettings;
     }

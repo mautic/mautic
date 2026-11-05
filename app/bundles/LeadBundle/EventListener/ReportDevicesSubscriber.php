@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class ReportDevicesSubscriber implements EventSubscriberInterface
+final readonly class ReportDevicesSubscriber
 {
     public const string DEVICES = 'contact.devices';
 
@@ -21,18 +22,12 @@ final readonly class ReportDevicesSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-            ReportDataEvent::class      => ['onReportDisplay', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[AsEventListener(
+        event: ReportBuilderEvent::class,
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::DEVICES])) {
@@ -92,6 +87,9 @@ final readonly class ReportDevicesSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGeneratorEvent::class,
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::DEVICES])) {
@@ -122,6 +120,9 @@ final readonly class ReportDevicesSubscriber implements EventSubscriberInterface
         $event->setQueryBuilder($qb);
     }
 
+    #[AsEventListener(
+        event: ReportDataEvent::class,
+    )]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         if (!$event->checkContext([self::DEVICES])) {
@@ -131,7 +132,7 @@ final readonly class ReportDevicesSubscriber implements EventSubscriberInterface
         $data = $event->getData();
         if (isset($data[0]['client_info'])) {
             foreach ($data as &$row) {
-                $clientInfo         = \Mautic\CoreBundle\Helper\Serializer::decode($row['client_info']);
+                $clientInfo         = Serializer::decode($row['client_info']);
                 $row['client_info'] = (is_array($clientInfo) && isset($clientInfo['name'])) ? $clientInfo['name'] : '';
             }
             $event->setData($data);

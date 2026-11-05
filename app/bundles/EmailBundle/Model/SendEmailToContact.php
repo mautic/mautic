@@ -7,13 +7,12 @@ use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Mailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
-use Mautic\EmailBundle\Stat\Reference;
 use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SendEmailToContact
+final class SendEmailToContact
 {
     private array $failedContacts = [];
 
@@ -23,10 +22,7 @@ class SendEmailToContact
 
     private array $emailSentCounts = [];
 
-    /**
-     * @var array|null
-     */
-    private $emailEntityErrors;
+    private ?array $emailEntityErrors = null;
 
     /**
      * @var int|null
@@ -50,12 +46,13 @@ class SendEmailToContact
     public function flush(bool $resetMailer = true): static
     {
         // Flushes the batch in case of using API mailers
-        if ($this->emailEntityId && !$flushResult = $this->mailer->flushQueue()) {
-            $sendFailures = $this->mailer->getErrors();
-
-            // Check to see if failed recipients were stored by the transport
-            if (!empty($sendFailures['failures'])) {
-                $this->processSendFailures($sendFailures);
+        if ($this->emailEntityId) {
+            $this->mailer->flushQueue();
+            if ($sendFailures = $this->mailer->getErrors()) {
+                // Check to see if failed recipients were stored by the transport
+                if (!empty($sendFailures['failures'])) {
+                    $this->processSendFailures($sendFailures);
+                }
             }
         }
 
@@ -206,15 +203,13 @@ class SendEmailToContact
     }
 
     /**
-     * @param array $errorMessages
-     *
      * @throws FailedToSendToContactException
      */
-    protected function failContact(bool $hasBadEmail = true, $errorMessages = null)
+    private function failContact(bool $hasBadEmail = true, array|null|string $errorMessages = null): void
     {
         if (null === $errorMessages) {
             // Clear the errors so it doesn't stop the next send
-            $errorMessages = implode('; ', (array) $this->mailer->getErrors());
+            $errorMessages = implode('; ', $this->mailer->getErrors());
         } elseif (is_array($errorMessages)) {
             $errorMessages = implode('; ', $errorMessages);
         }
@@ -239,7 +234,7 @@ class SendEmailToContact
     /**
      * @param array<string, mixed> $sendFailures
      */
-    protected function processSendFailures(array $sendFailures): void
+    private function processSendFailures(array $sendFailures): void
     {
         $failedEmailAddresses = $sendFailures['failures'];
         unset($sendFailures['failures']);
@@ -248,7 +243,6 @@ class SendEmailToContact
         // Delete the stat
         foreach ($failedEmailAddresses as $failedEmail) {
             try {
-                /** @var Reference $stat */
                 $stat = $this->statHelper->getStat($failedEmail);
             } catch (StatNotFoundException) {
                 continue;
@@ -268,7 +262,7 @@ class SendEmailToContact
     /**
      * Add DNC entries for bad emails to get them out of the queue permanently.
      */
-    protected function processBadEmails(): void
+    private function processBadEmails(): void
     {
         // Update bad emails as bounces
         if (count($this->badEmails)) {
@@ -285,7 +279,7 @@ class SendEmailToContact
         }
     }
 
-    protected function createContactStatEntry($email): void
+    private function createContactStatEntry($email): void
     {
         ++$this->statBatchCounter;
 
@@ -301,7 +295,7 @@ class SendEmailToContact
     /**
      * Up sent counter for the given email ID.
      */
-    protected function upEmailSentCount($emailId): void
+    private function upEmailSentCount($emailId): void
     {
         // Up sent counts
         $this->emailSentCounts[$emailId] ??= 0;
@@ -312,7 +306,7 @@ class SendEmailToContact
     /**
      * Down sent counter for the given email ID.
      */
-    protected function downEmailSentCount($emailId): void
+    private function downEmailSentCount(?int $emailId): void
     {
         --$this->emailSentCounts[$emailId];
     }
@@ -320,7 +314,7 @@ class SendEmailToContact
     /**
      * @return array<int, mixed>
      */
-    protected function queueTokenizedEmail(): array
+    private function queueTokenizedEmail(): array
     {
         [$queued, $queueErrors] = $this->mailer->queue(true, MailHelper::QUEUE_RETURN_ERRORS);
 
@@ -332,10 +326,7 @@ class SendEmailToContact
         return [$queued, $queueErrors];
     }
 
-    /**
-     * @return array
-     */
-    protected function sendStandardEmail()
+    private function sendStandardEmail(): array
     {
         // Dispatch the event to generate the tokens
         $this->mailer->dispatchSendEvent();

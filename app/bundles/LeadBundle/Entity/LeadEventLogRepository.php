@@ -3,13 +3,12 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * @extends CommonRepository<LeadEventLog>
  */
-class LeadEventLogRepository extends CommonRepository
+final class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
@@ -18,15 +17,13 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @param string $bundle
      * @param string $object
-     *
-     * @return Paginator
      */
-    public function getFailedRows($importId, array $args = [], $bundle = 'lead', $object = 'import')
+    public function getFailedRows($importId, array $args = [], $bundle = 'lead', $object = 'import'): array
     {
         return $this->getSpecificRows($importId, 'failed', $args, $bundle, $object);
     }
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $entities = parent::getEntities($args);
         $entities = iterator_to_array($entities);
@@ -48,10 +45,8 @@ class LeadEventLogRepository extends CommonRepository
      *
      * @param string $bundle
      * @param string $object
-     *
-     * @return Paginator
      */
-    public function getSpecificRows($objectId, $action, array $args = [], $bundle = 'lead', $object = 'import')
+    public function getSpecificRows($objectId, $action, array $args = [], $bundle = 'lead', $object = 'import'): array
     {
         return $this->getEntities(
             array_merge(
@@ -96,10 +91,8 @@ class LeadEventLogRepository extends CommonRepository
      * @param ?string              $object
      * @param array|string|null    $actions
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getEvents(?Lead $contact = null, $bundle = null, $object = null, $actions = null, array $options = [])
+    public function getEvents(?Lead $contact = null, $bundle = null, $object = null, $actions = null, array $options = []): array
     {
         $alias = $this->getTableAlias();
         $qb    = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -142,16 +135,13 @@ class LeadEventLogRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param int $fromLeadId
-     * @param int $toLeadId
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_event_log')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId)
+            ->set('lead_id', $toLeadId)
+            ->where('lead_id = '.$fromLeadId)
             ->executeStatement();
     }
 

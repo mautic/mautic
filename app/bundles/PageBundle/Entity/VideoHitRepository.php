@@ -2,6 +2,9 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -18,10 +21,8 @@ final class VideoHitRepository extends CommonRepository
      *
      * @param int|null             $leadId
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getTimelineStats($leadId = null, array $options = [])
+    public function getTimelineStats($leadId = null, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -29,7 +30,7 @@ final class VideoHitRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'video_hits', 'h');
 
         if ($leadId) {
-            $query->where($query->expr()->eq('h.lead_id', (int) $leadId));
+            $query->where($query->expr()->eq('h.lead_id', (string) ((int) $leadId)));
         }
 
         if (isset($options['search']) && $options['search']) {
@@ -41,12 +42,7 @@ final class VideoHitRepository extends CommonRepository
         return $this->getTimelineResults($query, $options, 'h.url', 'h.date_hit', [], ['date_hit'], null, 'h.id');
     }
 
-    /**
-     * @param string $guid
-     *
-     * @return VideoHit
-     */
-    public function getHitForLeadByGuid(Lead $lead, $guid)
+    public function getHitForLeadByGuid(Lead $lead, string $guid): VideoHit
     {
         $result = $this->findOneBy(['guid' => $guid, 'lead' => $lead]);
 
@@ -56,20 +52,17 @@ final class VideoHitRepository extends CommonRepository
     /**
      * Get a lead's page hits.
      *
-     * @param int                  $leadId
      * @param array<string, mixed> $options
      *
-     * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
-    public function getLeadHits($leadId, array $options = [])
+    public function getLeadHits(int|string $leadId, array $options = []): array
     {
         $query = $this->createQueryBuilder('h');
         $query->select('h.userAgent, h.dateHit, h.dateLeft, h.referer, h.channel, h.channelId, h.url, h.duration, h.query, h.timeWatched')
             ->where('h.lead = :leadId')
-            ->setParameter('leadId', (int) $leadId);
+            ->setParameter('leadId', $leadId);
 
         if (isset($options['url']) && $options['url']) {
             $query->andWhere($query->expr()->eq('h.url', $query->expr()->literal($options['url'])));
@@ -81,11 +74,9 @@ final class VideoHitRepository extends CommonRepository
     /**
      * Count stats from hit times.
      *
-     * @param array $times
-     *
      * @return array<string, mixed>
      */
-    public function countStats($times): array
+    public function countStats(array $times): array
     {
         return [
             'sum'     => array_sum($times),
@@ -99,14 +90,10 @@ final class VideoHitRepository extends CommonRepository
     /**
      * Get list of referers ordered by it's count.
      *
-     * @param \Doctrine\DBAL\Query\QueryBuilder $query
-     * @param int                               $limit
-     * @param int                               $offset
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
-    public function getReferers($query, $limit = 10, $offset = 0): array
+    public function getReferers(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->select('h.referer, count(h.referer) as sessions')
             ->groupBy('h.referer')

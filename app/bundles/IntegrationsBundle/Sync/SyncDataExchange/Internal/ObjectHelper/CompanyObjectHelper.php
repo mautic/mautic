@@ -6,6 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
@@ -17,7 +18,7 @@ use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
 
-class CompanyObjectHelper implements ObjectHelperInterface
+final class CompanyObjectHelper implements ObjectHelperInterface
 {
     /**
      * @var string[]|null
@@ -136,7 +137,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                 $changedObject->getIntegration(),
                 $changedObject->getMappedObject(),
                 $changedObject->getMappedObjectId(),
-                $changedObject->getChangeDateTime()
+                $changedObject->getChangeDateTime() ?? new \DateTime()
             );
         }
 
@@ -199,8 +200,9 @@ class CompanyObjectHelper implements ObjectHelperInterface
 
         foreach ($fields as $col => $val) {
             // Use andWhere because Mautic treats conflicting unique identifiers as different objects
-            $q->{$this->repository->getUniqueIdentifiersWherePart()}("c.{$col} = :".$col)
-                ->setParameter($col, $val);
+            /** @var QueryBuilder $q */
+            $q = $q->{$this->repository->getUniqueIdentifiersWherePart()}("c.{$col} = :".$col);
+            $q->setParameter($col, $val);
         }
 
         return $q->executeQuery()->fetchAllAssociative();

@@ -27,25 +27,15 @@ final class IntegrationsListTypeTest extends TestCase
     {
         $pluginName = 'plugin name';
 
-        $integration1 = $this->createMock(Integration::class);
-        $integration1->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(false);
-        $integration1->expects($this->never())
-            ->method('getPlugin');
+        $integration1 = new Integration();
+        $integration1->setIsPublished(false);
 
-        $plugin = $this->createMock(Plugin::class);
-        $plugin->expects($this->once())
-            ->method('getName')
-            ->willReturn($pluginName);
+        $plugin = new Plugin();
+        $plugin->setName($pluginName);
 
-        $integration2 = $this->createMock(Integration::class);
-        $integration2->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(true);
-        $integration2->expects($this->once())
-            ->method('getPlugin')
-            ->willReturn($plugin);
+        $integration2 = new Integration();
+        $integration2->setIsPublished(true);
+        $integration2->setPlugin($plugin);
 
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance1 = $this->createMock(AbstractIntegration::class);
@@ -160,25 +150,15 @@ final class IntegrationsListTypeTest extends TestCase
     {
         $pluginName = 'plugin name';
 
-        $integration1 = $this->createMock(Integration::class);
-        $integration1->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(false);
-        $integration1->expects($this->never())
-            ->method('getPlugin');
+        $integration1 = new Integration();
+        $integration1->setIsPublished(false);
 
-        $plugin = $this->createMock(Plugin::class);
-        $plugin->expects($this->once())
-            ->method('getName')
-            ->willReturn($pluginName);
+        $plugin = new Plugin();
+        $plugin->setName($pluginName);
 
-        $integration2 = $this->createMock(Integration::class);
-        $integration2->expects($this->once())
-            ->method('isPublished')
-            ->willReturn(true);
-        $integration2->expects($this->once())
-            ->method('getPlugin')
-            ->willReturn($plugin);
+        $integration2 = new Integration();
+        $integration2->setIsPublished(true);
+        $integration2->setPlugin($plugin);
 
         /** @phpstan-ignore classConstant.deprecatedClass */
         $integrationInstance1 = $this->createMock(AbstractIntegration::class);

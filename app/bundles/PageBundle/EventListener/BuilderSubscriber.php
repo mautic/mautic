@@ -2,8 +2,15 @@
 
 namespace Mautic\PageBundle\EventListener;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Connection;
+use DOMDocument;
+use DOMElement;
+use DOMNode;
+use DOMXPath;
+use InvalidArgumentException;
 use Mautic\CoreBundle\DTO\TokenFormatOptions;
+use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Event\EmailDisplayEvent;
@@ -15,11 +22,12 @@ use Mautic\PageBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use RuntimeException;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
-final class BuilderSubscriber implements EventSubscriberInterface
+final class BuilderSubscriber
 {
     private const string pageTokenRegex         = '{pagelink=(.*?)}';
 
@@ -70,17 +78,9 @@ final class BuilderSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            Events\PageDisplayEvent::class   => ['onPageDisplay', 0],
-            PageEvents::PAGE_ON_BUILD     => ['onPageBuild', 0],
-            EmailOnBuildEvent::class      => ['onEmailBuild', 0],
-            EmailSendEvent::class         => ['onEmailGenerate', 0],
-            EmailDisplayEvent::class      => ['onEmailGenerate', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EmailOnBuildEvent::class,
+    )]
     public function onEmailBuild(EmailOnBuildEvent $event): void
     {
         if ($event->tokensRequested([self::pageTokenRegex])) {
@@ -99,6 +99,12 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: EmailSendEvent::class,
+    )]
+    #[AsEventListener(
+        event: EmailDisplayEvent::class,
+    )]
     public function onEmailGenerate(EmailSendEvent $event): void
     {
         $content      = $event->getContent();
@@ -112,6 +118,9 @@ final class BuilderSubscriber implements EventSubscriberInterface
     /**
      * Add forms to available page tokens.
      */
+    #[AsEventListener(
+        event: Events\PageBuilderEvent::class,
+    )]
     public function onPageBuild(Events\PageBuilderEvent $event): void
     {
         $tokenHelper = $this->builderTokenHelperFactory->getBuilderTokenHelper('page');
@@ -183,6 +192,9 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: Events\PageDisplayEvent::class,
+    )]
     public function onPageDisplay(Events\PageDisplayEvent $event): void
     {
         if (empty($content = $event->getContent())) {
@@ -279,7 +291,7 @@ final class BuilderSubscriber implements EventSubscriberInterface
         if ($wrapperTemplate) {
             // If the content is not empty, ensure that the $wrapperTemplate contains a place to put it.
             if (!empty($content) && !str_contains($wrapperTemplate, '{templateContent}')) {
-                throw new \InvalidArgumentException('Your $wrapperTemplate must contain the string {templateContent} where you want to insert the rendered template content.');
+                throw new InvalidArgumentException('Your $wrapperTemplate must contain the string {templateContent} where you want to insert the rendered template content.');
             }
 
             $content = str_replace('{templateContent}', $content, sprintf($wrapperTemplate, ...$wrapperTemplateValues));
@@ -389,21 +401,23 @@ final class BuilderSubscriber implements EventSubscriberInterface
     {
         $related  = [];
         $parent   = $page->getTranslationParent();
+
+        /** @var Collection<int, Page>|null $children */
         $children = $page->getTranslationChildren();
 
-        if (!$parent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface && !$children instanceof \Doctrine\Common\Collections\Collection) {
+        if (!$parent instanceof TranslationEntityInterface && !$children instanceof Collection) {
             return $related;
         }
 
         // If this page has a parent, then fetch the children from the parent
-        if ($parent instanceof \Mautic\CoreBundle\Entity\TranslationEntityInterface) {
+        if ($parent instanceof TranslationEntityInterface) {
             $children = $parent->getTranslationChildren();
         } else {
             // Otherwise this is the parent page.
             $parent = $page;
         }
 
-        if (!$children instanceof \Doctrine\Common\Collections\Collection) {
+        if (!$children instanceof Collection) {
             return $related;
         }
 
@@ -412,6 +426,10 @@ final class BuilderSubscriber implements EventSubscriberInterface
         }
 
         foreach ($children as $child) {
+            if (!$child instanceof Page) {
+                continue;
+            }
+
             $related[$child->getId()] = $this->buildRelatedArrayForPage($child);
         }
 
@@ -439,12 +457,12 @@ final class BuilderSubscriber implements EventSubscriberInterface
         ];
     }
 
-    private function createDOMXPathForContent(string $content): \DOMXPath
+    private function createDOMXPathForContent(string $content): DOMXPath
     {
-        $domDocument = new \DOMDocument('1.0', 'utf-8');
+        $domDocument = new DOMDocument('1.0', 'utf-8');
         $domDocument->loadHTML(mb_encode_numericentity($content, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_NOERROR);
 
-        return new \DOMXPath($domDocument);
+        return new DOMXPath($domDocument);
     }
 
     /**
@@ -459,19 +477,19 @@ final class BuilderSubscriber implements EventSubscriberInterface
         $xpath = $this->createDOMXPathForContent($content);
         $node  = $this->getFirstNodeThatContainsAPreferenceCenterToken($xpath);
 
-        if (null === $node) {
+        if (!$node instanceof DOMNode) {
             return $content;
         }
 
         $parentNode = $this->getFirstParentNodeThatContainsAllFormInputs($node);
 
-        $parentNode->insertBefore(new \DOMElement('startform'), $parentNode->firstChild);
-        $parentNode->appendChild(new \DOMElement('endform'));
+        $parentNode->insertBefore(new DOMElement('startform'), $parentNode->firstChild);
+        $parentNode->appendChild(new DOMElement('endform'));
 
         return str_replace(['<startform></startform>', '<endform></endform>'], [$params['startform'], '</form>'], $xpath->document->saveHTML());
     }
 
-    private function getFirstNodeThatContainsAPreferenceCenterToken(\DOMXPath $xpath): ?\DOMNode
+    private function getFirstNodeThatContainsAPreferenceCenterToken(DOMXPath $xpath): ?DOMNode
     {
         $nodeList = $xpath->query('//*[@data-prefs-center-first="1"]');
 
@@ -482,14 +500,14 @@ final class BuilderSubscriber implements EventSubscriberInterface
         return null;
     }
 
-    private function getFirstParentNodeThatContainsAllFormInputs(\DOMNode $node): \DOMNode
+    private function getFirstParentNodeThatContainsAllFormInputs(DOMNode $node): DOMNode
     {
-        $content = implode('', array_map([$node->ownerDocument, 'saveHTML'], iterator_to_array($node->childNodes)));
+        $content = implode('', array_map($node->ownerDocument->saveHTML(...), iterator_to_array($node->childNodes)));
 
         // Check if the save button exists in the content. If not, try again with the parentNode.
         if (!str_contains($content, self::saveButtonContainerClass)) {
-            if (null === $node->parentNode) {
-                throw new \RuntimeException("Can't get parent node of #document. Did you forget to insert a save button in your preference center form?");
+            if (!$node->parentNode instanceof DOMNode) {
+                throw new RuntimeException("Can't get parent node of #document. Did you forget to insert a save button in your preference center form?");
             }
 
             return $this->getFirstParentNodeThatContainsAllFormInputs($node->parentNode);

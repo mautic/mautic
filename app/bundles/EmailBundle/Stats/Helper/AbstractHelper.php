@@ -28,11 +28,9 @@ abstract class AbstractHelper implements StatHelperInterface
     }
 
     /**
-     * @return array
-     *
      * @throws \Exception
      */
-    public function fetchStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options)
+    public function fetchStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options): array
     {
         $statCollection = $this->collector->fetchStats($this->getName(), $fromDateTime, $toDateTime, $options);
         $calculator     = $statCollection->getCalculator($fromDateTime, $toDateTime);
@@ -49,10 +47,7 @@ abstract class AbstractHelper implements StatHelperInterface
         return array_values($stats->getStats());
     }
 
-    /**
-     * @return ChartQuery
-     */
-    protected function getQuery(\DateTime $fromDateTime, \DateTime $toDateTime)
+    protected function getQuery(\DateTime $fromDateTime, \DateTime $toDateTime): ChartQuery
     {
         $unit = $this->getTimeUnitFromDateRange($fromDateTime, $toDateTime);
 

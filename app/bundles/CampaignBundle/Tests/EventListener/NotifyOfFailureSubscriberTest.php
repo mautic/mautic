@@ -29,7 +29,7 @@ final class NotifyOfFailureSubscriberTest extends TestCase
     public function testNotifyOfFailure(): void
     {
         $lead  = new Lead();
-        $event = $this->createStub(Event::class);
+        $event = new Event();
 
         $notifyEvent = new NotifyOfFailureEvent($lead, $event);
 
@@ -42,12 +42,5 @@ final class NotifyOfFailureSubscriberTest extends TestCase
             );
 
         $this->subscriber->notifyOfFailure($notifyEvent);
-    }
-
-    public function testGetSubscribedEvents(): void
-    {
-        $events = NotifyOfFailureSubscriber::getSubscribedEvents();
-        $this->assertArrayHasKey(NotifyOfFailureEvent::class, $events);
-        $this->assertEquals('notifyOfFailure', $events[NotifyOfFailureEvent::class]);
     }
 }

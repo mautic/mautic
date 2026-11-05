@@ -29,6 +29,7 @@ use Mautic\LeadBundle\Segment\OperatorOptions;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScore;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -36,9 +37,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     use LeadFieldTestTrait;
 
     private LeadRepository $contactRepository;
@@ -86,12 +89,9 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        if ('testUpdatesContactCampaignActionWithBooleanFields' === $this->name()) {
-            $this->useCleanupRollback = false;
-        } else {
-            $this->useCleanupRollback = true;
-        }
-
+        // The cleanup transaction stays off for every test here: they create custom field
+        // columns, and DDL makes MySQL commit the open transaction, which then fails the
+        // ORM's own commit under ORM 3.
         parent::setUp();
 
         $this->contactRepository = self::getContainer()->get(LeadRepository::class);
@@ -120,7 +120,8 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             }
         }
 
-        $parentEvent  = $this->createEvent($campaign,
+        $parentEvent  = $this->createEvent(
+            $campaign,
             'Check if contact is in segment',
             'lead.segments',
             'condition',
@@ -131,7 +132,8 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $expectedPoints = 10;
 
-        $childEvent = $this->createEvent($campaign,
+        $childEvent = $this->createEvent(
+            $campaign,
             'Update points',
             'lead.updatelead',
             'action',
@@ -173,7 +175,8 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($tag);
         $this->em->flush();
 
-        $parentEvent  = $this->createEvent($campaign,
+        $parentEvent  = $this->createEvent(
+            $campaign,
             'Check if contact has tag',
             'lead.tags',
             'condition',
@@ -184,7 +187,8 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $expectedPoints = 10;
 
-        $childEvent = $this->createEvent($campaign,
+        $childEvent = $this->createEvent(
+            $campaign,
             'Update points',
             'lead.updatelead',
             'action',
@@ -258,7 +262,9 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'type'       => 'lead.stages',
                 'properties' => [
                     'type'   => 'lead.stages',
-                    'stages' => [0 => '1'],
+                    // The created stage's id, not a hard-coded 1: auto-increment does not
+                    // restart per test now that the cleanup transaction is off.
+                    'stages' => [0 => (string) $stageIds[0]],
                 ],
             ]);
 
@@ -1071,7 +1077,6 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     #[DataProvider('regexOperatorProvider')]
     public function testRegexOperatorOnDateFieldCondition(string $operator, string $regex, string $fieldValue, bool $expectedResult): void
     {
-        $this->useCleanupRollback = false;
 
         // Create the custom date field
         $this->createField([

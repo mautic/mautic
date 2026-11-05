@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Doctrine\QueryFormatter;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 
 /**
@@ -10,14 +11,11 @@ use Mautic\CoreBundle\Doctrine\DatabasePlatform;
  */
 abstract class AbstractFormatter
 {
-    protected \Doctrine\DBAL\Platforms\AbstractPlatform $platform;
+    protected AbstractPlatform $platform;
 
     protected string $name;
 
-    /**
-     * @return AbstractFormatter
-     */
-    public static function createFormatter(Connection $db)
+    public static function createFormatter(Connection $db): self
     {
         $name  = DatabasePlatform::getDatabasePlatform($db->getDatabasePlatform());
         $class = '\Mautic\CoreBundle\Doctrine\QueryFormatter\\'.ucfirst($name).'Formatter';

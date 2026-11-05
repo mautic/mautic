@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
@@ -10,11 +11,11 @@ use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 /**
  * @extends CommonRepository<Page>
  */
-class PageRepository extends CommonRepository
+final class PageRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $select = ['p'];
 
@@ -39,10 +40,8 @@ class PageRepository extends CommonRepository
 
     /**
      * @param string $alias
-     *
-     * @return mixed
      */
-    public function checkPageUniqueAlias($alias, $ignoreIds = [])
+    public function checkPageUniqueAlias($alias, $ignoreIds = []): int
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as alias_count')
@@ -61,20 +60,10 @@ class PageRepository extends CommonRepository
         return $results['alias_count'];
     }
 
-    /**
-     * @param string      $search
-     * @param int         $limit
-     * @param int         $start
-     * @param string|bool $topLevel
-     * @param array       $ignoreIds
-     * @param array       $extraColumns
-     *
-     * @return array
-     */
-    public function getPageList($search = '', $limit = 10, $start = 0, bool $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [], bool $publishedOnly = false)
+    public function getPageList(string $search = '', int $limit = 10, int $start = 0, bool $viewOther = false, string|bool $topLevel = false, array $ignoreIds = [], array $extraColumns = [], bool $publishedOnly = false): array
     {
         $q = $this->createQueryBuilder('p');
-        $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));
+        $q->select(sprintf('partial p.{id, title, language, alias %s}', $extraColumns === [] ? '' : ','.implode(',', $extraColumns)));
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('p.title', ':search'))
@@ -93,7 +82,7 @@ class PageRepository extends CommonRepository
             $q->andWhere($q->expr()->isNull('p.variantParent'));
         }
 
-        if (!empty($ignoreIds)) {
+        if ($ignoreIds !== []) {
             $q->andWhere($q->expr()->notIn('p.id', ':pageIds'))
                 ->setParameter('pageIds', $ignoreIds);
         }
@@ -112,7 +101,7 @@ class PageRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $queryBuilder,
@@ -124,7 +113,7 @@ class PageRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {

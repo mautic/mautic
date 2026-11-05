@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Tests\Controller;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Entity\Download;
+use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTestCase;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,6 +20,7 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testDownloadActionStreamByDefault(): void
     {
+        $this->setOriginalFileName('Product brochure.png');
         $this->client->request(Request::METHOD_GET, '/asset/'.$this->asset->getSlug());
         ob_start();
         $response = $this->client->getResponse();
@@ -26,7 +30,7 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
-        $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
+        $this->assertSame('inline; filename="Product brochure.png"', $response->headers->get('Content-Disposition'));
         $this->assertSame($this->expectedPngContent, $content);
     }
 
@@ -35,6 +39,7 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testDownloadActionStreamIsZero(): void
     {
+        $this->setOriginalFileName('Product brochure.png');
         $this->client->request(Request::METHOD_GET, '/asset/'.$this->asset->getSlug().'?stream=0');
         ob_start();
         $response = $this->client->getResponse();
@@ -43,7 +48,7 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
         ob_end_clean();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringStartsWith($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
+        $this->assertSame('attachment; filename="Product brochure.png"', $response->headers->get('Content-Disposition'));
         $this->assertSame($this->expectedPngContent, $content);
     }
 
@@ -52,6 +57,7 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testDownloadActionById(): void
     {
+        $this->setOriginalFileName('Product brochure.png');
         $assetSlug = $this->asset->getId().':';
 
         $this->client->request(Request::METHOD_GET, '/asset/'.$assetSlug.'?stream=0');
@@ -62,7 +68,7 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
         ob_end_clean();
 
         $this->assertResponseIsSuccessful();
-        $this->assertStringStartsWith($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
+        $this->assertSame('attachment; filename="Product brochure.png"', $response->headers->get('Content-Disposition'));
         $this->assertSame($this->expectedPngContent, $content);
     }
 
@@ -71,6 +77,7 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
      */
     public function testDownloadActionWithUTM(): void
     {
+        $this->setOriginalFileName('Product brochure.png');
         $this->logoutUser();
         $assetSlug = $this->asset->getSlug().'?utm_source=test2&utm_medium=test3&utm_campaign=test6&utm_term=test4&utm_content=test5';
 
@@ -83,10 +90,10 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertSame($this->expectedMimeType, $response->headers->get('Content-Type'));
-        $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
+        $this->assertSame('inline; filename="Product brochure.png"', $response->headers->get('Content-Disposition'));
         $this->assertSame($this->expectedPngContent, $content);
 
-        $downloadRepo = $this->em->getRepository(Download::class);
+        $downloadRepo = $this->getContainer()->get(DownloadRepository::class);
 
         $download = $downloadRepo->findOneBy(['asset' => $this->asset]);
         $this->assertInstanceOf(Download::class, $download);
@@ -95,6 +102,48 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $this->assertSame('test4', $download->getUtmTerm());
         $this->assertSame('test5', $download->getUtmContent());
         $this->assertSame('test6', $download->getUtmCampaign());
+    }
+
+    #[DataProvider('filenameProvider')]
+    public function testDownloadFilename(string $filename, string $expectedParameters, string $stream, string $disposition): void
+    {
+        $this->setOriginalFileName($filename);
+
+        $this->client->request('GET', '/asset/'.$this->asset->getSlug().'?stream='.$stream);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSame($disposition.'; '.$expectedParameters, $this->client->getResponse()->headers->get('Content-Disposition'));
+        $this->assertSame($this->expectedPngContent, $this->client->getResponse()->getContent());
+    }
+
+    /**
+     * @return iterable<string, array{string, string, string, string}>
+     */
+    public static function filenameProvider(): iterable
+    {
+        $filenames = [
+            'quotes'          => ['Product "Pro".png', 'filename="Product \\"Pro\\".png"'],
+            'unicode'         => ['Broschüre.png', 'filename=Broschure.png; filename*=utf-8\'\'Brosch%C3%BCre.png'],
+            'repeated'        => ['Broschüüre.png', 'filename=Broschuure.png; filename*=utf-8\'\'Brosch%C3%BC%C3%BCre.png'],
+            'non-latin'       => ['ąęźżýřšї.png', 'filename=aezzyrsi.png; filename*=utf-8\'\'%C4%85%C4%99%C5%BA%C5%BC%C3%BD%C5%99%C5%A1%D1%97.png'],
+            'percent'         => ['100%.png', 'filename=100_.png; filename*=utf-8\'\'100%25.png'],
+            'path separators' => ['Product\\Pro/image.png', 'filename=Product_Pro_image.png'],
+            'combined'        => ['Product "ü\\/%here.png', 'filename="Product \\"u___here.png"; filename*=utf-8\'\'Product%20%22%C3%BC__%25here.png'],
+        ];
+
+        foreach (['inline' => '1', 'attachment' => '0'] as $disposition => $stream) {
+            foreach ($filenames as $name => [$filename, $expectedParameters]) {
+                yield $disposition.' '.$name => [$filename, $expectedParameters, $stream, $disposition];
+            }
+        }
+    }
+
+    private function setOriginalFileName(string $filename): void
+    {
+        $this->asset = $this->em->find(Asset::class, $this->asset->getId());
+        $this->asset->setOriginalFileName($filename);
+        $this->em->persist($this->asset);
+        $this->em->flush();
     }
 
     public function testDownloadActionWithInvalidSlug(): void
@@ -151,6 +200,23 @@ final class PublicControllerFunctionalTest extends AbstractAssetTestCase
         $this->client->request(Request::METHOD_GET, '/asset/'.$this->asset->getSlug());
 
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+    }
+
+    /**
+     * Download action should not serve an asset whose path escapes the upload dir.
+     */
+    public function testDownloadActionWithTraversalPathIsNotServed(): void
+    {
+        $this->logoutUser();
+        $asset = $this->createAsset([
+            'title' => 'Traversal Asset',
+            'path'  => '../../../../../../../../etc/passwd',
+        ]);
+
+        $this->client->request('GET', '/asset/'.$asset->getSlug());
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+        $this->assertStringNotContainsString('root:x:0:0', (string) $this->client->getResponse()->getContent());
     }
 
     public function testDownloadActionWithDisallowedAssetSetsRobotsTag(): void

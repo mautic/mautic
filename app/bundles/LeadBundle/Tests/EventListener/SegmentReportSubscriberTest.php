@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\EventListener\SegmentReportSubscriber;
 use Mautic\LeadBundle\Report\FieldsBuilder;
@@ -13,10 +13,12 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class SegmentReportSubscriberTest extends TestCase
 {
     public function testNotRelevantContext(): void
     {
@@ -24,18 +26,14 @@ final class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $channelListHelperMock            = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
         $reportHelperMock                 = new ReportHelper($this->createStub(EventDispatcherInterface::class));
         $fieldsBuilderMock                = $this->createStub(FieldsBuilder::class);
-        $reportMock                       = $this->createMock(Report::class);
+        $reportMock                       = new Report();
+        $reportMock->setSource('badContext');
         $queryBuilder                     = $this->createMock(QueryBuilder::class);
         $reportBuilderEvent               = new ReportBuilderEvent($translatorMock, $channelListHelperMock, 'badContext', [], $reportHelperMock);
         $segmentReportSubscriber          = new SegmentReportSubscriber($fieldsBuilderMock);
         $segmentReportSubscriber->onReportBuilder($reportBuilderEvent);
 
         $this->assertSame([], $reportBuilderEvent->getTables());
-
-        $reportMock->expects($this->once())
-            ->method('getSource')
-            ->with()
-            ->willReturn('badContext');
 
         $queryBuilder->expects($this->never())
             ->method('from');
@@ -158,23 +156,9 @@ final class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $channelListHelperMock            = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
         $fieldsBuilderMock                = $this->createStub(FieldsBuilder::class);
         $segmentReportSubscriber          = new SegmentReportSubscriber($fieldsBuilderMock);
-        $reportMock                       = $this->createMock(Report::class);
+        $reportMock                       = new Report();
+        $reportMock->setSource('segment.membership');
         $queryBuilder                     = $this->createMock(QueryBuilder::class);
-
-        $reportMock->expects($this->once())
-            ->method('getSource')
-            ->with()
-            ->willReturn('segment.membership');
-
-        $reportMock->expects($this->exactly(2))
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->with()
-            ->willReturn([]);
-
-        $reportMock->expects($this->exactly(1))
-            ->method('getFilters')
-            ->with()
-            ->willReturn([]);
 
         $queryBuilder->expects($this->once())
             ->method('from')
@@ -183,7 +167,7 @@ final class SegmentReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $matcher = $this->exactly(2);
 
         $queryBuilder->expects($matcher)
-            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilder): \PHPUnit\Framework\MockObject\MockObject {
+            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher, $queryBuilder): MockObject {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('lll', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'leads', $parameters[1]);

@@ -12,12 +12,13 @@ use MauticPlugin\MauticCrmBundle\Integration\SalesforceIntegration;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[CoversClass(SalesforceApi::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
+final class SalesforceApiTest extends TestCase
 {
     #[TestDox('Test that a locked record request is retried up to 3 times')]
     public function testRecordLockedErrorIsRetriedThreeTimes(): void
@@ -440,6 +441,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
+        $params             = [];
         $params['start']    = '2019-05-22 19:36:30';
         $params['end']      = '2030-05-22 19:36:30';
 
@@ -512,6 +514,7 @@ final class SalesforceApiTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
+        $params             = [];
         $params['start']    = '2019-05-22 19:36:30';
         $params['end']      = '2030-05-22 19:36:30';
 

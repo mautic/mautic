@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Tests\Dashboard;
 
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Entity\Widget as WidgetEntity;
 use Mautic\DashboardBundle\Model\DashboardModel;
@@ -31,10 +32,7 @@ final class WidgetTest extends TestCase
      */
     private MockObject $userHelper;
 
-    /**
-     * @var MockObject&User
-     */
-    private MockObject $user;
+    private User $user;
 
     private Widget $widget;
 
@@ -45,10 +43,8 @@ final class WidgetTest extends TestCase
         $this->dashboardModel = $this->createMock(DashboardModel::class);
         $this->userHelper     = $this->createMock(UserHelper::class);
 
-        $this->user = $this->createMock(User::class);
-        $this->user
-            ->method('getId')
-            ->willReturn(self::USER_ID);
+        $this->user = new User();
+        ReflectionHelper::setEntityId($this->user, self::USER_ID);
 
         $this->widget = new Widget(
             $this->dashboardModel,
@@ -60,14 +56,8 @@ final class WidgetTest extends TestCase
     public function testGetSuccess(): void
     {
         $widgetId = 2;
-        $widget   = $this->createMock(WidgetEntity::class);
-        $widget->expects($this->once())
-            ->method('getId')
-            ->willReturn($widgetId);
-        $widget->expects($this->once())
-            ->method('getCreatedBy')
-            ->willReturn(self::USER_ID);
-
+        $widget   = new WidgetEntity();
+        ReflectionHelper::setEntityId($widget, $widgetId);
         $widget->setCreatedBy(self::USER_ID);
         $filter = [
             'dateFrom' => new \DateTime(),
@@ -111,11 +101,7 @@ final class WidgetTest extends TestCase
     public function testGetNotFoundHttpExceptionEmptyEntity(): void
     {
         $widgetId = 2;
-        $widget   = $this->createMock(WidgetEntity::class);
-        $widget->expects($this->once())
-            ->method('getId')
-            ->willReturn(null);
-
+        $widget   = new WidgetEntity();
         $widget->setCreatedBy(self::USER_ID);
 
         $this->dashboardModel->expects($this->once())
@@ -130,15 +116,9 @@ final class WidgetTest extends TestCase
     public function testGetAccessDeniedException(): void
     {
         $widgetId = 2;
-        $widget   = $this->createMock(WidgetEntity::class);
-        $widget->expects($this->once())
-            ->method('getId')
-            ->willReturn($widgetId);
-        $widget->expects($this->once())
-            ->method('getCreatedBy')
-            ->willReturn(self::USER_ID + 1);
-
-        $widget->setCreatedBy(self::USER_ID);
+        $widget   = new WidgetEntity();
+        ReflectionHelper::setEntityId($widget, $widgetId);
+        $widget->setCreatedBy(self::USER_ID + 1);
 
         $this->dashboardModel->expects($this->once())
             ->method('getEntity')

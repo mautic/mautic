@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Field\Helper\IndexHelper;
 
 final class Version20211020092759 extends PreUpAssertionMigration
 {
-    private const TABLE = 'leads';
+    private const string TABLE = 'leads';
 
     protected function preUpAssertions(): void
     {

@@ -175,13 +175,13 @@ final class IsPostActionRedirectUrlValidatorTest extends ConstraintValidatorTest
     public function testNotSupportedConstraint(): void
     {
         $this->expectException(UnexpectedTypeException::class);
-        $this->validator->validate('lorem ipsum', new NotBlank());
+        $this->validate('lorem ipsum', new NotBlank());
     }
 
     #[DataProvider('provideEmptyValue')]
     public function testEmptyValue(?string $emptyValue): void
     {
-        $this->validator->validate($emptyValue, new IsPostActionRedirectUrl());
+        $this->validate($emptyValue, new IsPostActionRedirectUrl());
         $this->assertNoViolation();
     }
 
@@ -197,7 +197,7 @@ final class IsPostActionRedirectUrlValidatorTest extends ConstraintValidatorTest
         $violation->method('getParameters')->willReturn($violationParameters);
 
         $violationList = new ConstraintViolationList([$violation]);
-        $urlConstraint = new Url(message: 'mautic.form.form.postactionproperty_redirect.url');
+        $urlConstraint = new Url(message: 'mautic.form.form.postactionproperty_redirect.url', requireTld: false);
 
         $this
             ->urlValidator
@@ -206,7 +206,7 @@ final class IsPostActionRedirectUrlValidatorTest extends ConstraintValidatorTest
             ->with($dummyDataUrl ?? $incorrectUrl, $urlConstraint)
             ->willReturn($violationList);
 
-        $this->validator->validate($incorrectUrl, new IsPostActionRedirectUrl());
+        $this->validate($incorrectUrl, new IsPostActionRedirectUrl());
 
         $this
             ->buildViolation('Incorrect URL message')
@@ -217,7 +217,7 @@ final class IsPostActionRedirectUrlValidatorTest extends ConstraintValidatorTest
     #[DataProvider('provideUrl')]
     public function testRegularUrl(string $url): void
     {
-        $this->validator->validate($url, new IsPostActionRedirectUrl());
+        $this->validate($url, new IsPostActionRedirectUrl());
         $this->assertNoViolation();
     }
 
@@ -225,7 +225,7 @@ final class IsPostActionRedirectUrlValidatorTest extends ConstraintValidatorTest
     public function testUrlWithTokens(string $url, string $dummyDataUrl): void
     {
         $violationList = new ConstraintViolationList();
-        $urlConstraint = new Url(message: 'mautic.form.form.postactionproperty_redirect.url');
+        $urlConstraint = new Url(message: 'mautic.form.form.postactionproperty_redirect.url', requireTld: false);
 
         $this
             ->urlValidator
@@ -234,7 +234,7 @@ final class IsPostActionRedirectUrlValidatorTest extends ConstraintValidatorTest
             ->with($dummyDataUrl, $urlConstraint)
             ->willReturn($violationList);
 
-        $this->validator->validate($url, new IsPostActionRedirectUrl());
+        $this->validate($url, new IsPostActionRedirectUrl());
         $this->assertNoViolation();
     }
 

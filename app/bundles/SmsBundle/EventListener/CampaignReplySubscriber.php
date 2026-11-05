@@ -4,15 +4,19 @@ namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\DecisionEvent;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
+use Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\SmsBundle\Event\ReplyEvent;
 use Mautic\SmsBundle\Form\Type\CampaignReplyType;
 use Mautic\SmsBundle\Helper\ReplyHelper;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class CampaignReplySubscriber implements EventSubscriberInterface
+final readonly class CampaignReplySubscriber
 {
     public const string TYPE = 'sms.reply';
 
@@ -22,15 +26,9 @@ final readonly class CampaignReplySubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            SmsEvents::ON_CAMPAIGN_REPLY      => ['onCampaignReply', 0],
-            SmsEvents::ON_REPLY               => ['onReply', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (0 === count($this->transportChain->getEnabledTransports())) {
@@ -48,6 +46,9 @@ final readonly class CampaignReplySubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: SmsEvents::ON_CAMPAIGN_REPLY,
+    )]
     public function onCampaignReply(DecisionEvent $decisionEvent): void
     {
         /** @var ReplyEvent $replyEvent */
@@ -72,11 +73,14 @@ final readonly class CampaignReplySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     * @throws \Mautic\CampaignBundle\Executioner\Exception\CannotProcessEventException
-     * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws CannotProcessEventException
+     * @throws NotSchedulableException
      */
+    #[AsEventListener(
+        event: ReplyEvent::class,
+    )]
     public function onReply(ReplyEvent $event): void
     {
         $this->realTimeExecutioner->execute(self::TYPE, $event, 'sms');

@@ -12,10 +12,10 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PointRepository::class)]
 #[ORM\Table(name: 'points')]
-#[ORM\Index(columns: ['type'], name: 'point_type_search')]
+#[ORM\Index(name: 'point_type_search', columns: ['type'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -47,17 +47,26 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'point_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'point_projects_xref'),
+)])]
 class Point extends FormEntity implements UuidInterface
 {
     use UuidTrait;
     use ProjectTrait;
 
-    public const ENTITY_NAME = 'point';
+    public const string ENTITY_NAME = 'point';
 
     /**
      * @var int
      */
     #[Groups(['point:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -65,12 +74,14 @@ class Point extends FormEntity implements UuidInterface
      */
     #[Groups(['point:read', 'point:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -78,24 +89,28 @@ class Point extends FormEntity implements UuidInterface
      */
     #[Groups(['point:read', 'point:write'])]
     #[Assert\NotBlank(message: 'mautic.point.type.notblank')]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var bool
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\Column(type: 'boolean')]
     private $repeatable = false;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
@@ -104,25 +119,26 @@ class Point extends FormEntity implements UuidInterface
     #[Groups(['point:read', 'point:write'])]
     #[Assert\NotBlank(message: 'mautic.point.delta.notblank')]
     #[Assert\Range(min: IntHelper::MIN_INTEGER_VALUE, max: IntHelper::MAX_INTEGER_VALUE)]
+    #[ORM\Column(type: 'integer')]
     private $delta = 0;
 
     /**
      * @var array
      */
     #[Groups(['point:read', 'point:write'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
     /**
      * @var ArrayCollection<int,LeadPointLog>
      */
-    #[ORM\OneToMany(mappedBy: 'point', targetEntity: LeadPointLog::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: LeadPointLog::class, mappedBy: 'point', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['point:read', 'point:write'])]
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     #[Groups(['point:read', 'point:write'])]
     #[ORM\ManyToOne(targetEntity: Group::class)]
@@ -140,30 +156,6 @@ class Point extends FormEntity implements UuidInterface
     {
         $this->log = new ArrayCollection();
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->createField('repeatable', 'boolean')
-            ->build();
-
-        $builder->addField('delta', 'integer');
-
-        $builder->addField('properties', 'array');
-
-        $builder->addCategory();
-
-        self::addProjectsField($builder, 'point_projects_xref', 'point_id');
     }
 
     /**
@@ -203,10 +195,7 @@ class Point extends FormEntity implements UuidInterface
         return $this->id;
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
 
@@ -215,10 +204,7 @@ class Point extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -298,9 +284,9 @@ class Point extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection<int, LeadPointLog>
      */
-    public function getLog()
+    public function getLog(): Collection
     {
         return $this->log;
     }
@@ -343,18 +329,12 @@ class Point extends FormEntity implements UuidInterface
         return $this->publishDown;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category): void
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
     }

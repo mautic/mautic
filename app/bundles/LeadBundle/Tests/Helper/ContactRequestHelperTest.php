@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Entity\Email;
@@ -20,11 +19,12 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
+final class ContactRequestHelperTest extends TestCase
 {
     /**
      * @var MockObject&LeadModel
@@ -46,10 +46,7 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $dispatcher;
 
-    /**
-     * @var MockObject&Lead
-     */
-    private MockObject $trackedContact;
+    private Lead $trackedContact;
 
     /**
      * @var MockObject&ContactMerger
@@ -64,14 +61,10 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
         $this->dispatcher               = $this->createMock(EventDispatcher::class);
-        $this->trackedContact           = $this->createMock(Lead::class);
+        $this->trackedContact           = new Lead();
         $this->contactMerger            = $this->createMock(ContactMerger::class);
 
-        $this->trackedContact->method('getId')
-            ->willReturn(1);
-
-        $this->trackedContact->method('getIpAddresses')
-            ->willReturn(new ArrayCollection());
+        $this->trackedContact->setId(1);
 
         $this->contactTracker->method('getContact')
             ->willReturn($this->trackedContact);
@@ -92,9 +85,8 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $email = $this->createMock(Email::class);
-        $email->method('getId')
-            ->willReturn(2);
+        $email = new Email();
+        $email->setId(2);
 
         $stat = new Stat();
         $stat->setEmail($email);
@@ -107,7 +99,7 @@ final class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$this->trackedContact, []]);
 
         $helper = $this->getContactRequestHelper();
-        $this->assertEquals($this->trackedContact->getId(), $helper->getContactFromQuery($query)->getId());
+        $this->assertSame($this->trackedContact->getId(), $helper->getContactFromQuery($query)->getId());
     }
 
     public function testEventIdentifiesContact(): void

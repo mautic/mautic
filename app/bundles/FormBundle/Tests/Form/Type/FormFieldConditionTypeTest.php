@@ -11,11 +11,12 @@ use Mautic\FormBundle\Model\FieldModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FormFieldConditionTypeTest extends \PHPUnit\Framework\TestCase
+final class FormFieldConditionTypeTest extends TestCase
 {
     /**
      * @var MockObject&FieldModel

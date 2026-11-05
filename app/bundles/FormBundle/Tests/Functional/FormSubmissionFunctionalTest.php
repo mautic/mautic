@@ -9,7 +9,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Model\EmailModel;
-use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Tests\Model\FormSubmissionTrait;
 use Mautic\LeadBundle\Entity\Lead;
@@ -39,7 +38,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->submitLandingPageFormWithoutCompanies($formAlias, $pageA->getAlias(), 'j@doe.com', 'John', 'Doe');
 
         /** @var SubmissionRepository $submissionRepo */
-        $submissionRepo = $this->em->getRepository(Submission::class);
+        $submissionRepo = $this->getContainer()->get(SubmissionRepository::class);
 
         // Set tracking_id on submission using direct SQL (simulates device tracking which doesn't work in functional tests)
         $submissions = $submissionRepo->findBy(['page' => $pageA]);
@@ -89,7 +88,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
             'lastname'  => $lead->getLastname(), ]]);
 
         /** @var StatRepository $emailStatRepository */
-        $emailStatRepository = $this->em->getRepository(Stat::class);
+        $emailStatRepository = $this->getContainer()->get(StatRepository::class);
 
         /** @var Stat|null $emailStat */
         $emailStat = $emailStatRepository->findOneBy(
@@ -117,7 +116,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful($this->client->getResponse()->getContent());
 
         /** @var SubmissionRepository $submissionRepo */
-        $submissionRepo = $this->em->getRepository(Submission::class);
+        $submissionRepo = $this->getContainer()->get(SubmissionRepository::class);
 
         // Verify submission is associated with the page
         $submissions = $submissionRepo->findBy(['page' => $pageA]);
@@ -141,7 +140,7 @@ final class FormSubmissionFunctionalTest extends MauticMysqlTestCase
         $this->submitLandingPageFormWithoutCompanies($formAlias, $page->getAlias(), 'j@doe.com', 'John', 'Doe');
 
         /** @var SubmissionRepository $submissionRepo */
-        $submissionRepo = $this->em->getRepository(Submission::class);
+        $submissionRepo = $this->getContainer()->get(SubmissionRepository::class);
 
         $this->assertEmpty($submissionRepo->validateSubmissions([9999999999999], $formId));
 

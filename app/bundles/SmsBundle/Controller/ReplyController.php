@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\SmsBundle\Controller;
 
 use Mautic\SmsBundle\Callback\HandlerContainer;
@@ -23,7 +25,7 @@ final class ReplyController extends AbstractController
      * @throws \Exception
      */
     #[Route(
-        '/sms/{transport}/callback',
+        path: '/sms/{transport}/callback',
         name: 'mautic_sms_callback',
     )]
     public function callbackAction(Request $request, $transport): Response

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Helper;
 
 use Composer\Console\Application;
+use Composer\InstalledVersions;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -14,7 +15,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Provides several helper functions to interact with Composer (composer require, remove, etc.).
  */
-readonly class ComposerHelper
+final readonly class ComposerHelper
 {
     public function __construct(
         private KernelInterface $kernel,
@@ -103,7 +104,7 @@ readonly class ComposerHelper
      */
     public function isInstalled(string $packageName): bool
     {
-        return \Composer\InstalledVersions::isInstalled($packageName);
+        return InstalledVersions::isInstalled($packageName);
     }
 
     /**
@@ -113,7 +114,7 @@ readonly class ComposerHelper
      */
     public function getMauticPluginPackages(): array
     {
-        return \Composer\InstalledVersions::getInstalledPackagesByType('mautic-plugin');
+        return InstalledVersions::getInstalledPackagesByType('mautic-plugin');
     }
 
     /**
@@ -142,10 +143,12 @@ readonly class ComposerHelper
     private function runCommand(array $input): ConsoleOutput
     {
         $arrayInput = new ArrayInput(array_merge(
-            $input, [
+            $input,
+            [
                 '--no-interaction',
                 '--working-dir' => $this->kernel->getProjectDir(),
-            ]));
+            ]
+        ));
 
         $application = new Application();
         // We don't want our script to stop after running a Composer command

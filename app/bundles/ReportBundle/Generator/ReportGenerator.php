@@ -4,6 +4,7 @@ namespace Mautic\ReportBundle\Generator;
 
 use Doctrine\DBAL\Connection;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Builder\ReportBuilderInterface;
 use Mautic\ReportBundle\Entity\Report;
@@ -30,10 +31,8 @@ final class ReportGenerator
 
     /**
      * @param array $options Optional options array for the query
-     *
-     * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function getQuery(array $options = [])
+    public function getQuery(array $options = []): QueryBuilder
     {
         $builder = $this->getBuilder();
 
@@ -49,7 +48,7 @@ final class ReportGenerator
      *
      * @return FormInterface<Report>
      */
-    public function getForm(Report $entity, $options): FormInterface
+    public function getForm(Report $entity, array $options): FormInterface
     {
         return $this->formFactory->createBuilder(ReportType::class, $entity, $options)->getForm();
     }

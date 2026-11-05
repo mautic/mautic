@@ -7,10 +7,9 @@ namespace Mautic\LeadBundle\EventListener;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\ContactExportEvent;
-use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class ContactExportAuditLogSubscriber implements EventSubscriberInterface
+final readonly class ContactExportAuditLogSubscriber
 {
     public function __construct(
         private AuditLogModel $auditLogModel,
@@ -18,13 +17,7 @@ final readonly class ContactExportAuditLogSubscriber implements EventSubscriberI
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadEvents::POST_CONTACT_EXPORT  => 'onContactExport',
-        ];
-    }
-
+    #[AsEventListener(event: ContactExportEvent::class)]
     public function onContactExport(ContactExportEvent $event): void
     {
         $this->auditLogModel->writeToLog(

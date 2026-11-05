@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
@@ -59,6 +60,9 @@ final class FieldType extends AbstractType
     {
         $builder->addEventSubscriber(new FormExitSubscriber('lead.field', $options));
 
+        /** @var LeadField $leadField */
+        $leadField = $options['data'];
+
         $builder->add(
             'label',
             TextType::class,
@@ -69,7 +73,7 @@ final class FieldType extends AbstractType
             ]
         );
 
-        $disabled = (!empty($options['data'])) ? $options['data']->isFixed() : false;
+        $disabled = !empty($options['data']) && $leadField->isFixed();
 
         $builder->add(
             'group',
@@ -95,9 +99,9 @@ final class FieldType extends AbstractType
             ]
         );
 
-        $new         = !(bool) $options['data']->getId();
-        $type        = $options['data']->getType();
-        $isIndex     = $options['data']->isIsIndex();
+        $new         = !(bool) $leadField->getId();
+        $type        = $leadField->getType();
+        $isIndex     = $leadField->isIsIndex();
         $default     = (empty($type)) ? 'text' : $type;
 
         $builder->add(
@@ -210,7 +214,7 @@ final class FieldType extends AbstractType
             ]
         );
 
-        $disableDefaultValue = (!$new && in_array($options['data']->getAlias(), $this->identifierFields->getFieldList($options['data']->getObject())));
+        $disableDefaultValue = (!$new && in_array($leadField->getAlias(), $this->identifierFields->getFieldList($leadField->getObject())));
         $builder->add(
             'defaultValue',
             TextType::class,
@@ -234,8 +238,11 @@ final class FieldType extends AbstractType
          * Used as as form modifier before trying to set data
          */
         $formModifier = function (FormEvent $event) use ($listChoices, $type, $options, $disableDefaultValue): array {
+            /** @var LeadField $leadField */
+            $leadField     = $options['data'];
             $cleaningRules = [];
             $form          = $event->getForm();
+            /** @var array<string, mixed>|LeadField $data */
             $data          = $event->getData();
             $type          = (is_array($data)) ? ($data['type'] ?? $type) : $data->getType();
             $constraints   = [];
@@ -254,7 +261,7 @@ final class FieldType extends AbstractType
                         $properties = $data->getProperties();
                     }
 
-                    $propertiesList['list'] = isset($properties['list']) && 'lookup' === $type ? array_flip(array_filter($properties['list'])) : $properties['list'];
+                    $propertiesList = ['list' => isset($properties['list']) && 'lookup' === $type ? array_flip(array_filter($properties['list'])) : $properties['list']];
 
                     $form->add(
                         'properties',
@@ -279,7 +286,7 @@ final class FieldType extends AbstractType
                             'required'    => false,
                             'choices'     => array_flip($list),
                             'multiple'    => 'multiselect' === $type,
-                            'data'        => 'multiselect' === $type && is_string($options['data']->getDefaultValue()) ? explode('|', $options['data']->getDefaultValue()) : $options['data']->getDefaultValue(),
+                            'data'        => 'multiselect' === $type && is_string($leadField->getDefaultValue()) ? explode('|', $leadField->getDefaultValue()) : $leadField->getDefaultValue(),
                             'disabled'    => $disableDefaultValue,
                             'constraints' => $constraints,
                         ]
@@ -448,7 +455,7 @@ final class FieldType extends AbstractType
             ];
             // There's no need to filter list during FormEvents::PRE_SUBMIT.
             if ($object && $group) {
-                $options['query_builder'] = fn (EntityRepository $er) => $er->createQueryBuilder('f')
+                $options['query_builder'] = fn (EntityRepository $er): QueryBuilder => $er->createQueryBuilder('f')
                     ->orderBy('f.order', Order::Ascending->value)
                     ->where('f.object = :object')
                     ->setParameter('object', $object)
@@ -518,13 +525,13 @@ final class FieldType extends AbstractType
         );
 
         $attr = [];
-        if ($options['data']->getColumnIsNotCreated()) {
+        if ($leadField->getColumnIsNotCreated()) {
             $attr = [
                 'tooltip' => 'mautic.lead.field.being_created_in_background',
             ];
         }
 
-        if ($options['data']->getColumnIsNotRemoved()) {
+        if ($leadField->getColumnIsNotRemoved()) {
             if (array_key_exists('tooltip', $attr)) {
                 $attr['tooltip'] .= ' mautic.lead.field.being_removed_in_background';
             } else {
@@ -536,9 +543,9 @@ final class FieldType extends AbstractType
             'isPublished',
             YesNoButtonGroupType::class,
             [
-                'disabled' => $options['data']->disablePublishChange(),
+                'disabled' => $leadField->disablePublishChange(),
                 'attr'     => $attr,
-                'data'     => ('email' == $options['data']->getAlias()) ? true : $options['data']->getIsPublished(),
+                'data'     => ('email' == $leadField->getAlias()) ? true : $leadField->getIsPublished(),
                 'label'    => 'mautic.core.form.available',
             ]
         );
@@ -581,7 +588,7 @@ final class FieldType extends AbstractType
 
         $constraints = [];
 
-        if (false === $options['data']->isIsindex() && false === $this->indexHelper->isNewIndexAllowed()) {
+        if (false === $leadField->isIsindex() && false === $this->indexHelper->isNewIndexAllowed()) {
             $constraints[] = new IsFalse(message: 'mautic.lead.field.form.index_count.error');
         }
 
@@ -603,7 +610,7 @@ final class FieldType extends AbstractType
             ]
         );
 
-        $data = $options['data']->isUniqueIdentifier();
+        $data = $leadField->isUniqueIdentifier();
         $builder->add(
             'isUniqueIdentifer',
             YesNoButtonGroupType::class,
@@ -688,8 +695,10 @@ final class FieldType extends AbstractType
             return;
         }
 
+        /** @var FormInterface $root */
+        $root = $context->getRoot();
         /** @var LeadField $field */
-        $field = $context->getRoot()->getViewData();
+        $field = $root->getViewData();
 
         if (in_array($field->getType(), self::$fieldsWithNoLengthLimit)) {
             return;

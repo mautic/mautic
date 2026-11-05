@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Controller\Api;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CustomFieldEntityInterface;
 use Mautic\LeadBundle\Entity\Lead;
@@ -17,6 +18,17 @@ use Symfony\Contracts\Service\Attribute\Required;
 trait CustomFieldsApiControllerTrait
 {
     private RequestStack $requestStack;
+
+    private FieldModel $customFieldsFieldModel;
+
+    #[Required]
+    public function autowireCustomFieldsApiControllerTrait(
+        FieldModel $customFieldsFieldModel,
+        RequestStack $requestStack,
+    ): void {
+        $this->customFieldsFieldModel = $customFieldsFieldModel;
+        $this->requestStack = $requestStack;
+    }
 
     /**
      * @var mixed[]
@@ -44,9 +56,7 @@ trait CustomFieldsApiControllerTrait
             // If a new contact or PUT update (complete representation of the objectd), set empty fields to field defaults if the parameter
             // is not defined in the request
 
-            /** @var FieldModel $fieldModel */
-            $fieldModel = $this->getModel('lead.field');
-            $fields     = $fieldModel->getFieldListWithProperties($object);
+            $fields = $this->customFieldsFieldModel->getFieldListWithProperties($object);
 
             foreach ($fields as $alias => $field) {
                 // Set the default value if the parameter is not included in the request, there is no value for the given entity, and a default is defined
@@ -103,7 +113,7 @@ trait CustomFieldsApiControllerTrait
 
                 // Some requests don't seem to have properties unserialized by default (even in M2)
                 $fieldDefinition['properties'] ??= [];
-                $properties = is_string($fieldDefinition['properties']) ? \Mautic\CoreBundle\Helper\Serializer::decode($fieldDefinition['properties']) : $fieldDefinition['properties'];
+                $properties = is_string($fieldDefinition['properties']) ? Serializer::decode($fieldDefinition['properties']) : $fieldDefinition['properties'];
 
                 $fields[$group][$field]['value']           = empty($properties['scale']) ? (int) $fields[$group][$field]['value']
                     : (float) $fields[$group][$field]['value'];
@@ -131,10 +141,7 @@ trait CustomFieldsApiControllerTrait
             return $this->fieldCache[$object];
         }
 
-        $model = $this->getModel('lead.field');
-        \assert($model instanceof FieldModel);
-
-        $fields = $model->getEntities(
+        $fields = $this->customFieldsFieldModel->getEntities(
             [
                 'filter' => [
                     'force' => [
@@ -168,7 +175,7 @@ trait CustomFieldsApiControllerTrait
      *
      * @return bool|void
      */
-    protected function setCustomFieldValues($entity, $form, $parameters, bool $isPostOrPatch = false)
+    protected function setCustomFieldValues(object $entity, $form, array $parameters, bool $isPostOrPatch = false)
     {
         // set the custom field values
         // pull the data from the form in order to apply the form's formatting
@@ -203,12 +210,5 @@ trait CustomFieldsApiControllerTrait
         }
 
         $this->model->setFieldValues($entity, $parameters, $overwriteWithBlank);
-    }
-
-    #[Required]
-    public function setRequestStack(
-        RequestStack $requestStack,
-    ): void {
-        $this->requestStack = $requestStack;
     }
 }

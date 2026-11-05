@@ -6,17 +6,19 @@ namespace Mautic\CoreBundle\Tests\Unit\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependency;
 use Mautic\CoreBundle\Form\Validator\Constraints\CircularDependencyValidator;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
+final class CircularDependencyValidatorTest extends TestCase
 {
     private MockObject&ListModel $mockListModel;
 
@@ -40,7 +42,6 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->request);
 
         $this->validator = new CircularDependencyValidator($this->mockListModel, $requestStack);
-        $this->validator->initialize($this->context);
     }
 
     /**
@@ -54,7 +55,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
         $this->mockListModel->expects($this->never())
             ->method('getEntity');
 
-        $this->validator->validate([], new CircularDependency());
+        $this->validator->validateInContext([], new CircularDependency(), $this->context);
     }
 
     /**
@@ -100,39 +101,27 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $mockEntity1 = $this->createMock(LeadList::class);
-        $mockEntity1
-            ->method('getId')
-            ->willReturn(1);
-        $mockEntity1
-            ->method('getFilters')
-            ->willReturn($filters);
+        $leadList1 = new LeadList();
+        ReflectionHelper::setEntityId($leadList1, 1);
+        $leadList1->setFilters($filters);
 
-        $mockEntity2 = $this->createMock(LeadList::class);
-        $mockEntity2
-            ->method('getId')
-            ->willReturn(2);
-        $mockEntity2
-            ->method('getFilters')
-            ->willReturn($filters2);
+        $leadList2 = new LeadList();
+        ReflectionHelper::setEntityId($leadList2, 2);
+        $leadList2->setFilters($filters2);
 
-        $mockEntity3 = $this->createMock(LeadList::class);
-        $mockEntity3
-            ->method('getId')
-            ->willReturn(3);
-        $mockEntity3
-            ->method('getFilters')
-            ->willReturn($filters3);
+        $leadList3 = new LeadList();
+        ReflectionHelper::setEntityId($leadList3, 3);
+        $leadList3->setFilters($filters3);
 
         $entities = [
-            1 => $mockEntity1,
-            2 => $mockEntity2,
-            3 => $mockEntity3,
+            1 => $leadList1,
+            2 => $leadList2,
+            3 => $leadList3,
         ];
 
         $this->mockListModel
             ->method('getEntity')
-            ->willReturnCallback(fn ($id): LeadList&\PHPUnit\Framework\MockObject\MockObject => $entities[$id]);
+            ->willReturnCallback(fn ($id): LeadList => $entities[$id]);
 
         if (!empty($expectedMessage)) {
             $this->context->expects($this->once())
@@ -157,7 +146,7 @@ final class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidateOnInvalid(?string $message, int $currentSegmentId, array $filters): void
     {
         $this->configureValidator($message, $currentSegmentId)
-            ->validate($filters, new CircularDependency(message: 'mautic.core.segment.circular_dependency_exists'));
+            ->validateInContext($filters, new CircularDependency(message: 'mautic.core.segment.circular_dependency_exists'), $this->context);
     }
 
     /**

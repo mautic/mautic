@@ -10,16 +10,17 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\RedisStore;
 
 abstract class ModeratedCommand extends Command
 {
-    public const MODE_PID   = 'pid';
+    public const string MODE_PID   = 'pid';
 
-    public const MODE_FLOCK = 'flock';
+    public const string MODE_FLOCK = 'flock';
 
-    public const MODE_REDIS = 'redis';
+    public const string MODE_REDIS = 'redis';
 
     protected $moderationKey;
 
@@ -31,7 +32,7 @@ abstract class ModeratedCommand extends Command
 
     protected $lockFile;
 
-    private ?\Symfony\Component\Lock\LockInterface $lock = null;
+    private ?LockInterface $lock = null;
 
     /**
      * @var OutputInterface

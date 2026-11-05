@@ -64,7 +64,7 @@ final class PointApiController extends CommonApiController
      * Return array of available point action types.
      */
     #[Route(
-        '/api/points/actions/types',
+        path: '/api/points/actions/types',
         name: 'mautic_api_getpointactiontypes',
         defaults: ['_format' => 'json'],
         methods: ['GET']
@@ -84,18 +84,17 @@ final class PointApiController extends CommonApiController
     /**
      * Subtract points from a lead.
      *
-     * @param int    $leadId
      * @param string $operator
      * @param int    $delta
      */
     #[Route(
-        '/api/contacts/{leadId}/points/{operator}/{delta}',
+        path: '/api/contacts/{leadId}/points/{operator}/{delta}',
         name: 'mautic_api_adjustcontactpoints',
         requirements: ['leadId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, $leadId, $operator, $delta): Response
+    public function adjustPointsAction(Request $request, IpLookupHelper $ipLookupHelper, int|string $leadId, $operator, $delta): Response
     {
         $lead = $this->checkLeadAccess($leadId, 'edit');
         if ($lead instanceof Response) {
@@ -116,7 +115,7 @@ final class PointApiController extends CommonApiController
      *
      * @param int $delta
      */
-    protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, $lead, $delta, $operator): void
+    protected function logApiPointChange(Request $request, IpLookupHelper $ipLookupHelper, object $lead, $delta, $operator): void
     {
         $ip         = $ipLookupHelper->getIpAddress();
         $eventName  = InputHelper::clean($request->request->get('eventName', $this->translator->trans('mautic.lead.lead.submitaction.operator_'.$operator)));

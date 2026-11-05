@@ -16,7 +16,7 @@ interface ThemeHelperInterface
      *
      * @return string[]
      */
-    public function getDefaultThemes();
+    public function getDefaultThemes(): array;
 
     /**
      * @param string $defaultTheme
@@ -71,7 +71,7 @@ interface ThemeHelperInterface
      *
      * @return mixed[]
      */
-    public function getOptionalSettings();
+    public function getOptionalSettings(): array;
 
     /**
      * @param string $template
@@ -88,7 +88,7 @@ interface ThemeHelperInterface
      *
      * @return array<string[]>|string[]
      */
-    public function getInstalledThemes($specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true);
+    public function getInstalledThemes($specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true): array;
 
     /**
      * @param string $theme

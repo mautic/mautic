@@ -5,7 +5,6 @@ namespace Mautic\CampaignBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Entity\OptimisticLockTrait;
@@ -14,26 +13,29 @@ use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 
 #[ORM\Entity(repositoryClass: LeadEventLogRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['is_scheduled', 'lead_id'], name: 'campaign_event_upcoming_search')]
-#[ORM\Index(columns: ['campaign_id', 'is_scheduled', 'trigger_date'], name: 'campaign_event_schedule_counts')]
-#[ORM\Index(columns: ['date_triggered'], name: 'campaign_date_triggered')]
-#[ORM\Index(columns: ['campaign_id', 'lead_id', 'rotation'], name: 'campaign_leads')]
-#[ORM\Index(columns: ['channel', 'channel_id', 'lead_id'], name: 'campaign_log_channel')]
-#[ORM\Index(columns: ['campaign_id', 'event_id', 'date_triggered'], name: 'campaign_actions')]
-#[ORM\Index(columns: ['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'], name: 'campaign_stats')]
-#[ORM\Index(columns: ['trigger_date'], name: 'campaign_trigger_date_order')]
-#[ORM\Index(columns: ['is_scheduled', 'event_id', 'trigger_date'], name: 'idx_scheduled_events')]
+#[ORM\Index(name: 'campaign_event_upcoming_search', columns: ['is_scheduled', 'lead_id'])]
+#[ORM\Index(name: 'campaign_event_schedule_counts', columns: ['campaign_id', 'is_scheduled', 'trigger_date'])]
+#[ORM\Index(name: 'campaign_date_triggered', columns: ['date_triggered'])]
+#[ORM\Index(name: 'campaign_leads', columns: ['campaign_id', 'lead_id', 'rotation'])]
+#[ORM\Index(name: 'campaign_log_channel', columns: ['channel', 'channel_id', 'lead_id'])]
+#[ORM\Index(name: 'campaign_actions', columns: ['campaign_id', 'event_id', 'date_triggered'])]
+#[ORM\Index(name: 'campaign_stats', columns: ['campaign_id', 'date_triggered', 'event_id', 'non_action_path_taken'])]
+#[ORM\Index(name: 'campaign_trigger_date_order', columns: ['trigger_date'])]
+#[ORM\Index(name: 'idx_scheduled_events', columns: ['is_scheduled', 'event_id', 'trigger_date'])]
 #[ORM\UniqueConstraint(name: 'campaign_rotation', columns: ['event_id', 'lead_id', 'rotation'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 {
     use OptimisticLockTrait;
 
-    public const TABLE_NAME = 'campaign_lead_event_log';
+    public const string TABLE_NAME = 'campaign_lead_event_log';
 
     /**
-     * @var string|null
+     * @var int|string|null
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -43,30 +45,20 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     #[ORM\JoinColumn(name: 'event_id', nullable: false)]
     private $event;
 
-    /**
-     * @var LeadEntity
-     */
     #[ORM\ManyToOne(targetEntity: LeadEntity::class)]
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
-    private $lead;
+    private ?LeadEntity $lead = null;
 
-    /**
-     * @var Campaign|null
-     */
     #[ORM\ManyToOne(targetEntity: Campaign::class)]
     #[ORM\JoinColumn(name: 'campaign_id')]
-    private $campaign;
+    private ?Campaign $campaign = null;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    #[ORM\ManyToOne(targetEntity: IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
+    private ?IpAddress $ipAddress = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[ORM\Column(name: 'date_triggered', type: 'datetime', nullable: true)]
-    private $dateTriggered;
+    private ?\DateTimeInterface $dateTriggered = null;
 
     /**
      * @var bool
@@ -74,11 +66,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     #[ORM\Column(name: 'is_scheduled', type: 'boolean')]
     private $isScheduled = false;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[ORM\Column(name: 'trigger_date', type: 'datetime', nullable: true)]
-    private $triggerDate;
+    private ?\DateTimeInterface $triggerDate = null;
 
     /**
      * @var bool
@@ -95,6 +84,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var bool|null
      */
+    #[ORM\Column(name: 'non_action_path_taken', type: 'boolean', nullable: true)]
     private $nonActionPathTaken = false;
 
     /**
@@ -106,6 +96,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'channel_id', type: 'integer', nullable: true)]
     private $channelId;
 
     /**
@@ -119,11 +110,8 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     #[ORM\Column(type: 'integer')]
     private $rotation = 1;
 
-    /**
-     * @var FailedLeadEventLog|null
-     */
-    #[ORM\OneToOne(mappedBy: 'log', targetEntity: FailedLeadEventLog::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
-    private $failedLog;
+    #[ORM\OneToOne(targetEntity: FailedLeadEventLog::class, mappedBy: 'log', cascade: ['all'], fetch: 'EXTRA_LAZY')]
+    private ?FailedLeadEventLog $failedLog = null;
 
     /**
      * Subscribers can fail log with custom reschedule interval.
@@ -132,19 +120,6 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     #[ORM\Column(name: 'date_queued', type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTime $dateQueued = null;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addIpAddress(true);
-
-        $builder->addNamedField('channelId', 'integer', 'channel_id', true);
-
-        $builder->addNullableField('nonActionPathTaken', 'boolean', 'non_action_path_taken');
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -192,10 +167,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return (int) $this->id;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateTriggered()
+    public function getDateTriggered(): ?\DateTimeInterface
     {
         return $this->dateTriggered;
     }
@@ -210,10 +182,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
@@ -225,10 +194,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this;
     }
 
-    /**
-     * @return LeadEntity|null
-     */
-    public function getLead()
+    public function getLead(): LeadEntity|null
     {
         return $this->lead;
     }
@@ -289,10 +255,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this->previousScheduledState;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getTriggerDate()
+    public function getTriggerDate(): ?\DateTimeInterface
     {
         return $this->triggerDate;
     }
@@ -316,10 +279,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         ];
     }
 
-    /**
-     * @return Campaign|null
-     */
-    public function getCampaign()
+    public function getCampaign(): ?Campaign
     {
         return $this->campaign;
     }
@@ -370,13 +330,13 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     /**
      * @return mixed[]
      */
-    public function getMetadata()
+    public function getMetadata(): array
     {
         return $this->metadata;
     }
 
     /**
-     * @param mixed[] $metadata
+     * @param mixed[]|string $metadata
      */
     public function appendToMetadata($metadata): void
     {
@@ -389,7 +349,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
     }
 
     /**
-     * @param mixed[] $metadata
+     * @param mixed[]|string $metadata
      */
     public function setMetadata($metadata): static
     {
@@ -453,10 +413,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
         return $this;
     }
 
-    /**
-     * @return FailedLeadEventLog|null
-     */
-    public function getFailedLog()
+    public function getFailedLog(): ?FailedLeadEventLog
     {
         return $this->failedLog;
     }
@@ -470,7 +427,7 @@ class LeadEventLog implements ChannelInterface, OptimisticLockInterface
 
     public function isFailed(): bool
     {
-        return !empty($this->failedLog);
+        return $this->failedLog instanceof FailedLeadEventLog;
     }
 
     public function isSuccess(): bool

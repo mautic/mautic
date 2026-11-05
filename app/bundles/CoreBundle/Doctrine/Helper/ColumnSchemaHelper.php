@@ -3,42 +3,37 @@
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
 
 /**
  * Used to manipulate the schema of an existing table.
  */
-class ColumnSchemaHelper
+final class ColumnSchemaHelper
 {
     /**
-     * @var AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @var AbstractSchemaManager<AbstractMySQLPlatform>
      */
-    protected AbstractSchemaManager $sm;
+    private readonly AbstractSchemaManager $sm;
 
     /**
      * @var string
      */
-    protected $tableName;
+    private $tableName;
 
-    /**
-     * @var Table
-     */
-    protected $fromTable;
+    private ?Table $fromTable = null;
 
-    /**
-     * @var Table
-     */
-    protected $toTable;
+    private ?Table $toTable = null;
 
     private $columns;
 
     public function __construct(
-        protected Connection $db,
-        protected ?string $prefix,
+        Connection $db,
+        private readonly ?string $prefix,
     ) {
         $this->sm = $db->createSchemaManager();
     }
@@ -56,14 +51,14 @@ class ColumnSchemaHelper
         $this->checkTableExists($this->tableName, true);
 
         // use the to schema to get table details so that changes will be calculated
-        $this->fromTable = $this->sm->introspectTable($this->tableName);
+        $this->fromTable = $this->sm->introspectTableByUnquotedName($this->tableName);
         $this->toTable   = clone $this->fromTable;
 
         return $this;
     }
 
     /**
-     * @return AbstractSchemaManager<\Doctrine\DBAL\Platforms\AbstractMySQLPlatform>
+     * @return AbstractSchemaManager<AbstractMySQLPlatform>
      */
     public function getSchemaManager(): AbstractSchemaManager
     {
@@ -72,23 +67,22 @@ class ColumnSchemaHelper
 
     /**
      * Get table details.
-     *
-     * @return Table
      */
-    public function getTable()
+    public function getTable(): ?Table
     {
         return $this->toTable;
     }
 
     /**
      * Get array of Doctrine\DBAL\Schema\Column instances for the table.
-     *
-     * @return array
      */
-    public function getColumns()
+    public function getColumns(): array
     {
         if (empty($this->columns)) {
-            $this->columns = $this->toTable->getColumns();
+            // DBAL 4 hands the columns back as a list, and they are looked up by name here
+            foreach ($this->toTable->getColumns() as $column) {
+                $this->columns[AssetName::of($column)] = $column;
+            }
         }
 
         return $this->columns;
@@ -183,7 +177,9 @@ class ColumnSchemaHelper
     public function executeChanges(): void
     {
         // create a table diff
-        $comparator = new Comparator();
+        // DBAL 4's Comparator needs the platform, so it is obtained from the schema
+        // manager rather than constructed directly.
+        $comparator = $this->sm->createComparator();
         $diff       = $comparator->compareTables($this->fromTable, $this->toTable);
 
         if (!$diff->isEmpty()) {

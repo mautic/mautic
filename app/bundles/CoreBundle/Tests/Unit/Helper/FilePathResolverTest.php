@@ -11,12 +11,13 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FilePathResolverTest extends \PHPUnit\Framework\TestCase
+final class FilePathResolverTest extends TestCase
 {
     /**
      * @var MockObject&Filesystem

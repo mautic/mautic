@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\LookupType;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -173,14 +174,12 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->method('isAdmin')
             ->willReturn(false);
 
-        $userMock = $this->createMock(User::class);
-        $userMock->expects($this->once())
-            ->method('getId')
-            ->willReturn($userId);
+        $user = new User();
+        ReflectionHelper::setEntityId($user, $userId);
 
         $this->userHelperMock->expects($this->once())
             ->method('getUser')
-            ->willReturn($userMock);
+            ->willReturn($user);
 
         $this->security->expects($this->once())
             ->method('hasEntityAccess')
@@ -264,14 +263,12 @@ final class ContentPreviewSettingsTypeTest extends TestCase
             ->method('isAdmin')
             ->willReturn(false);
 
-        $userMock = $this->createMock(User::class);
-        $userMock->expects($this->once())
-            ->method('getId')
-            ->willReturn($userId);
+        $user = new User();
+        ReflectionHelper::setEntityId($user, $userId);
 
         $this->userHelperMock->expects($this->once())
             ->method('getUser')
-            ->willReturn($userMock);
+            ->willReturn($user);
 
         $this->security->expects($this->once())
             ->method('hasEntityAccess')

@@ -25,16 +25,18 @@ use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Mautic\CampaignBundle\Helper\RemovedContactTracker;
 use Mautic\CampaignBundle\Model\SummaryModel;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
+final class EventExecutionerTest extends TestCase
 {
     /**
      * @var MockObject&EventCollector
@@ -201,20 +203,15 @@ final class EventExecutionerTest extends \PHPUnit\Framework\TestCase
             ->setCampaign($campaign)
             ->setProperties(['jumpToEvent' => 999]);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(1);
+        $lead = new Lead();
+        $lead->setId(1);
 
-        $log = $this->createMock(LeadEventLog::class);
-        $log->method('getLead')
-            ->willReturn($lead);
-        $log->method('setIsScheduled')
-            ->willReturn($log);
-        $log->method('getEvent')
-            ->willReturn($event);
-        $log->method('getId')
-            ->willReturn(1);
+        $log = new LeadEventLog();
+        $log->setLead($lead);
+        $log->setEvent($event);
+        ReflectionHelper::setEntityId($log, 1);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection(
             [
                 1 => $log,

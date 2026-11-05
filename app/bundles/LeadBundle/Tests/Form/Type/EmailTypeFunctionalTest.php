@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Form\Type;
 
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Copy;
+use Mautic\EmailBundle\Entity\CopyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,8 +16,8 @@ use Symfony\Component\HttpFoundation\Request;
 final class EmailTypeFunctionalTest extends MauticMysqlTestCase
 {
     /**
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws OptimisticLockException
+     * @throws ORMException
      * @throws \Exception
      */
     public function testEmailWithJapanese(): void
@@ -29,7 +32,9 @@ final class EmailTypeFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts/email/'.$lead->getId());
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        $content     = json_decode($content)->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
         $this->assertCount(1, $formCrawler);
@@ -47,7 +52,7 @@ final class EmailTypeFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful();
 
         // Check the email has correct text
-        $copy = $this->em->getRepository(Copy::class)->findOneBy(['subject' => 'Test Jap Mautic']);
+        $copy = $this->getContainer()->get(CopyRepository::class)->findOneBy(['subject' => 'Test Jap Mautic']);
         $this->assertInstanceOf(Copy::class, $copy);
         $this->assertStringContainsString('<p style="font-family: メイリオ">Test</p>', (string) $copy->getBody());
     }

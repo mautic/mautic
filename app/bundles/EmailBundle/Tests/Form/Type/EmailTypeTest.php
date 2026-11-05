@@ -15,11 +15,12 @@ use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Mautic\StageBundle\Entity\StageRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class EmailTypeTest extends \PHPUnit\Framework\TestCase
+final class EmailTypeTest extends TestCase
 {
     /**
      * @var MockObject&FormBuilderInterface

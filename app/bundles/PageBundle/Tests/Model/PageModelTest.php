@@ -109,11 +109,14 @@ final class PageModelTest extends PageTestAbstract
                 'page_language' => 'en',
             ],
         ]);
-        $this->assertEquals($res, [
+        $this->assertEquals(
+            [
             'page_title'    => 'Mautic &#38; PHP',
             'page_url'      => 'http://mautic.com/page/test?hello=world&lorem=ipsum&q=this%20has%20spaces',
             'page_language' => 'en',
-        ]);
+        ],
+            $res
+        );
     }
 
     /**
@@ -179,15 +182,14 @@ final class PageModelTest extends PageTestAbstract
         $redirectUrl = '/somewhat';
         $pageModel   = $this->getPageModel();
 
-        $ipAddress = $this->createMock(IpAddress::class);
-        $ipAddress->method('isTrackable')->willReturn(true);
+        $ipAddress = new IpAddress();
 
         $this->security->method('isAnonymous')->willReturn(true);
         $this->ipLookupHelper->method('getIpAddress')->willReturn($ipAddress);
         $this->companyModel->method('fetchCompanyFields')->willReturn([]);
 
-        $redirect = $this->createMock(Redirect::class);
-        $redirect->method('getUrl')->willReturn($redirectUrl);
+        $redirect = new Redirect();
+        $redirect->setUrl($redirectUrl);
 
         $this->contactRequestHelper->expects($this->once())
             ->method('getContactFromQuery')

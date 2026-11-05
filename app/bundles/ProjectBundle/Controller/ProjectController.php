@@ -34,7 +34,7 @@ final class ProjectController extends AbstractFormController
     private const string TEMPLATE_FORM  = '@MauticProject/Project/form.html.twig';
 
     #[Route(
-        '/s/projects/{objectAction}/{objectId}',
+        path: '/s/projects/{objectAction}/{objectId}',
         name: 'mautic_project_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -45,7 +45,7 @@ final class ProjectController extends AbstractFormController
     }
 
     #[Route(
-        '/s/projects/{page}',
+        path: '/s/projects/{page}',
         name: 'mautic_project_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],

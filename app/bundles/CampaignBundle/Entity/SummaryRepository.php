@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Entity;
 
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
@@ -43,8 +45,8 @@ final class SummaryRepository extends CommonRepository
 
         if ($dateFrom && $dateTo) {
             $q->andWhere('cs.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
-                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
-                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), ParameterType::INTEGER)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), ParameterType::INTEGER);
         }
 
         $results = $q->executeQuery()->fetchAllAssociative();
@@ -65,7 +67,7 @@ final class SummaryRepository extends CommonRepository
     /**
      * Get the oldest triggered time for back-filling historical data.
      */
-    public function getOldestTriggeredDate(): ?\DateTimeInterface
+    public function getOldestTriggeredDate(): ?\DateTime
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('cs.date_triggered')
@@ -81,7 +83,7 @@ final class SummaryRepository extends CommonRepository
     /**
      * Regenerate summary entries for a given time frame.
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function summarize(
         \DateTimeInterface $dateFrom,

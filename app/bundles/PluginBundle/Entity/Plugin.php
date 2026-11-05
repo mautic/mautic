@@ -3,8 +3,8 @@
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
@@ -14,87 +14,67 @@ use Mautic\CoreBundle\Entity\CommonEntity;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Plugin extends CommonEntity implements CacheInvalidateInterface
 {
-    public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
+    public const string DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
 
-    public const CACHE_NAMESPACE             = 'Plugin';
+    public const string CACHE_NAMESPACE             = 'Plugin';
 
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
-    /**
-     * @var string
-     */
-    private $primaryDescription;
+    private ?string $primaryDescription = null;
 
-    /**
-     * @var string
-     */
-    private $secondaryDescription;
+    private ?string $secondaryDescription = null;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_missing', type: 'boolean')]
     private $isMissing = false;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 50)]
     private $bundle;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $version;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $author;
 
     /**
      * @var ArrayCollection<int, Integration>
      */
-    #[ORM\OneToMany(mappedBy: 'plugin', targetEntity: Integration::class, fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: Integration::class, mappedBy: 'plugin', fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $integrations;
 
     public function __construct()
     {
         $this->integrations = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('isMissing', 'boolean')
-            ->columnName('is_missing')
-            ->build();
-
-        $builder->createField('bundle', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('version', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('author', 'string')
-            ->nullable()
-            ->build();
     }
 
     public function __clone()
@@ -145,9 +125,9 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
     }
 
     /**
-     * @return ArrayCollection<int, Integration>
+     * @return Collection<int, Integration>
      */
-    public function getIntegrations()
+    public function getIntegrations(): Collection
     {
         return $this->integrations;
     }
@@ -182,10 +162,7 @@ class Plugin extends CommonEntity implements CacheInvalidateInterface
         return $this->description && preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getSecondaryDescription()
+    public function getSecondaryDescription(): ?string
     {
         return $this->secondaryDescription;
     }

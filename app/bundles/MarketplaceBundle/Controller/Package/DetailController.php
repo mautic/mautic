@@ -44,7 +44,7 @@ final class DetailController extends CommonController
     }
 
     #[Route(
-        '/s/marketplace/detail/{vendor}/{package}',
+        path: '/s/marketplace/detail/{vendor}/{package}',
         name: 'mautic_marketplace_detail',
         methods: ['GET'],
     )]
@@ -74,8 +74,6 @@ final class DetailController extends CommonController
             ? $this->resourceInstaller->isInstalled($packageFullName)
             : $this->composer->isInstalled($packageFullName);
 
-        $security = $this->security;
-
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
@@ -84,7 +82,7 @@ final class DetailController extends CommonController
                     'isInstalled'           => $isInstalled,
                     'isComposerEnabled'     => $this->config->isComposerEnabled(),
                     'marketplaceWebsiteUrl' => $this->config->getMarketplaceWebsiteUrl(),
-                    'security'              => $security,
+                    'security'              => $this->security,
                 ],
                 'contentTemplate' => '@Marketplace/Package/detail.html.twig',
                 'passthroughVars' => [

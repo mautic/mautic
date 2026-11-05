@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 
-class ObjectMappingsDAO
+final class ObjectMappingsDAO
 {
     /**
      * @var ObjectMapping[]

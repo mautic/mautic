@@ -6,8 +6,6 @@ namespace Mautic\LeadBundle\Tests\Functional\Model;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
-use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 
@@ -24,7 +22,7 @@ final class CompanyModelFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var CompanyLeadRepository $companyLeadRepo */
-        $companyLeadRepo = $this->em->getRepository(CompanyLead::class);
+        $companyLeadRepo = $this->getContainer()->get(CompanyLeadRepository::class);
 
         $this->assertEquals(0, $companyLeadRepo->count([]));
 

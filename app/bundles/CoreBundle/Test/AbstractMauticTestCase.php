@@ -23,7 +23,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
-use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
@@ -35,7 +34,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     protected KernelBrowser $client;
 
-    protected Router $router;
+    protected RouterInterface $router;
 
     protected array $clientOptions = [];
 

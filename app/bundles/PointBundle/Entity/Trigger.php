@@ -10,10 +10,10 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -43,17 +43,26 @@ use Symfony\Component\Validator\Constraints as Assert;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'point_trigger_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'point_trigger_projects_xref'),
+)])]
 class Trigger extends FormEntity implements UuidInterface
 {
     use UuidTrait;
     use ProjectTrait;
 
-    public const ENTITY_NAME = 'point_trigger';
+    public const string ENTITY_NAME = 'point_trigger';
 
     /**
      * @var int
      */
     #[Groups(['trigger:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -61,56 +70,62 @@ class Trigger extends FormEntity implements UuidInterface
      */
     #[Groups(['trigger:read', 'trigger:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var int
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(type: 'integer')]
     private $points = 0;
 
     /**
      * @var string
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(type: 'string', length: 7)]
     private $color = 'a0acb8';
 
     /**
      * @var bool
      */
     #[Groups(['trigger:read', 'trigger:write'])]
+    #[ORM\Column(name: 'trigger_existing_leads', type: 'boolean')]
     private $triggerExistingLeads = false;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['trigger:read', 'trigger:write'])]
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<int, TriggerEvent>
      */
     #[Groups(['trigger:read', 'trigger:write'])]
-    #[ORM\OneToMany(mappedBy: 'trigger', targetEntity: TriggerEvent::class, cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
-    #[ORM\OrderBy(['order' => 'ASC'])]
+    #[ORM\OneToMany(targetEntity: TriggerEvent::class, mappedBy: 'trigger', cascade: ['all'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OrderBy(value: ['order' => 'ASC'])]
     private $events;
 
     #[Groups(['trigger:read', 'trigger:write'])]
@@ -129,29 +144,6 @@ class Trigger extends FormEntity implements UuidInterface
     {
         $this->events = new ArrayCollection();
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->addPublishDates();
-
-        $builder->addField('points', 'integer');
-
-        $builder->createField('color', 'string')
-            ->length(7)
-            ->build();
-
-        $builder->createField('triggerExistingLeads', 'boolean')
-            ->columnName('trigger_existing_leads')
-            ->build();
-
-        $builder->addCategory();
-
-        self::addProjectsField($builder, 'point_trigger_projects_xref', 'point_trigger_id');
     }
 
     /**
@@ -265,9 +257,9 @@ class Trigger extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection<int, TriggerEvent>
      */
-    public function getEvents()
+    public function getEvents(): Collection
     {
         return $this->events;
     }
@@ -359,18 +351,12 @@ class Trigger extends FormEntity implements UuidInterface
         $this->triggerExistingLeads = $triggerExistingLeads;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category): void
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
     }

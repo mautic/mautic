@@ -4,29 +4,30 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Entity;
 
-use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Exception\DbalException as DBALException;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
+final class EmailRepositoryIncrementReadTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
     private QueryBuilder $queryBuilder;
 
     /**
-     * @var EmailRepository|object
+     * @var EmailRepository
      */
-    private $repo;
+    private object $emailRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->repo             = $this->configureRepository(Email::class);
+        $this->emailRepository             = $this->configureRepository(Email::class);
         $this->queryBuilder     = new QueryBuilder($this->connection);
         $subQueryBuilder        = new QueryBuilder($this->connection);
         $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(
@@ -42,12 +43,12 @@ final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
             ->method('executeStatement')
             ->willReturn(1);
 
-        $this->repo->incrementRead(11, '21');
+        $this->emailRepository->incrementRead(11, '21');
         $generatedSql = $this->queryBuilder->getSQL();
 
         // Assert that the generated SQL matches our expectations
         $expectedSql = 'UPDATE test_emails e SET read_count = read_count + 1 WHERE (e.id = :emailId) AND (e.id NOT IN (SELECT es.email_id FROM test_email_stats es WHERE (es.id = :statId) AND (es.is_read = 1)))';
-        $this->assertEquals($expectedSql, $generatedSql);
+        $this->assertSame($expectedSql, $generatedSql);
     }
 
     public function testIncrementReadWithVariant(): void
@@ -57,12 +58,12 @@ final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
             ->method('executeStatement')
             ->willReturn(1);
 
-        $this->repo->incrementRead(11, '21', true);
+        $this->emailRepository->incrementRead(11, '21', true);
         $generatedSql = $this->queryBuilder->getSQL();
 
         // Assert that the generated SQL matches our expectations
         $expectedSql = 'UPDATE test_emails e SET read_count = read_count + 1, variant_read_count = variant_read_count + 1 WHERE (e.id = :emailId) AND (e.id NOT IN (SELECT es.email_id FROM test_email_stats es WHERE (es.id = :statId) AND (es.is_read = 1)))';
-        $this->assertEquals($expectedSql, $generatedSql);
+        $this->assertSame($expectedSql, $generatedSql);
     }
 
     public function testUpCountWithTwoErrors(): void
@@ -76,7 +77,7 @@ final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
                     1
                 );
 
-        $this->repo->incrementRead(45, '616');
+        $this->emailRepository->incrementRead(45, '616');
     }
 
     public function testUpCountWithFourErrors(): void
@@ -87,6 +88,6 @@ final class EmailRepositoryIncrementReadTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new DBALException());
 
         $this->expectException(DBALException::class);
-        $this->repo->incrementRead(45, '616');
+        $this->emailRepository->incrementRead(45, '616');
     }
 }

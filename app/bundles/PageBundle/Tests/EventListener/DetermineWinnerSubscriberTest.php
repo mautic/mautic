@@ -187,7 +187,7 @@ final class DetermineWinnerSubscriberTest extends TestCase
 
         $abTestResults = $event->getAbTestResults();
 
-        $this->assertEquals($abTestResults['winners'], [2]);
+        $this->assertEquals([2], $abTestResults['winners']);
         $this->assertEquals($abTestResults['support']['data'][$translation], $expectedData);
     }
 }

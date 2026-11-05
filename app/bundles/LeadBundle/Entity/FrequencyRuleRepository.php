@@ -9,24 +9,23 @@ use Mautic\EmailBundle\Entity\Stat;
 /**
  * @extends CommonRepository<FrequencyRule>
  */
-class FrequencyRuleRepository extends CommonRepository
+final class FrequencyRuleRepository extends CommonRepository
 {
     /**
      * @param string      $channel
-     * @param array       $leadIds
      * @param string|null $defaultFrequencyNumber
      * @param string|null $defaultFrequencyTime
      */
     public function getAppliedFrequencyRules(
         $channel,
-        $leadIds,
+        array $leadIds,
         $defaultFrequencyNumber,
         $defaultFrequencyTime,
         string $statTable = 'email_stats',
         string $statContactColumn = 'lead_id',
         string $statSentColumn = 'date_sent',
     ): array {
-        if (empty($leadIds)) {
+        if ($leadIds === []) {
             return [];
         }
 
@@ -92,7 +91,7 @@ class FrequencyRuleRepository extends CommonRepository
         return $frequencyRules;
     }
 
-    public function getPreferredChannel($leadId): array
+    public function getPreferredChannel(int $leadId): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -175,18 +174,15 @@ class FrequencyRuleRepository extends CommonRepository
                 ->andWhere('e.send_to_dnc = 0');
         }
 
-        switch ($defaultFrequencyTime) {
-            case 'MONTH':
-                $since = new \DateTime('-1 month', new \DateTimeZone('UTC'));
-                break;
-            case 'WEEK':
-                $since = new \DateTime('-1 week', new \DateTimeZone('UTC'));
-                break;
-            case 'DAY':
-                $since = new \DateTime('-1 day', new \DateTimeZone('UTC'));
-                break;
-            default:
-                return [];
+        $since = match ($defaultFrequencyTime) {
+            'MONTH' => new \DateTime('-1 month', new \DateTimeZone('UTC')),
+            'WEEK' => new \DateTime('-1 week', new \DateTimeZone('UTC')),
+            'DAY' => new \DateTime('-1 day', new \DateTimeZone('UTC')),
+            default => null,
+        };
+
+        if (! $since instanceof \DateTime) {
+            return [];
         }
 
         $query->andWhere('ch.'.$statSentColumn.' >= :frequencyTime')

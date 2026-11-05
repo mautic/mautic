@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\PluginBundle\Form\Type\FieldsType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Model\PluginModel;
+use MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -36,7 +37,7 @@ final class MailchimpType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        /** @var \MauticPlugin\MauticEmailMarketingBundle\Integration\MailchimpIntegration $mailchimp */
+        /** @var MailchimpIntegration $mailchimp */
         $mailchimp = $this->integrationHelper->getIntegrationObject('Mailchimp');
 
         $api = $mailchimp->getApiHelper();
@@ -137,7 +138,8 @@ final class MailchimpType extends AbstractType
                 }
             };
 
-            $builder->addEventListener(FormEvents::PRE_SET_DATA,
+            $builder->addEventListener(
+                FormEvents::PRE_SET_DATA,
                 function (FormEvent $event) use ($formModifier): void {
                     $data = $event->getData();
                     if (isset($data['leadFields']['leadFields'])) {
@@ -147,7 +149,8 @@ final class MailchimpType extends AbstractType
                 }
             );
 
-            $builder->addEventListener(FormEvents::PRE_SUBMIT,
+            $builder->addEventListener(
+                FormEvents::PRE_SUBMIT,
                 function (FormEvent $event) use ($formModifier): void {
                     $data = $event->getData();
                     if (isset($data['leadFields']['leadFields'])) {

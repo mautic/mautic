@@ -2,7 +2,7 @@
 
 namespace Mautic\PointBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController as CommonFormController;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Form\Type\TriggerEventType;
 use Mautic\PointBundle\Model\TriggerModel;
@@ -24,7 +24,7 @@ final class TriggerEventController extends CommonFormController
     }
 
     #[Route(
-        '/s/points/triggers/events/{objectAction}/{objectId}',
+        path: '/s/points/triggers/events/{objectAction}/{objectId}',
         name: 'mautic_pointtriggerevent_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

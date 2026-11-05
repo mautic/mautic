@@ -7,7 +7,7 @@ namespace Mautic\CacheBundle\Cache\Adapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 
-class FilesystemTagAwareAdapter extends TagAwareAdapter
+final class FilesystemTagAwareAdapter extends TagAwareAdapter
 {
     public function __construct(?string $prefix, int $lifetime = 0, ?string $directory = null)
     {

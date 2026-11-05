@@ -54,7 +54,12 @@ final class EventLogModel extends AbstractCommonModel
         return 'campaign:campaigns';
     }
 
-    public function getEntities(array $args = [])
+    /**
+     * @param array<string, mixed> $args
+     *
+     * @return iterable<Event|LeadEventLog>
+     */
+    public function getEntities(array $args = []): iterable
     {
         /** @var LeadEventLog[] $logs */
         $logs = parent::getEntities($args);
@@ -115,6 +120,7 @@ final class EventLogModel extends AbstractCommonModel
         $logs    = $event->getContactLog($contact);
         $created = false;
         if (count($logs)) {
+            /** @var LeadEventLog $log */
             $log = $logs[0];
             if ($log->getDateTriggered()) {
                 return $this->translator->trans(
@@ -198,7 +204,7 @@ final class EventLogModel extends AbstractCommonModel
                     $log->setChannel(InputHelper::clean($value));
                     break;
                 case 'channelId':
-                    $log->setChannel(intval($value));
+                    $log->setChannel((string) intval($value));
                     break;
             }
         }

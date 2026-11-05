@@ -7,6 +7,7 @@ namespace Mautic\CoreBundle\Tests\Unit\Validator;
 use Mautic\CoreBundle\Event\EntityValidateEvent;
 use Mautic\CoreBundle\Validator\EntityEvent;
 use Mautic\CoreBundle\Validator\EntityEventValidator;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -20,9 +21,9 @@ final class EntityEventValidatorTest extends TestCase
     private EventDispatcherInterface $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\Stub&ExecutionContextInterface
+     * @var Stub&ExecutionContextInterface
      */
-    private \PHPUnit\Framework\MockObject\Stub $context;
+    private Stub $context;
 
     private ConstraintValidatorInterface $validator;
 
@@ -31,7 +32,6 @@ final class EntityEventValidatorTest extends TestCase
         $this->context    = $this->createStub(ExecutionContextInterface::class);
         $this->dispatcher = new EventDispatcher();
         $this->validator  = new EntityEventValidator($this->dispatcher);
-        $this->validator->initialize($this->context);
     }
 
     public function testInvalidValue(): void
@@ -39,7 +39,7 @@ final class EntityEventValidatorTest extends TestCase
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "object", "string" given');
 
-        $this->validator->validate('invalidType', new EntityEvent());
+        $this->validator->validateInContext('invalidType', new EntityEvent(), $this->context);
     }
 
     public function testInvalidConstraint(): void
@@ -47,7 +47,7 @@ final class EntityEventValidatorTest extends TestCase
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessageMatches('/Expected argument of type "Mautic\\\CoreBundle\\\Validator\\\EntityEvent"/');
 
-        $this->validator->validate(new \stdClass(), new NotBlank());
+        $this->validator->validateInContext(new \stdClass(), new NotBlank(), $this->context);
     }
 
     public function testEventIsDispatched(): void
@@ -64,7 +64,7 @@ final class EntityEventValidatorTest extends TestCase
             $this->assertSame($this->context, $event->getContext());
         });
 
-        $this->validator->validate($entity, $constraint);
+        $this->validator->validateInContext($entity, $constraint, $this->context);
 
         $this->assertTrue($dispatched);
     }

@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
+use Mautic\ProjectBundle\Controller\ProjectController;
+use Mautic\ProjectBundle\Security\Permissions\ProjectPermissions;
+
 return [
     'menu' => [
         'main' => [
             'project.menu.index' => [
-                'id'        => Mautic\ProjectBundle\Controller\ProjectController::ROUTE_INDEX,
-                'route'     => Mautic\ProjectBundle\Controller\ProjectController::ROUTE_INDEX,
-                'access'    => Mautic\ProjectBundle\Security\Permissions\ProjectPermissions::CAN_VIEW,
+                'id'        => ProjectController::ROUTE_INDEX,
+                'route'     => ProjectController::ROUTE_INDEX,
+                'access'    => ProjectPermissions::CAN_VIEW,
                 'iconClass' => 'ri-archive-stack-fill',
                 'priority'  => 1,
             ],

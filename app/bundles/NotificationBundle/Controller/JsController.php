@@ -13,7 +13,7 @@ final class JsController extends CommonController
      * it improperly encodes the data array.
      */
     #[Route(
-        '/manifest.json',
+        path: '/manifest.json',
         name: 'mautic_onesignal_manifest',
     )]
     public function manifestAction(): Response
@@ -35,7 +35,7 @@ final class JsController extends CommonController
     }
 
     #[Route(
-        '/OneSignalSDKWorker.js',
+        path: '/OneSignalSDKWorker.js',
         name: 'mautic_onesignal_worker',
     )]
     public function workerAction(): Response
@@ -51,7 +51,7 @@ final class JsController extends CommonController
     }
 
     #[Route(
-        '/OneSignalSDKUpdaterWorker.js',
+        path: '/OneSignalSDKUpdaterWorker.js',
         name: 'mautic_onesignal_updater',
     )]
     public function updaterAction(): Response

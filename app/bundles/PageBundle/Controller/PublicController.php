@@ -46,7 +46,7 @@ final class PublicController extends AbstractFormController
      * @throws FileNotFoundException
      */
     #[Route(
-        '/{slug}',
+        path: '/{slug}',
         name: 'mautic_page_public',
         requirements: ['slug' => '^(?!(_(profiler|wdt)|css|images|js|favicon.ico|apps/bundles/|plugins/)).+'],
     )]
@@ -116,6 +116,8 @@ final class PublicController extends AbstractFormController
             }
 
             // Check for variants
+            /** @var Page $parentVariant */
+            /** @var Page[] $childrenVariants */
             [$parentVariant, $childrenVariants] = $entity->getVariants();
 
             // Is this a variant of another? If so, the parent URL should be used unless a user is logged in and previewing
@@ -225,15 +227,15 @@ final class PublicController extends AbstractFormController
                 }
 
                 // Now show the translation for the page or a/b test - only fetch a translation if a slug was not used
+                /** @var Page $entity */
                 if ($entity->isTranslation() && empty($entity->languageSlug)) {
                     [$translationParent, $translatedEntity] = $model->getTranslatedEntity(
                         $entity,
                         $lead,
                         $request
                     );
-                    \assert($translatedEntity instanceof Page);
 
-                    if ($translatedEntity !== $entity) {
+                    if ($translatedEntity instanceof Page && $translatedEntity !== $entity) {
                         if (!($request->attributes->all()['ntrd'] ?? $request->query->all()['ntrd'] ?? $request->request->all()['ntrd'] ?? 0)) {
                             $url = $model->generateUrl($translatedEntity, false);
                             $model->hitPage($entity, $request, 302, $lead, $query);
@@ -288,7 +290,7 @@ final class PublicController extends AbstractFormController
      * @throws FileNotFoundException
      */
     #[Route(
-        '/page/preview/{id}/{objectType}',
+        path: '/page/preview/{id}/{objectType}',
         name: 'mautic_page_preview',
         defaults: ['objectType' => null],
     )]
@@ -333,7 +335,7 @@ final class PublicController extends AbstractFormController
             $this->throwAccessDenied();
         }
 
-        if (empty($content) && !empty($BCcontent)) {
+        if (empty($content) && $BCcontent !== []) {
             $template = $page->getTemplate();
             // all the checks pass so display the content
             $content = $page->getContent();
@@ -370,7 +372,7 @@ final class PublicController extends AbstractFormController
     }
 
     #[Route(
-        '/mtracking.gif',
+        path: '/mtracking.gif',
         name: 'mautic_page_tracker',
     )]
     public function trackingImageAction(Request $request, PageModel $model): Response
@@ -381,7 +383,7 @@ final class PublicController extends AbstractFormController
     }
 
     #[Route(
-        '/mtc/event',
+        path: '/mtc/event',
         name: 'mautic_page_tracker_cors',
     )]
     public function trackingAction(
@@ -409,7 +411,7 @@ final class PublicController extends AbstractFormController
 
         $lead          = $contactTracker->getContact();
         $trackedDevice = $deviceTrackingService->getTrackedDevice();
-        $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+        $trackingId    = ($trackedDevice?->getTrackingId());
 
         $sessionValue   = $trackingHelper->getCacheItem(true);
 
@@ -431,11 +433,11 @@ final class PublicController extends AbstractFormController
      * @throws \Exception
      */
     #[Route(
-        '/r/{redirectId}',
+        path: '/r/{redirectId}',
         name: 'mautic_url_redirect',
     )]
     #[Route(
-        '/redirect/{redirectId}',
+        path: '/redirect/{redirectId}',
         name: 'mautic_page_redirect',
     )]
     public function redirectAction(
@@ -559,7 +561,7 @@ final class PublicController extends AbstractFormController
      * Get the ID of the currently tracked Contact.
      */
     #[Route(
-        '/mtc',
+        path: '/mtc',
         name: 'mautic_page_tracker_getcontact',
     )]
     public function getContactIdAction(DeviceTrackingServiceInterface $trackedDeviceService, ContactTracker $contactTracker): JsonResponse
@@ -568,7 +570,7 @@ final class PublicController extends AbstractFormController
         if ($this->security->isAnonymous()) {
             $lead          = $contactTracker->getContact();
             $trackedDevice = $trackedDeviceService->getTrackedDevice();
-            $trackingId    = (null === $trackedDevice ? null : $trackedDevice->getTrackingId());
+            $trackingId    = ($trackedDevice?->getTrackingId());
             $data          = [
                 'id'        => ($lead) ? $lead->getId() : null,
                 'sid'       => $trackingId,

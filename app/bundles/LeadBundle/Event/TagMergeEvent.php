@@ -7,7 +7,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\LeadBundle\Entity\Tag;
 use Symfony\Contracts\EventDispatcher\Event;
 
-final class TagMergeEvent extends Event
+abstract class TagMergeEvent extends Event
 {
     public function __construct(
         private readonly Tag $primaryTag,

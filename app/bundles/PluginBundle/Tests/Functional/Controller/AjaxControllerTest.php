@@ -33,6 +33,8 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $integration->expects($this->once())
             ->method('getDataPriority')
             ->willReturn(true);
+        $integration->method('getFormNotes')
+            ->willReturn(['', 'info']);
 
         $helper = $this->createMock(IntegrationHelper::class);
         $helper->expects($this->once())

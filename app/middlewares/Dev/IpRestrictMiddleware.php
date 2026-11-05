@@ -17,12 +17,12 @@ final class IpRestrictMiddleware implements HttpKernelInterface, PrioritizedMidd
     /**
      * @var HttpKernelInterface
      */
-    protected $app;
+    private $app;
 
     /**
      * @var array
      */
-    protected $allowedIps;
+    private $allowedIps;
 
     public function __construct(HttpKernelInterface $app)
     {

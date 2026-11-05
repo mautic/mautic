@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -8,12 +10,12 @@ use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 /**
  * @extends CommonRepository<Scheduler>
  */
-class SchedulerRepository extends CommonRepository
+final class SchedulerRepository extends CommonRepository
 {
     /**
      * @return Scheduler|null
      */
-    public function getSchedulerByReport(Report $report)
+    public function getSchedulerByReport(Report $report): ?object
     {
         return $this->findOneBy(['report' => $report]);
     }
@@ -21,7 +23,7 @@ class SchedulerRepository extends CommonRepository
     /**
      * @return array|Scheduler[]
      */
-    public function getScheduledReportsForExport(ExportOption $exportOption)
+    public function getScheduledReportsForExport(ExportOption $exportOption): array
     {
         $qb = $this->createQueryBuilder('scheduler');
         $qb->addSelect('report')

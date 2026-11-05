@@ -25,11 +25,9 @@ final class AvatarHelper
     }
 
     /**
-     * @param string $filePath
-     *
      * @throws FileNotFoundException
      */
-    public function createAvatarFromFile(Lead $lead, $filePath): void
+    public function createAvatarFromFile(Lead $lead, string $filePath): void
     {
         if (!file_exists($filePath)) {
             throw new FileNotFoundException();

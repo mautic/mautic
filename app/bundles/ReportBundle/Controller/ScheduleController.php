@@ -4,6 +4,7 @@ namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,7 +23,7 @@ final class ScheduleController extends CommonAjaxController
     }
 
     #[Route(
-        '/s/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}',
+        path: '/s/reports/schedule/preview/{isScheduled}/{scheduleUnit}/{scheduleDay}/{scheduleMonthFrequency}',
         name: 'mautic_report_schedule_preview',
         defaults: ['isScheduled' => 0, 'scheduleUnit' => '', 'scheduleDay' => '', 'scheduleMonthFrequency' => ''],
     )]
@@ -50,15 +51,13 @@ final class ScheduleController extends CommonAjaxController
      * @param int $reportId
      */
     #[Route(
-        '/s/reports/schedule/{reportId}/now',
+        path: '/s/reports/schedule/{reportId}/now',
         name: 'mautic_report_schedule',
     )]
     public function nowAction($reportId): JsonResponse
     {
-        /** @var \Mautic\ReportBundle\Entity\Report $report */
+        /** @var Report $report */
         $report = $this->reportModel->getEntity($reportId);
-
-        $security = $this->security;
 
         if (empty($report)) {
             $this->addFlashMessage('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');
@@ -66,7 +65,7 @@ final class ScheduleController extends CommonAjaxController
             return $this->flushFlash();
         }
 
-        if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
+        if (!$this->security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
             $this->addFlashMessage('mautic.core.error.accessdenied', [], FlashBag::LEVEL_ERROR);
 
             return $this->flushFlash();

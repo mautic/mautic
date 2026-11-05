@@ -35,6 +35,7 @@ final class EntityResultHelperTest extends TestCase
             $this->modifyEntityData($entity);
         });
 
+        /** @var Lead $entity */
         foreach ($arrayResult as $entity) {
             $this->assertEquals(self::NEW_TITLE, $entity->getTitle());
         }
@@ -71,6 +72,7 @@ final class EntityResultHelperTest extends TestCase
             $this->modifyEntityData($entity);
         });
 
+        /** @var Lead $entity */
         foreach ($arrayResult as $entity) {
             $this->assertEquals(self::NEW_TITLE, $entity->getTitle());
         }
@@ -97,6 +99,7 @@ final class EntityResultHelperTest extends TestCase
 
         $this->assertEquals($expectedResult, $arrayResult);
 
+        /** @var Lead $entity */
         foreach ($arrayResult as $entity) {
             $this->assertEquals($entity->getTitle(), 'Title '.$entity->getId());
         }
@@ -105,6 +108,7 @@ final class EntityResultHelperTest extends TestCase
             $this->modifyEntityData($entity);
         });
 
+        /** @var Lead $entity */
         foreach ($arrayResult as $entity) {
             $this->assertEquals(self::NEW_TITLE, $entity->getTitle());
         }

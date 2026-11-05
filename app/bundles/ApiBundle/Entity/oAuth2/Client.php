@@ -3,9 +3,9 @@
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\Client as BaseClient;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
@@ -13,19 +13,23 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 #[ORM\Table(name: 'oauth2_clients')]
-#[ORM\Index(columns: ['random_id'], name: 'client_id_search')]
+#[ORM\Index(name: 'client_id_search', columns: ['random_id'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Client extends BaseClient
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     protected $id;
 
     /**
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     protected $name;
 
     /**
@@ -78,13 +82,6 @@ class Client extends BaseClient
         $this->authCodes = new ArrayCollection();
     }
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns('name', false);
-    }
-
     /**
      * @var array
      */
@@ -99,10 +96,7 @@ class Client extends BaseClient
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getChanges()
+    public function getChanges(): array
     {
         return $this->changes;
     }
@@ -185,9 +179,9 @@ class Client extends BaseClient
     }
 
     /**
-     * @return ArrayCollection<int, User>
+     * @return Collection<int, User>
      */
-    public function getUsers()
+    public function getUsers(): Collection
     {
         return $this->users;
     }
@@ -202,7 +196,7 @@ class Client extends BaseClient
         return $this;
     }
 
-    public function getRole(): Role
+    public function getRole(): ?Role
     {
         return $this->role;
     }

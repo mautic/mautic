@@ -12,10 +12,7 @@ final class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
 
     public const PRIORITY = 1000;
 
-    /**
-     * @var array
-     */
-    protected $corsHeaders = [
+    private array $corsHeaders = [
         'Access-Control-Allow-Origin'      => '*',
         'Access-Control-Allow-Headers'     => 'Origin, X-Requested-With, Content-Type, Authorization',
         'Access-Control-Allow-Methods'     => 'PUT, GET, POST, DELETE, OPTIONS',
@@ -23,25 +20,22 @@ final class CORSMiddleware implements HttpKernelInterface, PrioritizedMiddleware
         'Access-Control-Max-Age'           => 10 * 60 * 60, // 10 min, max age for Chrome
     ];
 
-    /**
-     * @var bool
-     */
-    protected $requestOriginIsValid = false;
+    private bool $requestOriginIsValid = false;
 
     /**
      * @var bool
      */
-    protected $restrictCORSDomains = true;
+    private $restrictCORSDomains = true;
 
     /**
      * @var array
      */
-    protected $validCORSDomains = [];
+    private $validCORSDomains = [];
 
     /**
      * @var HttpKernelInterface
      */
-    protected $app;
+    private $app;
 
     public function __construct(HttpKernelInterface $app)
     {

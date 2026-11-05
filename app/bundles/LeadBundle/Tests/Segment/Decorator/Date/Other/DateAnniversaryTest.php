@@ -12,9 +12,10 @@ use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateAnniversary;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DateAnniversary::class)]
-final class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
+final class DateAnniversaryTest extends TestCase
 {
     public function testGetOperator(): void
     {
@@ -48,7 +49,10 @@ final class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
             ->with(false)
             ->willReturn(
                 new DateTimeHelper(
-                    new \DateTime('midnight today', new \DateTimeZone('UTC')), null, 'UTC')
+                    new \DateTime('midnight today', new \DateTimeZone('UTC')),
+                    null,
+                    'UTC'
+                )
             );
 
         $filter        = [

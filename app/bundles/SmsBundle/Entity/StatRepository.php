@@ -3,6 +3,8 @@
 namespace Mautic\SmsBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
@@ -10,17 +12,15 @@ use Mautic\LeadBundle\Entity\TimelineTrait;
 /**
  * @extends CommonRepository<Stat>
  */
-class StatRepository extends CommonRepository
+final class StatRepository extends CommonRepository
 {
     use TimelineTrait;
 
     /**
-     * @return mixed
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
-    public function getSmsStatus($trackingHash)
+    public function getSmsStatus(string $trackingHash): ?Stat
     {
         $q = $this->createQueryBuilder('s');
         $q->select('s')
@@ -65,10 +65,8 @@ class StatRepository extends CommonRepository
     /**
      * @param int|array $smsIds
      * @param int       $listId
-     *
-     * @return int
      */
-    public function getSentCount($smsIds = null, $listId = null)
+    public function getSentCount($smsIds = null, $listId = null): int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -103,12 +101,10 @@ class StatRepository extends CommonRepository
      * @param int                  $leadId
      * @param array<string, mixed> $options
      *
-     * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
-    public function getLeadStats($leadId, array $options = [])
+    public function getLeadStats($leadId, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'sms_message_stats', 's')
@@ -135,7 +131,7 @@ class StatRepository extends CommonRepository
             $state = $options['state'];
             if ('failed' == $state) {
                 $query->andWhere(
-                    $query->expr()->eq('s.is_failed', 1)
+                    $query->expr()->eq('s.is_failed', '1')
                 );
             }
         }

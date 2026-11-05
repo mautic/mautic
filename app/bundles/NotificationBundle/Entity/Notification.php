@@ -10,8 +10,10 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
@@ -51,85 +53,99 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class Notification extends FormEntity implements UuidInterface, TranslationEntityInterface
 {
     use UuidTrait;
+    /** @use TranslationEntityTrait<Notification> */
     use TranslationEntityTrait;
 
     /**
      * @var int
      */
     #[Groups(['notification:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string|null
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $url;
 
     /**
      * @var string
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text')]
     private $heading;
 
     /**
      * @var string
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text')]
     private $message;
 
     /**
      * @var string|null
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $button;
 
     /**
      * @var array
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(name: 'utm_tags', type: 'array', nullable: true)]
     private $utmTags = [];
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var int
      */
     #[Groups(['notification:read'])]
+    #[ORM\Column(name: 'read_count', type: 'integer')]
     private $readCount = 0;
 
     /**
      * @var int
      */
     #[Groups(['notification:read'])]
+    #[ORM\Column(name: 'sent_count', type: 'integer')]
     private $sentCount = 0;
 
-    /**
-     * @var \Mautic\CategoryBundle\Entity\Category|null
-     */
     #[Groups(['notification:read', 'notification:write'])]
-    private $category;
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<int, LeadList>
@@ -144,25 +160,28 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     /**
      * @var ArrayCollection<int, Stat>
      */
-    #[ORM\OneToMany(mappedBy: 'notification', targetEntity: Stat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: Stat::class, mappedBy: 'notification', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**
      * @var string|null
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(name: 'notification_type', type: 'text', nullable: true)]
     private $notificationType = 'template';
 
     /**
      * @var bool
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'boolean')]
     private $mobile = false;
 
     /**
      * @var ?array
      */
     #[Groups(['notification:read', 'notification:write'])]
+    #[ORM\Column(type: 'array')]
     private $mobileSettings;
 
     public function __clone()
@@ -190,49 +209,6 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('url', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('heading', 'text')
-            ->build();
-
-        $builder->createField('message', 'text')
-            ->build();
-
-        $builder->createField('button', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmTags', 'array')
-            ->columnName('utm_tags')
-            ->nullable()
-            ->build();
-
-        $builder->createField('notificationType', 'text')
-            ->columnName('notification_type')
-            ->nullable()
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->createField('readCount', 'integer')
-            ->columnName('read_count')
-            ->build();
-
-        $builder->createField('sentCount', 'integer')
-            ->columnName('sent_count')
-            ->build();
-
-        $builder->addCategory();
-
-        $builder->createField('mobile', 'boolean')->build();
-
-        $builder->createField('mobileSettings', 'array')->build();
-
 
         self::addTranslationMetadata($builder, self::class);
     }
@@ -269,9 +245,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
                         $notification->getLists(),
                         [
                             new LeadListAccess(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
+                                message: 'mautic.lead.lists.required'
                             ),
                             new NotBlank(
                                 message: 'mautic.lead.lists.required'
@@ -326,6 +300,8 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         $current = $this->{$getter}();
 
         if ('category' == $prop || 'list' == $prop) {
+            /** @var Category|null $current */
+            /** @var Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -344,10 +320,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -380,15 +353,12 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->id;
     }
 
-    /**
-     * @return \Mautic\CategoryBundle\Entity\Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    public function setCategory($category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -421,7 +391,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->button;
     }
 
-    public function setButton($button): void
+    public function setButton(?string $button): void
     {
         $this->isChanged('button', $button);
         $this->button = $button;
@@ -435,27 +405,18 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->message;
     }
 
-    /**
-     * @param string $message
-     */
-    public function setMessage($message): void
+    public function setMessage(?string $message): void
     {
         $this->isChanged('message', $message);
         $this->message = $message;
     }
 
-    /**
-     * @return array
-     */
-    public function getUtmTags()
+    public function getUtmTags(): array
     {
         return $this->utmTags;
     }
 
-    /**
-     * @param array $utmTags
-     */
-    public function setUtmTags($utmTags): static
+    public function setUtmTags(array $utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;
@@ -540,9 +501,9 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return ArrayCollection<int, LeadList>
+     * @return Collection<int, LeadList>
      */
-    public function getLists()
+    public function getLists(): Collection
     {
         return $this->lists;
     }
@@ -560,9 +521,9 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
     }
 
     /**
-     * @return ArrayCollection<int, Stat>
+     * @return Collection<int, Stat>
      */
-    public function getStats()
+    public function getStats(): Collection
     {
         return $this->stats;
     }
@@ -575,10 +536,7 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->notificationType;
     }
 
-    /**
-     * @param string $notificationType
-     */
-    public function setNotificationType($notificationType): void
+    public function setNotificationType(string $notificationType): void
     {
         $this->isChanged('notificationType', $notificationType);
         $this->notificationType = $notificationType;
@@ -592,20 +550,14 @@ class Notification extends FormEntity implements UuidInterface, TranslationEntit
         return $this->mobile;
     }
 
-    /**
-     * @param bool $mobile
-     */
-    public function setMobile($mobile): static
+    public function setMobile(bool $mobile): static
     {
         $this->mobile = $mobile;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getMobileSettings()
+    public function getMobileSettings(): array
     {
         return $this->mobileSettings ?? [];
     }

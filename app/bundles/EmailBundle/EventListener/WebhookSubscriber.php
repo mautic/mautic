@@ -8,9 +8,9 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\WebhookBundle\Event\WebhookBuilderEvent;
 use Mautic\WebhookBundle\Event\WebhookQueueEvent;
 use Mautic\WebhookBundle\Model\WebhookModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class WebhookSubscriber implements EventSubscriberInterface
+final readonly class WebhookSubscriber
 {
     public function __construct(
         private WebhookModel $webhookModel,
@@ -18,19 +18,12 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EmailSendEvent::class               => ['onEmailSend', 0],
-            EmailOpenEvent::class               => ['onEmailOpen', 0],
-            WebhookBuilderEvent::class          => ['onWebhookBuild', 0],
-            WebhookQueueEvent::class            => ['onWebhookQueueOnAdd', 0],
-        ];
-    }
-
     /**
      * Add event triggers and actions.
      */
+    #[AsEventListener(
+        event: WebhookBuilderEvent::class,
+    )]
     public function onWebhookBuild(WebhookBuilderEvent $event): void
     {
         // add checkbox to the webhook form for new leads
@@ -48,6 +41,9 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         $event->addEvent(EmailEvents::EMAIL_ON_OPEN, $mailOpen);
     }
 
+    #[AsEventListener(
+        event: EmailSendEvent::class,
+    )]
     public function onEmailSend(EmailSendEvent $event): void
     {
         // Ignore test email sends.
@@ -73,6 +69,9 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         $this->webhookModel->queueWebhooksByType(EmailEvents::EMAIL_ON_SEND, $payload);
     }
 
+    #[AsEventListener(
+        event: EmailOpenEvent::class,
+    )]
     public function onEmailOpen(EmailOpenEvent $event): void
     {
         $this->webhookModel->queueWebhooksByType(
@@ -88,6 +87,9 @@ final readonly class WebhookSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: WebhookQueueEvent::class,
+    )]
     public function onWebhookQueueOnAdd(WebhookQueueEvent $event): void
     {
         if ($this->includeDetails) {

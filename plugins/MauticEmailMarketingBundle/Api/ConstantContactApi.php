@@ -44,14 +44,13 @@ final class ConstantContactApi extends EmailMarketingApi
     }
 
     /**
-     * @param array                $fields
      * @param array<string, mixed> $config
      *
      * @return mixed|string
      *
      * @throws ApiErrorException
      */
-    public function subscribeLead($email, $listId, $fields = [], array $config = [])
+    public function subscribeLead($email, $listId, array $fields = [], array $config = [])
     {
         $parameters = array_merge($fields, [
             'lists' => [

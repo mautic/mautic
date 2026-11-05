@@ -39,11 +39,9 @@ class TransportChain
     /**
      * Return the transport defined in parameters.
      *
-     * @return TransportInterface
-     *
      * @throws PrimaryTransportNotEnabledException
      */
-    public function getPrimaryTransport()
+    public function getPrimaryTransport(): TransportInterface
     {
         $enabled = $this->getEnabledTransports();
 
@@ -119,13 +117,11 @@ class TransportChain
     }
 
     /**
-     * @param string $content
-     *
      * @return mixed
      *
      * @throws \Exception
      */
-    public function sendSms(Lead $lead, $content, ?Stat $stat = null)
+    public function sendSms(Lead $lead, string $content, ?Stat $stat = null)
     {
         return $this->getPrimaryTransport()->sendSms($lead, $content, $stat);
     }
@@ -143,11 +139,9 @@ class TransportChain
     /**
      * @param string $transport
      *
-     * @return TransportInterface
-     *
      * @throws PrimaryTransportNotEnabledException
      */
-    public function getTransport($transport)
+    public function getTransport($transport): TransportInterface
     {
         $enabled = $this->getEnabledTransports();
 

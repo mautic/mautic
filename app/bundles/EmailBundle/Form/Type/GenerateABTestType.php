@@ -34,7 +34,7 @@ final class GenerateABTestType extends AbstractType
             'onchange' => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
         ];
 
-        if (!empty($abTestWinnerCriteria)) {
+        if ($abTestWinnerCriteria !== []) {
             $criteria    = $abTestWinnerCriteria['criteria'];
             $choices     = $abTestWinnerCriteria['choices'];
             $constraints = [];

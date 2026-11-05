@@ -2,7 +2,6 @@
 
 namespace Mautic\CampaignBundle\Executioner\ContactFinder;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -11,7 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\LoggerInterface;
 
-readonly class KickoffContactFinder
+final readonly class KickoffContactFinder
 {
     public function __construct(
         private LeadRepository $leadRepository,
@@ -21,13 +20,11 @@ readonly class KickoffContactFinder
     }
 
     /**
-     * @param int $campaignId
-     *
-     * @return ArrayCollection
+     * @return Collection<int, Lead>
      *
      * @throws NoContactsFoundException
      */
-    public function getContacts($campaignId, ContactLimiter $limiter)
+    public function getContacts(?int $campaignId, ContactLimiter $limiter): Collection
     {
         // Get list of all campaign leads; start is always zero in practice because of $pendingOnly
         $campaignContacts = $this->campaignRepository->getPendingContactIds($campaignId, $limiter);
@@ -53,10 +50,7 @@ readonly class KickoffContactFinder
         return $contacts;
     }
 
-    /**
-     * @param int $campaignId
-     */
-    public function getContactCount($campaignId, array $eventIds, ContactLimiter $limiter): int
+    public function getContactCount(?int $campaignId, array $eventIds, ContactLimiter $limiter): int
     {
         $countResult = $this->campaignRepository->getCountsForPendingContacts($campaignId, $eventIds, $limiter);
 

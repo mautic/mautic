@@ -11,7 +11,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-readonly class RouteHelper
+final readonly class RouteHelper
 {
     public function __construct(
         private ObjectProvider $objectProvider,

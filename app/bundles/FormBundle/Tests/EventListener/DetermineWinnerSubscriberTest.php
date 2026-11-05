@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
+final class DetermineWinnerSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&SubmissionRepository
@@ -38,10 +40,10 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnDetermineSubmissionWinner(): void
     {
-        $parentMock       = $this->createMock(Page::class);
-        $childMock        = $this->createMock(Page::class);
-        $children         = [2 => $childMock];
-        $parameters       = ['parent' => $parentMock, 'children' => $children];
+        $parent           = new Page();
+        $child            = new Page();
+        $children         = [2 => $child];
+        $parameters       = ['parent' => $parent, 'children' => $children];
         $event            = new DetermineWinnerEvent($parameters);
         $startDate        = new \DateTime();
         $transSubmissions = 'submissions';
@@ -64,25 +66,11 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translator->method('trans')
             ->willReturnOnConsecutiveCalls($transSubmissions, $transHits);
 
-        $parentMock
-            ->method('isPublished')
-            ->willReturn(true);
-
-        $childMock
-            ->method('isPublished')
-            ->willReturn(true);
-
-        $parentMock
-            ->method('getId')
-            ->willReturn(1);
-
-        $childMock
-            ->method('getId')
-            ->willReturn(2);
-
-        $parentMock->expects($this->once())
-            ->method('getVariantStartDate')
-            ->willReturn($startDate);
+        $parent->setIsPublished(true);
+        $child->setIsPublished(true);
+        ReflectionHelper::setEntityId($parent, 1);
+        ReflectionHelper::setEntityId($child, 2);
+        $parent->setVariantStartDate($startDate);
 
         $this->submissionRepository->expects($this->once())
             ->method('getSubmissionCountsByPage')
@@ -98,7 +86,7 @@ final class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $abTestResults = $event->getAbTestResults();
 
-        $this->assertEquals($abTestResults['winners'], [1]);
+        $this->assertEquals([1], $abTestResults['winners']);
         $this->assertEquals($abTestResults['support']['data'], $expectedData);
     }
 }

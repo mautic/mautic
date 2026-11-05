@@ -31,10 +31,10 @@ final class OwnershipScopedSecurityMetadataTest extends MauticMysqlTestCase
         ];
 
         /** @var ResourceNameCollectionFactoryInterface $nameFactory */
-        $nameFactory = self::getContainer()->get('api_platform.metadata.resource.name_collection_factory');
+        $nameFactory = self::getContainer()->get(ResourceNameCollectionFactoryInterface::class);
 
         /** @var ResourceMetadataCollectionFactoryInterface $metadataFactory */
-        $metadataFactory = self::getContainer()->get('api_platform.metadata.resource.metadata_collection_factory');
+        $metadataFactory = self::getContainer()->get(ResourceMetadataCollectionFactoryInterface::class);
 
         $violations = [];
 

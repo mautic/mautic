@@ -5,17 +5,14 @@ namespace Mautic\LeadBundle\Helper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
-readonly class PrimaryCompanyHelper
+final readonly class PrimaryCompanyHelper
 {
     public function __construct(
         private CompanyLeadRepository $companyLeadRepository,
     ) {
     }
 
-    /**
-     * @return array|null
-     */
-    public function getProfileFieldsWithPrimaryCompany(Lead $lead)
+    public function getProfileFieldsWithPrimaryCompany(Lead $lead): array
     {
         return $this->mergeInPrimaryCompany(
             $this->companyLeadRepository->getCompaniesByLeadId($lead->getId()),
@@ -23,10 +20,7 @@ readonly class PrimaryCompanyHelper
         );
     }
 
-    /**
-     * @return array
-     */
-    public function mergePrimaryCompanyWithProfileFields($contactId, array $profileFields)
+    public function mergePrimaryCompanyWithProfileFields($contactId, array $profileFields): array
     {
         return $this->mergeInPrimaryCompany(
             $this->companyLeadRepository->getCompaniesByLeadId($contactId),
@@ -34,10 +28,7 @@ readonly class PrimaryCompanyHelper
         );
     }
 
-    /**
-     * @return array
-     */
-    private function mergeInPrimaryCompany(array $companies, array $profileFields)
+    private function mergeInPrimaryCompany(array $companies, array $profileFields): array
     {
         foreach ($companies as $company) {
             if (empty($company['is_primary'])) {

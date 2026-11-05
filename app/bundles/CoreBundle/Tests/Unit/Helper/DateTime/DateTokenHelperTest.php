@@ -7,10 +7,11 @@ namespace Mautic\CoreBundle\Tests\Unit\Helper\DateTime;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTime\DateTimeLocalization;
 use Mautic\CoreBundle\Helper\DateTime\DateTimeToken;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
+final class DateTokenHelperTest extends TestCase
 {
     public const string DATE_FORMAT      = 'F j, Y';
 

@@ -6,11 +6,10 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: FailedLeadEventLogRepository::class)]
 #[ORM\Table(name: 'campaign_lead_event_failed_log')]
-#[ORM\Index(columns: ['date_added'], name: 'campaign_event_failed_date')]
+#[ORM\Index(name: 'campaign_event_failed_date', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class FailedLeadEventLog
 {
@@ -18,28 +17,21 @@ class FailedLeadEventLog
      * @var LeadEventLog
      */
     #[ORM\Id]
-    #[ORM\OneToOne(inversedBy: 'failedLog', targetEntity: LeadEventLog::class)]
+    #[ORM\OneToOne(targetEntity: LeadEventLog::class, inversedBy: 'failedLog')]
     #[ORM\JoinColumn(name: 'log_id', nullable: false, onDelete: 'CASCADE')]
     private $log;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $reason;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addDateAdded();
-
-        $builder->addNullableField('reason', 'text');
-    }
 
     /**
      * Prepares the metadata for API usage.

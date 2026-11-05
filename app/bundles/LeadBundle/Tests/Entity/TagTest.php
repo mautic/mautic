@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\Tag;
+use PHPUnit\Framework\TestCase;
 
-final class TagTest extends \PHPUnit\Framework\TestCase
+final class TagTest extends TestCase
 {
     public function testSetTagByConstructor(): void
     {

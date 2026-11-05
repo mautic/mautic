@@ -10,11 +10,11 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExcelExporter
+final readonly class ExcelExporter
 {
     public function __construct(
-        protected FormatterHelper $formatterHelper,
-        private readonly TranslatorInterface $translator,
+        private FormatterHelper $formatterHelper,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -35,7 +35,7 @@ class ExcelExporter
             $reportData       = $reportDataResult->getData();
             $rowCount         = 1;
 
-            if (empty($reportData)) {
+            if ($reportData === []) {
                 throw new \Exception('No report data to be exported');
             }
 

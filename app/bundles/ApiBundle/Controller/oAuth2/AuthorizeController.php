@@ -45,7 +45,7 @@ final class AuthorizeController extends \FOS\OAuthServerBundle\Controller\Author
     }
 
     #[Route(
-        '/oauth/v2/authorize',
+        path: '/oauth/v2/authorize',
         name: 'fos_oauth_server_authorize',
         methods: ['GET', 'POST'],
     )]

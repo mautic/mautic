@@ -8,10 +8,11 @@ use Mautic\ReportBundle\Scheduler\Builder\SchedulerNowBuilder;
 use Mautic\ReportBundle\Scheduler\Entity\SchedulerEntity;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
+use PHPUnit\Framework\TestCase;
 use Recurr\Exception\InvalidArgument;
 use Recurr\Rule;
 
-final class SchedulerNowBuilderTest extends \PHPUnit\Framework\TestCase
+final class SchedulerNowBuilderTest extends TestCase
 {
     public function testBuilEvent(): void
     {

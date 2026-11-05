@@ -23,6 +23,7 @@ use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -518,7 +519,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
     public function testGetEntitiesReturnsContactsForViewOwnUserBasedOnPermissionUser(): void
     {
         /** @var User $adminUser */
-        $adminUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $adminUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
 
         $role = new Role();
         $role->setName('View own contacts');
@@ -580,7 +581,7 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var User $apiUser */
-        $apiUser = $this->em->getRepository(User::class)->findOneBy(['username' => 'api-owner']);
+        $apiUser = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'api-owner']);
 
         $this->loginUser($apiUser);
         $this->client->setServerParameter('PHP_AUTH_USER', $apiUser->getUserIdentifier());
@@ -1057,7 +1058,9 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         // Test fetching the batch of contacts
         $this->client->request(
-            Request::METHOD_GET, '/api/contacts');
+            Request::METHOD_GET,
+            '/api/contacts'
+        );
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -1367,6 +1370,8 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/api/contacts/activity');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
+
+        /** @var \stdClass $responseJson */
         $responseJson = json_decode($clientResponse->getContent());
         $this->assertSame($expectedActivites, $responseJson->total);
     }
@@ -1395,8 +1400,10 @@ final class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/api/contacts/'.$contact->getId().'/activity');
         $clientResponse = $this->client->getResponse();
         $this->assertResponseIsSuccessful();
+        /** @var \stdClass $responseJson */
         $responseJson = json_decode($clientResponse->getContent());
         $resultOrder  = [];
+        /** @var \stdClass $event */
         foreach ($responseJson->events as $event) {
             $resultOrder[] = substr($event->timestamp, 0, 10);
         }

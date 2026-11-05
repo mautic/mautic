@@ -15,14 +15,14 @@ use Mautic\EmailBundle\MonitoredEmail\Search\Result;
 use Mautic\EmailBundle\Tests\MonitoredEmail\Transport\TestTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Mautic\LeadBundle\Model\LeadModel;
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\NullTransport;
 
 #[AllowMockObjectsWithoutExpectations]
-final class BounceTest extends \PHPUnit\Framework\TestCase
+final class BounceTest extends TestCase
 {
     #[TestDox('Test that the transport interface processes the message appropriately')]
     public function testProcessorInterfaceProcessesMessage(): void
@@ -57,15 +57,13 @@ final class BounceTest extends \PHPUnit\Framework\TestCase
         $emailStatModel->expects($this->once())
             ->method('saveEntity');
 
-        $leadModel = $this->createStub(LeadModel::class);
-
         $translator = $this->createStub(Translator::class);
 
         $logger = $this->createStub(Logger::class);
 
         $doNotContact = $this->createStub(DoNotContact::class);
 
-        $bouncer = new Bounce($transport, $contactFinder, $emailStatModel, $leadModel, $translator, $logger, $doNotContact);
+        $bouncer = new Bounce($transport, $contactFinder, $emailStatModel, $translator, $logger, $doNotContact);
 
         $message = new Message();
         $this->assertTrue($bouncer->process($message));
@@ -104,15 +102,13 @@ final class BounceTest extends \PHPUnit\Framework\TestCase
         $emailStatModel->expects($this->once())
             ->method('saveEntity');
 
-        $leadModel = $this->createStub(LeadModel::class);
-
         $translator = $this->createStub(Translator::class);
 
         $logger = $this->createStub(Logger::class);
 
         $doNotContact = $this->createStub(DoNotContact::class);
 
-        $bouncer = new Bounce($transport, $contactFinder, $emailStatModel, $leadModel, $translator, $logger, $doNotContact);
+        $bouncer = new Bounce($transport, $contactFinder, $emailStatModel, $translator, $logger, $doNotContact);
 
         $message            = new Message();
         $message->to        = ['contact+bounce_123abc@test.com' => null];

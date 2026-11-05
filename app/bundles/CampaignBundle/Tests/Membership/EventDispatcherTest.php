@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Membership;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
-use Mautic\CampaignBundle\Event\CampaignLeadChangeEvent;
+use Mautic\CampaignBundle\Event\CampaignBatchLeadChangeEvent;
+use Mautic\CampaignBundle\Event\CampaignSingleLeadChangeEvent;
 use Mautic\CampaignBundle\Membership\Action\Adder;
 use Mautic\CampaignBundle\Membership\EventDispatcher;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class EventDispatcherTest extends \PHPUnit\Framework\TestCase
+final class EventDispatcherTest extends TestCase
 {
     private MockObject&EventDispatcherInterface $eventDispatcher;
 
@@ -26,7 +27,7 @@ final class EventDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(CampaignLeadChangeEvent::class), CampaignEvents::CAMPAIGN_ON_LEADCHANGE);
+            ->with($this->isInstanceOf(CampaignSingleLeadChangeEvent::class));
 
         $this->getDispatcher()->dispatchMembershipChange(new Lead(), new Campaign(), Adder::NAME);
     }
@@ -35,7 +36,7 @@ final class EventDispatcherTest extends \PHPUnit\Framework\TestCase
     {
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($this->isInstanceOf(CampaignLeadChangeEvent::class), CampaignEvents::LEAD_CAMPAIGN_BATCH_CHANGE);
+            ->with($this->isInstanceOf(CampaignBatchLeadChangeEvent::class));
 
         $this->getDispatcher()->dispatchBatchMembershipChange([new Lead()], new Campaign(), Adder::NAME);
     }

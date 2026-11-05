@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace Mautic\PluginBundle\Tests\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Form\Type\DetailsType;
 use Mautic\PluginBundle\Form\Type\KeysType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-#[\PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations]
+#[AllowMockObjectsWithoutExpectations]
 final class DetailsTypeTest extends TestCase
 {
     public function testBuildFormRemovesHiddenKeys(): void
@@ -41,13 +43,7 @@ final class DetailsTypeTest extends TestCase
             ->method('getSupportedFeatures')
             ->willReturn([]);
 
-        $integration = $this->createMock(Integration::class);
-        $integration->method('getApiKeys')
-            ->willReturn([]);
-        $integration->expects($this->never())
-            ->method('getId');
-        $integration->expects($this->never())
-            ->method('getSupportedFeatures');
+        $integration = new Integration();
 
         $options['integration_object'] = $integrationObject;
         $options['data']               = $integration;
@@ -111,13 +107,7 @@ final class DetailsTypeTest extends TestCase
             ->method('getSupportedFeatures')
             ->willReturn([]);
 
-        $integration = $this->createMock(Integration::class);
-        $integration->method('getApiKeys')
-            ->willReturn([]);
-        $integration->expects($this->never())
-            ->method('getId');
-        $integration->expects($this->never())
-            ->method('getSupportedFeatures');
+        $integration = new Integration();
 
         $options['integration_object'] = $integrationObject;
         $options['data']               = $integration;
@@ -192,15 +182,11 @@ final class DetailsTypeTest extends TestCase
             ->method('getSupportedFeatures')
             ->willReturn(['non-configured']);
 
-        $integration = $this->createMock(Integration::class);
-        $integration->method('getApiKeys')
-            ->willReturn([]);
-        $integration->expects($this->once())
-            ->method('getId')
-            ->willReturn($integrationId);
-        $integration->expects($this->once())
-            ->method('getSupportedFeatures')
-            ->willReturn(['configured']);
+        $integration = new Integration();
+        if (null !== $integrationId) {
+            ReflectionHelper::setEntityId($integration, $integrationId);
+        }
+        $integration->setSupportedFeatures(['configured']);
 
         $options['integration_object'] = $integrationObject;
         $options['data']               = $integration;
@@ -274,13 +260,7 @@ final class DetailsTypeTest extends TestCase
         $integrationObject->expects($this->once())
             ->method('getSupportedFeatures');
 
-        $integration = $this->createMock(Integration::class);
-        $integration->method('getApiKeys')
-            ->willReturn([]);
-        $integration->expects($this->never())
-            ->method('getId');
-        $integration->expects($this->never())
-            ->method('getSupportedFeatures');
+        $integration = new Integration();
 
         $options['integration_object'] = $integrationObject;
         $options['data']               = $integration;

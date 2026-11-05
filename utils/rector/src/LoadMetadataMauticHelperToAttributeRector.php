@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Utils\Rector;
 
+use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\LeadBundle\Entity\Lead;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\ArrayItem;
@@ -39,7 +42,7 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
      * @var string[]
      */
     private const array FIELD_HELPERS = [
-        'addId', 'addBigIntIdField', 'addIdColumns', 'addDateAdded', 'addPublishDates',
+        'addId', 'addUuid', 'addBigIntIdField', 'addIdColumns', 'addDateAdded', 'addPublishDates',
         'addNullableField', 'addNamedField', 'addLead', 'addContact', 'addCategory', 'addIpAddress',
     ];
 
@@ -53,7 +56,7 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
         'setTable', 'setCustomRepositoryClass', 'setMappedSuperClass', 'addIndex', 'addFulltextIndex',
         'addIndexWithOptions', 'addUniqueConstraint',
         'createField', 'addField', 'createManyToOne', 'createOneToMany', 'createOneToOne', 'createManyToMany',
-        'addId', 'addBigIntIdField', 'addIdColumns', 'addDateAdded', 'addPublishDates',
+        'addId', 'addUuid', 'addBigIntIdField', 'addIdColumns', 'addDateAdded', 'addPublishDates',
         'addNullableField', 'addNamedField', 'addLead', 'addContact', 'addCategory', 'addIpAddress',
     ];
 
@@ -175,14 +178,15 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
     {
         return match ($this->methodName($call)) {
             'addId'            => [$this->buildAddId($builder)],
+            'addUuid'          => [$this->buildAddUuid($builder)],
             'addBigIntIdField' => [$this->buildBigIntIdField($builder, $call)],
             'addIdColumns'     => $this->buildAddIdColumns($builder, $call),
             'addDateAdded'     => [$this->buildDateAdded($builder, $call)],
             'addPublishDates'  => $this->buildPublishDates($builder),
             'addNullableField' => [$this->buildNullableField($builder, $call)],
             'addNamedField'    => [$this->buildNamedField($builder, $call)],
-            'addLead'          => [$this->buildContactHelper($builder, $call, 'lead', 'lead_id', 'Mautic\\LeadBundle\\Entity\\Lead')],
-            'addContact'       => [$this->buildContactHelper($builder, $call, 'contact', 'contact_id', 'Mautic\\LeadBundle\\Entity\\Lead')],
+            'addLead'          => [$this->buildContactHelper($builder, $call, 'lead', 'lead_id', Lead::class)],
+            'addContact'       => [$this->buildContactHelper($builder, $call, 'contact', 'contact_id', Lead::class)],
             'addCategory'      => [$this->buildCategory($builder)],
             'addIpAddress'     => [$this->buildIpAddress($builder, $call)],
             default            => [new Expression($call)],
@@ -196,6 +200,15 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
             $this->step('makePrimaryKey', []),
             $this->step('generatedValue', []),
             $this->step('option', [$this->strArg('unsigned'), $this->boolArg(true)]),
+            $this->step('build', []),
+        ]);
+    }
+
+    private function buildAddUuid(Variable $builder): Expression
+    {
+        return $this->chain($builder, [
+            $this->step('createField', [$this->strArg('id'), $this->strArg('guid')]),
+            $this->step('makePrimaryKey', []),
             $this->step('build', []),
         ]);
     }
@@ -364,8 +377,7 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
     private function buildCategory(Variable $builder): Expression
     {
         return $this->chain($builder, [
-            $this->step('createManyToOne', [$this->strArg('category'), $this->classConstArg('Mautic\\CategoryBundle\\Entity\\Category')]),
-            $this->step('cascadeMerge', []),
+            $this->step('createManyToOne', [$this->strArg('category'), $this->classConstArg(Category::class)]),
             $this->step('cascadeDetach', []),
             $this->step('addJoinColumn', [
                 $this->strArg('category_id'),
@@ -383,9 +395,8 @@ final class LoadMetadataMauticHelperToAttributeRector extends AbstractRector
         $nullable = $this->boolArgValue($call, 0, false);
 
         return $this->chain($builder, [
-            $this->step('createManyToOne', [$this->strArg('ipAddress'), $this->classConstArg('Mautic\\CoreBundle\\Entity\\IpAddress')]),
+            $this->step('createManyToOne', [$this->strArg('ipAddress'), $this->classConstArg(IpAddress::class)]),
             $this->step('cascadePersist', []),
-            $this->step('cascadeMerge', []),
             $this->step('cascadeDetach', []),
             $this->step('addJoinColumn', [
                 $this->strArg('ip_id'),

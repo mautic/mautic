@@ -18,6 +18,9 @@ interface TranslationEntityInterface
 
     public function removeTranslationParent(): void;
 
+    /**
+     * @return Collection<int, self>|null
+     */
     public function getTranslationChildren(): ?Collection;
 
     /**

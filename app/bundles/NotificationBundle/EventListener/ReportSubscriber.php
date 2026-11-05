@@ -9,9 +9,10 @@ use Mautic\NotificationBundle\Entity\StatRepository;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber
 {
     public const string MOBILE_NOTIFICATIONS       = 'mobile_notifications';
 
@@ -24,18 +25,12 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-            ReportGraphEvent::class     => ['onReportGraphGenerate', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[AsEventListener(
+        event: ReportBuilderEvent::class,
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::MOBILE_NOTIFICATIONS, self::MOBILE_NOTIFICATIONS_STATS])) {
@@ -169,6 +164,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGeneratorEvent::class,
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::MOBILE_NOTIFICATIONS, self::MOBILE_NOTIFICATIONS_STATS])) {
@@ -237,6 +235,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGraphEvent::class,
+    )]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Mobile Notification reports
@@ -249,6 +250,8 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
+            /** @var TranslatorInterface $translator */
+            $translator = $options['translator'];
             $queryBuilder = clone $qb;
 
             $chartQuery = clone $options['chartQuery'];
@@ -268,8 +271,8 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
                     $sends = $chartQuery->loadAndBuildTimeData($sendQuery);
                     $reads = $chartQuery->loadAndBuildTimeData($readQuery);
-                    $chart->setDataset($options['translator']->trans('mautic.mobile_notification.sent.mobile_notifications'), $sends);
-                    $chart->setDataset($options['translator']->trans('mautic.mobile_notification.read.mobile_notifications'), $reads);
+                    $chart->setDataset($translator->trans('mautic.mobile_notification.sent.mobile_notifications'), $sends);
+                    $chart->setDataset($translator->trans('mautic.mobile_notification.read.mobile_notifications'), $reads);
                     $data         = $chart->render();
                     $data['name'] = $g;
 

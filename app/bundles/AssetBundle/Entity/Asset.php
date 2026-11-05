@@ -14,7 +14,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Validator\Constraints\Upload;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -22,15 +21,17 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Validator\SafeRemoteUrl;
 use Mautic\ProjectBundle\Entity\ProjectTrait;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Sequentially;
 
 #[ORM\Entity(repositoryClass: AssetRepository::class)]
 #[ORM\Table(name: 'assets')]
-#[ORM\Index(columns: ['alias'], name: 'asset_alias_search')]
+#[ORM\Index(name: 'asset_alias_search', columns: ['alias'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -52,37 +53,52 @@ use Symfony\Component\Validator\Constraints\Sequentially;
     ]
 )]
 #[Upload]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'asset_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'asset_projects_xref'),
+)])]
 class Asset extends FormEntity implements UuidInterface
 {
     use UuidTrait;
 
     use ProjectTrait;
 
-    public const ENTITY_NAME = 'asset';
+    public const string ENTITY_NAME = 'asset';
 
     #[Groups(['asset:read', 'download:read', 'email:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private ?int $id = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private ?string $title = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'storage_location', type: Types::STRING, length: 191, nullable: true)]
     private ?string $storageLocation = 'local';
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $path = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
-    #[Sequentially([
-        new Assert\Url(message: 'mautic.asset.validation.error.url'),
+    #[Sequentially(constraints: [
+        new Assert\Url(message: 'mautic.asset.validation.error.url', requireTld: false),
         new SafeRemoteUrl(),
     ])]
+    #[ORM\Column(name: 'remote_path', type: Types::TEXT, nullable: true)]
     private ?string $remotePath = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'original_file_name', type: Types::TEXT, nullable: true)]
     private ?string $originalFileName = null;
 
     private ?File $file = null;
@@ -117,114 +133,60 @@ class Asset extends FormEntity implements UuidInterface
     private ?string $tempName = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $alias = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'lang', type: Types::STRING, length: 191)]
     private string $language = 'en';
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $publishUp = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $publishDown = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'download_count', type: Types::INTEGER)]
     private int $downloadCount = 0;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'unique_download_count', type: Types::INTEGER)]
     private int $uniqueDownloadCount = 0;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::INTEGER)]
     private int $revision = 1;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
     private ?Category $category = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $extension = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private ?string $mime = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
     private ?int $size = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
     private ?string $downloadUrl = null;
 
     #[Groups(['asset:read', 'asset:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: Types::BOOLEAN, nullable: true)]
     private ?bool $disallow = true;
 
     public function __construct()
     {
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns('title');
-
-        $builder->createField('alias', Types::STRING)
-            ->columnName('alias')
-            ->nullable()
-            ->build();
-
-        $builder->createField('storageLocation', Types::STRING)
-            ->columnName('storage_location')
-            ->nullable()
-            ->build();
-
-        $builder->createField('path', Types::STRING)
-            ->nullable()
-            ->build();
-
-        $builder->createField('remotePath', Types::TEXT)
-            ->columnName('remote_path')
-            ->nullable()
-            ->build();
-
-        $builder->createField('originalFileName', Types::TEXT)
-            ->columnName('original_file_name')
-            ->nullable()
-            ->build();
-
-        $builder->createField('language', Types::STRING)
-            ->columnName('lang')
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->createField('downloadCount', Types::INTEGER)
-            ->columnName('download_count')
-            ->build();
-
-        $builder->createField('uniqueDownloadCount', Types::INTEGER)
-            ->columnName('unique_download_count')
-            ->build();
-
-        $builder->addField('revision', Types::INTEGER);
-
-        $builder->addCategory();
-
-        $builder->createField('extension', Types::STRING)
-            ->nullable()
-            ->build();
-
-        $builder->createField('mime', Types::STRING)
-            ->nullable()
-            ->build();
-
-        $builder->createField('size', Types::INTEGER)
-            ->nullable()
-            ->build();
-
-        $builder->createField('disallow', Types::BOOLEAN)
-            ->nullable()
-            ->build();
-
-        self::addProjectsField($builder, 'asset_projects_xref', 'asset_id');
     }
 
     /**
@@ -503,7 +465,7 @@ class Asset extends FormEntity implements UuidInterface
     {
         if (null !== $this->getFile()) {
             // set the asset title as original file name if title is missing
-            if (null === $this->title && $this->file instanceof \Symfony\Component\HttpFoundation\File\UploadedFile) {
+            if (null === $this->title && $this->file instanceof UploadedFile) {
                 $this->setTitle($this->file->getClientOriginalName());
             }
 
@@ -593,12 +555,24 @@ class Asset extends FormEntity implements UuidInterface
 
     /**
      * Returns absolute path to the file.
+     *
+     * Local assets must stay within the upload dir, so a path resolving outside it is refused.
      */
     public function getAbsolutePath(): ?string
     {
-        return null === $this->path
-            ? null
-            : $this->getUploadDir().'/'.$this->path;
+        if (null === $this->path || '' === $this->path || str_contains($this->path, "\0")) {
+            return null;
+        }
+
+        $uploadDir    = Path::canonicalize($this->getUploadDir());
+        $absolutePath = Path::canonicalize($uploadDir.'/'.$this->path);
+
+        // isBasePath() accepts the upload dir itself, which is never an asset.
+        if ($absolutePath === $uploadDir || !Path::isBasePath($uploadDir, $absolutePath)) {
+            return null;
+        }
+
+        return $absolutePath;
     }
 
     /**
@@ -882,8 +856,8 @@ class Asset extends FormEntity implements UuidInterface
     public function getFileContents(): string|bool
     {
         $path = $this->getFilePath();
-        if (!file_exists($path)) {
-            throw new FileNotFoundException(sprintf('Asset file not found at path: "%s"', $path));
+        if (null === $path || !file_exists($path)) {
+            throw new FileNotFoundException(sprintf('Asset file not found at path: "%s"', (string) $path));
         }
 
         return file_get_contents($path);

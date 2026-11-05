@@ -14,7 +14,7 @@ use Mautic\IntegrationsBundle\Sync\Notification\Handler\HandlerContainer;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-readonly class Notifier
+final readonly class Notifier
 {
     public function __construct(
         private HandlerContainer $handlerContainer,

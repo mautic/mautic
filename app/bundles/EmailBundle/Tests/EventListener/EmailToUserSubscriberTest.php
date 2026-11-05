@@ -10,8 +10,9 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
+use PHPUnit\Framework\TestCase;
 
-final class EmailToUserSubscriberTest extends \PHPUnit\Framework\TestCase
+final class EmailToUserSubscriberTest extends TestCase
 {
     /**
      * @var array<string, mixed>

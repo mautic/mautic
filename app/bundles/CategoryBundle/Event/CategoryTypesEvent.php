@@ -2,7 +2,6 @@
 
 namespace Mautic\CategoryBundle\Event;
 
-use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Event\CommonEvent;
 
 final class CategoryTypesEvent extends CommonEvent
@@ -14,10 +13,8 @@ final class CategoryTypesEvent extends CommonEvent
 
     /**
      * Returns the array of Category Types.
-     *
-     * @return array
      */
-    public function getCategoryTypes()
+    public function getCategoryTypes(): array
     {
         if (!array_key_exists('global', $this->types)) {
             // Alphabetize once

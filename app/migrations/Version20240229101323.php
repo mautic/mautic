@@ -11,7 +11,7 @@ use Mautic\EmailBundle\Entity\Email;
 
 final class Version20240229101323 extends PreUpAssertionMigration
 {
-    private const COLUMN_NAME = 'send_to_dnc';
+    private const string COLUMN_NAME = 'send_to_dnc';
 
     protected function preUpAssertions(): void
     {

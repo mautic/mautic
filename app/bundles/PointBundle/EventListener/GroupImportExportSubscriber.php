@@ -16,9 +16,9 @@ use Mautic\CoreBundle\Serializer\ImportEntityDenormalizer;
 use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupRepository;
 use Mautic\PointBundle\Model\PointGroupModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class GroupImportExportSubscriber implements EventSubscriberInterface
+final readonly class GroupImportExportSubscriber
 {
     use ImportExportTrait;
 
@@ -32,16 +32,9 @@ final readonly class GroupImportExportSubscriber implements EventSubscriberInter
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onPointGroupExport', 0],
-            EntityImportEvent::class        => ['onPointGroupImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EntityExportEvent::class,
+    )]
     public function onPointGroupExport(EntityExportEvent $event): void
     {
         if (Group::ENTITY_NAME !== $event->getEntityName()) {
@@ -50,7 +43,7 @@ final readonly class GroupImportExportSubscriber implements EventSubscriberInter
 
         $pointGroupId = $event->getEntityId();
         $pointGroup   = $this->pointGroupModel->getEntity($pointGroupId);
-        if (!$pointGroup) {
+        if (!$pointGroup instanceof Group) {
             return;
         }
 
@@ -66,6 +59,9 @@ final readonly class GroupImportExportSubscriber implements EventSubscriberInter
         $this->logAction('export', $pointGroup->getId(), $pointGroupData);
     }
 
+    #[AsEventListener(
+        event: EntityImportEvent::class,
+    )]
     public function onPointGroupImport(EntityImportEvent $event): void
     {
         if (Group::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -107,6 +103,9 @@ final readonly class GroupImportExportSubscriber implements EventSubscriberInter
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportUndoEvent::class,
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Group::ENTITY_NAME !== $event->getEntityName()) {
@@ -121,7 +120,7 @@ final readonly class GroupImportExportSubscriber implements EventSubscriberInter
         foreach ($summary['ids'] as $id) {
             $entity = $this->groupRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof Group) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Group::class]);
             }
@@ -130,6 +129,9 @@ final readonly class GroupImportExportSubscriber implements EventSubscriberInter
         $this->entityManager->flush();
     }
 
+    #[AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(

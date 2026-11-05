@@ -9,13 +9,14 @@ use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumnInterface;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
+use Mautic\CoreBundle\Doctrine\Schema\ColumnIntrospector;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Stopwatch\Stopwatch;
 
-final readonly class MigrationCommandSubscriber implements EventSubscriberInterface
+final readonly class MigrationCommandSubscriber
 {
     public function __construct(
         private VersionProviderInterface $versionProvider,
@@ -24,13 +25,7 @@ final readonly class MigrationCommandSubscriber implements EventSubscriberInterf
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ConsoleEvents::TERMINATE => ['addGeneratedColumns'],
-        ];
-    }
-
+    #[AsEventListener(event: ConsoleEvents::TERMINATE)]
     public function addGeneratedColumns(ConsoleTerminateEvent $event): void
     {
         $command = $event->getCommand();
@@ -92,7 +87,7 @@ final readonly class MigrationCommandSubscriber implements EventSubscriberInterf
 
     private function generatedColumnExistsInSchema(GeneratedColumn $generatedColumn): bool
     {
-        $tableColumns = $this->connection->createSchemaManager()->listTableColumns($generatedColumn->getTableName());
+        $tableColumns = ColumnIntrospector::listColumns($this->connection->createSchemaManager(), $generatedColumn->getTableName());
 
         return isset($tableColumns[$generatedColumn->getColumnName()]);
     }

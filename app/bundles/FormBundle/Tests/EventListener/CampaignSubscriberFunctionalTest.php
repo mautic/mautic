@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -105,7 +106,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->detach($campaignEvent);
         $this->em->detach($campaign);
 
-        $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'testing@ampersand.select']);
+        $contact = $this->getContainer()->get(LeadRepository::class)->findOneBy(['email' => 'testing@ampersand.select']);
         $this->assertInstanceOf(Lead::class, $contact);
         $log = new LeadEventLog();
         $log->setLead($contact);
@@ -155,7 +156,7 @@ final class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         $tablePrefix = self::getContainer()->getParameter('mautic.db_table_prefix');
 
-        if ($this->connection->createSchemaManager()->tablesExist("{$tablePrefix}form_results_1_test_form")) {
+        if ($this->connection->createSchemaManager()->tablesExist(["{$tablePrefix}form_results_1_test_form"])) {
             $this->connection->executeStatement("DROP TABLE {$tablePrefix}form_results_1_test_form");
         }
     }

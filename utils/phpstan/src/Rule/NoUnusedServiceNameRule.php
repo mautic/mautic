@@ -28,6 +28,8 @@ use Utils\PHPStan\ServiceNameUsageResolver;
  * Only PHP is analysed, so a name used by a Twig template, a YAML or an XML file alone looks unused here.
  *
  * @implements Rule<CollectedDataNode>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoUnusedServiceNameRuleTest
  */
 final readonly class NoUnusedServiceNameRule implements Rule
 {

@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Executioner\Result;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 
@@ -12,7 +12,10 @@ final class Responses
 
     private array $conditionResponses = [];
 
-    public function setFromLogs(ArrayCollection $logs): void
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
+    public function setFromLogs(Collection $logs): void
     {
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
@@ -50,10 +53,8 @@ final class Responses
 
     /**
      * @param string|null $type
-     *
-     * @return array
      */
-    public function getActionResponses($type = null)
+    public function getActionResponses($type = null): array
     {
         if ($type) {
             return $this->actionResponses[$type] ?? [];
@@ -64,10 +65,8 @@ final class Responses
 
     /**
      * @param string|null $type
-     *
-     * @return array
      */
-    public function getConditionResponses($type = null)
+    public function getConditionResponses($type = null): array
     {
         if ($type) {
             return $this->conditionResponses[$type] ?? [];

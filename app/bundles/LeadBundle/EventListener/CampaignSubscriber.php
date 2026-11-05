@@ -2,6 +2,10 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateInterval;
+use DateTime;
+use DateTimeInterface;
+use DateTimeZone;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadRepository as CampaignLeadRepository;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
@@ -52,11 +56,12 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Entity\GroupContactScoreRepository;
 use Mautic\PointBundle\Model\PointGroupModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class CampaignSubscriber implements EventSubscriberInterface
+final class CampaignSubscriber
 {
     public const string ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
@@ -84,30 +89,12 @@ final class CampaignSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            LeadEvents::ON_CAMPAIGN_BATCH_ACTION => [
-                ['onCampaignTriggerActionUpdateLead', 0],
-                ['onCampaignTriggerActionChangePoints', 0],
-                ['onCampaignTriggerActionChangeLists', 1],
-                ['onCampaignTriggerActionUpdateTags', 3],
-                ['onCampaignTriggerActionAddToCompany', 4],
-                ['onCampaignTriggerActionChangeCompanyScore', 4],
-                ['onCampaignTriggerActionChangeOwner', 7],
-                ['onCampaignTriggerActionUpdateCompany', 8],
-                ['onCampaignTriggerActionSetManipulator', 100],
-            ],
-            LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => [
-                ['onCampaignTriggerCondition', 0],
-            ],
-        ];
-    }
-
     /**
      * Add event triggers and actions.
      */
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add actions
@@ -278,6 +265,9 @@ final class CampaignSubscriber implements EventSubscriberInterface
         $event->addCondition('lead.points', $trigger);
     }
 
+    #[AsEventListener(
+        event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
+    )]
     public function onCampaignTriggerActionChangePoints(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.changepoints')) {
@@ -296,7 +286,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             $lead = $log->getLead();
 
             if (null !== $lead && !empty($points)) {
-                if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
+                if ($pointGroup instanceof Group) {
                     $this->groupModel->adjustPoints($lead, $pointGroup, $points);
                 } else {
                     $lead->adjustPoints($points);
@@ -310,8 +300,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
                 $pointsChangeLog->setEventName($pointsLogEventName);
                 $pointsChangeLog->setActionName($pointsLogActionName);
                 $pointsChangeLog->setIpAddress($this->ipLookupHelper->getIpAddress());
-                $pointsChangeLog->setDateAdded(new \DateTime());
-                if ($pointGroup) {
+                $pointsChangeLog->setDateAdded(new DateTime());
+                if ($pointGroup instanceof Group) {
                     $pointsChangeLog->setGroup($pointGroup);
                 }
                 $lead->addPointsChangeLog($pointsChangeLog);
@@ -323,6 +313,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
+        priority: 1
+    )]
     public function onCampaignTriggerActionChangeLists(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.changelist')) {
@@ -348,6 +342,9 @@ final class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
+    )]
     public function onCampaignTriggerActionUpdateLead(PendingEvent $event): void
     {
         $values = $event->getEvent()->getProperties();
@@ -389,7 +386,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
             $event->fail($log, $e->getMessage());
         }
 
-        foreach ($values as $alias => &$value) {
+        foreach ($values as $alias => $value) {
             if (isset($fields[$alias]) && 'boolean' === $fields[$alias]['type'] && 0 === $value) {
                 // 0 is interpreted as 'don't change the bool field' instead of setting it to false, so we change the field manually in this step
                 $lead->addUpdatedField($alias, 0);
@@ -401,6 +398,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
         $event->pass($log);
     }
 
+    #[AsEventListener(
+        event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
+        priority: 7
+    )]
     public function onCampaignTriggerActionChangeOwner(PendingEvent $event): void
     {
         if (!$event->checkContext(self::ACTION_LEAD_CHANGE_OWNER)) {
@@ -420,6 +421,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
+        priority: 3
+    )]
     public function onCampaignTriggerActionUpdateTags(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.changetags')) {
@@ -436,6 +441,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
+        priority: 4
+    )]
     public function onCampaignTriggerActionAddToCompany(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.addtocompany')) {
@@ -453,6 +462,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
+        priority: 4
+    )]
     public function onCampaignTriggerActionChangeCompanyScore(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.scorecontactscompanies')) {
@@ -472,6 +485,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
+        priority: 8
+    )]
     public function onCampaignTriggerActionUpdateCompany(PendingEvent $event): void
     {
         if (!$event->checkContext('lead.updatecompany')) {
@@ -504,6 +521,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
                 if (!empty($company)) {
                     // Save after the lead in for new leads created
+                    /** @var Company $companyEntity */
                     $this->companyModel->addLeadToCompany($companyEntity, $lead);
                     $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
                 }
@@ -520,8 +538,12 @@ final class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+    )]
     public function onCampaignTriggerCondition(ConditionEvent $event): void
     {
+        /** @var Lead|null $lead */
         $lead   = $event->getLead();
         $result = false;
 
@@ -548,15 +570,17 @@ final class CampaignSubscriber implements EventSubscriberInterface
         } elseif ($event->checkContext('lead.field_value')) {
             if ('date' === $event->getConfig()['operator']) {
                 // Set the date in system timezone since this is triggered by cron
-                $triggerDate = new \DateTime('now',
-                    new \DateTimeZone($this->coreParametersHelper->getDefaultTimezone()));
+                $triggerDate = new DateTime(
+                    'now',
+                    new DateTimeZone($this->coreParametersHelper->getDefaultTimezone())
+                );
                 $interval    = substr($event->getConfig()['value'], 1); // remove 1st character + or -
 
                 if (str_contains($event->getConfig()['value'], '+P')) { // add date
-                    $triggerDate->add(new \DateInterval($interval)); // add the today date with interval
+                    $triggerDate->add(new DateInterval($interval)); // add the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
                 } elseif (str_contains($event->getConfig()['value'], '-P')) { // subtract date
-                    $triggerDate->sub(new \DateInterval($interval)); // subtract the today date with interval
+                    $triggerDate->sub(new DateInterval($interval)); // subtract the today date with interval
                     $result = $this->compareDateValue($lead, $event, $triggerDate);
                 } elseif ('anniversary' === $event->getConfig()['value']) {
                     /**
@@ -564,7 +588,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
                      * ( to integrate with: recursive campaign (future)).
                      */
                     $result = $this->leadFieldRepository->compareDateMonthValue(
-                        $lead->getId(), $event->getConfig()['field'], $triggerDate);
+                        $lead->getId(),
+                        $event->getConfig()['field'],
+                        $triggerDate
+                    );
                 }
             } else {
                 $operators = OperatorOptions::getFilterExpressionFunctions();
@@ -601,7 +628,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
                     );
 
                     $log = $event->getLogEntry();
-                    if (null !== $log) {
+                    if ($log instanceof LeadEventLog) {
                         $log->setMetadata([
                             'comparisonValue' => $fieldValue,
                             'operator'        => $operators[$event->getConfig()['operator']]['expr'],
@@ -646,14 +673,14 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
             if ($startDate) {
                 if (!is_a($startDate, 'DateTime')) {
-                    $startDate = new \DateTime($startDate);
+                    $startDate = new DateTime($startDate);
                 }
                 $filter['dateFrom'] = $startDate;
             }
 
             if ($endDate) {
                 if (!is_a($endDate, 'DateTime')) {
-                    $endDate = new \DateTime($endDate);
+                    $endDate = new DateTime($endDate);
                 }
                 $filter['dateTo'] = $endDate->modify('+1 minutes');
             }
@@ -676,8 +703,12 @@ final class CampaignSubscriber implements EventSubscriberInterface
                         $pageUrl = html_entity_decode($pageHitUrl);
                         if (UrlMatcher::hasMatch([$url], $pageUrl)) {
                             if ($hit['dateLeft'] && $totalSpentTime) {
-                                $realTotalSpentTime = new \DateTime($hit['dateLeft']->format('Y-m-d H:i'))->getTimestamp() -
-                                    new \DateTime($hit['dateHit']->format('Y-m-d H:i'))->getTimestamp();
+                                /** @var DateTimeInterface $dateLeft */
+                                $dateLeft = $hit['dateLeft'];
+                                /** @var DateTimeInterface $dateHit */
+                                $dateHit            = $hit['dateHit'];
+                                $realTotalSpentTime = new DateTime($dateLeft->format('Y-m-d H:i'))->getTimestamp() -
+                                    new DateTime($dateHit->format('Y-m-d H:i'))->getTimestamp();
                                 if ($realTotalSpentTime >= $totalSpentTime) {
                                     $event->pass();
 
@@ -693,8 +724,12 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
                     if (!empty($page) && (int) $page === (int) $pageId) {
                         if ($hit['dateLeft'] && $totalSpentTime) {
-                            $realTotalSpentTime = new \DateTime($hit['dateLeft']->format('Y-m-d H:i'))->getTimestamp() -
-                                new \DateTime($hit['dateHit']->format('Y-m-d H:i'))->getTimestamp();
+                            /** @var DateTimeInterface $dateLeft */
+                            $dateLeft = $hit['dateLeft'];
+                            /** @var DateTimeInterface $dateHit */
+                            $dateHit            = $hit['dateHit'];
+                            $realTotalSpentTime = new DateTime($dateLeft->format('Y-m-d H:i'))->getTimestamp() -
+                                new DateTime($dateHit->format('Y-m-d H:i'))->getTimestamp();
                             if ($realTotalSpentTime >= $totalSpentTime) {
                                 $event->pass();
 
@@ -716,11 +751,17 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
             if ($group) {
                 $result = $this->groupContactScoreRepository->compareScore(
-                    $lead->getId(), $group, $score, $operatorExpr,
+                    $lead->getId(),
+                    $group,
+                    $score,
+                    $operatorExpr,
                 );
             } else {
                 $result = $this->leadFieldRepository->compareValue(
-                    $lead->getId(), 'points', $score, $operatorExpr
+                    $lead->getId(),
+                    'points',
+                    $score,
+                    $operatorExpr
                 );
             }
         }
@@ -757,8 +798,8 @@ final class CampaignSubscriber implements EventSubscriberInterface
         $publishUp        = $campaign->getPublishUp();
         $dateAdded        = $campaign->getDateAdded();
 
-        $objEffectiveDate = ($publishUp instanceof \DateTime) ? $publishUp : $dateAdded;
-        if (!$objEffectiveDate instanceof \DateTime) {
+        $objEffectiveDate = ($publishUp instanceof DateTime) ? $publishUp : $dateAdded;
+        if (!$objEffectiveDate instanceof DateTime) {
             return false;
         }
 
@@ -773,11 +814,11 @@ final class CampaignSubscriber implements EventSubscriberInterface
 
         $duration = 'P'.$timeNotation.$triggerInterval.$triggerIntervalUnit;
 
-        $interval         = new \DateInterval($duration);
+        $interval         = new DateInterval($duration);
         $objEffectiveDate = clone $objEffectiveDate;
         $objEffectiveDate->add($interval);
 
-        $now    = new \DateTime();
+        $now    = new DateTime();
         if (OperatorOptions::LESS_THAN == $operator) {
             return $now < $objEffectiveDate;
         }
@@ -785,6 +826,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
         return $now > $objEffectiveDate;
     }
 
+    #[AsEventListener(
+        event: LeadEvents::ON_CAMPAIGN_BATCH_ACTION,
+        priority: 100
+    )]
     public function onCampaignTriggerActionSetManipulator(PendingEvent $event): void
     {
         // Cross-cutting listener: runs first (priority 100) and only mutates the leads.
@@ -813,7 +858,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Function to compare date value.
      */
-    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, \DateTime $triggerDate): bool
+    private function compareDateValue(Lead $lead, CampaignExecutionEvent $event, DateTime $triggerDate): bool
     {
         return $this->leadFieldRepository->compareDateValue(
             $lead->getId(),
@@ -838,7 +883,7 @@ final class CampaignSubscriber implements EventSubscriberInterface
      * device specified in the
      * CampaignExecutionEvent's settings.
      */
-    private function validateContactDevice(CampaignExecutionEvent $campaignExecutionEvent, Lead $contact): bool
+    private function validateContactDevice(ConditionEvent $campaignExecutionEvent, Lead $contact): bool
     {
         $campaignExecutionEventConfig = $campaignExecutionEvent->getConfig();
         $deviceType                   = empty($campaignExecutionEventConfig['device_type']) ? null : $campaignExecutionEventConfig['device_type'];

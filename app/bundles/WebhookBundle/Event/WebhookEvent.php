@@ -7,7 +7,7 @@ namespace Mautic\WebhookBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\WebhookBundle\Entity\Webhook;
 
-class WebhookEvent extends CommonEvent
+abstract class WebhookEvent extends CommonEvent
 {
     /**
      * @var Webhook
@@ -24,10 +24,8 @@ class WebhookEvent extends CommonEvent
 
     /**
      * Returns the Webhook entity.
-     *
-     * @return Webhook
      */
-    public function getWebhook()
+    public function getWebhook(): Webhook
     {
         return $this->entity;
     }

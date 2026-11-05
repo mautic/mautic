@@ -2,20 +2,21 @@
 
 namespace Mautic\CategoryBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * @extends CommonRepository<Category>
  */
-class CategoryRepository extends CommonRepository
+final class CategoryRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
      *
      * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder('c')
@@ -27,14 +28,11 @@ class CategoryRepository extends CommonRepository
     }
 
     /**
-     * @param string $bundle
-     * @param mixed  $search
-     * @param int    $limit
-     * @param int    $start
+     * @param string|int[] $search either a title prefix to match, or the ids to restrict to
      *
      * @return mixed[]
      */
-    public function getCategoryList($bundle, $search = '', $limit = 10, $start = 0, bool $includeGlobal = true)
+    public function getCategoryList(string $bundle, string|array $search = '', int $limit = 10, int $start = 0, bool $includeGlobal = true): array
     {
         $q = $this->createQueryBuilder('c');
         $q->select('partial c.{id, title, alias, color, bundle}');
@@ -76,7 +74,7 @@ class CategoryRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'c.title',
@@ -84,7 +82,7 @@ class CategoryRepository extends CommonRepository
         ]);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command                 = $field                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
@@ -137,13 +135,11 @@ class CategoryRepository extends CommonRepository
     }
 
     /**
-     * @param string $bundle
-     * @param string $alias
-     * @param object $entity
-     *
-     * @return mixed
+     * @param string        $bundle
+     * @param string        $alias
+     * @param Category|null $entity
      */
-    public function checkUniqueCategoryAlias($bundle, $alias, $entity = null)
+    public function checkUniqueCategoryAlias($bundle, $alias, ?object $entity = null): int
     {
         $q = $this->createQueryBuilder('e')
             ->select('count(e.id) as aliascount')

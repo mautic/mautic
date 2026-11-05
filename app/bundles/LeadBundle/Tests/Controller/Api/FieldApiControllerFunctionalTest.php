@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;

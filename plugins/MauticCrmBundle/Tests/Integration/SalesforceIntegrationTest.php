@@ -713,7 +713,7 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $sf = $this->getSalesforceIntegration();
         $sf->amendLeadDataBeforePush($input);
 
-        $this->assertSame($input, $output);
+        $this->assertSame($input, $output); // @phpstan-ignore method.impossibleType (mock of final class resolves to plain MockObject)
         $this->assertSame('string', gettype($output[0]));
         $this->assertSame('boolean', gettype($output[1]));
         $this->assertSame('string', gettype($output[2]));
@@ -795,11 +795,9 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 
         $this->em->method('getReference')
             ->willReturnCallback(
-                function () {
-                    if (IntegrationEntity::class === func_get_arg(0)) {
-                        return new IntegrationEntity();
-                    }
-                }
+                // ORM 3 types getReference() as returning an object, so every class asked
+                // for has to come back with one
+                static fn (string $className): object => IntegrationEntity::class === $className ? new IntegrationEntity() : new $className()
             );
 
         $this->router->method('generate')
@@ -930,7 +928,6 @@ final class SalesforceIntegrationTest extends AbstractIntegrationTestCase
         $integration = new Integration();
         $integration->setIsPublished(true)
             ->setName('Salesforce')
-            ->setPlugin('MauticCrmBundle')
             ->setApiKeys(
                 [
                     'access_token' => '123',

@@ -2,10 +2,10 @@
 
 namespace Mautic\ReportBundle\Event;
 
-use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
 
-class ReportGraphEvent extends AbstractReportEvent
+final class ReportGraphEvent extends AbstractReportEvent
 {
     /**
      * @param mixed[] $requestedGraphs
@@ -33,7 +33,7 @@ class ReportGraphEvent extends AbstractReportEvent
      * @param string $graph
      * @param array  $data  prepared for this chart
      */
-    public function setGraph($graph, $data): void
+    public function setGraph($graph, array $data): void
     {
         $this->requestedGraphs[$graph]['data'] ??= [];
         $this->requestedGraphs[$graph]['data'] = $data;
@@ -41,10 +41,8 @@ class ReportGraphEvent extends AbstractReportEvent
 
     /**
      * Fetch the options array for the graph.
-     *
-     * @return array
      */
-    public function getOptions($graph)
+    public function getOptions($graph): array
     {
         return $this->requestedGraphs[$graph]['options'] ?? [];
     }
@@ -66,9 +64,8 @@ class ReportGraphEvent extends AbstractReportEvent
      * Set the options for a graph.
      *
      * @param string $graph
-     * @param array  $options
      */
-    public function setOptions($graph, $options): void
+    public function setOptions($graph, array $options): void
     {
         $this->requestedGraphs[$graph]['options'] = $options;
     }

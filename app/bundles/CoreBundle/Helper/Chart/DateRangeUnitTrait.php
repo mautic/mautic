@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Helper\Chart;
+
+use DateTimeInterface;
 
 trait DateRangeUnitTrait
 {
     /**
      * Returns appropriate time unit from a date range so the line/bar charts won't be too full/empty.
      */
-    public function getTimeUnitFromDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo): string
+    public function getTimeUnitFromDateRange(DateTimeInterface $dateFrom, DateTimeInterface $dateTo): string
     {
         $dayDiff = $dateTo->diff($dateFrom)->format('%a');
         $unit    = 'd';

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\ReportBundle\Model\ExportResponse;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-final class ExportResponseTest extends \PHPUnit\Framework\TestCase
+final class ExportResponseTest extends TestCase
 {
     public function testResponse(): void
     {

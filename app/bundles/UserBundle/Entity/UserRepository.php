@@ -3,14 +3,13 @@
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
  * @extends CommonRepository<User>
  */
-class UserRepository extends CommonRepository
+final class UserRepository extends CommonRepository
 {
     /**
      * Find user by username or email.
@@ -28,6 +27,7 @@ class UserRepository extends CommonRepository
 
     public function setLastLogin($user): void
     {
+        /** @var User $user */
         $now      = new DateTimeHelper();
         $datetime = $now->toUtcString();
         $conn     = $this->getEntityManager()->getConnection();
@@ -39,6 +39,7 @@ class UserRepository extends CommonRepository
 
     public function setLastActive($user): void
     {
+        /** @var User $user */
         $now  = new DateTimeHelper();
         $conn = $this->getEntityManager()->getConnection();
         $conn->update(MAUTIC_TABLE_PREFIX.'users', ['last_active' => $now->toUtcString()], ['id' => (int) $user->getId()]);
@@ -48,10 +49,8 @@ class UserRepository extends CommonRepository
      * Checks to ensure that a username and/or email is unique.
      *
      * @param array<string, mixed> $params
-     *
-     * @return array
      */
-    public function checkUniqueUsernameEmail(array $params)
+    public function checkUniqueUsernameEmail(array $params): array
     {
         $q = $this->createQueryBuilder('u');
 
@@ -68,12 +67,7 @@ class UserRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
-    /**
-     * Get a list of users.
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder('u')
@@ -88,19 +82,14 @@ class UserRepository extends CommonRepository
     /**
      * Get a list of users for an autocomplete input.
      *
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param array  $permissionLimiter
-     *
-     * @return array
+     * The users API hands over the raw query parameters, so both arrive as string|null,
+     * and a null limit means "no limit".
      */
-    public function getUserList($search = '', $limit = 10, $start = 0, $permissionLimiter = [])
+    public function getUserList(?string $search = '', int|string|null $limit = 10, int $start = 0, array $permissionLimiter = []): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
+        $q = $this->createQueryBuilder('u');
 
         $q->select('DISTINCT partial u.{id, firstName, lastName, email}')
-            ->from(User::class, 'u')
             ->leftJoin('u.role', 'r')
             ->leftJoin('r.permissions', 'p');
 
@@ -110,7 +99,8 @@ class UserRepository extends CommonRepository
                     $q->expr()->like('u.firstName', ':search'),
                     $q->expr()->like('u.lastName', ':search'),
                     $q->expr()->like(
-                        $q->expr()->concat('u.firstName',
+                        $q->expr()->concat(
+                            'u.firstName',
                             $q->expr()->concat(
                                 $q->expr()->literal(' '),
                                 'u.lastName'
@@ -123,7 +113,7 @@ class UserRepository extends CommonRepository
             ->setParameter('search', "{$search}%");
         }
 
-        if (!empty($permissionLimiter)) {
+        if ($permissionLimiter !== []) {
             // only get users with a role that has some sort of access to set permissions
             $expr = $q->expr()->andX();
             foreach ($permissionLimiter as $bundle => $level) {
@@ -177,18 +167,13 @@ class UserRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
+     * $search arrives as null from UserModel::getLookupResults().
      */
-    public function getPositionList($search = '', $limit = 10, $start = 0)
+    public function getPositionList(?string $search = '', int $limit = 10, int $start = 0): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
+        $q = $this->createQueryBuilder('u')
             ->select('u.position')
             ->distinct()
-            ->from(User::class, 'u')
             ->where("u.position != ''")
             ->andWhere('u.position IS NOT NULL');
         if (!empty($search)) {

@@ -2,22 +2,21 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Point>
  */
-class PointRepository extends CommonRepository
+final class PointRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
+        $q = $this->createQueryBuilder($this->getTableAlias())
             ->select($this->getTableAlias().', cat')
-            ->from(Point::class, $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat')
             ->leftJoin($this->getTableAlias().'.group', 'pl');
 
@@ -33,12 +32,8 @@ class PointRepository extends CommonRepository
 
     /**
      * Get array of published actions based on type.
-     *
-     * @param string $type
-     *
-     * @return array
      */
-    public function getPublishedByType($type)
+    public function getPublishedByType(string $type): array
     {
         $q = $this->createQueryBuilder('p')
             ->select('partial p.{id, type, name, delta, repeatable, properties}')
@@ -68,7 +63,7 @@ class PointRepository extends CommonRepository
         $q->where(
             $q->expr()->and(
                 $q->expr()->eq('p.type', ':type'),
-                $q->expr()->eq('x.lead_id', (int) $leadId)
+                $q->expr()->eq('x.lead_id', (string) ((int) $leadId))
             )
         )
             ->setParameter('type', $type);
@@ -97,7 +92,7 @@ class PointRepository extends CommonRepository
         // make sure the published up and down dates are good
         $q->where(
             $q->expr()->and(
-                $q->expr()->eq('x.lead_id', (int) $leadId)
+                $q->expr()->eq('x.lead_id', (string) ((int) $leadId))
             )
         );
 
@@ -112,7 +107,7 @@ class PointRepository extends CommonRepository
         return $return;
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'p.name',
@@ -120,7 +115,7 @@ class PointRepository extends CommonRepository
         ]);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'), $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(

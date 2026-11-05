@@ -19,6 +19,7 @@ final class BatchTransport extends AbstractTransport implements TokenTransportIn
      * @var array<string, mixed>
      */
     private array $transports = []; // @phpstan-ignore-line
+
     /**
      * @var array<mixed, array<string, array<string, mixed[]>>>
      */

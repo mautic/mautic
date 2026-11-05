@@ -35,7 +35,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
     /**
      * @var WebhookRepository|EntityRepository<Webhook>
      */
-    private \Mautic\WebhookBundle\Entity\WebhookRepository|EntityRepository $webhhokRepository;
+    private WebhookRepository|EntityRepository $webhhokRepository;
 
     protected function setUp(): void
     {
@@ -54,7 +54,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
         $this->webhookQueueRepository       = self::getContainer()->get(WebhookQueueRepository::class);
         $this->notificationRepository       = self::getContainer()->get(NotificationRepository::class);
-        $this->webhhokRepository            = $this->em->getRepository(Webhook::class);
+        $this->webhhokRepository            = $this->getContainer()->get(WebhookRepository::class);
     }
 
     /**
@@ -67,7 +67,7 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
 
     public function testWebhookWorkflowWithCommandProcess(): void
     {
-        $webhookQueueRepository = $this->em->getRepository(WebhookQueue::class);
+        $webhookQueueRepository = $this->getContainer()->get(WebhookQueueRepository::class);
         $this->assertInstanceOf(WebhookQueueRepository::class, $webhookQueueRepository);
         $this->mockSuccessfulWebhookResponse(2);
         $webhook = $this->createWebhook();
@@ -307,6 +307,9 @@ final class WebhookFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /**
+     * @return Paginator<WebhookQueue>
+     */
     private function getWebhookQueue(int $webhookId): Paginator
     {
         return $this->webhookQueueRepository->getEntities([

@@ -9,16 +9,16 @@ use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\Request;
 
-class PageHitEvent extends CommonEvent
+final class PageHitEvent extends CommonEvent
 {
-    protected ?Page $page = null;
+    private readonly ?Page $page;
 
     public function __construct(
         Hit $hit,
-        protected Request $request,
-        protected $code,
-        protected array $clickthroughData = [],
-        protected bool $unique = false,
+        private readonly Request $request,
+        private $code,
+        private readonly array $clickthroughData = [],
+        private readonly bool $unique = false,
     ) {
         $this->entity           = $hit;
         $this->page             = $hit->getPage();

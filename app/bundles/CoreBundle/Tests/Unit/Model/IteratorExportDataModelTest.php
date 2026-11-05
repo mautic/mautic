@@ -8,8 +8,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-final class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
+final class IteratorExportDataModelTest extends TestCase
 {
     /**
      * @var MockObject&AbstractCommonModel

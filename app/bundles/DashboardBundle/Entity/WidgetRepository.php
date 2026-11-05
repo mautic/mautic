@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\DashboardBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -7,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Widget>
  */
-class WidgetRepository extends CommonRepository
+final class WidgetRepository extends CommonRepository
 {
     /**
      * Update widget ordering.
@@ -16,15 +18,13 @@ class WidgetRepository extends CommonRepository
      */
     public function updateOrdering(array $ordering, $userId): void
     {
-        $widgets = $this->getEntities(
-            [
-                'filter' => [
-                    'createdBy' => $userId,
-                ],
-            ]
-        );
+        $widgets = $this->getEntities([
+            'filter' => [
+                'createdBy' => $userId,
+            ],
+        ]);
 
-        foreach ($widgets as &$widget) {
+        foreach ($widgets as $widget) {
             if (isset($ordering[$widget->getId()])) {
                 $widget->setOrdering((int) $ordering[$widget->getId()]);
             }

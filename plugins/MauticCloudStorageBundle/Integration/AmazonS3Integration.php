@@ -57,10 +57,9 @@ final class AmazonS3Integration extends CloudStorageIntegration
 
     /**
      * @param Form|FormBuilder $builder
-     * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('keys' === $formArea) {
             $builder->add(
@@ -92,7 +91,7 @@ final class AmazonS3Integration extends CloudStorageIntegration
      */
     public function getAdapter()
     {
-        if (!$this->adapter || !$this->fileSystem) {
+        if (!$this->adapter || !$this->fileSystem instanceof ResolvableFilesystem) {
             $keys = $this->getDecryptedApiKeys();
             if (empty($keys['client_id']) || empty($keys['client_secret'])) {
                 $errorMessage = 'Configuration error: client_id and client_secret are not set!';

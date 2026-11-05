@@ -73,11 +73,11 @@ final class EntityExportEvent extends Event
     /**
      * Add a single entity to the dependencies.
      *
-     * @param array<string, mixed> $entity
+     * @param array<string, mixed> $dependency
      */
-    public function addDependencyEntity(string $entityName, array $entity): void
+    public function addDependencyEntity(string $entityName, array $dependency): void
     {
-        $this->dependencies[$entityName][] = $entity;
+        $this->dependencies[$entityName][] = $dependency;
     }
 
     /**

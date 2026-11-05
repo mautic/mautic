@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Helper\Language;
 
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 final class Installer
 {
@@ -72,7 +73,7 @@ final class Installer
         }
     }
 
-    private function copyBundle(\SplFileInfo $bundle): void
+    private function copyBundle(SplFileInfo $bundle): void
     {
         $name            = $bundle->getFilename();
         $targetDirectory = $this->installDirectory.'/'.$name;

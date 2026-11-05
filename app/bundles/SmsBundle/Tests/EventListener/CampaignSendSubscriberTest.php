@@ -10,6 +10,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\EventListener\CampaignSendSubscriber;
@@ -17,14 +18,16 @@ use Mautic\SmsBundle\Model\SmsModel;
 use Mautic\SmsBundle\Sms\TransportChain;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSendSubscriberTest extends TestCase
 {
     private MockObject&SmsModel $smsModel;
 
-    private \PHPUnit\Framework\MockObject\Stub&TransportChain $transportChain;
+    private Stub&TransportChain $transportChain;
 
     private MockObject&TranslatorInterface $translator;
 
@@ -64,7 +67,10 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $event->setCampaign($campaign);
         $event->setType('sms.send_text_sms');
 
-        $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, new ArrayCollection([$leadLog->getId() => $leadLog]));
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
+        $logs = new ArrayCollection([$leadLog->getId() => $leadLog]);
+
+        $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, $logs);
 
         $this->subscriber->onCampaignTriggerBatchAction($pendingEvent);
         $this->assertCount(0, $pendingEvent->getFailures());
@@ -101,7 +107,10 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->smsModel->expects($this->once())->method('getEntity')->willReturn($sms);
         $this->translator->method('trans')->willReturn('mautic.sms.campaign.failed.unpublished');
 
-        $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, new ArrayCollection([$leadLog->getId() => $leadLog]));
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
+        $logs = new ArrayCollection([$leadLog->getId() => $leadLog]);
+
+        $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, $logs);
 
         $this->subscriber->onCampaignTriggerBatchAction($pendingEvent);
 
@@ -113,13 +122,9 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignTriggerBatchAction(): void
     {
-        $sms = $this->createMock(Sms::class);
-        $sms
-            ->method('getId')
-            ->willReturn(1);
-        $sms
-            ->method('isPublished')
-            ->willReturn(true);
+        $sms = new Sms();
+        ReflectionHelper::setEntityId($sms, 1);
+        $sms->setIsPublished(true);
 
         // Partial mock, mocks just getRepository
         $smsModel = $this->getMockBuilder(SmsModel::class)
@@ -160,7 +165,10 @@ final class CampaignSendSubscriberTest extends \PHPUnit\Framework\TestCase
         $event->setProperties(['sms' => 1]);
         $event->setCampaign($campaign);
 
-        $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, new ArrayCollection([$leadLog->getId() => $leadLog]));
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
+        $logs = new ArrayCollection([$leadLog->getId() => $leadLog]);
+
+        $pendingEvent = new PendingEvent(new ActionAccessor([]), $event, $logs);
 
         $this->assertCount(1, $pendingEvent->getContacts());
         $subscriber->onCampaignTriggerBatchAction($pendingEvent);

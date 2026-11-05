@@ -4,15 +4,15 @@ namespace Mautic\ApiBundle\Helper;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class EntityResultHelper
+final class EntityResultHelper
 {
     /**
-     * @param array<mixed>|Paginator<mixed> $results
-     * @param callable|null                 $callback
+     * @param iterable<mixed> $results
+     * @param callable|null   $callback
      *
      * @return array<mixed>|\ArrayObject<int,mixed>
      */
-    public function getArray($results, $callback = null): \ArrayObject|array
+    public function getArray(iterable $results, $callback = null): \ArrayObject|array
     {
         $entities = [];
 
@@ -79,7 +79,7 @@ class EntityResultHelper
     /**
      * @param array<mixed>|Paginator<mixed> $results
      */
-    private function isKeyedById($results): bool
+    private function isKeyedById(iterable $results): bool
     {
         return !$results instanceof Paginator;
     }

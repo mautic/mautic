@@ -130,7 +130,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var LeadRepository $repo */
-        $repo     = $this->em->getRepository(Lead::class);
+        $repo     = $this->getContainer()->get(LeadRepository::class);
         $contacts = $repo->getContacts($contactIds);
 
         $this->assertCount($expectedCount, $contacts);
@@ -179,6 +179,30 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         $contentArray = json_decode($this->client->getResponse()->getContent(), true);
 
         $this->assertCount($expectedCount, $contentArray['items']);
+    }
+
+    #[DataProvider('dataForRejectedLeadFields')]
+    public function testAjaxGetLeadsByFieldValueRejectsInvalidField(string $field): void
+    {
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/ajax', [
+            'action' => 'lead:getLeadIdsByFieldValue',
+            'field'  => $field,
+            'value'  => 'a',
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $contentArray = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->assertSame([], $contentArray['items']);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function dataForRejectedLeadFields(): iterable
+    {
+        yield 'SQL injection payload' => ['email OR 1=1-- -'];
+        yield 'non-unique field' => ['firstname'];
     }
 
     /**
@@ -232,7 +256,7 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     public function testIfLeadExists(): void
     {
         /** @var LeadRepository $repo */
-        $repo = $this->em->getRepository(Lead::class);
+        $repo = $this->getContainer()->get(LeadRepository::class);
 
         $this->assertFalse($repo->exists('654'));
 

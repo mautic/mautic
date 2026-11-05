@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
@@ -63,7 +64,7 @@ final class UserApiController extends CommonApiController
      * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/users/self',
+        path: '/api/users/self',
         name: 'mautic_api_getself',
         defaults: ['_format' => 'json'],
         methods: ['GET']
@@ -152,9 +153,8 @@ final class UserApiController extends CommonApiController
      * @param User                 $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): void
     {
         if ('new' === $action) {
             $submittedPassword = null;
@@ -174,17 +174,17 @@ final class UserApiController extends CommonApiController
      *
      * @param int $id User ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+     * @throws BadRequestHttpException
      * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/users/{id}/permissioncheck',
+        path: '/api/users/{id}/permissioncheck',
         name: 'mautic_api_checkpermission',
         requirements: ['id' => '\\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function isGrantedAction(Request $request, $id): Response
+    public function isGrantedAction(Request $request, int $id): Response
     {
         $entity = $this->model->getEntity($id);
         if (!$entity instanceof $this->entityClass) {
@@ -210,7 +210,7 @@ final class UserApiController extends CommonApiController
      * Obtains a list of roles for user edits.
      */
     #[Route(
-        '/api/users/list/roles',
+        path: '/api/users/list/roles',
         name: 'mautic_api_getuserroles',
         defaults: ['_format' => 'json'],
         methods: ['GET']

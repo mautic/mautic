@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\PersistentCollection;
+use Mautic\LeadBundle\Entity\Tag;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
@@ -19,22 +20,26 @@ final class TagEntityModelTransformer implements DataTransformerInterface
     ) {
     }
 
-    public function reverseTransform(mixed $entity): mixed
+    /**
+     * @param array<mixed>|object|null $value
+     */
+    public function reverseTransform(mixed $value): mixed
     {
         if (!$this->isArray) {
-            if (null === $entity || !is_object($entity)) {
+            if (null === $value || !is_object($value)) {
                 return null;
             }
 
-            return $entity->getTag();
+            return $value->getTag();
         }
 
-        if (!is_array($entity) && !$entity instanceof PersistentCollection) {
+        if (!is_array($value) && !$value instanceof PersistentCollection) {
             return [];
         }
 
         $return = [];
-        foreach ($entity as $e) {
+        /** @var Tag $e */
+        foreach ($value as $e) {
             $return[] = $e->getTag();
         }
 

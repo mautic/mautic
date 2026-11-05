@@ -34,7 +34,7 @@ final class ListController extends CommonController
     }
 
     #[Route(
-        '/s/marketplace/{page}',
+        path: '/s/marketplace/{page}',
         name: 'mautic_marketplace_list',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 1],

@@ -30,7 +30,7 @@ final class ClientTypeTest extends TestCase
 
     protected function setUp(): void
     {
-        $requestStack       = $this->createMock(RequestStack::class);
+        $requestStack       = $this->createStub(RequestStack::class);
         $this->builder      = $this->createMock(FormBuilderInterface::class);
         $request            = new Request(['api_mode' => null]);
         $this->client       = new Client();

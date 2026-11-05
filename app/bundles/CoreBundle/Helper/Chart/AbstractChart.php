@@ -85,10 +85,8 @@ abstract class AbstractChart
      * Create a DateInterval time unit.
      *
      * @param string $unit
-     *
-     * @return \DateInterval
      */
-    public function getUnitInterval($unit = null)
+    public function getUnitInterval($unit = null): \DateInterval
     {
         if (!$unit) {
             $unit = $this->unit;
@@ -159,7 +157,7 @@ abstract class AbstractChart
      * Modify the date to add one current time unit to it and subtract 1 second.
      * Can be used to get the current day results.
      */
-    public function addOneUnitMinusOneSec(\DateTime|\DateTimeImmutable &$date): \DateTime|\DateTimeImmutable
+    public function addOneUnitMinusOneSec(\DateTime|\DateTimeImmutable $date): \DateTime|\DateTimeImmutable
     {
         return $date->add($this->getUnitInterval())->modify('-1 sec');
     }
@@ -222,10 +220,8 @@ abstract class AbstractChart
      * Generate unique color for the dataset.
      *
      * @param int $datasetId
-     *
-     * @return ColorHelper
      */
-    public function configureColorHelper($datasetId)
+    public function configureColorHelper($datasetId): ColorHelper
     {
         $colorHelper = new ColorHelper();
 

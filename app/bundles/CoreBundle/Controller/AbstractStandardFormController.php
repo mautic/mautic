@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -23,6 +24,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,7 +38,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     private AuditLogModel $auditLogModel;
 
     #[Required]
-    public function autowireAbstractFormController(
+    public function autowireAbstractStandardFormController(
         AuditLogModel $auditLogModel,
     ): void {
         $this->auditLogModel = $auditLogModel;
@@ -80,7 +82,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return array<int, mixed> of arguments for editAction
      */
-    protected function afterEntityClone($newEntity, $entity)
+    protected function afterEntityClone($newEntity, object $entity): array
     {
         return [$newEntity, true];
     }
@@ -88,21 +90,21 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Called after the entity has been persisted allowing for custom preperation of $entity prior to viewAction.
      */
-    protected function afterEntitySave($entity, Form $form, $action, $pass = null): void
+    protected function afterEntitySave(object $entity, Form $form, $action, $pass = null): void
     {
     }
 
     /**
      * Called after the form is validated on POST.
      */
-    protected function afterFormProcessed($isValid, $entity, Form $form, $action, bool $isClone = false): void
+    protected function afterFormProcessed($isValid, object $entity, Form $form, $action, bool $isClone = false): void
     {
     }
 
     /**
      * Deletes a group of entities.
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     protected function batchDeleteStandard(Request $request)
     {
@@ -175,7 +177,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return mixed Whatever is returned will be passed into afterEntitySave; pass false to fail validation
      */
-    protected function beforeEntitySave($entity, Form $form, $action, $objectId = null, bool $isClone = false): bool
+    protected function beforeEntitySave(object $entity, Form $form, $action, $objectId = null, bool $isClone = false): bool
     {
         return true;
     }
@@ -183,14 +185,14 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Do anything necessary before the form is checked for POST and processed.
      */
-    protected function beforeFormProcessed($entity, Form $form, $action, $isPost, $objectId = null, bool $isClone = false): void
+    protected function beforeFormProcessed(object $entity, Form $form, $action, $isPost, $objectId = null, bool $isClone = false): void
     {
     }
 
     /**
      * @return bool|mixed
      */
-    protected function checkActionPermission($action, $entity = null, $objectId = null)
+    protected function checkActionPermission($action, ?object $entity = null, $objectId = null)
     {
         $permissionUser = 0;
 
@@ -238,7 +240,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Clone an entity.
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return array|JsonResponse|RedirectResponse
      */
     protected function cloneStandard(Request $request, $objectId)
     {
@@ -269,7 +271,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @param int $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     protected function deleteStandard(Request $request, $objectId)
     {
@@ -329,7 +331,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return JsonResponse|RedirectResponse|Response
      *
      * @throws \Exception
      */
@@ -561,9 +563,9 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Get items for index list.
      *
-     * @return array<int, iterable<object>|\Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator<mixed>|int>
+     * @return array<int, iterable<object>|SimplePaginator<mixed>|int>
      */
-    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = [])
+    protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $items = $this->getModel($this->getModelName())->getEntities(
             array_merge(
@@ -738,7 +740,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return array<string, mixed>
      */
-    protected function getEntityFormOptions()
+    protected function getEntityFormOptions(): array
     {
         return [];
     }
@@ -747,13 +749,10 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * Return array of options update select response.
      *
      * @param string $updateSelect HTML id of the select
-     * @param object $entity
      * @param string $nameMethod   name of the entity method holding the name
      * @param string $groupMethod  name of the entity method holding the select group
-     *
-     * @return array
      */
-    protected function getUpdateSelectParams($updateSelect, $entity, $nameMethod = 'getName', $groupMethod = 'getLanguage')
+    protected function getUpdateSelectParams(string $updateSelect, object $entity, string $nameMethod = 'getName', string $groupMethod = 'getLanguage'): array
     {
         $options = [
             'updateSelect' => $updateSelect,
@@ -769,11 +768,11 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param string $timezone
+     * @param-out FormInterface $dateRangeForm
      *
-     * @return \DateTime[]
+     * @return array{0: \DateTime, 1: \DateTime}
      */
-    protected function getViewDateRange(Request $request, $objectId, $returnUrl, $timezone = 'local', &$dateRangeForm = null)
+    protected function getViewDateRange(Request $request, $objectId, $returnUrl, string $timezone = 'local', ?FormInterface &$dateRangeForm = null): array
     {
         $name            = $this->getSessionBase($objectId).'.view.daterange';
         $method          = ('POST' === $request->getMethod()) ? 'request' : 'query';
@@ -796,10 +795,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         return [$dateFrom, $dateTo];
     }
 
-    /**
-     * @param int $page
-     */
-    protected function indexStandard(Request $request, $page = null): Response
+    protected function indexStandard(Request $request, ?int $page = null): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -917,7 +913,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|RedirectResponse|Response
      *
      * @throws \Exception
      */
@@ -1055,7 +1051,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      * @param string|null $listPage
      * @param string      $itemName
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|JsonResponse|RedirectResponse|Response
      */
     protected function viewStandard(Request $request, $objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item')
     {
@@ -1146,17 +1142,15 @@ abstract class AbstractStandardFormController extends AbstractFormController
         );
     }
 
-    protected function getDataForExport(AbstractCommonModel $model, array $args, ?callable $resultsCallback = null, ?int $start = 0): ?array
+    protected function getDataForExport(AbstractCommonModel $model, array $args, ?callable $resultsCallback = null, int $start = 0): ?array
     {
         return parent::getDataForExport($model, $args, $resultsCallback, $start);
     }
 
     /**
      * If the $entity supports optimistic locking, entity's current version is set to the $form for a later comparison.
-     *
-     * @param mixed $entity
      */
-    protected function setOptimisticLockVersion($entity, FormInterface $form): void
+    protected function setOptimisticLockVersion(object $entity, FormInterface $form): void
     {
         if (!$entity instanceof OptimisticLockInterface) {
             return;
@@ -1168,10 +1162,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     /**
      * If the $entity supports optimistic locking, entity's current version is compared to the value in the $form.
-     *
-     * @param mixed $entity
      */
-    protected function checkOptimisticLockVersion($entity, FormInterface $form, bool $isClone): bool
+    protected function checkOptimisticLockVersion(object $entity, FormInterface $form, bool $isClone): bool
     {
         if ($isClone || !$entity instanceof OptimisticLockInterface) {
             return true;

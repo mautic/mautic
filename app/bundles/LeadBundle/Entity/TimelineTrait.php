@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\Serializer;
@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Helper\Serializer;
 trait TimelineTrait
 {
     /**
-     * @param QueryBuilder $query                 DBAL QueryBuilder
      * @param array<mixed> $options               Query optons from LeadTimelineEvent
      * @param string       $eventNameColumn       Name of column to sort event name by
      * @param string       $timestampColumn       Name of column to sort timestamp by
@@ -31,7 +30,7 @@ trait TimelineTrait
         array $dateTimeColumns = [],
         $resultsParserCallback = null,
         ?string $secondaryOrdering = null,
-    ) {
+    ): array {
         if (!empty($options['unitCounts'])) {
             [$tablePrefix, $column] = explode('.', $timestampColumn);
 
@@ -46,15 +45,23 @@ trait TimelineTrait
         }
 
         if (!empty($options['fromDate']) && !empty($options['toDate'])) {
+            /** @var \DateTimeInterface $fromDate */
+            $fromDate = $options['fromDate'];
+            /** @var \DateTimeInterface $toDate */
+            $toDate = $options['toDate'];
             $query->andWhere($timestampColumn.' BETWEEN :dateFrom AND :dateTo')
-                ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s'))
-                ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
+                ->setParameter('dateFrom', $fromDate->format('Y-m-d H:i:s'))
+                ->setParameter('dateTo', $toDate->format('Y-m-d H:i:s'));
         } elseif (!empty($options['fromDate'])) {
+            /** @var \DateTimeInterface $fromDate */
+            $fromDate = $options['fromDate'];
             $query->andWhere($query->expr()->gte($timestampColumn, ':dateFrom'))
-                ->setParameter('dateFrom', $options['fromDate']->format('Y-m-d H:i:s'));
+                ->setParameter('dateFrom', $fromDate->format('Y-m-d H:i:s'));
         } elseif (!empty($options['toDate'])) {
+            /** @var \DateTimeInterface $toDate */
+            $toDate = $options['toDate'];
             $query->andWhere($query->expr()->lte($timestampColumn, ':dateTo'))
-                ->setParameter('dateTo', $options['toDate']->format('Y-m-d H:i:s'));
+                ->setParameter('dateTo', $toDate->format('Y-m-d H:i:s'));
         }
 
         if (isset($options['leadIds'])) {

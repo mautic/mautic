@@ -4,128 +4,91 @@ declare(strict_types=1);
 
 namespace Mautic\SmsBundle\Entity;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['sms_id', 'lead_id'], name: 'stat_sms_search')]
-#[ORM\Index(columns: ['tracking_hash'], name: 'stat_sms_hash_search')]
-#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_sms_source_search')]
-#[ORM\Index(columns: ['is_failed'], name: 'stat_sms_failed_search')]
+#[ORM\Index(name: 'stat_sms_search', columns: ['sms_id', 'lead_id'])]
+#[ORM\Index(name: 'stat_sms_hash_search', columns: ['tracking_hash'])]
+#[ORM\Index(name: 'stat_sms_source_search', columns: ['source', 'source_id'])]
+#[ORM\Index(name: 'stat_sms_failed_search', columns: ['is_failed'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
-    public const TABLE_NAME = 'sms_message_stats';
+    public const string TABLE_NAME = 'sms_message_stats';
 
     /**
-     * @var string
+     * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var Sms|null
-     */
     #[ORM\ManyToOne(targetEntity: Sms::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'sms_id', onDelete: 'SET NULL')]
-    private $sms;
+    private ?Sms $sms = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
-    /**
-     * @var LeadList|null
-     */
     #[ORM\ManyToOne(targetEntity: LeadList::class)]
     #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
-    private $list;
+    private ?LeadList $list = null;
+
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
+    private ?IpAddress $ipAddress = null;
 
     /**
-     * @var IpAddress|null
+     * @var DateTimeInterface
      */
-    private $ipAddress;
-
-    /**
-     * @var \DateTimeInterface
-     */
+    #[ORM\Column(name: 'date_sent', type: 'datetime')]
     private $dateSent;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_hash', type: 'string', length: 191, nullable: true)]
     private $trackingHash;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $tokens = [];
 
     /**
      * @var array
      */
+    #[ORM\Column(type: Types::JSON)]
     private $details = [];
 
     /**
      * @var bool|null
      */
+    #[ORM\Column(name: 'is_failed', type: 'boolean', nullable: true)]
     private $isFailed = false;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->build();
-
-        $builder->createField('isFailed', 'boolean')
-            ->columnName('is_failed')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingHash', 'string')
-            ->columnName('tracking_hash')
-            ->nullable()
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tokens', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->addField('details', Types::JSON);
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -155,10 +118,7 @@ class Stat
         return (int) $this->id;
     }
 
-    /**
-     * @return Sms|null
-     */
-    public function getSms()
+    public function getSms(): ?Sms
     {
         return $this->sms;
     }
@@ -170,10 +130,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
@@ -185,10 +142,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return LeadList|null
-     */
-    public function getList()
+    public function getList(): ?LeadList
     {
         return $this->list;
     }
@@ -200,10 +154,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
@@ -216,7 +167,7 @@ class Stat
     }
 
     /**
-     * @return \DateTimeInterface|null
+     * @return DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -224,9 +175,9 @@ class Stat
     }
 
     /**
-     * @param \DateTime $dateSent
+     * @param DateTime $dateSent
      */
-    public function setDateSent($dateSent): static
+    public function setDateSent(DateTimeInterface $dateSent): static
     {
         $this->dateSent = $dateSent;
 
@@ -241,10 +192,7 @@ class Stat
         return $this->trackingHash;
     }
 
-    /**
-     * @param string $trackingHash
-     */
-    public function setTrackingHash($trackingHash): static
+    public function setTrackingHash(string $trackingHash): static
     {
         $this->trackingHash = $trackingHash;
 
@@ -290,7 +238,7 @@ class Stat
     /**
      * @return array<array-key, mixed>
      */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
@@ -302,10 +250,7 @@ class Stat
         return $this;
     }
 
-    /**
-     * @param bool $isFailed
-     */
-    public function setIsFailed($isFailed): static
+    public function setIsFailed(bool $isFailed): static
     {
         $this->isFailed = $isFailed;
 
@@ -323,15 +268,12 @@ class Stat
     /**
      * @return array<array-key, mixed>
      */
-    public function getDetails()
+    public function getDetails(): array
     {
         return $this->details;
     }
 
-    /**
-     * @param array $details
-     */
-    public function setDetails($details): static
+    public function setDetails(array $details): static
     {
         $this->details = $details;
 

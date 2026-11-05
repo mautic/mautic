@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Segment;
 
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Symfony\Component\HttpFoundation\Request;
@@ -120,7 +123,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseStatusCodeSame(201);
         $this->assertGreaterThan(0, $segmentId);
 
-        return $this->em->getRepository(LeadList::class)->find($segmentId);
+        return $this->getContainer()->get(LeadListRepository::class)->find($segmentId);
     }
 
     private function buildSegment(LeadList $segment, int $expectedCountInSegment): void
@@ -144,7 +147,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
     {
         $this->em->remove($segment);
         foreach ($this->leads as $lead) {
-            $deleteLead = $this->em->getRepository(Lead::class)->find($lead->getId());
+            $deleteLead = $this->getContainer()->get(LeadRepository::class)->find($lead->getId());
             $this->assertInstanceOf(Lead::class, $deleteLead);
             $this->em->remove($deleteLead);
         }
@@ -197,7 +200,7 @@ final class SegmentFilterFunctionalTest extends MauticMysqlTestCase
         $field->setObject('lead');
         $field->setAlias('multiselect');
         $field->setName('Multiselect');
-        $properties = \Mautic\CoreBundle\Helper\Serializer::decode('a:1:{s:4:"list";a:3:{i:0;a:2:{s:5:"label";s:1:"f";s:5:"value";s:1:"f";}i:1;a:2:{s:5:"label";s:1:"s";s:5:"value";s:1:"s";}i:2;a:2:{s:5:"label";s:1:"t";s:5:"value";s:1:"t";}}}');
+        $properties = Serializer::decode('a:1:{s:4:"list";a:3:{i:0;a:2:{s:5:"label";s:1:"f";s:5:"value";s:1:"f";}i:1;a:2:{s:5:"label";s:1:"s";s:5:"value";s:1:"s";}i:2;a:2:{s:5:"label";s:1:"t";s:5:"value";s:1:"t";}}}');
         $field->setProperties($properties);
         $fieldModel = self::getContainer()->get(FieldModel::class);
         $fieldModel->saveEntity($field);

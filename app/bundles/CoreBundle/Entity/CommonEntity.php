@@ -4,20 +4,21 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\CategoryBundle\Entity\Category;
 
 #[ORM\MappedSuperclass]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
-class CommonEntity implements \Stringable
+abstract class CommonEntity implements \Stringable
 {
     /**
      * @var mixed[]
      */
-    protected $changes = [];
+    protected array $changes = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
-    protected $pastChanges = [];
+    protected array $pastChanges = [];
 
     /**
      * Wrapper function for isProperty methods.
@@ -59,6 +60,8 @@ class CommonEntity implements \Stringable
         $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
         $current = $this->{$getter}();
         if ('category' == $prop) {
+            /** @var Category|null $current */
+            /** @var Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -111,9 +114,9 @@ class CommonEntity implements \Stringable
     /**
      * @return mixed[]
      */
-    public function getChanges(bool $includePast = false)
+    public function getChanges(bool $includePast = false): array
     {
-        if ($includePast && empty($this->changes) && !empty($this->pastChanges)) {
+        if ($includePast && $this->changes === [] && $this->pastChanges !== []) {
             return $this->pastChanges;
         }
 

@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
@@ -117,7 +118,7 @@ final class LeadFieldRepositoryTest extends TestCase
     ): void {
         $exprCompare->expects($this->exactly(null !== $value ? 2 : 1))
             ->method('eq')
-            ->willReturnCallback(function (...$parameters) use ($fieldAlias, $value): void {
+            ->willReturnCallback(function (...$parameters) use ($fieldAlias, $value): string {
                 static $invocationCount = 0;
                 ++$invocationCount;
 
@@ -129,6 +130,8 @@ final class LeadFieldRepositoryTest extends TestCase
                     $this->assertSame("l.{$fieldAlias}", $parameters[0]);
                     $this->assertSame(':value', $parameters[1]);
                 }
+
+                return $parameters[0].' = '.$parameters[1];
             });
 
         $builderCompare->expects($this->once())
@@ -224,7 +227,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $matcher = $this->exactly(2);
         $mocks['exprCompare']->expects($matcher)
-            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher): void {
+            ->method('eq')->willReturnCallback(function (...$parameters) use ($matcher): string {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l.id', $parameters[0]);
                     $this->assertSame(':lead', $parameters[1]);
@@ -233,11 +236,13 @@ final class LeadFieldRepositoryTest extends TestCase
                     $this->assertSame('company.date_field', $parameters[0]);
                     $this->assertSame(':value', $parameters[1]);
                 }
+
+                return $parameters[0].' = '.$parameters[1];
             });
 
         $matcher = $this->exactly(2);
         $mocks['builderCompare']->expects($matcher)
-            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher): void {
+            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher, $mocks): QueryBuilder {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'companies_leads', $parameters[1]);
@@ -250,6 +255,8 @@ final class LeadFieldRepositoryTest extends TestCase
                     $this->assertSame('company', $parameters[2]);
                     $this->assertSame('companies_lead.company_id = company.id', $parameters[3]);
                 }
+
+                return $mocks['builderCompare'];
             });
 
         $mocks['builderCompare']->expects($this->once())
@@ -298,7 +305,7 @@ final class LeadFieldRepositoryTest extends TestCase
         $query = $this->createQueryMock();
         $this->entityManager->expects($this->once())
             ->method('createQuery')
-            ->with('SELECT f FROM  f INDEX BY f.id WHERE f.isListable = 1 AND f.isPublished = 1 ORDER BY f.object ASC')
+            ->with('SELECT f FROM Mautic\LeadBundle\Entity\LeadField f INDEX BY f.id WHERE f.isListable = 1 AND f.isPublished = 1 ORDER BY f.object ASC')
             ->willReturn($query);
 
         $query->method('execute')->willReturn([]);
@@ -311,7 +318,7 @@ final class LeadFieldRepositoryTest extends TestCase
         $query = $this->createQueryMock();
         $this->entityManager->expects($this->once())
             ->method('createQuery')
-            ->with('SELECT f.alias, f.label, f.type, f.isUniqueIdentifer, f.charLengthLimit FROM  f INDEX BY f.alias WHERE f.object = :object')
+            ->with('SELECT f.alias, f.label, f.type, f.isUniqueIdentifer, f.charLengthLimit FROM Mautic\LeadBundle\Entity\LeadField f INDEX BY f.alias WHERE f.object = :object')
             ->willReturn($query);
 
         $result = [];
@@ -335,12 +342,12 @@ final class LeadFieldRepositoryTest extends TestCase
             ->method('from')
             ->willReturnSelf();
 
-        $expr = $this->createMock(Query\Expr::class);
+        $expr = $this->createMock(Expr::class);
         $queryBuilder->expects($this->once())
             ->method('expr')
             ->willReturn($expr);
 
-        $comparison = $this->createStub(Query\Expr\Comparison::class);
+        $comparison = $this->createStub(Comparison::class);
         $expr->expects($this->once())
             ->method('eq')
             ->willReturn($comparison);
@@ -359,12 +366,12 @@ final class LeadFieldRepositoryTest extends TestCase
             ->with(1)
             ->willReturnSelf();
 
-        $query = $this->createMock(AbstractQuery::class);
+        $query = $this->createMock(Query::class);
         $queryBuilder->expects($this->once())
             ->method('getQuery')
             ->willReturn($query);
 
-        $leadField = $this->createStub(LeadField::class);
+        $leadField = new LeadField();
         $query->expects($this->once())
             ->method('getOneOrNullResult')
             ->willReturn($leadField);

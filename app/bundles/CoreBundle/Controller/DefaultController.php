@@ -4,7 +4,9 @@ namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -29,10 +31,10 @@ final class DefaultController extends CommonController
     }
 
     #[Route(
-        '/',
+        path: '/',
         name: 'mautic_base_index',
     )]
-    public function indexAction(Request $request): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function indexAction(Request $request): RedirectResponse|Response
     {
         $root = $this->coreParametersHelper->get('webroot');
 
@@ -41,7 +43,7 @@ final class DefaultController extends CommonController
         }
         $page      = $this->pageModel->getEntity($root);
 
-        if (!$page instanceof \Mautic\PageBundle\Entity\Page) {
+        if (!$page instanceof Page) {
             return $this->notFound();
         }
 
@@ -65,7 +67,8 @@ final class DefaultController extends CommonController
             $results = [];
         }
 
-        return $this->render('@MauticCore/GlobalSearch/globalsearch.html.twig',
+        return $this->render(
+            '@MauticCore/GlobalSearch/globalsearch.html.twig',
             [
                 'results'      => $results,
                 'searchString' => $searchStr,

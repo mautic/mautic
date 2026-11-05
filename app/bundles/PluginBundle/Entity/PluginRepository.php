@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\Entity;
 
+use Doctrine\ORM\NonUniqueResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -14,13 +15,9 @@ final class PluginRepository extends CommonRepository
     /**
      * Find an addon record by bundle name.
      *
-     * @param string $bundle
-     *
-     * @return mixed
-     *
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NonUniqueResultException
      */
-    public function findByBundle($bundle)
+    public function findByBundle(string $bundle): ?Plugin
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
         $q->where($q->expr()->eq('p.bundle', ':bundle'))
@@ -29,11 +26,9 @@ final class PluginRepository extends CommonRepository
         return $q->getQuery()->getOneOrNullResult();
     }
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()->createQueryBuilder();
-        $q->select($this->getTableAlias())
-            ->from(Plugin::class, $this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias().'.'.$args['index'] : $this->getTableAlias().'.id');
+        $q = $this->createQueryBuilder($this->getTableAlias(), (!empty($args['index'])) ? $this->getTableAlias().'.'.$args['index'] : $this->getTableAlias().'.id');
 
         $args['qb']               = $q;
         $args['ignore_paginator'] = true;

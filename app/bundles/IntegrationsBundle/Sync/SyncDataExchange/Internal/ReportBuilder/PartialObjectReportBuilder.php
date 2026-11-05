@@ -18,7 +18,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class PartialObjectReportBuilder
+final class PartialObjectReportBuilder
 {
     private array $reportObjects = [];
 

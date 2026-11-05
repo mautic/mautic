@@ -13,8 +13,10 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -22,7 +24,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testWidgetWithReport(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy([]);
 
         $report = new Report();
         $report->setName('Lead and points');
@@ -68,7 +70,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testWidgetWithBestHours(): void
     {
-        $user    = $this->em->getRepository(User::class)->findOneBy([]);
+        $user    = $this->getContainer()->get(UserRepository::class)->findOneBy([]);
         $segment = $this->createSegment('A', 'a');
         $widget  = new Widget();
         $widget->setName('Best email read hours');
@@ -105,7 +107,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testWidgetWithSegmentBuildTime(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy([]);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy([]);
         $this->assertInstanceOf(User::class, $user);
         $this->createSegment('A', 'a', 3, $user);
         $this->createSegment('B', 'b', 60, $user);
@@ -150,7 +152,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testAuditLogWidgetWithDeletedContact(): void
     {
-        $user   = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user   = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
         $widget = new Widget();
         $widget->setName('Recent activity');
         $widget->setType('recent.activity');
@@ -173,6 +175,13 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $printResponse = fn (): string => print_r(json_decode($this->client->getResponse()->getContent(), true), true);
         $this->assertStringContainsString('created', $printResponse());
         $this->assertStringContainsString('deleted', $printResponse());
+    }
+
+    public function testEditActionReturnsNotFoundForMissingWidget(): void
+    {
+        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/dashboard/edit/999999');
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
     private function createSegment(string $name, string $alias, float $lastBuildTime = 0, ?User $user = null): LeadList
@@ -208,7 +217,7 @@ final class DashboardControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testUpcomingEmailsWidget(): void
     {
-        $user = $this->em->getRepository(User::class)->findOneBy(['username' => 'admin']);
+        $user = $this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']);
 
         $widget = new Widget();
         $widget->setName('Upcoming Emails');

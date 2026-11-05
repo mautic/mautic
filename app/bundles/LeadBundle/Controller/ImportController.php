@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -24,6 +24,7 @@ use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -33,7 +34,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ImportController extends FormController
+final class ImportController extends AbstractStandardFormController
 {
     // Steps of the import
     public const int STEP_UPLOAD_CSV      = 1;
@@ -66,7 +67,7 @@ final class ImportController extends FormController
     }
 
     #[Route(
-        '/s/{object}/import/{objectAction}/{objectId}',
+        path: '/s/{object}/import/{objectAction}/{objectId}',
         name: 'mautic_import_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -76,16 +77,13 @@ final class ImportController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
-        '/s/{object}/import/{page}',
+        path: '/s/{object}/import/{page}',
         name: 'mautic_import_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         $initEvent = $this->dispatchImportOnInit();
         $this->requestStack->getSession()->set('mautic.import.object', $initEvent->objectSingular);
@@ -324,6 +322,7 @@ final class ImportController extends FormController
                             unlink($fullPath);
                         }
 
+                        /** @var UploadedFile|null $fileData */
                         $fileData = $form['file']->getData();
                         if (!empty($fileData)) {
                             $errorMessage    = null;
@@ -658,7 +657,7 @@ final class ImportController extends FormController
     /**
      * @return mixed[]
      */
-    public function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, $action): array
     {
         if ('view' === $action) {
             /** @var Import $entity */

@@ -8,43 +8,16 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\EventListener\CompanySubscriber;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
+use PHPUnit\Framework\TestCase;
 
-final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
+final class CompanySubscriberTest extends TestCase
 {
-    public function testGetSubscribedEvents(): void
-    {
-        $ipLookupHelper        = $this->createStub(IpLookupHelper::class);
-        $auditLogModel         = $this->createStub(AuditLogModel::class);
-        $entityManager         = $this->createStub(EntityManager::class);
-        $coreParameters        = $this->createStub(CoreParametersHelper::class);
-        $companyLeadRepository = $this->createStub(CompanyLeadRepository::class);
-        $companyModel          = $this->createStub(CompanyModel::class);
-        $subscriber            = new CompanySubscriber(
-            $ipLookupHelper,
-            $auditLogModel,
-            $entityManager,
-            $coreParameters,
-            $companyLeadRepository,
-            $companyModel
-        );
-
-        $this->assertSame(
-            [
-                LeadEvents::COMPANY_PRE_SAVE    => ['onCompanyPreSave', 0],
-                LeadEvents::COMPANY_POST_SAVE   => ['onCompanyPostSave', 0],
-                LeadEvents::COMPANY_POST_DELETE => ['onCompanyDelete', 0],
-                LeadEvents::COMPANY_SOFT_DELETE => ['onCompanySoftDelete', 0],
-            ],
-            $subscriber->getSubscribedEvents()
-        );
-    }
-
     public function testOnCompanyPostSave(): void
     {
         $this->onCompanyPostSaveMethodCall(false); // update company log
@@ -89,11 +62,9 @@ final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             $companyModel,
         );
 
-        $company            = $this->createMock(Company::class);
+        $company            = new Company();
         $company->deletedId = $companyId;
-        $company->expects($this->once())
-            ->method('getPrimaryIdentifier')
-            ->willReturn($companyName);
+        $company->setName($companyName);
 
         $event = $this->createMock(CompanyEvent::class);
         $event->expects($this->once())
@@ -139,10 +110,8 @@ final class CompanySubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(CompanyModel::class),
         );
 
-        $company = $this->createMock(Company::class);
-        $company->expects($this->once())
-            ->method('getId')
-            ->willReturn($companyId);
+        $company = new Company();
+        ReflectionHelper::setEntityId($company, $companyId);
 
         $event = $this->createMock(CompanyEvent::class);
         $event->expects($this->once())

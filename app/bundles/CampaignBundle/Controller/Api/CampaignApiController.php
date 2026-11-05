@@ -26,10 +26,13 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -116,19 +119,18 @@ final class CampaignApiController extends CommonApiController
     /**
      * Adds a lead to a campaign.
      *
-     * @param int $id     Campaign ID
-     * @param int $leadId Lead ID
+     * @param int        $id     Campaign ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/campaigns/{id}/contact/{leadId}/add',
+        path: '/api/campaigns/{id}/contact/{leadId}/add',
         name: 'mautic_api_campaignaddcontact',
         requirements: ['id' => '\d+', 'leadId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function addLeadAction($id, $leadId): Response
+    public function addLeadAction(int $id, int|string $leadId): Response
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
@@ -155,18 +157,17 @@ final class CampaignApiController extends CommonApiController
      * Removes given lead from a campaign.
      *
      * @param int $id     Campaign ID
-     * @param int $leadId Lead ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/campaigns/{id}/contact/{leadId}/remove',
+        path: '/api/campaigns/{id}/contact/{leadId}/remove',
         name: 'mautic_api_campaignremovecontact',
         requirements: ['id' => '\d+', 'leadId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function removeLeadAction($id, $leadId): Response
+    public function removeLeadAction(int $id, int|string $leadId): Response
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
@@ -189,9 +190,8 @@ final class CampaignApiController extends CommonApiController
      * @param Campaign             $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit')
     {
         $method = $this->requestStack->getCurrentRequest()->getMethod();
 
@@ -205,6 +205,12 @@ final class CampaignApiController extends CommonApiController
                 $msg = $this->translator->trans('mautic.campaign.form.sources.notempty', [], 'validators');
 
                 return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        foreach (['lists', 'forms'] as $source) {
+            if (isset($parameters[$source]) && !is_array($parameters[$source])) {
+                return $this->returnError('$campaign['.$source.'] must be an array', Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -315,18 +321,14 @@ final class CampaignApiController extends CommonApiController
 
     /**
      * Change the array structure.
-     *
-     * @param array $events
      */
-    public function modifyCampaignEventArray($events): array
+    private function modifyCampaignEventArray(array $events): array
     {
         $updatedEvents = [];
 
-        if ($events && is_array($events)) {
-            foreach ($events as $event) {
-                if (!empty($event['id'])) {
-                    $updatedEvents[$event['id']] = 'ignore';
-                }
+        foreach ($events as $event) {
+            if (!empty($event['id'])) {
+                $updatedEvents[$event['id']] = 'ignore';
             }
         }
 
@@ -337,13 +339,13 @@ final class CampaignApiController extends CommonApiController
      * Obtains a list of campaign contacts.
      */
     #[Route(
-        '/api/campaigns/{id}/contacts',
+        path: '/api/campaigns/{id}/contacts',
         name: 'mautic_api_campaigngetcontacts',
         requirements: ['id' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getContactsAction(Request $request, $id): Response
+    public function getContactsAction(Request $request, int $id): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -386,13 +388,13 @@ final class CampaignApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/campaigns/clone/{campaignId}',
+        path: '/api/campaigns/clone/{campaignId}',
         name: 'mautic_api_contact_clone_campaign',
         requirements: ['campaignId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function cloneCampaignAction($campaignId): Response
+    public function cloneCampaignAction(int $campaignId): Response
     {
         if (empty($campaignId) || false == intval($campaignId)) {
             return $this->notFound();
@@ -417,7 +419,7 @@ final class CampaignApiController extends CommonApiController
         $headers['Location'] = $this->generateUrl(
             $route,
             array_merge(['id' => $entity->getId()], $this->routeParams),
-            true
+            UrlGeneratorInterface::ABSOLUTE_URL
         );
 
         $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK, $headers);
@@ -431,7 +433,7 @@ final class CampaignApiController extends CommonApiController
      * Get a list of events.
      */
     #[Route(
-        '/api/campaigns/export/{campaignId}',
+        path: '/api/campaigns/export/{campaignId}',
         name: 'mautic_api_export_campaign',
         requirements: ['campaignId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -463,7 +465,7 @@ final class CampaignApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/campaigns/import',
+        path: '/api/campaigns/import',
         name: 'mautic_api_import_campaign',
         defaults: ['_format' => 'json'],
         methods: ['POST']
@@ -488,6 +490,12 @@ final class CampaignApiController extends CommonApiController
             }
 
             $uploadedFile = array_values($files)[0];
+
+            if (!$uploadedFile instanceof UploadedFile) {
+                return $this->handleView(
+                    $this->view(['error' => $this->translator->trans('mautic.campaign.api.import.incorrect_zip_file', [], 'messages')], Response::HTTP_BAD_REQUEST)
+                );
+            }
 
             if (!$uploadedFile->isValid()) {
                 return $this->handleView(

@@ -7,15 +7,16 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -32,7 +33,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
     {
         /** @var EventDispatcher $eventDispatcher */
         $eventDispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-        $eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, $this->addPointsListener(...));
+        $eventDispatcher->addListener(LeadPostSaveEvent::class, $this->addPointsListener(...));
 
         /** @var LeadModel $model */
         $model = self::getContainer()->get(LeadModel::class);
@@ -91,8 +92,8 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
      * @return array<int,array<int|string>>
      *
      * @throws DBALException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     protected function getContactWithAssignTwoCompanies(): array
     {
@@ -118,7 +119,7 @@ final class LeadModelFunctionalTest extends MauticMysqlTestCase
         $leadModel->addToCompany($contact, $company2);
 
         /** @var CompanyLeadRepository $companyLeadRepo */
-        $companyLeadRepo  = $this->em->getRepository(CompanyLead::class);
+        $companyLeadRepo  = $this->getContainer()->get(CompanyLeadRepository::class);
 
         return $companyLeadRepo->getCompaniesByLeadId($contact->getId());
     }

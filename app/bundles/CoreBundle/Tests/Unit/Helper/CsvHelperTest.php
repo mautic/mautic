@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\CsvHelper;
+use PHPUnit\Framework\TestCase;
 
-final class CsvHelperTest extends \PHPUnit\Framework\TestCase
+final class CsvHelperTest extends TestCase
 {
     public function testSanitizeHeaders(): void
     {

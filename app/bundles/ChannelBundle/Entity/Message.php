@@ -14,10 +14,8 @@ use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -27,7 +25,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
 #[ORM\Table(name: 'messages')]
-#[ORM\Index(columns: ['date_added'], name: 'date_message_added')]
+#[ORM\Index(name: 'date_message_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -48,6 +46,12 @@ use Symfony\Component\Validator\Constraints\NotBlank;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'message_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'message_projects_xref'),
+)])]
 class Message extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -57,6 +61,9 @@ class Message extends FormEntity implements UuidInterface
      * @var ?int
      */
     #[Groups(['message:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -64,54 +71,39 @@ class Message extends FormEntity implements UuidInterface
      */
     #[Groups(['message:read', 'message:write', 'channel:read'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var ?string
      */
     #[Groups(['message:read', 'message:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
-    /**
-     * @var ?\DateTimeInterface
-     */
     #[Groups(['message:read', 'message:write'])]
-    private $publishUp;
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $publishUp = null;
 
-    /**
-     * @var ?\DateTimeInterface
-     */
     #[Groups(['message:read', 'message:write'])]
-    private $publishDown;
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $publishDown = null;
 
-    /**
-     * @var ?Category
-     */
     #[Groups(['message:read', 'message:write'])]
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<int,Channel>
      */
     #[Groups(['message:read', 'message:write'])]
-    #[ORM\OneToMany(mappedBy: 'message', targetEntity: Channel::class, cascade: ['merge', 'persist', 'detach'], orphanRemoval: true, indexBy: 'channel')]
+    #[ORM\OneToMany(targetEntity: Channel::class, mappedBy: 'message', cascade: ['persist', 'detach'], orphanRemoval: true, indexBy: 'channel')]
     private $channels;
 
     public function __clone()
     {
         $this->id = null;
-    }
-
-    public static function loadMetadata(ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder
-            ->addIdColumns()
-            ->addPublishDates()
-            ->addCategory();
-
-        self::addProjectsField($builder, 'message_projects_xref', 'message_id');
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void
@@ -189,10 +181,7 @@ class Message extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return ?\DateTimeInterface
-     */
-    public function getPublishUp()
+    public function getPublishUp(): ?\DateTimeInterface
     {
         return $this->publishUp;
     }
@@ -200,7 +189,7 @@ class Message extends FormEntity implements UuidInterface
     /**
      * @param ?\DateTime $publishUp
      */
-    public function setPublishUp($publishUp): static
+    public function setPublishUp(?\DateTimeInterface $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -208,10 +197,7 @@ class Message extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return ?\DateTimeInterface
-     */
-    public function getPublishDown()
+    public function getPublishDown(): ?\DateTimeInterface
     {
         return $this->publishDown;
     }
@@ -219,7 +205,7 @@ class Message extends FormEntity implements UuidInterface
     /**
      * @param ?\DateTime $publishDown
      */
-    public function setPublishDown($publishDown): static
+    public function setPublishDown(?\DateTimeInterface $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -227,18 +213,12 @@ class Message extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return ?Category
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    /**
-     * @param ?Category $category
-     */
-    public function setCategory($category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -249,15 +229,15 @@ class Message extends FormEntity implements UuidInterface
     /**
      * @return Collection<int,Channel>
      */
-    public function getChannels()
+    public function getChannels(): Collection
     {
         return $this->channels;
     }
 
     /**
-     * @param ArrayCollection<int,Channel> $channels
+     * @param Collection<int, Channel> $channels
      */
-    public function setChannels($channels): static
+    public function setChannels(Collection $channels): static
     {
         $this->isChanged('channels', $channels);
         $this->channels = $channels;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Command;
 
+use Doctrine\DBAL\Exception;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Model\IpAddressModel;
@@ -60,7 +61,7 @@ final class UnusedIpDeleteCommand extends ModeratedCommand
             $limit       = $input->getOption('limit') ?? self::DEFAULT_LIMIT;
             $deletedRows = $this->ipAddressModel->deleteUnusedIpAddresses((int) $limit);
             $output->writeln(sprintf('<info>%s unused IP addresses have been deleted</info>', $deletedRows));
-        } catch (\Doctrine\DBAL\Exception $e) {
+        } catch (Exception $e) {
             $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $e->getMessage()));
             $this->completeRun();
 

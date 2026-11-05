@@ -2,9 +2,10 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Helper\AssetSearchScopeProvider;
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\FileHelper;
@@ -17,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class AssetController extends FormController
+final class AssetController extends AbstractStandardFormController
 {
     private AuditLogModel $auditLogModel;
 
@@ -29,7 +30,7 @@ final class AssetController extends FormController
     }
 
     #[Route(
-        '/s/assets/{objectAction}/{objectId}',
+        path: '/s/assets/{objectAction}/{objectId}',
         name: 'mautic_asset_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -40,7 +41,7 @@ final class AssetController extends FormController
     }
 
     #[Route(
-        '/s/assets/{page}',
+        path: '/s/assets/{page}',
         name: 'mautic_asset_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -291,8 +292,10 @@ final class AssetController extends FormController
 
     /**
      * Generates new form and processes post data.
+     *
+     * @param Asset $entity
      */
-    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, $entity = null): Response
+    public function newAction(Request $request, CoreParametersHelper $parametersHelper, UploaderHelper $uploaderHelper, IntegrationHelper $integrationHelper, AssetModel $model, ?object $entity = null): Response
     {
         if (null == $entity) {
             $entity = $model->getEntity();
@@ -475,7 +478,9 @@ final class AssetController extends FormController
             );
         }
         if (!$this->security->hasEntityAccess(
-            'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
+            'asset:assets:viewown',
+            'asset:assets:viewother',
+            $entity->getCreatedBy()
         )
         ) {
             $this->throwAccessDenied();
@@ -590,7 +595,9 @@ final class AssetController extends FormController
         if (null != $entity) {
             if (!$this->security->isGranted('asset:assets:create')
                 || !$this->security->hasEntityAccess(
-                    'asset:assets:viewown', 'asset:assets:viewother', $entity->getCreatedBy()
+                    'asset:assets:viewown',
+                    'asset:assets:viewother',
+                    $entity->getCreatedBy()
                 )
             ) {
                 $this->throwAccessDenied();
@@ -701,7 +708,9 @@ final class AssetController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    'asset:assets:deleteown', 'asset:assets:deleteother', $entity->getCreatedBy()
+                    'asset:assets:deleteown',
+                    'asset:assets:deleteother',
+                    $entity->getCreatedBy()
                 )
                 ) {
                     $flashes[] = $this->getAccessDeniedFlash();
@@ -737,7 +746,7 @@ final class AssetController extends FormController
      * Renders the container for the remote file browser.
      */
     #[Route(
-        '/s/assets/remote',
+        path: '/s/assets/remote',
         name: 'mautic_asset_remote',
     )]
     public function remoteAction(Request $request, IntegrationHelper $integrationHelper): Response
@@ -761,7 +770,7 @@ final class AssetController extends FormController
         ]);
     }
 
-    public function getModelName(): string
+    protected function getModelName(): string
     {
         return 'asset';
     }

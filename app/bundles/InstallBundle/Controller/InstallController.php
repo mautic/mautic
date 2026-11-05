@@ -2,6 +2,7 @@
 
 namespace Mautic\InstallBundle\Controller;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\CommonController;
@@ -10,6 +11,7 @@ use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -34,15 +36,19 @@ final class InstallController extends CommonController
      *
      * @param float $index The step number to process
      *
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
-    public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0): RedirectResponse|Response
     {
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app
         // is installed and redirect
         if ($this->installer->checkIfInstalled()) {
             return $this->redirectToRoute('mautic_dashboard_index');
         }
+
+        // The requirements check reports a missing directory as unwritable, so create the
+        // ones the installer needs before it runs.
+        $this->installer->prepareDirectories();
 
         if ($index - floor($index) > 0) {
             $subIndex = (int) (round($index - floor($index), 1) * 10);
@@ -212,7 +218,7 @@ final class InstallController extends CommonController
      *
      * @throws \Exception
      */
-    public function finalAction(Request $request, PathsHelper $pathsHelper): \Symfony\Component\HttpFoundation\RedirectResponse|Response
+    public function finalAction(Request $request, PathsHelper $pathsHelper): RedirectResponse|Response
     {
         $session = $request->getSession();
 

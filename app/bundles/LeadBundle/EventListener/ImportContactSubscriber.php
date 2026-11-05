@@ -14,12 +14,13 @@ use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\UserBundle\Entity\User;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ImportContactSubscriber implements EventSubscriberInterface
+final readonly class ImportContactSubscriber
 {
     public function __construct(
         private FieldList $fieldList,
@@ -29,19 +30,10 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ImportInitEvent::class => 'onImportInit',
-            ImportMappingEvent::class => 'onFieldMapping',
-            ImportProcessEvent::class => 'onImportProcess',
-            ImportValidateEvent::class => 'onValidateImport',
-        ];
-    }
-
     /**
      * @throws AccessDeniedException
      */
+    #[AsEventListener(event: ImportInitEvent::class)]
     public function onImportInit(ImportInitEvent $event): void
     {
         if ($event->importIsForRouteObject('contacts')) {
@@ -57,6 +49,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(event: ImportMappingEvent::class)]
     public function onFieldMapping(ImportMappingEvent $event): void
     {
         if ($event->importIsForRouteObject('contacts')) {
@@ -85,6 +78,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(event: ImportProcessEvent::class)]
     public function onImportProcess(ImportProcessEvent $event): void
     {
         if ($event->importIsForObject('lead')) {
@@ -105,6 +99,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(event: ImportValidateEvent::class)]
     public function onValidateImport(ImportValidateEvent $event): void
     {
         if (false === $event->importIsForRouteObject('contacts')) {
@@ -148,6 +143,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
      */
     private function handleValidateOwner(array &$matchedFields): ?int
     {
+        /** @var User|null $owner */
         $owner = ArrayHelper::pickValue('owner', $matchedFields);
 
         return $owner ? $owner->getId() : null;
@@ -173,7 +169,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
         // ...we must ensure we pass an [] to array_map
         $tags = $tags instanceof ArrayCollection ? $tags->toArray() : [];
 
-        return array_map(fn (Tag $tag) => $tag->getTag(), $tags);
+        return array_map(fn (Tag $tag): ?string => $tag->getTag(), $tags);
     }
 
     /**
@@ -185,7 +181,7 @@ final readonly class ImportContactSubscriber implements EventSubscriberInterface
      *
      * @param mixed[] $matchedFields
      */
-    private function handleValidateRequired(ImportValidateEvent $event, array &$matchedFields): void
+    private function handleValidateRequired(ImportValidateEvent $event, array $matchedFields): void
     {
         $requiredFields = $this->fieldList->getFieldList(false, false, [
             'isPublished' => true,

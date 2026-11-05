@@ -2,7 +2,7 @@
 
 namespace Mautic\PointBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Helper\TriggerSearchScopeProvider;
@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class TriggerController extends FormController
+final class TriggerController extends AbstractFormController
 {
     private TriggerEventModel $triggerEventModel;
 
@@ -30,7 +30,7 @@ final class TriggerController extends FormController
     }
 
     #[Route(
-        '/s/points/triggers/{objectAction}/{objectId}',
+        path: '/s/points/triggers/{objectAction}/{objectId}',
         name: 'mautic_pointtrigger_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -41,7 +41,7 @@ final class TriggerController extends FormController
     }
 
     #[Route(
-        '/s/points/triggers/{page}',
+        path: '/s/points/triggers/{page}',
         name: 'mautic_pointtrigger_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -176,7 +176,9 @@ final class TriggerController extends FormController
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
-                'route'         => $this->generateUrl('mautic_pointtrigger_action', [
+                'route'         => $this->generateUrl(
+                    'mautic_pointtrigger_action',
+                    [
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId(), ]
                 ),
@@ -197,7 +199,7 @@ final class TriggerController extends FormController
         }
 
         $session   = $request->getSession();
-        $sessionId = $this->getSessionBase();
+        $sessionId = '';
 
         if (!$this->security->isGranted('point:triggers:create')) {
             $this->throwAccessDenied();
@@ -299,7 +301,9 @@ final class TriggerController extends FormController
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
-                'route'         => $this->generateUrl('mautic_pointtrigger_action', [
+                'route'         => $this->generateUrl(
+                    'mautic_pointtrigger_action',
+                    [
                     'objectAction' => (!empty($valid) ? 'edit' : 'new'), // valid means a new form was applied
                     'objectId'     => $entity->getId(), ]
                 ),
@@ -465,7 +469,9 @@ final class TriggerController extends FormController
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
-                'route'         => $this->generateUrl('mautic_pointtrigger_action', [
+                'route'         => $this->generateUrl(
+                    'mautic_pointtrigger_action',
+                    [
                     'objectAction' => 'edit',
                     'objectId'     => $entity->getId(), ]
                 ),

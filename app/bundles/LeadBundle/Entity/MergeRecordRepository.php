@@ -7,12 +7,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<MergeRecord>
  */
-class MergeRecordRepository extends CommonRepository
+final class MergeRecordRepository extends CommonRepository
 {
-    /**
-     * @return Lead|null
-     */
-    public function findMergedContact($id)
+    public function findMergedContact($id): ?Lead
     {
         $record = $this->findOneBy(['mergedId' => (int) $id], ['dateAdded' => 'desc']);
         if ($record instanceof MergeRecord) {
@@ -30,12 +27,12 @@ class MergeRecordRepository extends CommonRepository
     /**
      * Keep track of subseqent merges by cascading records to the latest lead that was merged into.
      */
-    public function moveMergeRecord($fromId, $toId): void
+    public function moveMergeRecord(int $fromId, int $toId): void
     {
         $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'contact_merge_records')
-            ->set('contact_id', (int) $toId)
-            ->where('contact_id = '.(int) $fromId)
+            ->set('contact_id', $toId)
+            ->where('contact_id = '.$fromId)
             ->executeQuery();
     }
 }

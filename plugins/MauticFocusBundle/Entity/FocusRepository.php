@@ -2,20 +2,18 @@
 
 namespace MauticPlugin\MauticFocusBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Focus>
  */
-class FocusRepository extends CommonRepository
+final class FocusRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    /**
-     * @return array
-     */
-    public function findByForm($formId)
+    public function findByForm($formId): array
     {
         return $this->findBy(
             [
@@ -24,14 +22,11 @@ class FocusRepository extends CommonRepository
         );
     }
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $alias = $this->getTableAlias();
 
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select($alias)
-            ->from(Focus::class, $alias, $alias.'.id');
+        $q = $this->createQueryBuilder($alias, $alias.'.id');
 
         if (empty($args['iterable_mode'])) {
             $q->leftJoin($alias.'.category', 'c');
@@ -42,12 +37,12 @@ class FocusRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, ['f.name', 'f.website']);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'),
@@ -88,10 +83,7 @@ class FocusRepository extends CommonRepository
         return 'f';
     }
 
-    /**
-     * @return array
-     */
-    public function getFocusList($currentId)
+    public function getFocusList($currentId): array
     {
         $q = $this->createQueryBuilder('f');
         $q->select('partial f.{id, name, description}')->orderBy('f.name');

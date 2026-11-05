@@ -19,28 +19,20 @@ use Mautic\NotificationBundle\Model\NotificationModel;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CampaignSubscriber implements EventSubscriberInterface
+class CampaignSubscriber
 {
-    /**
-     * @var string
-     */
-    public const EVENT_ACTION_SEND_MOBILE_NOTIFICATION = 'notification.send_mobile_notification';
+    public const string EVENT_ACTION_SEND_MOBILE_NOTIFICATION = 'notification.send_mobile_notification';
 
-    /**
-     * @var string
-     */
-    public const EVENT_ACTION_SEND_NOTIFICATION = 'notification.send_notification';
+    public const string EVENT_ACTION_SEND_NOTIFICATION = 'notification.send_notification';
 
     /**
      * The maximum number of `include_player_ids` that can be sent within a single request.
-     *
-     * @var int
      */
-    protected const MAX_PLAYER_IDS_PER_REQUEST = 2000;
+    protected const int MAX_PLAYER_IDS_PER_REQUEST = 2000;
 
     public function __construct(
         private readonly IntegrationHelper $integrationHelper,
@@ -53,14 +45,9 @@ class CampaignSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            NotificationEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignBatchAction', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
@@ -73,7 +60,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if (in_array('mobile', $features)) {
             $event->addAction(
-                static::EVENT_ACTION_SEND_MOBILE_NOTIFICATION,
+                self::EVENT_ACTION_SEND_MOBILE_NOTIFICATION,
                 [
                     'label'            => 'mautic.notification.campaign.send_mobile_notification',
                     'description'      => 'mautic.notification.campaign.send_mobile_notification.tooltip',
@@ -89,7 +76,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         $event->addAction(
-            static::EVENT_ACTION_SEND_NOTIFICATION,
+            self::EVENT_ACTION_SEND_NOTIFICATION,
             [
                 'label'            => 'mautic.notification.campaign.send_notification',
                 'description'      => 'mautic.notification.campaign.send_notification.tooltip',
@@ -104,16 +91,19 @@ class CampaignSubscriber implements EventSubscriberInterface
         );
     }
 
+    #[AsEventListener(
+        event: NotificationEvents::ON_CAMPAIGN_BATCH_ACTION,
+    )]
     public function onCampaignBatchAction(PendingEvent $event): void
     {
-        if (!$event->checkContext(static::EVENT_ACTION_SEND_NOTIFICATION) && !$event->checkContext(static::EVENT_ACTION_SEND_MOBILE_NOTIFICATION)) {
+        if (!$event->checkContext(self::EVENT_ACTION_SEND_NOTIFICATION) && !$event->checkContext(self::EVENT_ACTION_SEND_MOBILE_NOTIFICATION)) {
             return;
         }
 
         $notificationId = $event->getEvent()->getProperties()['notification'] ?? null;
         $notification   = $notificationId ? $this->notificationModel->getEntity((int) $notificationId) : null;
 
-        if (!$notification) {
+        if (!$notification instanceof Notification) {
             $event->passAllWithError($this->translator->trans('mautic.notification.campaign.failed.missing_entity'));
 
             return;
@@ -196,12 +186,12 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         foreach ($log->getLead()->getPushIDs() as $pushID) {
             // Skip non-mobile PushIDs if this is a mobile event
-            if ($event->checkContext(static::EVENT_ACTION_SEND_MOBILE_NOTIFICATION) && !$pushID->isMobile()) {
+            if ($event->checkContext(self::EVENT_ACTION_SEND_MOBILE_NOTIFICATION) && !$pushID->isMobile()) {
                 continue;
             }
 
             // Skip mobile PushIDs if this is a non-mobile event
-            if ($event->checkContext(static::EVENT_ACTION_SEND_NOTIFICATION) && $pushID->isMobile()) {
+            if ($event->checkContext(self::EVENT_ACTION_SEND_NOTIFICATION) && $pushID->isMobile()) {
                 continue;
             }
 
@@ -280,7 +270,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array<string,mixed[]>
+     * @return array<string, array{sendNotification: Notification, playerIds: array<string, LeadEventLog>}>
      */
     private function buildBatches(PendingEvent $event, Notification $notification): array
     {

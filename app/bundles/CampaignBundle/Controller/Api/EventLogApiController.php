@@ -91,20 +91,20 @@ final class EventLogApiController extends FetchCommonApiController
      * Get a list of events.
      */
     #[Route(
-        '/api/campaigns/events/contact/{contactId}',
+        path: '/api/campaigns/events/contact/{contactId}',
         name: 'mautic_api_campaigns_events_contact',
         requirements: ['contactId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
     #[Route(
-        '/api/campaigns/{campaignId}/events/contact/{contactId}',
+        path: '/api/campaigns/{campaignId}/events/contact/{contactId}',
         name: 'mautic_api_campaign_contact_events',
         requirements: ['campaignId' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getContactEventsAction(Request $request, UserHelper $userHelper, $contactId, $campaignId = null): Response
+    public function getContactEventsAction(Request $request, UserHelper $userHelper, int|string $contactId, ?int $campaignId = null): Response
     {
         // Ensure contact exists and user has access
         $contact = $this->checkLeadAccess($contactId, 'view');
@@ -152,13 +152,13 @@ final class EventLogApiController extends FetchCommonApiController
     }
 
     #[Route(
-        '/api/campaigns/events/{eventId}/contact/{contactId}/edit',
+        path: '/api/campaigns/events/{eventId}/contact/{contactId}/edit',
         name: 'mautic_api_campaigns_edit_contact_event',
         requirements: ['eventId' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['PUT']
     )]
-    public function editContactEventAction(Request $request, $eventId, $contactId): Response
+    public function editContactEventAction(Request $request, int $eventId, int|string $contactId): Response
     {
         $parameters = $request->request->all();
 
@@ -201,7 +201,7 @@ final class EventLogApiController extends FetchCommonApiController
     }
 
     #[Route(
-        '/api/campaigns/events/batch/edit',
+        path: '/api/campaigns/events/batch/edit',
         name: 'mautic_api_campaigns_batchedit_events',
         defaults: ['_format' => 'json'],
         methods: ['PUT']
@@ -217,6 +217,8 @@ final class EventLogApiController extends FetchCommonApiController
 
         $errors= [];
 
+        /** @var array<int, Event> $events */
+        /** @var array<Event> $events */
         $events   = $this->getBatchEntities($parameters, $errors, false, 'eventId', $this->eventModel, false);
         $contacts = $this->getBatchEntities($parameters, $errors, false, 'contactId', $this->leadModel, false);
 
@@ -231,6 +233,7 @@ final class EventLogApiController extends FetchCommonApiController
                 continue;
             }
 
+            /** @var Event $event */
             $event = $events[$params['eventId']];
 
             // Ensure contact exists and user has access

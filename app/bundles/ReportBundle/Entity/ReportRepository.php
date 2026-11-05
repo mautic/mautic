@@ -2,20 +2,15 @@
 
 namespace Mautic\ReportBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * @extends CommonRepository<Report>
  */
-class ReportRepository extends CommonRepository
+final class ReportRepository extends CommonRepository
 {
-    /**
-     * Get a list of entities.
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder('r')
@@ -26,7 +21,7 @@ class ReportRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $queryBuilder,
@@ -37,7 +32,7 @@ class ReportRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command                 = $filter->command;
         $unique                  = $this->generateRandomParameterName();
@@ -119,7 +114,7 @@ class ReportRepository extends CommonRepository
 
         if ($ownedBy) {
             $qb->andWhere(
-                $qb->expr()->eq('r.created_by', (int) $ownedBy)
+                $qb->expr()->eq('r.created_by', (string) ((int) $ownedBy))
             );
         }
 

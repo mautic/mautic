@@ -3,13 +3,15 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\PointBundle\Entity\Group;
 
 /**
  * @extends CommonRepository<PointsChangeLog>
  */
-class PointsChangeLogRepository extends CommonRepository
+final class PointsChangeLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
@@ -18,10 +20,8 @@ class PointsChangeLogRepository extends CommonRepository
      *
      * @param int|null             $leadId
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getLeadTimelineEvents($leadId = null, array $options = [])
+    public function getLeadTimelineEvents($leadId = null, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
@@ -47,10 +47,10 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Get table stat data from point log table.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
-    public function getMostPoints(QueryBuilder $query, $limit = 10, $offset = 0): array
+    public function getMostPoints(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
@@ -61,10 +61,10 @@ class PointsChangeLogRepository extends CommonRepository
     /**
      * Get table stat data from lead table.
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
-    public function getMostLeads(QueryBuilder $query, $limit = 10, $offset = 0): array
+    public function getMostLeads(QueryBuilder $query, int $limit = 10, int $offset = 0): array
     {
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
@@ -74,16 +74,13 @@ class PointsChangeLogRepository extends CommonRepository
 
     /**
      * Updates lead ID (e.g. after a lead merge).
-     *
-     * @param int $fromLeadId
-     * @param int $toLeadId
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_points_change_log')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId)
+            ->set('lead_id', $toLeadId)
+            ->where('lead_id = '.$fromLeadId)
             ->executeStatement();
     }
 

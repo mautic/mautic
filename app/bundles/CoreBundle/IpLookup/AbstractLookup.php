@@ -57,10 +57,7 @@ abstract class AbstractLookup
     ) {
     }
 
-    /**
-     * @return $this
-     */
-    public function setIpAddress($ip)
+    public function setIpAddress($ip): static
     {
         $this->ip = $ip;
 
@@ -77,7 +74,7 @@ abstract class AbstractLookup
      *
      * @return array<string, mixed>
      */
-    public function getDetails()
+    public function getDetails(): array
     {
         return [
             'city'         => $this->city,

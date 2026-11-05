@@ -13,6 +13,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
     final class ErrorHandler
     {
+        /**
+         * @var self
+         */
         public static $handler;
 
         /**
@@ -35,9 +38,12 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private $logger;
 
+        /**
+         * @var LoggerInterface
+         */
         private $mainLogger;
 
-        private static string|false $root;
+        private static string $root;
 
         public function __construct()
         {
@@ -85,10 +91,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
         }
 
-        /**
-         * @return mixed
-         */
-        public function getDebugLogger()
+        public function getDebugLogger(): LoggerInterface
         {
             return $this->debugLogger;
         }
@@ -314,7 +317,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
              */
             if (!defined('IS_PHPUNIT')) {
                 // Log PHP fatal errors
-                register_shutdown_function([self::$handler, 'handleFatal']);
+                register_shutdown_function(self::$handler->handleFatal(...));
 
                 // Log general PHP errors
                 set_exception_handler(self::$handler->handleException(...));
@@ -460,6 +463,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             } else {
                 if (empty($error['showExceptionMessage']) && empty($error['showExceptionDetails'])) {
                     unset($error);
+                    $error               = [];
                     $error['message']    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
                     $error['submessage'] = 'System administrators, check server logs for errors.';
                 }
@@ -503,7 +507,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 ]);
                 $twig               = new \Twig\Environment($loader);
                 // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
-                $twig->addFunction(new \Twig\TwigFunction('getRootPath', fn (): string|false => realpath(__DIR__.'/../../../../')));
+                $twig->addFunction(new \Twig\TwigFunction('getRootPath', fn (): string => realpath(__DIR__.'/../../../../')));
 
                 if ($loader->exists('custom_offline.html.twig')) {
                     $content = $twig->render('custom_offline.html.twig', ['error' => $error]);

@@ -10,10 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class EmailSendEvent extends CommonEvent
 {
-    /**
-     * @var Email|null
-     */
-    private $email;
+    private readonly ?Email $email;
 
     private string $content;
 
@@ -76,7 +73,7 @@ class EmailSendEvent extends CommonEvent
         $this->skip        = $args['skip'] ?? false;
 
         if (!$this->subject && $this->email instanceof Email) {
-            $this->subject = (string) $args['email']->getSubject();
+            $this->subject = (string) $this->email->getSubject();
         }
 
         if (isset($args['internalSend'])) {
@@ -106,10 +103,8 @@ class EmailSendEvent extends CommonEvent
 
     /**
      * Returns the Email entity.
-     *
-     * @return ?Email
      */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return (null !== $this->helper) ? $this->helper->getEmail() : $this->email;
     }
@@ -216,7 +211,7 @@ class EmailSendEvent extends CommonEvent
      */
     public function getLead()
     {
-        return (null !== $this->helper) ? $this->helper->getLead() : $this->lead;
+        return $this->helper?->getLead() ?? $this->lead;
     }
 
     /**
@@ -227,12 +222,9 @@ class EmailSendEvent extends CommonEvent
         return (null !== $this->helper) ? $this->helper->getIdHash() : $this->idHash;
     }
 
-    /**
-     * @return array
-     */
-    public function getSource()
+    public function getSource(): array
     {
-        return (null !== $this->helper) ? $this->helper->getSource() : $this->source;
+        return $this->helper?->getSource() ?? $this->source;
     }
 
     public function addTokens(array $tokens): void
@@ -268,7 +260,7 @@ class EmailSendEvent extends CommonEvent
 
     public function getTextHeaders(): array
     {
-        return (null !== $this->helper) ? $this->helper->getCustomHeaders() : $this->textHeaders;
+        return $this->helper?->getCustomHeaders() ?? $this->textHeaders;
     }
 
     /**

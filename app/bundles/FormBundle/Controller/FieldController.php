@@ -3,7 +3,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController as CommonFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -19,6 +19,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -48,11 +49,11 @@ final class FieldController extends CommonFormController
         $this->fieldHelper                 = $fieldHelper;
         $this->formFactory                 = $formFactory;
 
-        parent::__construct($formFactory, $fieldHelper, $doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     #[Route(
-        '/s/forms/field/{objectAction}/{objectId}',
+        path: '/s/forms/field/{objectAction}/{objectId}',
         name: 'mautic_formfield_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -205,7 +206,7 @@ final class FieldController extends CommonFormController
                     'field'                => $formField,
                     'id'                   => $keyId,
                     'formId'               => $formId,
-                    'formName'             => null === $formEntity ? 'newform' : $formEntity->generateFormName(),
+                    'formName'             => $formEntity?->generateFormName() ?? 'newform',
                     'mappedFields'         => $this->mappedObjectCollector->buildCollection((string) $formField['mappedObject']),
                     'inBuilder'            => true,
                     'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
@@ -423,10 +424,8 @@ final class FieldController extends CommonFormController
     /**
      * @param int                  $formId
      * @param array<string, mixed> $formField
-     *
-     * @return mixed
      */
-    private function getFieldForm($formId, array $formField)
+    private function getFieldForm($formId, array $formField): FormInterface
     {
         $customComponents = $this->formModel->getCustomComponents();
         $customParams     = $customComponents['fields'][$formField['type']] ?? false;

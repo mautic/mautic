@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Test\Doctrine\MockedConnectionTrait;
 use Mautic\CoreBundle\Translation\Translator;
@@ -27,11 +27,12 @@ use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportSubscriberTest extends TestCase
 {
     use MockedConnectionTrait;
 
@@ -50,10 +51,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $emailRepository;
 
-    /**
-     * @var MockObject&Report
-     */
-    private MockObject $report;
+    private Report $report;
 
     private ChannelListHelper $channelListHelper;
 
@@ -84,24 +82,20 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createStub(DncReportService::class),
         );
 
-        $this->report             = $this->createMock(Report::class);
+        $this->report             = new Report();
         $this->channelListHelper  = new ChannelListHelper($this->createStub(EventDispatcherInterface::class), $this->createStub(Translator::class));
         $this->queryBuilder       = new QueryBuilder($this->connectionMock);
     }
 
     public function testOnReportGenerateForEmailStatsWhenDncIsUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSource')
-            ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
+        $this->report->setSource(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn([
-                'es.email_address',
-                'bounced',
-                'es.date_read',
-            ]);
+        $this->report->setColumns([
+            'es.email_address',
+            'bounced',
+            'es.date_read',
+        ]);
 
         $event = new ReportGeneratorEvent(
             $this->report,
@@ -120,13 +114,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportGenerateForEmailStatsWhenVariantIsUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSource')
-            ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
+        $this->report->setSource(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['vp.subject']);
+        $this->report->setColumns(['vp.subject']);
 
         $event = new ReportGeneratorEvent(
             $this->report,
@@ -145,17 +135,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportGenerateForEmailStatsWhenClickIsUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSource')
-            ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
+        $this->report->setSource(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['unique_hits']);
-
-        $this->report
-            ->method('getFilters')
-            ->willReturn([]);
+        $this->report->setColumns(['unique_hits']);
 
         $this->connectionMock->expects($this->exactly(2))
             ->method('createQueryBuilder')->willReturn(new QueryBuilder($this->connectionMock));
@@ -177,17 +159,9 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportGenerateForEmailStatsWhenCampaignIsUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSource')
-            ->willReturn(ReportSubscriber::CONTEXT_EMAIL_STATS);
+        $this->report->setSource(ReportSubscriber::CONTEXT_EMAIL_STATS);
 
-        $this->report
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['cmp.name']);
-
-        $this->report
-            ->method('getFilters')
-            ->willReturn([]);
+        $this->report->setColumns(['cmp.name']);
 
         $this->connectionMock->expects($this->exactly(2))
             ->method('createQueryBuilder')->willReturn(new QueryBuilder($this->connectionMock));
@@ -245,7 +219,8 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $queryBuilderMock->expects($this->once())
             ->method('select')
-            ->with('SUM(DISTINCT e.sent_count) as sent_count,
+            ->with(
+                'SUM(DISTINCT e.sent_count) as sent_count,
                         SUM(DISTINCT e.read_count) as read_count,
                         count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::UNSUBSCRIBED.' THEN 1 ELSE null END) as unsubscribed,
                         count(CASE WHEN dnc.id and dnc.reason = '.DoNotContact::BOUNCED.' THEN 1 ELSE null END) as bounced'
@@ -361,22 +336,26 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $queryBuilderMock->expects($this->once())
             ->method('select')
-            ->with('e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed'
+            ->with(
+                'e.id, e.subject as title, count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed'
             )->willReturn($queryBuilderMock);
 
         $queryBuilderMock->expects($this->once())
             ->method('andWhere')
-            ->with('es.is_failed = 1'
+            ->with(
+                'es.is_failed = 1'
             )->willReturn($queryBuilderMock);
 
         $queryBuilderMock->expects($this->once())
             ->method('groupBy')
-            ->with('e.id, e.subject'
+            ->with(
+                'e.id, e.subject'
             )->willReturn($queryBuilderMock);
 
         $queryBuilderMock->expects($this->once())
             ->method('having')
-            ->with('count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0'
+            ->with(
+                'count(CASE WHEN es.is_failed THEN 1 ELSE null END) > 0'
             )->willReturn($queryBuilderMock);
 
         $this->subscriber->onReportGraphGenerate($eventMock);

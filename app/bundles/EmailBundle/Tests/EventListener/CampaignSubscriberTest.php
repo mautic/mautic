@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
+use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\CampaignSubscriber;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
@@ -18,15 +21,17 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CampaignSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&SendEmailToUser
+     * @var MockObject&SendEmailToUser
      */
-    private \PHPUnit\Framework\MockObject\MockObject $sendEmailToUser;
+    private MockObject $sendEmailToUser;
 
     private CampaignSubscriber $subscriber;
 
@@ -53,14 +58,11 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event->setType(Event::TYPE_ACTION);
 
-        $leadEventLog = $this->createMock(LeadEventLog::class);
-        $leadEventLog
-            ->method('getLead')
-            ->willReturn($lead);
-        $leadEventLog
-            ->method('getId')
-            ->willReturn(6);
+        $leadEventLog = new LeadEventLog();
+        $leadEventLog->setLead($lead);
+        ReflectionHelper::setEntityId($leadEventLog, 6);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
 
         $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
@@ -76,19 +78,12 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $event         = new Event()->setType('email.send.to.user');
         $lead          = new Lead()->setEmail('tester@mautic.org');
 
-        $leadEventLog = $this->createMock(LeadEventLog::class);
-        $leadEventLog
-            ->method('getLead')
-            ->willReturn($lead);
-        $leadEventLog
-            ->method('getId')
-            ->willReturn(0);
-        $leadEventLog
-            ->expects($this->once())
-            ->method('setIsScheduled')
-            ->with(false)
-            ->willReturn($leadEventLog);
+        $leadEventLog = new LeadEventLog();
+        $leadEventLog->setLead($lead);
+        $leadEventLog->setIsScheduled(true);
+        ReflectionHelper::setEntityId($leadEventLog, 0);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
 
         $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);
@@ -96,6 +91,7 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->assertCount(1, $pendingEvent->getSuccessful());
         $this->assertCount(0, $pendingEvent->getFailures());
+        $this->assertFalse($leadEventLog->getIsScheduled());
     }
 
     public function testOnCampaignTriggerActionSendEmailToUserWithError(): void
@@ -104,20 +100,11 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $event         = new Event()->setType('email.send.to.user');
         $lead          = new Lead()->setEmail('tester@mautic.org');
 
-        $leadEventLog = $this->createMock(LeadEventLog::class);
-        $leadEventLog
-            ->method('getLead')
-            ->willReturn($lead);
-        $leadEventLog
-            ->method('getId')
-            ->willReturn(0);
-        $leadEventLog
-            ->method('setIsScheduled')
-            ->willReturn($leadEventLog);
-        $leadEventLog
-            ->method('getMetadata')
-            ->willReturn([]);
+        $leadEventLog = new LeadEventLog();
+        $leadEventLog->setLead($lead);
+        ReflectionHelper::setEntityId($leadEventLog, 0);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
 
         $this->sendEmailToUser->expects($this->once())
@@ -141,8 +128,8 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @throws \Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws NoContactsFoundException
+     * @throws ORMException
      */
     public function testOnCampaignTriggerActionSendEmailToContactWithWrongEventType(): void
     {
@@ -150,14 +137,11 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $event         = new Event();
         $lead          = new Lead()->setEmail('tester@mautic.org');
 
-        $leadEventLog = $this->createMock(LeadEventLog::class);
-        $leadEventLog
-            ->method('getLead')
-            ->willReturn($lead);
-        $leadEventLog
-            ->method('getId')
-            ->willReturn(6);
+        $leadEventLog = new LeadEventLog();
+        $leadEventLog->setLead($lead);
+        ReflectionHelper::setEntityId($leadEventLog, 6);
 
+        /** @var ArrayCollection<int, LeadEventLog> $logs */
         $logs = new ArrayCollection([$leadEventLog]);
 
         $pendingEvent = new PendingEvent($eventAccessor, $event, $logs);

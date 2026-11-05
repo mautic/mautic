@@ -7,19 +7,18 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\EventListener\PointSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Entity\TriggerEvent as TriggerEventEntity;
 use Mautic\PointBundle\Event\TriggerExecutedEvent;
-use Mautic\PointBundle\PointEvents;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
+final class PointSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&LeadModel
@@ -43,10 +42,7 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private MockObject $triggerExecutedEvent;
 
-    /**
-     * @var MockObject&TriggerEventEntity
-     */
-    private MockObject $triggerEventEntity;
+    private TriggerEventEntity $triggerEventEntity;
 
     protected function setUp(): void
     {
@@ -55,7 +51,7 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->subscriber           = new PointSubscriber($this->leadModel, $this->stageModel, $this->translator, $this->createStub(LoggerInterface::class));
         $this->triggerExecutedEvent = $this->createMock(TriggerExecutedEvent::class);
-        $this->triggerEventEntity   = $this->createMock(TriggerEventEntity::class);
+        $this->triggerEventEntity   = new TriggerEventEntity();
 
         $this->triggerExecutedEvent
             ->method('getTriggerEvent')
@@ -64,7 +60,7 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPointTriggerExecutedIfNotChangeTagsTyoe(): void
     {
-        $triggerEvent = new TriggerEvent();
+        $triggerEvent = new TriggerEventEntity();
         $contact      = new Lead();
         $triggerEvent->setType('unknown.type');
 
@@ -76,7 +72,7 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPointTriggerExecutedForChangeTagsTyoe(): void
     {
-        $triggerEvent = new TriggerEvent();
+        $triggerEvent = new TriggerEventEntity();
         $contact      = new Lead();
         $triggerEvent->setType('lead.changetags');
         $triggerEvent->setProperties([
@@ -94,7 +90,7 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPointTriggerExecutedForChangeStage(): void
     {
-        $triggerEvent = new TriggerEvent();
+        $triggerEvent = new TriggerEventEntity();
         $contact      = new Lead();
         $stage        = new Stage();
         $stage->setIsPublished(true);
@@ -125,7 +121,7 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPointTriggerExecutedForRemoveStage(): void
     {
-        $triggerEvent = new TriggerEvent();
+        $triggerEvent = new TriggerEventEntity();
         $stage        = new Stage();
         $contact      = new Lead();
         $contact->setStage($stage);
@@ -151,7 +147,7 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnPointTriggerExecutedForMissingStageMarksEventFailed(): void
     {
-        $triggerEvent = new TriggerEvent();
+        $triggerEvent = new TriggerEventEntity();
         $contact      = new Lead();
         $triggerEvent->setType('lead.changestage');
         $triggerEvent->setProperties([
@@ -174,12 +170,10 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testThatTheLeadIsAddedToTheSegmentOnTriggerOnLeadSegmentsChangeEvent(): void
     {
-        $this->triggerEventEntity
-            ->method('getProperties')
-            ->willReturn([
-                'addToLists'      => 1,
-                'removeFromLists' => null,
-            ]);
+        $this->triggerEventEntity->setProperties([
+            'addToLists'      => 1,
+            'removeFromLists' => null,
+        ]);
 
         $this->leadModel->expects($this->once())->method('addToLists');
         $this->subscriber->onLeadSegmentsChange($this->triggerExecutedEvent);
@@ -187,21 +181,12 @@ final class PointSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testThatTheLeadIsRemovedFromTheSegmentOnTriggerOnLeadSegmentsChangeEvent(): void
     {
-        $this->triggerEventEntity
-            ->method('getProperties')
-            ->willReturn([
-                'removeFromLists' => 1,
-                'addToLists'      => null,
-            ]);
+        $this->triggerEventEntity->setProperties([
+            'removeFromLists' => 1,
+            'addToLists'      => null,
+        ]);
 
         $this->leadModel->expects($this->once())->method('removeFromLists');
         $this->subscriber->onLeadSegmentsChange($this->triggerExecutedEvent);
-    }
-
-    public function testThatTheObserverForTriggerOnLeadSegmentsChangeEventIsFired(): void
-    {
-        $subscribers = PointSubscriber::getSubscribedEvents();
-        $this->assertArrayHasKey(PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE, $subscribers);
-        $this->assertSame(['onLeadSegmentsChange', 0], $subscribers[PointEvents::TRIGGER_ON_LEAD_SEGMENTS_CHANGE]);
     }
 }

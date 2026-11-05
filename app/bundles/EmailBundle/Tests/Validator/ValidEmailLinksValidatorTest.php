@@ -9,6 +9,7 @@ use Mautic\EmailBundle\Validator\ValidEmailLinks;
 use Mautic\EmailBundle\Validator\ValidEmailLinksValidator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -18,7 +19,7 @@ use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 #[AllowMockObjectsWithoutExpectations]
 final class ValidEmailLinksValidatorTest extends TestCase
 {
-    private ExecutionContextInterface&\PHPUnit\Framework\MockObject\MockObject $context;
+    private ExecutionContextInterface&MockObject $context;
 
     private ValidEmailLinksValidator $validator;
 
@@ -26,7 +27,6 @@ final class ValidEmailLinksValidatorTest extends TestCase
     {
         $this->context   = $this->createMock(ExecutionContextInterface::class);
         $this->validator = new ValidEmailLinksValidator();
-        $this->validator->initialize($this->context);
     }
 
     public function testMalformedCustomHtmlLinkAddsViolation(): void
@@ -36,7 +36,7 @@ final class ValidEmailLinksValidatorTest extends TestCase
 
         $this->expectViolation('customHtml', '://example.com');
 
-        $this->validator->validate($email, new ValidEmailLinks());
+        $this->validator->validateInContext($email, new ValidEmailLinks(), $this->context);
     }
 
     public function testMalformedDynamicContentLinkAddsViolation(): void
@@ -46,7 +46,7 @@ final class ValidEmailLinksValidatorTest extends TestCase
 
         $this->expectViolation('content', '://example.com');
 
-        $this->validator->validate($email, new ValidEmailLinks());
+        $this->validator->validateInContext($email, new ValidEmailLinks(), $this->context);
     }
 
     public function testCustomHtmlTakesPrecedenceOverStaleBuilderContent(): void
@@ -58,7 +58,7 @@ final class ValidEmailLinksValidatorTest extends TestCase
         $this->context->expects($this->never())
             ->method('buildViolation');
 
-        $this->validator->validate($email, new ValidEmailLinks());
+        $this->validator->validateInContext($email, new ValidEmailLinks(), $this->context);
     }
 
     #[DataProvider('validLinkProvider')]
@@ -70,7 +70,7 @@ final class ValidEmailLinksValidatorTest extends TestCase
         $this->context->expects($this->never())
             ->method('buildViolation');
 
-        $this->validator->validate($email, new ValidEmailLinks());
+        $this->validator->validateInContext($email, new ValidEmailLinks(), $this->context);
     }
 
     /**
@@ -88,7 +88,7 @@ final class ValidEmailLinksValidatorTest extends TestCase
     {
         $this->expectException(UnexpectedTypeException::class);
 
-        $this->validator->validate(new Email(), $this->createStub(Constraint::class));
+        $this->validator->validateInContext(new Email(), $this->createStub(Constraint::class), $this->context);
     }
 
     private function expectViolation(string $path, string $url): void

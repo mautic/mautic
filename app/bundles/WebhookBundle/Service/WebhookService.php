@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Notificator\WebhookFailureNotificator;
 
-readonly class WebhookService
+final readonly class WebhookService
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,

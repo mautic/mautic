@@ -9,7 +9,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\BasicInterface;
 
 class TagManagerIntegration extends BasicIntegration implements BasicInterface
 {
-    public const PLUGIN_NAME = 'TagManager';
+    public const string PLUGIN_NAME = 'TagManager';
 
     public function getName(): string
     {

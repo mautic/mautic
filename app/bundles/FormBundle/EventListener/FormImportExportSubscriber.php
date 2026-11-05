@@ -18,10 +18,10 @@ use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\FormModel;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class FormImportExportSubscriber implements EventSubscriberInterface
+final readonly class FormImportExportSubscriber
 {
     use ImportExportTrait;
 
@@ -36,16 +36,9 @@ final readonly class FormImportExportSubscriber implements EventSubscriberInterf
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            EntityExportEvent::class        => ['onFormExport', 0],
-            EntityImportEvent::class        => ['onFormImport', 0],
-            EntityImportUndoEvent::class    => ['onUndoImport', 0],
-            EntityImportAnalyzeEvent::class => ['onDuplicationCheck', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: EntityExportEvent::class,
+    )]
     public function onFormExport(EntityExportEvent $event): void
     {
         if (Form::ENTITY_NAME !== $event->getEntityName()) {
@@ -55,7 +48,7 @@ final readonly class FormImportExportSubscriber implements EventSubscriberInterf
         $formId       = $event->getEntityId();
 
         $form = $this->formModel->getEntity($formId);
-        if (!$form) {
+        if (!$form instanceof Form) {
             return;
         }
 
@@ -108,6 +101,9 @@ final readonly class FormImportExportSubscriber implements EventSubscriberInterf
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportEvent::class,
+    )]
     public function onFormImport(EntityImportEvent $event): void
     {
         if (Form::ENTITY_NAME !== $event->getEntityName() || !$event->getEntityData()) {
@@ -148,6 +144,9 @@ final readonly class FormImportExportSubscriber implements EventSubscriberInterf
         }
     }
 
+    #[AsEventListener(
+        event: EntityImportUndoEvent::class,
+    )]
     public function onUndoImport(EntityImportUndoEvent $event): void
     {
         if (Form::ENTITY_NAME !== $event->getEntityName()) {
@@ -162,7 +161,7 @@ final readonly class FormImportExportSubscriber implements EventSubscriberInterf
         foreach ($summary['ids'] as $id) {
             $entity = $this->formRepository->find($id);
 
-            if ($entity) {
+            if ($entity instanceof Form) {
                 $this->entityManager->remove($entity);
                 $this->logAction('undo_import', $id, ['deletedEntity' => Form::class], 'form');
             }
@@ -171,6 +170,9 @@ final readonly class FormImportExportSubscriber implements EventSubscriberInterf
         $this->entityManager->flush();
     }
 
+    #[AsEventListener(
+        event: EntityImportAnalyzeEvent::class,
+    )]
     public function onDuplicationCheck(EntityImportAnalyzeEvent $event): void
     {
         $this->performDuplicationCheck(

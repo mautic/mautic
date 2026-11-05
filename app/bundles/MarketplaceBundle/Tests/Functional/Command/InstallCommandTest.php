@@ -6,12 +6,14 @@ namespace Mautic\MarketplaceBundle\Tests\Functional\Command;
 
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\MarketplaceBundle\Command\InstallCommand;
 use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use Mautic\MarketplaceBundle\DTO\PackageDetail;
 use Mautic\MarketplaceBundle\Exception\ApiException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Service\ResourceInstallerInterface;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\UserModel;
@@ -53,9 +55,12 @@ final class InstallCommandTest extends AbstractMauticTestCase
         $this->userRepository    = $this->createStub(UserRepository::class);
         $this->packageName       = 'koco/mautic-recaptcha-bundle';
 
-        $user = $this->createMock(User::class);
-        $user->method('getId')->willReturn(1);
-        $user->method('isAdmin')->willReturn(true);
+        $role = new Role();
+        $role->setIsAdmin(true);
+
+        $user = new User();
+        ReflectionHelper::setValue($user, 'id', 1);
+        $user->setRole($role);
         $this->userModel->method('getEntity')->willReturn($user);
     }
 

@@ -13,42 +13,44 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingService;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
+final class DeviceTrackingServiceTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CookieHelper
+     * @var MockObject&CookieHelper
      */
-    private \PHPUnit\Framework\MockObject\MockObject $cookieHelperMock;
+    private MockObject $cookieHelperMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&EntityManagerInterface
+     * @var MockObject&EntityManagerInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $entityManagerMock;
+    private MockObject $entityManagerMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&RandomHelperInterface
+     * @var MockObject&RandomHelperInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $randomHelperMock;
+    private MockObject $randomHelperMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadDeviceRepository
+     * @var MockObject&LeadDeviceRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadDeviceRepositoryMock;
+    private MockObject $leadDeviceRepositoryMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&RequestStack
+     * @var MockObject&RequestStack
      */
-    private \PHPUnit\Framework\MockObject\MockObject $requestStackMock;
+    private MockObject $requestStackMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CorePermissions
+     * @var MockObject&CorePermissions
      */
-    private \PHPUnit\Framework\MockObject\MockObject $security;
+    private MockObject $security;
 
     protected function setUp(): void
     {
@@ -73,7 +75,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->method('getCookie')
             ->with('mautic_device_id', null)
             ->willReturn($trackingId);
-        $leadDeviceMock = $this->createStub(LeadDevice::class);
+        $leadDeviceMock = new LeadDevice();
 
         $this->security->expects($this->once())
             ->method('isAnonymous')
@@ -116,7 +118,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
     public function testGetTrackedDeviceCookie(): void
     {
         $trackingId     = 'randomTrackingId';
-        $leadDeviceMock = $this->createStub(LeadDevice::class);
+        $leadDeviceMock = new LeadDevice();
         $requestMock    = $this->createStub(Request::class);
 
         $this->requestStackMock->expects($this->once())
@@ -144,7 +146,7 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
     {
         $trackingId     = 'randomTrackingId';
         $requestMock    = new Request(['mautic_device_id' => $trackingId]);
-        $leadDeviceMock = $this->createStub(LeadDevice::class);
+        $leadDeviceMock = new LeadDevice();
 
         $this->requestStackMock->expects($this->once())
             ->method('getCurrentRequest')
@@ -201,9 +203,9 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
      */
     public function testTrackCurrentDeviceAlreadyTracked(): void
     {
-        $leadDeviceMock        = $this->createStub(LeadDevice::class);
+        $leadDeviceMock        = new LeadDevice();
         $trackingId            = 'randomTrackingId';
-        $trackedLeadDeviceMock = $this->createStub(LeadDevice::class);
+        $trackedLeadDeviceMock = new LeadDevice();
 
         $requestMock = $this->createStub(Request::class);
         $this->requestStackMock->expects($this->once())
@@ -234,8 +236,9 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
      */
     public function testTrackCurrentDeviceAlreadyTrackedReplaceExistingTracking(): void
     {
-        $leadDeviceMock           = $this->createMock(LeadDevice::class);
-        $trackedLeadDeviceMock    = $this->createStub(LeadDevice::class);
+        $leadDeviceMock           = new LeadDevice();
+        $leadDeviceMock->setLead(new Lead());
+        $trackedLeadDeviceMock    = new LeadDevice();
         $requestMock              = $this->createStub(Request::class);
         $trackingId               = 'randomTrackingId';
         $uniqueTrackingIdentifier = '1234567890abcdefghij123';
@@ -272,19 +275,6 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->method('persist')
             ->with($leadDeviceMock);
 
-        // index 0-3 for leadDeviceRepository::findOneBy
-        $leadDeviceMock->method('getTrackingId')
-            ->willReturnOnConsecutiveCalls(null, $uniqueTrackingIdentifier);
-
-        $leadDeviceMock->expects($this->once())
-            ->method('setTrackingId')
-            ->with($uniqueTrackingIdentifier)
-            ->willReturn($leadDeviceMock);
-
-        $leadDeviceMock->expects($this->once())
-            ->method('getLead')
-            ->willReturn(new Lead());
-
         $matcher = new AnyInvokedCount();
 
         $this->cookieHelperMock->expects($matcher)->method('setCookie')
@@ -298,6 +288,8 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
         $deviceTrackingService = $this->getDeviceTrackingService();
         $deviceTrackingService->trackCurrentDevice($leadDeviceMock, true);
+
+        $this->assertSame($uniqueTrackingIdentifier, $leadDeviceMock->getTrackingId());
     }
 
     /**
@@ -305,7 +297,8 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
      */
     public function testTrackCurrentDeviceNotTrackedYet(): void
     {
-        $leadDeviceMock           = $this->createMock(LeadDevice::class);
+        $leadDeviceMock           = new LeadDevice();
+        $leadDeviceMock->setLead(new Lead());
         $uniqueTrackingIdentifier = '1234567890abcdefghij123';
         $requestMock              = new Request();
 
@@ -327,19 +320,6 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
             ->method('isAnonymous')
             ->willReturn(true);
 
-        // index 0-3 for leadDeviceRepository::findOneBy
-        $leadDeviceMock->method('getTrackingId')
-            ->willReturnOnConsecutiveCalls(null, $uniqueTrackingIdentifier);
-
-        $leadDeviceMock->expects($this->once())
-            ->method('setTrackingId')
-            ->with($uniqueTrackingIdentifier)
-            ->willReturn($leadDeviceMock);
-
-        $leadDeviceMock->expects($this->once())
-            ->method('getLead')
-            ->willReturn(new Lead());
-
         $matcher = new AnyInvokedCount();
 
         $this->cookieHelperMock->expects($matcher)->method('setCookie')
@@ -360,6 +340,8 @@ final class DeviceTrackingServiceTest extends \PHPUnit\Framework\TestCase
 
         $deviceTrackingService = $this->getDeviceTrackingService();
         $deviceTrackingService->trackCurrentDevice($leadDeviceMock, false);
+
+        $this->assertSame($uniqueTrackingIdentifier, $leadDeviceMock->getTrackingId());
     }
 
     /**

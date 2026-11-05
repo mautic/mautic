@@ -7,8 +7,9 @@ namespace Mautic\LeadBundle\Tests\Field\DTO;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Exception\InvalidObjectTypeException;
 use Mautic\LeadBundle\Field\DTO\CustomFieldObject;
+use PHPUnit\Framework\TestCase;
 
-final class CustomFieldObjectTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldObjectTest extends TestCase
 {
     public function testLeadObject(): void
     {

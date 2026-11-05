@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CampaignShareDownloadController extends CommonController
 {
     #[Route(
-        '/campaign-share/{token}',
+        path: '/campaign-share/{token}',
         name: 'mautic_campaign_share_download',
         requirements: ['token' => '[a-f0-9]{32}'],
         methods: ['GET']

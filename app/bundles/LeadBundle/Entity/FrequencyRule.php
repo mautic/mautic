@@ -6,25 +6,27 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 
 #[ORM\Entity(repositoryClass: FrequencyRuleRepository::class)]
 #[ORM\Table(name: 'lead_frequencyrules')]
-#[ORM\Index(columns: ['channel'], name: 'channel_frequency')]
-#[ORM\Index(columns: ['lead_id', 'date_added'], name: 'idx_frequency_date_added')]
+#[ORM\Index(name: 'channel_frequency', columns: ['channel'])]
+#[ORM\Index(name: 'idx_frequency_date_added', columns: ['lead_id', 'date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class FrequencyRule extends CommonEntity
 {
-    public const TIME_DAY   = 'DAY';
+    public const string TIME_DAY   = 'DAY';
 
-    public const TIME_WEEK  = 'WEEK';
+    public const string TIME_WEEK  = 'WEEK';
 
-    public const TIME_MONTH = 'MONTH';
+    public const string TIME_MONTH = 'MONTH';
 
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -37,68 +39,41 @@ class FrequencyRule extends CommonEntity
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'frequency_number', type: 'smallint', nullable: true)]
     private $frequencyNumber;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'frequency_time', type: 'string', length: 25, nullable: true)]
     private $frequencyTime;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
+    #[ORM\Column(name: 'preferred_channel', type: 'boolean')]
     private bool $preferredChannel = false;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'pause_from_date', type: 'datetime', nullable: true)]
     private $pauseFromDate;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'pause_to_date', type: 'datetime', nullable: true)]
     private $pauseToDate;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->addDateAdded();
-
-        $builder->addNamedField('frequencyNumber', 'smallint', 'frequency_number', true);
-
-        $builder->createField('frequencyTime', 'string')
-            ->columnName('frequency_time')
-            ->nullable()
-            ->length(25)
-            ->build();
-
-        $builder->createField('channel', 'string')
-            ->build();
-
-        $builder->createField('preferredChannel', 'boolean')
-            ->columnName('preferred_channel')
-            ->build();
-
-        $builder->createField('pauseFromDate', 'datetime')
-            ->columnName('pause_from_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('pauseToDate', 'datetime')
-            ->columnName('pause_to_date')
-            ->nullable()
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -141,10 +116,7 @@ class FrequencyRule extends CommonEntity
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function setLead($lead): static
+    public function setLead(Lead $lead): static
     {
         $this->lead = $lead;
 

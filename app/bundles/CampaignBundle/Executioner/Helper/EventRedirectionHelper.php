@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
  * This helper centralizes logic for finding and following chains of redirected events.
  * It also provides methods to handle the replacement of deleted events with their redirects.
  */
-readonly class EventRedirectionHelper
+final readonly class EventRedirectionHelper
 {
     private const int MAX_DEPTH = 20;
 
@@ -26,9 +26,9 @@ readonly class EventRedirectionHelper
      * Handle redirection for a deleted event and replace it in the event's collection.
      * If a redirection is found, returns the redirected event; otherwise returns the original event.
      *
-     * @param Event           $event  The event to check for redirection
-     * @param ?Collection     $events The collection containing the event
-     * @param int|string|null $key    The key of the event in the collection
+     * @param Event                    $event  The event to check for redirection
+     * @param ?Collection<int, Event>  $events The collection containing the event
+     * @param int|string|null          $key    The key of the event in the collection
      *
      * @return Event The redirected event if redirection was successful, or the original event if not
      */
@@ -112,8 +112,10 @@ readonly class EventRedirectionHelper
         }
 
         $this->logger->debug(
-            sprintf('CAMPAIGN: Redirect event ID %d is also deleted, following redirect chain',
-                $redirectEvent->getId())
+            sprintf(
+                'CAMPAIGN: Redirect event ID %d is also deleted, following redirect chain',
+                $redirectEvent->getId()
+            )
         );
 
         return $this->findRedirectEventInCampaign($redirectEvent, $visited, $depth + 1);

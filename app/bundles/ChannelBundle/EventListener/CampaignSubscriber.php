@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\EventListener;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
@@ -12,20 +12,26 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException;
+use Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Form\Type\MessageSendType;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\ChannelBundle\PreferenceBuilder\PreferenceBuilder;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use ReflectionException;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class CampaignSubscriber implements EventSubscriberInterface
+final class CampaignSubscriber
 {
     private ?Event $pseudoEvent = null;
 
-    private ?ArrayCollection $mmLogs = null;
+    /**
+     * @var Collection<int, LeadEventLog>|null
+     */
+    private ?Collection $mmLogs = null;
 
     /**
      * @var mixed[]
@@ -41,14 +47,9 @@ final class CampaignSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            ChannelEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         $channels  = $this->messageModel->getChannels();
@@ -80,10 +81,13 @@ final class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
-     * @throws \ReflectionException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
+     * @throws ReflectionException
      */
+    #[AsEventListener(
+        event: ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
+    )]
     public function onCampaignTriggerAction(PendingEvent $pendingEvent): void
     {
         $this->pseudoEvent = clone $pendingEvent->getEvent();
@@ -137,16 +141,16 @@ final class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param string               $channel
      * @param array<string, mixed> $messageChannel
      *
-     * @return bool|ArrayCollection
+     * @return bool|Collection<int, LeadEventLog>
      *
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogNotProcessedException
-     * @throws \Mautic\CampaignBundle\Executioner\Dispatcher\Exception\LogPassedAndFailedException
+     * @throws LogNotProcessedException
+     * @throws LogPassedAndFailedException
      * @throws \ReflectionException
+     * @param Collection<int, LeadEventLog> $logs
      */
-    private function sendChannelMessage(ArrayCollection $logs, int|string $channel, array $messageChannel)
+    private function sendChannelMessage(Collection $logs, int|string $channel, array $messageChannel)
     {
         /** @var ActionAccessor $config */
         $config = $this->eventCollector->getEventConfig($this->pseudoEvent);
@@ -181,7 +185,10 @@ final class CampaignSubscriber implements EventSubscriberInterface
         return $success;
     }
 
-    private function passExecutedLogs(PendingEvent $pendingEvent, ArrayCollection $logs, PreferenceBuilder $channelPreferences): void
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
+    private function passExecutedLogs(PendingEvent $pendingEvent, Collection $logs, PreferenceBuilder $channelPreferences): void
     {
         /** @var LeadEventLog $log */
         foreach ($logs as $log) {
@@ -197,9 +204,9 @@ final class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param ArrayCollection<int,LeadEventLog> $success
+     * @param Collection<int,LeadEventLog> $success
      */
-    private function removePsuedoFailures(ArrayCollection $success): void
+    private function removePsuedoFailures(Collection $success): void
     {
         foreach ($success as $key => $log) {
             if (!empty($log->getMetadata()['failed'])) {

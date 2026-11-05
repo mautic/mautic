@@ -10,14 +10,18 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
+use Mautic\LeadBundle\Event\ListDeleteEvent;
+use Mautic\LeadBundle\Event\ListPostDeleteEvent;
+use Mautic\LeadBundle\Event\ListPostSaveEvent;
+use Mautic\LeadBundle\Event\ListPreDeleteEvent;
+use Mautic\LeadBundle\Event\ListPreUnpublishEvent;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class SegmentSubscriber implements EventSubscriberInterface
+final readonly class SegmentSubscriber
 {
     public function __construct(
         private IpLookupHelper $ipLookupHelper,
@@ -30,27 +34,12 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadEvents::LIST_POST_SAVE     => ['onSegmentPostSave', 0],
-            LeadEvents::ON_LIST_DELETE     => ['onSegmentDelete', 0],
-            LeadEvents::LIST_POST_DELETE   => [
-                ['onSegmentPostDelete', 0],
-                ['clearSegmentCountCache', 0],
-            ],
-            LeadEvents::LIST_PRE_DELETE   => [
-                ['onSegmentPreDelete', 0],
-            ],
-            LeadEvents::LIST_PRE_UNPUBLISH => [
-                ['onSegmentPreUnpublish', 0],
-            ],
-        ];
-    }
-
     /**
      * Add a segment entry to the audit log.
      */
+    #[AsEventListener(
+        event: ListPostSaveEvent::class,
+    )]
     public function onSegmentPostSave(SegmentEvent $event): void
     {
         $segment = $event->getList();
@@ -70,6 +59,9 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
     /**
      * @throws RecordCanNotUnpublishException
      */
+    #[AsEventListener(
+        event: ListPreUnpublishEvent::class,
+    )]
     public function onSegmentPreUnpublish(SegmentEvent $event): void
     {
         $leadList = $event->getList();
@@ -81,7 +73,8 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
                     '%segments%'     => implode(',', $lists),
                     '%segmentNames%' => $leadList->getName(),
                 ],
-                'validators');
+                'validators'
+            );
             throw new RecordCanNotUnpublishException($message);
         }
 
@@ -93,6 +86,9 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
     /**
      * @throws DeleteEntityDependencyException
      */
+    #[AsEventListener(
+        event: ListPreDeleteEvent::class,
+    )]
     public function onSegmentPreDelete(SegmentEvent $event): void
     {
         $leadList = $event->getList();
@@ -105,7 +101,8 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
                     '%segments%'     => implode(',', $lists),
                     '%segmentNames%' => $leadList->getName(),
                 ],
-                'validators');
+                'validators'
+            );
             $event->addDependencyError($message);
         }
 
@@ -114,6 +111,9 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: ListDeleteEvent::class,
+    )]
     public function onSegmentDelete(SegmentEvent $event): void
     {
         if ($this->coreParametersHelper->get('delete_segment_in_background', false)) {
@@ -129,6 +129,9 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
     /**
      * Add a segment delete entry to the audit log.
      */
+    #[AsEventListener(
+        event: ListPostDeleteEvent::class,
+    )]
     public function onSegmentPostDelete(SegmentEvent $event): void
     {
         $segment = $event->getList();
@@ -143,6 +146,9 @@ final readonly class SegmentSubscriber implements EventSubscriberInterface
         $this->auditLogModel->writeToLog($log);
     }
 
+    #[AsEventListener(
+        event: ListPostDeleteEvent::class,
+    )]
     public function clearSegmentCountCache(SegmentEvent $event): void
     {
         $segment = $event->getList();

@@ -8,9 +8,10 @@ use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Tests\Unit\Helper\TestResources\WakeupCall;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Serializer::class)]
-final class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
+final class ClickthroughHelperTest extends TestCase
 {
     public function testEncodingCanBeDecoded(): void
     {

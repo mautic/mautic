@@ -10,15 +10,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Provides translated flash messages.
  */
-readonly class FlashBag
+final readonly class FlashBag
 {
-    public const LEVEL_ERROR     = 'error';
+    public const string LEVEL_ERROR     = 'error';
 
-    public const LEVEL_WARNING   = 'warning';
+    public const string LEVEL_WARNING   = 'warning';
 
-    public const LEVEL_NOTICE    = 'notice';
+    public const string LEVEL_NOTICE    = 'notice';
 
-    public const LEVEL_SUCCESS   = 'success';
+    public const string LEVEL_SUCCESS   = 'success';
 
     public function __construct(
         private TranslatorInterface $translator,
@@ -60,7 +60,11 @@ readonly class FlashBag
             };
 
             // If the user has not interacted with the browser for the last 30 seconds, consider the message unread
-            $lastActive = $this->requestStack->getCurrentRequest()->attributes->all()['mauticUserLastActive'] ?? $this->requestStack->getCurrentRequest()->query->all()['mauticUserLastActive'] ?? $this->requestStack->getCurrentRequest()->request->all()['mauticUserLastActive'] ?? 0;
+            $request    = $this->requestStack->getCurrentRequest();
+            $lastActive = $request->attributes->all()['mauticUserLastActive']
+                ?? $request->query->all()['mauticUserLastActive']
+                ?? $request->request->all()['mauticUserLastActive']
+                ?? 0;
             $isRead     = $lastActive > 30 ? 0 : 1;
 
             $this->notificationModel->addNotification($message, $level, $isRead, null, $iconClass);

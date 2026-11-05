@@ -95,8 +95,8 @@ final class InjectCustomContentSubscriberTest extends TestCase
     {
         $requestStack = new RequestStack([new Request([], [], [], [], [], ['REQUEST_METHOD' => 'GET'])]);
 
-        $grapesJsBuilder = $this->createMock(GrapesJsBuilder::class);
-        $grapesJsBuilder->expects($this->once())->method('getCustomMjml')->willReturn('<mjml>stored</mjml>');
+        $grapesJsBuilder = new GrapesJsBuilder();
+        $grapesJsBuilder->setCustomMjml('<mjml>stored</mjml>');
 
         $this->grapesJsBuilderRepository->expects($this->once())->method('findOneBy')->willReturn($grapesJsBuilder);
 

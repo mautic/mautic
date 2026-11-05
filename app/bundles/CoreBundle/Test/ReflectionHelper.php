@@ -4,8 +4,31 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Test;
 
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+
 final class ReflectionHelper
 {
+    /**
+     * Returns the #[AsEventListener] bindings of a class as a sorted list of
+     * [event, method, priority] triples, so tests can assert the wiring regardless of order.
+     *
+     * @return list<array{string, string, int}>
+     */
+    public static function getAttributeListeners(string $class): array
+    {
+        $listeners = [];
+        foreach (new \ReflectionClass($class)->getMethods() as $method) {
+            foreach ($method->getAttributes(AsEventListener::class) as $attribute) {
+                $listener = $attribute->newInstance();
+                $listeners[] = [$listener->event, $method->getName(), $listener->priority];
+            }
+        }
+
+        sort($listeners);
+
+        return $listeners;
+    }
+
     /**
      * Sets a property value on an object via reflection, bypassing visibility.
      *
@@ -24,6 +47,14 @@ final class ReflectionHelper
         }
 
         $reflectionClass->getProperty($property)->setValue($object, $value);
+    }
+
+    /**
+     * Sets the "id" property on an entity via reflection, bypassing visibility.
+     */
+    public static function setEntityId(object $entity, mixed $id): void
+    {
+        self::setValue($entity, 'id', $id);
     }
 
     /**

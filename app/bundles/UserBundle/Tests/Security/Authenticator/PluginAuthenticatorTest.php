@@ -8,12 +8,12 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractSsoServiceIntegration;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\AuthenticationEvent;
+use Mautic\UserBundle\Event\PreAuthenticationEvent;
 use Mautic\UserBundle\Security\Authentication\AuthenticationHandler;
 use Mautic\UserBundle\Security\Authentication\Token\Permissions\TokenPermissions;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PluginBadge;
 use Mautic\UserBundle\Security\Authenticator\PluginAuthenticator;
-use Mautic\UserBundle\UserEvents;
 use OAuth2\OAuth2;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +28,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -53,7 +52,7 @@ final class PluginAuthenticatorTest extends TestCase
             ->with($integration, ['sso_service'], false, null, true)
             ->willReturn([$integrationService]);
 
-        $authEvent = new AuthenticationEvent(
+        $authEvent = new PreAuthenticationEvent(
             null,
             $pluginToken,
             $userProvider,
@@ -65,8 +64,8 @@ final class PluginAuthenticatorTest extends TestCase
 
         // If there will be an issue with this, then please replace with proper class name.
         // I'm not 100% sure the SSO will return a User instance.
-        $authenticatedUser = $this->createMock(User::class);
-        $authenticatedUser->method('getUserIdentifier')->willReturn($userIdentifier);
+        $authenticatedUser = new User();
+        $authenticatedUser->setUsername($userIdentifier);
         $returnedPluginToken = new PluginToken($firewallName, $authenticatedIntegration);
         $returnedPluginToken->setUser($authenticatedUser);
         $returnedAuthEvent = clone $authEvent;
@@ -76,7 +75,7 @@ final class PluginAuthenticatorTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())
             ->method('hasListeners')
-            ->with(UserEvents::USER_PRE_AUTHENTICATION)
+            ->with(PreAuthenticationEvent::class)
             ->willReturn(true);
         $dispatcher->expects($this->once())
             ->method('dispatch')
@@ -127,7 +126,7 @@ final class PluginAuthenticatorTest extends TestCase
             ->with($integration, ['sso_service'], false, null, true)
             ->willReturn([$integrationService]);
 
-        $authEvent = new AuthenticationEvent(
+        $authEvent = new PreAuthenticationEvent(
             null,
             $pluginToken,
             $userProvider,
@@ -139,13 +138,13 @@ final class PluginAuthenticatorTest extends TestCase
 
         // If there will be an issue with this, then please replace with proper class name.
         // I'm not 100% sure the SSO will return a User instance.
-        $authenticatedUser = $this->createMock(User::class);
-        $authenticatedUser->method('getUserIdentifier')->willReturn($userIdentifier);
+        $authenticatedUser = new User();
+        $authenticatedUser->setUsername($userIdentifier);
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())
             ->method('hasListeners')
-            ->with(UserEvents::USER_PRE_AUTHENTICATION)
+            ->with(PreAuthenticationEvent::class)
             ->willReturn(true);
         $dispatcher->expects($this->once())
             ->method('dispatch')
@@ -187,7 +186,6 @@ final class PluginAuthenticatorTest extends TestCase
         $firewallName          = 'test';
         $authenticatingService = 'Auth service';
         $encodedPassword       = 'En pass.';
-        $roles                 = ['role', 'the', 'roly'];
         $pluginResponse        = new Response();
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -199,9 +197,10 @@ final class PluginAuthenticatorTest extends TestCase
 
         $userProvider = $this->createStub(UserProviderInterface::class);
 
-        $passportUser = $this->createMock(User::class);
-        $passportUser->method('getPassword')->willReturn($encodedPassword);
-        $passportUser->method('getRoles')->willReturn($roles);
+        $passportUser = new User();
+        $passportUser->setUsername('plugin-user');
+        $passportUser->setPassword($encodedPassword);
+        $roles = $passportUser->getRoles();
 
         $userBadge = new UserBadge('user', fn (): UserInterface => $passportUser);
 
@@ -265,7 +264,6 @@ final class PluginAuthenticatorTest extends TestCase
             ->method('dispatch')
             ->with(
                 new InteractiveLoginEvent($request, $token),
-                SecurityEvents::INTERACTIVE_LOGIN
             )
             ->willReturnArgument(0);
 

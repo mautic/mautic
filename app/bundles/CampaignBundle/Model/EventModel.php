@@ -2,12 +2,11 @@
 
 namespace Mautic\CampaignBundle\Model;
 
-use Mautic\CampaignBundle\CampaignEvents;
-use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Event\AfterEventsDeleteEvent;
 use Mautic\CampaignBundle\Event\DeleteEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -17,7 +16,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Event>
  */
-class EventModel extends FormModel
+final class EventModel extends FormModel
 {
     public static function getName(): string
     {
@@ -101,7 +100,7 @@ class EventModel extends FormModel
     {
         $deletedData = array_map(fn (string $id): array => ['id' => (int) $id, 'redirectEvent' => null], $eventIds);
         $this->eventRepository->setEventsAsDeletedWithRedirect($deletedData);
-        $this->dispatcher->dispatch(new DeleteEvent($eventIds), CampaignEvents::ON_AFTER_EVENTS_DELETE);
+        $this->dispatcher->dispatch(new AfterEventsDeleteEvent($eventIds));
     }
 
     /**
@@ -109,9 +108,8 @@ class EventModel extends FormModel
      *
      * @param string $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
-     * @param array  $filter
      */
-    public function getEventLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [], bool $canViewOthers = true): array
+    public function getEventLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, array $filter = [], bool $canViewOthers = true): array
     {
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);

@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\Event\DecisionEvent;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\EmailBundle\Helper\UrlMatcher;
+use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\PageBundle\Entity\Hit;
@@ -16,9 +17,9 @@ use Mautic\PageBundle\Form\Type\CampaignEventPageHitType;
 use Mautic\PageBundle\Form\Type\TrackingPixelSendType;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\PageEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class CampaignSubscriber implements EventSubscriberInterface
+final readonly class CampaignSubscriber
 {
     public function __construct(
         private LeadDeviceRepository $leadDeviceRepository,
@@ -27,22 +28,12 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignBuilderEvent::class => ['onCampaignBuild', 0],
-            PageHitEvent::class                  => ['onPageHit', 0],
-            PageEvents::ON_CAMPAIGN_TRIGGER_DECISION => [
-                ['onCampaignTriggerDecision', 0],
-                ['onCampaignTriggerDecisionDeviceHit', 1],
-            ],
-            PageEvents::ON_CAMPAIGN_BATCH_ACTION => ['onCampaignTriggerAction', 0],
-        ];
-    }
-
     /**
      * Add event triggers and actions.
      */
+    #[AsEventListener(
+        event: CampaignBuilderEvent::class,
+    )]
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         // Add trigger
@@ -92,6 +83,9 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
     /**
      * Trigger actions for page hits.
      */
+    #[AsEventListener(
+        event: PageHitEvent::class,
+    )]
     public function onPageHit(PageHitEvent $event): void
     {
         $hit       = $event->getHit();
@@ -107,6 +101,10 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         $this->realTimeExecutioner->execute('page.devicehit', $hit, $channel, $channelId);
     }
 
+    #[AsEventListener(
+        event: PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+        priority: 1
+    )]
     public function onCampaignTriggerDecisionDeviceHit(DecisionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();
@@ -123,7 +121,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
 
         $result = false;
 
-        $deviceId     = $eventDetails->getDeviceStat() ? $eventDetails->getDeviceStat()->getId() : null;
+        $deviceId     = $eventDetails->getDeviceStat() instanceof LeadDevice ? $eventDetails->getDeviceStat()->getId() : null;
         $deviceType   = $config['device_type'];
         $deviceBrands = $config['device_brand'];
         $deviceOs     = $config['device_os'];
@@ -154,6 +152,9 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: PageEvents::ON_CAMPAIGN_TRIGGER_DECISION,
+    )]
     public function onCampaignTriggerDecision(DecisionEvent $event): void
     {
         $eventDetails = $event->getEventDetails();
@@ -222,6 +223,9 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: PageEvents::ON_CAMPAIGN_BATCH_ACTION,
+    )]
     public function onCampaignTriggerAction(PendingEvent $event): void
     {
         $config = $event->getEvent()->getProperties();

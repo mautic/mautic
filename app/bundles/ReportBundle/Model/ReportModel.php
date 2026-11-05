@@ -3,9 +3,9 @@
 namespace Mautic\ReportBundle\Model;
 
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -47,14 +47,14 @@ use Twig\Environment;
 /**
  * @extends FormModel<Report>
  */
-class ReportModel extends FormModel implements GlobalSearchInterface
+final class ReportModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
         return 'report.report';
     }
 
-    public const CHANNEL_FEATURE = 'reporting';
+    public const string CHANNEL_FEATURE = 'reporting';
 
     /**
      * @var array
@@ -64,14 +64,14 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     /**
      * @var mixed
      */
-    protected $defaultPageLimit;
+    private $defaultPageLimit;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        protected Environment $twig,
-        protected ChannelListHelper $channelListHelper,
-        protected FieldModel $fieldModel,
-        protected ReportHelper $reportHelper,
+        private readonly Environment $twig,
+        private readonly ChannelListHelper $channelListHelper,
+        private readonly FieldModel $fieldModel,
+        private readonly ReportHelper $reportHelper,
         private readonly CsvExporter $csvExporter,
         private readonly ExcelExporter $excelExporter,
         EntityManagerInterface $em,
@@ -99,7 +99,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         return 'report:reports';
     }
 
-    protected function getSession(): SessionInterface
+    private function getSession(): SessionInterface
     {
         try {
             return $this->requestStack->getSession();
@@ -109,9 +109,11 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Report|array<string, mixed> $entity
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -145,9 +147,11 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Report $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -173,7 +177,6 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         if ($this->dispatcher->hasListeners($name)) {
             if (!$event instanceof Event) {
                 $event = new ReportEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
             }
 
             $this->dispatcher->dispatch($event, $name);
@@ -232,10 +235,8 @@ class ReportModel extends FormModel implements GlobalSearchInterface
      * Builds the table lookup data for the report forms.
      *
      * @param string $context
-     *
-     * @return array
      */
-    public function getTableData($context = 'all', ?string $reportSource = null)
+    public function getTableData($context = 'all', ?string $reportSource = null): array
     {
         $data = $this->buildAvailableReports($context, $reportSource);
 
@@ -313,8 +314,6 @@ class ReportModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param string $context
-     *
      * return \stdClass{filterList: mixed[], definitions: mixed[], operatorChoices: mixed[], operatorHtml: mixed[], filterListHtml: string}
      */
     public function getFilterList(string $context = 'all'): \stdClass
@@ -461,16 +460,23 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
             $options['dateTo'] ??= $now;
 
+            /** @var \DateTime $dateFrom */
+            $dateFrom = $options['dateFrom'];
+            /** @var \DateTime $dateTo */
+            $dateTo = $options['dateTo'];
+
             // Set time to the last second of the "to date" date
-            if ($now->format('Y-m-d') === $options['dateTo']->format('Y-m-d')) {
-                $options['dateTo'] = $now->setTime(23, 59, 59);
+            if ($now->format('Y-m-d') === $dateTo->format('Y-m-d')) {
+                $dateTo = $now->setTime(23, 59, 59);
             } else {
-                $options['dateTo']->setTime(23, 59, 59);
+                $dateTo->setTime(23, 59, 59);
             }
 
             // Convert date ranges to UTC for fetching tabular data
-            $options['dateFrom']->setTimeZone(new \DateTimeZone('UTC'));
-            $options['dateTo']->setTimeZone(new \DateTimeZone('UTC'));
+            $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
+            $dateTo->setTimeZone(new \DateTimeZone('UTC'));
+
+            $options['dateTo'] = $dateTo;
         }
 
         $paginate        = !empty($options['paginate']);
@@ -493,7 +499,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             $dataAggregatorColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']] = $aggregatorColumn['column'];
         }
         // Build a reference for column to data column (without table prefix)
-        foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
+        foreach ($tableDetails['columns'] as $dbColumn => $columnData) {
             $dataColumns[$columnData['alias']] = $dbColumn;
         }
 
@@ -516,7 +522,6 @@ class ReportModel extends FormModel implements GlobalSearchInterface
             'dynamicFilters' => $options['dynamicFilters'] ?? [],
         ];
 
-        /** @var QueryBuilder $query */
         $query                 = $reportGenerator->getQuery($dataOptions);
         $options['translator'] = $this->translator;
 
@@ -539,11 +544,8 @@ class ReportModel extends FormModel implements GlobalSearchInterface
 
             // Check to see if this is an update from AJAX
             $selectedGraphs = (!empty($options['graphName'])) ? [$options['graphName']] : $entity->getGraphs();
-            if (!empty($selectedGraphs)) {
+            if ($selectedGraphs !== []) {
                 $availableGraphs = $this->getGraphData($entity->getSource());
-                if (empty($query)) {
-                    $query = $reportGenerator->getQuery();
-                }
 
                 $eventGraphs                     = [];
                 $defaultGraphOptions             = $options;
@@ -580,7 +582,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         $this->dispatcher->dispatch($event);
         $query = $event->getQuery();
 
-        if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
+        if (empty($options['ignoreTableData']) && $selectedColumns !== []) {
             if ($paginate) {
                 // Build the options array to pass into the query
                 if ($session->isStarted()) {
@@ -805,6 +807,14 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         return (int) $countQb->executeQuery()->fetchOne();
     }
 
+    /**
+     * @return iterable<Report>
+     */
+    public function getEntities(array $args = []): iterable
+    {
+        return parent::getEntities($args);
+    }
+
     public function getReportsIdsWithDependenciesOnSegment(int $segmentId): array
     {
         $search = 'lll.leadlist_id';
@@ -890,10 +900,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         return array_unique($dependents);
     }
 
-    /**
-     * @return \Doctrine\DBAL\Connection
-     */
-    private function getConnection()
+    private function getConnection(): \Doctrine\DBAL\Connection
     {
         $connection = $this->em->getConnection();
         if ($connection instanceof PrimaryReadReplicaConnection) {
@@ -903,7 +910,7 @@ class ReportModel extends FormModel implements GlobalSearchInterface
         return $connection;
     }
 
-    protected function isDebugMode(): bool
+    private function isDebugMode(): bool
     {
         return MAUTIC_ENV == 'dev' || $this->coreParametersHelper->get('debug');
     }

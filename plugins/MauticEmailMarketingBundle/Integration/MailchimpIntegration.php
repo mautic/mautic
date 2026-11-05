@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
+use Exception;
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\MailchimpType;
 
 final class MailchimpIntegration extends EmailAbstractIntegration
@@ -112,15 +113,12 @@ final class MailchimpIntegration extends EmailAbstractIntegration
         return [];
     }
 
-    /**
-     * @param array $config
-     */
-    public function pushLead($lead, $config = []): bool
+    public function pushLead($lead, array $config = []): bool
     {
         $config     = $this->mergeConfigToFeatureSettings($config);
         $mappedData = $this->populateLeadData($lead, $config);
 
-        if (empty($mappedData)) {
+        if ($mappedData === []) {
             return false;
         }
         if (empty($mappedData['EMAIL'])) {
@@ -144,7 +142,7 @@ final class MailchimpIntegration extends EmailAbstractIntegration
 
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 

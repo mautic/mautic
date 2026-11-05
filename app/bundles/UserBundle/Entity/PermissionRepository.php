@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Query;
@@ -10,7 +12,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Permission>
  */
-class PermissionRepository extends CommonRepository
+final class PermissionRepository extends CommonRepository
 {
     /**
      * Delete all permissions for a specific role.

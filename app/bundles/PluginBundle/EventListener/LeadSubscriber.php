@@ -2,16 +2,18 @@
 
 namespace Mautic\PluginBundle\EventListener;
 
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Event\CompanyEvent;
+use Mautic\LeadBundle\Event\CompanyPreDeleteEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
+use Mautic\LeadBundle\Event\LeadPreDeleteEvent;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Entity\IntegrationRepository;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber
 {
     private const string FEATURE_PUSH_LEAD = 'push_lead';
 
@@ -21,15 +23,9 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadEvents::LEAD_PRE_DELETE    => ['onLeadDelete', 0],
-            LeadEvents::LEAD_POST_SAVE     => ['onLeadSave', 0],
-            LeadEvents::COMPANY_PRE_DELETE => ['onCompanyDelete', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: LeadPreDeleteEvent::class,
+    )]
     public function onLeadDelete(LeadEvent $event): bool
     {
         $lead = $event->getLead();
@@ -38,9 +34,12 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         return false;
     }
 
+    #[AsEventListener(
+        event: CompanyPreDeleteEvent::class,
+    )]
     public function onCompanyDelete(CompanyEvent $event): bool
     {
-        /** @var \Mautic\LeadBundle\Entity\Company $company */
+        /** @var Company $company */
         $company = $event->getCompany();
         $this->integrationEntityRepository->findLeadsToDelete('company%', $company->getId());
 
@@ -48,8 +47,11 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     }
 
     /*
-    * Change lead event
-    */
+     * Change lead event
+     */
+    #[AsEventListener(
+        event: LeadPostSaveEvent::class,
+    )]
     public function onLeadSave(LeadEvent $event): void
     {
         $lead = $event->getLead();

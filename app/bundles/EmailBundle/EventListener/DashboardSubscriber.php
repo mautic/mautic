@@ -207,7 +207,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                foreach ($emails as &$email) {
+                foreach ($emails as $email) {
                     $emailUrl = $this->router->generate('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email['id']]);
                     $row      = [
                         [
@@ -249,7 +249,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                foreach ($emails as &$email) {
+                foreach ($emails as $email) {
                     $emailUrl = $this->router->generate('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email['id']]);
                     $row      = [
                         [
@@ -291,7 +291,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                foreach ($emails as &$email) {
+                foreach ($emails as $email) {
                     $emailUrl = $this->router->generate(
                         'mautic_email_action',
                         [

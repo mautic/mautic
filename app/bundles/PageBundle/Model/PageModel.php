@@ -2,9 +2,9 @@
 
 namespace Mautic\PageBundle\Model;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use GuzzleHttp\Psr7\Query;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -37,7 +37,6 @@ use Mautic\LeadBundle\Entity\UtmTagRepository;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -69,7 +68,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Page>
  */
-class PageModel extends FormModel implements GlobalSearchInterface
+final class PageModel extends FormModel implements GlobalSearchInterface
 {
     use TranslationModelTrait;
     use VariantModelTrait;
@@ -92,20 +91,14 @@ class PageModel extends FormModel implements GlobalSearchInterface
      */
     private const string STRING_ENCODING = 'UTF-8';
 
-    /**
-     * @var bool
-     */
-    protected $catInUrl;
+    private ?bool $catInUrl = null;
 
-    protected DateTimeHelper $dateTimeHelper;
+    private readonly DateTimeHelper $dateTimeHelper;
 
     public function __construct(
-        protected CookieHelper $cookieHelper,
-        protected IpLookupHelper $ipLookupHelper,
-        protected LeadModel $leadModel,
-        protected FieldModel $leadFieldModel,
-        protected RedirectModel $pageRedirectModel,
-        protected TrackableModel $pageTrackableModel,
+        private readonly CookieHelper $cookieHelper,
+        private readonly IpLookupHelper $ipLookupHelper,
+        private readonly LeadModel $leadModel,
         private readonly MessageBusInterface $messageBus,
         private readonly CompanyModel $companyModel,
         private readonly IdentifyCompanyHelper $identifyCompanyHelper,
@@ -163,7 +156,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @param Page $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $pageIds = $entity->getRelatedEntityIds();
 
@@ -222,7 +215,10 @@ class PageModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    /**
+     * @param Page|array<string, mixed> $entity
+     */
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -248,8 +244,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
             $entity->setSessionId('new_'.hash('sha1', uniqid(mt_rand())));
         } else {
             $entity = parent::getEntity($id);
-            if (null !== $entity) {
-                $entity->setSessionId($entity->getId());
+            if ($entity instanceof Page) {
+                $entity->setSessionId((string) $entity->getId());
             }
         }
 
@@ -257,9 +253,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Page $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -288,7 +286,6 @@ class PageModel extends FormModel implements GlobalSearchInterface
         if ($this->dispatcher->hasListeners($name)) {
             if (!$event instanceof Event) {
                 $event = new PageEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
             }
 
             $this->dispatcher->dispatch($event, $name);
@@ -301,14 +298,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get list of entities for autopopulate fields.
-     *
-     * @param string $type
-     * @param string $filter
-     * @param int    $limit
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults(string $type, string $filter = '', int $limit = 10): array
     {
         $results = [];
         if ('page' === $type) {
@@ -325,11 +316,10 @@ class PageModel extends FormModel implements GlobalSearchInterface
      * Generate URL for a page.
      *
      * @param Page  $entity
-     * @param array $clickthrough
      *
      * @return string
      */
-    public function generateUrl($entity, bool $absolute = true, $clickthrough = [])
+    public function generateUrl(object $entity, bool $absolute = true, array $clickthrough = [])
     {
         // If this is a variant, then get the parent's URL
         $parent = $entity->getVariantParent();
@@ -344,8 +334,10 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Generates slug string.
+     *
+     * @param Page $entity
      */
-    public function generateSlug($entity): string
+    public function generateSlug(object $entity): string
     {
         $pageSlug = $entity->getAlias();
 
@@ -380,7 +372,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * @return array|mixed
      */
-    protected function generateClickThrough(Hit $hit)
+    private function generateClickThrough(Hit $hit)
     {
         $query = $hit->getQuery();
 
@@ -398,13 +390,11 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * @param string|int $code
-     * @param array      $query
      *
      * @return bool If hit is tracked or not
-     *
      * @throws \Exception
      */
-    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, $query = [], ?\DateTime $dateTime = null): bool
+    public function hitPage(Redirect|Page|null $page, Request $request, $code = '200', ?Lead $lead = null, array|string|null $query = [], ?\DateTime $dateTime = null): bool
     {
         // Don't skew results with user hits
         if (!$this->security->isAnonymous() || $request->cookies->get('Blocked-Tracking')) {
@@ -418,7 +408,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $ipAddress = $this->ipLookupHelper->getIpAddress();
 
         // Process the query
-        if (empty($query) || !is_array($query)) {
+        if ($query === [] || !is_array($query)) {
             $query = $this->getHitQuery($request, $page);
         }
 
@@ -553,7 +543,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
             }
         }
 
-        $query = $hit->getQuery() ?: [];
+        $query = $hit->getQuery();
 
         if (!$lead->getTimezone()) {
             if (isset($query['timezone'])) {
@@ -759,16 +749,14 @@ class PageModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
+     * Get array of page builder tokens from bundles subscribed to PageBuilderEvent.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     *
-     * @return array
      */
-    public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = '')
+    public function getBuilderComponents(?Page $page = null, $requestedComponents = 'all', string $tokenFilter = ''): array
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
-        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
+        $this->dispatcher->dispatch($event);
 
         return $this->getCommonBuilderComponents($requestedComponents, $event);
     }
@@ -786,7 +774,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q): void
+    public function limitQueryToCreator(QueryBuilder $q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'pages', 'p', 'p.id = t.page_id')
             ->andWhere('p.created_by = :userId')
@@ -883,7 +871,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $q  = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(*) as count')
             ->from(
-                sprintf('(%s)', $allQ->getSQL()), 'tt'
+                sprintf('(%s)', $allQ->getSQL()),
+                'tt'
             );
         $q->setParameters($allQ->getParameters());
         $all       = $query->fetchCount($q);
@@ -893,7 +882,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
         $q  = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(*) as count')
             ->from(
-                sprintf('(%s)', $allQ->getSQL()), 'tt'
+                sprintf('(%s)', $allQ->getSQL()),
+                'tt'
             );
         $q->setParameters($allQ->getParameters());
         $returning = $query->fetchCount($q);
@@ -907,10 +897,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get pie chart data of dwell times.
-     *
-     * @param array $filters
      */
-    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], bool $canViewOthers = true): array
+    public function getDwellTimesPieChartData(\DateTime $dateFrom, \DateTime $dateTo, array $filters = [], bool $canViewOthers = true): array
     {
         $timesOnSite = $this->hitRepository->getDwellTimeLabels();
         $chart       = new PieChart();
@@ -951,7 +939,7 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
         $chart   = new PieChart();
 
-        if (empty($results)) {
+        if ($results === []) {
             $results[] = [
                 'device' => $this->translator->trans('mautic.report.report.noresults'),
                 'count'  => 0,
@@ -969,11 +957,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of popular (by hits) pages.
-     *
-     * @param int   $limit
-     * @param array $filters
      */
-    public function getPopularPages($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getPopularPages(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('COUNT(DISTINCT t.id) AS hits, p.id, p.title, p.alias')
@@ -997,11 +982,8 @@ class PageModel extends FormModel implements GlobalSearchInterface
 
     /**
      * Get a list of pages created in a date range.
-     *
-     * @param int   $limit
-     * @param array $filters
      */
-    public function getPageList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], bool $canViewOthers = true): array
+    public function getPageList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], bool $canViewOthers = true): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.title AS name, t.date_added, t.date_modified')

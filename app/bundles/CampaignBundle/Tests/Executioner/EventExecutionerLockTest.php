@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -28,6 +29,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
     private Logger $logger;
 
     private TestHandler $testHandler;
+
     private const int ADD_POINTS = 10;
 
     private EventExecutioner $eventExecutioner;
@@ -68,7 +70,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $this->eventExecutioner->executeForContacts($event, $contacts);
         $this->assertSame(self::ADD_POINTS, $contact->getPoints(), 'Points should be added.');
 
-        $logs = $this->em->getRepository(LeadEventLog::class)->findAll();
+        $logs = $this->getContainer()->get(LeadEventLogRepository::class)->findAll();
         $this->assertCount(1, $logs);
 
         $log = reset($logs);
@@ -94,7 +96,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $contacts = new ArrayCollection([$contact->getId() => $contact]);
         $this->eventExecutioner->executeForContacts($event, $contacts);
 
-        $logs = $this->em->getRepository(LeadEventLog::class)->findAll();
+        $logs = $this->getContainer()->get(LeadEventLogRepository::class)->findAll();
         $this->assertCount(1, $logs);
 
         $log = reset($logs);
@@ -121,7 +123,7 @@ final class EventExecutionerLockTest extends MauticMysqlTestCase
         $this->eventExecutioner->executeForContacts($event, $contacts);
         $this->assertSame(0, $contact->getPoints(), 'Points should not be added as the execution failed.');
 
-        $logs = $this->em->getRepository(LeadEventLog::class)->findAll();
+        $logs = $this->getContainer()->get(LeadEventLogRepository::class)->findAll();
         $this->assertCount(1, $logs);
 
         $log = reset($logs);

@@ -2,12 +2,15 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use DateTime;
+use Exception;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Api\CrmApi;
 
 /**
@@ -49,11 +52,10 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param Lead|array $lead
-     * @param array      $config
      *
      * @return array|bool
      */
-    public function pushLead($lead, $config = [])
+    public function pushLead($lead, array $config = [])
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -75,7 +77,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -94,7 +96,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
                 return $this->amendLeadDataBeforeMauticPopulate($result, $object);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -168,7 +170,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return mixed[]
      */
-    public function getLeadData(?\DateTime $startDate = null, ?\DateTime $endDate = null, $leadId = []): array
+    public function getLeadData(?DateTime $startDate = null, ?DateTime $endDate = null, $leadId = []): array
     {
         $leadIds      = (!is_array($leadId)) ? [$leadId] : $leadId;
         $leadActivity = [];
@@ -188,7 +190,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             'excludeEvents' => [],
         ];
 
-        if ($startDate) {
+        if ($startDate instanceof DateTime) {
             $filters['dateFrom'] = $startDate;
             $filters['dateTo']   = $endDate;
         }
@@ -238,7 +240,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 $entityToNotDetach = [Integration::class, Plugin::class];
                 $loadedEntities    = $this->em->getUnitOfWork()->getIdentityMap();
                 foreach ($loadedEntities as $name => $loadedEntitySet) {
-                    if (!in_array($name, $entityToNotDetach, true)) {
+                    if (in_array($name, $entityToNotDetach, true)) {
                         continue;
                     }
 
@@ -281,11 +283,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                         $matchedFields[$companyField] = substr($value, 0, 255);
                         break;
                     case 'date':
-                        $date                         = new \DateTime($value);
+                        $date                         = new DateTime($value);
                         $matchedFields[$companyField] = $date->format('Y-m-d');
                         break;
                     case 'datetime':
-                        $date                         = new \DateTime($value);
+                        $date                         = new DateTime($value);
                         $matchedFields[$companyField] = $date->format('Y-m-d H:i:s');
                         break;
                 }
@@ -342,7 +344,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         // Match that data with mapped lead fields
         $matchedFields = $this->populateMauticLeadData($data, $config);
 
-        if (empty($matchedFields)) {
+        if ($matchedFields === []) {
             return null;
         }
 
@@ -376,7 +378,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
         if (count($uniqueLeadFieldData)) {
             $existingLeads = $this->leadRepository->getLeadsByUniqueFields($uniqueLeadFieldData);
-            if (!empty($existingLeads)) {
+            if ($existingLeads !== []) {
                 $lead = array_shift($existingLeads);
             }
         }
@@ -389,7 +391,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
             // Use only prioirty fields if updating
             $fieldsToUpdateInMautic = $this->getPriorityFieldsForMautic($config, $object, 'mautic');
-            if (empty($fieldsToUpdateInMautic)) {
+            if ($fieldsToUpdateInMautic === []) {
                 $this->logger->debug('getMauticLead: No fields to update in Mautic', ['config' => $config, 'object' => $object]);
 
                 return null;
@@ -428,7 +430,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         if (isset($data['owner_email']) && isset($config['updateOwner']) && isset($config['updateOwner'][0])
             && 'updateOwner' == $config['updateOwner'][0]
         ) {
-            if ($mauticUser = $this->userRepository->findOneBy(['email' => $data['owner_email']])) {
+            if (($mauticUser = $this->userRepository->findOneBy(['email' => $data['owner_email']])) instanceof User) {
                 $lead->setOwner($mauticUser);
             }
         }
@@ -449,10 +451,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param array<string, mixed> $settings
-     *
-     * @return array|mixed
      */
-    protected function getFormFieldsByObject($object, array $settings = [])
+    protected function getFormFieldsByObject($object, array $settings = []): array
     {
         $settings['feature_settings']['objects'] = [$object => $object];
 
@@ -463,10 +463,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param string $priorityObject
-     *
-     * @return array
      */
-    protected function getPriorityFieldsForMautic(array $config, $entityObject = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $entityObject = null, $priorityObject = 'mautic'): array
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 1),
@@ -476,10 +474,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param string $priorityObject
-     *
-     * @return array
      */
-    protected function getPriorityFieldsForIntegration(array $config, $entityObject = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForIntegration(array $config, $entityObject = null, $priorityObject = 'mautic'): array
     {
         return $this->cleanPriorityFields(
             $this->getFieldsByPriority($config, $priorityObject, 0),
@@ -490,10 +486,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param string               $priorityObject
      * @param array<string, mixed> $config
-     *
-     * @return array
      */
-    protected function getFieldsByPriority(array $config, $priorityObject, $direction)
+    protected function getFieldsByPriority(array $config, $priorityObject, $direction): array
     {
         return isset($config['update_'.$priorityObject]) ? array_keys($config['update_'.$priorityObject], $direction) : array_keys($config['leadFields'] ?? []);
     }
@@ -501,10 +495,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     /**
      * @param string[]|string|null $objects
      * @param array<string, mixed> $fieldsToUpdate
-     *
-     * @return array
      */
-    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null): array
     {
         if (!isset($fieldsToUpdate['leadFields'])) {
             return $fieldsToUpdate;
@@ -522,11 +514,11 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      *
      * @return array<int, string|null>
      */
-    protected function getSyncTimeframeDates(array $params)
+    protected function getSyncTimeframeDates(array $params): array
     {
-        $fromDate = (isset($params['start'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['start'])->format('Y-m-d H:i:s')
+        $fromDate = (isset($params['start'])) ? DateTime::createFromFormat(DateTime::ISO8601, $params['start'])->format('Y-m-d H:i:s')
             : null;
-        $toDate = (isset($params['end'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['end'])->format('Y-m-d H:i:s')
+        $toDate = (isset($params['end'])) ? DateTime::createFromFormat(DateTime::ISO8601, $params['end'])->format('Y-m-d H:i:s')
             : null;
 
         return [$fromDate, $toDate];
@@ -572,10 +564,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         return $fields;
     }
 
-    /**
-     * @return array
-     */
-    protected function prepareFieldsForPush($fields)
+    protected function prepareFieldsForPush($fields): array
     {
         $fieldMappings = [];
         $required      = [];
@@ -597,10 +586,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
 
     /**
      * @param array<string, mixed> $matchedFields
-     *
-     * @return array
      */
-    private function hydrateCompanyName(array $matchedFields)
+    private function hydrateCompanyName(array $matchedFields): array
     {
         if (!empty($matchedFields['companyname'])) {
             return $matchedFields;

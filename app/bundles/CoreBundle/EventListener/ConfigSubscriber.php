@@ -2,28 +2,23 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\CoreBundle\Form\Type\ConfigType;
 use Mautic\CoreBundle\Helper\LanguageHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class ConfigSubscriber implements EventSubscriberInterface
+final readonly class ConfigSubscriber
 {
     public function __construct(
         private LanguageHelper $languageHelper,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
-            ConfigEvents::CONFIG_PRE_SAVE    => ['onConfigBeforeSave', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: ConfigBuilderEvent::class,
+    )]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $coreParams = $event->getParametersFromConfig('MauticCoreBundle');
@@ -38,6 +33,9 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
+    #[AsEventListener(
+        event: ConfigPreSaveEvent::class,
+    )]
     public function onConfigBeforeSave(ConfigEvent $event): void
     {
         $values = $event->getConfig();

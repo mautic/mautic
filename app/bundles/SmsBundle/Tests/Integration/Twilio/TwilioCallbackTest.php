@@ -8,17 +8,18 @@ use Mautic\SmsBundle\Helper\ContactHelper;
 use Mautic\SmsBundle\Integration\Twilio\Configuration;
 use Mautic\SmsBundle\Integration\Twilio\TwilioCallback;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
-use Symfony\Component\HttpFoundation\InputBag;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 #[AllowMockObjectsWithoutExpectations]
-final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
+final class TwilioCallbackTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Configuration
+     * @var MockObject&Configuration
      */
-    private \PHPUnit\Framework\MockObject\MockObject $configuration;
+    private MockObject $configuration;
 
     protected function setUp(): void
     {
@@ -31,13 +32,10 @@ final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createStub(Request::class);
-        $inputBag         = new InputBag([
+        $request = new Request([], [
             'AccountSid' => '123',
             'From'       => '',
         ]);
-
-        $request->request = $inputBag;
 
         $this->getCallback()->getMessage($request);
     }
@@ -46,14 +44,11 @@ final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createStub(Request::class);
-        $inputBag         = new InputBag([
+        $request = new Request([], [
             'AccountSid' => '123',
             'From'       => '321',
             'Body'       => '',
         ]);
-
-        $request->request = $inputBag;
 
         $this->getCallback()->getMessage($request);
     }
@@ -62,12 +57,9 @@ final class TwilioCallbackTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(BadRequestHttpException::class);
 
-        $request          = $this->createStub(Request::class);
-        $inputBag         = new InputBag([
+        $request = new Request([], [
             'AccountSid' => '321',
         ]);
-
-        $request->request = $inputBag;
 
         $this->getCallback()->getMessage($request);
     }

@@ -9,8 +9,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-final class ContactActionModelTest extends \PHPUnit\Framework\TestCase
+final class ContactActionModelTest extends TestCase
 {
     private Lead $contactMock5;
 

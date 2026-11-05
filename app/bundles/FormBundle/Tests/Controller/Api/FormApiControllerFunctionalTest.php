@@ -6,9 +6,11 @@ namespace Mautic\FormBundle\Tests\Controller\Api;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -395,7 +397,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
 
         // Ensure the submission was created properly.
-        $submissions = $this->em->getRepository(Submission::class)->findAll();
+        $submissions = $this->getContainer()->get(SubmissionRepository::class)->findAll();
 
         $this->assertCount(1, $submissions);
 
@@ -421,7 +423,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(123, $contact->getPoints());
         $this->assertSame('Doe Corp', $contact->getCompany());
 
-        $companies = $this->em->getRepository(Company::class)->findAll();
+        $companies = $this->getContainer()->get(CompanyRepository::class)->findAll();
 
         $this->assertCount(1, $companies);
 
@@ -432,7 +434,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('+420444555666', $company->getPhone());
 
         // The previous request changes user to anonymous.
-        $this->loginUser($this->em->getRepository(User::class)->findOneBy(['username' => 'admin']));
+        $this->loginUser($this->getContainer()->get(UserRepository::class)->findOneBy(['username' => 'admin']));
 
         // Delete:
         $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
@@ -629,10 +631,13 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_PUT, '/api/forms/123/edit', $payload);
         $response        = $this->client->getResponse();
+        /** @var \stdClass $responseContent */
         $responseContent = json_decode($response->getContent());
 
         $this->assertNotEmpty($responseContent->errors, 'No errors were returned when trying to save an invalid form');
-        $this->assertSame('Form Field ID 123 not found', $responseContent->errors[0]->message);
+        /** @var \stdClass $firstError */
+        $firstError = $responseContent->errors[0];
+        $this->assertSame('Form Field ID 123 not found', $firstError->message);
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND, 'Return code must be 404.');
     }
 

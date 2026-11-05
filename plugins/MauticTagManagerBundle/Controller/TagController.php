@@ -7,7 +7,7 @@ namespace MauticPlugin\MauticTagManagerBundle\Controller;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class TagController extends FormController
+final class TagController extends AbstractFormController
 {
     private TagRepository $tagRepository;
 
@@ -169,7 +169,7 @@ final class TagController extends FormController
         }
 
         // retrieve the entity
-        $tag   = new \MauticPlugin\MauticTagManagerBundle\Entity\Tag();
+        $tag   = new Tag();
         // set the page we came from
         $page = $request->getSession()->get('mautic.tagmanager.page', 1);
         // set the return URL for post actions
@@ -198,7 +198,7 @@ final class TagController extends FormController
         return $response;
     }
 
-    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag, FormInterface $form, string $returnUrl, int $page): ?Response
+    private function handleNewActionPost(Request $request, TagDependencies $tagDependencies, Tag $tag, FormInterface $form, string $returnUrl, int $page): ?Response
     {
         if (Request::METHOD_POST !== $request->getMethod()) {
             return null;
@@ -292,7 +292,6 @@ final class TagController extends FormController
     }
 
     /**
-     * @param \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag
      * @param array<string, mixed>                            $postActionVars
      */
     private function createTagModifyResponse(Request $request, Tag $tag, TagDependencies $tagDependencies, array $postActionVars, string $action, bool $ignorePost): Response
@@ -324,7 +323,6 @@ final class TagController extends FormController
     }
 
     /**
-     * @param \MauticPlugin\MauticTagManagerBundle\Entity\Tag $tag
      * @param array<string, mixed>                            $postActionVars
      */
     private function handleEditFormPost(Request $request, Tag $tag, TagDependencies $tagDependencies, FormInterface $form, array $postActionVars): ?Response
@@ -376,7 +374,7 @@ final class TagController extends FormController
                         'objectAction' => 'edit',
                         'entity'       => $tag,
                         'objectId'     => $tag->getId(),
-                        'form'         => $this->getFormView($form, 'edit'),
+                        'form'         => $form->createView(),
                     ];
 
                     $response = $this->postActionRedirect($postActionVars);
@@ -401,12 +399,10 @@ final class TagController extends FormController
     /**
      * Return tag if exists and user has access.
      *
-     * @return Tag
-     *
      * @throws EntityNotFoundException
      * @throws AccessDeniedException
      */
-    private function getTag(int $tagId)
+    private function getTag(int $tagId): Tag
     {
         $tag = $this->leadTagModel->getEntity($tagId);
 

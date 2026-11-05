@@ -5,6 +5,7 @@ namespace Mautic\InstallBundle\InstallFixtures\ORM;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
+use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -23,10 +24,11 @@ final class LeadFieldData extends Fixture implements OrderedFixtureInterface, Fi
     }
 
     /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      */
     public function load(ObjectManager $manager): void
     {
+        $fieldGroups            = [];
         $fieldGroups['lead']    = FieldModel::$coreFields;
         $fieldGroups['company'] = FieldModel::$coreCompanyFields;
 

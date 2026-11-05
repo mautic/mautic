@@ -15,6 +15,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * A test must not define the "MAUTIC_TABLE_PREFIX" const, it is already defined by the test bootstrap.
  *
  * @implements Rule<FuncCall>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoTablePrefixDefinitionInTestsRuleTest
  */
 final class NoTablePrefixDefinitionInTestsRule implements Rule
 {

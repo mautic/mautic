@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\EventSubscriber;
 
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailDraft;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Event\EmailEditSubmitEvent;
 use Mautic\EmailBundle\Helper\EmailConfigInterface;
@@ -65,23 +66,23 @@ final class EmailSubscriberTest extends TestCase
 
         $event->expects($this->once())
             ->method('getCurrentEmail')
-            ->willReturn($this->createStub(Email::class));
+            ->willReturn(new Email());
 
         $event->expects($this->once())
             ->method('isSaveAsDraft')
             ->willReturn(true);
 
         $this->grapesJsBuilderRepo->expects($this->once())->method('findOneBy')
-            ->willReturn($grapesJsBuilder = $this->createMock(GrapesJsBuilder::class));
+            ->willReturn($grapesJsBuilder = new GrapesJsBuilder());
 
         $this->config->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
 
-        $grapesJsBuilder->expects($this->once())->method('setDraftCustomMjml');
-        $grapesJsBuilder->expects($this->once())->method('setCustomMjml');
-
         $this->subscriber->manageEmailDraft($event);
+
+        $this->assertSame('', $grapesJsBuilder->getCustomMjml());
+        $this->assertNull($grapesJsBuilder->getDraftCustomMjml());
     }
 
     public function testManageEmailDraftHandlesApply(): void
@@ -90,52 +91,52 @@ final class EmailSubscriberTest extends TestCase
 
         $event->expects($this->once())
             ->method('getCurrentEmail')
-            ->willReturn($this->createStub(Email::class));
+            ->willReturn(new Email());
 
         $event->expects($this->once())
             ->method('isApplyDraft')
             ->willReturn(true);
 
         $this->grapesJsBuilderRepo->expects($this->once())->method('findOneBy')
-            ->willReturn($grapesJsBuilder = $this->createMock(GrapesJsBuilder::class));
+            ->willReturn($grapesJsBuilder = new GrapesJsBuilder());
 
         $this->config->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
 
-        $grapesJsBuilder->expects($this->once())->method('setDraftCustomMjml');
-        $grapesJsBuilder->expects($this->never())->method('setCustomMjml');
-
         $this->subscriber->manageEmailDraft($event);
+
+        $this->assertNull($grapesJsBuilder->getDraftCustomMjml());
+        $this->assertNull($grapesJsBuilder->getCustomMjml());
     }
 
     public function testManageEmailDraftHandlesDiscardDraft(): void
     {
         $event = $this->createMock(EmailEditSubmitEvent::class);
 
+        $email = new Email();
+        $email->setDraft(new EmailDraft($email, null, null));
+
         $event->expects($this->once())
             ->method('getCurrentEmail')
-            ->willReturn($mockEmail = $this->createMock(Email::class));
+            ->willReturn($email);
 
         $event->expects($this->once())
             ->method('isDiscardDraft')
             ->willReturn(true);
 
-        $mockEmail->expects($this->once())
-            ->method('hasDraft')
-            ->willReturn(true);
+        $grapesJsBuilder = new GrapesJsBuilder();
+        $grapesJsBuilder->setDraftCustomMjml('<mjml>draft</mjml>');
 
         $this->grapesJsBuilderRepo->expects($this->once())->method('findOneBy')
-            ->willReturn($grapesJsBuilder = $this->createMock(GrapesJsBuilder::class));
+            ->willReturn($grapesJsBuilder);
 
         $this->config->expects($this->once())
             ->method('isPublished')
             ->willReturn(true);
 
-        $grapesJsBuilder->expects($this->once())
-            ->method('setDraftCustomMjml')
-            ->with(null);
-
         $this->subscriber->manageEmailDraft($event);
+
+        $this->assertNull($grapesJsBuilder->getDraftCustomMjml());
     }
 }

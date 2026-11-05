@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
@@ -117,7 +118,7 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
     }
 
     /**
-     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|string|null
+     * @return CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

@@ -6,165 +6,116 @@ namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['notification_id', 'lead_id'], name: 'stat_notification_search')]
-#[ORM\Index(columns: ['is_clicked'], name: 'stat_notification_clicked_search')]
-#[ORM\Index(columns: ['tracking_hash'], name: 'stat_notification_hash_search')]
-#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_notification_source_search')]
+#[ORM\Index(name: 'stat_notification_search', columns: ['notification_id', 'lead_id'])]
+#[ORM\Index(name: 'stat_notification_clicked_search', columns: ['is_clicked'])]
+#[ORM\Index(name: 'stat_notification_hash_search', columns: ['tracking_hash'])]
+#[ORM\Index(name: 'stat_notification_source_search', columns: ['source', 'source_id'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
-    public const TABLE_NAME = 'push_notification_stats';
+    public const string TABLE_NAME = 'push_notification_stats';
 
     /**
-     * @var string
+     * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var Notification|null
-     */
     #[ORM\ManyToOne(targetEntity: Notification::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'notification_id', onDelete: 'SET NULL')]
-    private $notification;
+    private ?Notification $notification = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
-    /**
-     * @var LeadList|null
-     */
     #[ORM\ManyToOne(targetEntity: LeadList::class)]
     #[ORM\JoinColumn(name: 'list_id', onDelete: 'SET NULL')]
-    private $list;
+    private ?LeadList $list = null;
 
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
     private ?IpAddress $ipAddress = null;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_sent', type: 'datetime')]
     private $dateSent;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_read', type: 'datetime', nullable: true)]
     private $dateRead;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_clicked', type: 'boolean')]
     private $isClicked = false;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_clicked', type: 'datetime', nullable: true)]
     private $dateClicked;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_hash', type: 'string', length: 191, nullable: true)]
     private $trackingHash;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'retry_count', type: 'integer', nullable: true)]
     private $retryCount = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $tokens = [];
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'click_count', type: 'integer', nullable: true)]
     private $clickCount;
 
     /**
      * @var array
      */
+    #[ORM\Column(name: 'click_details', type: 'array', nullable: true)]
     private $clickDetails = [];
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'last_clicked', type: 'datetime', nullable: true)]
     private $lastClicked;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->build();
-
-        $builder->createField('dateRead', 'datetime')
-            ->columnName('date_read')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isClicked', 'boolean')
-            ->columnName('is_clicked')
-            ->build();
-
-        $builder->createField('dateClicked', 'datetime')
-            ->columnName('date_clicked')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingHash', 'string')
-            ->columnName('tracking_hash')
-            ->nullable()
-            ->build();
-
-        $builder->createField('retryCount', 'integer')
-            ->columnName('retry_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tokens', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('clickCount', 'integer', 'click_count');
-
-        $builder->addNullableField('lastClicked', 'datetime', 'last_clicked');
-
-        $builder->addNullableField('clickDetails', 'array', 'click_details');
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -216,18 +167,12 @@ class Stat
         return $this->dateSent;
     }
 
-    /**
-     * @param mixed $dateSent
-     */
-    public function setDateSent($dateSent): void
+    public function setDateSent(\DateTimeInterface $dateSent): void
     {
         $this->dateSent = $dateSent;
     }
 
-    /**
-     * @return Notification|null
-     */
-    public function getNotification()
+    public function getNotification(): ?Notification
     {
         return $this->notification;
     }
@@ -268,10 +213,7 @@ class Stat
         $this->isClicked = $isClicked;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
@@ -297,18 +239,12 @@ class Stat
         $this->trackingHash = $trackingHash;
     }
 
-    /**
-     * @return LeadList|null
-     */
-    public function getList()
+    public function getList(): ?LeadList
     {
         return $this->list;
     }
 
-    /**
-     * @param mixed $list
-     */
-    public function setList($list): void
+    public function setList(?LeadList $list): void
     {
         $this->list = $list;
     }
@@ -369,7 +305,7 @@ class Stat
     /**
      * @return array<array-key, mixed>
      */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
@@ -436,7 +372,7 @@ class Stat
     /**
      * @return array<array-key, mixed>
      */
-    public function getClickDetails()
+    public function getClickDetails(): array
     {
         return $this->clickDetails;
     }

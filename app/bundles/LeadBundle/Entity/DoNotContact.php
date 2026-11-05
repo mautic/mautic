@@ -6,91 +6,74 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\InputHelper;
 
 #[ORM\Entity(repositoryClass: DoNotContactRepository::class)]
 #[ORM\Table(name: 'lead_donotcontact')]
-#[ORM\Index(columns: ['lead_id', 'channel', 'reason'], name: 'leadid_reason_channel')]
-#[ORM\Index(columns: ['reason'], name: 'dnc_reason_search')]
-#[ORM\Index(columns: ['date_added'], name: 'dnc_date_added')]
+#[ORM\Index(name: 'leadid_reason_channel', columns: ['lead_id', 'channel', 'reason'])]
+#[ORM\Index(name: 'dnc_reason_search', columns: ['reason'])]
+#[ORM\Index(name: 'dnc_date_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class DoNotContact
 {
     /**
      * Lead is contactable.
      */
-    public const IS_CONTACTABLE = 0;
+    public const int IS_CONTACTABLE = 0;
 
     /**
      * Lead unsubscribed themselves.
      */
-    public const UNSUBSCRIBED = 1;
+    public const int UNSUBSCRIBED = 1;
 
     /**
      * Lead was unsubscribed due to an unsuccessful send.
      */
-    public const BOUNCED = 2;
+    public const int BOUNCED = 2;
 
     /**
      * Lead was manually unsubscribed by user.
      */
-    public const MANUAL = 3;
+    public const int MANUAL = 3;
 
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'doNotContact')]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'CASCADE')]
-    private $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'smallint')]
     private $reason = 0;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $comments;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
+    #[ORM\Column(name: 'channel_id', type: 'integer', nullable: true)]
     private $channelId;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->addDateAdded();
-
-        $builder->createField('reason', 'smallint')
-            ->build();
-
-        $builder->createField('channel', 'string')
-            ->build();
-
-        $builder->addNamedField('channelId', 'integer', 'channel_id', true);
-
-        $builder->createField('comments', 'text')
-            ->nullable()
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -124,10 +107,7 @@ class DoNotContact
         return $this->id;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }

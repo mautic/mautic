@@ -2,6 +2,7 @@
 
 namespace Mautic\DynamicContentBundle\Entity;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Serializer;
@@ -19,12 +20,9 @@ final class DynamicContentRepository extends CommonRepository
      *
      * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
-            ->select('e')
-            ->from(DynamicContent::class, 'e', 'e.id');
+        $q = $this->createQueryBuilder('e', 'e.id');
 
         if (empty($args['iterable_mode'])) {
             $q->leftJoin('e.category', 'c');
@@ -35,7 +33,7 @@ final class DynamicContentRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
@@ -136,16 +134,9 @@ final class DynamicContentRepository extends CommonRepository
     }
 
     /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     * @param bool   $topLevel
-     * @param array  $ignoreIds
-     * @param string $where
-     *
-     * @return array
+     * @param string|array<int|string> $search
      */
-    public function getDynamicContentList($search = '', $limit = 10, $start = 0, bool $viewOther = false, $topLevel = false, $ignoreIds = [], $where = null)
+    public function getDynamicContentList(string|array $search = '', int $limit = 10, int $start = 0, bool $viewOther = false, bool|string $topLevel = false, array $ignoreIds = [], ?string $where = null): array
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');
@@ -173,7 +164,7 @@ final class DynamicContentRepository extends CommonRepository
             $q->andWhere($q->expr()->isNull('e.variantParent'));
         }
 
-        if (!empty($ignoreIds)) {
+        if ($ignoreIds !== []) {
             $q->andWhere($q->expr()->notIn('e.id', ':dwc_ids'))
                 ->setParameter('dwc_ids', $ignoreIds);
         }

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Mautic\ConfigBundle\Tests\Event;
 
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-final class ConfigEventTest extends \PHPUnit\Framework\TestCase
+final class ConfigEventTest extends TestCase
 {
     public function testGetSetConfig(): void
     {

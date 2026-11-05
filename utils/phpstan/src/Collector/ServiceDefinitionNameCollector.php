@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Collector;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Expr\Variable;
@@ -70,7 +71,7 @@ final class ServiceDefinitionNameCollector implements Collector
         return [$args[0]->value->value, $className, $node->getStartLine(), $node->getEndLine()];
     }
 
-    private function matchClassName(Node $classValue): ?string
+    private function matchClassName(Expr $classValue): ?string
     {
         if (!$classValue instanceof ClassConstFetch || !$classValue->class instanceof Name) {
             return null;

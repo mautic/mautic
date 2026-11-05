@@ -26,8 +26,7 @@ final class EmailAddressValidatorTest extends AbstractMauticTestCase
 
         $context = new ExecutionContext($this->createStub(ValidatorInterface::class), null, $translator);
 
-        $emailAddressValidator->initialize($context);
-        $emailAddressValidator->validate($value, new EmailAddress());
+        $emailAddressValidator->validateInContext($value, new EmailAddress(), $context);
 
         $this->assertCount($expectedViolationCount, $context->getViolations());
     }

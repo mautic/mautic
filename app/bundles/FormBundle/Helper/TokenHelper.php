@@ -5,13 +5,13 @@ namespace Mautic\FormBundle\Helper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Model\FormModel;
 
-class TokenHelper
+final readonly class TokenHelper
 {
-    public const REGEX = '/{form=(.*?)}/';
+    public const string REGEX = '/{form=(.*?)}/';
 
     public function __construct(
-        protected FormModel $formModel,
-        protected CorePermissions $security,
+        private FormModel $formModel,
+        private CorePermissions $security,
     ) {
     }
 
@@ -33,7 +33,9 @@ class TokenHelper
                     && (
                         $form->isPublished(false)
                         || $this->security->hasEntityAccess(
-                            'form:forms:viewown', 'form:forms:viewother', $form->getCreatedBy()
+                            'form:forms:viewown',
+                            'form:forms:viewother',
+                            $form->getCreatedBy()
                         )
                     )
                 ) {

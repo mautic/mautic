@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Mautic\FormBundle\Tests\Crate;
 
 use Mautic\FormBundle\Crate\FieldCrate;
+use PHPUnit\Framework\TestCase;
 
-final class FieldCrateTest extends \PHPUnit\Framework\TestCase
+final class FieldCrateTest extends TestCase
 {
     public function testGettersForEmailField(): void
     {

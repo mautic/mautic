@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateTime;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Crate\ObjectCrate;
@@ -10,6 +11,7 @@ use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\ObjectCollectEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\UtmTag;
@@ -28,10 +30,11 @@ use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PointBundle\Entity\Group;
 use Mautic\PointBundle\Model\PointGroupModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class FormSubscriber implements EventSubscriberInterface
+final readonly class FormSubscriber
 {
     public function __construct(
         private LeadModel $leadModel,
@@ -45,28 +48,12 @@ final readonly class FormSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            FormBuilderEvent::class                      => ['onFormBuilder', 0],
-            ObjectCollectEvent::class                    => ['onObjectCollect', 0],
-            FieldCollectEvent::class                     => ['onFieldCollect', 0],
-            LeadEvents::LEAD_ON_SEGMENTS_CHANGE          => ['onLeadSegmentsChange', 0],
-            FormEvents::ON_EXECUTE_SUBMIT_ACTION         => [
-                ['onFormSubmitActionChangePoints', 0],
-                ['onFormSubmitActionChangeList', 1],
-                ['onFormSubmitActionChangeTags', 2],
-                ['onFormSubmitActionAddUtmTags', 3],
-                ['onFormSubmitActionScoreContactsCompanies', 4],
-                ['onFormSubmitActionRemoveFromDoNotContact', 5],
-                ['onFormSubmitActionUpdateLead', 5],
-            ],
-        ];
-    }
-
     /**
      * Add a lead generation action to available form submit actions.
      */
+    #[AsEventListener(
+        event: FormBuilderEvent::class,
+    )]
     public function onFormBuilder(FormBuilderEvent $event): void
     {
         $event->addSubmitAction('lead.pointschange', [
@@ -133,12 +120,18 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         ]);
     }
 
+    #[AsEventListener(
+        event: ObjectCollectEvent::class,
+    )]
     public function onObjectCollect(ObjectCollectEvent $event): void
     {
         $event->appendObject(new ObjectCrate('contact', 'mautic.lead.contact'));
         $event->appendObject(new ObjectCrate('company', 'mautic.core.company'));
     }
 
+    #[AsEventListener(
+        event: FieldCollectEvent::class,
+    )]
     public function onFieldCollect(FieldCollectEvent $event): void
     {
         $object = 'contact' === $event->getObject() ? 'lead' : $event->getObject(); // BC conversion.
@@ -163,13 +156,16 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+    )]
     public function onFormSubmitActionChangePoints(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.pointschange')) {
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof Lead) {
             return;
         }
 
@@ -180,7 +176,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $pointsChangeLog->setEventName($form->getId().':'.$form->getName());
         $pointsChangeLog->setActionName($event->getAction()->getName());
         $pointsChangeLog->setIpAddress($this->ipLookupHelper->getIpAddress());
-        $pointsChangeLog->setDateAdded(new \DateTime());
+        $pointsChangeLog->setDateAdded(new DateTime());
         $pointsChangeLog->setLead($contact);
 
         $oldPoints  = $contact->getPoints();
@@ -191,7 +187,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $pointGroup   = $pointGroupId ? $this->groupModel->getEntity($pointGroupId) : null;
         $points       = $properties['points'];
 
-        if ($pointGroup instanceof \Mautic\PointBundle\Entity\Group) {
+        if ($pointGroup instanceof Group) {
             $this->groupModel->adjustPoints($contact, $pointGroup, $points, $operator);
         } else {
             $contact->adjustPoints($points, $operator);
@@ -207,13 +203,17 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $event->getSubmission()->getLead()->setPoints($contact->getPoints());
     }
 
+    #[AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+        priority: 1
+    )]
     public function onFormSubmitActionChangeList(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.changelist')) {
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof Lead) {
             return;
         }
 
@@ -230,13 +230,17 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+        priority: 2
+    )]
     public function onFormSubmitActionChangeTags(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.changetags')) {
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof Lead) {
             return;
         }
 
@@ -247,13 +251,17 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $this->leadModel->modifyTags($contact, $addTags, $removeTags);
     }
 
+    #[AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+        priority: 3
+    )]
     public function onFormSubmitActionAddUtmTags(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.addutmtags')) {
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof Lead) {
             return;
         }
 
@@ -272,7 +280,7 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         $utmValues->setQuery($event->getRequest()->query->all());
         $utmValues->setReferer($refererURL);
         $utmValues->setUrl($event->getRequest()->server->get('REQUEST_URI'));
-        $utmValues->setDateAdded(new \DateTime());
+        $utmValues->setDateAdded(new DateTime());
         $utmValues->setRemoteHost($refererParsedUrl['host'] ?? null);
         $utmValues->setUserAgent($event->getRequest()->server->get('HTTP_USER_AGENT') ?? null);
         $utmValues->setUtmCampaign($queryArray['utm_campaign'] ?? $queryReferer['utm_campaign'] ?? null);
@@ -287,13 +295,17 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+        priority: 4
+    )]
     public function onFormSubmitActionScoreContactsCompanies(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.scorecontactscompanies')) {
             return;
         }
 
-        if (!$contact = $this->contactTracker->getContact()) {
+        if (!($contact = $this->contactTracker->getContact()) instanceof Lead) {
             return;
         }
 
@@ -304,6 +316,10 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+        priority: 5
+    )]
     public function onFormSubmitActionRemoveFromDoNotContact(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.remove_do_not_contact')) {
@@ -315,6 +331,9 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadEvents::LEAD_ON_SEGMENTS_CHANGE,
+    )]
     public function onLeadSegmentsChange(SubmissionEvent $event): void
     {
         $properties = $event->getActionConfig();
@@ -332,13 +351,17 @@ final readonly class FormSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+        priority: 5
+    )]
     public function onFormSubmitActionUpdateLead(SubmissionEvent $event): void
     {
         if (false === $event->checkContext('lead.updatelead')) {
             return;
         }
 
-        if (!$lead = $this->contactTracker->getContact()) {
+        if (!($lead = $this->contactTracker->getContact()) instanceof Lead) {
             return;
         }
 

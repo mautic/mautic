@@ -2,26 +2,27 @@
 
 namespace Mautic\PluginBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class AuthController extends FormController
+final class AuthController extends AbstractFormController
 {
     /**
      * @param string $integration
      */
     #[Route(
-        '/s/plugins/integrations/authcallback/{integration}',
+        path: '/s/plugins/integrations/authcallback/{integration}',
         name: 'mautic_integration_auth_callback_secure',
     )]
     #[Route(
-        '/plugins/integrations/authcallback/{integration}',
+        path: '/plugins/integrations/authcallback/{integration}',
         name: 'mautic_integration_auth_callback',
     )]
     public function authCallbackAction(Request $request, IntegrationHelper $integrationHelper, $integration): JsonResponse|RedirectResponse
@@ -66,6 +67,7 @@ final class AuthController extends FormController
 
         $session->set('mautic.integration.postauth.message', [$message, $params, $type]);
 
+        $identifier               = [];
         $identifier[$integration] = null;
         $socialCache              = [];
         $userData                 = $integrationObject->getUserData($identifier, $socialCache);
@@ -76,11 +78,11 @@ final class AuthController extends FormController
     }
 
     #[Route(
-        '/s/plugins/integrations/authstatus/{integration}',
+        path: '/s/plugins/integrations/authstatus/{integration}',
         name: 'mautic_integration_auth_postauth_secure',
     )]
     #[Route(
-        '/plugins/integrations/authstatus/{integration}',
+        path: '/plugins/integrations/authstatus/{integration}',
         name: 'mautic_integration_auth_postauth',
     )]
     public function authStatusAction(Request $request, $integration): Response
@@ -110,17 +112,18 @@ final class AuthController extends FormController
     }
 
     #[Route(
-        '/plugins/integrations/authuser/{integration}',
+        path: '/plugins/integrations/authuser/{integration}',
         name: 'mautic_integration_auth_user',
     )]
     public function authUserAction(IntegrationHelper $integrationHelper, $integration): RedirectResponse
     {
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
 
+        $settings                = [];
         $settings['method']      = 'GET';
         $settings['integration'] = $integrationObject->getName();
 
-        /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
+        /** @var AbstractIntegration $integrationObject */
         $event = $this->dispatcher->dispatch(
             new PluginIntegrationAuthRedirectEvent(
                 $integrationObject,

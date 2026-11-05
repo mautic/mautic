@@ -8,9 +8,10 @@ use Mautic\CoreBundle\Helper\FileHelper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(FileHelper::class)]
-final class FileHelperTest extends \PHPUnit\Framework\TestCase
+final class FileHelperTest extends TestCase
 {
     #[DataProvider('bytesToMegabytesProvider')]
     #[TestDox('Conversion of Bytes to Megebytes')]

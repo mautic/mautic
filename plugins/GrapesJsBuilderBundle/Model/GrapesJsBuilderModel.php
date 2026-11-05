@@ -18,7 +18,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends AbstractCommonModel<GrapesJsBuilder>
  */
-class GrapesJsBuilderModel extends AbstractCommonModel
+final class GrapesJsBuilderModel extends AbstractCommonModel
 {
     private RequestStack $requestStack;
 
@@ -198,10 +198,11 @@ class GrapesJsBuilderModel extends AbstractCommonModel
         return true;
     }
 
-    public function getGrapesJsFromEmailId(?int $emailId)
+    public function getGrapesJsFromEmailId(?int $emailId): ?object
     {
         if ($email = $this->emailModel->getEntity($emailId)) {
             return $this->grapesJsBuilderRepository->findOneBy(['email' => $email]);
         }
+        return null;
     }
 }

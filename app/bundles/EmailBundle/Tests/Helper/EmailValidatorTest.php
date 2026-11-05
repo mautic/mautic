@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use Mautic\EmailBundle\Event\EmailValidationEvent;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Tests\Helper\EventListener\EmailValidationSubscriber;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class EmailValidatorTest extends \PHPUnit\Framework\TestCase
+final class EmailValidatorTest extends TestCase
 {
     /**
      * @var MockObject&TranslatorInterface
@@ -174,7 +176,7 @@ final class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     public function testIntegrationInvalidatesEmail(): void
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new EmailValidationSubscriber());
+        AttributeEventListenerRegistrar::register($dispatcher, new EmailValidationSubscriber());
 
         $emailValidator = new EmailValidator($this->translator, $dispatcher);
 

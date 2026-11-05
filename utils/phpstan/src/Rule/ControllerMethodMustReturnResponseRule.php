@@ -14,6 +14,7 @@ use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * A controller action must declare a Response return type.
@@ -30,10 +31,12 @@ use PHPStan\Rules\RuleErrorBuilder;
  * on the parent would lock the children out.
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\ControllerMethodMustReturnResponseRuleTest
  */
 final readonly class ControllerMethodMustReturnResponseRule implements Rule
 {
-    private const string RESPONSE_CLASS = \Symfony\Component\HttpFoundation\Response::class;
+    private const string RESPONSE_CLASS = Response::class;
 
     private const string CONTROLLER_SUFFIX = 'Controller';
 

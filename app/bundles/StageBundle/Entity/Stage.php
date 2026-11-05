@@ -10,10 +10,10 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -45,6 +45,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     ]
 )]
 #[UniqueEntity(fields: ['weight'], message: 'mautic.stage.weight.unique')]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'stage_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'stage_projects_xref'),
+)])]
 class Stage extends FormEntity implements UuidInterface
 {
     use UuidTrait;
@@ -54,6 +60,9 @@ class Stage extends FormEntity implements UuidInterface
      * @var int
      */
     #[Groups(['stage:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -61,43 +70,47 @@ class Stage extends FormEntity implements UuidInterface
      */
     #[Groups(['stage:read', 'stage:write'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var int
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\Column(type: 'integer')]
     private $weight = 0;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['stage:read', 'stage:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var ArrayCollection<int,LeadStageLog>
      */
-    #[ORM\OneToMany(mappedBy: 'stage', targetEntity: LeadStageLog::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: LeadStageLog::class, mappedBy: 'stage', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['stage:read', 'stage:write'])]
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     public function __clone()
     {
@@ -110,22 +123,6 @@ class Stage extends FormEntity implements UuidInterface
     {
         $this->log = new ArrayCollection();
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('weight', 'integer')
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->addCategory();
-
-        self::addProjectsField($builder, 'stage_projects_xref', 'stage_id');
     }
 
     /**
@@ -182,10 +179,7 @@ class Stage extends FormEntity implements UuidInterface
         return get_object_vars($this);
     }
 
-    /**
-     * @param string $description
-     */
-    public function setDescription($description): self
+    public function setDescription(?string $description): self
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -233,9 +227,9 @@ class Stage extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection<int, LeadStageLog>
      */
-    public function getLog()
+    public function getLog(): Collection
     {
         return $this->log;
     }
@@ -278,18 +272,12 @@ class Stage extends FormEntity implements UuidInterface
         return $this->publishDown;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    /**
-     * @param mixed $category
-     */
-    public function setCategory($category): void
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
     }

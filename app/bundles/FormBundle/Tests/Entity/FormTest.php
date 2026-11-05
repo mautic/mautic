@@ -7,8 +7,9 @@ namespace Mautic\FormBundle\Tests\Entity;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class FormTest extends \PHPUnit\Framework\TestCase
+final class FormTest extends TestCase
 {
     /**
      * @param array<string, array<int, mixed>> $changes

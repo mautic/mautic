@@ -10,6 +10,7 @@ use LightSaml\Error\LightSamlException;
 use LightSaml\Model\Protocol\Response as LightSamlResponse;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\EventListener\ErrorListener;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -74,7 +75,7 @@ final class ExceptionListener extends ErrorListener
                     && 'urn:oasis:names:tc:SAML:2.0:status:Success' === $message->getStatus()->getStatusCode()->getValue()
                 ) {
                     $session = $event->getRequest()->attributes->get('_session');
-                    if ($session) {
+                    if ($session instanceof SessionInterface) {
                         $session->clear();
                     }
                     $event->setResponse(new RedirectResponse($this->router->generate('mautic_saml_login_retry')));
@@ -86,7 +87,7 @@ final class ExceptionListener extends ErrorListener
         // not keeping elseif statement to prevent prevent inner if condition above
         if ($exception instanceof LightSamlException) {
             $session = $event->getRequest()->attributes->get('_session');
-            if ($session) {
+            if ($session instanceof SessionInterface) {
                 $session->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
             }
             $event->setResponse(new RedirectResponse($this->router->generate('login')));

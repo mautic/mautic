@@ -6,7 +6,7 @@ namespace Mautic\EmailBundle\Stats;
 
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 final readonly class EmailPeriodMetrics

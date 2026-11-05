@@ -5,14 +5,12 @@ namespace Mautic\FormBundle\Controller\Api;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
-use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Action;
-use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Model\ActionModel;
@@ -72,13 +70,13 @@ final class FormApiController extends CommonApiController
      * Delete fields from a form.
      */
     #[Route(
-        '/api/forms/{formId}/fields/delete',
+        path: '/api/forms/{formId}/fields/delete',
         name: 'mautic_api_formdeletefields',
         requirements: ['formId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['DELETE']
     )]
-    public function deleteFieldsAction(Request $request, $formId): Response
+    public function deleteFieldsAction(Request $request, int $formId): Response
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
@@ -107,13 +105,13 @@ final class FormApiController extends CommonApiController
      * Delete fields from a form.
      */
     #[Route(
-        '/api/forms/{formId}/actions/delete',
+        path: '/api/forms/{formId}/actions/delete',
         name: 'mautic_api_formdeleteactions',
         requirements: ['formId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['DELETE']
     )]
-    public function deleteActionsAction(Request $request, $formId): Response
+    public function deleteActionsAction(Request $request, int $formId): Response
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
@@ -142,9 +140,8 @@ final class FormApiController extends CommonApiController
      * @param Form                 $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): Response|array|null
     {
         $method = $this->getCurrentRequest()->getMethod();
         $isNew  = false;
@@ -300,6 +297,8 @@ final class FormApiController extends CommonApiController
                 $this->model->deleteActions($entity, $actionsToDelete);
             }
         }
+
+        return null;
     }
 
     /**
@@ -330,10 +329,10 @@ final class FormApiController extends CommonApiController
      *
      * @return FormInterface<mixed>
      */
-    protected function createFieldEntityForm($entity): FormInterface
+    private function createFieldEntityForm(array $entityArray): FormInterface
     {
         return $this->fieldModel->createForm(
-            $entity,
+            $entityArray,
             null,
             [
                 'csrf_protection'    => false,
@@ -343,12 +342,12 @@ final class FormApiController extends CommonApiController
     }
 
     /**
-     * @param CommonEntity $entity
+     * @param Form $entity
      * @param array<mixed> $parameters
      *
      * @return mixed
      */
-    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, object $entity, ?array $parameters = null, string $method = 'PUT')
     {
         $parameters['postAction'] ??= 'return';
 

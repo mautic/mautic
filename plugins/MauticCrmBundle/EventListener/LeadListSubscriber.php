@@ -5,14 +5,13 @@ namespace MauticPlugin\MauticCrmBundle\EventListener;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\ListPreProcessListEvent;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class LeadListSubscriber implements EventSubscriberInterface
+final readonly class LeadListSubscriber
 {
     public function __construct(
         private IntegrationHelper $helper,
@@ -21,14 +20,9 @@ final readonly class LeadListSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => ['onFilterChoiceFieldsGenerate', 0],
-            LeadEvents::LIST_PRE_PROCESS_LIST            => ['onLeadListProcessList', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: LeadListFiltersChoicesEvent::class,
+    )]
     public function onFilterChoiceFieldsGenerate(LeadListFiltersChoicesEvent $event): void
     {
         $services = $this->helper->getIntegrationObjects();
@@ -83,6 +77,9 @@ final readonly class LeadListSubscriber implements EventSubscriberInterface
     /**
      * Add/remove contacts to a segment based on contacts found in Integration Campaigns.
      */
+    #[AsEventListener(
+        event: ListPreProcessListEvent::class,
+    )]
     public function onLeadListProcessList(ListPreProcessListEvent $event): void
     {
         // get Integration Campaign members

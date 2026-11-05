@@ -2,7 +2,8 @@
 
 namespace Mautic\EmailBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController as CommonFormController;
+use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
@@ -16,6 +17,7 @@ use Mautic\EmailBundle\Helper\EmailDefaultsHelper;
 use Mautic\EmailBundle\Helper\MailHashHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -66,14 +68,14 @@ final class PublicController extends CommonFormController
     }
 
     #[Route(
-        '/email/view/{idHash}',
+        path: '/email/view/{idHash}',
         name: 'mautic_email_webview',
     )]
     public function indexAction(Request $request, AnalyticsHelper $analyticsHelper, string $idHash): Response
     {
         $stat  = $this->emailModel->getEmailStatus($idHash);
 
-        if (!empty($stat)) {
+        if ($stat instanceof Stat) {
             if ($this->security->isAnonymous()) {
                 $this->emailModel->hitEmail($stat, $request, true);
             }
@@ -116,7 +118,7 @@ final class PublicController extends CommonFormController
     }
 
     #[Route(
-        '/email/{idHash}.gif',
+        path: '/email/{idHash}.gif',
         name: 'mautic_email_tracker',
     )]
     public function trackingImageAction(
@@ -138,10 +140,10 @@ final class PublicController extends CommonFormController
 
     /**
      * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
     #[Route(
-        '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
+        path: '/email/unsubscribe/{idHash}/{urlEmail}/{secretHash}',
         name: 'mautic_email_unsubscribe',
         defaults: ['urlEmail' => null, 'secretHash' => null],
     )]
@@ -162,13 +164,13 @@ final class PublicController extends CommonFormController
             return $this->oneClickUnsubscribe($model, $stat);
         }
 
-        if (!empty($stat) && $email = $stat->getEmail()) {
+        if ($stat instanceof Stat && $email = $stat->getEmail()) {
             $template = $email->getTemplate();
             if ('mautic_code_mode' === $template) {
                 $template = null; // Use system default
             }
 
-            /** @var \Mautic\FormBundle\Entity\Form $unsubscribeForm */
+            /** @var Form $unsubscribeForm */
             $unsubscribeForm = $email->getUnsubscribeForm();
             if (null != $unsubscribeForm && $unsubscribeForm->isPublished()) {
                 $formTemplate = $unsubscribeForm->getTemplate();
@@ -192,9 +194,9 @@ final class PublicController extends CommonFormController
         }
         $contentTemplate = $themeHelper->checkForTwigTemplate('@themes/'.$template.'/html/message.html.twig');
         $isCorrectHash   = $secretHash && $urlEmail && $mailHash->getEmailHash($urlEmail) === $secretHash;
-        if (!empty($stat) || $isCorrectHash) {
+        if ($stat instanceof Stat || $isCorrectHash) {
             $successSessionName = 'mautic.email.prefscenter.success';
-            if (!empty($stat) && $lead = $stat->getLead()) {
+            if ($stat instanceof Stat && $lead = $stat->getLead()) {
                 // Set the lead as current lead
                 $contactTracker->setTrackedContact($lead);
 
@@ -206,10 +208,10 @@ final class PublicController extends CommonFormController
                 // Add contact ID to the session name in case more contacts
                 // share the same session/device and the contact is known.
                 $successSessionName .= ".{$lead->getId()}";
-            } elseif (empty($stat)) {
+            } elseif (!$stat instanceof Stat) {
                 $contacts = $this->leadRepository->getContactsByEmail($urlEmail);
                 $lead     = null;
-                if (is_array($contacts) && count($contacts) > 0) {
+                if (count($contacts) > 0) {
                     $lead  = array_pop($contacts);
                 } else {
                     $message = $this->translator->trans('mautic.email.stat_record.not_found');
@@ -217,7 +219,7 @@ final class PublicController extends CommonFormController
             }
 
             if (!$isHeadRequest && (!$showContactPreferences || $isUnsubscribeAll)) {
-                if (!empty($stat)) {
+                if ($stat instanceof Stat) {
                     $message = $this->getUnsubscribeMessage($idHash, $model, $stat);
                 } elseif ($lead && $lead instanceof Lead) {
                     $message = $this->getUnsubscribeMessageLead($idHash, $model, $lead, $urlEmail);
@@ -341,7 +343,7 @@ final class PublicController extends CommonFormController
     }
 
     #[Route(
-        '/email/dnc/{idHash}/{urlEmail}/{secretHash}',
+        path: '/email/dnc/{idHash}/{urlEmail}/{secretHash}',
         name: 'mautic_email_unsubscribe_all',
         defaults: ['urlEmail' => null, 'secretHash' => null],
     )]
@@ -359,17 +361,17 @@ final class PublicController extends CommonFormController
 
     /**
      * @throws \Exception
-     * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
     #[Route(
-        '/email/resubscribe/{idHash}',
+        path: '/email/resubscribe/{idHash}',
         name: 'mautic_email_resubscribe',
     )]
     public function resubscribeAction(ContactTracker $contactTracker, EmailModel $model, MailHashHelper $mailHash, ThemeHelper $themeHelper, AssetsHelper $assetsHelper, AnalyticsHelper $analyticsHelper, string $idHash): Response
     {
         $stat = $model->getEmailStatus($idHash);
 
-        if (!empty($stat)) {
+        if ($stat instanceof Stat) {
             $email = $stat->getEmail();
             $lead  = $stat->getLead();
 
@@ -456,7 +458,7 @@ final class PublicController extends CommonFormController
      * Handles mailer transport webhook post.
      */
     #[Route(
-        '/mailer/callback',
+        path: '/mailer/callback',
         name: 'mautic_mailer_transport_callback',
     )]
     public function mailerCallbackAction(Request $request): Response
@@ -471,13 +473,13 @@ final class PublicController extends CommonFormController
      * Preview email.
      */
     #[Route(
-        '/email/preview/{objectId}/{objectType}',
+        path: '/email/preview/{objectId}/{objectType}',
         name: 'mautic_email_preview',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectType' => null, 'objectId' => 0],
     )]
     #[Route(
-        '/s/campaign/preview/{objectId}',
+        path: '/s/campaign/preview/{objectId}',
         name: 'mautic_campaign_preview',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -691,7 +693,7 @@ final class PublicController extends CommonFormController
     }
 
     #[Route(
-        '/plugin/{integration}/tracking.gif',
+        path: '/plugin/{integration}/tracking.gif',
         name: 'mautic_plugin_tracker',
         requirements: ['integration' => Requirement::CATCH_ALL],
     )]
@@ -746,14 +748,14 @@ final class PublicController extends CommonFormController
         return $this->leadRepository->getLeadByEmail($email);
     }
 
-    public function getUnsubscribeMessage(string $idHash, $model, $stat): string
+    private function getUnsubscribeMessage(string $idHash, EmailModel $model, Stat $stat): string
     {
         $model->setDoNotContact($stat, $this->translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 
         return $this->getUnsubscribeText($stat->getEmailAddress(), $idHash);
     }
 
-    public function getUnsubscribeMessageLead(string $idHash, EmailModel $model, Lead $lead, string $urlEmail): string
+    private function getUnsubscribeMessageLead(string $idHash, EmailModel $model, Lead $lead, string $urlEmail): string
     {
         $model->setDoNotContactLead($lead, $this->translator->trans('mautic.email.dnc.unsubscribed'), DoNotContact::UNSUBSCRIBED);
 

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class AuditlogController extends CommonController
@@ -16,12 +17,12 @@ final class AuditlogController extends CommonController
     use LeadDetailsTrait;
 
     #[Route(
-        '/s/contacts/auditlog/{leadId}/{page}',
+        path: '/s/contacts/auditlog/{leadId}/{page}',
         name: 'mautic_contact_auditlog_action',
         requirements: ['leadId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, $leadId, int $page = 1): Response
+    public function indexAction(Request $request, int|string $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -72,11 +73,11 @@ final class AuditlogController extends CommonController
     }
 
     #[Route(
-        '/s/contacts/auditlog/batchExport/{leadId}',
+        path: '/s/contacts/auditlog/batchExport/{leadId}',
         name: 'mautic_contact_auditlog_export_action',
         requirements: ['leadId' => '\d+'],
     )]
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response|\Symfony\Component\HttpFoundation\StreamedResponse
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, int|string $leadId): Response|StreamedResponse
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();

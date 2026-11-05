@@ -3,7 +3,7 @@
 namespace Mautic\PluginBundle\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PluginBundle\Entity\PluginRepository;
 use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class PluginController extends FormController
+final class PluginController extends AbstractFormController
 {
     private PluginRepository $pluginRepository;
 
@@ -37,7 +37,7 @@ final class PluginController extends FormController
     }
 
     #[Route(
-        '/s/plugins',
+        path: '/s/plugins',
         name: 'mautic_plugin_index',
     )]
     public function indexAction(Request $request, IntegrationHelper $integrationHelper): Response
@@ -141,12 +141,12 @@ final class PluginController extends FormController
      * @param string $name
      */
     #[Route(
-        '/s/plugins/config/{name}/{page}',
+        path: '/s/plugins/config/{name}/{page}',
         name: 'mautic_plugin_config',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', $page = 1): JsonResponse|Response
+    public function configAction(Request $request, EntityManagerInterface $em, IntegrationHelper $integrationHelper, LoggerInterface $mauticLogger, $name, $activeTab = 'details-container', int $page = 1): JsonResponse|Response
     {
         if (!$this->security->isGranted('plugin:plugins:manage')) {
             $this->throwAccessDenied();
@@ -376,7 +376,7 @@ final class PluginController extends FormController
     }
 
     #[Route(
-        '/s/plugins/info/{name}',
+        path: '/s/plugins/info/{name}',
         name: 'mautic_plugin_info',
     )]
     public function infoAction(IntegrationHelper $integrationHelper, $name): Response
@@ -418,7 +418,7 @@ final class PluginController extends FormController
      * Scans the addon bundles directly and loads bundles which are not registered to the database.
      */
     #[Route(
-        '/s/plugins/reload',
+        path: '/s/plugins/reload',
         name: 'mautic_plugin_reload',
     )]
     public function reloadAction(Request $request, ReloadFacade $reloadFacade): Response

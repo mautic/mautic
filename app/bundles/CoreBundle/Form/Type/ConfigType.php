@@ -779,7 +779,7 @@ final class ConfigType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
-        $view->vars['ipLookupAttribution'] = (null !== $this->ipLookup) ? $this->ipLookup->getAttribution() : '';
+        $view->vars['ipLookupAttribution'] = $this->ipLookup?->getAttribution() ?? '';
     }
 
     public function getBlockPrefix(): string

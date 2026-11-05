@@ -3,22 +3,21 @@
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\Order;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Trigger>
  */
-class TriggerRepository extends CommonRepository
+final class TriggerRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
-        $q = $this->getEntityManager()
-            ->createQueryBuilder()
+        $q = $this->createQueryBuilder($this->getTableAlias())
             ->select($this->getTableAlias().', cat')
-            ->from(Trigger::class, $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat')
             ->leftJoin($this->getTableAlias().'.group', 'pl');
 
@@ -29,14 +28,11 @@ class TriggerRepository extends CommonRepository
 
     /**
      * Get a list of published triggers with color and points.
-     *
-     * @return array
      */
-    public function getTriggerColors()
+    public function getTriggerColors(): array
     {
-        $q = $this->getEntityManager()->createQueryBuilder()
-            ->select('partial t.{id, color, points}')
-            ->from(Trigger::class, 't', 't.id');
+        $q = $this->createQueryBuilder('t', 't.id')
+            ->select('partial t.{id, color, points}');
 
         $q->where($this->getPublishedByDateOrmExpression($q));
         $q->orderBy('t.points', Order::Ascending->value);
@@ -49,7 +45,7 @@ class TriggerRepository extends CommonRepository
         return 't';
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             't.name',
@@ -57,7 +53,7 @@ class TriggerRepository extends CommonRepository
         ]);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return match ($filter->command) {
             $this->translator->trans('mautic.project.searchcommand.name'), $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US') => $this->handleProjectFilter(

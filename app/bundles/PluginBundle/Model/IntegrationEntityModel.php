@@ -11,7 +11,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<IntegrationEntity>
  */
-class IntegrationEntityModel extends FormModel
+final class IntegrationEntityModel extends FormModel
 {
     public static function getName(): string
     {
@@ -25,10 +25,6 @@ class IntegrationEntityModel extends FormModel
         IntegrationEntityRepository $integrationEntityRepository,
     ): void {
         $this->integrationEntityRepository = $integrationEntityRepository;
-    }
-
-    public function logDataSync(IntegrationObject $integrationObject): void
-    {
     }
 
     public function getSyncedRecords(IntegrationObject $integrationObject, $integrationName, $recordList, $internalEntityId = null): array
@@ -99,11 +95,9 @@ class IntegrationEntityModel extends FormModel
     }
 
     /**
-     * @param int $id
-     *
      * @return IntegrationEntity|null
      */
-    public function getEntityByIdAndSetSyncDate($id, \DateTime $dateTime)
+    public function getEntityByIdAndSetSyncDate(int $id, \DateTime $dateTime): ?object
     {
         $entity = $this->integrationEntityRepository->find($id);
         if ($entity) {

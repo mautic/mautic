@@ -9,13 +9,11 @@ use Mautic\CoreBundle\Event\BuilderEvent;
 trait BuilderModelTrait
 {
     /**
-     * Get array of page builder tokens from bundles subscribed PageEvents::PAGE_ON_BUILD.
+     * Get array of page builder tokens from bundles subscribed to PageBuilderEvent.
      *
      * @param array|string $requestedComponents all | tokens | abTestWinnerCriteria
-     *
-     * @return array
      */
-    public function getCommonBuilderComponents($requestedComponents, BuilderEvent $event)
+    public function getCommonBuilderComponents($requestedComponents, BuilderEvent $event): array
     {
         $singleComponent = (!is_array($requestedComponents) && 'all' != $requestedComponents);
         $components      = [];

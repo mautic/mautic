@@ -53,10 +53,8 @@ final class MenuEvent extends Event
 
     /**
      * Return the menu items.
-     *
-     * @return array
      */
-    public function getMenuItems()
+    public function getMenuItems(): array
     {
         $this->helper->placeOrphans($this->menuItems['children'], true, 1, $this->type);
         $this->helper->sortByPriority($this->menuItems['children']);

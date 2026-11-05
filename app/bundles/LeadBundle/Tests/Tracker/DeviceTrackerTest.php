@@ -14,20 +14,22 @@ use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactor
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorService;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-final class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
+final class DeviceTrackerTest extends TestCase
 {
     private DeviceCreatorService $deviceCreatorService;
 
     private DeviceDetectorFactory $deviceDetectorFactory;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&DeviceTrackingServiceInterface
+     * @var MockObject&DeviceTrackingServiceInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $deviceTrackingService;
+    private MockObject $deviceTrackingService;
 
     private string $userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.181 Safari/537.36';
 
@@ -86,12 +88,10 @@ final class DeviceTrackerTest extends \PHPUnit\Framework\TestCase
         $tracker = new DeviceTracker($this->deviceCreatorService, $this->deviceDetectorFactory, $this->deviceTrackingService, $this->createStub(Logger::class));
 
         $device = $tracker->createDeviceFromUserAgent($lead, $this->userAgent);
-        $this->assertInstanceOf(LeadDevice::class, $device);
         $this->assertSame('3dfc9e6dff07948058df37455718cb98', $device->getSignature());
 
         // Subsequent calls should not create a new tracking ID
         $device2 = $tracker->createDeviceFromUserAgent($lead, $this->userAgent);
-        $this->assertInstanceOf(LeadDevice::class, $device2);
         $this->assertEquals($device->getTrackingId(), $device2->getTrackingId());
         $this->assertEquals('apple', $device2->getDeviceBrand());
         $this->assertSame($device->getSignature(), $device2->getSignature());

@@ -12,15 +12,17 @@ use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaign
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class RemoverTest extends \PHPUnit\Framework\TestCase
+final class RemoverTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadEventLogRepository
+     * @var MockObject&LeadEventLogRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadEventLogRepository;
+    private MockObject $leadEventLogRepository;
 
     protected function setUp(): void
     {

@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
+use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -175,7 +176,8 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertGreaterThan(0, $segmentId);
         $this->assertEquals($payload['name'], $response['list']['name']);
         $this->assertEquals($payload['description'], $response['list']['description']);
-        $this->assertEquals([
+        $this->assertEquals(
+            [
             [
                 'object'     => 'lead',
                 'glue'       => 'and',
@@ -853,7 +855,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(0, $commandTester->getStatusCode());
 
-        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segment->getId()]);
+        $members = $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment->getId()]);
 
         $this->assertCount($expected, $members);
 
@@ -864,7 +866,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $expectedMembers = $expectedMembersForOperator[$operator];
 
-        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        $actualMembers   = array_map(fn (ListLead $segment): int => $segment->getLead()->getId(), $members);
         sort($expectedMembers);
         sort($actualMembers);
         $this->assertSame($expectedMembers, $actualMembers);
@@ -914,13 +916,13 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(0, $commandTester->getStatusCode());
 
-        $members = $this->em->getRepository(ListLead::class)->findBy(['list' => $segment->getId()]);
+        $members = $this->getContainer()->get(ListLeadRepository::class)->findBy(['list' => $segment->getId()]);
 
         $this->assertCount($expectedCount, $members);
 
         $expectedMembers = [$contactB->getId(), $contactC->getId()];
 
-        $actualMembers   = array_map(fn (ListLead $segment) => $segment->getLead()->getId(), $members);
+        $actualMembers   = array_map(fn (ListLead $segment): int => $segment->getLead()->getId(), $members);
         sort($expectedMembers);
         sort($actualMembers);
         $this->assertSame($expectedMembers, $actualMembers);
@@ -966,7 +968,7 @@ final class ListApiControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var CompanyRepository $companyRepo */
-        $companyRepo = $this->em->getRepository(Company::class);
+        $companyRepo = $this->getContainer()->get(CompanyRepository::class);
         $company     = new Company();
         $company->setName($name);
         $company->addUpdatedField('company_created_at', $timeStamp->format('Y-m-d H:i:s'));

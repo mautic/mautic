@@ -1,29 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
+use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Form\Type\ConfigType;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class ConfigSubscriber implements EventSubscriberInterface
+final readonly class ConfigSubscriber
 {
     public function __construct(
         private CoreParametersHelper $coreParametersHelper,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
-            ConfigEvents::CONFIG_PRE_SAVE    => ['onConfigBeforeSave', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: ConfigBuilderEvent::class,
+    )]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addForm([
@@ -35,6 +32,9 @@ final readonly class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
+    #[AsEventListener(
+        event: ConfigPreSaveEvent::class,
+    )]
     public function onConfigBeforeSave(ConfigEvent $event): void
     {
         $data = $event->getConfig('emailconfig');

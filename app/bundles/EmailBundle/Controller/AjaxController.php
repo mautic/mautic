@@ -92,10 +92,8 @@ final class AjaxController extends CommonAjaxController
 
     /**
      * Called by parent::getBuilderTokensAction().
-     *
-     * @return array
      */
-    protected function getBuilderTokens($query)
+    protected function getBuilderTokens($query): array
     {
         return $this->emailModel->getBuilderComponents(null, ['tokens'], (string) $query);
     }
@@ -148,7 +146,7 @@ final class AjaxController extends CommonAjaxController
             try {
                 $mailbox->setMailboxSettings($settings);
                 $folders = $mailbox->getListingFolders();
-                if (!empty($folders)) {
+                if ($folders !== []) {
                     $dataArray['folders'] = '';
                     foreach ($folders as $folder) {
                         $dataArray['folders'] .= "<option value=\"{$folder}\">{$folder}</option>\n";

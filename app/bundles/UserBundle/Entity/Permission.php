@@ -12,7 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -40,65 +40,50 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent(association: 'role')]
 class Permission implements CacheInvalidateInterface, UuidInterface
 {
     use UuidTrait;
 
-    public const CACHE_NAMESPACE = 'Permission';
+    public const string CACHE_NAMESPACE = 'Permission';
 
     /**
      * @var int
      */
     #[Groups(['permission:read', 'role:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     protected $id;
 
     /**
      * @var string
      */
     #[Groups(['permission:read', 'permission:write', 'role:read'])]
+    #[ORM\Column(type: 'string', length: 50)]
     protected $bundle;
 
     /**
      * @var string
      */
     #[Groups(['permission:read', 'permission:write', 'role:read'])]
+    #[ORM\Column(type: 'string', length: 50)]
     protected $name;
 
     /**
      * @var Role
      */
     #[Groups(['permission:read', 'permission:write', 'role:read'])]
+    #[ORM\ManyToOne(targetEntity: Role::class, inversedBy: 'permissions')]
+    #[ORM\JoinColumn(name: 'role_id', nullable: false, onDelete: 'CASCADE')]
     protected $role;
 
     /**
      * @var int
      */
     #[Groups(['permission:read', 'permission:write', 'role:read'])]
+    #[ORM\Column(type: 'integer')]
     protected $bitwise;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->createField('bundle', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('name', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createManyToOne('role', 'Role')
-            ->inversedBy('permissions')
-            ->addJoinColumn('role_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
-            ->build();
-
-        $builder->addField('bitwise', 'integer');
-
-    }
 
     /**
      * @return int|null

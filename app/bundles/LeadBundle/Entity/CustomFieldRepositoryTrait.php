@@ -5,9 +5,9 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Cache\ResultCacheHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
@@ -53,7 +53,7 @@ trait CustomFieldRepositoryTrait
 
             // Advanced search filters may have set a group by and if so, let's remove it for the count.
             if ($groupBy) {
-                $dq->resetQueryPart('groupBy');
+                $dq->resetGroupBy();
             }
 
             // get a total count
@@ -64,7 +64,7 @@ trait CustomFieldRepositoryTrait
             }
 
             $result = $statement->fetchAllAssociative();
-            $total  = ($result) ? $result[0]['count'] : 0;
+            $total  = ($result !== []) ? $result[0]['count'] : 0;
         } else {
             $total = $args['count'];
         }
@@ -73,13 +73,13 @@ trait CustomFieldRepositoryTrait
             $results = [];
         } else {
             if (isset($groupBy) && $groupBy) {
-                $dq->groupBy($groupBy);
+                // the query part comes back as a list, and DBAL 4 takes the expressions one by one
+                $dq->groupBy(...$groupBy);
             }
             // now get the actual paginated results
 
             $this->buildOrderByClause($dq, $args);
             $this->buildLimiterClauses($dq, $args);
-
             $dq->resetQueryPart('select');
             $this->buildSelectClause($dq, $args);
 
@@ -206,10 +206,8 @@ trait CustomFieldRepositoryTrait
      * @param string $search
      * @param int    $limit
      * @param int    $start
-     *
-     * @return array
      */
-    public function getValueList($field, $search = '', $limit = 10, $start = 0)
+    public function getValueList($field, $search = '', $limit = 10, $start = 0): array
     {
         // Includes prefix
         $table = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
@@ -245,7 +243,7 @@ trait CustomFieldRepositoryTrait
      *
      * @param array $entities
      */
-    public function saveEntities($entities): void
+    public function saveEntities(iterable $entities): void
     {
         foreach ($entities as $entity) {
             // Leads cannot be batched due to requiring the ID to update the fields
@@ -368,7 +366,7 @@ trait CustomFieldRepositoryTrait
      *
      * @return array [$fields, $fixedFields]
      */
-    public function getCustomFieldList($object)
+    public function getCustomFieldList($object): array
     {
         if (empty($this->customFieldList)) {
             // Get the list of custom fields
@@ -395,7 +393,7 @@ trait CustomFieldRepositoryTrait
     protected function prepareDbalFieldsForSave(array &$fields): void
     {
         // Ensure booleans are integers
-        foreach ($fields as $field => &$value) {
+        foreach ($fields as $field => $value) {
             if (is_bool($value)) {
                 $fields[$field] = (int) $value;
             }
@@ -438,7 +436,7 @@ trait CustomFieldRepositoryTrait
     /**
      * Inherit and use in class if required to do something with the entity after persisting.
      */
-    protected function postSaveEntity($entity): void
+    protected function postSaveEntity(object $entity): void
     {
         // Inherit and use if required
     }

@@ -2,14 +2,16 @@
 
 namespace Mautic\CampaignBundle\EventListener;
 
+use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Exception;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\Event\CampaignEvent;
+use Mautic\CampaignBundle\Event\CampaignPreSaveEvent;
 use Mautic\CampaignBundle\Event\EventPreview;
 use Mautic\CampaignBundle\Event\ExecutedEvent;
 use Mautic\CampaignBundle\Event\FailedEvent;
@@ -20,10 +22,10 @@ use Mautic\CampaignBundle\Model\Exceptions\CampaignAlreadyUnpublishedException;
 use Mautic\CampaignBundle\Model\Exceptions\CampaignVersionMismatchedException;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-final readonly class CampaignEventSubscriber implements EventSubscriberInterface
+final readonly class CampaignEventSubscriber
 {
     public const int LOOPS_TO_FAIL = 100;
 
@@ -41,25 +43,13 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Get the subscribed events for this listener.
-     *
-     * @return array<string,mixed>
-     */
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CampaignEvents::CAMPAIGN_PRE_SAVE        => ['onCampaignPreSave', 0],
-            FailedEvent::class                       => ['onEventFailed', 0],
-            ExecutedEvent::class                     => ['onEventExecuted', 0],
-            EventPreview::class                      => ['onEventPreviewRequest', 0],
-        ];
-    }
-
-    /**
      * Reset all campaign event failed_count's
      * to 0 when the campaign is published.
      */
-    public function onCampaignPreSave(CampaignEvent $event): void
+    #[AsEventListener(
+        event: CampaignPreSaveEvent::class,
+    )]
+    public function onCampaignPreSave(CampaignPreSaveEvent $event): void
     {
         $campaign = $event->getCampaign();
         $changes  = $campaign->getChanges();
@@ -71,7 +61,7 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
             && !$campaign->getPublishUp()
         ) {
             // Publish up date should be in format 'yyyy-MM-dd HH:mm'
-            $publishUp = new \DateTime();
+            $publishUp = new DateTime();
             $publishUp->setTime((int) $publishUp->format('H'), (int) $publishUp->format('i'));
             $campaign->setPublishUp($publishUp);
         }
@@ -95,6 +85,9 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
      * @throws OptimisticLockException
      * @throws TransactionRequiredException
      */
+    #[AsEventListener(
+        event: FailedEvent::class,
+    )]
     public function onEventFailed(FailedEvent $event): void
     {
         $log                  = $event->getLog();
@@ -104,7 +97,8 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
         $countFailedLeadEvent = $this->eventRepository->getFailedCountLeadEvent($lead->getId(), $failedEvent->getId());
 
         // Do not increase if under LOOPS_TO_FAIL || Do not increase twice
-        if (($countFailedLeadEvent < self::LOOPS_TO_FAIL) || ($countFailedLeadEvent > self::LOOPS_TO_FAIL
+        if (($countFailedLeadEvent < self::LOOPS_TO_FAIL) || (
+            $countFailedLeadEvent > self::LOOPS_TO_FAIL
                 && $this->leadEventLogRepository->isLastFailed($lead->getId(), $failedEvent->getId())
         )) {
             return;
@@ -142,8 +136,11 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
      * Check the fail log if the lead is recorded there. If yes it decrease the failed count. It prevents counting
      * the same failure twice.
      *
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NonUniqueResultException
      */
+    #[AsEventListener(
+        event: ExecutedEvent::class,
+    )]
     public function onEventExecuted(ExecutedEvent $event): void
     {
         $log                  = $event->getLog();
@@ -163,11 +160,14 @@ final readonly class CampaignEventSubscriber implements EventSubscriberInterface
         $this->eventRepository->decreaseFailedCount($executedEvent);
     }
 
+    #[AsEventListener(
+        event: EventPreview::class,
+    )]
     public function onEventPreviewRequest(EventPreview $eventPreview): void
     {
         $logStats = $this->leadEventLogRepository->getEventLogStats($eventPreview->event->getId());
 
-        if ($logStats->firstExecutionDate && $logStats->lastExecutionDate) {
+        if ($logStats->firstExecutionDate instanceof DateTimeImmutable && $logStats->lastExecutionDate instanceof DateTimeImmutable) {
             $firstExecutionDate = new DateTimeHelper($logStats->firstExecutionDate);
             $lastExecutionDate  = new DateTimeHelper($logStats->lastExecutionDate);
 

@@ -14,10 +14,8 @@ trait FormThemeTrait
      *
      * @param FormInterface<mixed> $form
      * @param mixed                $themes
-     *
-     * @return FormView
      */
-    protected function setFormTheme(FormInterface $form, Environment $twig, $themes = null)
+    protected function setFormTheme(FormInterface $form, Environment $twig, $themes = null): FormView
     {
         $formView = $form->createView();
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
 
@@ -29,7 +30,7 @@ final class ClientRepository extends CommonRepository
     /**
      * @return array{0: mixed, 1: array<string, mixed>}
      */
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'c.name',
@@ -40,7 +41,7 @@ final class ClientRepository extends CommonRepository
     /**
      * @return array{0: mixed, 1: array<string, mixed>}
      */
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q, \stdClass $filter): array
     {
         [$expr, $parameters] = parent::addSearchCommandWhereClause($q, $filter);
 

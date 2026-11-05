@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
 final class DayStat implements StatInterface
@@ -20,11 +22,9 @@ final class DayStat implements StatInterface
     /**
      * @param int $hour
      *
-     * @return HourStat
-     *
      * @throws \Exception
      */
-    public function getHour($hour)
+    public function getHour($hour): HourStat
     {
         $key = new \DateTime("{$this->day} {$hour}:00:00")->format('Y-m-d H');
 

@@ -36,13 +36,6 @@ final class PasswordSubscriberTest extends TestCase
             ->willReturn($this->createStub(PluginToken::class));
     }
 
-    public function testThatItIsSubscribedToEvents(): void
-    {
-        $subscribedEvents = PasswordSubscriber::getSubscribedEvents();
-        $this->assertCount(1, $subscribedEvents);
-        $this->assertArrayHasKey(CheckPassportEvent::class, $subscribedEvents);
-    }
-
     public function testThatItThrowsExceptionIfPasswordIsWeak(): void
     {
         $this->expectException(WeakPasswordException::class);

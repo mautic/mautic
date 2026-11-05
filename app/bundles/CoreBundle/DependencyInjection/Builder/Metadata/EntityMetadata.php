@@ -2,6 +2,9 @@
 
 namespace Mautic\CoreBundle\DependencyInjection\Builder\Metadata;
 
+use Doctrine\ORM\Mapping\Embeddable;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\MappedSuperclass;
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use Mautic\CoreBundle\Entity\DeprecatedInterface;
 use Symfony\Component\Finder\Finder;
@@ -55,8 +58,9 @@ final class EntityMetadata
                 ];
             }
 
-            // The bundle leverages the static loadMetadata method
-            if ([] === $this->ormConfig && $reflectionClass->hasMethod('loadMetadata')) {
+            // The bundle maps entities via the static loadMetadata method or Doctrine attributes;
+            // the staticphp driver is swapped for one that reads both (DoctrineMappingDriverPass)
+            if ([] === $this->ormConfig && ($reflectionClass->hasMethod('loadMetadata') || $this->hasOrmMappingAttribute($reflectionClass))) {
                 $this->ormConfig = [
                     'dir'       => 'Entity',
                     'type'      => 'staticphp',
@@ -66,6 +70,11 @@ final class EntityMetadata
                 ];
             }
         }
+    }
+
+    private function hasOrmMappingAttribute(\ReflectionClass $reflectionClass): bool
+    {
+        return array_any([Entity::class, MappedSuperclass::class, Embeddable::class], fn (string $ormAttribute): bool => [] !== $reflectionClass->getAttributes($ormAttribute));
     }
 
     public function getOrmConfig(): array

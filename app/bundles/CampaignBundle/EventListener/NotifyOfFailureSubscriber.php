@@ -6,22 +6,16 @@ namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\Event\NotifyOfFailureEvent;
 use Mautic\CampaignBundle\Executioner\Helper\NotificationHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class NotifyOfFailureSubscriber implements EventSubscriberInterface
+final readonly class NotifyOfFailureSubscriber
 {
     public function __construct(
         private NotificationHelper $notificationHelper,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            NotifyOfFailureEvent::class => 'notifyOfFailure',
-        ];
-    }
-
+    #[AsEventListener(event: NotifyOfFailureEvent::class)]
     public function notifyOfFailure(NotifyOfFailureEvent $event): void
     {
         $this->notificationHelper->notifyOfFailure($event->getLead(), $event->getFailedEvent());

@@ -6,7 +6,6 @@ namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: EmailDraftRepository::class)]
 #[ORM\Table(name: 'emails_draft')]
@@ -17,30 +16,22 @@ class EmailDraft
     /**
      * @api cannot be readonly as modified by external source
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private int $id;
 
     public function __construct(
-        #[ORM\OneToOne(inversedBy: 'draft', targetEntity: Email::class)]
+        #[ORM\OneToOne(targetEntity: Email::class, inversedBy: 'draft')]
         #[ORM\JoinColumn(name: 'email_id', nullable: false)]
         private Email $email,
+        #[ORM\Column(type: Types::TEXT, nullable: true)]
         private ?string $html,
+        #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
         private ?string $template,
+        #[ORM\Column(name: 'public_preview', type: Types::BOOLEAN, options: ['default' => 1])]
         private ?bool $publicPreview = true,
     ) {
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-        $builder->addNullableField('html', Types::TEXT);
-        $builder->addNullableField('template', Types::STRING);
-        $builder->createField('publicPreview', Types::BOOLEAN)
-            ->columnName('public_preview')
-            ->nullable(false)
-            ->option('default', 1)
-            ->build();
     }
 
     /**
@@ -82,7 +73,7 @@ class EmailDraft
         return $this->email;
     }
 
-    public function getHtml(): string
+    public function getHtml(): ?string
     {
         return $this->html;
     }
@@ -97,7 +88,7 @@ class EmailDraft
         $this->html = $html;
     }
 
-    public function getTemplate(): string
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
@@ -112,7 +103,7 @@ class EmailDraft
         return $this->publicPreview;
     }
 
-    public function getPublishStatus(): bool
+    public function getPublishStatus(): ?bool
     {
         return $this->publicPreview;
     }

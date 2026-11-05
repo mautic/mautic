@@ -18,7 +18,11 @@ use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\DependencyInjection\Container;
 
+/**
+ * @method Container getContainer()
+ */
 trait CampaignEntitiesTrait
 {
     /**
@@ -35,7 +39,6 @@ trait CampaignEntitiesTrait
         $field->setProperties($fieldDetails['properties']);
 
         $fieldModel = self::getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
         $fieldModel->saveEntity($field);
     }
 
@@ -85,8 +88,8 @@ trait CampaignEntitiesTrait
      */
     protected function createLead(string $leadName, array $customField = []): Lead
     {
-        $contactRepo = $this->em->getRepository(Lead::class);
-        \assert($contactRepo instanceof LeadRepository);
+        $leadRepository = $this->getContainer()->get(LeadRepository::class);
+
         $lead        = new Lead();
         $lead->setFirstname($leadName);
         if ([] !== $customField) {
@@ -100,10 +103,9 @@ trait CampaignEntitiesTrait
                 ],
             ]);
             $leadModel = self::getContainer()->get(LeadModel::class);
-            \assert($leadModel instanceof LeadModel);
             $leadModel->setFieldValues($lead, [$customField['alias'] => $customField['value']]);
         }
-        $contactRepo->saveEntity($lead);
+        $leadRepository->saveEntity($lead);
 
         return $lead;
     }
@@ -113,8 +115,8 @@ trait CampaignEntitiesTrait
      */
     public function createCompany(string $name, array $customField = []): Company
     {
-        $companyRepo = $this->em->getRepository(Company::class);
-        \assert($companyRepo instanceof CompanyRepository);
+        $companyRepository = $this->getContainer()->get(CompanyRepository::class);
+
         $company = new Company();
         $company->setName($name);
         if ([] !== $customField) {
@@ -127,10 +129,9 @@ trait CampaignEntitiesTrait
                 ],
             ]);
             $companyModel = self::getContainer()->get(CompanyModel::class);
-            \assert($companyModel instanceof CompanyModel);
             $companyModel->setFieldValues($company, [$customField['alias'] => $customField['value']]);
         }
-        $companyRepo->saveEntity($company);
+        $companyRepository->saveEntity($company);
 
         return $company;
     }

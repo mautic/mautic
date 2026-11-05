@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\PageBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\DncReportService;
@@ -17,6 +17,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -24,19 +25,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class ReportSubscriberTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CompanyReportData
+     * @var MockObject&CompanyReportData
      */
-    private \PHPUnit\Framework\MockObject\MockObject $companyReportData;
+    private MockObject $companyReportData;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&HitRepository
+     * @var MockObject&HitRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $hitRepository;
+    private MockObject $hitRepository;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&TranslatorInterface
+     * @var MockObject&TranslatorInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     private ReportSubscriber $subscriber;
 
@@ -122,10 +123,8 @@ final class ReportSubscriberTest extends TestCase
             ])
             ->getMock();
 
-        $reportMock = $this->createMock(Report::class);
-        $reportMock->expects($this->once())
-            ->method('getGroupBy')
-            ->willReturn('');
+        $reportMock = new Report();
+        $reportMock->setGroupBy([]);
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
@@ -172,10 +171,8 @@ final class ReportSubscriberTest extends TestCase
             ])
             ->getMock();
 
-        $reportMock = $this->createMock(Report::class);
-        $reportMock->expects($this->once())
-            ->method('getGroupBy')
-            ->willReturn('');
+        $reportMock = new Report();
+        $reportMock->setGroupBy([]);
 
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()

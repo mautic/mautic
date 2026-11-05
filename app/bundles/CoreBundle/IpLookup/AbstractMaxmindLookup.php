@@ -16,10 +16,7 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
 
     abstract protected function getName(): string;
 
-    /**
-     * @return array
-     */
-    protected function getHeaders()
+    protected function getHeaders(): array
     {
         if (!$this->auth) {
             throw new \InvalidArgumentException('Maxmind Authentication key canot be empty.');

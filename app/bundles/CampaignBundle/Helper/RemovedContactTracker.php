@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Helper;
 
-class RemovedContactTracker
+final class RemovedContactTracker
 {
     private array $removedContacts = [];
 

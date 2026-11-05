@@ -97,15 +97,12 @@ final class MappingManualDAOTest extends TestCase
 
     private function getMappingManualDAO(): MappingManualDAO
     {
-        $mappingManual = new MappingManualDAO($this->integrationName);
         $objectMapping = new ObjectMappingDAO(Contact::NAME, $this->integrationObjectName);
         $objectMapping->addFieldMapping('email', 'email', ObjectMappingDAO::SYNC_BIDIRECTIONALLY, true);
         $objectMapping->addFieldMapping('country', 'country', ObjectMappingDAO::SYNC_BIDIRECTIONALLY);
         $objectMapping->addFieldMapping('firstname', 'first_name', ObjectMappingDAO::SYNC_TO_INTEGRATION);
         $objectMapping->addFieldMapping('lastname', 'last_name', ObjectMappingDAO::SYNC_TO_MAUTIC);
 
-        $mappingManual->addObjectMapping($objectMapping);
-
-        return $mappingManual;
+        return new MappingManualDAO($this->integrationName, [$objectMapping]);
     }
 }

@@ -14,6 +14,7 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -35,7 +36,7 @@ final class EventModelTest extends TestCase
      */
     private MockObject $dispatcherMock;
 
-    private MockObject|EventModel $eventModel;
+    private EventModel $eventModel;
 
     protected function setUp(): void
     {
@@ -121,8 +122,8 @@ final class EventModelTest extends TestCase
             'new1',
         ];
 
-        $redirectEvent = $this->createMock(Event::class);
-        $redirectEvent->method('getId')->willReturn(123);
+        $redirectEvent = new Event();
+        ReflectionHelper::setEntityId($redirectEvent, 123);
 
         $deletedEvents = [
             ['id' => 'new1', 'redirectEvent' => null],

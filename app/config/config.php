@@ -200,15 +200,13 @@ $container->loadFromExtension('doctrine', [
             ]),
         ],
         'types'    => [
-            // Types::ARRAY is deprecated in DBAL, but the "array" type name is still used by entity mappings
-            'array'                       => Type\ArrayType::class,
+            Type\ArrayType::ARRAY         => Type\ArrayType::class,
             Types::DATETIME_MUTABLE       => Type\UTCDateTimeType::class,
             Types::DATETIME_IMMUTABLE     => Type\UTCDateTimeImmutableType::class,
             Type\GeneratedType::GENERATED => Type\GeneratedType::class,
         ],
     ],
     'orm'  => [
-        'auto_generate_proxy_classes' => '%kernel.debug%',
         'auto_mapping'                => true,
         'mappings'                    => $bundleMetadataBuilder->getOrmConfig(),
         'dql'                         => [
@@ -314,7 +312,7 @@ $container->loadFromExtension('framework', [
 
 $container->setParameter(
     'jms_serializer.camel_case_naming_strategy.class',
-    'JMS\Serializer\Naming\IdenticalPropertyNamingStrategy'
+    \JMS\Serializer\Naming\IdenticalPropertyNamingStrategy::class
 );
 
 // Monolog formatter
@@ -323,12 +321,8 @@ $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\Li
     ->addMethodCall('ignoreEmptyContextAndExtra', [true]);
 
 // Register command line logging
-$container->setParameter(
-    'console_error_listener.class',
-    ConsoleErrorListener::class
-);
 $definitionConsoleErrorListener = new Definition(
-    '%console_error_listener.class%',
+    ConsoleErrorListener::class,
     [new Reference('monolog.logger.mautic')]
 );
 $definitionConsoleErrorListener->addTag(
@@ -340,12 +334,8 @@ $container->setDefinition(
     $definitionConsoleErrorListener
 );
 
-$container->setParameter(
-    'console_terminate_listener.class',
-    ConsoleTerminateListener::class
-);
 $definitionConsoleErrorListener = new Definition(
-    '%console_terminate_listener.class%',
+    ConsoleTerminateListener::class,
     [new Reference('monolog.logger.mautic')]
 );
 $definitionConsoleErrorListener->addTag(

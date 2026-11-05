@@ -2,7 +2,7 @@
 
 namespace Mautic\ReportBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\EventListener\ReportSubscriber;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -15,15 +15,17 @@ use Mautic\ReportBundle\Helper\ReportSearchScopeProvider;
 use Mautic\ReportBundle\Model\ExportResponse;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
-use Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ReportController extends FormController
+final class ReportController extends AbstractFormController
 {
     private ReportModel $reportModel;
 
@@ -35,7 +37,7 @@ final class ReportController extends FormController
     }
 
     #[Route(
-        '/s/reports/{objectAction}/{objectId}',
+        path: '/s/reports/{objectAction}/{objectId}',
         name: 'mautic_report_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -46,7 +48,7 @@ final class ReportController extends FormController
     }
 
     #[Route(
-        '/s/reports/{page}',
+        path: '/s/reports/{page}',
         name: 'mautic_report_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -349,6 +351,7 @@ final class ReportController extends FormController
                 $entity->setColumns([]);
                 $oldSchedule = $entity->isScheduled() ? $entity->getSchedule() : null;
 
+                $newSchedule                             = [];
                 $newSchedule['schedule_unit']            = $request->request->all()['report']['scheduleUnit'];
                 $newSchedule['schedule_day']             = $request->request->all()['report']['scheduleDay'];
                 $newSchedule['schedule_month_frequency'] = $request->request->all()['report']['scheduleMonthFrequency'];
@@ -541,15 +544,14 @@ final class ReportController extends FormController
      * Shows a report.
      *
      * @param int $objectId   Report ID
-     * @param int $reportPage
      */
     #[Route(
-        '/s/reports/view/{objectId}/{reportPage}',
+        path: '/s/reports/view/{objectId}/{reportPage}',
         name: 'mautic_report_view',
         requirements: ['reportPage' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['reportPage' => 1, 'objectId' => 0],
     )]
-    public function viewAction(Request $request, $objectId, $reportPage = 1): Response
+    public function viewAction(Request $request, $objectId, int $reportPage = 1): Response
     {
         $entity   = $this->reportModel->getEntity($objectId);
 
@@ -746,7 +748,7 @@ final class ReportController extends FormController
      * @param array<mixed> $postActionVars
      * @param array<mixed> $permissions
      */
-    private function checkEntityAccess(array $postActionVars, ?Report $entity, int $objectId, array $permissions, string $modelName): bool|HttpFoundation\JsonResponse|HttpFoundation\RedirectResponse|Response
+    private function checkEntityAccess(array $postActionVars, ?Report $entity, int $objectId, array $permissions, string $modelName): bool|JsonResponse|RedirectResponse|Response
     {
         if (null === $entity) {
             return $this->postActionRedirect(
@@ -781,7 +783,7 @@ final class ReportController extends FormController
      * @throws \Exception
      */
     #[Route(
-        '/s/reports/view/{objectId}/export/{format}',
+        path: '/s/reports/view/{objectId}/export/{format}',
         name: 'mautic_report_export',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['format' => 'csv', 'objectId' => 0],
@@ -830,7 +832,7 @@ final class ReportController extends FormController
         $options['dynamicFilters'] = $dynamicFilters;
 
         if ('csv' === $format) {
-            $response = new HttpFoundation\StreamedResponse(
+            $response = new StreamedResponse(
                 function () use ($entity, $format, $options): void {
                     $options['paginate']        = true;
                     $options['ignoreGraphData'] = true;
@@ -886,7 +888,7 @@ final class ReportController extends FormController
      * @throws \Exception
      */
     #[Route(
-        '/s/reports/download/{reportId}/{format}',
+        path: '/s/reports/download/{reportId}/{format}',
         name: 'mautic_report_download',
         defaults: ['format' => 'csv'],
     )]

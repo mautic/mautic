@@ -6,51 +6,52 @@ namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: MessageQueueRepository::class)]
 #[ORM\Table(name: 'message_queue')]
-#[ORM\Index(columns: ['status'], name: 'message_status_search')]
-#[ORM\Index(columns: ['date_sent'], name: 'message_date_sent')]
-#[ORM\Index(columns: ['scheduled_date'], name: 'message_scheduled_date')]
-#[ORM\Index(columns: ['priority'], name: 'message_priority')]
-#[ORM\Index(columns: ['success'], name: 'message_success')]
-#[ORM\Index(columns: ['channel', 'channel_id'], name: 'message_channel_search')]
-#[ORM\Index(columns: ['date_published'], name: 'message_queue_date_published')]
+#[ORM\Index(name: 'message_status_search', columns: ['status'])]
+#[ORM\Index(name: 'message_date_sent', columns: ['date_sent'])]
+#[ORM\Index(name: 'message_scheduled_date', columns: ['scheduled_date'])]
+#[ORM\Index(name: 'message_priority', columns: ['priority'])]
+#[ORM\Index(name: 'message_success', columns: ['success'])]
+#[ORM\Index(name: 'message_channel_search', columns: ['channel', 'channel_id'])]
+#[ORM\Index(name: 'message_queue_date_published', columns: ['date_published'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class MessageQueue
 {
-    public const STATUS_RESCHEDULED = 'rescheduled';
+    public const string STATUS_RESCHEDULED = 'rescheduled';
 
-    public const STATUS_PENDING     = 'pending';
+    public const string STATUS_PENDING     = 'pending';
 
-    public const STATUS_SENT        = 'sent';
+    public const string STATUS_SENT        = 'sent';
 
-    public const STATUS_CANCELLED   = 'cancelled';
+    public const string STATUS_CANCELLED   = 'cancelled';
 
-    public const PRIORITY_NORMAL = 2;
+    public const int PRIORITY_NORMAL = 2;
 
-    public const PRIORITY_HIGH   = 1;
+    public const int PRIORITY_HIGH   = 1;
 
     /**
-     * @var string
+     * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $channel;
 
+    #[ORM\Column(name: 'channel_id', type: 'integer')]
     private $channelId;
 
-    /**
-     * @var Event|null
-     */
     #[ORM\ManyToOne(targetEntity: Event::class)]
     #[ORM\JoinColumn(name: 'event_id', onDelete: 'CASCADE')]
-    private $event;
+    private ?Event $event = null;
 
     /**
      * @var Lead
@@ -62,122 +63,65 @@ class MessageQueue
     /**
      * @var int
      */
+    #[ORM\Column(type: 'smallint')]
     private $priority = 2;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'max_attempts', type: 'smallint')]
     private $maxAttempts = 3;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'smallint')]
     private $attempts = 0;
 
     /**
      * @var bool
      */
+    #[ORM\Column(type: 'boolean')]
     private $success = false;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'string', length: 191)]
     private $status = self::STATUS_PENDING;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_published', type: 'datetime', nullable: true)]
     private $datePublished;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $scheduledDate;
+    #[ORM\Column(name: 'scheduled_date', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $scheduledDate = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $lastAttempt;
+    #[ORM\Column(name: 'last_attempt', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $lastAttempt = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $dateSent;
+    #[ORM\Column(name: 'date_sent', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $dateSent = null;
 
     /**
      * @var mixed[][]
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private array $options = [];
 
     /**
      * Used by listeners to note if the message had been processed in bulk.
-     *
-     * @var bool
      */
-    private $processed = false;
+    private bool $processed = false;
 
     /**
      * Used by listeners to tell the event dispatcher the message needs to be retried in 15 minutes.
-     *
-     * @var bool
      */
-    private $failed = false;
+    private bool $failed = false;
 
     private bool $metadataUpdated = false;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addField('channel', 'string');
-        $builder->addNamedField('channelId', 'integer', 'channel_id');
-
-        $builder->createField('priority', 'smallint')
-            ->columnName('priority')
-            ->build();
-
-        $builder->createField('maxAttempts', 'smallint')
-            ->columnName('max_attempts')
-            ->build();
-
-        $builder->createField('attempts', 'smallint')
-            ->columnName('attempts')
-            ->build();
-
-        $builder->createField('success', 'boolean')
-            ->columnName('success')
-            ->build();
-
-        $builder->createField('status', 'string')
-            ->columnName('status')
-            ->build();
-
-        $builder->createField('datePublished', 'datetime')
-            ->columnName('date_published')
-            ->nullable()
-            ->build();
-
-        $builder->createField('scheduledDate', 'datetime')
-            ->columnName('scheduled_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastAttempt', 'datetime')
-            ->columnName('last_attempt')
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->nullable()
-            ->build();
-
-        $builder->createField('options', 'array')
-            ->nullable()
-            ->build();
-    }
 
     public function getId(): int
     {
@@ -208,10 +152,7 @@ class MessageQueue
         return $this->options;
     }
 
-    /**
-     * @param array $options
-     */
-    public function setOptions($options): void
+    public function setOptions(array $options): void
     {
         $this->options[] = $options;
     }
@@ -250,10 +191,7 @@ class MessageQueue
         return $this;
     }
 
-    /**
-     * @return Event|null
-     */
-    public function getEvent()
+    public function getEvent(): ?Event
     {
         return $this->event;
     }
@@ -281,10 +219,7 @@ class MessageQueue
         $this->datePublished = $datePublished;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateSent()
+    public function getDateSent(): ?\DateTimeInterface
     {
         return $this->dateSent;
     }
@@ -292,15 +227,12 @@ class MessageQueue
     /**
      * @param \DateTime $dateSent
      */
-    public function setDateSent($dateSent): void
+    public function setDateSent(?\DateTimeInterface $dateSent): void
     {
         $this->dateSent = $dateSent;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getLastAttempt()
+    public function getLastAttempt(): ?\DateTimeInterface
     {
         return $this->lastAttempt;
     }
@@ -308,7 +240,7 @@ class MessageQueue
     /**
      * @param \DateTime $lastAttempt
      */
-    public function setLastAttempt($lastAttempt): void
+    public function setLastAttempt(?\DateTimeInterface $lastAttempt): void
     {
         $this->lastAttempt = $lastAttempt;
     }
@@ -358,18 +290,12 @@ class MessageQueue
         $this->priority = $priority;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getScheduledDate()
+    public function getScheduledDate(): ?\DateTimeInterface
     {
         return $this->scheduledDate;
     }
 
-    /**
-     * @param mixed $scheduledDate
-     */
-    public function setScheduledDate($scheduledDate): void
+    public function setScheduledDate(?\DateTimeInterface $scheduledDate): void
     {
         $this->scheduledDate = $scheduledDate;
     }
@@ -411,10 +337,7 @@ class MessageQueue
         $this->success = $success;
     }
 
-    /**
-     * @return bool
-     */
-    public function isFailed()
+    public function isFailed(): bool
     {
         return $this->failed;
     }
@@ -426,10 +349,7 @@ class MessageQueue
         return $this;
     }
 
-    /**
-     * @return bool
-     */
-    public function isProcessed()
+    public function isProcessed(): bool
     {
         return $this->processed;
     }
@@ -444,7 +364,7 @@ class MessageQueue
     /**
      * @return array<array-key, mixed>
      */
-    public function getMetadata()
+    public function getMetadata(): array
     {
         return $this->options['metadata'] ?? [];
     }

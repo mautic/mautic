@@ -59,7 +59,7 @@ final class SubmissionApiController extends CommonApiController
      * @param int $formId
      */
     #[Route(
-        '/api/forms/{formId}/submissions',
+        path: '/api/forms/{formId}/submissions',
         name: 'mautic_api_formresults',
         requirements: ['formId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -87,18 +87,15 @@ final class SubmissionApiController extends CommonApiController
 
     /**
      * Obtains a list of entities for specific form and contact.
-     *
-     * @param int $formId
-     * @param int $contactId
      */
     #[Route(
-        '/api/forms/{formId}/submissions/contact/{contactId}',
+        path: '/api/forms/{formId}/submissions/contact/{contactId}',
         name: 'mautic_api_contactformresults',
         requirements: ['formId' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, $formId, $contactId): Response
+    public function getEntitiesForContactAction(Request $request, UserHelper $userHelper, int $formId, int|string $contactId): Response
     {
         $filter = [
             'filter' => [
@@ -106,7 +103,7 @@ final class SubmissionApiController extends CommonApiController
                     [
                         'col'  => 's.lead_id',
                         'expr' => 'eq',
-                        'val'  => (int) $contactId,
+                        'val'  => $contactId,
                     ],
                 ],
             ],
@@ -121,7 +118,7 @@ final class SubmissionApiController extends CommonApiController
      * Obtains a specific entity as defined by the API URL.
      */
     #[Route(
-        '/api/forms/{formId}/submissions/{submissionId}',
+        path: '/api/forms/{formId}/submissions/{submissionId}',
         name: 'mautic_api_formresult',
         requirements: ['formId' => '\d+', 'submissionId' => '\d+'],
         defaults: ['_format' => 'json'],
@@ -146,10 +143,8 @@ final class SubmissionApiController extends CommonApiController
      * Returns Form on success
      *
      * @param int $formId
-     *
-     * @return Response|Form
      */
-    protected function getFormOrResponseWithError($formId)
+    protected function getFormOrResponseWithError($formId): Response|Form
     {
         $form = $this->formModel->getEntity($formId);
 

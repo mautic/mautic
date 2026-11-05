@@ -6,7 +6,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -15,78 +14,60 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class PointInsight extends FormEntity
 {
-    public const INSIGHT_TYPE_COMPARE_POINT_GROUPS = 'compare_point_groups';
+    public const string INSIGHT_TYPE_COMPARE_POINT_GROUPS = 'compare_point_groups';
 
-    public const INSIGHT_ACTION_SET_CUSTOM_FIELD = 'set_custom_field';
+    public const string INSIGHT_ACTION_SET_CUSTOM_FIELD = 'set_custom_field';
 
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private ?int $id = null;
 
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private string $name = '';
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.point.insight.type.required')]
+    #[ORM\Column(name: 'insight_type', type: Types::STRING, length: 191)]
     private $insightType = self::INSIGHT_TYPE_COMPARE_POINT_GROUPS;
 
     /**
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.point.insight.action.required')]
+    #[ORM\Column(name: 'insight_action', type: Types::STRING, length: 191)]
     private $insightAction = self::INSIGHT_ACTION_SET_CUSTOM_FIELD;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'custom_field', type: Types::STRING, length: 191, nullable: true)]
     private $customField;
 
     /**
      * @var array<int>
      */
+    #[ORM\Column(name: 'point_groups', type: Types::JSON)]
     private $pointGroups = [];
 
-    /**
-     * @var Category|null
-     */
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     public function __clone()
     {
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('insightType', Types::STRING)
-            ->columnName('insight_type')
-            ->build();
-
-        $builder->createField('insightAction', Types::STRING)
-            ->columnName('insight_action')
-            ->build();
-
-        $builder->createField('customField', Types::STRING)
-            ->columnName('custom_field')
-            ->nullable()
-            ->build();
-
-        $builder->createField('pointGroups', Types::JSON)
-            ->columnName('point_groups')
-            ->build();
-
-        $builder->addCategory();
     }
 
     /**
@@ -211,7 +192,7 @@ class PointInsight extends FormEntity
     /**
      * @return array<int>
      */
-    public function getPointGroups()
+    public function getPointGroups(): array
     {
         return $this->pointGroups;
     }
@@ -219,7 +200,7 @@ class PointInsight extends FormEntity
     /**
      * @param array<int> $pointGroups
      */
-    public function setPointGroups($pointGroups): static
+    public function setPointGroups(array $pointGroups): static
     {
         $this->isChanged('pointGroups', $pointGroups);
         $this->pointGroups = $pointGroups;
@@ -227,18 +208,12 @@ class PointInsight extends FormEntity
         return $this;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    /**
-     * @param Category|null $category
-     */
-    public function setCategory($category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;

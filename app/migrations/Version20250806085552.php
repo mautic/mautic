@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Entity\OptimisticLockInterface;
 
 final class Version20250806085552 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = LeadEventLog::TABLE_NAME;
+    protected const string TABLE_NAME = LeadEventLog::TABLE_NAME;
 
     protected function preUpAssertions(): void
     {

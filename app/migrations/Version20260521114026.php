@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Company;
 
 final class Version20260521114026 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = Company::TABLE_NAME;
+    protected const string TABLE_NAME = Company::TABLE_NAME;
 
     protected function preUpAssertions(): void
     {

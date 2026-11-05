@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ParameterType;
@@ -8,7 +10,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<StagesChangeLog>
  */
-class StagesChangeLogRepository extends CommonRepository
+final class StagesChangeLogRepository extends CommonRepository
 {
     use TimelineTrait;
 
@@ -17,10 +19,8 @@ class StagesChangeLogRepository extends CommonRepository
      *
      * @param int|null             $leadId
      * @param array<string, mixed> $options
-     *
-     * @return array
      */
-    public function getLeadTimelineEvents($leadId = null, array $options = [])
+    public function getLeadTimelineEvents($leadId = null, array $options = []): array
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_stages_change_log', 'ls')
@@ -69,10 +69,8 @@ class StagesChangeLogRepository extends CommonRepository
 
     /**
      * Get the current stage assigned to a lead.
-     *
-     * @param int $leadId
      */
-    public function getCurrentLeadStage($leadId): ?int
+    public function getCurrentLeadStage(int $leadId): ?int
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

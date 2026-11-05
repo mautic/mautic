@@ -60,13 +60,13 @@ final class PointGroupsApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/contacts/{contactId}/points/groups',
+        path: '/api/contacts/{contactId}/points/groups',
         name: 'mautic_api_getcontactpointgroups',
         requirements: ['contactId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getContactPointGroupsAction(int $contactId): Response
+    public function getContactPointGroupsAction(int|string $contactId): Response
     {
         $contact = $this->leadModel->getEntity($contactId);
 
@@ -94,13 +94,13 @@ final class PointGroupsApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/contacts/{contactId}/points/groups/{groupId}',
+        path: '/api/contacts/{contactId}/points/groups/{groupId}',
         name: 'mautic_api_getcontactpointgroup',
         requirements: ['contactId' => '\d+', 'groupId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['GET']
     )]
-    public function getContactPointGroupAction(int $contactId, int $groupId): Response
+    public function getContactPointGroupAction(int|string $contactId, int $groupId): Response
     {
         $contact = $this->leadModel->getEntity($contactId);
 
@@ -132,13 +132,13 @@ final class PointGroupsApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/contacts/{contactId}/points/groups/{groupId}/{operator}/{value}',
+        path: '/api/contacts/{contactId}/points/groups/{groupId}/{operator}/{value}',
         name: 'mautic_api_adjustcontactgrouppoints',
         requirements: ['contactId' => '\d+', 'groupId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function adjustGroupPointsAction(Request $request, IpLookupHelper $ipLookupHelper, int $contactId, int $groupId, string $operator, int $value): Response
+    public function adjustGroupPointsAction(Request $request, IpLookupHelper $ipLookupHelper, int|string $contactId, int $groupId, string $operator, int $value): Response
     {
         $contact = $this->leadModel->getEntity($contactId);
 

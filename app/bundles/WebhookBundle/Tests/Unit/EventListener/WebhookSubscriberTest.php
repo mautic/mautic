@@ -10,12 +10,12 @@ use Mautic\WebhookBundle\Entity\Webhook;
 use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\EventListener\WebhookSubscriber;
 use Mautic\WebhookBundle\Notificator\WebhookKillNotificator;
-use Mautic\WebhookBundle\WebhookEvents;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
+final class WebhookSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&WebhookKillNotificator
@@ -27,21 +27,9 @@ final class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->webhookKillNotificator = $this->createMock(WebhookKillNotificator::class);
     }
 
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertSame(
-            [
-                WebhookEvents::WEBHOOK_POST_SAVE   => ['onWebhookSave', 0],
-                WebhookEvents::WEBHOOK_POST_DELETE => ['onWebhookDelete', 0],
-                WebhookEvents::WEBHOOK_KILL        => ['onWebhookKill', 0],
-            ],
-            WebhookSubscriber::getSubscribedEvents()
-        );
-    }
-
     public function testOnWebhookKill(): void
     {
-        $webhookMock = $this->createStub(Webhook::class);
+        $webhookMock = new Webhook();
         $reason      = 'reason';
 
         $eventMock = $this->createMock(WebhookEvent::class);

@@ -62,9 +62,8 @@ final class TriggerApiController extends CommonApiController
      * @param Trigger              $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): Response|array|null
     {
         $method            = $this->requestStack->getCurrentRequest()->getMethod();
 
@@ -122,6 +121,7 @@ final class TriggerApiController extends CommonApiController
                 }
             }
         }
+        return null;
     }
 
     /**
@@ -143,7 +143,7 @@ final class TriggerApiController extends CommonApiController
      * Return array of available point trigger event types.
      */
     #[Route(
-        '/api/points/triggers/events/types',
+        path: '/api/points/triggers/events/types',
         name: 'mautic_api_getpointtriggereventtypes',
         defaults: ['_format' => 'json'],
         methods: ['GET']
@@ -168,17 +168,15 @@ final class TriggerApiController extends CommonApiController
 
     /**
      * Delete events from a point trigger.
-     *
-     * @param int $triggerId
      */
     #[Route(
-        '/api/points/triggers/{triggerId}/events/delete',
+        path: '/api/points/triggers/{triggerId}/events/delete',
         name: 'mautic_api_pointtriggerdeleteevents',
         requirements: ['triggerId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['DELETE']
     )]
-    public function deletePointTriggerEventsAction($triggerId): Response
+    public function deletePointTriggerEventsAction(int $triggerId): Response
     {
         if (!$this->security->isGranted([$this->permissionBase.':editown', $this->permissionBase.':editother'], 'MATCH_ONE')) {
             return $this->accessDenied();

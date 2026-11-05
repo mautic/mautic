@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -24,6 +25,7 @@ final class UniqueUserAliasValidator extends ConstraintValidator
             throw new ConstraintDefinitionException('A field has to be specified.');
         }
 
+        /** @var LeadList $list */
         if ($list->getAlias()) {
             $lists = $this->segmentRepository->getLists(
                 $this->userHelper->getUser(),

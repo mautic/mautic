@@ -67,7 +67,7 @@ final class SearchStringHelper
         return $this->splitUpSearchString($input);
     }
 
-    public static function mergeCommands(&$filters, array $commands): void
+    public static function mergeCommands($filters, array $commands): void
     {
         if (!isset($filters->commands)) {
             $filters->commands = $commands;
@@ -86,7 +86,7 @@ final class SearchStringHelper
         }
     }
 
-    private function addFilterCommand(\stdClass &$filters, \stdClass $mergeFilter): void
+    private function addFilterCommand(\stdClass $filters, \stdClass $mergeFilter): void
     {
         $command = $mergeFilter->command;
         if ('is' === $command) {
@@ -223,10 +223,17 @@ final class SearchStringHelper
         return $filters;
     }
 
-    private function setFilter(\stdClass &$filters, string &$baseName, int &$keyCount, string &$string, string &$command, string $overrideCommand,
+    private function setFilter(
+        \stdClass &$filters,
+        string $baseName,
+        int &$keyCount,
+        string &$string,
+        string &$command,
+        string $overrideCommand,
         bool $setFilter = true,
         ?string $type = null,
-        bool $setUpNext = true): void
+        bool $setUpNext = true
+    ): void
     {
         if (!empty($type)) {
             $filters->{$baseName}[$keyCount]->type = ('OR' === $type || 'AND' === $type) ? strtolower($type) : 'and';
@@ -235,6 +242,13 @@ final class SearchStringHelper
 
             // remove operators and empty values
             if (in_array($string, ['', 'OR', 'AND'])) {
+                if ($setUpNext) {
+                    // keep the current filter so the next term has a filter to write to
+                    $string = '';
+
+                    return;
+                }
+
                 unset($filters->{$baseName}[$keyCount]);
 
                 return;

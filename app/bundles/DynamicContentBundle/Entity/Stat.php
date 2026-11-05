@@ -6,100 +6,73 @@ namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: StatRepository::class)]
 #[ORM\Table(name: 'dynamic_content_stats')]
-#[ORM\Index(columns: ['dynamic_content_id', 'lead_id'], name: 'stat_dynamic_content_search')]
-#[ORM\Index(columns: ['source', 'source_id'], name: 'stat_dynamic_content_source_search')]
-#[ORM\Index(columns: ['date_sent'], name: 'stat_dynamic_content_date_sent')]
+#[ORM\Index(name: 'stat_dynamic_content_search', columns: ['dynamic_content_id', 'lead_id'])]
+#[ORM\Index(name: 'stat_dynamic_content_source_search', columns: ['source', 'source_id'])]
+#[ORM\Index(name: 'stat_dynamic_content_date_sent', columns: ['date_sent'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Stat
 {
     /**
-     * @var string
+     * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var DynamicContent|null
-     */
     #[ORM\ManyToOne(targetEntity: DynamicContent::class, inversedBy: 'stats')]
     #[ORM\JoinColumn(name: 'dynamic_content_id', onDelete: 'SET NULL')]
-    private $dynamicContent;
+    private ?DynamicContent $dynamicContent = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_sent', type: 'datetime')]
     private $dateSent;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'sent_count', type: 'integer', nullable: true)]
     private $sentCount;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'last_sent', type: 'datetime', nullable: true)]
     private $lastSent;
 
     /**
      * @var array
      */
+    #[ORM\Column(name: 'sent_details', type: 'array', nullable: true)]
     private $sentDetails = [];
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     /**
      * @var array
      */
+    #[ORM\Column(type: 'array', nullable: true)]
     private $tokens = [];
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->createField('dateSent', 'datetime')
-            ->columnName('date_sent')
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('tokens', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('sentCount', 'integer', 'sent_count');
-
-        $builder->addNullableField('lastSent', 'datetime', 'last_sent');
-
-        $builder->addNullableField('sentDetails', 'array', 'sent_details');
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -150,10 +123,7 @@ class Stat
         $this->id = (string) $id;
     }
 
-    /**
-     * @return DynamicContent|null
-     */
-    public function getDynamicContent()
+    public function getDynamicContent(): ?DynamicContent
     {
         return $this->dynamicContent;
     }
@@ -163,18 +133,12 @@ class Stat
         $this->dynamicContent = $dynamicContent;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
-    public function setLead($lead): void
+    public function setLead(?Lead $lead): void
     {
         $this->lead = $lead;
     }
@@ -227,18 +191,12 @@ class Stat
         $this->lastSent = $lastSent;
     }
 
-    /**
-     * @return array
-     */
-    public function getSentDetails()
+    public function getSentDetails(): array
     {
         return $this->sentDetails;
     }
 
-    /**
-     * @param array $sentDetails
-     */
-    public function setSentDetails($sentDetails): void
+    public function setSentDetails(array $sentDetails): void
     {
         $this->sentDetails = $sentDetails;
     }
@@ -275,18 +233,12 @@ class Stat
         $this->sourceId = $sourceId;
     }
 
-    /**
-     * @return array
-     */
-    public function getTokens()
+    public function getTokens(): array
     {
         return $this->tokens;
     }
 
-    /**
-     * @param array $tokens
-     */
-    public function setTokens($tokens): void
+    public function setTokens(array $tokens): void
     {
         $this->tokens = $tokens;
     }

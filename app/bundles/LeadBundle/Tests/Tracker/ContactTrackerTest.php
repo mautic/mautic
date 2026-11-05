@@ -12,7 +12,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -20,12 +19,13 @@ use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServ
 use Monolog\Logger;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
+final class ContactTrackerTest extends TestCase
 {
     /**
      * @var MockObject&LeadRepository
@@ -226,13 +226,11 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $device = new LeadDevice();
         $device->setTrackingId('abc123');
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getId')
-            ->willReturn(1);
+        $lead = new Lead();
+        $lead->setId(1);
 
-        $lead2 = $this->createMock(Lead::class);
-        $lead2->method('getId')
-            ->willReturn(2);
+        $lead2 = new Lead();
+        $lead2->setId(2);
 
         $leadDevice1 = new LeadDevice();
         $leadDevice2 = new LeadDevice();
@@ -245,12 +243,12 @@ final class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcherMock->expects($this->once())
             ->method('hasListeners')
-            ->with(LeadEvents::CURRENT_LEAD_CHANGED)
+            ->with(LeadChangeEvent::class)
             ->willReturn(true);
 
         $this->dispatcherMock->expects($this->once())
             ->method('dispatch')
-            ->with(new LeadChangeEvent($lead, 'def456', $lead2, null), LeadEvents::CURRENT_LEAD_CHANGED)
+            ->with(new LeadChangeEvent($lead, 'def456', $lead2, null))
             ->willReturn(new \stdClass());
 
         $contactTracker->setTrackedContact($lead);

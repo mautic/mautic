@@ -28,7 +28,7 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @implements AjaxLookupModelInterface<DynamicContent>
  */
-class DynamicContentModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+final class DynamicContentModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     use VariantModelTrait;
     use TranslationModelTrait;
@@ -67,9 +67,9 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     }
 
     /**
-     * @param object $entity
+     * @param DynamicContent $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
 
@@ -85,8 +85,12 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         return parent::getEntity($id);
     }
 
-    public function checkEntityBySlotName(string $slotName, ?string $type = null, string $typeCondition = '=',
-        ?int $skipId = null): bool
+    public function checkEntityBySlotName(
+        string $slotName,
+        ?string $type = null,
+        string $typeCondition = '=',
+        ?int $skipId = null
+    ): bool
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
 
@@ -114,12 +118,12 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     }
 
     /**
-     * @param string|null $action
-     * @param array       $options
+     * @param DynamicContent|array<string, mixed> $entity
+     * @param string|null    $action
      *
      * @throws \InvalidArgumentException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof DynamicContent) {
             throw new \InvalidArgumentException('Entity must be of class DynamicContent');
@@ -152,7 +156,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
      *
      * @return array<string, mixed>|false
      */
-    public function getSlotContentForLead(string $slot, array|Lead|null $lead)
+    public function getSlotContentForLead(string $slot, array|Lead|null $lead): array|false
     {
         if (!$lead) {
             return [];
@@ -167,7 +171,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
             ->leftJoin('dc', MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data', 'dcld', 'dcld.dynamic_content_id = dc.id')
             ->andWhere($qb->expr()->eq('dcld.slot', ':slot'))
             ->andWhere($qb->expr()->eq('dcld.lead_id', ':lead_id'))
-            ->andWhere($qb->expr()->eq('dc.is_published', 1))
+            ->andWhere($qb->expr()->eq('dc.is_published', '1'))
             ->setParameter('slot', $slot)
             ->setParameter('lead_id', $id)
             ->orderBy('dcld.date_added', 'DESC')
@@ -210,9 +214,11 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     }
 
     /**
+     * @param DynamicContent $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof DynamicContent) {
             throw new MethodNotAllowedHttpException(['Dynamic Content']);
@@ -238,7 +244,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
         if ($this->dispatcher->hasListeners($name)) {
             if (!$event instanceof Event) {
                 $event = new DynamicContentEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
             }
 
             $this->dispatcher->dispatch($event, $name);
@@ -252,7 +257,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface,
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q): void
+    public function limitQueryToCreator(QueryBuilder $q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'dynamic_content', 'd', 'd.id = t.dynamic_content_id')
             ->andWhere('d.created_by = :userId')

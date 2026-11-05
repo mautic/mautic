@@ -2,8 +2,7 @@
 
 namespace Mautic\SmsBundle\Controller;
 
-use Doctrine\Common\Collections\Collection;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -19,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class SmsController extends FormController
+final class SmsController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
 
@@ -37,7 +36,7 @@ final class SmsController extends FormController
     }
 
     #[Route(
-        '/s/sms/{objectAction}/{objectId}',
+        path: '/s/sms/{objectAction}/{objectId}',
         name: 'mautic_sms_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -47,16 +46,13 @@ final class SmsController extends FormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
-        '/s/sms/{page}',
+        path: '/s/sms/{page}',
         name: 'mautic_sms_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, TransportChain $transportChain, $page = 1): Response
+    public function indexAction(Request $request, TransportChain $transportChain, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -168,10 +164,8 @@ final class SmsController extends FormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        $security = $this->security;
-
-        /** @var Sms $sms */
         $sms = $this->smsModel->getEntity($objectId);
+
         // set the page we came from
         $page = $request->getSession()->get('mautic.sms.page', 1);
 
@@ -221,12 +215,7 @@ final class SmsController extends FormController
         // Get click through stats
         $trackableLinks = $this->smsModel->getSmsClickStats($sms->getId());
 
-        $translations = $sms->getTranslations();
-        if ($translations instanceof Collection) {
-            $translations = $translations->toArray();
-        }
-
-        [$translationParent, $translationChildren] = $translations;
+        [$translationParent, $translationChildren] = $sms->getTranslations();
 
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_sms_action', ['objectAction' => 'view', 'objectId' => $sms->getId()]),
@@ -235,7 +224,7 @@ final class SmsController extends FormController
                 'trackables'  => $trackableLinks,
                 'logs'        => $logs,
                 'isEmbedded'  => $request->attributes->all()['isEmbedded'] ?? $request->query->all()['isEmbedded'] ?? $request->request->all()['isEmbedded'] ?? null ?: false,
-                'permissions' => $security->isGranted([
+                'permissions' => $this->security->isGranted([
                     'sms:smses:viewown',
                     'sms:smses:viewother',
                     'sms:smses:create',
@@ -246,7 +235,7 @@ final class SmsController extends FormController
                     'sms:smses:publishown',
                     'sms:smses:publishother',
                 ], 'RETURN_ARRAY'),
-                'security'    => $security,
+                'security'    => $this->security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
                     'Mautic\SmsBundle\Controller\SmsController::contactsAction',
@@ -272,12 +261,10 @@ final class SmsController extends FormController
 
     /**
      * Generates new form and processes post data.
-     *
-     * @param Sms $entity
      */
-    public function newAction(Request $request, $entity = null): Response
+    public function newAction(Request $request, ?Sms $entity = null): Response
     {
-        if (!$entity instanceof Sms) {
+        if (! $entity instanceof Sms) {
             /** @var Sms $entity */
             $entity = $this->smsModel->getEntity();
         }
@@ -722,10 +709,9 @@ final class SmsController extends FormController
 
     public function previewAction($objectId): Response
     {
-        $sms      = $this->smsModel->getEntity($objectId);
-        $security = $this->security;
+        $sms = $this->smsModel->getEntity($objectId);
 
-        if (null !== $sms && $security->hasEntityAccess('sms:smses:viewown', 'sms:smses:viewother')) {
+        if (null !== $sms && $this->security->hasEntityAccess('sms:smses:viewown', 'sms:smses:viewother')) {
             return $this->delegateView([
                 'viewParameters' => [
                     'sms' => $sms,
@@ -737,11 +723,8 @@ final class SmsController extends FormController
         return new Response('', Response::HTTP_NOT_FOUND);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
-        '/s/sms/view/{objectId}/contact/{page}',
+        path: '/s/sms/view/{objectId}/contact/{page}',
         name: 'mautic_sms_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
@@ -750,7 +733,7 @@ final class SmsController extends FormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1,
+        int $page = 1,
     ): Response {
         return $this->generateContactsGrid(
             $request,

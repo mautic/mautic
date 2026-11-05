@@ -52,6 +52,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
     public function onWidgetDetailGenerate(WidgetDetailEvent $event): void
     {
         $this->checkPermissions($event);
+
         $canViewOthers = $event->hasPermission('form:forms:viewother');
 
         if ('submissions.in.time' == $event->getType()) {
@@ -67,7 +68,8 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                         $params['dateFrom'],
                         $params['dateTo'],
                         $params['dateFormat'],
-                        $canViewOthers
+                        [],
+                        $canViewOthers,
                     ),
                 ]);
             }
@@ -87,11 +89,11 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $referrers = $this->formSubmissionModel->getTopSubmissionReferrers($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
+                $referrers = $this->formSubmissionModel->getTopSubmissionReferrers($limit, $params['dateFrom'], $params['dateTo'], [], $canViewOthers);
                 $items     = [];
 
                 // Build table rows with links
-                foreach ($referrers as &$referrer) {
+                foreach ($referrers as $referrer) {
                     $row = [
                         [
                             'value'    => $referrer['referer'],
@@ -131,11 +133,11 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                     $limit = $params['limit'];
                 }
 
-                $submitters = $this->formSubmissionModel->getTopSubmitters($limit, $params['dateFrom'], $params['dateTo'], $canViewOthers);
+                $submitters = $this->formSubmissionModel->getTopSubmitters($limit, $params['dateFrom'], $params['dateTo'], [], $canViewOthers);
                 $items      = [];
 
                 // Build table rows with links
-                foreach ($submitters as &$submitter) {
+                foreach ($submitters as $submitter) {
                     $name    = $submitter['lead_id'];
                     $leadUrl = $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $submitter['lead_id']]);
                     if ($submitter['firstname'] || $submitter['lastname']) {
@@ -186,7 +188,7 @@ final class DashboardSubscriber extends MainDashboardSubscriber
                 $items = [];
 
                 // Build table rows with links
-                foreach ($forms as &$form) {
+                foreach ($forms as $form) {
                     $formUrl = $this->router->generate('mautic_form_action', ['objectAction' => 'view', 'objectId' => $form['id']]);
                     $row     = [
                         [

@@ -2,8 +2,10 @@
 
 namespace Mautic\DashboardBundle\Model;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Exception;
 use Mautic\CacheBundle\Cache\CacheProviderTagAwareInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
@@ -13,7 +15,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Entity\WidgetRepository;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
@@ -26,11 +27,12 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Throwable;
 
 /**
  * @extends FormModel<Widget>
  */
-class DashboardModel extends FormModel
+final class DashboardModel extends FormModel
 {
     public static function getName(): string
     {
@@ -81,9 +83,9 @@ class DashboardModel extends FormModel
     /**
      * Load widgets for the current user from database.
      *
-     * @return array
+     * @return iterable<Widget>
      */
-    public function getWidgets(bool $ignorePaginator = false)
+    public function getWidgets(bool $ignorePaginator = false): iterable
     {
         return $this->getEntities([
             'orderBy' => 'w.ordering',
@@ -140,7 +142,7 @@ class DashboardModel extends FormModel
             'mautic.dashboard.generated_by',
             [
                 '%name%' => $this->userHelper->getUser()->getName(),
-                '%date%' => new \DateTime()->format('Y-m-d H:i:s'),
+                '%date%' => new DateTime()->format('Y-m-d H:i:s'),
             ]
         );
     }
@@ -162,10 +164,9 @@ class DashboardModel extends FormModel
     /**
      * Fill widgets with their content.
      *
-     * @param array $widgets
-     * @param array $filter
+     * @param array<mixed>|Paginator<mixed> $widgets
      */
-    public function populateWidgetsContent(&$widgets, $filter = []): void
+    public function populateWidgetsContent(array|Paginator &$widgets, array $filter = []): void
     {
         if (count($widgets)) {
             foreach ($widgets as &$widget) {
@@ -197,17 +198,15 @@ class DashboardModel extends FormModel
 
     public function populateWidgetPreview(Widget $widget): void
     {
-        $event = $this->widgetEventFactory->create($widget);
+        $event = $this->widgetEventFactory->createPreLoad($widget);
 
-        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_PRE_LOAD);
+        $this->dispatcher->dispatch($event);
     }
 
     /**
      * Load widget content from the onWidgetDetailGenerate event.
-     *
-     * @param array $filter
      */
-    public function populateWidgetContent(Widget $widget, $filter = []): void
+    public function populateWidgetContent(Widget $widget, array $filter = []): void
     {
         $defaultTimeout = $this->coreParametersHelper->get('cached_data_timeout');
 
@@ -240,10 +239,9 @@ class DashboardModel extends FormModel
 
         try {
             $this->dispatcher->dispatch(
-                $this->widgetEventFactory->create($widget),
-                DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE
+                $this->widgetEventFactory->createGenerate($widget)
             );
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->logger->error(
                 'Dashboard widget "{type}" failed to load: {message}',
                 ['type' => $widget->getType(), 'message' => $e->getMessage(), 'exception' => $e]
@@ -261,15 +259,14 @@ class DashboardModel extends FormModel
     }
 
     /**
-     * @param Widget      $entity
+     * @param Widget|array<string, mixed>      $entity
      * @param string|null $action
-     * @param array       $options
      *
      * @return FormInterface<mixed>
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Widget) {
             throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');
@@ -284,19 +281,18 @@ class DashboardModel extends FormModel
 
     /**
      * Create/edit entity.
+     * @param Widget $entity
      *
-     * @param object $entity
-     *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         // Set widget name from widget type if empty
         if (!$entity->getName()) {
             $entity->setName($this->translator->trans('mautic.widget.'.$entity->getType()));
         }
 
-        $entity->setDateModified(new \DateTime());
+        $entity->setDateModified(new DateTime());
 
         parent::saveEntity($entity, $unlock);
     }
@@ -304,18 +300,18 @@ class DashboardModel extends FormModel
     /**
      * Generate default date range filter and time unit.
      *
-     * @return array{dateFrom: \DateTime, dateTo: \DateTime}
+     * @return array{dateFrom: DateTime, dateTo: DateTime}
      */
     public function getDefaultFilter(): array
     {
         $dateRangeDefault = $this->coreParametersHelper->get('default_daterange_filter', '-1 month');
-        $dateRangeStart   = new \DateTime();
+        $dateRangeStart   = new DateTime();
         $dateRangeStart->modify($dateRangeDefault);
 
         $session  = $this->requestStack->getSession();
-        $today    = new \DateTime();
-        $dateFrom = new \DateTime($session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00')));
-        $dateTo   = new \DateTime($session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
+        $today    = new DateTime();
+        $dateFrom = new DateTime($session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00')));
+        $dateTo   = new DateTime($session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
 
         return [
             'dateFrom' => $dateFrom,

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<Copy>
  */
-class CopyRepository extends CommonRepository
+final class CopyRepository extends CommonRepository
 {
     /**
      * @param string $hash
@@ -42,10 +42,8 @@ class CopyRepository extends CommonRepository
 
     /**
      * @param string $string md5 hash or content
-     *
-     * @return array
      */
-    public function findByHash($string, $subject = null)
+    public function findByHash($string, $subject = null): ?Copy
     {
         if (null !== $subject) {
             // Combine subject with $string and hash together

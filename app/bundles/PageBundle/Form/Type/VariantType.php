@@ -25,7 +25,8 @@ final class VariantType extends AbstractType
     {
         $builder->add(
             'weight',
-            IntegerType::class, [
+            IntegerType::class,
+            [
                 'label'      => 'mautic.core.ab_test.form.traffic_weight',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
@@ -42,13 +43,14 @@ final class VariantType extends AbstractType
 
         $abTestWinnerCriteria = $this->pageModel->getBuilderComponents(null, 'abTestWinnerCriteria');
 
-        if (!empty($abTestWinnerCriteria)) {
+        if ($abTestWinnerCriteria !== []) {
             $criteria = $abTestWinnerCriteria['criteria'];
             $choices  = $abTestWinnerCriteria['choices'];
 
             $builder->add(
                 'winnerCriteria',
-                ChoiceType::class, [
+                ChoiceType::class,
+                [
                     'label'      => 'mautic.core.ab_test.form.winner',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [

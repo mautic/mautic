@@ -7,8 +7,9 @@ namespace Mautic\FormBundle\Tests\Collection;
 use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Mautic\FormBundle\Exception\FieldNotFoundException;
+use PHPUnit\Framework\TestCase;
 
-final class FieldCollectionTest extends \PHPUnit\Framework\TestCase
+final class FieldCollectionTest extends TestCase
 {
     public function testToChoicesWithObjects(): void
     {

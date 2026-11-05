@@ -12,7 +12,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -21,6 +20,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -62,7 +62,7 @@ final class CompanyApiController extends CommonApiController
         parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine, $modelFactory, $dispatcher, $coreParametersHelper);
     }
 
-    public function getNewEntity(array $params)
+    protected function getNewEntity(array $params)
     {
         [$company, $companyEntities] = $this->identifyCompanyHelper->findCompany($params);
         if (count($companyEntities)) {
@@ -76,9 +76,8 @@ final class CompanyApiController extends CommonApiController
      * @param Company              $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): void
     {
         $this->setCustomFieldValues($entity, $form, $parameters);
     }
@@ -86,19 +85,16 @@ final class CompanyApiController extends CommonApiController
     /**
      * Adds a contact to a company.
      *
-     * @param int $companyId Company ID
-     * @param int $contactId Contact ID
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/companies/{companyId}/contact/{contactId}/add',
+        path: '/api/companies/{companyId}/contact/{contactId}/add',
         name: 'mautic_api_companyaddcontact',
         requirements: ['companyId' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function addContactAction($companyId, $contactId): Response
+    public function addContactAction(int $companyId, int|string $contactId): Response
     {
         $company = $this->model->getEntity($companyId);
         $view    = $this->view(['success' => 1], Response::HTTP_OK);
@@ -120,19 +116,19 @@ final class CompanyApiController extends CommonApiController
     /**
      * Removes given contact from a company.
      *
-     * @param int $companyId List ID
-     * @param int $contactId Lead ID
+     * @param int        $companyId List ID
+     * @param int|string $contactId Lead ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/companies/{companyId}/contact/{contactId}/remove',
+        path: '/api/companies/{companyId}/contact/{contactId}/remove',
         name: 'mautic_api_companyremovecontact',
         requirements: ['companyId' => '\d+', 'contactId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function removeContactAction($companyId, $contactId): Response
+    public function removeContactAction(int $companyId, int|string $contactId): Response
     {
         $company = $this->model->getEntity($companyId);
         $view    = $this->view(['success' => 1], Response::HTTP_OK);

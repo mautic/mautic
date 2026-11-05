@@ -14,30 +14,32 @@ use Mautic\CampaignBundle\Membership\EventDispatcher;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 #[AllowMockObjectsWithoutExpectations]
-final class MembershipManagerTest extends \PHPUnit\Framework\TestCase
+final class MembershipManagerTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Adder
+     * @var MockObject&Adder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $adder;
+    private MockObject $adder;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Remover
+     * @var MockObject&Remover
      */
-    private \PHPUnit\Framework\MockObject\MockObject $remover;
+    private MockObject $remover;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcher
+     * @var MockObject&EventDispatcher
      */
-    private \PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
+    private MockObject $eventDispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
+     * @var MockObject&LeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
+    private MockObject $leadRepository;
 
     private NullLogger $logger;
 

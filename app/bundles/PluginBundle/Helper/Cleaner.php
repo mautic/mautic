@@ -2,6 +2,8 @@
 
 namespace Mautic\PluginBundle\Helper;
 
+use DateTime;
+
 final class Cleaner
 {
     public const string FIELD_TYPE_STRING   = 'string';
@@ -14,10 +16,7 @@ final class Cleaner
 
     public const string FIELD_TYPE_DATE     = 'date';
 
-    /**
-     * @return bool|float|string
-     */
-    public static function clean($value, $fieldType = self::FIELD_TYPE_STRING)
+    public static function clean($value, $fieldType = self::FIELD_TYPE_STRING): bool|float|string
     {
         $clean = strip_tags(html_entity_decode($value, ENT_QUOTES));
         switch ($fieldType) {
@@ -26,11 +25,11 @@ final class Cleaner
             case self::FIELD_TYPE_NUMBER:
                 return (float) $clean;
             case self::FIELD_TYPE_DATETIME:
-                $dateTimeValue = new \DateTime($value);
+                $dateTimeValue = new DateTime($value);
 
                 return (!empty($clean)) ? $dateTimeValue->format('c') : '';
             case self::FIELD_TYPE_DATE:
-                $dateTimeValue = new \DateTime($value);
+                $dateTimeValue = new DateTime($value);
 
                 return (!empty($clean)) ? $dateTimeValue->format('Y-m-d') : '';
             default:

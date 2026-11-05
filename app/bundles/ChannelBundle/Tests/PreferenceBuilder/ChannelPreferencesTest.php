@@ -8,8 +8,9 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\ChannelBundle\PreferenceBuilder\ChannelPreferences;
+use PHPUnit\Framework\TestCase;
 
-final class ChannelPreferencesTest extends \PHPUnit\Framework\TestCase
+final class ChannelPreferencesTest extends TestCase
 {
     public function testLogsAreOrganizedByPriority(): void
     {

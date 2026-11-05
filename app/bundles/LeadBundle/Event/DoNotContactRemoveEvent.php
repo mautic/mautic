@@ -9,8 +9,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 final class DoNotContactRemoveEvent extends Event
 {
-    public const string REMOVE_DONOT_CONTACT = 'mautic.lead.remove_donot_contact';
-
     public function __construct(
         private readonly Lead $lead,
         private readonly string $channel,

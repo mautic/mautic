@@ -10,6 +10,7 @@ use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Tests\Traits\LeadFieldTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -60,7 +61,9 @@ final class CampaignDecisionTest extends MauticMysqlTestCase
         $lead5    = $this->createLeadData($segment, $object, [], [], 5);
         $campaign = $this->createCampaign('c1', $segment);
 
-        $parentEvent = $this->createEvent('Field Value Condition', $campaign,
+        $parentEvent = $this->createEvent(
+            'Field Value Condition',
+            $campaign,
             'lead.field_value',
             'condition',
             [
@@ -72,7 +75,9 @@ final class CampaignDecisionTest extends MauticMysqlTestCase
             ]
         );
 
-        $yesEvent = $this->createEvent('Add 10 points', $campaign,
+        $yesEvent = $this->createEvent(
+            'Add 10 points',
+            $campaign,
             'lead.changepoints',
             'action',
             ['points' => 10],
@@ -80,7 +85,9 @@ final class CampaignDecisionTest extends MauticMysqlTestCase
             $parentEvent
         );
 
-        $noEvent = $this->createEvent('Add 5 points', $campaign,
+        $noEvent = $this->createEvent(
+            'Add 5 points',
+            $campaign,
             'lead.changepoints',
             'action',
             ['points' => 5],
@@ -124,12 +131,12 @@ final class CampaignDecisionTest extends MauticMysqlTestCase
         array $yesEventLeads,
         array $noEventLeads,
     ): void {
-        $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)
+        $campaignEventLogs = $this->getContainer()->get(LeadEventLogRepository::class)
             ->findBy(['campaign' => $campaign, 'event' => $yesEvent], ['event' => 'ASC']);
         $this->assertCount(count($yesEventLeads), $campaignEventLogs);
         $this->assertSame($yesEventLeads, $this->getLeadIds($campaignEventLogs));
 
-        $campaignEventLogs = $this->em->getRepository(LeadEventLog::class)
+        $campaignEventLogs = $this->getContainer()->get(LeadEventLogRepository::class)
             ->findBy(['campaign' => $campaign, 'event' => $noEvent], ['event' => 'ASC']);
         $this->assertCount(count($noEventLeads), $campaignEventLogs);
         $this->assertSame($noEventLeads, $this->getLeadIds($campaignEventLogs));

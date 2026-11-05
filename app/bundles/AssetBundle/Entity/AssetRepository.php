@@ -7,23 +7,21 @@ use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
  * @extends CommonRepository<Asset>
  */
-class AssetRepository extends CommonRepository
+final class AssetRepository extends CommonRepository
 {
     use ProjectRepositoryTrait;
 
     /**
      * Get a list of entities.
-     *
-     * @return Paginator
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder('a')
@@ -35,14 +33,7 @@ class AssetRepository extends CommonRepository
         return parent::getEntities($args);
     }
 
-    /**
-     * @param string $search
-     * @param int    $limit
-     * @param int    $start
-     *
-     * @return array
-     */
-    public function getAssetList($search = '', $limit = 10, $start = 0, bool $viewOther = false)
+    public function getAssetList(string $search = '', int $limit = 10, int $start = 0, bool $viewOther = false): array
     {
         $q = $this->createQueryBuilder('a');
         $q->select('partial a.{id, title, path, alias, language}');
@@ -67,7 +58,7 @@ class AssetRepository extends CommonRepository
         return $q->getQuery()->getArrayResult();
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause($queryBuilder, $filter, [
             'a.title',
@@ -75,7 +66,7 @@ class AssetRepository extends CommonRepository
         ]);
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($queryBuilder, $filter);
         if ($expr) {
@@ -207,14 +198,10 @@ class AssetRepository extends CommonRepository
     }
 
     /**
-     * @param int $categoryId
-     *
-     * @return Asset
-     *
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function getLatestAssetForCategory($categoryId)
+    public function getLatestAssetForCategory(int $categoryId): Asset
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
         $q->where($this->getTableAlias().'.category = :categoryId');

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Mautic\CoreBundle\IpLookup\ExtremeIpLookup;
+
 return [
     'routes'   => [
         'main' => [
@@ -20,33 +22,10 @@ return [
             ],
         ],
     ],
-    'services' => [
-        'helpers'  => [
-            'mautic.helper.bundle' => [
-                'class'     => Mautic\CoreBundle\Helper\BundleHelper::class,
-                'arguments' => [
-                    '%mautic.bundles%',
-                    '%mautic.plugin.bundles%',
-                ],
-            ],
-        ],
-        'other'    => [
-            'mautic.http.client' => [
-                'class' => GuzzleHttp\Client::class,
-            ],
-        ],
-        'fixtures' => [
-            'mautic.test.fixture' => [
-                'class'    => 'Foo\Bar\NonExisting',
-                'optional' => true,
-            ],
-        ],
-    ],
-
     'ip_lookup_services' => [
         'extreme-ip' => [
             'display_name' => 'Extreme-IP',
-            'class'        => Mautic\CoreBundle\IpLookup\ExtremeIpLookup::class,
+            'class'        => ExtremeIpLookup::class,
         ],
     ],
 

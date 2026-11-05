@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Service\FlashBag;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -87,7 +86,7 @@ final class FlashBagTest extends TestCase
     public function testAddWithChoices(): void
     {
         $message                      = 'message';
-        $messageVars['%count%']       = 2;
+        $messageVars                  = ['%count%' => 2];
         $translatedMessage            = 'translatedMessage';
         $level                        = FlashBag::LEVEL_NOTICE;
         $domain                       = 'flashes';
@@ -195,10 +194,10 @@ final class FlashBagTest extends TestCase
             ->with($message, $messageVars, $domain)
             ->willReturn($translatedMessage);
 
-        $request            = $this->createMock(Request::class);
+        // A real request: Request::$query and $request are typed InputBag, which Symfony 8
+        // made final, so PHPUnit can no longer double them for those typed properties.
+        $request = new Request();
         $request->attributes = new ParameterBag(['mauticUserLastActive' => $mauticUserLastActive]);
-        $request->query      = new InputBag();
-        $request->request    = new InputBag();
 
         $this->requestStack
             ->expects($this->once())
@@ -238,10 +237,10 @@ final class FlashBagTest extends TestCase
             ->with($message, $messageVars, $domain)
             ->willReturn($translatedMessage);
 
-        $request            = $this->createMock(Request::class);
+        // A real request: Request::$query and $request are typed InputBag, which Symfony 8
+        // made final, so PHPUnit can no longer double them for those typed properties.
+        $request = new Request();
         $request->attributes = new ParameterBag(['mauticUserLastActive' => $mauticUserLastActive]);
-        $request->query      = new InputBag();
-        $request->request    = new InputBag();
 
         $this->requestStack
             ->expects($this->once())

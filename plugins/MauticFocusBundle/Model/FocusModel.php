@@ -4,8 +4,7 @@ namespace MauticPlugin\MauticFocusBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
-use MatthiasMullie\Minify;
-use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use MatthiasMullie\Minify\JS;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -15,17 +14,20 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\GlobalSearchInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Entity\StatRepository;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
+use MauticPlugin\MauticFocusBundle\Event\FocusTokenReplacementEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Psr\Log\LoggerInterface;
@@ -41,7 +43,7 @@ use Twig\Runtime\EscaperRuntime;
 /**
  * @extends FormModel<Focus>
  */
-class FocusModel extends FormModel implements GlobalSearchInterface
+final class FocusModel extends FormModel implements GlobalSearchInterface
 {
     public static function getName(): string
     {
@@ -49,11 +51,11 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     public function __construct(
-        protected \Mautic\FormBundle\Model\FormModel $formModel,
-        protected TrackableModel $trackableModel,
-        protected Environment $twig,
-        protected FieldModel $leadFieldModel,
-        protected ContactTracker $contactTracker,
+        private readonly \Mautic\FormBundle\Model\FormModel $formModel,
+        private readonly TrackableModel $trackableModel,
+        private readonly Environment $twig,
+        private readonly FieldModel $leadFieldModel,
+        private readonly ContactTracker $contactTracker,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -81,13 +83,12 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
-     * @param object      $entity
-     * @param string|null $action
-     * @param array       $options
+     * @param Focus|array<string, mixed> $entity
+     * @param string|null                $action
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);
@@ -120,7 +121,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     /**
      * @param Focus $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
         $this->generateTrackableUrl($entity);
@@ -147,17 +148,17 @@ class FocusModel extends FormModel implements GlobalSearchInterface
 
         $content = $this->getContent($focusArray, $isPreview, $url);
         $data    = [
-            'js'    => new Minify\JS($javascript)->minify(),
+            'js'    => new JS($javascript)->minify(),
             'focus' => InputHelper::minifyHTML($content['focus']),
             'form'  => InputHelper::minifyHTML($content['form']),
         ];
 
         // Replace tokens to ensure clickthroughs, lead tokens etc. are appropriate
-        $tokenEvent = new TokenReplacementEvent($data['focus'], $lead, ['focus_id' => $focus->getId()]);
+        $tokenEvent = new FocusTokenReplacementEvent($data['focus'], $lead, ['focus_id' => $focus->getId()]);
         if ($trackableUrl) {
             $tokenEvent->addToken($url, $trackableUrl);
         }
-        $this->dispatcher->dispatch($tokenEvent, FocusEvents::TOKEN_REPLACEMENT);
+        $this->dispatcher->dispatch($tokenEvent);
         $focusContent = $tokenEvent->getContent();
         $focusContent = str_replace('{focus_form}', $data['form'], $focusContent, $formReplaced);
         if (!$formReplaced && !empty($data['form'])) {
@@ -210,7 +211,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
             $displayManager = new DisplayManager($form, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         }
-        $formContent        = ($form instanceof \Mautic\FormBundle\Entity\Form) ? $this->twig->render(
+        $formContent        = ($form instanceof Form) ? $this->twig->render(
             '@MauticFocus/Builder/form.html.twig',
             [
                 'form'           => $form,
@@ -289,7 +290,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         switch ($type) {
             case Stat::TYPE_FORM:
             case Stat::TYPE_CLICK:
-                /** @var \Mautic\PageBundle\Entity\Hit|Submission $data */
+                /** @var Hit|Submission $data */
                 $typeId = $data->getId();
                 break;
             case Stat::TYPE_NOTIFICATION:
@@ -310,9 +311,11 @@ class FocusModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Focus $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);
@@ -338,7 +341,6 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         if ($this->dispatcher->hasListeners($name)) {
             if (!$event instanceof Event) {
                 $event = new FocusEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
             }
 
             $this->dispatcher->dispatch($event, $name);

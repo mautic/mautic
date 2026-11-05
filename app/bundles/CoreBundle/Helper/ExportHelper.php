@@ -24,11 +24,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  * Provides several functions for export-related tasks,
  * like exporting to CSV or Excel.
  */
-readonly class ExportHelper
+final readonly class ExportHelper
 {
-    public const EXPORT_TYPE_EXCEL = 'xlsx';
+    public const string EXPORT_TYPE_EXCEL = 'xlsx';
 
-    public const EXPORT_TYPE_CSV   = 'csv';
+    public const string EXPORT_TYPE_CSV   = 'csv';
 
     public function __construct(
         private TranslatorInterface $translator,
@@ -55,10 +55,8 @@ readonly class ExportHelper
 
     /**
      * Exports data as the given export type. You can get available export types with getSupportedExportTypes().
-     *
-     * @param array|\Iterator $data
      */
-    public function exportDataAs($data, string $type, string $filename): StreamedResponse
+    public function exportDataAs(array|\Iterator $data, string $type, string $filename): StreamedResponse
     {
         if (is_array($data)) {
             $data = new \ArrayIterator($data);
@@ -176,11 +174,9 @@ readonly class ExportHelper
     }
 
     /**
-     * @param \Iterator<mixed> $data
-     *
      * @throws SignalCaughtException
      */
-    private function exportAsCsvIntoFile(\Iterator $data, string $fileName): string
+    private function exportAsCsvIntoFile(IteratorExportDataModel $data, string $fileName): string
     {
         $filePath  = $this->getValidContactExportFileName($fileName);
         $handler   = @fopen($filePath, 'ab+');

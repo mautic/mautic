@@ -12,20 +12,22 @@ use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 #[AllowMockObjectsWithoutExpectations]
-final class KickoffContactFinderTest extends \PHPUnit\Framework\TestCase
+final class KickoffContactFinderTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LeadRepository
+     * @var MockObject&LeadRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $leadRepository;
+    private MockObject $leadRepository;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&CampaignRepository
+     * @var MockObject&CampaignRepository
      */
-    private \PHPUnit\Framework\MockObject\MockObject $campaignRepository;
+    private MockObject $campaignRepository;
 
     protected function setUp(): void
     {

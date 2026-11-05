@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field;
 
-class FieldsWithUniqueIdentifier
+final class FieldsWithUniqueIdentifier
 {
     /**
      * @var array<mixed>

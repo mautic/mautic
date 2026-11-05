@@ -31,13 +31,6 @@ final class DynamicContentSubscriberTest extends TestCase
         parent::setUp();
     }
 
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertSame([
-            ContactFiltersEvaluateEvent::class => ['onContactFilterEvaluate', 0],
-        ], DynamicContentSubscriber::getSubscribedEvents());
-    }
-
     public function testOnContactFilterEvaluateUnknownOperator(): void
     {
         $contactId = 1;

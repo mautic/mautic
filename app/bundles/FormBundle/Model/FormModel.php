@@ -95,7 +95,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         return 'getName';
     }
 
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    /**
+     * @param Form|array<string, mixed> $entity
+     */
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -129,9 +132,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Form $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -157,7 +162,6 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         if ($this->dispatcher->hasListeners($name)) {
             if (!$event instanceof Event) {
                 $event = new FormEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
             }
 
             $this->dispatcher->dispatch($event, $name);
@@ -295,12 +299,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
-    /**
-     * @param array $actions
-     */
-    public function deleteActions(Form $entity, $actions): void
+    public function deleteActions(Form $entity, array $actions): void
     {
-        if (empty($actions)) {
+        if ($actions === []) {
             return;
         }
 
@@ -320,7 +321,10 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
-    public function saveEntity($entity, bool $unlock = true): void
+    /**
+     * @param Form $entity
+     */
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $isNew = !(bool) $entity->getId();
 
@@ -551,6 +555,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
     }
 
+    /**
+     * @param Form $entity
+     */
     public function deleteEntity(object $entity): void
     {
         /** @var Form $entity */
@@ -660,23 +667,33 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         $html       = $this->getContent($form, false);
         $formScript = $this->getFormScript($form);
 
-        // replace line breaks with literal symbol and escape quotations
-        $search        = ["\r\n", "\n", '"'];
-        $replace       = ['', '', '\"'];
-        $html          = str_replace($search, $replace, $html);
-        $oldFormScript = str_replace($search, $replace, $formScript);
+        // Remove line breaks for inline JavaScript string literals
+        $search  = ["\r\n", "\n"];
+        $replace = ['', ''];
+        $html    = str_replace($search, $replace, $html);
+
+        // generateJsScript uses createTextNode which can handle newlines,
+        // so pass the original formScript to preserve single-line // comments
         $newFormScript = $this->generateJsScript($formScript);
+
+        // The document.write fallback embeds formScript in a string literal,
+        // so newlines must be stripped there
+        $formScriptStripped = str_replace($search, $replace, $formScript);
+
+        // Use proper JSON encoding for JavaScript strings
+        $htmlEscaped       = json_encode($html, JSON_UNESCAPED_SLASHES);
+        $formScriptEscaped = json_encode($formScriptStripped, JSON_UNESCAPED_SLASHES);
 
         // Write html for all browser and fallback for IE
         $script = '
             var scr  = document.currentScript;
-            var html = "'.$html.'";
+            var html = '.$htmlEscaped.';
 
             if (scr !== undefined) {
                 scr.insertAdjacentHTML("afterend", html);
                 '.$newFormScript.'
             } else {
-                document.write("'.$oldFormScript.'"+html);
+                document.write('.$formScriptEscaped.'+html);
             }
         ';
 
@@ -770,7 +787,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
 
         // get the contact (lead) and primary company field values
         $leadArray = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
-        if (!is_array($leadArray) || count($leadArray) <= 0) {
+        if (count($leadArray) <= 0) {
             return;
         }
 
@@ -855,11 +872,9 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Get a list of assets in a date range.
      *
-     * @param int                  $limit
-     * @param array                $filters
      * @param array<string, mixed> $options
      */
-    public function getFormList($limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, $filters = [], array $options = []): array
+    public function getFormList(int $limit = 10, ?\DateTime $dateFrom = null, ?\DateTime $dateTo = null, array $filters = [], array $options = []): array
     {
         $q = $this->em->getConnection()->createQueryBuilder();
         $q->select('t.id, t.name, t.date_added, t.date_modified')
@@ -881,7 +896,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
     /**
      * Load HTML consider Libxml < 2.7.8.
      */
-    private function loadHTML(\DOMDocument &$dom, string $html): void
+    private function loadHTML(\DOMDocument $dom, string $html): void
     {
         if (defined('LIBXML_HTML_NOIMPLIED') && defined('LIBXML_HTML_NODEFDTD')) {
             $dom->loadHTML(mb_encode_numericentity($html, [0x80, 0x10FFFF, 0, 0xFFFFF], 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -970,10 +985,11 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
                 document.getElementsByTagName('head')[0].appendChild(script{$key});";
             } else {
                 $scriptContent = $script->nodeValue;
-                $scriptContent = str_replace(["\r\n", "\n", '"'], ['', '', '\"'], $scriptContent);
+                // Use json_encode to properly escape content for JavaScript string
+                $escapedContent = json_encode($scriptContent, JSON_UNESCAPED_SLASHES);
 
                 $javascript .= "
-                var inlineScript{$key} = document.createTextNode(\"{$scriptContent}\");
+                var inlineScript{$key} = document.createTextNode({$escapedContent});
                 var script{$key}       = document.createElement('script');
                 script{$key}.appendChild(inlineScript{$key});
                 document.getElementsByTagName('head')[0].appendChild(script{$key});";

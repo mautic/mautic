@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Model;
 
-use Doctrine\DBAL\Schema\Column;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
@@ -108,6 +107,7 @@ final class FieldModelFunctionalTest extends MauticMysqlTestCase
         ]);
 
         $ids = [];
+
         foreach ($fields as $field) {
             $ids[] = $field->getId();
         }

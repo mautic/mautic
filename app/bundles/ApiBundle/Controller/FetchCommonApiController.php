@@ -2,15 +2,14 @@
 
 namespace Mautic\ApiBundle\Controller;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
-use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiInitializeEvent;
-use Mautic\ApiBundle\Event\ApiSerializationContextEvent;
+use Mautic\ApiBundle\Event\PostSerializationContextEvent;
+use Mautic\ApiBundle\Event\PreSerializationContextEvent;
 use Mautic\ApiBundle\Helper\BatchIdToEntityHelper;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Serializer\Exclusion\ParentChildrenExclusionStrategy;
@@ -232,7 +231,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return array<mixed>
      */
-    protected function getWhereFromRequest(Request $request)
+    protected function getWhereFromRequest(Request $request): array
     {
         $where = $request->query->all()['where'] ?? [];
 
@@ -321,12 +320,12 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return object
      */
-    public function getNewEntity(array $params)
+    protected function getNewEntity(array $params)
     {
         return $this->model->getEntity();
     }
 
-    public function getCurrentRequest(): Request
+    protected function getCurrentRequest(): Request
     {
         $request = $this->requestStack->getCurrentRequest();
 
@@ -341,20 +340,16 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      * Alias for notFound method. It's used in the LeadAccessTrait.
      *
      * @param array<mixed> $args
-     *
-     * @return Response
      */
-    public function postActionRedirect(array $args = [])
+    protected function postActionRedirect(array $args = []): Response
     {
         return $this->notFound('mautic.contact.error.notfound');
     }
 
     /**
      * Returns a 403 Access Denied.
-     *
-     * @return Response
      */
-    protected function accessDenied(string $msg = 'mautic.core.error.accessdenied')
+    protected function accessDenied(string $msg = 'mautic.core.error.accessdenied'): Response
     {
         return $this->returnError($msg, Response::HTTP_FORBIDDEN);
     }
@@ -366,10 +361,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * Returns a 400 Bad Request.
-     *
-     * @return Response
      */
-    protected function badRequest(string $msg = 'mautic.core.error.badrequest')
+    protected function badRequest(string $msg = 'mautic.core.error.badrequest'): Response
     {
         return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
     }
@@ -377,12 +370,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * Checks if user has permission to access retrieved entity.
      *
-     * @param FormEntity $entity
-     * @param string     $action view|create|edit|publish|delete
-     *
-     * @return bool|Response
+     * @param FormEntity|null $entity
+     * @param string       $action view|create|edit|publish|delete
      */
-    protected function checkEntityAccess($entity, $action = 'view')
+    protected function checkEntityAccess(?object $entity, $action = 'view'): bool|Response
     {
         $ownPerm   = "{$this->permissionBase}:{$action}own";
         $otherPerm = "{$this->permissionBase}:{$action}other";
@@ -407,14 +398,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * @param mixed[]                   $parameters
      * @param mixed[]                   $errors
-     * @param bool                      $prepareForSerialization
-     * @param string                    $requestIdColumn
-     * @param MauticModelInterface|null $model
-     * @param bool                      $returnWithOriginalKeys
      *
-     * @return mixed[]
+     * @return array<TEntity|null>
      */
-    protected function getBatchEntities($parameters, array &$errors, $prepareForSerialization = false, $requestIdColumn = 'id', $model = null, $returnWithOriginalKeys = true): array
+    protected function getBatchEntities(array $parameters, array &$errors, bool $prepareForSerialization = false, string $requestIdColumn = 'id', ?MauticModelInterface $model = null, bool $returnWithOriginalKeys = true): array
     {
         $idHelper = new BatchIdToEntityHelper($parameters, $requestIdColumn);
 
@@ -422,8 +409,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             return [];
         }
 
-        /** @var AbstractCommonModel<object> $model */
+        /** @var AbstractCommonModel<TEntity> $model */
         $model    = $model ?: $this->model;
+
+        /** @var TEntity[] $entities */
         $entities = $model->getEntities(
             [
                 'filter' => [
@@ -441,10 +430,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         // It must be associative because the order of entities has changed
         $idHelper->setIsAssociative(true);
 
-        [$entities, $total] = $prepareForSerialization
-            ?
-            $this->prepareEntitiesForView($entities)
-            :
+        [$entities, $total] = $prepareForSerialization ?
+            $this->prepareEntitiesForView($entities) :
             $this->prepareEntityResultsToArray($entities);
 
         // Set errors
@@ -466,6 +453,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         // Return the response with IDs as keys (default behavior)
         $return = [];
         foreach ($entities as $entity) {
+            /** @var TEntity $entity */
             $return[$entity->getId()] = $entity;
         }
 
@@ -485,21 +473,17 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $chain         = array_reverse(class_parents($entity), true) + [$class => $class];
         $defaultValues = [];
 
-        $classMetdata = new ClassMetadata($class);
         foreach ($chain as $class) {
-            if (method_exists($class, 'loadMetadata')) {
-                $class::loadMetadata($classMetdata);
-            }
             $defaultValues += new \ReflectionClass($class)->getDefaultProperties();
         }
 
-        // These are the mapped columns
-        $fields = $classMetdata->getFieldNames();
+        // These are the mapped columns, whether mapped by attributes or loadMetadata()
+        $fields = $this->doctrine->getManager()->getClassMetadata($entity::class)->getFieldNames();
 
         // Merge values in with $fields
         $properties = [];
         foreach ($fields as $field) {
-            $properties[$field] = $defaultValues[$field];
+            $properties[$field] = $defaultValues[$field] ?? null;
         }
 
         return $properties;
@@ -525,10 +509,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * Returns a 404 Not Found.
-     *
-     * @return Response
      */
-    protected function notFound(string $msg = 'mautic.core.error.notfound')
+    protected function notFound(string $msg = 'mautic.core.error.notfound'): Response
     {
         return $this->returnError($msg, Response::HTTP_NOT_FOUND);
     }
@@ -547,9 +529,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @param array<mixed>|Paginator<TEntity> $results
      *
-     * @return array{0: array<mixed>|\ArrayObject<int,mixed>, 1: int}
+     * @return array{0: array<TEntity>|\ArrayObject<int, TEntity>, 1: int}
      */
-    protected function prepareEntitiesForView($results): array
+    protected function prepareEntitiesForView(iterable $results): array
     {
         return $this->prepareEntityResultsToArray(
             $results,
@@ -565,7 +547,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return array{0: array<mixed>|\ArrayObject<int,mixed>, 1: int}
      */
-    protected function prepareEntityResultsToArray($results, $callback = null): array
+    protected function prepareEntityResultsToArray(iterable $results, $callback = null): array
     {
         if (is_array($results) && isset($results['count'])) {
             $totalCount = $results['count'];
@@ -584,7 +566,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return Response|array<string, array<mixed>|int|string|null>
      */
-    protected function returnError(string $msg, int $code = Response::HTTP_INTERNAL_SERVER_ERROR, array $details = [])
+    protected function returnError(string $msg, int $code = Response::HTTP_INTERNAL_SERVER_ERROR, array $details = []): Response|array
     {
         if ($this->translator->hasId($msg, 'flashes')) {
             $msg = $this->translator->trans($msg, [], 'flashes');
@@ -655,9 +637,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         $context = $view->getContext();
 
-        if ($this->dispatcher->hasListeners(ApiEvents::API_PRE_SERIALIZATION_CONTEXT)) {
-            $apiSerializationContextEvent = new ApiSerializationContextEvent($context, $this->getCurrentRequest());
-            $this->dispatcher->dispatch($apiSerializationContextEvent, ApiEvents::API_PRE_SERIALIZATION_CONTEXT);
+        if ($this->dispatcher->hasListeners(PreSerializationContextEvent::class)) {
+            $apiSerializationContextEvent = new PreSerializationContextEvent($context, $this->getCurrentRequest());
+            $this->dispatcher->dispatch($apiSerializationContextEvent);
             $context = $apiSerializationContextEvent->getContext();
         }
 
@@ -687,9 +669,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $context->setSerializeNull(true);
         }
 
-        if ($this->dispatcher->hasListeners(ApiEvents::API_POST_SERIALIZATION_CONTEXT)) {
-            $apiSerializationContextEvent = new ApiSerializationContextEvent($context, $this->getCurrentRequest());
-            $this->dispatcher->dispatch($apiSerializationContextEvent, ApiEvents::API_POST_SERIALIZATION_CONTEXT);
+        if ($this->dispatcher->hasListeners(PostSerializationContextEvent::class)) {
+            $apiSerializationContextEvent = new PostSerializationContextEvent($context, $this->getCurrentRequest());
+            $this->dispatcher->dispatch($apiSerializationContextEvent);
             $context = $apiSerializationContextEvent->getContext();
         }
 
@@ -699,9 +681,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     /**
      * @param array<mixed> $parameters
      *
-     * @return array<string, array<mixed>|int|string|null>|bool|Response
+     * @return array<string, array<mixed>|int|string|null>|true|Response
      */
-    protected function validateBatchPayload(array $parameters)
+    protected function validateBatchPayload(array $parameters): Response|array|true
     {
         $batchLimit = (int) $this->coreParametersHelper->get('api_batch_max_limit', 200);
         if (count($parameters) > $batchLimit) {

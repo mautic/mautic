@@ -10,8 +10,9 @@ use Mautic\EmailBundle\EventListener\ProcessUnsubscribeSubscriber;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Processor\FeedbackLoop;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Unsubscribe;
+use PHPUnit\Framework\TestCase;
 
-final class ProcessUnsubscribeSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ProcessUnsubscribeSubscriberTest extends TestCase
 {
     private ProcessUnsubscribeSubscriber $subscriber;
 

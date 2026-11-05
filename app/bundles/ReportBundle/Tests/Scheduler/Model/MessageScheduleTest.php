@@ -8,12 +8,13 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class MessageScheduleTest extends \PHPUnit\Framework\TestCase
+final class MessageScheduleTest extends TestCase
 {
     private MockObject&Router $router;
 
@@ -33,11 +34,8 @@ final class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMessageForAttachedFile(): void
     {
-        $report = $this->createMock(Report::class);
-
-        $report->expects($this->once())
-            ->method('getId')
-            ->willReturn(33);
+        $report = new Report();
+        $report->setId(33);
 
         $this->router->expects($this->once())
             ->method('generate')
@@ -54,15 +52,9 @@ final class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMessageForLinkedFile(): void
     {
-        $report = $this->createMock(Report::class);
-
-        $report->expects($this->once())
-            ->method('getId')
-            ->willReturn(33);
-
-        $report->expects($this->once())
-            ->method('getName')
-            ->willReturn('Report ABC');
+        $report = new Report();
+        $report->setId(33);
+        $report->setName('Report ABC');
 
         $this->router->expects($this->once())
             ->method('generate')
@@ -79,11 +71,8 @@ final class MessageScheduleTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSubject(): void
     {
-        $report = $this->createMock(Report::class);
-
-        $report->expects($this->once())
-            ->method('getName')
-            ->willReturn('Report ABC');
+        $report = new Report();
+        $report->setName('Report ABC');
 
         $this->translatorMock->expects($this->once())
             ->method('trans')

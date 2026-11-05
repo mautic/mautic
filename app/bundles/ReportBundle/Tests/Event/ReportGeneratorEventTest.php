@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Event;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -19,10 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[AllowMockObjectsWithoutExpectations]
 final class ReportGeneratorEventTest extends TestCase
 {
-    /**
-     * @var MockObject&Report
-     */
-    private MockObject $report;
+    private Report $report;
 
     /**
      * @var MockObject&QueryBuilder
@@ -35,7 +32,7 @@ final class ReportGeneratorEventTest extends TestCase
     {
         parent::setUp();
 
-        $this->report                = $this->createMock(Report::class);
+        $this->report                = new Report();
         $this->queryBuilder          = $this->createMock(QueryBuilder::class);
         $channelListHelper           = new ChannelListHelper($this->createStub(EventDispatcher::class), $this->createStub(Translator::class));
         $this->reportGeneratorEvent  = new ReportGeneratorEvent(
@@ -48,9 +45,7 @@ final class ReportGeneratorEventTest extends TestCase
 
     public function testAddCategoryLeftJoinWhenColumnIsNotUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['e.id', 'comp.name']);
+        $this->report->setColumns(['e.id', 'comp.name']);
 
         $this->queryBuilder->expects($this->never())
             ->method('leftJoin');
@@ -60,11 +55,7 @@ final class ReportGeneratorEventTest extends TestCase
 
     public function testAddCategoryLeftJoinWhenColumnIsUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(
-                ['e.id', ReportGeneratorEvent::CATEGORY_PREFIX.'.title', 'comp.name']
-            );
+        $this->report->setColumns(['e.id', ReportGeneratorEvent::CATEGORY_PREFIX.'.title', 'comp.name']);
 
         $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
@@ -80,9 +71,7 @@ final class ReportGeneratorEventTest extends TestCase
 
     public function testAddLeadLeftJoinWhenColumnIsNotUsed(): void
     {
-        $this->report->expects($this->exactly(6))
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['e.id', 'h.name']);
+        $this->report->setColumns(['e.id', 'h.name']);
 
         $this->queryBuilder->expects($this->never())
             ->method('leftJoin');
@@ -92,11 +81,7 @@ final class ReportGeneratorEventTest extends TestCase
 
     public function testAddLeadLeftJoinWhenColumnIsUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(
-                ['e.id', ReportGeneratorEvent::CONTACT_PREFIX.'.email', 'comp.name']
-            );
+        $this->report->setColumns(['e.id', ReportGeneratorEvent::CONTACT_PREFIX.'.email', 'comp.name']);
 
         $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
@@ -112,11 +97,7 @@ final class ReportGeneratorEventTest extends TestCase
 
     public function testAddLeadLeftJoinWhenCampaignIdColumnIsUsed(): void
     {
-        $this->report->expects($this->exactly(5))
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(
-                ['e.id', 'clel.campaign_id', 'h.name']
-            );
+        $this->report->setColumns(['e.id', 'clel.campaign_id', 'h.name']);
 
         $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
@@ -132,9 +113,7 @@ final class ReportGeneratorEventTest extends TestCase
 
     public function testAddIpAddressLeftJoinWhenColumnIsNotUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['e.id', 't.name']);
+        $this->report->setColumns(['e.id', 't.name']);
 
         $this->queryBuilder->expects($this->never())
             ->method('leftJoin');
@@ -144,11 +123,7 @@ final class ReportGeneratorEventTest extends TestCase
 
     public function testAddIpAddressLeftJoinWhenColumnIsUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(
-                ['e.id', ReportGeneratorEvent::IP_ADDRESS_PREFIX.'.address', 'comp.name']
-            );
+        $this->report->setColumns(['e.id', ReportGeneratorEvent::IP_ADDRESS_PREFIX.'.address', 'comp.name']);
 
         $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
@@ -164,8 +139,7 @@ final class ReportGeneratorEventTest extends TestCase
 
     public function testHasColumnWithPrefix(): void
     {
-        $this->report->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['e.id', 'c.first_name', 'comp.name']);
+        $this->report->setColumns(['e.id', 'c.first_name', 'comp.name']);
 
         $this->assertTrue($this->reportGeneratorEvent->hasColumnWithPrefix('e'));
         $this->assertTrue($this->reportGeneratorEvent->hasColumnWithPrefix('c'));
@@ -177,15 +151,9 @@ final class ReportGeneratorEventTest extends TestCase
 
     public function testUsesColumnWithPrefix(): void
     {
-        $this->report->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['e.id', 'c.first_name', 'comp.name']);
+        $this->report->setColumns(['e.id', 'c.first_name', 'comp.name']);
 
-        $this->report->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['e.id', 'c.first_name', 'comp.name']);
-
-        $this->report->method('getFilters')
-            ->willReturn(
-                [
+        $this->report->setFilters([
                     [
                         'column'    => 'foo.is_published',
                         'condition' => 'eq',
@@ -193,8 +161,7 @@ final class ReportGeneratorEventTest extends TestCase
                         'glue'      => 'and',
                         'dynamic'   => null,
                     ],
-                ]
-            );
+                ]);
 
         $this->assertTrue($this->reportGeneratorEvent->usesColumnWithPrefix('e'));
         $this->assertTrue($this->reportGeneratorEvent->usesColumnWithPrefix('c'));
@@ -207,15 +174,9 @@ final class ReportGeneratorEventTest extends TestCase
 
     public function testUsesColumn(): void
     {
-        $this->report->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['e.id', 'c.first_name', 'comp.name']);
+        $this->report->setColumns(['e.id', 'c.first_name', 'comp.name']);
 
-        $this->report->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['e.id', 'c.first_name', 'comp.name']);
-
-        $this->report->method('getFilters')
-            ->willReturn(
-                [
+        $this->report->setFilters([
                     [
                         'column'    => 'foo.is_published',
                         'condition' => 'eq',
@@ -223,8 +184,7 @@ final class ReportGeneratorEventTest extends TestCase
                         'glue'      => 'and',
                         'dynamic'   => null,
                     ],
-                ]
-            );
+                ]);
 
         $this->assertTrue($this->reportGeneratorEvent->usesColumn('e.id'));
         $this->assertTrue($this->reportGeneratorEvent->usesColumn('c.first_name'));
@@ -235,9 +195,7 @@ final class ReportGeneratorEventTest extends TestCase
 
     public function testAddCompanyLeftJoinWhenColumnIsNotUsed(): void
     {
-        $this->report->expects($this->exactly(2))
-      ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-      ->willReturn(['e.id', 'e.title']);
+        $this->report->setColumns(['e.id', 'e.title']);
 
         $this->queryBuilder->expects($this->never())
       ->method('leftJoin');
@@ -247,13 +205,11 @@ final class ReportGeneratorEventTest extends TestCase
 
     public function testAddCompanyLeftJoinWhenColumnIsUsed(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['e.id', 'e.title', 'comp.name']);
+        $this->report->setColumns(['e.id', 'e.title', 'comp.name']);
         $matcher = $this->exactly(2);
 
         $this->queryBuilder->expects($matcher)
-            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher): void {
+            ->method('leftJoin')->willReturnCallback(function (...$parameters) use ($matcher): QueryBuilder {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('l', $parameters[0]);
                     $this->assertSame(MAUTIC_TABLE_PREFIX.'companies_leads', $parameters[1]);
@@ -266,15 +222,14 @@ final class ReportGeneratorEventTest extends TestCase
                     $this->assertSame(ReportGeneratorEvent::COMPANY_PREFIX, $parameters[2]);
                     $this->assertSame('companies_lead.company_id = '.ReportGeneratorEvent::COMPANY_PREFIX.'.id', $parameters[3]);
                 }
+                    return $this->queryBuilder;
             });
         $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
     }
 
     public function testAddCompanyLeftJoinOnlyOnceWhenTableAlreadyJoined(): void
     {
-        $this->report->expects($this->once())
-            ->method('getSelectAndAggregatorAndOrderAndGroupByColumns')
-            ->willReturn(['e.id', 'e.title', 'comp.name']);
+        $this->report->setColumns(['e.id', 'e.title', 'comp.name']);
 
         $this->queryBuilder->expects($this->once())
       ->method('getQueryParts')
@@ -317,13 +272,17 @@ final class ReportGeneratorEventTest extends TestCase
             ->method('setParameter')->willReturnCallback(function (...$parameters) use ($matcher, $dateFormat) {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('dateFrom', $parameters[0]);
-                    $this->assertSame($this->reportGeneratorEvent->getOptions()['dateFrom']->format($dateFormat), $parameters[1]);
+                    /** @var \DateTimeInterface $dateFrom */
+                    $dateFrom = $this->reportGeneratorEvent->getOptions()['dateFrom'];
+                    $this->assertSame($dateFrom->format($dateFormat), $parameters[1]);
 
                     return $this->queryBuilder;
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('dateTo', $parameters[0]);
-                    $this->assertSame($this->reportGeneratorEvent->getOptions()['dateTo']->format($dateFormat), $parameters[1]);
+                    /** @var \DateTimeInterface $dateTo */
+                    $dateTo = $this->reportGeneratorEvent->getOptions()['dateTo'];
+                    $this->assertSame($dateTo->format($dateFormat), $parameters[1]);
 
                     return $this->queryBuilder;
                 }
@@ -367,13 +326,17 @@ final class ReportGeneratorEventTest extends TestCase
             ->method('setParameter')->willReturnCallback(function (...$parameters) use ($matcher, $dateFormat) {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame('dateFrom', $parameters[0]);
-                    $this->assertSame($this->reportGeneratorEvent->getOptions()['dateFrom']->format($dateFormat), $parameters[1]);
+                    /** @var \DateTimeInterface $dateFrom */
+                    $dateFrom = $this->reportGeneratorEvent->getOptions()['dateFrom'];
+                    $this->assertSame($dateFrom->format($dateFormat), $parameters[1]);
 
                     return $this->queryBuilder;
                 }
                 if (2 === $matcher->numberOfInvocations()) {
                     $this->assertSame('dateTo', $parameters[0]);
-                    $this->assertSame($this->reportGeneratorEvent->getOptions()['dateTo']->format($dateFormat), $parameters[1]);
+                    /** @var \DateTimeInterface $dateTo */
+                    $dateTo = $this->reportGeneratorEvent->getOptions()['dateTo'];
+                    $this->assertSame($dateTo->format($dateFormat), $parameters[1]);
 
                     return $this->queryBuilder;
                 }

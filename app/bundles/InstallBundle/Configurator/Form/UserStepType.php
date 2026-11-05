@@ -24,6 +24,7 @@ final class UserStepType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var mixed[]|\stdClass $storedData */
         $storedData = $this->requestStack->getSession()->get('mautic.installer.user', new \stdClass());
 
         $builder->add(

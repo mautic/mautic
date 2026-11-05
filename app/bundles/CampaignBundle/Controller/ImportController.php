@@ -23,8 +23,8 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,25 +50,21 @@ final class ImportController extends AbstractFormController
 
     private PathsHelper $pathsHelper;
 
-    private FormFactoryInterface $formFactory;
-
     #[Required]
     public function autowireImportController(
         UserHelper $userHelper,
         RequestStack $requestStack,
         LoggerInterface $logger,
         PathsHelper $pathsHelper,
-        FormFactoryInterface $formFactory,
     ): void {
         $this->userHelper   = $userHelper;
         $this->requestStack = $requestStack;
         $this->logger       = $logger;
         $this->pathsHelper  = $pathsHelper;
-        $this->formFactory  = $formFactory;
     }
 
     #[Route(
-        '/s/campaign/import/{objectAction}',
+        path: '/s/campaign/import/{objectAction}',
         name: 'mautic_campaign_import_action',
     )]
     public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = ''): Response
@@ -134,6 +130,7 @@ final class ImportController extends AbstractFormController
             $form->addError(new FormError($this->translator->trans('mautic.campaign.import.incorrectfile', [], 'validators')));
         } else {
             // Retrieve uploaded file
+            /** @var UploadedFile|null $fileData */
             $fileData = $request->files->get('campaign_import')['campaignFile'] ?? null;
 
             if (!$fileData) {

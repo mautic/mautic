@@ -31,6 +31,9 @@ final class NoteType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['text' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('lead.note', $options));
 
+        /** @var LeadNote $note */
+        $note = $options['data'];
+
         $builder->add(
             'text',
             TextareaType::class,
@@ -57,7 +60,7 @@ final class NoteType extends AbstractType
             ]
         );
 
-        $dt   = $options['data']->getDatetime();
+        $dt   = $note->getDatetime();
         $data = (null == $dt) ? $this->dateHelper->getDateTime() : $dt;
 
         $builder->add(

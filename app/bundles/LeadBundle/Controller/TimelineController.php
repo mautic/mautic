@@ -17,12 +17,12 @@ final class TimelineController extends CommonController
     use LeadDetailsTrait;
 
     #[Route(
-        '/s/contacts/timeline/{leadId}/{page}',
+        path: '/s/contacts/timeline/{leadId}/{page}',
         name: 'mautic_contacttimeline_action',
         requirements: ['leadId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, $leadId, int $page = 1): Response
+    public function indexAction(Request $request, int|string $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();
@@ -72,7 +72,7 @@ final class TimelineController extends CommonController
     }
 
     #[Route(
-        '/s/plugin/{integration}/timeline/{page}',
+        path: '/s/plugin/{integration}/timeline/{page}',
         name: 'mautic_plugin_timeline_index',
         requirements: ['integration' => Requirement::CATCH_ALL, 'page' => '\d+'],
         defaults: ['page' => 0],
@@ -140,12 +140,12 @@ final class TimelineController extends CommonController
     }
 
     #[Route(
-        '/s/plugin/{integration}/timeline/view/{leadId}/{page}',
+        path: '/s/plugin/{integration}/timeline/view/{leadId}/{page}',
         name: 'mautic_plugin_timeline_view',
         requirements: ['integration' => Requirement::CATCH_ALL, 'leadId' => '\d+', 'page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function pluginViewAction(Request $request, $integration, $leadId, int $page = 1): Response
+    public function pluginViewAction(Request $request, $integration, int|string $leadId, int $page = 1): Response
     {
         if (empty($leadId)) {
             return $this->notFound();
@@ -208,11 +208,11 @@ final class TimelineController extends CommonController
     }
 
     #[Route(
-        '/s/contacts/timeline/batchExport/{leadId}',
+        path: '/s/contacts/timeline/batchExport/{leadId}',
         name: 'mautic_contact_timeline_export_action',
         requirements: ['leadId' => '\d+'],
     )]
-    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, $leadId): Response
+    public function batchExportAction(Request $request, DateHelper $dateHelper, ExportHelper $exportHelper, int|string $leadId): Response
     {
         if (empty($leadId)) {
             $this->throwAccessDenied();

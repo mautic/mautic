@@ -21,10 +21,7 @@ trait FiltersEntityTrait
             ->build();
     }
 
-    /**
-     * @return array
-     */
-    public function getFilters()
+    public function getFilters(): array
     {
         return $this->filters ?: [];
     }

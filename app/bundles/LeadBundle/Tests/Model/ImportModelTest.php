@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Exception\ORMException;
+use Mautic\CoreBundle\Exception\OrmException as MauticOrmException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\ProcessSignal\ProcessSignalService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\ReflectionHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
@@ -20,6 +25,7 @@ use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ImportModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tests\Fixtures\Model\ImportModelMock;
 use Mautic\LeadBundle\Tests\StandardImportTestHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -160,12 +166,12 @@ final class ImportModelTest extends StandardImportTestHelper
 
     public function testBeginImportWhenParallelLimitHit(): void
     {
-        $model = $this->getMockBuilder(\Mautic\LeadBundle\Tests\Fixtures\Model\ImportModel::class)
+        $model = $this->getMockBuilder(ImportModelMock::class)
             ->onlyMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'getParallelImportLimit'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $model->setTranslator($this->getTranslatorMock());
+        $model->setTranslator($this->createStub(Translator::class));
 
         $model->method('checkParallelImportLimit')
             ->willReturn(false);
@@ -196,12 +202,12 @@ final class ImportModelTest extends StandardImportTestHelper
 
     public function testBeginImportWhenDatabaseException(): void
     {
-        $model = $this->getMockBuilder(\Mautic\LeadBundle\Tests\Fixtures\Model\ImportModel::class)
+        $model = $this->getMockBuilder(ImportModelMock::class)
             ->onlyMethods(['checkParallelImportLimit', 'setGhostImportsAsFailed', 'saveEntity', 'logDebug', 'process'])
             ->disableOriginalConstructor()
             ->getMock();
 
-        $model->setTranslator($this->getTranslatorMock());
+        $model->setTranslator($this->createStub(Translator::class));
 
         $model->expects($this->once())
             ->method('checkParallelImportLimit')
@@ -209,7 +215,7 @@ final class ImportModelTest extends StandardImportTestHelper
 
         $model->expects($this->once())
             ->method('process')
-            ->willThrowException(new ORMException());
+            ->willThrowException(new MauticOrmException());
 
         $entity = $this->initImportEntity(['canProceed']);
 
@@ -374,13 +380,10 @@ final class ImportModelTest extends StandardImportTestHelper
         $this->expectException(ORMException::class);
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->willThrowException(new ORMException('Some DB error'));
+            ->willThrowException(new MauticOrmException('Some DB error'));
 
         $import->start();
         $importModel->process($import, new Progress());
-        $import->end();
-
-        $this->assertSame(Import::FAILED, $import->getStatus());
     }
 
     public function testWhenWarningsAvailableInProcessEventLog(): void
@@ -410,10 +413,10 @@ final class ImportModelTest extends StandardImportTestHelper
 
     public function testWhenImportUnpublishedInBetweenImportProcess(): void
     {
-        $translator           = $this->getTranslatorMock();
-        $pathsHelper          = $this->getPathsHelperMock();
-        $this->entityManager  = $this->getEntityManagerMock();
-        $coreParametersHelper = $this->getCoreParametersHelperMock();
+        $translator           = $this->createStub(Translator::class);
+        $pathsHelper          = $this->createStub(PathsHelper::class);
+        $this->entityManager  = $this->createMock(EntityManager::class);
+        $coreParametersHelper = $this->createStub(CoreParametersHelper::class);
 
         /** @var MockObject&UserHelper $userHelper */
         $userHelper = $this->createStub(UserHelper::class);
@@ -425,7 +428,7 @@ final class ImportModelTest extends StandardImportTestHelper
         $importRepository = $this->createMock(ImportRepository::class);
 
         $importRepository->expects($this->exactly(3))->method('getValue')
-            ->willReturnOnConsecutiveCalls(true, false, false);
+            ->willReturnOnConsecutiveCalls('some value', null, null);
 
         $this->entityManager
             ->method('isOpen')

@@ -8,8 +8,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-final class VersionProviderTest extends \PHPUnit\Framework\TestCase
+final class VersionProviderTest extends TestCase
 {
     /**
      * @var MockObject&Connection

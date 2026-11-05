@@ -2,10 +2,12 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use DateInterval;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Translation\Translator;
@@ -13,9 +15,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ImportRepository::class)]
 #[ORM\Table(name: 'imports')]
-#[ORM\Index(columns: ['object'], name: 'import_object')]
-#[ORM\Index(columns: ['status'], name: 'import_status')]
-#[ORM\Index(columns: ['priority'], name: 'import_priority')]
+#[ORM\Index(name: 'import_object', columns: ['object'])]
+#[ORM\Index(name: 'import_status', columns: ['status'])]
+#[ORM\Index(name: 'import_priority', columns: ['priority'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Import extends FormEntity
 {
@@ -23,50 +25,53 @@ class Import extends FormEntity
     /**
      * When the import entity is created for background processing.
      */
-    public const QUEUED = 1;
+    public const int QUEUED = 1;
 
     /**
      * When the background process started the import.
      */
-    public const IN_PROGRESS = 2;
+    public const int IN_PROGRESS = 2;
 
     /**
      * When the import is finished.
      */
-    public const IMPORTED = 3;
+    public const int IMPORTED = 3;
 
     /**
      * When the import process failed.
      */
-    public const FAILED = 4;
+    public const int FAILED = 4;
 
     /**
      * When the import has been stopped by a user.
      */
-    public const STOPPED = 5;
+    public const int STOPPED = 5;
 
     /**
      * When the import happens in the browser.
      */
-    public const MANUAL = 6;
+    public const int MANUAL = 6;
 
     /**
      * When the import is scheduled for later processing.
      */
-    public const DELAYED = 7;
+    public const int DELAYED = 7;
 
     /**
      * ===== Priorities: =====.
      */
-    public const LOW    = 512;
+    public const int LOW    = 512;
 
-    public const NORMAL = 64;
+    public const int NORMAL = 64;
 
-    public const HIGH   = 1;
+    public const int HIGH   = 1;
 
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -75,6 +80,7 @@ class Import extends FormEntity
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.lead.import.dir.notblank')]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $dir;
 
     /**
@@ -83,6 +89,7 @@ class Import extends FormEntity
      * @var string
      */
     #[Assert\NotBlank(message: 'mautic.lead.import.file.notblank')]
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $file = 'import.csv';
 
     /**
@@ -90,47 +97,58 @@ class Import extends FormEntity
      *
      * @var string|null
      */
+    #[ORM\Column(name: 'original_file', type: Types::STRING, length: 191, nullable: true)]
     private $originalFile;
 
     /**
      * Tolal line count of the CSV file.
      */
+    #[ORM\Column(name: 'line_count', type: Types::INTEGER)]
     private int $lineCount = 0;
 
     /**
      * Count of entities which were newly created.
      */
+    #[ORM\Column(name: 'inserted_count', type: Types::INTEGER)]
     private int $insertedCount = 0;
 
     /**
      * Count of entities which were updated.
      */
+    #[ORM\Column(name: 'updated_count', type: Types::INTEGER)]
     private int $updatedCount = 0;
 
     /**
      * Count of ignored items.
      */
+    #[ORM\Column(name: 'ignored_count', type: Types::INTEGER)]
     private int $ignoredCount = 0;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: Types::INTEGER)]
     private $priority = self::LOW;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: Types::INTEGER)]
     private $status = self::QUEUED;
 
-    private ?\DateTimeInterface $dateStarted = null;
+    #[ORM\Column(name: 'date_started', type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?DateTimeInterface $dateStarted = null;
 
-    private ?\DateTimeInterface $dateEnded = null;
+    #[ORM\Column(name: 'date_ended', type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?DateTimeInterface $dateEnded = null;
 
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private string $object = 'lead';
 
     /**
      * @var array<mixed>|null
      */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private $properties = [];
 
     public function __clone()
@@ -138,26 +156,6 @@ class Import extends FormEntity
         $this->id = null;
 
         parent::__clone();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-        $builder
-            ->addId()
-            ->addField('dir', Types::STRING)
-            ->addField('file', Types::STRING)
-            ->addNullableField('originalFile', Types::STRING, 'original_file')
-            ->addNamedField('lineCount', Types::INTEGER, 'line_count')
-            ->addNamedField('insertedCount', Types::INTEGER, 'inserted_count')
-            ->addNamedField('updatedCount', Types::INTEGER, 'updated_count')
-            ->addNamedField('ignoredCount', Types::INTEGER, 'ignored_count')
-            ->addField('priority', Types::INTEGER)
-            ->addField('status', Types::INTEGER)
-            ->addNullableField('dateStarted', Types::DATETIME_MUTABLE, 'date_started')
-            ->addNullableField('dateEnded', Types::DATETIME_MUTABLE, 'date_ended')
-            ->addField('object', Types::STRING)
-            ->addNullableField('properties', Types::JSON);
     }
 
     /**
@@ -473,7 +471,7 @@ class Import extends FormEntity
         };
     }
 
-    public function setDateStarted(?\DateTimeInterface $dateStarted): self
+    public function setDateStarted(?DateTimeInterface $dateStarted): self
     {
         $this->isChanged('dateStarted', $dateStarted);
         $this->dateStarted = $dateStarted;
@@ -481,7 +479,7 @@ class Import extends FormEntity
         return $this;
     }
 
-    public function getDateStarted(): ?\DateTimeInterface
+    public function getDateStarted(): ?DateTimeInterface
     {
         return $this->dateStarted;
     }
@@ -491,8 +489,8 @@ class Import extends FormEntity
      */
     public function start(): self
     {
-        if (!$this->dateStarted instanceof \DateTimeInterface) {
-            $this->setDateStarted(new \DateTime());
+        if (!$this->dateStarted instanceof DateTimeInterface) {
+            $this->setDateStarted(new DateTime());
         }
 
         $this->setStatus(self::IN_PROGRESS);
@@ -507,7 +505,7 @@ class Import extends FormEntity
      */
     public function end(bool $removeFile = true): self
     {
-        $this->setDateEnded(new \DateTime());
+        $this->setDateEnded(new DateTime());
 
         if (self::IN_PROGRESS === $this->status) {
             $this->setStatus(self::IMPORTED);
@@ -520,7 +518,7 @@ class Import extends FormEntity
         return $this;
     }
 
-    public function setDateEnded(?\DateTimeInterface $dateEnded): self
+    public function setDateEnded(?DateTimeInterface $dateEnded): self
     {
         $this->isChanged('dateEnded', $dateEnded);
         $this->dateEnded = $dateEnded;
@@ -528,17 +526,15 @@ class Import extends FormEntity
         return $this;
     }
 
-    public function getDateEnded(): ?\DateTimeInterface
+    public function getDateEnded(): ?DateTimeInterface
     {
         return $this->dateEnded;
     }
 
     /**
      * Counts how long the import has run so far.
-     *
-     * @return \DateInterval|null
      */
-    public function getRunTime()
+    public function getRunTime(): ?DateInterval
     {
         $startTime = $this->dateStarted;
         $endTime   = $this->dateEnded;
@@ -547,7 +543,7 @@ class Import extends FormEntity
             $endTime = $this->getDateModified();
         }
 
-        if ($startTime instanceof \DateTimeInterface && $endTime instanceof \DateTimeInterface) {
+        if ($startTime instanceof DateTimeInterface && $endTime instanceof DateTimeInterface) {
             return $endTime->diff($startTime);
         }
 
@@ -568,7 +564,7 @@ class Import extends FormEntity
             $endTime = $this->getDateModified();
         }
 
-        if ($startTime instanceof \DateTime && $endTime instanceof \DateTime) {
+        if ($startTime instanceof DateTime && $endTime instanceof DateTime) {
             return $endTime->format('U') - $startTime->format('U');
         }
 
@@ -624,18 +620,12 @@ class Import extends FormEntity
         return $this->properties['line'] ?? 0;
     }
 
-    /**
-     * @return array
-     */
-    public function getMatchedFields()
+    public function getMatchedFields(): array
     {
         return empty($this->properties['fields']) ? [] : $this->properties['fields'];
     }
 
-    /**
-     * @param array $properties
-     */
-    public function setProperties($properties): static
+    public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
         $this->properties = $properties;
@@ -646,17 +636,15 @@ class Import extends FormEntity
     /**
      * @param array<mixed> $properties
      */
-    public function mergeToProperties($properties): static
+    public function mergeToProperties(array $properties): static
     {
         return $this->setProperties(array_merge($this->properties, $properties));
     }
 
     /**
      * Get array of default values.
-     *
-     * @return array
      */
-    public function getDefaults()
+    public function getDefaults(): array
     {
         return $this->properties['defaults'] ?? [];
     }
@@ -695,10 +683,7 @@ class Import extends FormEntity
         return $this->setProperties($properties);
     }
 
-    /**
-     * @return array
-     */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return empty($this->properties['headers']) ? [] : $this->properties['headers'];
     }
@@ -714,10 +699,7 @@ class Import extends FormEntity
         return $this->setProperties($properties);
     }
 
-    /**
-     * @return array
-     */
-    public function getParserConfig()
+    public function getParserConfig(): array
     {
         return empty($this->properties['parser']) ? [] : $this->properties['parser'];
     }
@@ -725,7 +707,7 @@ class Import extends FormEntity
     /**
      * @return array<mixed>|null
      */
-    public function getProperties()
+    public function getProperties(): ?array
     {
         return $this->properties;
     }

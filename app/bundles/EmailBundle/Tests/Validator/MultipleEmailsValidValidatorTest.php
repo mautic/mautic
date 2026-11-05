@@ -7,11 +7,12 @@ namespace Mautic\EmailBundle\Tests\Validator;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Validator\MultipleEmailsValidValidator;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-final class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
+final class MultipleEmailsValidValidatorTest extends TestCase
 {
     public function testNoEmailsProvided(): void
     {
@@ -69,10 +70,9 @@ final class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
             ->with();
 
         $multipleEmailsValidValidator = new MultipleEmailsValidValidator($emailValidatorMock);
-        $multipleEmailsValidValidator->initialize($executionContextInterfaceMock);
 
         $emails = 'xxx';
-        $multipleEmailsValidValidator->validate($emails, $constraintMock);
+        $multipleEmailsValidValidator->validateInContext($emails, $constraintMock, $executionContextInterfaceMock);
     }
 
     public function testZeroValueIsValidated(): void
@@ -96,8 +96,7 @@ final class MultipleEmailsValidValidatorTest extends \PHPUnit\Framework\TestCase
             ->with();
 
         $multipleEmailsValidValidator = new MultipleEmailsValidValidator($emailValidatorMock);
-        $multipleEmailsValidValidator->initialize($executionContextInterfaceMock);
 
-        $multipleEmailsValidValidator->validate('0', $constraintMock);
+        $multipleEmailsValidValidator->validateInContext('0', $constraintMock, $executionContextInterfaceMock);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
@@ -137,6 +138,6 @@ final class BuilderSubscriberFunctionalTest extends MauticMysqlTestCase
         preg_match('/<a href=\"([^\"]*)\">(.*)<\/a>/iU', $string, $match);
         parse_str(parse_url($match[1], PHP_URL_QUERY), $queryParams);
 
-        return \Mautic\CoreBundle\Helper\Serializer::decode(base64_decode($queryParams['ct']));
+        return Serializer::decode(base64_decode($queryParams['ct']));
     }
 }

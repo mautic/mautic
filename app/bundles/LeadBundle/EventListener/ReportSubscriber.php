@@ -20,9 +20,10 @@ use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\StageBundle\Model\StageModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ReportSubscriber implements EventSubscriberInterface
+final class ReportSubscriber
 {
     public const string CONTEXT_LEADS                     = 'leads';
 
@@ -77,20 +78,12 @@ final class ReportSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-            ReportGraphEvent::class     => ['onReportGraphGenerate', 0],
-            ReportDataEvent::class      => ['onReportDisplay', 0],
-            ColumnCollectEvent::class   => ['onReportColumnCollect', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[AsEventListener(
+        event: ReportBuilderEvent::class,
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
@@ -194,6 +187,9 @@ final class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGeneratorEvent::class,
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext($this->leadContexts) && !$event->checkContext($this->companyContexts)) {
@@ -282,9 +278,9 @@ final class ReportSubscriber implements EventSubscriberInterface
                     ->andWhere(
                         $qb->expr()->and(
                             $qb->expr()->eq('e.event_type', $qb->expr()->literal('decision')),
-                            $qb->expr()->eq('log.is_scheduled', 0),
+                            $qb->expr()->eq('log.is_scheduled', '0'),
                             $qb->expr()->isNotNull('l.attribution'),
-                            $qb->expr()->neq('l.attribution', 0),
+                            $qb->expr()->neq('l.attribution', '0'),
                             $qb->expr()->lte("DATE({$localDateTriggered})", 'DATE(l.attribution_date)')
                         )
                     );
@@ -378,6 +374,9 @@ final class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGraphEvent::class,
+    )]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         if (!$event->checkContext([
@@ -395,6 +394,8 @@ final class ReportSubscriber implements EventSubscriberInterface
         foreach ($graphs as $g) {
             $queryBuilder = clone $qb;
             $options      = $event->getOptions($g);
+            /** @var TranslatorInterface $translator */
+            $translator = $options['translator'];
             /** @var ChartQuery $chartQuery */
             $chartQuery    = clone $options['chartQuery'];
             $attributionQb = clone $queryBuilder;
@@ -478,15 +479,15 @@ final class ReportSubscriber implements EventSubscriberInterface
 
                 case 'mautic.lead.graph.line.leads':
                     $chart          = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    $parametersKeys = array_keys($queryBuilder->getParameters() ?? []);
+                    $parametersKeys = array_keys($queryBuilder->getParameters());
                     $leadListFilter = preg_grep('/leadlistid/', $parametersKeys);
                     $tablePrefix    = $leadListFilter ? 's' : 'l';
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', $tablePrefix);
                     $leads = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans('mautic.lead.all.leads'), $leads);
+                    $chart->setDataset($translator->trans('mautic.lead.all.leads'), $leads);
                     $queryBuilder->andwhere($qb->expr()->isNotNull('l.date_identified'));
                     $identified = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans('mautic.lead.identified'), $identified);
+                    $chart->setDataset($translator->trans('mautic.lead.identified'), $identified);
                     $data         = $chart->render();
                     $data['name'] = $g;
                     $event->setGraph($g, $data);
@@ -496,7 +497,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 'lp');
                     $leads = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans('mautic.lead.graph.line.points'), $leads);
+                    $chart->setDataset($translator->trans('mautic.lead.graph.line.points'), $leads);
                     $data         = $chart->render();
                     $data['name'] = $g;
                     $event->setGraph($g, $data);
@@ -585,7 +586,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                         }
                         $companyCount += $count['companies'];
                     }
-                    $chart->setDataset($options['translator']->trans('mautic.lead.all.companies'), $companyCount);
+                    $chart->setDataset($translator->trans('mautic.lead.all.companies'), $companyCount);
                     $event->setGraph(
                         $g,
                         [
@@ -599,7 +600,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 'comp');
                     $companies = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans('mautic.lead.all.companies'), $companies);
+                    $chart->setDataset($translator->trans('mautic.lead.all.companies'), $companies);
                     $data         = $chart->render();
                     $data['name'] = $g;
                     $event->setGraph($g, $data);
@@ -614,7 +615,7 @@ final class ReportSubscriber implements EventSubscriberInterface
                         }
                         $companyCount += $count['companies'];
                     }
-                    $chart->setDataset($options['translator']->trans('mautic.lead.all.companies'), $companyCount);
+                    $chart->setDataset($translator->trans('mautic.lead.all.companies'), $companyCount);
                     $event->setGraph(
                         $g,
                         [
@@ -649,6 +650,9 @@ final class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: ColumnCollectEvent::class,
+    )]
     public function onReportColumnCollect(ColumnCollectEvent $event): void
     {
         if ('company' === $event->getObject()) {
@@ -904,6 +908,9 @@ final class ReportSubscriber implements EventSubscriberInterface
         $event->addTable($context, $data, self::GROUP_CONTACTS);
     }
 
+    #[AsEventListener(
+        event: ReportDataEvent::class,
+    )]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();

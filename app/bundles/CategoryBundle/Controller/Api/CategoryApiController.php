@@ -51,7 +51,7 @@ final class CategoryApiController extends CommonApiController
      * @param Category $entity
      * @param string   $action view|create|edit|publish|delete
      */
-    protected function checkEntityAccess($entity, $action = 'view'): bool
+    protected function checkEntityAccess(?object $entity, $action = 'view'): bool
     {
         if (!$bundle = $entity->getBundle()) {
             $bundle = 'category';

@@ -4,127 +4,86 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Entity;
 
+use DateTime;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: ObjectMappingRepository::class)]
 #[ORM\Table(name: 'sync_object_mapping')]
-#[ORM\Index(columns: ['internal_object_id'], name: 'internal_object_id_idx')]
-#[ORM\Index(columns: ['integration', 'integration_object_name', 'integration_object_id', 'integration_reference_id'], name: 'integration_object')]
-#[ORM\Index(columns: ['integration', 'integration_object_name', 'integration_reference_id', 'integration_object_id'], name: 'integration_reference')]
-#[ORM\Index(columns: ['integration', 'internal_object_name', 'last_sync_date'], name: 'integration_integration_object_name_last_sync_date')]
-#[ORM\Index(columns: ['integration', 'last_sync_date'], name: 'integration_last_sync_date')]
+#[ORM\Index(name: 'internal_object_id_idx', columns: ['internal_object_id'])]
+#[ORM\Index(name: 'integration_object', columns: ['integration', 'integration_object_name', 'integration_object_id', 'integration_reference_id'])]
+#[ORM\Index(name: 'integration_reference', columns: ['integration', 'integration_object_name', 'integration_reference_id', 'integration_object_id'])]
+#[ORM\Index(name: 'integration_integration_object_name_last_sync_date', columns: ['integration', 'internal_object_name', 'last_sync_date'])]
+#[ORM\Index(name: 'integration_last_sync_date', columns: ['integration', 'last_sync_date'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class ObjectMapping
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
-    private readonly ?\DateTimeInterface $dateCreated;
+    #[ORM\Column(name: 'date_created', type: Types::DATETIME_MUTABLE)]
+    private readonly ?DateTimeInterface $dateCreated;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: Types::STRING, length: 191)]
     private $integration;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'internal_object_name', type: Types::STRING, length: 191)]
     private $internalObjectName;
 
     /**
-     * @var string
+     * @var int|string
      */
+    #[ORM\Column(name: 'internal_object_id', type: 'bigint', options: ['unsigned' => true])]
     private $internalObjectId;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'integration_object_name', type: Types::STRING, length: 191)]
     private $integrationObjectName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'integration_object_id', type: Types::STRING, length: 191)]
     private $integrationObjectId;
 
-    private ?\DateTimeInterface $lastSyncDate;
+    #[ORM\Column(name: 'last_sync_date', type: Types::DATETIME_MUTABLE)]
+    private ?DateTimeInterface $lastSyncDate;
 
     /**
      * @var array
      */
+    #[ORM\Column(name: 'internal_storage', type: Types::JSON)]
     private $internalStorage = [];
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_deleted', type: Types::BOOLEAN)]
     private $isDeleted = false;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'integration_reference_id', type: Types::STRING, length: 191, nullable: true)]
     private $integrationReferenceId;
 
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
+    public function __construct(?DateTime $dateCreated = null)
     {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder
-            ->createField('dateCreated', Types::DATETIME_MUTABLE)
-            ->columnName('date_created')
-            ->build();
-
-        $builder
-            ->createField('integration', Types::STRING)
-            ->build();
-
-        $builder
-            ->createField('internalObjectName', Types::STRING)
-            ->columnName('internal_object_name')
-            ->build();
-
-        $builder->addBigIntIdField('internalObjectId', 'internal_object_id', false);
-
-        $builder
-            ->createField('integrationObjectName', Types::STRING)
-            ->columnName('integration_object_name')
-            ->build();
-
-        // Must be a string as not all IDs are integer based
-        $builder
-            ->createField('integrationObjectId', Types::STRING)
-            ->columnName('integration_object_id')
-            ->build();
-
-        $builder
-            ->createField('lastSyncDate', Types::DATETIME_MUTABLE)
-            ->columnName('last_sync_date')
-            ->build();
-
-        $builder
-            ->createField('internalStorage', Types::JSON)
-            ->columnName('internal_storage')
-            ->build();
-
-        $builder
-            ->createField('isDeleted', Types::BOOLEAN)
-            ->columnName('is_deleted')
-            ->build();
-
-        $builder
-            ->createField('integrationReferenceId', Types::STRING)
-            ->columnName('integration_reference_id')
-            ->nullable()
-            ->build();
-    }
-
-    public function __construct(?\DateTime $dateCreated = null)
-    {
-        $dateCreated ??= new \DateTime();
+        $dateCreated ??= new DateTime();
 
         $this->dateCreated  = $dateCreated;
         $this->lastSyncDate = $dateCreated;
@@ -148,7 +107,7 @@ class ObjectMapping
         return $this;
     }
 
-    public function getDateCreated(): ?\DateTimeInterface
+    public function getDateCreated(): ?DateTimeInterface
     {
         return $this->dateCreated;
     }
@@ -240,32 +199,26 @@ class ObjectMapping
         return $this;
     }
 
-    public function getLastSyncDate(): ?\DateTimeInterface
+    public function getLastSyncDate(): ?DateTimeInterface
     {
         return $this->lastSyncDate;
     }
 
-    public function setLastSyncDate(?\DateTimeInterface $lastSyncDate): static
+    public function setLastSyncDate(?DateTimeInterface $lastSyncDate): static
     {
-        $lastSyncDate ??= new \DateTime();
+        $lastSyncDate ??= new DateTime();
 
         $this->lastSyncDate = $lastSyncDate;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getInternalStorage()
+    public function getInternalStorage(): array
     {
         return $this->internalStorage;
     }
 
-    /**
-     * @param array $internalStorage
-     */
-    public function setInternalStorage($internalStorage): static
+    public function setInternalStorage(array $internalStorage): static
     {
         $this->internalStorage = $internalStorage;
 

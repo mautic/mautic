@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -10,14 +11,14 @@ use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Psr\Log\LoggerInterface;
 
-class IpAddressModel
+final readonly class IpAddressModel
 {
     private const int DELETE_SIZE = 10000;
 
     public function __construct(
-        protected EntityManagerInterface $entityManager,
-        protected LoggerInterface $logger,
-        private readonly IpAddressRepository $ipAddressRepository,
+        private EntityManagerInterface $entityManager,
+        private LoggerInterface $logger,
+        private IpAddressRepository $ipAddressRepository,
     ) {
     }
 
@@ -73,7 +74,7 @@ class IpAddressModel
     }
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function deleteUnusedIpAddresses(int $limit): int
     {

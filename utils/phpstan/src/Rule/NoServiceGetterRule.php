@@ -30,6 +30,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * parent-class or interface method are skipped - a contract getter cannot be replaced with direct injection.
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\NoServiceGetterRuleTest
  */
 final class NoServiceGetterRule implements Rule
 {

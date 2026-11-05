@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Tests\Entity\oAuth2;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ApiBundle\Entity\oAuth2\Client;
 use Mautic\ApiBundle\Entity\oAuth2\ClientRepository;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;

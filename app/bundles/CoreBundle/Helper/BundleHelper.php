@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-readonly class BundleHelper
+final readonly class BundleHelper
 {
     /**
      * @var mixed[]

@@ -8,14 +8,11 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\EmailBundle\Entity\Email;
 
-class AbTestSettingsService
+final class AbTestSettingsService
 {
-    /**
-     * @var int
-     */
-    public const DEFAULT_TOTAL_WEIGHT = 100;
+    public const int DEFAULT_TOTAL_WEIGHT = 100;
 
-    public const DEFAULT_AB_WEIGHT = 10;
+    public const int DEFAULT_AB_WEIGHT = 10;
 
     private ?int $allPublishedVariantsWeight = null;
 

@@ -4,27 +4,21 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\EventListener;
 
+use Mautic\LeadBundle\Event\ContactExportEmailSentEvent;
+use Mautic\LeadBundle\Event\ContactExportPrepareFileEvent;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\ContactExportSendEmailEvent;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class ContactScheduledExportSubscriber implements EventSubscriberInterface
+final readonly class ContactScheduledExportSubscriber
 {
     public function __construct(
         private ContactExportSchedulerModel $contactExportSchedulerModel,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadEvents::CONTACT_EXPORT_PREPARE_FILE    => 'onContactExportPrepareFile',
-            LeadEvents::CONTACT_EXPORT_SEND_EMAIL      => 'onContactExportSendEmail',
-            LeadEvents::POST_CONTACT_EXPORT_SEND_EMAIL => 'onContactExportEmailSent',
-        ];
-    }
-
+    #[AsEventListener(event: ContactExportPrepareFileEvent::class)]
     public function onContactExportPrepareFile(ContactExportSchedulerEvent $event): void
     {
         $contactExportScheduler = $event->getContactExportScheduler();
@@ -32,12 +26,14 @@ final readonly class ContactScheduledExportSubscriber implements EventSubscriber
         $event->setFilePath($filePath);
     }
 
+    #[AsEventListener(event: ContactExportSendEmailEvent::class)]
     public function onContactExportSendEmail(ContactExportSchedulerEvent $event): void
     {
         $contactExportScheduler = $event->getContactExportScheduler();
         $this->contactExportSchedulerModel->sendEmail($contactExportScheduler, $event->getFilePath());
     }
 
+    #[AsEventListener(event: ContactExportEmailSentEvent::class)]
     public function onContactExportEmailSent(ContactExportSchedulerEvent $event): void
     {
         $contactExportScheduler = $event->getContactExportScheduler();

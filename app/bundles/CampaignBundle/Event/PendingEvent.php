@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\FailedLeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -27,8 +28,9 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
     /**
      * @throws \Exception
+     * @param Collection<int, LeadEventLog> $logs
      */
-    public function __construct(AbstractEventAccessor $config, Event $event, ArrayCollection $logs)
+    public function __construct(AbstractEventAccessor $config, Event $event, Collection $logs)
     {
         $this->failures   = new ArrayCollection();
         $this->successful = new ArrayCollection();
@@ -38,12 +40,13 @@ final class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return ArrayCollection<int, LeadEventLog>
+     * @return Collection<int, LeadEventLog>
      */
-    public function getPending()
+    public function getPending(): Collection
     {
         return $this->logs;
     }
+
     public function fail(LeadEventLog $log, string $reason, ?\DateInterval $rescheduleInterval = null): void
     {
         if (!$failedLog = $log->getFailedLog()) {
@@ -71,6 +74,7 @@ final class PendingEvent extends AbstractLogCollectionEvent
 
         $this->failures->set($log->getId(), $log);
     }
+
     public function failAll(string $reason): void
     {
         foreach ($this->logs as $log) {
@@ -196,17 +200,17 @@ final class PendingEvent extends AbstractLogCollectionEvent
     }
 
     /**
-     * @return ArrayCollection<int, LeadEventLog>
+     * @return Collection<int, LeadEventLog>
      */
-    public function getFailures(): ArrayCollection
+    public function getFailures(): Collection
     {
         return $this->failures;
     }
 
     /**
-     * @return ArrayCollection<int, LeadEventLog>
+     * @return Collection<int, LeadEventLog>
      */
-    public function getSuccessful(): ArrayCollection
+    public function getSuccessful(): Collection
     {
         return $this->successful;
     }

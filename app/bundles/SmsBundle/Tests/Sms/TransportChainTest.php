@@ -91,7 +91,7 @@ final class TransportChainTest extends MauticMysqlTestCase
         $bulkSmsTransport = new class() implements BulkTransportInterface {
             public function sendBatchSms(RecipientCollection $collection, string $content): RecipientCollection
             {
-                foreach ($collection as &$recipient) {
+                foreach ($collection as $recipient) {
                     $recipient->setResult(true);
                 }
 

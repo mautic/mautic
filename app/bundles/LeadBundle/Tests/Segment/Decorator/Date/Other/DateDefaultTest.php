@@ -9,9 +9,10 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateDefault;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DateDefault::class)]
-final class DateDefaultTest extends \PHPUnit\Framework\TestCase
+final class DateDefaultTest extends TestCase
 {
     public function testGetParameterValue(): void
     {

@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Doctrine\ORM\PersistentCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -10,6 +11,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -20,6 +22,7 @@ use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\ListTypeaheadEvent;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
@@ -59,6 +62,8 @@ final class AjaxController extends CommonAjaxController
 
     private FormFieldHelper $formFieldHelper;
 
+    private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
+
     #[Required]
     public function autowireLeadAjaxController(
         LeadRepository $leadRepository,
@@ -68,6 +73,7 @@ final class AjaxController extends CommonAjaxController
         DoNotContactRepository $doNotContactRepository,
         FormFactoryInterface $formFactory,
         FormFieldHelper $formFieldHelper,
+        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
     ): void {
         $this->leadModel = $leadModel;
         $this->doNotContactRepository = $doNotContactRepository;
@@ -76,6 +82,7 @@ final class AjaxController extends CommonAjaxController
         $this->leadFieldRepository = $leadFieldRepository;
         $this->formFactory = $formFactory;
         $this->formFieldHelper = $formFieldHelper;
+        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
     }
 
     public function userListAction(Request $request): JsonResponse
@@ -96,7 +103,7 @@ final class AjaxController extends CommonAjaxController
 
     public function contactListAction(Request $request, LeadModel $model, CorePermissions $corePermissions): JsonResponse
     {
-        $filter['string'] = InputHelper::clean($request->query->get('filter'));
+        $filter           = ['string' => InputHelper::clean($request->query->get('filter'))];
 
         // Do not show other's contacts if do not have permission.
         if (!$corePermissions->isGranted(['lead:leads:viewother'], 'MATCH_ONE')) {
@@ -117,7 +124,9 @@ final class AjaxController extends CommonAjaxController
         $ignore    = (int) $request->query->get('ignore');
         $dataArray = ['items' => []];
 
-        if ($field && $value) {
+        $allowedFields = array_keys($this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier(['object' => 'lead']));
+
+        if ($field && $value && in_array($field, $allowedFields, true)) {
             $leads                      = $this->leadRepository->getLeadsByFieldValue($field, $value, $ignore);
             $dataArray['existsMessage'] = $this->translator->trans('mautic.lead.exists.by.field').': ';
 
@@ -527,7 +536,7 @@ final class AjaxController extends CommonAjaxController
         $data    = ['success' => 1, 'body' => '', 'subject' => ''];
         $emailId = $request->query->get('template');
 
-        /** @var \Mautic\EmailBundle\Entity\Email $email */
+        /** @var Email $email */
         $email = $model->getEntity($emailId);
 
         if (null !== $email
@@ -556,7 +565,7 @@ final class AjaxController extends CommonAjaxController
         if (null !== $lead && $this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
             $leadModel->setTags($lead, $updatedTags, true);
 
-            /** @var \Doctrine\ORM\PersistentCollection $leadTags */
+            /** @var PersistentCollection $leadTags */
             $leadTags    = $lead->getTags();
             $leadTagKeys = $leadTags->getKeys();
 
@@ -721,7 +730,7 @@ final class AjaxController extends CommonAjaxController
 
     public function setAsPrimaryCompanyAction(Request $request, LeadModel $leadModel): JsonResponse
     {
-        $dataArray['success'] = 1;
+        $dataArray            = ['success' => 1];
         $companyId            = InputHelper::clean($request->request->get('companyId'));
         $leadId               = InputHelper::clean($request->request->get('leadId'));
 

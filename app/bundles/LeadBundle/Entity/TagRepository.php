@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -125,10 +126,8 @@ class TagRepository extends CommonRepository
 
     /**
      * @param string $name
-     *
-     * @return Tag
      */
-    public function getTagByNameOrCreateNewOne($name)
+    public function getTagByNameOrCreateNewOne($name): Tag
     {
         $tag = new Tag($name, true);
 
@@ -206,7 +205,7 @@ class TagRepository extends CommonRepository
      *
      * @param array<int>|int $tagIds
      *
-     * @return array<mixed>
+     * @return Tag[]
      */
     public function getTagById(array|int $tagIds): array
     {
@@ -225,7 +224,7 @@ class TagRepository extends CommonRepository
             ->setParameter('tag', $tagIds, ArrayParameterType::INTEGER)
             ->executeQuery()->fetchAllKeyValue();
 
-        if (empty($tagsIdName)) {
+        if ($tagsIdName === []) {
             return [];
         }
 
@@ -235,7 +234,7 @@ class TagRepository extends CommonRepository
     /**
      * @return array<mixed>
      */
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $qb, \stdClass $filter): array
     {
         $alias = $this->getTableAlias();
 

@@ -4,15 +4,30 @@ namespace Mautic\CoreBundle\Doctrine\Type;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\Type;
 
 /**
  * Type that maps a PHP array to a clob SQL type.
  *
+ * DBAL 4 removed \Doctrine\DBAL\Types\ArrayType, so the serialization the
+ * parent used to provide is implemented here.
+ *
  * @since 2.0
  */
-final class ArrayType extends \Doctrine\DBAL\Types\ArrayType
+final class ArrayType extends Type
 {
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    /**
+     * DBAL 4 removed Doctrine's Types::ARRAY along with the built-in type; entity mappings
+     * still refer to the 'array' type name this class is registered under.
+     */
+    public const string ARRAY = 'array';
+
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
+    {
+        return $platform->getClobTypeDeclarationSQL($column);
+    }
+
+    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): string
     {
         if (!is_array($value)) {
             return (null === $value) ? 'N;' : 'a:0:{}';
@@ -29,14 +44,15 @@ final class ArrayType extends \Doctrine\DBAL\Types\ArrayType
     }
 
     /**
-     * @param mixed $value
-     *
-     * @return array
+     * Returns the unserialized array, or whatever unserialize() produced when the stored
+     * value was not an array - null for a NULL column, false for unreadable data - which
+     * is what DBAL's own ArrayType did.
      */
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): mixed
     {
         try {
-            $value = parent::convertToPHPValue($value, $platform);
+            $value = $this->unserializeValue($value);
+
             if (!is_array($value) || (1 > count($value))) {
                 return $value;
             }
@@ -60,6 +76,38 @@ final class ArrayType extends \Doctrine\DBAL\Types\ArrayType
             return $value;
         } catch (ConversionException|\ErrorException) {
             return [];
+        }
+    }
+
+    /**
+     * Mirrors the unserialization \Doctrine\DBAL\Types\ArrayType performed before it was
+     * removed in DBAL 4, including turning unserialize() notices into exceptions.
+     */
+    private function unserializeValue(mixed $value): mixed
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        $value = is_resource($value) ? stream_get_contents($value) : $value;
+
+        set_error_handler(static function (int $code, string $message): bool {
+            // DBAL let deprecations through to the normal handler. Turning one into a
+            // conversion failure would discard the whole stored array, and since PHP 8.2
+            // unserializing a property the class no longer declares raises E_DEPRECATED.
+            if (E_DEPRECATED === $code || E_USER_DEPRECATED === $code) {
+                return false;
+            }
+
+            throw new ConversionException('Could not convert database value to PHP array: '.$message);
+        });
+
+        try {
+            // Objects are unserialized rather than rejected, as DBAL did: convertToPHPValue
+            // drops the ones that would carry null bytes and keeps the rest
+            return unserialize((string) $value);
+        } finally {
+            restore_error_handler();
         }
     }
 }

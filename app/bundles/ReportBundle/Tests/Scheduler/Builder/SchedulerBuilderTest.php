@@ -9,9 +9,10 @@ use Mautic\ReportBundle\Scheduler\Entity\SchedulerEntity;
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Exception\InvalidSchedulerException;
 use Mautic\ReportBundle\Scheduler\Factory\SchedulerTemplateFactory;
+use PHPUnit\Framework\TestCase;
 use Recurr\Recurrence;
 
-final class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
+final class SchedulerBuilderTest extends TestCase
 {
     public function testGetNextEvent(): void
     {
@@ -44,10 +45,12 @@ final class SchedulerBuilderTest extends \PHPUnit\Framework\TestCase
         $expectedDate = new \DateTime()->setTime(0, 0)->modify('+1 day');
         $this->assertEquals($expectedDate, $event->getStart());
 
+        /** @var Recurrence $event */
         $event = $events[1];
         $expectedDate->modify('+1 day');
         $this->assertEquals($expectedDate, $event->getStart());
 
+        /** @var Recurrence $event */
         $event = $events[2];
         $expectedDate->modify('+1 day');
         $this->assertEquals($expectedDate, $event->getStart());

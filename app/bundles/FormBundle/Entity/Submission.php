@@ -6,23 +6,30 @@ namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Page;
 
 #[ORM\Entity(repositoryClass: SubmissionRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['tracking_id'], name: 'form_submission_tracking_search')]
-#[ORM\Index(columns: ['date_submitted'], name: 'form_date_submitted')]
+#[ORM\Index(name: 'form_submission_tracking_search', columns: ['tracking_id'])]
+#[ORM\Index(name: 'form_date_submitted', columns: ['date_submitted'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Submission
 {
-    public const TABLE_NAME = 'form_submissions';
+    public const string TABLE_NAME = 'form_submissions';
 
     /**
-     * @var string
+     * Set by FormModel::deleteEntity() so post_delete listeners can still read the id.
      */
+    public ?int $deletedId = null;
+
+    /**
+     * @var int|string
+     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -32,64 +39,40 @@ class Submission
     #[ORM\JoinColumn(name: 'form_id', nullable: false, onDelete: 'CASCADE')]
     private $form;
 
-    /**
-     * @var IpAddress|null
-     */
-    private $ipAddress;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
+    private ?IpAddress $ipAddress = null;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191, nullable: true)]
     private $trackingId;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_submitted', type: 'datetime')]
     private $dateSubmitted;
 
     /**
      * @var string
      */
+    #[ORM\Column(type: 'text')]
     private $referer;
 
-    /**
-     * @var Page|null
-     */
     #[ORM\ManyToOne(targetEntity: Page::class, fetch: 'EXTRA_LAZY')]
     #[ORM\JoinColumn(name: 'page_id', onDelete: 'SET NULL')]
-    private $page;
+    private ?Page $page = null;
 
     /**
      * @var array
      */
     private $results = [];
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->addIpAddress(true);
-
-        $builder->createField('trackingId', 'string')
-            ->columnName('tracking_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateSubmitted', 'datetime')
-            ->columnName('date_submitted')
-            ->build();
-
-        $builder->addField('referer', 'text');
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -189,18 +172,12 @@ class Submission
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }
 
-    /**
-     * @return array
-     */
-    public function getResults()
+    public function getResults(): array
     {
         return $this->results;
     }
@@ -219,18 +196,12 @@ class Submission
         return $this;
     }
 
-    /**
-     * @return Page|null
-     */
-    public function getPage()
+    public function getPage(): ?Page
     {
         return $this->page;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }

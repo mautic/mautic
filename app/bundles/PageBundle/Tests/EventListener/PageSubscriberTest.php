@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Test\AttributeEventListenerRegistrar;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\InstallBundle\Install\InstallService;
@@ -52,12 +53,12 @@ final class PageSubscriberTest extends TestCase
 EOF;
         $event = new PageDisplayEvent(
             $dummyPageContent,
-            $this->createStub(Page::class)
+            new Page()
         );
         $dispatcher = new EventDispatcher();
         $subscriber = $this->getPageSubscriber();
 
-        $dispatcher->addSubscriber($subscriber);
+        AttributeEventListenerRegistrar::register($dispatcher, $subscriber);
 
         $dispatcher->dispatch($event);
 
@@ -73,7 +74,8 @@ const foo='bar';
 
     </body>
 </html>
-EOF,
+EOF
+,
             $event->getContent()
         );
     }

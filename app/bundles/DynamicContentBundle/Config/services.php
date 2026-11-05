@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\DynamicContentBundle\Model\DynamicContentModel;
+use Mautic\DynamicContentBundle\Security\Permissions\DynamicContentPermissions;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {
@@ -16,6 +18,6 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', MauticCoreExtension::DEFAULT_EXCLUDES).'}');
 
     $services->load('Mautic\\DynamicContentBundle\\Entity\\', '../Entity/*Repository.php');
-    $services->alias('mautic.dynamicContent.model.dynamicContent', Mautic\DynamicContentBundle\Model\DynamicContentModel::class);
-    $services->set(Mautic\DynamicContentBundle\Security\Permissions\DynamicContentPermissions::class);
+    $services->alias('mautic.dynamicContent.model.dynamicContent', DynamicContentModel::class);
+    $services->set(DynamicContentPermissions::class);
 };

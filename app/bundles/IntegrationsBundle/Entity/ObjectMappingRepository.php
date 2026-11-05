@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 /**
  * @extends CommonRepository<ObjectMapping>
  */
-class ObjectMappingRepository extends CommonRepository
+final class ObjectMappingRepository extends CommonRepository
 {
     public function getInternalObject(string $integration, string $integrationObjectName, $integrationObjectId, string $internalObjectName): ?array
     {
@@ -27,10 +27,7 @@ class ObjectMappingRepository extends CommonRepository
         return $this->doGetInternalObject($integration, $integrationObjectName, $integrationObjectId, $internalObjectName, $lock);
     }
 
-    /**
-     * @return array|null
-     */
-    public function getIntegrationObject($integration, $internalObjectName, $internalObjectId, $integrationObjectName)
+    public function getIntegrationObject($integration, $internalObjectName, $internalObjectId, $integrationObjectName): ?array
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('*')
@@ -64,7 +61,7 @@ class ObjectMappingRepository extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'i')
+        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping i')
             ->set('integration_object_name', ':newObjectName')
             ->set('integration_object_id', ':newObjectId')
             ->where(
@@ -136,7 +133,7 @@ class ObjectMappingRepository extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'm')
+        $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping m')
             ->set('is_deleted', 1)
             ->where(
                 $qb->expr()->and(

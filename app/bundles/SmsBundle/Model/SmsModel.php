@@ -27,7 +27,10 @@ use Mautic\SmsBundle\Entity\StatRepository;
 use Mautic\SmsBundle\Event\DncEvent;
 use Mautic\SmsBundle\Event\FilterEvent;
 use Mautic\SmsBundle\Event\QueueEvent;
-use Mautic\SmsBundle\Event\SmsEvent;
+use Mautic\SmsBundle\Event\SmsPostDeleteEvent;
+use Mautic\SmsBundle\Event\SmsPostSaveEvent;
+use Mautic\SmsBundle\Event\SmsPreDeleteEvent;
+use Mautic\SmsBundle\Event\SmsPreSaveEvent;
 use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Exception\PrimaryTransportNotEnabledException;
 use Mautic\SmsBundle\Form\Type\SmsType;
@@ -47,7 +50,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @implements AjaxLookupModelInterface<Sms>
  */
-class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
+final class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSearchInterface
 {
     use TranslationModelTrait;
 
@@ -57,9 +60,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     }
 
     public function __construct(
-        protected TrackableModel $pageTrackableModel,
-        protected LeadModel $leadModel,
-        protected TransportChain $transport,
+        private readonly TrackableModel $pageTrackableModel,
+        private readonly LeadModel $leadModel,
+        private readonly TransportChain $transport,
         private readonly CacheProviderInterface $cacheProvider,
         EntityManagerInterface $em,
         CorePermissions $security,
@@ -86,7 +89,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         return 'sms:smses';
     }
 
-    public function saveEntity($entity, bool $unlock = true): void
+    /**
+     * @param Sms $entity
+     */
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         parent::saveEntity($entity, $unlock);
 
@@ -95,10 +101,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
     /**
      * Save an array of entities.
-     *
-     * @param iterable<Sms> $entities
      */
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
@@ -109,15 +113,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
             // set some defaults
             $this->setTimestamps($entity, $isNew, $unlock);
 
-            if ($dispatchEvent = $entity instanceof Sms) {
-                $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-            }
+            $event = $this->dispatchEvent('pre_save', $entity, $isNew);
 
             $this->smsRepository->saveEntity($entity, false);
 
-            if ($dispatchEvent) {
-                $this->dispatchEvent('post_save', $entity, $isNew, $event);
-            }
+            $this->dispatchEvent('post_save', $entity, $isNew, $event);
 
             if (0 === ++$i % $batchSize) {
                 $this->em->flush();
@@ -127,11 +127,12 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     }
 
     /**
+     * @param Sms|array<string, mixed>     $entity
      * @param mixed[] $options
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Sms) {
             throw new MethodNotAllowedHttpException(['Sms']);
@@ -160,9 +161,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
      *
      * @param array $args [start, limit, filter, orderBy, orderByDir]
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator|array
+     * @return iterable<Sms>
      */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $entities = parent::getEntities($args);
 
@@ -337,7 +338,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
 
             foreach ($recipientCollection as $recipient) {
                 $defaultSendResult['content'] = $recipient->getFinalMessage();
-                if (true !== $recipient->getResult()) {
+                if (!$recipient->getResult()) {
                     $defaultSendResult['sent']   = false;
                     $defaultSendResult['status'] = $recipient->getResult();
                     unset($stats[$recipient->getKey()]);
@@ -397,49 +398,37 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
     }
 
     /**
+     * @param Sms $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Sms) {
             throw new MethodNotAllowedHttpException(['Sms']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = SmsEvents::SMS_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = SmsEvents::SMS_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = SmsEvents::SMS_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = SmsEvents::SMS_POST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'    => new SmsPreSaveEvent($entity, $isNew),
+            'post_save'   => new SmsPostSaveEvent($entity, $isNew),
+            'pre_delete'  => new SmsPreDeleteEvent($entity, $isNew),
+            'post_delete' => new SmsPostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new SmsEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
-            }
+        $this->dispatcher->dispatch($event);
 
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
+        return $event;
     }
 
     /**
      * Joins the page table and limits created_by to currently logged in user.
      */
-    public function limitQueryToCreator(QueryBuilder &$q): void
+    public function limitQueryToCreator(QueryBuilder $q): void
     {
         $q->join('t', MAUTIC_TABLE_PREFIX.'sms_messages', 's', 's.id = t.sms_id')
             ->andWhere('s.created_by = :userId')
@@ -491,20 +480,15 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface, GlobalSear
         return $chart->render();
     }
 
-    /**
-     * @return Stat
-     */
-    public function getSmsStatus(string $idHash)
+    public function getSmsStatus(string $idHash): ?Stat
     {
         return $this->statRepository->getSmsStatus($idHash);
     }
 
     /**
      * Search for an sms stat by sms and lead IDs.
-     *
-     * @return array
      */
-    public function getSmsStatByLeadId($smsId, $leadId)
+    public function getSmsStatByLeadId($smsId, $leadId): array
     {
         return $this->statRepository->findBy(
             [

@@ -16,12 +16,12 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class FormFieldHelper extends AbstractFormFieldHelper
+final class FormFieldHelper extends AbstractFormFieldHelper
 {
     private readonly ValidatorInterface $validator;
 
     /**
-     * @var array<string, array<string|array<string, array<string, string>>>>
+     * @var array<string, array<string|array<string, array<string, bool|string>>>>
      */
     private array $types = [
         'captcha' => [
@@ -70,7 +70,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         'url'       => [
             'filter'      => 'url',
             'constraints' => [
-                Url::class => ['message' => 'mautic.form.submission.url.invalid'],
+                Url::class => ['message' => 'mautic.form.submission.url.invalid', 'requireTld' => false],
             ],
         ],
         'file' => [],
@@ -92,7 +92,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     }
 
     /**
-     * @return array<string, array<string|array<string, array<string, string>>>>
+     * @return array<string, array<string|array<string, array<string, bool|string>>>>
      */
     public function getTypes(): array
     {
@@ -134,7 +134,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
                 }
 
                 /** @var ConstraintViolationList $violations */
-                $violations = $this->validator->validate($value, new $constraint($opts));
+                $violations = $this->validator->validate($value, new $constraint(...$opts));
 
                 if (count($violations)) {
                     /** @var ConstraintViolation $v */
@@ -157,7 +157,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
     /**
      * Search and replace the HTML of the form field with the value.
      */
-    public function populateField($field, $value, $formName, &$formHtml): void
+    public function populateField(Field $field, $value, $formName, &$formHtml): void
     {
         $alias = $field->getAlias();
 
@@ -166,7 +166,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
         $escapedAlias      = preg_quote($alias, '/');
 
         // Adds the "readonly" attribute to a field if it is configured as read-only with auto-fill enabled and a sanitized value exists.
-        $fieldAttributeReadOnly = fn ($field, $sanitizedValue): string => ($field->isAutoFillReadOnly() && $sanitizedValue) ? ' readonly ' : '';
+        $fieldAttributeReadOnly = fn (Field $field, $sanitizedValue): string => ($field->isAutoFillReadOnly() && $sanitizedValue) ? ' readonly ' : '';
 
         switch ($field->getType()) {
             case 'text':

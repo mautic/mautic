@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Model;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CategoryBundle\Model\CategoryModel;
@@ -32,12 +33,11 @@ use Mautic\LeadBundle\Entity\MergeRecordRepository;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
-use Mautic\LeadBundle\Event\SaveBatchLeadsEvent;
+use Mautic\LeadBundle\Event\LeadPostBatchSaveEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\IpAddressModel;
@@ -55,6 +55,7 @@ use Mautic\UserBundle\Security\Provider\UserProvider;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactory;
@@ -64,7 +65,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 #[AllowMockObjectsWithoutExpectations]
-final class LeadModelTest extends \PHPUnit\Framework\TestCase
+final class LeadModelTest extends TestCase
 {
     private MockObject|RequestStack $requestStack;
 
@@ -346,6 +347,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         [$contact, $fields] = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], true, true);
         $this->assertEquals(['email' => 'Email'], $mockLeadModel->getAvailableLeadFields());
+        /** @var Lead $contact */
         $this->assertEquals('john@doe.com', $contact->getEmail());
         $this->assertNull($contact->getFirstname());
         $this->assertEquals(['email' => 'john@doe.com'], $fields);
@@ -444,10 +446,8 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         $lead = new Lead();
         $lead->setId(1);
         $lead->setFields(['all' => 'sth']);
-        $stageMock = $this->createMock(Stage::class);
-        $stageMock
-            ->method('getId')
-            ->willReturn(1);
+        $stageMock = new Stage();
+        ReflectionHelper::setEntityId($stageMock, 1);
         $data = ['stage' => $stageMock];
 
         $this->stagesChangeLogRepositoryMock->expects($this->once())
@@ -497,36 +497,11 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockGetLeadRepository();
 
-        $contact     = $this->createMock(Lead::class);
+        $contact     = new Lead();
+        $contact->setEmail('contact@example.com');
+        $contact->setNewlyCreated(true);
         $manipulator = new LeadManipulator('lead', 'import', 333);
-
-        $contact->expects($this->exactly(2))
-            ->method('getIpAddresses')
-            ->willReturn([]);
-
-        $contact->expects($this->exactly(2))
-            ->method('isNewlyCreated')
-            ->willReturn(true);
-
-        $contact->expects($this->exactly(2))
-            ->method('getManipulator')
-            ->willReturn($manipulator);
-
-        $contact->expects($this->exactly(2))
-            ->method('getUpdatedFields')
-            ->willReturn([]);
-
-        $contact->expects($this->once())
-            ->method('addEventLog')
-            ->with($this->callback(function (LeadEventLog $leadEventLog) use ($contact): true {
-                $this->assertSame($contact, $leadEventLog->getLead());
-                $this->assertSame('identified_contact', $leadEventLog->getAction());
-                $this->assertSame('lead', $leadEventLog->getBundle());
-                $this->assertSame('import', $leadEventLog->getObject());
-                $this->assertSame(333, $leadEventLog->getObjectId());
-
-                return true;
-            }));
+        $contact->setManipulator($manipulator);
 
         $this->fieldModelMock->expects($this->exactly(1))
             ->method('getFieldListWithProperties')
@@ -538,6 +513,19 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
         $this->leadModel->saveEntity($contact);
         $this->leadModel->saveEntity($contact);
+
+        $eventLogReflection = new \ReflectionProperty($contact, 'eventLog');
+        /** @var Collection<int, LeadEventLog> $eventLogs */
+        $eventLogs = $eventLogReflection->getValue($contact);
+        $this->assertCount(1, $eventLogs);
+
+        /** @var LeadEventLog $leadEventLog */
+        $leadEventLog = $eventLogs->first();
+        $this->assertSame($contact, $leadEventLog->getLead());
+        $this->assertSame('identified_contact', $leadEventLog->getAction());
+        $this->assertSame('lead', $leadEventLog->getBundle());
+        $this->assertSame('import', $leadEventLog->getObject());
+        $this->assertSame(333, $leadEventLog->getObjectId());
     }
 
     public function testImportHtmlFields(): void
@@ -644,7 +632,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
             /**
              * @return \ArrayIterator<int,array{label: string, alias: string, isPublished: bool, id: int, object: string, group: string, type: string}>
              */
-            public function getIterator()
+            public function getIterator(): \Traversable
             {
                 return new \ArrayIterator([
                     4 => ['label' => 'Email', 'alias' => 'email', 'isPublished' => true, 'id' => 4, 'object' => 'lead', 'group' => 'basic', 'type' => 'email'],
@@ -676,23 +664,21 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
         };
 
         $leadEvent1 =  new LeadEvent($leadsParams[0]['entity'], $leadsParams[0]['isNew']);
-        $leadEvent1->setEntityManager($this->entityManagerMock);
 
         $leadEvent2 =  new LeadEvent($leadsParams[1]['entity'], $leadsParams[1]['isNew']);
-        $leadEvent2->setEntityManager($this->entityManagerMock);
 
-        $event = new SaveBatchLeadsEvent([
+        $event = new LeadPostBatchSaveEvent([
             $leadEvent1,
             $leadEvent2,
         ]);
 
         $this->dispatcherMock->expects($this->once())
             ->method('hasListeners')
-            ->with(LeadEvents::LEAD_POST_BATCH_SAVE)
+            ->with(LeadPostBatchSaveEvent::class)
             ->willReturn(true);
         $this->dispatcherMock->expects($this->once())
             ->method('dispatch')
-            ->with($event, LeadEvents::LEAD_POST_BATCH_SAVE)
+            ->with($event)
             ->willReturn($event);
 
         $leadModel->dispatchBatchEventForTest($action, $leadsParams);
@@ -714,7 +700,7 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
     /**
      * Creates and configures a mock UserHelper with a User.
      */
-    private function createMockUserHelper(): UserHelper&MockObject
+    private function createMockUserHelper(): UserHelper
     {
         /** @var UserHelper&MockObject $mockUserModel */
         $mockUserModel = $this->createMock(UserHelper::class);
@@ -773,6 +759,8 @@ final class LeadModelTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Creates a mock LeadModel for duplicate contact tests.
+     *
+     * @return MockObject&LeadModel
      */
     private function createMockLeadModelForDuplicateTest(): MockObject
     {

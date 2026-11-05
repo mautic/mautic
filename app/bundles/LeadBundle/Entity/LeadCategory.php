@@ -11,7 +11,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: LeadCategoryRepository::class)]
@@ -37,12 +37,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent(association: 'lead')]
 class LeadCategory
 {
     /**
      * @var int
      */
     #[Groups(['leadcategory:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -57,47 +61,30 @@ class LeadCategory
      * @var Lead
      */
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
+    #[ORM\ManyToOne(targetEntity: Lead::class)]
+    #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
      * @var bool
      */
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
+    #[ORM\Column(name: 'manually_removed', type: 'boolean')]
     private $manuallyRemoved = false;
 
     /**
      * @var bool
      */
     #[Groups(['leadcategory:read', 'leadcategory:write'])]
+    #[ORM\Column(name: 'manually_added', type: 'boolean')]
     private $manuallyAdded = false;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->createManyToOne('lead', Lead::class)
-            ->addJoinColumn('lead_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
-            ->build();
-
-        $builder->addDateAdded();
-
-        $builder->createField('manuallyRemoved', 'boolean')
-            ->columnName('manually_removed')
-            ->build();
-
-        $builder->createField('manuallyAdded', 'boolean')
-            ->columnName('manually_added')
-            ->build();
-    }
 
     /**
      * @return int|null
@@ -147,10 +134,7 @@ class LeadCategory
         return $this->category;
     }
 
-    /**
-     * @param Category $category
-     */
-    public function setCategory($category): void
+    public function setCategory(Category $category): void
     {
         $this->category = $category;
     }

@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Executioner\Scheduler;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Enum\RepublishBehavior;
@@ -49,7 +50,10 @@ class EventScheduler
         $this->schedule($event, $executionDate, $contacts);
     }
 
-    public function schedule(Event $event, \DateTimeInterface $executionDate, ArrayCollection $contacts, bool $isInactiveEvent = false): void
+    /**
+     * @param Collection<int, Lead> $contacts
+     */
+    public function schedule(Event $event, \DateTimeInterface $executionDate, Collection $contacts, bool $isInactiveEvent = false): void
     {
         $config = $this->collector->getEventConfig($event);
 
@@ -78,9 +82,9 @@ class EventScheduler
     }
 
     /**
-     * @param ArrayCollection|LeadEventLog[] $logs
+     * @param Collection<int, LeadEventLog> $logs
      */
-    public function rescheduleLogs(ArrayCollection $logs, \DateTimeInterface $toBeExecutedOn): void
+    public function rescheduleLogs(Collection $logs, \DateTimeInterface $toBeExecutedOn): void
     {
         foreach ($logs as $log) {
             $log->setTriggerDate($toBeExecutedOn, 'Bulk rescheduling of events');
@@ -95,7 +99,10 @@ class EventScheduler
         $this->dispatchBatchScheduledEvent($config, $event, $logs, true);
     }
 
-    public function rescheduleFailures(ArrayCollection $logs): void
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
+    public function rescheduleFailures(Collection $logs): void
     {
         if (!$logs->count()) {
             return;
@@ -236,11 +243,11 @@ class EventScheduler
     }
 
     /**
-     * @param ArrayCollection|Event[] $events
+     * @param Collection<int, Event> $events
      *
      * @throws NotSchedulableException
      */
-    public function getSortedExecutionDates(ArrayCollection $events, \DateTimeInterface $lastActiveDate): array
+    public function getSortedExecutionDates(Collection $events, \DateTimeInterface $lastActiveDate): array
     {
         $eventExecutionDates = [];
 
@@ -292,8 +299,9 @@ class EventScheduler
 
     /**
      * @throws NotSchedulableException
+     * @param Collection<int, Lead> $contacts
      */
-    public function validateAndScheduleEventForContacts(Event $event, \DateTimeInterface $executionDateTime, ArrayCollection $contacts, \DateTimeInterface $comparedFromDateTime): void
+    public function validateAndScheduleEventForContacts(Event $event, \DateTimeInterface $executionDateTime, Collection $contacts, \DateTimeInterface $comparedFromDateTime): void
     {
         if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
             $this->logger->debug(
@@ -333,7 +341,10 @@ class EventScheduler
         );
     }
 
-    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, ArrayCollection $logs, bool $isReschedule = false): void
+    /**
+     * @param Collection<int, LeadEventLog> $logs
+     */
+    private function dispatchBatchScheduledEvent(AbstractEventAccessor $config, Event $event, Collection $logs, bool $isReschedule = false): void
     {
         if (!$logs->count()) {
             return;
@@ -344,7 +355,10 @@ class EventScheduler
         );
     }
 
-    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, ArrayCollection $contacts, bool $isInactiveEvent = false): void
+    /**
+     * @param Collection<int, Lead> $contacts
+     */
+    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, Collection $contacts, bool $isInactiveEvent = false): void
     {
         foreach ($contacts as $contact) {
             // Create the entry

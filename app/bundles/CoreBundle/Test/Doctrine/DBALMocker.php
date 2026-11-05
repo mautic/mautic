@@ -4,9 +4,9 @@ namespace Mautic\CoreBundle\Test\Doctrine;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -130,6 +130,7 @@ final class DBALMocker
                 ->onlyMethods([
                     'createQueryBuilder',
                     'quote',
+                    'quoteSingleIdentifier',
                     'update',
                     'insert',
                 ])
@@ -142,6 +143,11 @@ final class DBALMocker
             $mock->expects(new AnyInvokedCount())
                 ->method('quote')
                 ->willReturnArgument(0);
+            $mock->expects(new AnyInvokedCount())
+                ->method('quoteSingleIdentifier')
+                ->willReturnCallback(
+                    static fn (string $identifier): string => '`'.str_replace('`', '``', $identifier).'`'
+                );
 
             $mock->expects(new AnyInvokedCount())
                 ->method('update');

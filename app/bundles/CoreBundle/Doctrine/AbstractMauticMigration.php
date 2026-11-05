@@ -4,25 +4,26 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Doctrine;
 
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Schema\ForeignKeyConstraint;
+use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
+use Mautic\CoreBundle\Doctrine\Schema\AssetName;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractMauticMigration extends AbstractMigration
 {
-    protected const TABLE_NAME = null;
+    protected const ?string TABLE_NAME = null;
 
-    /**
-     * @var string
-     */
-    public const COLUMN_TYPE_SIGNED = 'SIGNED';
+    public const string COLUMN_TYPE_SIGNED = 'SIGNED';
 
-    /**
-     * @var string
-     */
-    public const COLUMN_TYPE_UNSIGNED = 'UNSIGNED';
+    public const string COLUMN_TYPE_UNSIGNED = 'UNSIGNED';
 
     protected ContainerInterface $container;
 
@@ -39,7 +40,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
     protected ?string $prefix = null;
 
     /**
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      * @throws AbortMigration
      *
      * @todo remove this method to make it absctract for Mautic 6
@@ -101,9 +102,9 @@ abstract class AbstractMauticMigration extends AbstractMigration
             case 'fk':
                 if (!array_key_exists('fk', $tables[$table])) {
                     $keys = $schemaManager->listTableForeignKeys($table);
-                    /** @var \Doctrine\DBAL\Schema\ForeignKeyConstraint $k */
+                    /** @var ForeignKeyConstraint $k */
                     foreach ($keys as $k) {
-                        $name                       = strtolower($k->getName());
+                        $name                       = strtolower(AssetName::ofOptional($k));
                         $key                        = substr($name, -4);
                         $tables[$table]['fk'][$key] = $name;
                     }
@@ -122,9 +123,9 @@ abstract class AbstractMauticMigration extends AbstractMigration
 
                     $indexes = $schemaManager->listTableIndexes($table);
 
-                    /** @var \Doctrine\DBAL\Schema\Index $i */
+                    /** @var Index $i */
                     foreach ($indexes as $i) {
-                        $name   = strtolower($i->getName());
+                        $name   = strtolower(AssetName::of($i));
                         $isIdx  = stripos($name, 'idx');
                         $isUniq = stripos($name, 'uniq');
 
@@ -169,7 +170,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
      *
      * @return array<int, string> [idx, fk]
      */
-    protected function generateKeys($table, array $columnNames)
+    protected function generateKeys($table, array $columnNames): array
     {
         return [
             $this->generatePropertyName($table, 'idx', $columnNames),
@@ -203,7 +204,7 @@ abstract class AbstractMauticMigration extends AbstractMigration
         $table       = $schema->getTable($this->getPrefixedTableName($tableName));
         $idColumn    = $table->getColumn($columnName);
 
-        if (true === $idColumn->getUnsigned()) {
+        if ($idColumn->getUnsigned()) {
             return self::COLUMN_TYPE_UNSIGNED;
         }
 
@@ -215,5 +216,25 @@ abstract class AbstractMauticMigration extends AbstractMigration
         $table = $schema->getTable($this->getPrefixedTableName($tableName));
 
         return Type::getTypeRegistry()->lookupName($table->getColumn($columnName)->getType());
+    }
+
+    /**
+     * Declare a table's primary key.
+     *
+     * DBAL 4 deprecated Table::setPrimaryKey() in favour of addPrimaryKeyConstraint(),
+     * which takes name objects rather than column-name strings. This keeps the call sites
+     * in migrations reading the way they did.
+     *
+     * @param non-empty-list<string> $columnNames
+     */
+    protected function setPrimaryKey(Table $table, array $columnNames): void
+    {
+        $table->addPrimaryKeyConstraint(
+            new PrimaryKeyConstraint(
+                null,
+                array_map(UnqualifiedName::unquoted(...), $columnNames),
+                false
+            )
+        );
     }
 }

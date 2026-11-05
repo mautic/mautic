@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ReportBuilder;
 
 use Mautic\IntegrationsBundle\Event\InternalCompanyEvent;
+use Mautic\IntegrationsBundle\Event\InternalCompanyFullReportBuildEvent;
 use Mautic\IntegrationsBundle\Event\InternalContactEvent;
+use Mautic\IntegrationsBundle\Event\InternalContactFullReportBuildEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindByIdEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectFindEvent;
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
-use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Request\ObjectDAO;
@@ -24,6 +25,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\FullO
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company as CompanyEntity;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -34,19 +36,19 @@ final class FullObjectReportBuilderTest extends TestCase
     private const string TEST_EMAIL = 'test@test.com';
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&ObjectProvider
+     * @var MockObject&ObjectProvider
      */
-    private \PHPUnit\Framework\MockObject\MockObject $objectProvider;
+    private MockObject $objectProvider;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&EventDispatcherInterface
+     * @var MockObject&EventDispatcherInterface
      */
-    private \PHPUnit\Framework\MockObject\MockObject $dispatcher;
+    private MockObject $dispatcher;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&FieldBuilder
+     * @var MockObject&FieldBuilder
      */
-    private \PHPUnit\Framework\MockObject\MockObject $fieldBuilder;
+    private MockObject $fieldBuilder;
 
     private FullObjectReportBuilder $reportBuilder;
 
@@ -202,7 +204,7 @@ final class FullObjectReportBuilderTest extends TestCase
                     $this->assertSame(InternalObjectFindByIdEvent::class, $parameters[0]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(IntegrationEvents::INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD, $parameters[0]);
+                    $this->assertSame(InternalContactFullReportBuildEvent::class, $parameters[0]);
                 }
 
                 return true;
@@ -256,7 +258,6 @@ final class FullObjectReportBuilderTest extends TestCase
                         $this->assertSame($contactEntity, $event->getContact());
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_BEFORE_FULL_CONTACT_REPORT_BUILD, $parameters[1]);
                 }
 
                 return $parameters[0];
@@ -303,7 +304,7 @@ final class FullObjectReportBuilderTest extends TestCase
                     $this->assertSame(InternalObjectFindByIdEvent::class, $parameters[0]);
                 }
                 if (2 === $matcher->numberOfInvocations()) {
-                    $this->assertSame(IntegrationEvents::INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD, $parameters[0]);
+                    $this->assertSame(InternalCompanyFullReportBuildEvent::class, $parameters[0]);
                 }
 
                 return true;
@@ -318,10 +319,13 @@ final class FullObjectReportBuilderTest extends TestCase
         $matcher = $this->exactly(3);
 
         $this->dispatcher->expects($matcher)
-            ->method('dispatch')->willReturnCallback(function (...$parameters) use ($matcher, $internalObject,
+            ->method('dispatch')->willReturnCallback(function (...$parameters) use (
+                $matcher,
+                $internalObject,
                 $fromDateTime,
                 $toDateTime,
-                $companyEntity): object {
+                $companyEntity
+            ): object {
                 if (1 === $matcher->numberOfInvocations()) {
                     $callback = function (InternalObjectFindEvent $event) use (
                         $internalObject,
@@ -360,7 +364,6 @@ final class FullObjectReportBuilderTest extends TestCase
                         $this->assertSame($companyEntity, $event->getCompany());
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(IntegrationEvents::INTEGRATION_BEFORE_FULL_COMPANY_REPORT_BUILD, $parameters[1]);
                 }
 
                 return $parameters[0];

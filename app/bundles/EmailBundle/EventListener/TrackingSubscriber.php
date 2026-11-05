@@ -5,23 +5,18 @@ namespace Mautic\EmailBundle\EventListener;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
-use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final readonly class TrackingSubscriber implements EventSubscriberInterface
+final readonly class TrackingSubscriber
 {
     public function __construct(
         private StatRepository $statRepository,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadEvents::ON_CLICKTHROUGH_IDENTIFICATION => ['onIdentifyContact', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: ContactIdentificationEvent::class,
+    )]
     public function onIdentifyContact(ContactIdentificationEvent $event): void
     {
         $clickthrough = $event->getClickthrough();

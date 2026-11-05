@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Mautic\StageBundle\Controller\Api\StageApiController;
+use Mautic\StageBundle\Entity\Stage;
+
 return [
     'routes' => [
         'api' => [
@@ -9,7 +12,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'stages',
                 'path'            => '/stages',
-                'controller'      => Mautic\StageBundle\Controller\Api\StageApiController::class,
+                'controller'      => StageApiController::class,
             ],
         ],
     ],
@@ -27,7 +30,7 @@ return [
 
     'categories' => [
         'stage' => [
-            'class' => Mautic\StageBundle\Entity\Stage::class,
+            'class' => Stage::class,
         ],
     ],
 ];

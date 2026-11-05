@@ -10,16 +10,16 @@ use Mautic\LeadBundle\Exception\PrimaryCompanyNotFoundException;
 /**
  * @extends CommonRepository<CompanyLead>
  */
-class CompanyLeadRepository extends CommonRepository
+final class CompanyLeadRepository extends CommonRepository
 {
-    public const DELETE_BATCH_SIZE = 1000;
+    public const int DELETE_BATCH_SIZE = 1000;
 
-    public const BATCH_SIZE        = 5000;
+    public const int BATCH_SIZE        = 5000;
 
     /**
      * @param CompanyLead[] $entities
      */
-    public function saveEntities($entities, bool $new = true): void
+    public function saveEntities(iterable $entities, bool $new = true): void
     {
         // Get a list of contacts and set primary to 0
         if ($new) {
@@ -69,7 +69,7 @@ class CompanyLeadRepository extends CommonRepository
 
         if ($onlyPrimary) {
             $q->andWhere(
-                $q->expr()->eq('cl.is_primary', true)
+                $q->expr()->eq('cl.is_primary', '1')
             );
         }
 
@@ -151,10 +151,7 @@ class CompanyLeadRepository extends CommonRepository
         return $q->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return array
-     */
-    public function getLatestCompanyForLead($leadId)
+    public function getLatestCompanyForLead($leadId): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
@@ -190,17 +187,12 @@ class CompanyLeadRepository extends CommonRepository
         return $qb->executeQuery()->fetchAllAssociative();
     }
 
-    /**
-     * @return mixed
-     */
-    public function getEntitiesByLead(Lead $lead)
+    public function getEntitiesByLead(Lead $lead): array
     {
-        $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->select('cl')
-            ->from(CompanyLead::class, 'cl')
-            ->where(
-                $qb->expr()->eq('cl.lead', ':lead')
-            )->setParameter('lead', $lead);
+        $qb = $this->createQueryBuilder('cl');
+        $qb->where(
+            $qb->expr()->eq('cl.lead', ':lead')
+        )->setParameter('lead', $lead);
 
         return $qb->getQuery()->execute();
     }
@@ -259,9 +251,9 @@ class CompanyLeadRepository extends CommonRepository
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
         $qb->where(
-            $qb->expr()->eq('lead_id', $leadId)
+            $qb->expr()->eq('lead_id', (string) $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', 1)
+            $qb->expr()->eq('is_primary', '1')
         )->executeStatement();
     }
 
@@ -279,9 +271,9 @@ class CompanyLeadRepository extends CommonRepository
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
         $qb->where(
-            $qb->expr()->eq('lead_id', $leadId)
+            $qb->expr()->eq('lead_id', (string) $leadId)
         )->andWhere(
-            $qb->expr()->eq('is_primary', 0)
+            $qb->expr()->eq('is_primary', '0')
         )->executeStatement();
     }
 }

@@ -32,7 +32,7 @@ final class StageController extends AbstractFormController
     }
 
     #[Route(
-        '/s/stages/{objectAction}/{objectId}',
+        path: '/s/stages/{objectAction}/{objectId}',
         name: 'mautic_stage_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -43,7 +43,7 @@ final class StageController extends AbstractFormController
     }
 
     #[Route(
-        '/s/stages/{page}',
+        path: '/s/stages/{page}',
         name: 'mautic_stage_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -139,7 +139,7 @@ final class StageController extends AbstractFormController
      *
      * @param Stage $entity
      */
-    public function newAction(Request $request, $entity = null): Response
+    public function newAction(Request $request, ?object $entity = null): Response
     {
         if (!$entity instanceof Stage) {
             /** @var Stage $entity */

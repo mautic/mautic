@@ -36,6 +36,9 @@ final class ReportType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('report', $options));
 
+        /** @var Report $report */
+        $report = $options['data'];
+
         // Only add these fields if we're in edit mode
         if (!($options['attr']['readonly'] ?? false)) {
             $builder->add(
@@ -64,7 +67,7 @@ final class ReportType extends AbstractType
                 'label' => 'mautic.core.form.available',
             ]);
 
-            $data = $options['data']->getSystem();
+            $data = $report->getSystem();
             $builder->add(
                 'system',
                 YesNoButtonGroupType::class,
@@ -101,7 +104,7 @@ final class ReportType extends AbstractType
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.email.utm_tags.tooltip',
                     ],
-                    'data'     => $options['data']->getSettings(),
+                    'data'     => $report->getSettings(),
                     'required' => false,
                 ]
             );
@@ -380,6 +383,7 @@ final class ReportType extends AbstractType
             $builder->addEventListener(
                 FormEvents::PRE_SET_DATA,
                 function (FormEvent $event) use ($formModifier): void {
+                    /** @var Report $data */
                     $data = $event->getData();
                     $formModifier($event->getForm(), $data->getSource(), $data->getColumns(), $data->getGraphs(), $data);
                 }

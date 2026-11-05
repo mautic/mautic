@@ -5,16 +5,17 @@ namespace Mautic\PointBundle\EventListener;
 use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
+use Mautic\LeadBundle\Event\LeadPostMergeEvent;
+use Mautic\LeadBundle\Event\LeadPostSaveEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\PointsChangeEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Entity\LeadPointLogRepository;
 use Mautic\PointBundle\Entity\LeadTriggerLogRepository;
 use Mautic\PointBundle\Model\TriggerModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class LeadSubscriber implements EventSubscriberInterface
+final readonly class LeadSubscriber
 {
     public function __construct(
         private TriggerModel $triggerModel,
@@ -25,19 +26,12 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            LeadEvents::LEAD_POINTS_CHANGE   => ['onLeadPointsChange', 0],
-            LeadTimelineEvent::class => ['onTimelineGenerate', 0],
-            LeadEvents::LEAD_POST_MERGE      => ['onLeadMerge', 0],
-            LeadEvents::LEAD_POST_SAVE       => ['onLeadSave', -1],
-        ];
-    }
-
     /**
      * Trigger applicable events for the lead.
      */
+    #[AsEventListener(
+        event: PointsChangeEvent::class,
+    )]
     public function onLeadPointsChange(PointsChangeEvent $event): void
     {
         $this->triggerModel->triggerEvents($event->getLead());
@@ -46,6 +40,10 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     /**
      * Handle point triggers for new leads (including 0 point triggers).
      */
+    #[AsEventListener(
+        event: LeadPostSaveEvent::class,
+        priority: -1
+    )]
     public function onLeadSave(LeadEvent $event): void
     {
         if ($event->isNew()) {
@@ -56,6 +54,9 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
+    #[AsEventListener(
+        event: LeadTimelineEvent::class,
+    )]
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         // Set available event types
@@ -99,6 +100,9 @@ final readonly class LeadSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: LeadPostMergeEvent::class,
+    )]
     public function onLeadMerge(LeadMergeEvent $event): void
     {
         $this->leadPointLogRepository->updateLead(

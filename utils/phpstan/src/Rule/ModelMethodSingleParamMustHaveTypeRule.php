@@ -18,6 +18,8 @@ use PHPStan\Rules\RuleErrorBuilder;
  * caller may pass and drops static checks, so the one parameter must be typed.
  *
  * @implements Rule<ClassMethod>
+ *
+ * @see \Utils\PHPStan\Tests\Rule\ModelMethodSingleParamMustHaveTypeRuleTest
  */
 final readonly class ModelMethodSingleParamMustHaveTypeRule implements Rule
 {

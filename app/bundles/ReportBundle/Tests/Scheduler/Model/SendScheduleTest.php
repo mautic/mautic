@@ -12,9 +12,10 @@ use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use Mautic\ReportBundle\Scheduler\Model\MessageSchedule;
 use Mautic\ReportBundle\Scheduler\Model\SendSchedule;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-final class SendScheduleTest extends \PHPUnit\Framework\TestCase
+final class SendScheduleTest extends TestCase
 {
     private Report $report;
 

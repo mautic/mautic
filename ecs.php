@@ -33,9 +33,18 @@ return ECSConfig::configure()
 
         // templates rely on alternative syntax (endforeach, endif), keep it as-is
         PhpCsFixer\Fixer\ControlStructure\NoAlternativeSyntaxFixer::class,
+
+        // bug, to be fixed in ecs
+        \Symplify\CodingStandard\Fixer\Commenting\RemoveSuperfluousReturnNameFixer::class => [
+            __DIR__.'/app/bundles/LeadBundle/Model/LeadModel.php',
+            __DIR__ . '/app/bundles/LeadBundle/Entity/LeadListRepository.php',
+        ],
     ])
     ->withRules([
+        PhpCsFixer\Fixer\FunctionNotation\MethodArgumentSpaceFixer::class,
         PhpCsFixer\Fixer\Semicolon\MultilineWhitespaceBeforeSemicolonsFixer::class,
+        PhpCsFixer\Fixer\Whitespace\NoExtraBlankLinesFixer::class,
+        PhpCsFixer\Fixer\Whitespace\NoWhitespaceInBlankLineFixer::class,
     ])
     ->withPreparedSets(
         comments: true,
@@ -44,6 +53,5 @@ return ECSConfig::configure()
         cleanup: true,
         controlStructures: true,
         standaloneLine: true,
-        // @todo enable next
-        // spaces: true,
+        spaces: true,
     );

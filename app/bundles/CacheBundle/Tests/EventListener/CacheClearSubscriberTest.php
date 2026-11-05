@@ -8,9 +8,10 @@ use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CacheBundle\EventListener\CacheClearSubscriber;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 
-final class CacheClearSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CacheClearSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&CacheProvider

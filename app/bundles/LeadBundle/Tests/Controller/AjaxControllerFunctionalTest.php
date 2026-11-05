@@ -12,12 +12,11 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
-use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -89,14 +88,14 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $campaign = $this->createCampaign();
         $contact  = $this->createContact('blabla@contact.email');
 
-        $userRepository = $this->em->getRepository(User::class);
+        $userRepository = $this->getContainer()->get(UserRepository::class);
         $this->assertInstanceOf(UserRepository::class, $userRepository);
 
         $role = new Role();
         $role->setName('No-campaign-edit-access');
         $role->setIsAdmin(false);
 
-        $roleRepository = $this->em->getRepository(Role::class);
+        $roleRepository = $this->getContainer()->get(RoleRepository::class);
         $this->assertInstanceOf(RoleRepository::class, $roleRepository);
         $roleRepository->saveEntity($role);
 
@@ -477,7 +476,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertResponseIsSuccessful($clientResponse->getContent());
 
         // Assert the tag is removed from the lead
-        $updatedLead = $this->em->getRepository(Lead::class)->find($lead->getId());
+        $updatedLead = $this->getContainer()->get(LeadRepository::class)->find($lead->getId());
         $this->assertInstanceOf(Lead::class, $updatedLead);
         $this->assertNotContains($tag, $updatedLead->getTags()->toArray());
     }
@@ -485,7 +484,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     public function testContactListActionSuggestionsByAdminUser(): void
     {
         /** @var UserRepository $userRepository */
-        $userRepository = $this->em->getRepository(User::class);
+        $userRepository = $this->getContainer()->get(UserRepository::class);
 
         /** @var User $adminUser */
         $adminUser = $userRepository->findOneBy(['username' => 'admin']);
@@ -511,7 +510,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var LeadRepository $leadRepository */
-        $leadRepository = $this->em->getRepository(Lead::class);
+        $leadRepository = $this->getContainer()->get(LeadRepository::class);
         $leadRepository->saveEntities($leads);
         $this->em->clear();
 
@@ -535,7 +534,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
     public function testContactListActionSuggestionsByNonAdminUser(): void
     {
         /** @var UserRepository $userRepository */
-        $userRepository = $this->em->getRepository(User::class);
+        $userRepository = $this->getContainer()->get(UserRepository::class);
 
         $adminUser = $userRepository->findOneBy(['username' => 'admin']);
         $this->assertInstanceOf(User::class, $adminUser);
@@ -551,7 +550,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         }
 
         /** @var LeadRepository $leadRepository */
-        $leadRepository = $this->em->getRepository(Lead::class);
+        $leadRepository = $this->getContainer()->get(LeadRepository::class);
         $leadRepository->saveEntities($leads);
         $this->em->clear();
 
@@ -561,7 +560,7 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $role->setRawPermissions(['lead:leads' => ['viewown']]);
 
         /** @var RoleRepository $roleRepository */
-        $roleRepository = $this->em->getRepository(Role::class);
+        $roleRepository = $this->getContainer()->get(RoleRepository::class);
         $roleRepository->saveEntity($role);
 
         // Create a non admin user with view own contacts permission.

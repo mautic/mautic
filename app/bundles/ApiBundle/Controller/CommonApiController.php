@@ -3,8 +3,8 @@
 namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\ApiBundle\ApiEvents;
-use Mautic\ApiBundle\Event\ApiEntityEvent;
+use Mautic\ApiBundle\Event\PostSaveApiEntityEvent;
+use Mautic\ApiBundle\Event\PreSaveApiEntityEvent;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\ApiBundle\Model\ApiLockAwareInterface;
 use Mautic\CategoryBundle\Entity\Category;
@@ -23,12 +23,13 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * @template E of object
+ * @template TEntity of object
  *
- * @extends FetchCommonApiController<E>
+ * @extends FetchCommonApiController<TEntity>
  */
 class CommonApiController extends FetchCommonApiController
 {
@@ -40,7 +41,7 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Model object for processing the entity.
      *
-     * @var FormModel<E>|null
+     * @var FormModel<TEntity>|null
      */
     protected $model;
 
@@ -106,8 +107,11 @@ class CommonApiController extends FetchCommonApiController
             try {
                 $this->model->deleteEntity($entity);
             } catch (DeleteEntityDependencyException $e) {
-                $msg = $this->translator->trans('mautic.api.dependent.entity.delete.error',
-                    ['%id%'   => $entity->getId()], 'validators');
+                $msg = $this->translator->trans(
+                    'mautic.api.dependent.entity.delete.error',
+                    ['%id%'   => $entity->getId()],
+                    'validators'
+                );
                 $this->setBatchError($key, $msg, $e->getCode(), $errors, $entities, $entity);
                 $errors[$key]['details'] = $e->getErrors();
                 continue;
@@ -147,8 +151,11 @@ class CommonApiController extends FetchCommonApiController
         try {
             $this->model->deleteEntity($entity);
         } catch (DeleteEntityDependencyException $e) {
-            $msg = $this->translator->trans('mautic.api.dependent.entity.delete.error',
-                ['%id%'   => $entity->getId()], 'validators');
+            $msg = $this->translator->trans(
+                'mautic.api.dependent.entity.delete.error',
+                ['%id%'   => $entity->getId()],
+                'validators'
+            );
 
             return $this->returnError($msg, $e->getCode(), $e->getErrors());
         }
@@ -342,9 +349,10 @@ class CommonApiController extends FetchCommonApiController
     }
 
     /**
+     * @param TEntity $entity
      * @return FormInterface<mixed>
      */
-    protected function createEntityForm($entity): FormInterface
+    protected function createEntityForm(object $entity): FormInterface
     {
         return $this->model->createForm(
             $entity,
@@ -362,31 +370,31 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before populating the form.
      *
-     * @param string $action
+     * @param TEntity      $entity
      *
      * @return mixed
      */
-    protected function prePopulateForm(&$entity, $parameters, $action = 'edit')
+    protected function prePopulateForm(object $entity, array $parameters, string $action = 'edit')
     {
     }
 
     /**
      * Give the controller an opportunity to process the entity before persisting.
      *
-     * @param E                    $entity
+     * @param TEntity                    $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      *
      * @return mixed
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit')
     {
     }
 
     /**
      * Convert posted parameters into what the form needs in order to successfully bind.
      *
+     * @param TEntity $entity
      * @param mixed[] $parameters
      */
     protected function prepareParametersForBinding(Request $request, array $parameters, object $entity, string $action): array|Response
@@ -395,10 +403,11 @@ class CommonApiController extends FetchCommonApiController
     }
 
     /**
+     * @param TEntity            $entity
      * @param mixed[][]          $errors
      * @param array<object|null> $entities
      */
-    protected function processBatchForm(Request $request, $key, $entity, $params, $method, array &$errors, array &$entities)
+    protected function processBatchForm(Request $request, $key, object $entity, ?array $params, string $method, array &$errors, array &$entities)
     {
         $this->inBatchMode = true;
         $formResponse      = $this->processForm($request, $entity, $params, $method);
@@ -441,12 +450,12 @@ class CommonApiController extends FetchCommonApiController
     /**
      * Processes API Form.
      *
+     * @param TEntity          $entity
      * @param array<mixed>|null $parameters
-     * @param string            $method
      *
      * @return mixed
      */
-    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, object $entity, ?array $parameters = null, string $method = 'PUT')
     {
         $categoryId = null;
 
@@ -551,8 +560,8 @@ class CommonApiController extends FetchCommonApiController
             }
 
             try {
-                if ($this->dispatcher->hasListeners(ApiEvents::API_ON_ENTITY_PRE_SAVE)) {
-                    $this->dispatcher->dispatch(new ApiEntityEvent($entity, $this->entityRequestParameters, $request), ApiEvents::API_ON_ENTITY_PRE_SAVE);
+                if ($this->dispatcher->hasListeners(PreSaveApiEntityEvent::class)) {
+                    $this->dispatcher->dispatch(new PreSaveApiEntityEvent($entity, $this->entityRequestParameters, $request));
                 }
             } catch (\Exception $e) {
                 return $this->returnError($e->getMessage(), $e->getCode());
@@ -568,13 +577,13 @@ class CommonApiController extends FetchCommonApiController
                 $headers['Location'] = $this->generateUrl(
                     $route,
                     array_merge(['id' => $entity->getId()], $this->routeParams),
-                    true
+                    UrlGeneratorInterface::ABSOLUTE_URL
                 );
             }
 
             try {
-                if ($this->dispatcher->hasListeners(ApiEvents::API_ON_ENTITY_POST_SAVE)) {
-                    $this->dispatcher->dispatch(new ApiEntityEvent($entity, $this->entityRequestParameters, $request), ApiEvents::API_ON_ENTITY_POST_SAVE);
+                if ($this->dispatcher->hasListeners(PostSaveApiEntityEvent::class)) {
+                    $this->dispatcher->dispatch(new PostSaveApiEntityEvent($entity, $this->entityRequestParameters, $request));
                 }
             } catch (\Exception $e) {
                 return $this->returnError($e->getMessage(), $e->getCode());
@@ -605,7 +614,10 @@ class CommonApiController extends FetchCommonApiController
         return $this->handleView($view);
     }
 
-    protected function saveEntity($entity, int $statusCode): int
+    /**
+     * @param TEntity $entity
+     */
+    protected function saveEntity(object $entity, int $statusCode): int
     {
         $this->model->saveEntity($entity);
 
@@ -613,12 +625,12 @@ class CommonApiController extends FetchCommonApiController
     }
 
     /**
-     * @param object $entity
+     * @param TEntity $entity
      * @param int    $categoryId
      *
      * @throws \UnexpectedValueException
      */
-    protected function setCategory($entity, $categoryId)
+    protected function setCategory(object $entity, $categoryId)
     {
         if (!empty($categoryId) && method_exists($entity, 'setCategory')) {
             $category = $this->doctrine->getManager()->find(Category::class, $categoryId);

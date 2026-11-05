@@ -35,7 +35,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Entity(repositoryClass: PageRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['alias'], name: 'page_alias_search')]
+#[ORM\Index(name: 'page_alias_search', columns: ['alias'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -56,27 +56,38 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-/**
- * @use TranslationEntityTrait<Page>
- * @use VariantEntityTrait<Page>
- */
 #[EntityEvent]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'page_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'page_projects_xref'),
+)])]
 class Page extends FormEntity implements TranslationEntityInterface, VariantEntityInterface, UuidInterface, OptimisticLockInterface
 {
+    /** @use TranslationEntityTrait<Page> */
     use TranslationEntityTrait;
+
+    /** @use VariantEntityTrait<Page> */
     use VariantEntityTrait;
+
     use UuidTrait;
+
     use ProjectTrait;
+
     use OptimisticLockTrait;
 
-    public const ENTITY_NAME = 'page';
+    public const string ENTITY_NAME = 'page';
 
-    public const TABLE_NAME = 'pages';
+    public const string TABLE_NAME = 'pages';
 
     /**
      * @var int
      */
     #[Groups(['page:read', 'download:read', 'email:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -84,114 +95,125 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
     #[NotBlank(message: 'mautic.core.title.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $title;
 
     /**
      * @var string
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $alias;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $template;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'custom_html', type: 'text', nullable: true)]
     private $customHtml;
 
     /**
      * @var array
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'array', nullable: true)]
     private $content = [];
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
-    private $publishUp;
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $publishUp = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
-    private $publishDown;
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $publishDown = null;
 
     /**
      * @var int
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'integer')]
     private $hits = 0;
 
     /**
      * @var int
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'unique_hits', type: 'integer')]
     private $uniqueHits = 0;
 
     /**
      * @var int
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'variant_hits', type: 'integer')]
     private $variantHits = 0;
 
     /**
      * @var int
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(type: 'integer')]
     private $revision = 1;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'meta_description', type: 'string', length: 191, nullable: true)]
     private $metaDescription;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'head_script', type: 'text', nullable: true)]
     private $headScript;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'footer_script', type: 'text', nullable: true)]
     private $footerScript;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'redirect_type', type: 'string', length: 100, nullable: true)]
     private $redirectType;
 
     /**
      * @var string|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'redirect_url', type: 'string', length: 2048, nullable: true)]
     private $redirectUrl;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     /**
      * @var bool|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'is_preference_center', type: 'boolean', nullable: true)]
     private $isPreferenceCenter;
 
     /**
      * @var bool|null
      */
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'no_index', type: 'boolean', nullable: true)]
     private $noIndex;
 
     /**
@@ -199,7 +221,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
      */
     private $sessionId;
 
-    #[ORM\OneToOne(mappedBy: 'page', targetEntity: PageDraft::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToOne(targetEntity: PageDraft::class, mappedBy: 'page', cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private ?PageDraft $draft = null;
 
     private bool $isCloned = false;
@@ -207,6 +229,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private ?int $cloneObjectId = null;
 
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
+    #[ORM\Column(name: 'public_preview', type: Types::BOOLEAN, nullable: true)]
     private ?bool $publicPreview = true;
 
     #[Groups(['page:read', 'page:write', 'download:read', 'email:read'])]
@@ -236,81 +259,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->addId();
-
-        $builder->addField('title', 'string');
-
-        $builder->addField('alias', 'string');
-
-        $builder->addNullableField('template', 'string');
-
-        $builder->createField('customHtml', 'text')
-            ->columnName('custom_html')
-            ->nullable()
-            ->build();
-
-        $builder->createField('content', 'array')
-            ->nullable()
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->addField('hits', 'integer');
-
-        $builder->createField('uniqueHits', 'integer')
-            ->columnName('unique_hits')
-            ->build();
-
-        $builder->createField('variantHits', 'integer')
-            ->columnName('variant_hits')
-            ->build();
-
-        $builder->addField('revision', 'integer');
-
-        $builder->createField('metaDescription', 'string')
-            ->columnName('meta_description')
-            ->nullable()
-            ->build();
-
-        $builder->createField('headScript', 'text')
-            ->columnName('head_script')
-            ->nullable()
-            ->build();
-
-        $builder->createField('footerScript', 'text')
-            ->columnName('footer_script')
-            ->nullable()
-            ->build();
-
-        $builder->createField('redirectType', 'string')
-            ->columnName('redirect_type')
-            ->nullable()
-            ->length(100)
-            ->build();
-
-        $builder->createField('redirectUrl', 'string')
-            ->columnName('redirect_url')
-            ->nullable()
-            ->length(2048)
-            ->build();
-
-        $builder->addCategory();
-
-        $builder->createField('isPreferenceCenter', 'boolean')
-            ->columnName('is_preference_center')
-            ->nullable()
-            ->build();
-
-        $builder->createField('noIndex', 'boolean')
-            ->columnName('no_index')
-            ->nullable()
-            ->build();
-
-        $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
-
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
-        self::addProjectsField($builder, 'page_projects_xref', 'page_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -323,7 +273,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
                     $violations = $validator->validate(
                         $page->getRedirectUrl(),
                         [
-                            new Assert\Url(),
+                            new Assert\Url(requireTld: false),
                             new NotBlank(message: 'mautic.core.value.required'),
                         ],
                     );
@@ -452,7 +402,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param array<string> $content
      */
-    public function setContent($content): static
+    public function setContent(array $content): static
     {
         $this->isChanged('content', $content);
         $this->content = $content;
@@ -461,9 +411,9 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     }
 
     /**
-     * @return array<string>
+     * @return array<string>|null
      */
-    public function getContent()
+    public function getContent(): ?array
     {
         return $this->content;
     }
@@ -471,7 +421,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param \DateTime $publishUp
      */
-    public function setPublishUp($publishUp): static
+    public function setPublishUp(?\DateTimeInterface $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -479,10 +429,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getPublishUp()
+    public function getPublishUp(): ?\DateTimeInterface
     {
         return $this->publishUp;
     }
@@ -490,7 +437,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * @param \DateTime $publishDown
      */
-    public function setPublishDown($publishDown): static
+    public function setPublishDown(?\DateTimeInterface $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -498,10 +445,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getPublishDown()
+    public function getPublishDown(): ?\DateTimeInterface
     {
         return $this->publishDown;
     }
@@ -643,10 +587,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
@@ -732,6 +673,8 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         $current = $this->{$getter}();
 
         if ('translationParent' == $prop || 'variantParent' == $prop || 'category' == $prop) {
+            /** @var self|Category|null $current */
+            /** @var self|Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -817,12 +760,12 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
         return $this->isCloned;
     }
 
-    public function getCloneObjectId(): int
+    public function getCloneObjectId(): ?int
     {
         return $this->cloneObjectId;
     }
 
-    public function getPublicPreview(): bool
+    public function getPublicPreview(): ?bool
     {
         return $this->publicPreview;
     }

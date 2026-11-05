@@ -19,7 +19,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Category>
  */
-class CategoryModel extends FormModel implements AjaxLookupModelInterface
+final class CategoryModel extends FormModel implements AjaxLookupModelInterface
 {
     public static function getName(): string
     {
@@ -31,7 +31,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
      */
     private array $categoriesByBundleCache = [];
 
-    protected RequestStack $requestStack;
+    private RequestStack $requestStack;
 
     private CategoryRepository $categoryRepository;
 
@@ -66,7 +66,10 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
         return $bundle.':categories';
     }
 
-    public function saveEntity($entity, bool $unlock = true): void
+    /**
+     * @param Category $entity
+     */
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $alias = $entity->getAlias();
         if (empty($alias)) {
@@ -94,10 +97,10 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param Category|array<string, mixed>    $entity
      * @param string|null $action
-     * @param array       $options
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);
@@ -122,9 +125,11 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
+     * @param Category $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);
@@ -150,7 +155,6 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
         if ($this->dispatcher->hasListeners($name)) {
             if (!$event instanceof Event) {
                 $event = new CategoryEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
             }
 
             $this->dispatcher->dispatch($event, $name);
@@ -211,7 +215,7 @@ class CategoryModel extends FormModel implements AjaxLookupModelInterface
             $class     = $type['class'];
             $resources = $this->em->getRepository($class)->findBy(['category' => $category->getId()]);
 
-            if (!$resources) {
+            if ($resources === []) {
                 continue;
             }
 

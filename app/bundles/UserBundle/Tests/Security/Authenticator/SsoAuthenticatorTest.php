@@ -7,12 +7,11 @@ namespace Mautic\UserBundle\Tests\Security\Authenticator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\PluginBundle\Integration\AbstractSsoServiceIntegration;
 use Mautic\UserBundle\Entity\User;
-use Mautic\UserBundle\Event\AuthenticationEvent;
+use Mautic\UserBundle\Event\FormAuthenticationEvent;
 use Mautic\UserBundle\Security\Authentication\Token\PluginToken;
 use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PasswordStrengthBadge;
 use Mautic\UserBundle\Security\Authenticator\SsoAuthenticator;
 use Mautic\UserBundle\Security\Provider\UserProvider;
-use Mautic\UserBundle\UserEvents;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -319,7 +318,7 @@ final class SsoAuthenticatorTest extends TestCase
 
         $dispatcher->expects($this->once())
             ->method('hasListeners')
-            ->with(UserEvents::USER_FORM_AUTHENTICATION)
+            ->with(FormAuthenticationEvent::class)
             ->willReturn(false);
 
         $authenticator = new SsoAuthenticator(
@@ -374,10 +373,7 @@ final class SsoAuthenticatorTest extends TestCase
             ->with($integration, ['sso_form'], false, null, true)
             ->willReturn($integrations);
 
-        $user = $this->createMock(User::class);
-        $user->expects($this->once())
-            ->method('getRoles')
-            ->willReturn([]);
+        $user = new User();
         $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($username)
@@ -385,7 +381,7 @@ final class SsoAuthenticatorTest extends TestCase
 
         $dispatcher->expects($this->once())
             ->method('hasListeners')
-            ->with(UserEvents::USER_FORM_AUTHENTICATION)
+            ->with(FormAuthenticationEvent::class)
             ->willReturn(false);
 
         $authenticator = new SsoAuthenticator(
@@ -419,7 +415,9 @@ final class SsoAuthenticatorTest extends TestCase
         $password          = 'pw';
         $integration       = 'integration';
         $csrfToken         = 'token';
-        $userRoles         = ['ROLE'];
+        $user              = new User();
+        $user->setUsername($username);
+        $userRoles         = $user->getRoles();
         $options           = ['post_only' => true];
         $failedMessage     = 'Failure';
         $httpUtils         = $this->createStub(HttpUtils::class);
@@ -439,10 +437,6 @@ final class SsoAuthenticatorTest extends TestCase
             ->with($integration, ['sso_form'], false, null, true)
             ->willReturn($integrations);
 
-        $user = $this->createMock(User::class);
-        $user->expects($this->once())
-            ->method('getRoles')
-            ->willReturn($userRoles);
         $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($username)
@@ -463,7 +457,7 @@ final class SsoAuthenticatorTest extends TestCase
             $userRoles,
         );
 
-        $callEvent = new AuthenticationEvent(
+        $callEvent = new FormAuthenticationEvent(
             $user,
             $token,
             $userProvider,
@@ -479,11 +473,11 @@ final class SsoAuthenticatorTest extends TestCase
 
         $dispatcher->expects($this->once())
             ->method('hasListeners')
-            ->with(UserEvents::USER_FORM_AUTHENTICATION)
+            ->with(FormAuthenticationEvent::class)
             ->willReturn(true);
         $dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($callEvent, UserEvents::USER_FORM_AUTHENTICATION)
+            ->with($callEvent)
             ->willReturn($returnEvent);
 
         $authenticator = new SsoAuthenticator(
@@ -532,7 +526,7 @@ final class SsoAuthenticatorTest extends TestCase
             ->with($integration, ['sso_form'], false, null, true)
             ->willReturn($integrations);
 
-        $user = $this->createStub(User::class);
+        $user = new User();
         $userProvider->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($username)
@@ -553,7 +547,7 @@ final class SsoAuthenticatorTest extends TestCase
             [],
         );
 
-        $callEvent = new AuthenticationEvent(
+        $callEvent = new FormAuthenticationEvent(
             $username,
             $token,
             $userProvider,
@@ -568,11 +562,11 @@ final class SsoAuthenticatorTest extends TestCase
 
         $dispatcher->expects($this->once())
             ->method('hasListeners')
-            ->with(UserEvents::USER_FORM_AUTHENTICATION)
+            ->with(FormAuthenticationEvent::class)
             ->willReturn(true);
         $dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with($callEvent, UserEvents::USER_FORM_AUTHENTICATION)
+            ->with($callEvent)
             ->willReturn($returnEvent);
 
         $authenticator = new SsoAuthenticator(

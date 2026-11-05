@@ -139,7 +139,7 @@ final class MauticSyncDataExchangeTest extends TestCase
 
     public function testGetConflictedInternalObjectWithNoObjectId(): void
     {
-        $mappingManualDao     = new MappingManualDAO('IntegrationA');
+        $mappingManualDao     = new MappingManualDAO('IntegrationA', []);
         $integrationObjectDao = new ObjectDAO('Lead', 'some-SF-ID');
 
         $this->mappingHelper->expects($this->once())
@@ -159,7 +159,7 @@ final class MauticSyncDataExchangeTest extends TestCase
 
     public function testGetConflictedInternalObjectWithObjectId(): void
     {
-        $mappingManualDao     = new MappingManualDAO('IntegrationA');
+        $mappingManualDao     = new MappingManualDAO('IntegrationA', []);
         $integrationObjectDao = new ObjectDAO('Lead', 'some-SF-ID');
         $fieldChange          = [
             'modified_at'  => '2020-08-25 17:20:00',

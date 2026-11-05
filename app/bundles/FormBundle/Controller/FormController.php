@@ -3,7 +3,7 @@
 namespace Mautic\FormBundle\Controller;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController as CommonFormController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\MappedObjectCollector;
+use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
@@ -61,7 +62,7 @@ class FormController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/{objectAction}/{objectId}',
+        path: '/s/forms/{objectAction}/{objectId}',
         name: 'mautic_form_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -72,7 +73,7 @@ class FormController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/{page}',
+        path: '/s/forms/{page}',
         name: 'mautic_form_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -725,6 +726,7 @@ class FormController extends CommonFormController
         $fieldMap         = [];
         $submitButton     = false;
 
+        /** @var Field $formField */
         foreach ($existingFields as $fieldId => $formField) {
             // Check to see if the field still exists
 
@@ -779,6 +781,7 @@ class FormController extends CommonFormController
         }
 
         if (!empty($reorder)) {
+            /** @var array<string, array<string, mixed>> $modifiedFields */
             uasort(
                 $modifiedFields,
                 fn ($a, $b): int => $a['order'] <=> $b['order'] ?: $a['id'] <=> $b['id']
@@ -792,6 +795,7 @@ class FormController extends CommonFormController
         $modifiedActions = [];
         $existingActions = $entity->getActions()->toArray();
 
+        /** @var Action $formAction */
         foreach ($existingActions as $formAction) {
             // Check to see if the action still exists
             if (!isset($customComponents['actions'][$formAction->getType()])) {
@@ -891,7 +895,7 @@ class FormController extends CommonFormController
 
             // Clone the forms's actions
             $actions = $entity->getActions()->toArray();
-            /** @var \Mautic\FormBundle\Entity\Action $action */
+            /** @var Action $action */
             foreach ($actions as $action) {
                 $actionClone = clone $action;
                 $actionClone->setForm($entity);
@@ -1113,7 +1117,7 @@ class FormController extends CommonFormController
     /**
      * Clear field and actions from the session.
      */
-    public function clearSessionComponents(Request $request, $sessionId): void
+    protected function clearSessionComponents(Request $request, $sessionId): void
     {
         $session = $request->getSession();
         $session->remove('mautic.form.'.$sessionId.'.fields.modified');
@@ -1187,7 +1191,7 @@ class FormController extends CommonFormController
         );
     }
 
-    public function getModelName(): string
+    protected function getModelName(): string
     {
         return 'form';
     }

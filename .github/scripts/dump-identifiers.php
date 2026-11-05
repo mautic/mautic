@@ -36,15 +36,17 @@ $entityManager = $registry->getManager();
 assert($entityManager instanceof EntityManagerInterface);
 
 /**
- * @param array<int, array<string, mixed>> $definitions
+ * @param array<int|string, array<string, mixed>> $definitions
  *
- * @return array<string, list<string>>
+ * @return array<array-key, list<string>>
  */
 function columnsByName(array $definitions): array
 {
     $out = [];
     foreach ($definitions as $name => $definition) {
-        $out[(string) $name] = array_values((array) ($definition['columns'] ?? []));
+        $columns = array_values((array) ($definition['columns'] ?? []));
+
+        $out[(string) $name] = array_map(static fn (mixed $column): string => (string) $column, $columns);
     }
     ksort($out);
 
@@ -78,15 +80,17 @@ foreach ($entityManager->getMetadataFactory()->getAllMetadata() as $metadata) {
 
     $joinColumns = [];
     foreach ($metadata->associationMappings as $field => $mapping) {
-        $mapping = (array) $mapping;
+        // ORM 2 hands out arrays here and ORM 3 objects, but both answer to array
+        // access. Casting the ORM 3 object with (array) instead would silently drop
+        // isOwningSide, which is a method there rather than a property, and leave every
+        // entity looking as if it had no join columns at all.
         if (!($mapping['isOwningSide'] ?? false)) {
             continue;
         }
 
         $names = [];
-        foreach ((array) ($mapping['joinColumns'] ?? []) as $joinColumn) {
-            $joinColumn = (array) $joinColumn;
-            $names[]    = ($joinColumn['name'] ?? '?').' -> '.($joinColumn['referencedColumnName'] ?? '?');
+        foreach ($mapping['joinColumns'] ?? [] as $joinColumn) {
+            $names[] = ($joinColumn['name'] ?? '?').' -> '.($joinColumn['referencedColumnName'] ?? '?');
         }
 
         if ([] !== $names) {

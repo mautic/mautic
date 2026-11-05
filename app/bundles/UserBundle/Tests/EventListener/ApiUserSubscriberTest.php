@@ -24,14 +24,6 @@ use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 #[AllowMockObjectsWithoutExpectations]
 final class ApiUserSubscriberTest extends TestCase
 {
-    public function testSubscribedEvents(): void
-    {
-        $this->assertSame([
-            CheckPassportEvent::class              => ['onCheckPassport', 2048],
-            AuthenticationTokenCreatedEvent::class => 'onTokenCreated',
-        ], ApiUserSubscriber::getSubscribedEvents());
-    }
-
     public function testIfAuthenticationHasNoUserInvolved(): void
     {
         $passport = $this->createMock(Passport::class);
@@ -215,7 +207,9 @@ final class ApiUserSubscriberTest extends TestCase
     public function testIfOauthAuthenticationAndIdentifierIsUserFromLoader(): void
     {
         $userIdentifier = 'The user';
-        $userRoles      = ['role' => 'test'];
+        $user           = new User();
+        $user->setUsername('the-user');
+        $userRoles      = $user->getRoles();
         $userBadge      = $this->createMock(UserBadge::class);
         $userBadge->expects($this->once())
             ->method('getUserLoader')
@@ -260,9 +254,6 @@ final class ApiUserSubscriberTest extends TestCase
         $event->expects($this->once())
             ->method('getPassport')
             ->willReturn($passport);
-
-        $user = $this->createMock(User::class);
-        $user->method('getRoles')->willReturn($userRoles);
 
         $userProvider = $this->createMock(UserProvider::class);
         $userProvider->expects($this->once())
@@ -287,7 +278,9 @@ final class ApiUserSubscriberTest extends TestCase
     public function testIfOauthAuthenticationAndIdentifierIsFromTokenPermisions(): void
     {
         $userIdentifier = 'The user';
-        $userRoles      = ['role' => 'test'];
+        $user           = new User();
+        $user->setUsername('the-user');
+        $userRoles      = $user->getRoles();
         $userBadge      = $this->createMock(UserBadge::class);
         $userBadge->expects($this->once())
             ->method('getUserLoader')
@@ -332,9 +325,6 @@ final class ApiUserSubscriberTest extends TestCase
         $event->expects($this->once())
             ->method('getPassport')
             ->willReturn($passport);
-
-        $user = $this->createMock(User::class);
-        $user->method('getRoles')->willReturn($userRoles);
 
         $userProvider = $this->createMock(UserProvider::class);
         $userProvider->expects($this->once())

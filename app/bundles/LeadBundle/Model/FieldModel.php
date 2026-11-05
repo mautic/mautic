@@ -10,6 +10,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
+use Mautic\CoreBundle\Exception\DbalException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -20,7 +21,10 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
-use Mautic\LeadBundle\Event\LeadFieldEvent;
+use Mautic\LeadBundle\Event\FieldPostDeleteEvent;
+use Mautic\LeadBundle\Event\FieldPostSaveEvent;
+use Mautic\LeadBundle\Event\FieldPreDeleteEvent;
+use Mautic\LeadBundle\Event\FieldPreSaveEvent;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
@@ -31,7 +35,6 @@ use Mautic\LeadBundle\Field\LeadFieldDeleter;
 use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
@@ -506,6 +509,16 @@ class FieldModel extends FormModel
         return $this->leadFieldRepository;
     }
 
+    /**
+     * @param array<mixed> $args
+     *
+     * @return array<int, LeadField>|Paginator<LeadField>
+     */
+    public function getEntities(array $args = []): iterable
+    {
+        return parent::getEntities($args);
+    }
+
     public function getPermissionBase(): string
     {
         return 'lead:fields';
@@ -523,10 +536,7 @@ class FieldModel extends FormModel
         return parent::getEntity($id);
     }
 
-    /**
-     * @return array
-     */
-    public function getLeadFields()
+    public function getLeadFields(): iterable
     {
         return $this->getEntities([
             'filter' => [
@@ -587,7 +597,7 @@ class FieldModel extends FormModel
     /**
      * @return array
      */
-    public function getCompanyFields()
+    public function getCompanyFields(): iterable
     {
         return $this->getEntities([
             'filter' => [
@@ -612,7 +622,7 @@ class FieldModel extends FormModel
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadEntity']);
@@ -630,7 +640,7 @@ class FieldModel extends FormModel
                 $this->customFieldColumn->createLeadColumn($entity);
             } catch (CustomFieldLimitException $e) {
                 // Convert to original Exception not to cause BC
-                throw new Exception($this->translator->trans($e->getMessage()), $e->getCode(), $e);
+                throw new DbalException($this->translator->trans($e->getMessage()), $e->getCode(), $e);
             }
         } else {
             $this->leadFieldSaver->saveLeadFieldEntity($entity, false);
@@ -644,15 +654,13 @@ class FieldModel extends FormModel
     /**
      * Build schema for each entity.
      *
-     * @param array $entities
-     *
      * @throws AbortColumnCreateException
      * @throws Exception
      * @throws DriverException
      * @throws SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         foreach ($entities as $entity) {
             $this->saveEntity($entity, $unlock);
@@ -715,10 +723,8 @@ class FieldModel extends FormModel
 
     /**
      * Returns list of all segments that use $field.
-     *
-     * @return Paginator
      */
-    public function getFieldSegments(LeadField $field)
+    public function getFieldSegments(LeadField $field): \Countable
     {
         return $this->leadListModel->getFieldSegments($field);
     }
@@ -779,23 +785,19 @@ class FieldModel extends FormModel
     /**
      * Get list of custom field values for autopopulate fields.
      *
-     * @param string $type
-     * @param string $filter
      * @param int    $limit
-     *
-     * @return array
      */
-    public function getLookupResults($type, $filter = '', $limit = 10)
+    public function getLookupResults(string $type, string $filter = '', $limit = 10): array
     {
         return $this->leadRepository->getValueList($type, $filter, $limit);
     }
 
     /**
-     * @param array $options
+     * @param LeadField|array<string, mixed> $entity
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
@@ -849,44 +851,39 @@ class FieldModel extends FormModel
     }
 
     /**
+     * @param LeadField $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
-        switch ($action) {
-            case 'pre_save':
-                $action = LeadEvents::FIELD_PRE_SAVE;
-                break;
-            case 'post_save':
-                $action = LeadEvents::FIELD_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $action = LeadEvents::FIELD_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $action = LeadEvents::FIELD_POST_DELETE;
-                break;
-        }
-
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
         }
 
-        if (null !== $event && !$event instanceof LeadFieldEvent) {
-            throw new \RuntimeException('Event should be LeadFieldEvent|null.');
+        $event = match ($action) {
+            'pre_save'    => new FieldPreSaveEvent($entity, $isNew),
+            'post_save'   => new FieldPostSaveEvent($entity, $isNew),
+            'pre_delete'  => new FieldPreDeleteEvent($entity, $isNew),
+            'post_delete' => new FieldPostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event) {
+            return null;
         }
 
         try {
-            return $this->fieldSaveDispatcher->dispatchEvent($action, $entity, $isNew, $event);
+            return $this->fieldSaveDispatcher->dispatchEvent($event);
         } catch (NoListenerException) {
-            return $event;
+            return null;
         }
     }
 
     /**
      * @return array
      */
-    public function getPublishedFieldArrays(string $object = 'lead')
+    public function getPublishedFieldArrays(string $object = 'lead'): iterable
     {
         return $this->getEntities(
             [
@@ -962,10 +959,8 @@ class FieldModel extends FormModel
 
     /**
      * Get the fields for a specific group.
-     *
-     * @param array $filters
      */
-    public function getGroupFields($group, $filters = ['isPublished' => true]): array
+    public function getGroupFields($group, array $filters = ['isPublished' => true]): array
     {
         $forceFilters = [
             [

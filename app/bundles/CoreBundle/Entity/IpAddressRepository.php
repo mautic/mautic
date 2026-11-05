@@ -3,11 +3,12 @@
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\ParameterType;
 
 /**
  * @extends CommonRepository<IpAddress>
  */
-class IpAddressRepository extends CommonRepository
+final class IpAddressRepository extends CommonRepository
 {
     /**
      * Count how many unique IP addresses is there.
@@ -84,7 +85,7 @@ class IpAddressRepository extends CommonRepository
 SQL;
 
         $params = ['limit' => $limit];
-        $types  = ['limit' => \PDO::PARAM_INT];
+        $types  = ['limit' => ParameterType::INTEGER];
 
         return $this->getEntityManager()->getConnection()->executeQuery($sql, $params, $types)->fetchFirstColumn();
     }

@@ -101,10 +101,8 @@ final class ObjectChangeDAO
 
     /**
      * @param string $name
-     *
-     * @return FieldDAO|null
      */
-    public function getField($name)
+    public function getField($name): ?FieldDAO
     {
         return $this->fields[$name] ?? null;
     }
@@ -154,7 +152,7 @@ final class ObjectChangeDAO
         return !empty(count($this->fields));
     }
 
-    public function getChangeDateTime(): \DateTimeInterface
+    public function getChangeDateTime(): ?\DateTimeInterface
     {
         return $this->changeDateTime;
     }
@@ -176,7 +174,7 @@ final class ObjectChangeDAO
     /**
      * This is set after the ObjectMapping entity has been persisted to the database with the updates from this object.
      */
-    public function getObjectMapping(): ObjectMapping
+    public function getObjectMapping(): ?ObjectMapping
     {
         return $this->objectMapping;
     }

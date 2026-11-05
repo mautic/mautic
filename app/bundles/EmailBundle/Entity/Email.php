@@ -17,6 +17,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\OptimisticLockInterface;
@@ -68,28 +69,34 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-/**
- * @use VariantEntityTrait<Email>
- * @use TranslationEntityTrait<Email>
- */
 #[EmailLists]
 #[EntityEvent]
 #[ScheduleDateRange]
 #[ValidEmailLinks]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'email_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'email_projects_xref'),
+)])]
 class Email extends FormEntity implements VariantEntityInterface, TranslationEntityInterface, UuidInterface, OptimisticLockInterface
 {
+    /** @use VariantEntityTrait<Email> */
     use VariantEntityTrait;
+
+    /** @use TranslationEntityTrait<Email> */
     use TranslationEntityTrait;
+
     use DynamicContentEntityTrait;
     use UuidTrait;
     use ProjectTrait;
     use OptimisticLockTrait;
 
-    public const ENTITY_NAME = 'email';
+    public const string ENTITY_NAME = 'email';
 
-    public const MAX_NAME_SUBJECT_LENGTH = 190;
+    public const int MAX_NAME_SUBJECT_LENGTH = 190;
 
-    public const TABLE_NAME = 'emails';
+    public const string TABLE_NAME = 'emails';
 
     private const string SETTINGS_PREFIX = 'settings_';
 
@@ -97,6 +104,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var int
      */
     #[Groups(['email:read', 'download:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -105,12 +115,14 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[NotBlank(message: 'mautic.core.name.required')]
     #[Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.name.length')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
@@ -119,31 +131,37 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[NotBlank(message: 'mautic.core.subject.required')]
     #[Length(max: self::MAX_NAME_SUBJECT_LENGTH, maxMessage: 'mautic.email.subject.length')]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private $subject;
 
     /**
      * @var bool|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'use_owner_as_mailer', type: Types::BOOLEAN, nullable: true)]
     private $useOwnerAsMailer;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'send_to_dnc', type: Types::BOOLEAN, options: ['default' => 0])]
     private bool $sendToDnc = false;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[Length(max: 130, maxMessage: 'mautic.email.preheader_text.length')]
+    #[ORM\Column(name: 'preheader_text', type: Types::STRING, length: 191, nullable: true)]
     private ?string $preheaderText = null;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'from_address', type: Types::STRING, length: 191, nullable: true)]
     private $fromAddress;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'from_name', type: Types::STRING, length: 191, nullable: true)]
     private $fromName;
 
     /**
@@ -151,6 +169,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[\Symfony\Component\Validator\Constraints\Email(message: 'mautic.core.email.required')]
+    #[ORM\Column(name: 'reply_to_address', type: Types::STRING, length: 191, nullable: true)]
     private $replyToAddress;
 
     /**
@@ -158,85 +177,91 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[\Symfony\Component\Validator\Constraints\Email(message: 'mautic.core.email.required')]
+    #[ORM\Column(name: 'bcc_address', type: Types::STRING, length: 191, nullable: true)]
     private $bccAddress;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: Types::STRING, length: 191, nullable: true)]
     private $template;
 
     /**
      * @var array
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: ArrayType::ARRAY, nullable: true)]
     private $content = [];
 
     /**
      * @var array
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'utm_tags', type: ArrayType::ARRAY, nullable: true)]
     private $utmTags = [];
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'plain_text', type: Types::TEXT, nullable: true)]
     private $plainText;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'custom_html', type: Types::TEXT, nullable: true)]
     private $customHtml;
 
     /**
      * @var string|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'email_type', type: Types::TEXT, nullable: true)]
     private $emailType = 'template';
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $publishUp;
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $publishUp = null;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
-    private $publishDown;
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $publishDown = null;
 
     /**
      * @var bool|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'public_preview', type: Types::BOOLEAN, nullable: true)]
     private $publicPreview = false;
 
     /**
      * @var int
      */
     #[Groups(['email:read', 'download:read'])]
+    #[ORM\Column(name: 'read_count', type: Types::INTEGER)]
     private $readCount = 0;
 
     /**
      * @var int
      */
     #[Groups(['email:read', 'download:read'])]
+    #[ORM\Column(name: 'sent_count', type: Types::INTEGER)]
     private $sentCount = 0;
 
     /**
      * @var int
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: Types::INTEGER)]
     private $revision = 1;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['email:read', 'email:write'])]
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<LeadList>
@@ -261,36 +286,32 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var ArrayCollection<Stat>
      */
-    #[ORM\OneToMany(mappedBy: 'email', targetEntity: Stat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: Stat::class, mappedBy: 'email', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**
      * @var int
      */
     #[Groups(['email:read', 'download:read'])]
+    #[ORM\Column(name: 'variant_sent_count', type: Types::INTEGER)]
     private $variantSentCount = 0;
 
     /**
      * @var int
      */
     #[Groups(['email:read', 'download:read'])]
+    #[ORM\Column(name: 'variant_read_count', type: Types::INTEGER)]
     private $variantReadCount = 0;
 
-    /**
-     * @var Form|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[ORM\ManyToOne(targetEntity: Form::class)]
     #[ORM\JoinColumn(name: 'unsubscribeform_id', onDelete: 'SET NULL')]
-    private $unsubscribeForm;
+    private ?Form $unsubscribeForm = null;
 
-    /**
-     * @var Page|null
-     */
     #[Groups(['email:read', 'email:write', 'download:read'])]
     #[ORM\ManyToOne(targetEntity: Page::class)]
     #[ORM\JoinColumn(name: 'preference_center_id', onDelete: 'SET NULL')]
-    private $preferenceCenter;
+    private ?Page $preferenceCenter = null;
 
     /**
      * @var ArrayCollection<Asset>
@@ -311,6 +332,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var array
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: Types::JSON)]
     private $headers = [];
 
     /**
@@ -324,7 +346,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     #[Groups(['email:read', 'download:read'])]
     private $queuedCount = 0;
 
-    #[ORM\OneToOne(mappedBy: 'email', targetEntity: EmailDraft::class, cascade: ['all'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToOne(targetEntity: EmailDraft::class, mappedBy: 'email', cascade: ['all'], fetch: 'EXTRA_LAZY')]
     private ?EmailDraft $draft = null;
 
     private bool $isCloned = false;
@@ -337,6 +359,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $clonedId;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(name: 'continue_sending', type: Types::BOOLEAN, options: ['default' => false])]
     private bool $continueSending = false;
 
     #[Groups(['email:read', 'email:write', 'download:read'])]
@@ -346,6 +369,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var mixed[]|null
      */
     #[Groups(['email:read', 'email:write', 'download:read'])]
+    #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $settings = null;
 
     public function __clone()
@@ -395,54 +419,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->addIdColumns();
-        $builder->addNullableField('subject', Types::TEXT);
-        $builder->addNullableField('preheaderText', Types::STRING, 'preheader_text');
-        $builder->addNullableField('fromAddress', Types::STRING, 'from_address');
-        $builder->addNullableField('fromName', Types::STRING, 'from_name');
-        $builder->addNullableField('replyToAddress', Types::STRING, 'reply_to_address');
-        $builder->addNullableField('bccAddress', Types::STRING, 'bcc_address');
-        $builder->addNullableField('useOwnerAsMailer', Types::BOOLEAN, 'use_owner_as_mailer');
-
-        $builder->createField('sendToDnc', Types::BOOLEAN)
-            ->columnName('send_to_dnc')
-            ->option('default', 0)
-            ->build();
-
-        $builder->addNullableField('template', Types::STRING);
-        $builder->addNullableField('content', Types::ARRAY);
-        $builder->addNullableField('utmTags', Types::ARRAY, 'utm_tags');
-        $builder->addNullableField('plainText', Types::TEXT, 'plain_text');
-        $builder->addNullableField('customHtml', Types::TEXT, 'custom_html');
-        $builder->addNullableField('emailType', Types::TEXT, 'email_type');
-        $builder->addPublishDates();
-        $builder->addField('continueSending', Types::BOOLEAN, [
-            'columnName' => 'continue_sending',
-            'nullable'   => false,
-            'options'    => [
-                'default' => false,
-            ],
-        ]);
-        $builder->addNamedField('readCount', Types::INTEGER, 'read_count');
-        $builder->addNamedField('sentCount', Types::INTEGER, 'sent_count');
-        $builder->addNamedField('variantSentCount', Types::INTEGER, 'variant_sent_count');
-        $builder->addNamedField('variantReadCount', Types::INTEGER, 'variant_read_count');
-        $builder->addField('revision', Types::INTEGER);
-        $builder->addCategory();
-
         self::addTranslationMetadata($builder, self::class);
         self::addVariantMetadata($builder, self::class);
 
-        $builder->addField('headers', Types::JSON);
-
-        $builder->addNullableField('publicPreview', Types::BOOLEAN, 'public_preview');
-
-        $builder->createField('settings', Types::JSON)
-            ->columnName('settings')
-            ->nullable()
-            ->build();
-
-        self::addProjectsField($builder, 'email_projects_xref', 'email_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -539,6 +518,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $current = $this->{$getter}();
 
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop || 'list' == $prop) {
+            /** @var VariantEntityInterface|TranslationEntityInterface|Category|null $current */
+            /** @var VariantEntityInterface|TranslationEntityInterface|Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -602,15 +583,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->id;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    public function setCategory($category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -618,10 +596,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getContent()
+    public function getContent(): array|string
     {
         return $this->content;
     }
@@ -634,18 +609,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getUtmTags()
+    public function getUtmTags(): array
     {
         return $this->utmTags;
     }
 
-    /**
-     * @param array $utmTags
-     */
-    public function setUtmTags($utmTags): static
+    public function setUtmTags(array $utmTags): static
     {
         $this->isChanged('utmTags', $utmTags);
         $this->utmTags = $utmTags;
@@ -855,10 +824,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getPublishDown()
+    public function getPublishDown(): ?\DateTimeInterface
     {
         if ($this->isSegmentEmail() && !$this->continueSending) {
             return null;
@@ -867,7 +833,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->publishDown;
     }
 
-    public function setPublishDown($publishDown): static
+    public function setPublishDown(?\DateTimeInterface $publishDown): static
     {
         $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
@@ -875,15 +841,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getPublishUp()
+    public function getPublishUp(): ?\DateTimeInterface
     {
         return $this->publishUp;
     }
 
-    public function setPublishUp($publishUp): static
+    public function setPublishUp(?\DateTimeInterface $publishUp): static
     {
         $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
@@ -924,7 +887,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @return Collection<int, LeadList>
      */
-    public function getLists()
+    public function getLists(): Collection
     {
         return $this->lists;
     }
@@ -1024,9 +987,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return ArrayCollection<int, Stat>
+     * @return Collection<int, Stat>
      */
-    public function getStats()
+    public function getStats(): Collection
     {
         return $this->stats;
     }
@@ -1046,10 +1009,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return Form|null
-     */
-    public function getUnsubscribeForm()
+    public function getUnsubscribeForm(): ?Form
     {
         return $this->unsubscribeForm;
     }
@@ -1061,10 +1021,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this;
     }
 
-    /**
-     * @return Page|null
-     */
-    public function getPreferenceCenter()
+    public function getPreferenceCenter(): ?Page
     {
         return $this->preferenceCenter;
     }
@@ -1114,25 +1071,19 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return Collection
+     * @return Collection<int, Asset>
      */
-    public function getAssetAttachments()
+    public function getAssetAttachments(): Collection
     {
         return $this->assetAttachments;
     }
 
-    /**
-     * @return array
-     */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
 
-    /**
-     * @param array $headers
-     */
-    public function setHeaders($headers): static
+    public function setHeaders(array $headers): static
     {
         $this->headers = $headers;
 
@@ -1249,7 +1200,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     public function isBackgroundSending(): bool
     {
-        return $this->isPublished() && !empty($this->publishUp) && ($this->publishUp < new \DateTime());
+        return $this->isPublished() && $this->publishUp instanceof \DateTimeInterface && ($this->publishUp < new \DateTime());
     }
 
     public function isSegmentEmail(): bool

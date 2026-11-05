@@ -7,24 +7,21 @@ namespace Mautic\UserBundle\EventListener;
 use Mautic\UserBundle\Exception\WeakPasswordException;
 use Mautic\UserBundle\Model\PasswordStrengthEstimatorModel;
 use Mautic\UserBundle\Security\Authenticator\Passport\Badge\PasswordStrengthBadge;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 
-final readonly class PasswordSubscriber implements EventSubscriberInterface
+final readonly class PasswordSubscriber
 {
     public function __construct(
         private PasswordStrengthEstimatorModel $passwordStrengthEstimatorModel,
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            CheckPassportEvent::class => ['checkPassport', -100], // After default password checker
-        ];
-    }
-
+    #[AsEventListener(
+        event: CheckPassportEvent::class,
+        priority: -100
+    )]
     public function checkPassport(CheckPassportEvent $event): void
     {
         $passport = $event->getPassport();

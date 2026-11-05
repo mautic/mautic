@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250127092203 extends PreUpAssertionMigration
 {
-    protected const TABLE_NAME = 'user_invites';
+    protected const string TABLE_NAME = 'user_invites';
 
     protected function preUpAssertions(): void
     {
@@ -31,7 +31,7 @@ final class Version20250127092203 extends PreUpAssertionMigration
         $table->addColumn('used', Types::BOOLEAN, ['notnull' => true]);
         $table->addColumn('role_id', Types::INTEGER, ['unsigned' => true, 'notnull' => true]);
 
-        $table->setPrimaryKey(['id']);
+        $this->setPrimaryKey($table, ['id']);
         $table->addUniqueIndex(['token_selector'], 'UNIQ_USER_INVITES_TOKEN_SELECTOR');
         $table->addIndex(['email'], 'IDX_USER_INVITES_EMAIL');
         $table->addIndex(['expiration'], 'IDX_USER_INVITES_EXPIRATION');

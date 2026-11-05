@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Mautic\NotificationBundle\Controller\Api\NotificationApiController;
+
 return [
     'routes' => [
         'api' => [
@@ -9,7 +11,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'notifications',
                 'path'            => '/notifications',
-                'controller'      => Mautic\NotificationBundle\Controller\Api\NotificationApiController::class,
+                'controller'      => NotificationApiController::class,
             ],
         ],
     ],

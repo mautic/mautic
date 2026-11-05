@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\EventRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
@@ -87,10 +86,8 @@ final class RealTimeExecutionerTest extends TestCase
 
     public function testNoRelatedEventsResultInEmptyResponses(): void
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->exactly(3))
-            ->method('getId')
-            ->willReturn(10);
+        $lead = new Lead();
+        $lead->setId(10);
 
         $this->contactTracker->expects($this->once())
             ->method('getContact')
@@ -111,21 +108,16 @@ final class RealTimeExecutionerTest extends TestCase
 
     public function testChannelMisMatchResultsInEmptyResponses(): void
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->exactly(5))
-            ->method('getId')
-            ->willReturn(10);
+        $lead = new Lead();
+        $lead->setId(10);
 
         $this->contactTracker->expects($this->once())
             ->method('getContact')
             ->willReturn($lead);
 
-        $event = $this->createMock(Event::class);
-        $event->expects($this->exactly(3))
-            ->method('getChannel')
-            ->willReturn('email');
-        $event->method('getEventType')
-            ->willReturn(Event::TYPE_DECISION);
+        $event = new Event();
+        $event->setChannel('email');
+        $event->setEventType(Event::TYPE_DECISION);
 
         $this->eventRepository->expects($this->once())
             ->method('getContactPendingEvents')
@@ -142,28 +134,23 @@ final class RealTimeExecutionerTest extends TestCase
 
     public function testChannelFuzzyMatchResultsInNonEmptyResponses(): void
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->exactly(5))
-            ->method('getId')
-            ->willReturn(10);
+        $lead = new Lead();
+        $lead->setId(10);
 
         $this->contactTracker->expects($this->once())
             ->method('getContact')
             ->willReturn($lead);
 
-        $event = $this->createMock(Event::class);
-        $event->expects($this->exactly(2))
-            ->method('getChannel')
-            ->willReturn('page');
-        $event->method('getEventType')
-            ->willReturn(Event::TYPE_DECISION);
+        $event = new Event();
+        $event->setChannel('page');
+        $event->setEventType(Event::TYPE_DECISION);
 
-        $action1 = $this->createStub(Event::class);
-        $action2 = $this->createStub(Event::class);
-
-        $event->expects($this->once())
-            ->method('getPositiveChildren')
-            ->willReturn(new ArrayCollection([$action1, $action2]));
+        $action1 = new Event();
+        $action1->setDecisionPath(Event::PATH_ACTION);
+        $action2 = new Event();
+        $action2->setDecisionPath(Event::PATH_ACTION);
+        $event->addChild($action1);
+        $event->addChild($action2);
 
         $this->eventRepository->expects($this->once())
             ->method('getContactPendingEvents')
@@ -193,18 +180,15 @@ final class RealTimeExecutionerTest extends TestCase
 
     public function testChannelIdMisMatchResultsInEmptyResponses(): void
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->exactly(5))
-            ->method('getId')
-            ->willReturn(10);
+        $lead = new Lead();
+        $lead->setId(10);
 
         $this->contactTracker->expects($this->once())
             ->method('getContact')
             ->willReturn($lead);
 
-        $event = $this->getEventMock(2, 4);
-        $event->method('getEventType')
-            ->willReturn(Event::TYPE_DECISION);
+        $event = $this->createEvent();
+        $event->setEventType(Event::TYPE_DECISION);
 
         $this->eventRepository->expects($this->once())
             ->method('getContactPendingEvents')
@@ -221,21 +205,15 @@ final class RealTimeExecutionerTest extends TestCase
 
     public function testEmptyPositiveactionsResultsInEmptyResponses(): void
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->exactly(5))
-            ->method('getId')
-            ->willReturn(10);
+        $lead = new Lead();
+        $lead->setId(10);
 
         $this->contactTracker->expects($this->once())
             ->method('getContact')
             ->willReturn($lead);
 
-        $event = $this->getEventMock(2, 3);
-        $event->expects($this->once())
-            ->method('getPositiveChildren')
-            ->willReturn(new ArrayCollection());
-        $event->method('getEventType')
-            ->willReturn(Event::TYPE_DECISION);
+        $event = $this->createEvent();
+        $event->setEventType(Event::TYPE_DECISION);
 
         $this->eventRepository->expects($this->once())
             ->method('getContactPendingEvents')
@@ -256,13 +234,9 @@ final class RealTimeExecutionerTest extends TestCase
 
     public function testAssociatedEventsAreExecuted(): void
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->exactly(5))
-            ->method('getId')
-            ->willReturn(10);
-        $lead->expects($this->once())
-            ->method('getChanges')
-            ->willReturn(['notempty' => true]);
+        $lead = new Lead();
+        $lead->setId(10);
+        $lead->setChanges(['notempty' => true]);
 
         $this->leadModel->expects($this->once())
             ->method('saveEntity');
@@ -271,15 +245,15 @@ final class RealTimeExecutionerTest extends TestCase
             ->method('getContact')
             ->willReturn($lead);
 
-        $action1 = $this->createStub(Event::class);
-        $action2 = $this->createStub(Event::class);
+        $action1 = new Event();
+        $action1->setDecisionPath(Event::PATH_ACTION);
+        $action2 = new Event();
+        $action2->setDecisionPath(Event::PATH_ACTION);
 
-        $event = $this->getEventMock(2, 3);
-        $event->method('getEventType')
-            ->willReturn(Event::TYPE_DECISION);
-        $event->expects($this->once())
-            ->method('getPositiveChildren')
-            ->willReturn(new ArrayCollection([$action1, $action2]));
+        $event = $this->createEvent();
+        $event->setEventType(Event::TYPE_DECISION);
+        $event->addChild($action1);
+        $event->addChild($action2);
 
         $this->eventRepository->expects($this->once())
             ->method('getContactPendingEvents')
@@ -314,24 +288,16 @@ final class RealTimeExecutionerTest extends TestCase
 
     public function testNonDecisionEventsAreIgnored(): void
     {
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->exactly(5))
-            ->method('getId')
-            ->willReturn(10);
-        $lead->expects($this->once())
-            ->method('getChanges')
-            ->willReturn(['notempty' => true]);
+        $lead = new Lead();
+        $lead->setId(10);
+        $lead->setChanges(['notempty' => true]);
 
         $this->contactTracker->expects($this->once())
             ->method('getContact')
             ->willReturn($lead);
 
-        $event = $this->createMock(Event::class);
-        $event->method('getEventType')
-            ->willReturn(Event::TYPE_CONDITION);
-
-        $event->expects($this->never())
-            ->method('getPositiveChildren');
+        $event = new Event();
+        $event->setEventType(Event::TYPE_CONDITION);
 
         $this->eventRepository->expects($this->once())
             ->method('getContactPendingEvents')
@@ -343,15 +309,11 @@ final class RealTimeExecutionerTest extends TestCase
         $this->assertSame(0, $responses->containsResponses());
     }
 
-    private function getEventMock(int $getChannelExpectsCount, int $getChannelIdExpectsCount): MockObject
+    private function createEvent(): Event
     {
-        $event = $this->createMock(Event::class);
-        $event->expects($this->exactly($getChannelExpectsCount))
-            ->method('getChannel')
-            ->willReturn('email');
-        $event->expects($this->exactly($getChannelIdExpectsCount))
-            ->method('getChannelId')
-            ->willReturn('3');
+        $event = new Event();
+        $event->setChannel('email');
+        $event->setChannelId('3');
 
         return $event;
     }

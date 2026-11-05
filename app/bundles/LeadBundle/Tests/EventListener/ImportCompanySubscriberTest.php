@@ -16,12 +16,13 @@ use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\CompanyModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
+final class ImportCompanySubscriberTest extends TestCase
 {
     public function testOnImportInitForUknownObject(): void
     {

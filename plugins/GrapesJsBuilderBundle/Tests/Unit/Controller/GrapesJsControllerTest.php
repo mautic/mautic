@@ -39,9 +39,9 @@ final class GrapesJsControllerTest extends TestCase
         $security = $this->createMock(CorePermissions::class);
         $security->expects($this->once())->method('hasEntityAccess')->willReturn(true);
 
-        $entity = $this->createMock(Email::class);
-        $entity->expects($this->once())->method('getCreatedBy')->willReturn(1);
-        $entity->expects($this->once())->method('getContent')->willReturn(json_encode([
+        $entity = new Email();
+        $entity->setCreatedBy(1);
+        $entity->setContent(json_encode([
             'grapesjsbuilder' => [
                 'editorState' => json_encode(['components' => [['type' => 'text']]]),
             ],
@@ -58,9 +58,9 @@ final class GrapesJsControllerTest extends TestCase
         $security = $this->createMock(CorePermissions::class);
         $security->expects($this->once())->method('hasEntityAccess')->willReturn(true);
 
-        $entity = $this->createMock(Email::class);
-        $entity->expects($this->once())->method('getCreatedBy')->willReturn(1);
-        $entity->expects($this->once())->method('getContent')->willReturn('a:1:{s:15:"grapesjsbuilder";a:1:{s:11:"editorState";a:1:{s:5:"pages";a:0:{}}}}');
+        $entity = new Email();
+        $entity->setCreatedBy(1);
+        $entity->setContent('a:1:{s:15:"grapesjsbuilder";a:1:{s:11:"editorState";a:1:{s:5:"pages";a:0:{}}}}');
 
         $controller = $this->getControllerForEditorState($security, $entity);
         $response   = $controller->editorStateAction('email', '33');
@@ -73,9 +73,9 @@ final class GrapesJsControllerTest extends TestCase
         $security = $this->createMock(CorePermissions::class);
         $security->expects($this->once())->method('hasEntityAccess')->willReturn(true);
 
-        $entity = $this->createMock(Email::class);
-        $entity->expects($this->once())->method('getCreatedBy')->willReturn(1);
-        $entity->expects($this->once())->method('getContent')->willReturn([
+        $entity = new Email();
+        $entity->setCreatedBy(1);
+        $entity->setContent([
             'grapesjsbuilder' => [
                 'editorState' => 'not-a-json',
             ],

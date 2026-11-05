@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Entity\AuditLog;
+use Mautic\CoreBundle\Entity\AuditLogRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\PageBundle\Entity\Page;
-use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -102,7 +102,7 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
         ], $email->getExcludedLists());
 
         // assert audit log
-        $auditLogs = $this->em->getRepository(AuditLog::class)->findBy([
+        $auditLogs = $this->getContainer()->get(AuditLogRepository::class)->findBy([
             'bundle' => 'email',
             'object' => 'email',
         ]);
@@ -157,7 +157,7 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame($preferenceCenterTwo->getId(), $email->getPreferenceCenter()->getId());
 
-        $auditLogs = $this->em->getRepository(AuditLog::class)->findBy([
+        $auditLogs = $this->getContainer()->get(AuditLogRepository::class)->findBy([
             'bundle' => 'email',
             'object' => 'email',
         ]);
@@ -214,6 +214,7 @@ final class EmailFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @param int[]|null[] $expectedListIds
+     * @param Collection<int, LeadList> $collection
      */
     private function assertEmailLists(array $expectedListIds, Collection $collection): void
     {

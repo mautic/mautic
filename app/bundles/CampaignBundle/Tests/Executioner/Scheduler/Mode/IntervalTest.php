@@ -11,13 +11,15 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
 use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 
 #[AllowMockObjectsWithoutExpectations]
-final class IntervalTest extends \PHPUnit\Framework\TestCase
+final class IntervalTest extends TestCase
 {
     /**
      * @param array<int> $restrictedDays
@@ -25,38 +27,29 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
     #[DataProvider('provideBatchReschedulingData')]
     public function testBatchRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, string $localTimezone = 'UTC', ?\DateTime $specifiedHour = null, ?\DateTime $startTime = null, ?\DateTime $endTime = null, array $restrictedDays = []): void
     {
-        $contact1 = $this->createMock(Lead::class);
-        $contact1->method('getId')
-            ->willReturn(1);
-        $contact1->method('getTimezone')
-            ->willReturn($localTimezone);
+        $contact1 = new Lead();
+        $contact1->setId(1);
+        $contact1->setTimezone($localTimezone);
+        /** @var ArrayCollection<int, Lead> $contacts */
         $contacts = new ArrayCollection([$contact1]);
 
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->method('getId')
-            ->willReturn(1);
+        $campaign = new Campaign();
+        ReflectionHelper::setEntityId($campaign, 1);
 
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getCampaign')
-            ->willReturn($campaign);
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setCampaign($campaign);
         if ($startTime) {
-            $event->method('getTriggerRestrictedStartHour')
-                ->willReturn($startTime);
+            $event->setTriggerRestrictedStartHour($startTime);
         }
         if ($endTime) {
-            $event->method('getTriggerRestrictedStopHour')
-                ->willReturn($endTime);
+            $event->setTriggerRestrictedStopHour($endTime);
         }
         if ($specifiedHour) {
-            $event->method('getTriggerHour')
-                ->willReturn($specifiedHour);
+            $event->setTriggerHour($specifiedHour->format('Y-m-d H:i:s'));
         }
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn($restrictedDays);
+        $event->setTriggerRestrictedDaysOfWeek($restrictedDays);
 
         $interval = $this->getInterval();
         $grouped  = $interval->groupContactsByDate($event, $contacts, $scheduledOnDate);
@@ -111,28 +104,20 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
     #[DataProvider('provideReschedulingData')]
     public function testRescheduling(\DateTime $expectedScheduleDate, \DateTime $scheduledOnDate, ?\DateTime $specifiedHour = null, ?\DateTime $startTime = null, ?\DateTime $endTime = null, array $restrictedDays = [], int $triggerInterval = 0, string $intervalUnit = 'H'): void
     {
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn($restrictedDays);
-        $event->method('getTriggerInterval')
-            ->willReturn($triggerInterval);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn($intervalUnit);
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerRestrictedDaysOfWeek($restrictedDays);
+        $event->setTriggerInterval($triggerInterval);
+        $event->setTriggerIntervalUnit($intervalUnit);
         if ($startTime) {
-            $event->method('getTriggerRestrictedStartHour')
-                ->willReturn($startTime);
+            $event->setTriggerRestrictedStartHour($startTime);
         }
         if ($endTime) {
-            $event->method('getTriggerRestrictedStopHour')
-                ->willReturn($endTime);
+            $event->setTriggerRestrictedStopHour($endTime);
         }
         if ($specifiedHour) {
-            $event->method('getTriggerHour')
-                ->willReturn($specifiedHour);
+            $event->setTriggerHour($specifiedHour->format('Y-m-d H:i:s'));
         }
 
         $interval         = $this->getInterval();
@@ -181,17 +166,12 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
     {
         $scheduledOnDate = new \DateTime('now');
 
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn([]);
-        $event->method('getTriggerInterval')
-            ->willReturn(10);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn('z');
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerRestrictedDaysOfWeek([]);
+        $event->setTriggerInterval(10);
+        $event->setTriggerIntervalUnit('z');
 
         $interval = $this->getInterval();
 
@@ -201,23 +181,15 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testContactsAreGrouped(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->method('getId')
-            ->willReturn(1);
+        $campaign = new Campaign();
+        ReflectionHelper::setEntityId($campaign, 1);
 
-        $event = $this->createMock(Event::class);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerHour')
-            ->willReturn(
-                new \DateTime('1970-01-01 06:00:00')
-            );
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn([]);
-        $event->method('getCampaign')
-            ->willReturn($campaign);
-        $event->method('getId')
-            ->willReturn(1);
+        $event = new Event();
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerHour('1970-01-01 06:00:00');
+        $event->setTriggerRestrictedDaysOfWeek([]);
+        $event->setCampaign($campaign);
+        ReflectionHelper::setEntityId($event, 1);
 
         $interval = $this->getInterval();
         $contact1 = new Lead();
@@ -295,29 +267,23 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $expectedDateTime    = new \DateTime('now');
         $compareFromDateTime = new \DateTime('now');
 
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn('d');
-        $event->method('getTriggerInterval')
-            ->willReturn(1);
-        $event->method('getTriggerHour')
-            ->willReturn(new \DateTime('now'));
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn([]);
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getTimezone')
-            ->willReturn('UTC');
-        $log = $this->createMock(LeadEventLog::class);
-        $log->method('getEvent')
-            ->willReturn($event);
-        $log->method('getDateTriggered')
-            ->willReturn(new \DateTime('now'));
-        $log->method('getLead')
-            ->willReturn($lead);
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerIntervalUnit('d');
+        $event->setTriggerInterval(1);
+        $event->setTriggerHour('now');
+        $event->setTriggerRestrictedDaysOfWeek([]);
+
+        $event->setCampaign(new Campaign());
+
+        $lead = new Lead();
+        $lead->setTimezone('UTC');
+
+        $log = new LeadEventLog();
+        $log->setEvent($event);
+        $log->setDateTriggered(new \DateTime('now'));
+        $log->setLead($lead);
 
         $interval = $this->getInterval();
 
@@ -330,31 +296,23 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $expectedDateTime    = new \DateTime('now');
         $compareFromDateTime = new \DateTime('now');
 
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn('S');
-        $event->method('getTriggerInterval')
-            ->willReturn(0);
-        $event->method('getTriggerHour')
-            ->willReturn(new \DateTime('now'));
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn([]);
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerIntervalUnit('S');
+        $event->setTriggerInterval(0);
+        $event->setTriggerHour('now');
+        $event->setTriggerRestrictedDaysOfWeek([]);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getTimezone')
-            ->willReturn('UTC');
+        $event->setCampaign(new Campaign());
 
-        $log = $this->createMock(LeadEventLog::class);
-        $log->method('getEvent')
-            ->willReturn($event);
-        $log->method('getDateTriggered')
-            ->willReturn(new \DateTime('now'));
-        $log->method('getLead')
-            ->willReturn($lead);
+        $lead = new Lead();
+        $lead->setTimezone('UTC');
+
+        $log = new LeadEventLog();
+        $log->setEvent($event);
+        $log->setDateTriggered(new \DateTime('now'));
+        $log->setLead($lead);
 
         $interval = $this->getInterval();
 
@@ -364,16 +322,12 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testIsContactSpecificExecutionDateRequiredIsFalseWhenNotCorrectTriggerMode(): void
     {
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_DATE);
-        $event2 = $this->createMock(Event::class);
-        $event2->method('getId')
-            ->willReturn(2);
-        $event2->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_IMMEDIATE);
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setTriggerMode(Event::TRIGGER_MODE_DATE);
+        $event2 = new Event();
+        ReflectionHelper::setEntityId($event2, 2);
+        $event2->setTriggerMode(Event::TRIGGER_MODE_IMMEDIATE);
 
         $interval = $this->getInterval();
 
@@ -383,29 +337,20 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testIsContactSpecificExecutionDateRequiredIsFalseWhenNotCorrectIntervalUnit(): void
     {
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn('i');
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerIntervalUnit('i');
 
-        $event2 = $this->createMock(Event::class);
-        $event2->method('getId')
-            ->willReturn(1);
-        $event2->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event2->method('getTriggerIntervalUnit')
-            ->willReturn('h');
+        $event2 = new Event();
+        ReflectionHelper::setEntityId($event2, 1);
+        $event2->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event2->setTriggerIntervalUnit('h');
 
-        $event3 = $this->createMock(Event::class);
-        $event3->method('getId')
-            ->willReturn(1);
-        $event3->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event3->method('getTriggerIntervalUnit')
-            ->willReturn('s');
+        $event3 = new Event();
+        ReflectionHelper::setEntityId($event3, 1);
+        $event3->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event3->setTriggerIntervalUnit('s');
 
         $interval = $this->getInterval();
 
@@ -416,15 +361,11 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testIsContactSpecificExecutionDateRequiredIsTrueWithValidTriggerHour(): void
     {
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn('d');
-        $event->method('getTriggerHour')
-            ->willReturn(new \DateTime('now'));
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerIntervalUnit('d');
+        $event->setTriggerHour('now');
 
         $interval = $this->getInterval();
 
@@ -433,17 +374,12 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testIsContactSpecificExecutionDateRequiredIsTrueWithDayOfWeekRestrictions(): void
     {
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn('d');
-        $event->method('getTriggerHour')
-            ->willReturn(null);
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn([0, 1, 2]);
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerIntervalUnit('d');
+        $event->setTriggerHour(null);
+        $event->setTriggerRestrictedDaysOfWeek([0, 1, 2]);
 
         $interval = $this->getInterval();
 
@@ -452,21 +388,14 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testIsContactSpecificExecutionDateRequiredIsTrueWithStartAndStopHours(): void
     {
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn('d');
-        $event->method('getTriggerHour')
-            ->willReturn(null);
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn([]);
-        $event->method('getTriggerRestrictedStartHour')
-            ->willReturn(new \DateTime('now'));
-        $event->method('getTriggerRestrictedStopHour')
-            ->willReturn(new \DateTime('now'));
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerIntervalUnit('d');
+        $event->setTriggerHour(null);
+        $event->setTriggerRestrictedDaysOfWeek([]);
+        $event->setTriggerRestrictedStartHour(new \DateTime('now'));
+        $event->setTriggerRestrictedStopHour(new \DateTime('now'));
 
         $interval = $this->getInterval();
 
@@ -484,31 +413,21 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testExecutionDateIsValidatedAsExpectedWithStartHourAndDaylightSavingsTimeChange(): void
     {
-        $campaign = $this->createMock(Campaign::class);
-        $campaign->method('getId')
-                 ->willReturn(1);
+        $campaign = new Campaign();
+        ReflectionHelper::setEntityId($campaign, 1);
 
-        $event = $this->createMock(Event::class);
-        $event->method('getTriggerMode')
-              ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerInterval')
-              ->willReturn(15);
-        $event->method('getTriggerIntervalUnit')
-              ->willReturn('D');
-        $event->method('getTriggerRestrictedStartHour')
-              ->willReturn(new \DateTime('1970-01-01 08:00:00'));
-        $event->method('getTriggerRestrictedStopHour')
-              ->willReturn(new \DateTime('1970-01-01 20:00:00'));
-        $event->method('getTriggerRestrictedDaysOfWeek')
-              ->willReturn([]);
-        $event->method('getCampaign')
-              ->willReturn($campaign);
+        $event = new Event();
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerInterval(15);
+        $event->setTriggerIntervalUnit('D');
+        $event->setTriggerRestrictedStartHour(new \DateTime('1970-01-01 08:00:00'));
+        $event->setTriggerRestrictedStopHour(new \DateTime('1970-01-01 20:00:00'));
+        $event->setTriggerRestrictedDaysOfWeek([]);
+        $event->setCampaign($campaign);
 
-        $contact1 = $this->createMock(Lead::class);
-        $contact1->method('getId')
-                 ->willReturn(1);
-        $contact1->method('getTimezone')
-                 ->willReturn('America/New_York');
+        $contact1 = new Lead();
+        $contact1->setId(1);
+        $contact1->setTimezone('America/New_York');
 
         $log = new LeadEventLog();
         $log->setCampaign($campaign);
@@ -531,31 +450,23 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
         $expectedDateTime    = new \DateTime('now');
         $compareFromDateTime = new \DateTime('now');
 
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn('i');
-        $event->method('getTriggerInterval')
-            ->willReturn(0);
-        $event->method('getTriggerHour')
-            ->willReturn(new \DateTime('now'));
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn([]);
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerIntervalUnit('i');
+        $event->setTriggerInterval(0);
+        $event->setTriggerHour('now');
+        $event->setTriggerRestrictedDaysOfWeek([]);
 
-        $lead = $this->createMock(Lead::class);
-        $lead->method('getTimezone')
-            ->willReturn('UTC');
+        $event->setCampaign(new Campaign());
 
-        $log = $this->createMock(LeadEventLog::class);
-        $log->method('getEvent')
-            ->willReturn($event);
-        $log->method('getDateTriggered')
-            ->willReturn(new \DateTime('now'));
-        $log->method('getLead')
-            ->willReturn($lead);
+        $lead = new Lead();
+        $lead->setTimezone('UTC');
+
+        $log = new LeadEventLog();
+        $log->setEvent($event);
+        $log->setDateTriggered(new \DateTime('now'));
+        $log->setLead($lead);
 
         $interval = $this->getInterval();
 
@@ -564,28 +475,18 @@ final class IntervalTest extends \PHPUnit\Framework\TestCase
 
     public function testIsContactSpecificExecutionDateRequiredShouldReturnFalseForNegativePathAction(): void
     {
-        $parentEvent = $this->createMock(Event::class);
-        $parentEvent->method('getEventType')
-            ->willReturn(Event::TYPE_DECISION);
-        $event = $this->createMock(Event::class);
-        $event->method('getId')
-            ->willReturn(1);
-        $event->method('getTriggerMode')
-            ->willReturn(Event::TRIGGER_MODE_INTERVAL);
-        $event->method('getTriggerIntervalUnit')
-            ->willReturn('i');
-        $event->method('getTriggerInterval')
-            ->willReturn(5);
-        $event->method('getDecisionPath')
-            ->willReturn(Event::PATH_INACTION);
-        $event->method('getEventType')
-            ->willReturn(Event::TYPE_ACTION);
-        $event->method('getTriggerHour')
-            ->willReturn(new \DateTime('now'));
-        $event->method('getTriggerRestrictedDaysOfWeek')
-            ->willReturn([]);
-        $event->method('getParent')
-            ->willReturn($parentEvent);
+        $parentEvent = new Event();
+        $parentEvent->setEventType(Event::TYPE_DECISION);
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 1);
+        $event->setTriggerMode(Event::TRIGGER_MODE_INTERVAL);
+        $event->setTriggerIntervalUnit('i');
+        $event->setTriggerInterval(5);
+        $event->setDecisionPath(Event::PATH_INACTION);
+        $event->setEventType(Event::TYPE_ACTION);
+        $event->setTriggerHour('now');
+        $event->setTriggerRestrictedDaysOfWeek([]);
+        $event->setParent($parentEvent);
 
         $interval = $this->getInterval();
 

@@ -4,11 +4,14 @@ namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ServerBag;
 
-class SubmissionEvent extends CommonEvent
+final class SubmissionEvent extends CommonEvent
 {
     /**
      * Cleaned post results.
@@ -53,10 +56,10 @@ class SubmissionEvent extends CommonEvent
 
     private ?string $context = null;
 
-    private \Symfony\Component\HttpFoundation\Response|array|null $postSubmitResponse = null;
+    private Response|array|null $postSubmitResponse = null;
 
     /**
-     * @var array<mixed>
+     * @var array<mixed>|null
      */
     private ?array $postSubmitPayload = null;
 
@@ -97,7 +100,7 @@ class SubmissionEvent extends CommonEvent
     }
 
     /**
-     * @return \Mautic\FormBundle\Entity\Form
+     * @return Form
      */
     public function getForm()
     {
@@ -232,7 +235,7 @@ class SubmissionEvent extends CommonEvent
         return (null === $key) ? $this->callbackResponses : $this->callbackResponses[$key];
     }
 
-    public function setPostSubmitCallbackResponse(string $key, \Symfony\Component\HttpFoundation\RedirectResponse $callbackResponse): static
+    public function setPostSubmitCallbackResponse(string $key, RedirectResponse $callbackResponse): static
     {
         $this->callbackResponses[$key] = $callbackResponse;
 
@@ -244,12 +247,12 @@ class SubmissionEvent extends CommonEvent
         return null !== $this->postSubmitResponse;
     }
 
-    public function getPostSubmitResponse(): \Symfony\Component\HttpFoundation\Response|array|null
+    public function getPostSubmitResponse(): Response|array|null
     {
         return $this->postSubmitResponse;
     }
 
-    public function setPostSubmitResponse(array|\Symfony\Component\HttpFoundation\Response $response): void
+    public function setPostSubmitResponse(array|Response $response): void
     {
         $this->postSubmitResponse = $response;
     }
@@ -257,7 +260,7 @@ class SubmissionEvent extends CommonEvent
     /**
      * @return mixed[]
      */
-    public function getPostSubmitPayload(): array
+    public function getPostSubmitPayload(): ?array
     {
         return $this->postSubmitPayload;
     }

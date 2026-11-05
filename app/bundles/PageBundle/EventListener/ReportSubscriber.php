@@ -12,10 +12,10 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber
 {
     public const string CONTEXT_PAGES      = 'pages';
 
@@ -31,19 +31,12 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-            ReportGraphEvent::class     => ['onReportGraphGenerate', 0],
-            ReportDataEvent::class      => ['onReportDisplay', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[AsEventListener(
+        event: ReportBuilderEvent::class,
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_PAGES, self::CONTEXT_PAGE_HITS, self::CONTEXT_VIDEO_HITS])) {
@@ -357,6 +350,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGeneratorEvent::class,
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         $context    = $event->getContext();
@@ -407,6 +403,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGraphEvent::class,
+    )]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Lead reports
@@ -419,6 +418,8 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
+            /** @var TranslatorInterface $translator */
+            $translator = $options['translator'];
             $queryBuilder = clone $qb;
 
             /** @var ChartQuery $chartQuery */
@@ -430,7 +431,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_hit', 'ph');
                     $hits = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans($g), $hits);
+                    $chart->setDataset($translator->trans($g), $hits);
                     $data         = $chart->render();
                     $data['name'] = $g;
 
@@ -443,7 +444,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->andWhere($qb->expr()->isNotNull('ph.date_left'));
 
                     $hits = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans($g), $hits);
+                    $chart->setDataset($translator->trans($g), $hits);
                     $data         = $chart->render();
                     $data['name'] = $g;
 
@@ -573,6 +574,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: ReportDataEvent::class,
+    )]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();

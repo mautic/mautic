@@ -6,9 +6,11 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
 use Mautic\LeadBundle\Entity\LeadNoteRepository;
-use Mautic\LeadBundle\Event\LeadNoteEvent;
+use Mautic\LeadBundle\Event\NotePostDeleteEvent;
+use Mautic\LeadBundle\Event\NotePostSaveEvent;
+use Mautic\LeadBundle\Event\NotePreDeleteEvent;
+use Mautic\LeadBundle\Event\NotePreSaveEvent;
 use Mautic\LeadBundle\Form\Type\NoteType;
-use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -61,10 +63,10 @@ final class NoteModel extends FormModel
     }
 
     /**
+     * @param LeadNote|array<string, mixed>    $entity
      * @param string|null $action
-     * @param array       $options
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof LeadNote) {
             throw new MethodNotAllowedHttpException(['LeadNote']);
@@ -78,43 +80,31 @@ final class NoteModel extends FormModel
     }
 
     /**
+     * @param LeadNote $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof LeadNote) {
             throw new MethodNotAllowedHttpException(['LeadNote']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = LeadEvents::NOTE_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = LeadEvents::NOTE_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = LeadEvents::NOTE_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = LeadEvents::NOTE_POST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'    => new NotePreSaveEvent($entity, $isNew),
+            'post_save'   => new NotePostSaveEvent($entity, $isNew),
+            'pre_delete'  => new NotePreDeleteEvent($entity, $isNew),
+            'post_delete' => new NotePostDeleteEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (null === $event || !$this->dispatcher->hasListeners($event::class)) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new LeadNoteEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
-            }
+        $this->dispatcher->dispatch($event);
 
-            $this->dispatcher->dispatch($event, $name);
-
-            return $event;
-        }
-
-        return null;
+        return $event;
     }
 
     public function getNoteCount(Lead $lead, bool $useFilters = false): int

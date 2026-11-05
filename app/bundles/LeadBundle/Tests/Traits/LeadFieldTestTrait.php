@@ -25,7 +25,6 @@ trait LeadFieldTestTrait
         }
 
         $fieldModel = self::getContainer()->get(FieldModel::class);
-        \assert($fieldModel instanceof FieldModel);
         $fieldModel->saveEntity($field);
     }
 }

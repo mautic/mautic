@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\NotificationBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
 #[ORM\Entity(repositoryClass: PushIDRepository::class)]
@@ -16,47 +15,32 @@ class PushID
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue]
     private $id;
 
-    /**
-     * @var Lead|null
-     */
     #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'pushIds')]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
-    private $lead;
+    private ?Lead $lead = null;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'push_id', type: 'string', length: 191)]
     private $pushID;
 
     /**
      * @var bool
      */
+    #[ORM\Column(type: 'boolean')]
     private $enabled;
 
     /**
      * @var bool
      */
+    #[ORM\Column(type: 'boolean')]
     private $mobile;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createField('id', 'integer')
-            ->makePrimaryKey()
-            ->generatedValue()
-            ->build();
-
-        $builder->createField('pushID', 'string')
-            ->columnName('push_id')
-            ->nullable(false)
-            ->build();
-
-        $builder->createField('enabled', 'boolean')->build();
-        $builder->createField('mobile', 'boolean')->build();
-    }
 
     /**
      * @return int|null
@@ -76,10 +60,7 @@ class PushID
         return $this;
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getLead()
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }
@@ -117,7 +98,7 @@ class PushID
         return $this->enabled;
     }
 
-    public function setEnabled($enabled): static
+    public function setEnabled(bool $enabled): static
     {
         $this->enabled = $enabled;
 
@@ -132,10 +113,7 @@ class PushID
         return $this->mobile;
     }
 
-    /**
-     * @param bool $mobile
-     */
-    public function setMobile($mobile): static
+    public function setMobile(bool $mobile): static
     {
         $this->mobile = $mobile;
 

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper\Language;
 
 use Mautic\CoreBundle\Helper\Language\Installer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
-final class InstallerTest extends \PHPUnit\Framework\TestCase
+final class InstallerTest extends TestCase
 {
     public function testInstaller(): void
     {

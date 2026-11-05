@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20210818090322 extends PreUpAssertionMigration
 {
-    public function preUpAssertions(): void
+    protected function preUpAssertions(): void
     {
         $this->skipAssertion(fn (Schema $schema) => $schema->getTable("{$this->prefix}roles")->hasColumn('uuid'), sprintf('Column %s already exists', 'uuid'));
     }

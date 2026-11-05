@@ -65,6 +65,8 @@ final class ListModelTest extends TestCase
         $entityManagerMock = $this->createMock(EntityManager::class);
         $entityManagerMock->method('getRepository')
             ->willReturn($this->leadListRepositoryMock);
+        $entityManagerMock->method('getReference')
+            ->willReturn(new LeadList());
         $this->contactSegmentServiceMock       = $this->createMock(ContactSegmentService::class);
         $this->segmentCountCacheHelper         = $this->createMock(SegmentCountCacheHelper::class);
 
@@ -220,6 +222,7 @@ final class ListModelTest extends TestCase
             ->method('setSegmentContactCount')
             ->with($segmentId, $leadCount);
 
+        $newLeadsCount             = [];
         $newLeadsCount[$segmentId] = [
             'maxId' => 0,
             'count' => 0,
@@ -231,6 +234,7 @@ final class ListModelTest extends TestCase
             ->with($leadList)
             ->willReturn($newLeadsCount);
 
+        $orphanLeadsCount             = [];
         $orphanLeadsCount[$segmentId] = [
             'maxId' => 0,
             'count' => 0,

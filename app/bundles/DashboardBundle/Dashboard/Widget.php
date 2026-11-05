@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-readonly class Widget
+final readonly class Widget
 {
-    public const FORMAT_HUMAN = 'M j, Y';
+    public const string FORMAT_HUMAN = 'M j, Y';
 
     public function __construct(
         private DashboardModel $dashboardModel,
@@ -24,7 +24,7 @@ readonly class Widget
     /**
      * Get ready widget to populate in template.
      *
-     * @return bool|\Mautic\DashboardBundle\Entity\Widget
+     * @return \Mautic\DashboardBundle\Entity\Widget
      */
     public function get(int $widgetId)
     {

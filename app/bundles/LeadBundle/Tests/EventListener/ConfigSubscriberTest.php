@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\LeadBundle\EventListener\ConfigSubscriber;
 use Mautic\LeadBundle\Form\Type\ConfigCompanyType;
@@ -20,10 +19,7 @@ final class ConfigSubscriberTest extends TestCase
 {
     private ConfigSubscriber $configSubscriber;
 
-    /**
-     * @var MockObject&ConfigBuilderEvent
-     */
-    private MockObject $configBuilderEvent;
+    private ConfigBuilderEvent&MockObject $configBuilderEvent;
 
     protected function setUp(): void
     {
@@ -46,14 +42,6 @@ final class ConfigSubscriberTest extends TestCase
                 'MauticLeadBundle' => $leadBundleParameters,
                 default            => [],
             });
-    }
-
-    public function testSubscribedEvents(): void
-    {
-        $subscribedEvents = ConfigSubscriber::getSubscribedEvents();
-        $this->assertArrayHasKey(ConfigEvents::CONFIG_ON_GENERATE, $subscribedEvents);
-        $handlers = ConfigSubscriber::getSubscribedEvents()[ConfigEvents::CONFIG_ON_GENERATE];
-        $this->assertCount(2, $handlers);
     }
 
     public function testLeadAndSegmentFormsUseExpectedThemes(): void

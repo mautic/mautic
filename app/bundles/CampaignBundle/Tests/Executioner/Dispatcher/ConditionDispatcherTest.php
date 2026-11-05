@@ -10,9 +10,10 @@ use Mautic\CampaignBundle\Event\ConditionEvent;
 use Mautic\CampaignBundle\EventCollector\Accessor\Event\ConditionAccessor;
 use Mautic\CampaignBundle\Executioner\Dispatcher\ConditionDispatcher;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
+final class ConditionDispatcherTest extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface

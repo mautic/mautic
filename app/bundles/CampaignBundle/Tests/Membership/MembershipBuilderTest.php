@@ -15,10 +15,11 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class MembershipBuilderTest extends \PHPUnit\Framework\TestCase
+final class MembershipBuilderTest extends TestCase
 {
     /**
      * @var MockObject&MembershipManager

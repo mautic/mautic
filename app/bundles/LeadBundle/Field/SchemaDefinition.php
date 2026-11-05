@@ -6,13 +6,19 @@ namespace Mautic\LeadBundle\Field;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-class SchemaDefinition
+final class SchemaDefinition
 {
     /**
      * Max length of VARCHAR fields.
      * Fields: charLengthLimit.
      */
-    public const MAX_VARCHAR_LENGTH = 191;
+    public const int MAX_VARCHAR_LENGTH = 191;
+
+    /**
+     * Length DBAL applied to a VARCHAR column when none was given. DBAL 4 asks for it
+     * explicitly, so it is spelled out where the length is not driven by the field.
+     */
+    public const int DEFAULT_VARCHAR_LENGTH = 255;
 
     /**
      * Get the MySQL database type based on the field type
@@ -27,6 +33,8 @@ class SchemaDefinition
 
         // Unique is always a string in order to control index length
         if ($isUnique) {
+            $options['length'] = self::DEFAULT_VARCHAR_LENGTH;
+
             return [
                 'name'    => $alias,
                 'type'    => 'string',

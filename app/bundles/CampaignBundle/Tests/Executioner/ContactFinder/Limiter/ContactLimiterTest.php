@@ -6,8 +6,9 @@ namespace Mautic\CampaignBundle\Tests\Executioner\ContactFinder\Limiter;
 
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
+use PHPUnit\Framework\TestCase;
 
-final class ContactLimiterTest extends \PHPUnit\Framework\TestCase
+final class ContactLimiterTest extends TestCase
 {
     public function testGetters(): void
     {

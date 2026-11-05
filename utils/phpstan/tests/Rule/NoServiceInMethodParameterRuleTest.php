@@ -7,6 +7,7 @@ namespace Utils\PHPStan\Tests\Rule;
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
 use Utils\PHPStan\Rule\NoServiceInMethodParameterRule;
+use Utils\PHPStan\ServiceTypeDetector;
 
 /**
  * @extends RuleTestCase<NoServiceInMethodParameterRule>
@@ -15,7 +16,7 @@ final class NoServiceInMethodParameterRuleTest extends RuleTestCase
 {
     protected function getRule(): Rule
     {
-        return new NoServiceInMethodParameterRule($this->createReflectionProvider());
+        return new NoServiceInMethodParameterRule(new ServiceTypeDetector($this->createReflectionProvider()));
     }
 
     public function testRule(): void

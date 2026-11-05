@@ -51,7 +51,7 @@ final class TrackableRepositoryFunctionalTest extends MauticMysqlTestCase
         $segment = $this->createSegment();
         $this->addContactsToSegment($segment, [$leadA, $leadB, $leadC]);
 
-        $this->assertSame('2', $this->model->getRepository()->getCount('channel-a', [1, 2], null));
+        $this->assertSame(2, $this->model->getRepository()->getCount('channel-a', [1, 2], null));
 
         $this->assertEmpty($this->model->getRepository()->getCount('channel-a', [2], [$segment->getId()]));
 

@@ -6,8 +6,9 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\LeadBundle\Entity\LeadList;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
 
-final class LeadListTest extends \PHPUnit\Framework\TestCase
+final class LeadListTest extends TestCase
 {
     public function testAddLegacyParamsWithEmptyFilters(): void
     {
@@ -260,6 +261,8 @@ final class LeadListTest extends \PHPUnit\Framework\TestCase
                     'display' => null,
                 ],
             ],
-            $entity->getFilters(), 'The first filter glue must be "and".');
+            $entity->getFilters(),
+            'The first filter glue must be "and".'
+        );
     }
 }

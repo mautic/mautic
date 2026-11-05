@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\SyncProcess;
 
-use Mautic\IntegrationsBundle\Event\CompletedSyncIterationEvent;
+use Mautic\IntegrationsBundle\Event\IntegrationToMauticSyncCompletedEvent;
+use Mautic\IntegrationsBundle\Event\MauticToIntegrationSyncCompletedEvent;
 use Mautic\IntegrationsBundle\Event\SyncEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
-use Mautic\IntegrationsBundle\IntegrationEvents;
+use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\MappingManualDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\ObjectIdsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectMappingsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderResultsDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ObjectDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\ReportDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\HandlerNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
@@ -127,8 +129,7 @@ final class SyncProcess
             // Dispatch an event to allow subscribers to take action after this batch of objects has been synced to Mautic
             $orderResults = $this->getOrderResultsForIntegrationSync($syncOrder, $objectMappings);
             $this->eventDispatcher->dispatch(
-                new CompletedSyncIterationEvent($orderResults, $this->syncIteration, $this->inputOptionsDAO, $this->mappingManualDAO),
-                IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC
+                new IntegrationToMauticSyncCompletedEvent($orderResults, $this->syncIteration, $this->inputOptionsDAO, $this->mappingManualDAO)
             );
             unset($orderResults);
 
@@ -197,8 +198,7 @@ final class SyncProcess
             // Dispatch an event to allow subscribers to take action after this batch of objects has been synced to the integration
             $orderResults = $this->getOrderResultsForInternalSync($syncOrder);
             $this->eventDispatcher->dispatch(
-                new CompletedSyncIterationEvent($orderResults, $this->syncIteration, $this->inputOptionsDAO, $this->mappingManualDAO),
-                IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION
+                new MauticToIntegrationSyncCompletedEvent($orderResults, $this->syncIteration, $this->inputOptionsDAO, $this->mappingManualDAO)
             );
             unset($orderResults);
 
@@ -232,7 +232,9 @@ final class SyncProcess
     }
 
     /**
-     * @throws \Mautic\IntegrationsBundle\Exception\InvalidValueException
+     * @param ObjectDAO[] $objectsToSynchronize
+     *
+     * @throws InvalidValueException
      */
     private function getInputOptionsForObjects(array $objectsToSynchronize): InputOptionsDAO
     {

@@ -13,6 +13,7 @@ final class ReportSubscriberFunctionalTest extends AbstractReportSubscriberTestC
 {
     public function testPageHitReportWithDncListColumn(): void
     {
+        $leads   = [];
         $leads[] = $this->createContact('test1@example.com');
         $leads[] = $this->createContact('test2@example.com');
         $leads[] = $this->createContact('test3@example.com');

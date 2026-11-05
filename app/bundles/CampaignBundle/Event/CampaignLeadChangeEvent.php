@@ -8,9 +8,9 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Contracts\EventDispatcher\Event;
 
-final class CampaignLeadChangeEvent extends Event
+abstract class CampaignLeadChangeEvent extends Event
 {
-    private ?\Mautic\LeadBundle\Entity\Lead $lead = null;
+    private ?Lead $lead = null;
 
     /**
      * @var Lead[]
@@ -22,7 +22,7 @@ final class CampaignLeadChangeEvent extends Event
      */
     public function __construct(
         private readonly Campaign $campaign,
-        array|\Mautic\LeadBundle\Entity\Lead $leads,
+        array|Lead $leads,
         private readonly ?string $action,
     ) {
         if (is_array($leads)) {
@@ -43,7 +43,7 @@ final class CampaignLeadChangeEvent extends Event
     /**
      * Returns the Lead entity.
      */
-    public function getLead(): ?\Mautic\LeadBundle\Entity\Lead
+    public function getLead(): ?Lead
     {
         return $this->lead;
     }

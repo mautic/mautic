@@ -10,10 +10,10 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
@@ -27,8 +27,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LeadListRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['alias'], name: 'lead_list_alias')]
-#[ORM\Index(columns: ['deleted'], name: 'segment_deleted')]
+#[ORM\Index(name: 'lead_list_alias', columns: ['alias'])]
+#[ORM\Index(name: 'segment_deleted', columns: ['deleted'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     shortName: 'Segments',
@@ -53,20 +53,29 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[UniqueUserAlias(field: 'alias', message: 'mautic.lead.list.alias.unique')]
 #[SegmentUsedInCampaigns]
 #[SegmentInUse]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'leadlist_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'lead_list_projects_xref'),
+)])]
 class LeadList extends FormEntity implements UuidInterface
 {
     use UuidTrait;
 
     use ProjectTrait;
 
-    public const TABLE_NAME  = 'lead_lists';
+    public const string TABLE_NAME = 'lead_lists';
 
-    public const ENTITY_NAME = 'lists';
+    public const string ENTITY_NAME = 'lists';
 
     /**
      * @var int|null
      */
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -74,108 +83,78 @@ class LeadList extends FormEntity implements UuidInterface
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'public_name', type: 'string', length: 191)]
     private $publicName;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     /**
      * @var string|null
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $alias;
 
     /**
      * @var array
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'array')]
     private $filters = [];
 
     /**
      * @var bool
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'is_global', type: 'boolean')]
     private $isGlobal = true;
 
     /**
      * @var bool
      */
     #[Groups(['segment:read', 'segment:write', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'is_preference_center', type: 'boolean')]
     private $isPreferenceCenter = false;
 
     /**
      * @var ArrayCollection<ListLead>
      */
-    #[ORM\OneToMany(mappedBy: 'list', targetEntity: ListLead::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: ListLead::class, mappedBy: 'list', fetch: 'EXTRA_LAZY')]
     private $leads;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'last_built_date', type: 'datetime', nullable: true)]
     private \DateTime|\DateTimeInterface|null $lastBuiltDate = null;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(name: 'last_built_time', type: 'float', nullable: true)]
     private ?float $lastBuiltTime = null;
 
     #[Groups(['segment:read', 'campaign:read', 'email:read', 'sms:read'])]
+    #[ORM\Column(type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $deleted = null;
 
     public function __construct()
     {
         $this->leads = new ArrayCollection();
         $this->initializeProjects();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->addField('alias', 'string');
-
-        $builder->createField('publicName', 'string')
-            ->columnName('public_name')
-            ->build();
-
-        $builder->addCategory();
-
-        $builder->addField('filters', 'array');
-
-        $builder->createField('isGlobal', 'boolean')
-            ->columnName('is_global')
-            ->build();
-
-        $builder->createField('isPreferenceCenter', 'boolean')
-            ->columnName('is_preference_center')
-            ->build();
-
-        $builder->createField('lastBuiltDate', 'datetime')
-            ->columnName('last_built_date')
-            ->nullable()
-            ->build();
-
-        $builder->createField('lastBuiltTime', 'float')
-            ->columnName('last_built_time')
-            ->nullable()
-            ->build();
-
-        self::addProjectsField($builder, 'lead_list_projects_xref', 'leadlist_id');
-        $builder->addNullableField('deleted', 'datetime');
-
     }
 
     /**
@@ -297,10 +276,7 @@ class LeadList extends FormEntity implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getFilters()
+    public function getFilters(): array
     {
         if (is_array($this->filters)) {
             return $this->setFirstFilterGlueToAnd($this->addLegacyParams($this->filters)); // @phpstan-ignore method.deprecated
@@ -326,13 +302,7 @@ class LeadList extends FormEntity implements UuidInterface
 
     public function hasFilterTypeOf(string $type): bool
     {
-        foreach ($this->getFilters() as $filter) {
-            if ($filter['type'] === $type) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->getFilters(), fn ($filter): bool => $filter['type'] === $type);
     }
 
     /**
@@ -384,9 +354,9 @@ class LeadList extends FormEntity implements UuidInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection<int, ListLead>
      */
-    public function getLeads()
+    public function getLeads(): Collection
     {
         return $this->leads;
     }

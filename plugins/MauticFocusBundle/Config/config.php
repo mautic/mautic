@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
+
 return [
     'name'        => 'Mautic Focus',
     'description' => 'Drive visitor\'s focus on your website with Mautic Focus',
@@ -34,7 +37,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'focus',
                 'path'            => '/focus',
-                'controller'      => MauticPlugin\MauticFocusBundle\Controller\Api\FocusApiController::class,
+                'controller'      => FocusApiController::class,
             ],
             'mautic_api_focusjs' => [
                 'path'       => '/focus/{id}/js',
@@ -58,7 +61,7 @@ return [
     'categories' => [
         'plugin:focus' => [
             'label' => 'mautic.focus',
-            'class' => MauticPlugin\MauticFocusBundle\Entity\Focus::class,
+            'class' => Focus::class,
         ],
     ],
 

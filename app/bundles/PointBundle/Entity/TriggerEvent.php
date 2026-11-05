@@ -12,16 +12,17 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TriggerEventRepository::class)]
 #[ORM\Table(name: 'point_trigger_events')]
-#[ORM\Index(columns: ['type'], name: 'trigger_type_search')]
+#[ORM\Index(name: 'trigger_type_search', columns: ['type'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -41,6 +42,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent(association: 'trigger')]
 class TriggerEvent implements UuidInterface
 {
     use UuidTrait;
@@ -49,54 +51,61 @@ class TriggerEvent implements UuidInterface
      * @var int|null
      */
     #[Groups(['trigger_event:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(type: 'string', length: 50)]
     private $type;
 
     /**
      * @var int
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(name: 'action_order', type: 'integer')]
     private $order = 0;
 
     /**
      * @var array
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\Column(type: 'array')]
     private $properties = [];
 
     /**
      * @var Trigger
      */
     #[Groups(['trigger_event:read', 'trigger_event:write'])]
+    #[ORM\ManyToOne(targetEntity: Trigger::class, inversedBy: 'events')]
+    #[ORM\JoinColumn(name: 'trigger_id', nullable: false, onDelete: 'CASCADE')]
     private $trigger;
 
     /**
      * @var ArrayCollection<int,LeadTriggerLog>
      */
-    #[ORM\OneToMany(mappedBy: 'event', targetEntity: LeadTriggerLog::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: LeadTriggerLog::class, mappedBy: 'event', cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     private $log;
 
-    /**
-     * @var array
-     */
-    private $changes;
+    private ?array $changes = null;
 
     public function __clone(): void
     {
@@ -106,30 +115,6 @@ class TriggerEvent implements UuidInterface
     public function __construct()
     {
         $this->log = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addIdColumns();
-
-        $builder->createField('type', 'string')
-            ->length(50)
-            ->build();
-
-        $builder->createField('order', 'integer')
-            ->columnName('action_order')
-            ->build();
-
-        $builder->addField('properties', 'array');
-
-        $builder->createManyToOne('trigger', 'Trigger')
-            ->inversedBy('events')
-            ->addJoinColumn('trigger_id', 'id', false, false, 'CASCADE')
-            ->isOwnershipParent()
-            ->build();
-
     }
 
     /**
@@ -158,10 +143,7 @@ class TriggerEvent implements UuidInterface
         }
     }
 
-    /**
-     * @return array|null
-     */
-    public function getChanges()
+    public function getChanges(): ?array
     {
         return $this->changes;
     }
@@ -193,6 +175,7 @@ class TriggerEvent implements UuidInterface
     {
         return $this->order;
     }
+
     public function setProperties(array $properties): static
     {
         $this->isChanged('properties', $properties);
@@ -202,10 +185,7 @@ class TriggerEvent implements UuidInterface
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getProperties()
+    public function getProperties(): array
     {
         return $this->properties;
     }
@@ -224,6 +204,7 @@ class TriggerEvent implements UuidInterface
     {
         return $this->trigger;
     }
+
     public function setType(string $type): static
     {
         $this->isChanged('type', $type);
@@ -263,6 +244,7 @@ class TriggerEvent implements UuidInterface
     {
         return $this->description;
     }
+
     public function setName(string $name): static
     {
         $this->isChanged('name', $name);
@@ -292,9 +274,9 @@ class TriggerEvent implements UuidInterface
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Collection<int, LeadTriggerLog>
      */
-    public function getLog()
+    public function getLog(): Collection
     {
         return $this->log;
     }

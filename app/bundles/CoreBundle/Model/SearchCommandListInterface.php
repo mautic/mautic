@@ -9,5 +9,5 @@ interface SearchCommandListInterface
     /**
      * @return list<string>
      */
-    public function getCommandList();
+    public function getCommandList(): array;
 }

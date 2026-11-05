@@ -12,7 +12,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonFormModel<Action>
  */
-class ActionModel extends CommonFormModel
+final class ActionModel extends CommonFormModel
 {
     public static function getName(): string
     {
@@ -48,10 +48,9 @@ class ActionModel extends CommonFormModel
     }
 
     /**
-     * @param object $entity
-     * @param array  $options
+     * @param Action|array<string, mixed> $entity
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Action) {
             throw new \InvalidArgumentException('Entity must be of class Action');
@@ -84,6 +83,7 @@ class ActionModel extends CommonFormModel
             ]
         );
         $dependents = [];
+
         foreach ($entities as $entity) {
             $properties = $entity->getProperties();
             foreach ($properties as $property) {

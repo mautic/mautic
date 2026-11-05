@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Mautic\ReportBundle\Controller\Api\ReportApiController;
+
 return [
     'routes' => [
         'api' => [
@@ -9,7 +11,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'reports',
                 'path'            => '/reports',
-                'controller'      => Mautic\ReportBundle\Controller\Api\ReportApiController::class,
+                'controller'      => ReportApiController::class,
             ],
         ],
     ],

@@ -8,14 +8,14 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<ListLead>
  */
-class ListLeadRepository extends CommonRepository
+final class ListLeadRepository extends CommonRepository
 {
-    public const DELETE_BATCH_SIZE = 5000;
+    public const int DELETE_BATCH_SIZE = 5000;
 
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         // First check to ensure the $toLead doesn't already exist
         $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
@@ -32,8 +32,8 @@ class ListLeadRepository extends CommonRepository
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $q->update(MAUTIC_TABLE_PREFIX.'lead_lists_leads')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId);
+            ->set('lead_id', $toLeadId)
+            ->where('lead_id = '.$fromLeadId);
 
         if ([] !== $lists) {
             $q->andWhere(
@@ -45,7 +45,7 @@ class ListLeadRepository extends CommonRepository
             // Delete remaining leads as the new lead already belongs
             $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->delete(MAUTIC_TABLE_PREFIX.'lead_lists_leads')
-                ->where('lead_id = '.(int) $fromLeadId)
+                ->where('lead_id = '.$fromLeadId)
                 ->executeStatement();
         } else {
             $q->executeStatement();

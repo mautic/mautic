@@ -69,8 +69,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             new CustomFieldValidator($fieldModel, $translator)
         );
 
-        $validator->initialize($context);
-        $validator->validate('john@doe.com, jane@doe.com', new EmailOrEmailTokenList(allowMultiple: false));
+        $validator->validateInContext('john@doe.com, jane@doe.com', new EmailOrEmailTokenList(allowMultiple: false), $context);
 
         $this->assertSame(1, $context->violationCount);
     }
@@ -141,8 +140,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             new CustomFieldValidator($fieldModel, $translator)
         );
 
-        $emaiOrEmailTokenListValidator->initialize($context);
-        $emaiOrEmailTokenListValidator->validate($value, new EmailOrEmailTokenList());
+        $emaiOrEmailTokenListValidator->validateInContext($value, new EmailOrEmailTokenList(), $context);
 
         $this->assertSame($expectedViolationCount, $context->violationCount);
     }

@@ -15,6 +15,7 @@ use Mautic\DashboardBundle\Form\Type\UploadType;
 use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,7 +39,7 @@ final class DashboardController extends AbstractFormController
     }
 
     #[Route(
-        '/s/dashboard/{objectAction}/{objectId}',
+        path: '/s/dashboard/{objectAction}/{objectId}',
         name: 'mautic_dashboard_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -52,7 +53,7 @@ final class DashboardController extends AbstractFormController
      * Generates the default view.
      */
     #[Route(
-        '/s/dashboard',
+        path: '/s/dashboard',
         name: 'mautic_dashboard_index',
     )]
     public function indexAction(Request $request, WidgetService $widget, PathsHelper $pathsHelper, RouterInterface $urlGenerator): Response
@@ -118,7 +119,7 @@ final class DashboardController extends AbstractFormController
     }
 
     #[Route(
-        '/s/dashboard/widget/{widgetId}',
+        path: '/s/dashboard/widget/{widgetId}',
         name: 'mautic_dashboard_widget',
     )]
     public function widgetAction(Request $request, WidgetService $widgetService, Environment $twig, $widgetId): JsonResponse
@@ -216,6 +217,10 @@ final class DashboardController extends AbstractFormController
     {
         $widget = $this->dashboardModel->getEntity($objectId);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+
+        if (! $widget instanceof Widget) {
+            throw new NotFoundHttpException(sprintf('Widget with id "%s" not found.', $objectId));
+        }
 
         // get the user form factory
         $form       = $this->dashboardModel->createForm($widget, $action);
@@ -455,6 +460,7 @@ final class DashboardController extends AbstractFormController
         if ($request->isMethod(Request::METHOD_POST)) {
             if (!$this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
+                    /** @var UploadedFile|null $fileData */
                     $fileData = $form['file']->getData();
                     if (!empty($fileData)) {
                         $extension = pathinfo($fileData->getClientOriginalName(), PATHINFO_EXTENSION);
@@ -512,7 +518,8 @@ final class DashboardController extends AbstractFormController
             }
 
             // Sort by name
-            uasort($tempDashboard,
+            uasort(
+                $tempDashboard,
                 fn ($a, $b): int => strnatcasecmp($a['name'], $b['name'])
             );
 

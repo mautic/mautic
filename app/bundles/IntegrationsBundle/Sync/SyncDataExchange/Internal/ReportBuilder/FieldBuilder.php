@@ -14,7 +14,7 @@ use Mautic\IntegrationsBundle\Sync\ValueNormalizer\ValueNormalizer;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class FieldBuilder
+final class FieldBuilder
 {
     private readonly ValueNormalizer $valueNormalizer;
 

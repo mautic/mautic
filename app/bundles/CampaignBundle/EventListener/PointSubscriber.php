@@ -7,18 +7,13 @@ namespace Mautic\CampaignBundle\EventListener;
 use Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType;
 use Mautic\CampaignBundle\Helper\CampaignEventHelper;
 use Mautic\PointBundle\Event\TriggerBuilderEvent;
-use Mautic\PointBundle\PointEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class PointSubscriber implements EventSubscriberInterface
+final class PointSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            PointEvents::TRIGGER_ON_BUILD => ['onTriggerBuild', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: TriggerBuilderEvent::class,
+    )]
     public function onTriggerBuild(TriggerBuilderEvent $event): void
     {
         $changeLists = [

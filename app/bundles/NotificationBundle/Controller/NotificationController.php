@@ -33,7 +33,7 @@ final class NotificationController extends AbstractFormController
     }
 
     #[Route(
-        '/s/notifications/{objectAction}/{objectId}',
+        path: '/s/notifications/{objectAction}/{objectId}',
         name: 'mautic_notification_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -43,16 +43,13 @@ final class NotificationController extends AbstractFormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
-        '/s/notifications/{page}',
+        path: '/s/notifications/{page}',
         name: 'mautic_notification_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, $page = 1): Response
+    public function indexAction(Request $request, int $page = 1): Response
     {
         // set some permissions
         $permissions = $this->security->isGranted(
@@ -172,8 +169,6 @@ final class NotificationController extends AbstractFormController
      */
     public function viewAction(Request $request, $objectId): Response
     {
-        $security = $this->security;
-
         /** @var Notification $notification */
         $notification = $this->notificationModel->getEntity($objectId);
         // set the page we came from
@@ -233,7 +228,7 @@ final class NotificationController extends AbstractFormController
                 'notification' => $notification,
                 'trackables'   => $trackableLinks,
                 'logs'         => $logs,
-                'permissions'  => $security->isGranted([
+                'permissions'  => $this->security->isGranted([
                     'notification:notifications:viewown',
                     'notification:notifications:viewother',
                     'notification:notifications:create',
@@ -244,7 +239,7 @@ final class NotificationController extends AbstractFormController
                     'notification:notifications:publishown',
                     'notification:notifications:publishother',
                 ], 'RETURN_ARRAY'),
-                'security'    => $security,
+                'security'    => $this->security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
                     'Mautic\NotificationBundle\Controller\NotificationController::contactsAction',
@@ -269,7 +264,7 @@ final class NotificationController extends AbstractFormController
      *
      * @param Notification $entity
      */
-    public function newAction(Request $request, $entity = null): Response
+    public function newAction(Request $request, ?object $entity = null): Response
     {
         if (!$entity instanceof Notification) {
             /** @var Notification $entity */
@@ -726,11 +721,8 @@ final class NotificationController extends AbstractFormController
         );
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
-        '/s/notifications/view/{objectId}/contact/{page}',
+        path: '/s/notifications/view/{objectId}/contact/{page}',
         name: 'mautic_notification_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
@@ -739,7 +731,7 @@ final class NotificationController extends AbstractFormController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         $objectId,
-        $page = 1,
+        int $page = 1,
     ): Response {
         return $this->generateContactsGrid(
             $request,

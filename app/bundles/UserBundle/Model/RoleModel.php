@@ -8,9 +8,11 @@ use Mautic\UserBundle\Entity\PermissionRepository;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\UserRepository;
-use Mautic\UserBundle\Event\RoleEvent;
+use Mautic\UserBundle\Event\PostDeleteRoleEvent;
+use Mautic\UserBundle\Event\PostSaveRoleEvent;
+use Mautic\UserBundle\Event\PreDeleteRoleEvent;
+use Mautic\UserBundle\Event\PreSaveRoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
-use Mautic\UserBundle\UserEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
@@ -55,9 +57,11 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Role $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
@@ -76,9 +80,9 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     /**
      * Generate the role's permissions.
      *
-     * @param array $rawPermissions (i.e. from request)
+     * @param array<string, mixed>|null $rawPermissions (i.e. from request)
      */
-    public function setRolePermissions(Role &$entity, $rawPermissions): void
+    public function setRolePermissions(Role $entity, ?array $rawPermissions): void
     {
         if (!is_array($rawPermissions)) {
             return;
@@ -97,6 +101,8 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Role $entity
+     *
      * @throws PreconditionRequiredHttpException
      */
     public function deleteEntity(object $entity): void
@@ -113,7 +119,10 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
         parent::deleteEntity($entity);
     }
 
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    /**
+     * @param Role|array<string, mixed> $entity
+     */
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role']);
@@ -149,37 +158,30 @@ final class RoleModel extends FormModel implements GlobalSearchInterface
     }
 
     /**
+     * @param Role $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         if (!$entity instanceof Role) {
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = UserEvents::ROLE_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = UserEvents::ROLE_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = UserEvents::ROLE_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = UserEvents::ROLE_POST_DELETE;
-                break;
-            default:
-                return null;
+        $event = match ($action) {
+            'pre_save'    => new PreSaveRoleEvent($entity, $isNew),
+            'post_save'   => new PostSaveRoleEvent($entity, $isNew),
+            'pre_delete'  => new PreDeleteRoleEvent($entity, $isNew),
+            'post_delete' => new PostDeleteRoleEvent($entity, $isNew),
+            default       => null,
+        };
+
+        if (!$event instanceof Event) {
+            return null;
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (!$event instanceof Event) {
-                $event = new RoleEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
-            }
-            $this->dispatcher->dispatch($event, $name);
+        if ($this->dispatcher->hasListeners($event::class)) {
+            $this->dispatcher->dispatch($event);
 
             return $event;
         }

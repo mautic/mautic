@@ -13,9 +13,9 @@ use Mautic\CoreBundle\Entity\CacheInvalidateInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-#[AsDoctrineListener(Events::postPersist)]
-#[AsDoctrineListener(Events::postUpdate)]
-#[AsDoctrineListener(Events::postRemove)]
+#[AsDoctrineListener(event: Events::postPersist)]
+#[AsDoctrineListener(event: Events::postUpdate)]
+#[AsDoctrineListener(event: Events::postRemove)]
 final readonly class CacheInvalidateSubscriber
 {
     private const string ACTION_PERSIST = 'persist';
@@ -69,11 +69,8 @@ final readonly class CacheInvalidateSubscriber
             return;
         }
 
-        $cache = clone $cache;
-
         foreach ($namespacesToDelete as $namespace) {
-            $cache->setNamespace($namespace);
-            $cache->deleteAll();
+            ResultCacheHelper::getNamespacedCache($cache, $namespace)->clear();
         }
     }
 

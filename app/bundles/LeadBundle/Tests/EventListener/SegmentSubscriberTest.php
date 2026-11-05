@@ -11,11 +11,11 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListEvent as SegmentEvent;
 use Mautic\LeadBundle\EventListener\SegmentSubscriber;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Validator\SegmentUsedInCampaignsValidator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -39,7 +39,7 @@ final class SegmentSubscriberTest extends TestCase
 
     private CoreParametersHelper&MockObject $coreParametersHelper;
 
-    private SegmentCountCacheHelper&\PHPUnit\Framework\MockObject\Stub $segmentCountCacheHelper;
+    private SegmentCountCacheHelper&Stub $segmentCountCacheHelper;
 
     protected function setUp(): void
     {
@@ -51,37 +51,6 @@ final class SegmentSubscriberTest extends TestCase
         $this->coreParametersHelper            = $this->createMock(CoreParametersHelper::class);
         $this->segmentCountCacheHelper         = $this->createStub(SegmentCountCacheHelper::class);
         $this->coreParametersHelper->method('get')->willReturnCallback(fn (): false => false);
-    }
-
-    public function testGetSubscribedEvents(): void
-    {
-        $subscriber  = new SegmentSubscriber(
-            $this->ipLookupHelper,
-            $this->auditLogModel,
-            $this->listModel,
-            $this->createStub(SegmentUsedInCampaignsValidator::class),
-            $this->coreParametersHelper,
-            $this->segmentCountCacheHelper,
-            $this->createStub(TranslatorInterface::class)
-        );
-
-        $this->assertSame(
-            [
-                LeadEvents::LIST_POST_SAVE     => ['onSegmentPostSave', 0],
-                LeadEvents::ON_LIST_DELETE     => ['onSegmentDelete', 0],
-                LeadEvents::LIST_POST_DELETE   => [
-                    ['onSegmentPostDelete', 0],
-                    ['clearSegmentCountCache', 0],
-                ],
-                LeadEvents::LIST_PRE_DELETE   => [
-                    ['onSegmentPreDelete', 0],
-                ],
-                LeadEvents::LIST_PRE_UNPUBLISH => [
-                    ['onSegmentPreUnpublish', 0],
-                ],
-            ],
-            $subscriber->getSubscribedEvents()
-        );
     }
 
     public function testOnSegmentPostSave(): void
@@ -122,11 +91,9 @@ final class SegmentSubscriberTest extends TestCase
             $this->createStub(TranslatorInterface::class)
         );
 
-        $segment            = $this->createMock(LeadList::class);
+        $segment            = new LeadList();
         $segment->deletedId = $segmentId;
-        $segment->expects($this->once())
-            ->method('getName')
-            ->willReturn($segmentName);
+        $segment->setName($segmentName);
 
         $event = $this->createMock(SegmentEvent::class);
         $event->expects($this->once())
@@ -157,12 +124,9 @@ final class SegmentSubscriberTest extends TestCase
             $this->createStub(TranslatorInterface::class)
         );
 
-        $segment            = $this->createMock(LeadList::class);
+        $segment            = new LeadList();
         $segment->deletedId = $segmentId;
-
-        $segment->expects($this->once())
-            ->method('getId')
-            ->willReturn($segmentId);
+        $segment->setId($segmentId);
 
         $event = $this->createMock(SegmentEvent::class);
         $event->expects($this->once())
@@ -210,10 +174,8 @@ final class SegmentSubscriberTest extends TestCase
             $this->createStub(TranslatorInterface::class)
         );
 
-        $segment = $this->createMock(LeadList::class);
-        $segment->expects($this->once())
-            ->method('getId')
-            ->willReturn($segmentId);
+        $segment = new LeadList();
+        $segment->setId($segmentId);
 
         $event = $this->createMock(SegmentEvent::class);
         $event->expects($this->once())

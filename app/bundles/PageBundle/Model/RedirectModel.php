@@ -13,7 +13,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends FormModel<Redirect>
  */
-class RedirectModel extends FormModel
+final class RedirectModel extends FormModel
 {
     public static function getName(): string
     {
@@ -41,7 +41,7 @@ class RedirectModel extends FormModel
     /**
      * @return Redirect|null
      */
-    public function getRedirectById(string $identifier)
+    public function getRedirectById(string $identifier): ?object
     {
         return $this->redirectRepository->findOneBy(['redirectId' => $identifier]);
     }
@@ -49,13 +49,11 @@ class RedirectModel extends FormModel
     /**
      * Generate a Mautic redirect/passthrough URL.
      *
-     * @param array $clickthrough
-     *
      * @return string
      */
     public function generateRedirectUrl(
         Redirect $redirect,
-        $clickthrough = [],
+        array $clickthrough = [],
     ) {
         if ($this->dispatcher->hasListeners(RedirectGenerationEvent::class)) {
             $event = new RedirectGenerationEvent($redirect, $clickthrough);
@@ -89,10 +87,8 @@ class RedirectModel extends FormModel
      * Get a Redirect entity by URL.
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
-     *
-     * @return Redirect|null
      */
-    public function getRedirectByUrl(string $url)
+    public function getRedirectByUrl(string $url): Redirect
     {
         // Ensure the URL saved to the database does not have encoded ampersands
         $url = UrlHelper::decodeAmpersands($url);

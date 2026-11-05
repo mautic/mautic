@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Tests\Model;
 
-use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Exception\DbalException as Exception;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -27,7 +27,6 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -49,7 +48,7 @@ final class UserModelTest extends TestCase
     private MockObject $entityManager;
 
     /**
-     * @var MockObject&Router
+     * @var MockObject&UrlGeneratorInterface
      */
     private MockObject $router;
 
@@ -58,10 +57,7 @@ final class UserModelTest extends TestCase
      */
     private MockObject $translator;
 
-    /**
-     * @var MockObject&User
-     */
-    private MockObject $user;
+    private User $user;
 
     /**
      * @var MockObject&UserTokenServiceInterface
@@ -93,8 +89,8 @@ final class UserModelTest extends TestCase
         $this->mailHelper       = $this->createMock(MailHelper::class);
         $this->userTokenService = $this->createMock(UserTokenServiceInterface::class);
         $this->entityManager    = $this->createMock(EntityManager::class);
-        $this->user             = $this->createMock(User::class);
-        $this->router           = $this->createMock(Router::class);
+        $this->user             = new User();
+        $this->router           = $this->createMock(UrlGeneratorInterface::class);
         $this->translator       = $this->createMock(Translator::class);
         $this->logger           = $this->createMock(LoggerInterface::class);
         $this->twig             = $this->createMock(Environment::class);
@@ -126,7 +122,7 @@ final class UserModelTest extends TestCase
     {
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->createStub(UserToken::class));
+            ->willReturn(new UserToken());
 
         $this->mailHelper
             ->method('getMailer')
@@ -137,7 +133,7 @@ final class UserModelTest extends TestCase
 
         $this->userTokenService->expects($this->once())
             ->method('generateSecret')
-            ->willReturn($this->createStub(UserToken::class));
+            ->willReturn(new UserToken());
 
         $this->router->expects($this->once())
             ->method('generate')
@@ -155,6 +151,10 @@ final class UserModelTest extends TestCase
         $errorMessage = 'Database connection failed';
 
         $this->expectException(PasswordResetTokenCreationFailedException::class);
+
+        $this->userTokenService->expects($this->once())
+            ->method('generateSecret')
+            ->willReturn(new UserToken());
 
         $this->entityManager->expects($this->once())
             ->method('flush')
@@ -177,18 +177,14 @@ final class UserModelTest extends TestCase
     public function testEmailUser(): void
     {
         $email   = 'a@test.com';
-        $name    = 'name';
+        $name    = 'John Doe';
         $toMail  = [$email => $name];
         $subject = 'subject';
         $content = 'content';
 
-        $this->user->expects($this->once())
-            ->method('getEmail')
-            ->willReturn($email);
-
-        $this->user->expects($this->once())
-            ->method('getName')
-            ->willReturn($name);
+        $this->user->setEmail($email);
+        $this->user->setFirstName('John');
+        $this->user->setLastName('Doe');
 
         $this->mailHelper->expects($this->once())
             ->method('getMailer')

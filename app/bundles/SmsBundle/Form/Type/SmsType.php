@@ -41,6 +41,9 @@ final class SmsType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['content' => 'html', 'customHtml' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('sms.sms', $options));
 
+        /** @var Sms $sms */
+        $sms = $options['data'];
+
         $builder->add(
             'name',
             TextType::class,
@@ -86,7 +89,7 @@ final class SmsType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.sms.form.is_mms',
-                'data'  => (bool) $options['data']->getIsMms(),
+                'data'  => (bool) $sms->getIsMms(),
                 'attr'  => [
                     'onchange' => 'Mautic.toggleIsMms()',
                 ],
@@ -187,9 +190,9 @@ final class SmsType extends AbstractType
                 'multiple'       => false,
                 'placeholder'    => 'mautic.core.form.translation_parent.empty',
                 'top_level'      => 'translation',
-                'ignore_ids'     => [(int) $options['data']->getId()],
+                'ignore_ids'     => [(int) $sms->getId()],
                 'mapped'         => false,
-                'data'           => ($options['data']->getTranslationParent()) ? $options['data']->getTranslationParent()->getId() : null,
+                'data'           => ($sms->getTranslationParent()) ? $sms->getTranslationParent()->getId() : null,
             ]
         );
 

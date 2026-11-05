@@ -66,7 +66,7 @@ final class EmailUtmTagsType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'required'          => false,
-                'constraints'       => new Length(['max' => ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH]),
+                'constraints'       => new Length(max: ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH),
             ]
         );
     }

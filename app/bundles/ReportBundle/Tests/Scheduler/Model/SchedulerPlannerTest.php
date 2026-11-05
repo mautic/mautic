@@ -11,8 +11,9 @@ use Mautic\ReportBundle\Entity\SchedulerRepository;
 use Mautic\ReportBundle\Scheduler\Date\DateBuilder;
 use Mautic\ReportBundle\Scheduler\Exception\NoScheduleException;
 use Mautic\ReportBundle\Scheduler\Model\SchedulerPlanner;
+use PHPUnit\Framework\TestCase;
 
-final class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
+final class SchedulerPlannerTest extends TestCase
 {
     public function testComputeSchedule(): void
     {
@@ -50,13 +51,11 @@ final class SchedulerPlannerTest extends \PHPUnit\Framework\TestCase
 
         $entityManager->expects($this->once())
             ->method('persist')
-            ->with($this->callback(function ($scheduler) use ($report, $dateOfNextSchedule): bool {
+            ->willReturnCallback(function (object $scheduler) use ($report, $dateOfNextSchedule): void {
                 $this->assertInstanceOf(Scheduler::class, $scheduler);
                 $this->assertSame($report, $scheduler->getReport());
                 $this->assertSame($dateOfNextSchedule, $scheduler->getScheduleDate());
-
-                return true;
-            }));
+            });
 
         $schedulerPlanner->computeScheduler($report);
     }

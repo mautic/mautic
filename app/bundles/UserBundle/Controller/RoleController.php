@@ -2,10 +2,11 @@
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
-use Mautic\UserBundle\Entity;
+use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use Mautic\UserBundle\Entity\PermissionRepository;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Helper\RoleSearchScopeProvider;
 use Mautic\UserBundle\Model\RoleModel;
@@ -16,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class RoleController extends FormController
+final class RoleController extends AbstractFormController
 {
     private const string PERMISSION_VIEW = 'user:roles:view';
 
@@ -50,7 +51,7 @@ final class RoleController extends FormController
     }
 
     #[Route(
-        '/s/roles/{objectAction}/{objectId}',
+        path: '/s/roles/{objectAction}/{objectId}',
         name: 'mautic_role_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -78,7 +79,7 @@ final class RoleController extends FormController
      * Generate's default role list view.
      */
     #[Route(
-        '/s/roles/{page}',
+        path: '/s/roles/{page}',
         name: 'mautic_role_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
@@ -89,7 +90,7 @@ final class RoleController extends FormController
             $this->throwAccessDenied();
         }
 
-        $this->setListFilters();
+        $this->setListFilters($this->getSessionBase());
 
         $pageHelper = $pageHelperFactory->make('mautic.role', $page);
 
@@ -165,7 +166,7 @@ final class RoleController extends FormController
         }
 
         // retrieve the entity
-        $entity = new Entity\Role();
+        $entity = new Role();
 
         // set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_role_index');
@@ -292,7 +293,7 @@ final class RoleController extends FormController
     /**
      * @param array<string, mixed> $postActionVars
      */
-    private function handleRoleClone(Request $request, int $objectId, Entity\Role $source, RoleModel $model, array $postActionVars): Response
+    private function handleRoleClone(Request $request, int $objectId, Role $source, RoleModel $model, array $postActionVars): Response
     {
         $entity            = $model->cloneEntity($source);
         $permissionsConfig = $this->getPermissionsConfig($source);
@@ -310,7 +311,7 @@ final class RoleController extends FormController
     /**
      * @param array<string, mixed> $postActionVars
      */
-    private function handleRoleClonePost(Request $request, Entity\Role $entity, RoleModel $model, FormInterface $form, array $postActionVars): ?Response
+    private function handleRoleClonePost(Request $request, Role $entity, RoleModel $model, FormInterface $form, array $postActionVars): ?Response
     {
         $cancelled = $this->isFormCancelled($form);
         $valid     = !$cancelled && $this->isFormValid($form);
@@ -473,9 +474,9 @@ final class RoleController extends FormController
     }
 
     /**
-     * @return array{config: array<string, array{label: string, permissionObject: \Mautic\CoreBundle\Security\Permissions\AbstractPermissions, ratio: array{int, int}, data: mixed}>, list: array<string, array<string, list<int|string>>>}
+     * @return array{config: array<string, array{label: string, permissionObject: AbstractPermissions, ratio: array{int, int}, data: mixed}>, list: array<string, array<string, list<int|string>>>}
      */
-    private function getPermissionsConfig(Entity\Role $role): array
+    private function getPermissionsConfig(Role $role): array
     {
         $permissionObjects = $this->security->getPermissionObjects();
 
@@ -483,7 +484,7 @@ final class RoleController extends FormController
 
         $permissions     = [];
         $permissionsList = [];
-        /** @var \Mautic\CoreBundle\Security\Permissions\AbstractPermissions $object */
+        /** @var AbstractPermissions $object */
         foreach ($permissionObjects as $object) {
             if (!is_object($object)) {
                 continue;

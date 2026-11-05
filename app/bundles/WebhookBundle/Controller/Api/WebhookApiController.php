@@ -66,9 +66,8 @@ final class WebhookApiController extends CommonApiController
      * @param Webhook              $entity
      * @param FormInterface<mixed> $form
      * @param array<mixed>         $parameters
-     * @param string               $action
      */
-    protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit'): void
+    protected function preSaveEntity(object &$entity, FormInterface $form, array $parameters, string $action = 'edit'): void
     {
         $eventsToKeep = [];
 
@@ -89,7 +88,7 @@ final class WebhookApiController extends CommonApiController
     }
 
     #[Route(
-        '/api/hooks/triggers',
+        path: '/api/hooks/triggers',
         name: 'mautic_api_webhookevents',
         defaults: ['_format' => 'json'],
         methods: ['GET']

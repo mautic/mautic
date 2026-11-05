@@ -7,7 +7,7 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 use Mautic\IntegrationsBundle\Sync\Exception\FieldNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 
-class MappingManualDAO
+final class MappingManualDAO
 {
     private array $objectsMapping = [];
 
@@ -17,7 +17,11 @@ class MappingManualDAO
 
     public function __construct(
         private readonly string $integration,
+        array $objectsMapping
     ) {
+        foreach ($objectsMapping as $objectMapping) {
+            $this->addObjectMapping($objectMapping);
+        }
     }
 
     public function getIntegration(): string
@@ -25,7 +29,7 @@ class MappingManualDAO
         return $this->integration;
     }
 
-    public function addObjectMapping(ObjectMappingDAO $objectMappingDAO): void
+    private function addObjectMapping(ObjectMappingDAO $objectMappingDAO): void
     {
         $internalObjectName    = $objectMappingDAO->getInternalObjectName();
         $integrationObjectName = $objectMappingDAO->getIntegrationObjectName();

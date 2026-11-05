@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Doctrine\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
@@ -31,10 +31,11 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\AnyInvokedCount;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 #[AllowMockObjectsWithoutExpectations]
-final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
+final class ReportSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&FieldModel
@@ -156,7 +157,7 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilderMock
             ->method('getQueryPart')
-            ->willReturnCallback(function ($input): array|string {
+            ->willReturnCallback(function (string $input): array|string {
                 if ('join' === $input) {
                     return [
                         'lp' => [[
@@ -254,7 +255,8 @@ final class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             ],
                         ],
                     ],
-                ]);
+                ]
+            );
 
         $this->translatorMock
             ->method('hasId')

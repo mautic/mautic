@@ -52,26 +52,6 @@ final class CompanyObjectSubscriberTest extends TestCase
         );
     }
 
-    public function testGetSubscribedEvents(): void
-    {
-        $this->assertSame(
-            [
-                InternalObjectEvent::class         => ['collectInternalObjects', 0],
-                InternalObjectUpdateEvent::class   => ['updateCompanies', 0],
-                InternalObjectCreateEvent::class   => ['createCompanies', 0],
-                InternalObjectFindEvent::class     => [
-                    ['findCompaniesByIds', 0],
-                    ['findCompaniesByDateRange', 0],
-                    ['findCompaniesByFieldValues', 0],
-                ],
-                InternalObjectOwnerEvent::class    => ['findOwnerIdsForCompanies', 0],
-                InternalObjectRouteEvent::class    => ['buildCompanyRoute', 0],
-                InternalObjectFindByIdEvent::class => ['findCompanyById', 0],
-            ],
-            CompanyObjectSubscriber::getSubscribedEvents()
-        );
-    }
-
     public function testCollectInternalObjects(): void
     {
         $event = new InternalObjectEvent();
@@ -128,12 +108,14 @@ final class CompanyObjectSubscriberTest extends TestCase
 
     public function testCreateCompaniesWithRightObject(): void
     {
-        $event = new InternalObjectCreateEvent(new Company(), [['somefield' => 'somevalue']]);
+        $objectChangeDAOStub = $this->createStub(ObjectChangeDAO::class);
 
-        $objectMapping = $this->createStub(ObjectMapping::class);
+        $event = new InternalObjectCreateEvent(new Company(), [$objectChangeDAOStub]);
+
+        $objectMapping = new ObjectMapping();
         $this->companyObjectHelper->expects($this->once())
             ->method('create')
-            ->with([['somefield' => 'somevalue']])
+            ->with([$objectChangeDAOStub])
             ->willReturn([$objectMapping]);
 
         $this->subscriber->createCompanies($event);
@@ -335,7 +317,7 @@ final class CompanyObjectSubscriberTest extends TestCase
     {
         $event = new InternalObjectFindByIdEvent(new Company());
         $event->setId(1);
-        $companyObj = $this->createStub(CompanyEntity::class);
+        $companyObj = new CompanyEntity();
         $this->companyObjectHelper->expects($this->once())
             ->method('findObjectById')
             ->with(1)

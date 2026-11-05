@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Command;
 
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeleteContactSecondaryCompaniesCommand;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -20,7 +21,7 @@ final class DeleteContactSecondaryCompaniesCommandTest extends MauticMysqlTestCa
     {
         $contact          = $this->getContactWithCompanies();
         /** @var CompanyLeadRepository $companyLeadRepo */
-        $companyLeadRepo  = $this->em->getRepository(CompanyLead::class);
+        $companyLeadRepo  = $this->getContainer()->get(CompanyLeadRepository::class);
 
         $contactCompanies = $companyLeadRepo->getCompaniesByLeadId($contact->getId());
         $this->assertCount(2, $contactCompanies);
@@ -38,8 +39,8 @@ final class DeleteContactSecondaryCompaniesCommandTest extends MauticMysqlTestCa
     }
 
     /**
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     protected function getContactWithCompanies(): Lead
     {

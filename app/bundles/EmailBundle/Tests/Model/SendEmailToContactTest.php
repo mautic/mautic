@@ -33,6 +33,8 @@ use Mautic\PageBundle\Model\TrackableModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -44,7 +46,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
+final class SendEmailToContactTest extends TestCase
 {
     /**
      * @var array<array<string,int|string>>
@@ -84,13 +86,13 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
     private MockObject&CoreParametersHelper $coreParametersHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&Mailbox $mailbox;
+    private Stub&Mailbox $mailbox;
 
-    private \PHPUnit\Framework\MockObject\Stub&LoggerInterface $loggerMock;
+    private Stub&LoggerInterface $loggerMock;
 
     private MailHashHelper $mailHashHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&TranslatorInterface $translator;
+    private Stub&TranslatorInterface $translator;
 
     private MockObject&MailHelper $mailHelper;
 
@@ -98,19 +100,19 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
     private MockObject&EmailStatModel $emailStatModel;
 
-    private \PHPUnit\Framework\MockObject\Stub&Environment $twig;
+    private Stub&Environment $twig;
 
     private MockObject&SMimeHelper $sMimeHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&EventDispatcherInterface $dispatcher;
+    private Stub&EventDispatcherInterface $dispatcher;
 
-    private \PHPUnit\Framework\MockObject\Stub&PathsHelper $pathsHelper;
+    private Stub&PathsHelper $pathsHelper;
 
-    private \PHPUnit\Framework\MockObject\Stub&AssetModel $assetModel;
+    private Stub&AssetModel $assetModel;
 
-    private \PHPUnit\Framework\MockObject\Stub&TrackableModel $trackableModel;
+    private Stub&TrackableModel $trackableModel;
 
-    private \PHPUnit\Framework\MockObject\Stub&RedirectModel $redirectModel;
+    private Stub&RedirectModel $redirectModel;
 
     private StatHelper $statHelper;
 
@@ -175,10 +177,8 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     #[TestDox('Tests that bad emails are failed')]
     public function testExceptionIsThrownIfEmailIsSentToBadContact(): void
     {
-        $emailMock = $this->createMock(Email::class);
-        $emailMock
-            ->method('getId')
-            ->willReturn(1);
+        $emailMock = new Email();
+        $emailMock->setId(1);
 
         $this->mailHelper->method('setEmail')
             ->willReturn(true);
@@ -228,11 +228,11 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     public function testBadEmailDoesNotCauseBatchQueueMaxExceptionOnSubsequentContacts(): void
     {
         /** @var Email&MockObject $emailMock */
-        $emailMock = $this->createMock(Email::class);
-        $emailMock->method('getId')->willReturn(1);
-        $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
-        $emailMock->method('getSubject')->willReturn('Subject');
-        $emailMock->method('getCustomHtml')->willReturn('<html>{unsubscribe_url}</html>');
+        $emailMock = new Email();
+        $emailMock->setId(1);
+        $emailMock->setFromAddress('test@mautic.com');
+        $emailMock->setSubject('Subject');
+        $emailMock->setCustomHtml('<html>{unsubscribe_url}</html>');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(false, 1);
@@ -293,10 +293,8 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     $stat = new Stat();
                     $stat->setEmail($emailMock);
 
-                    /** @var Lead&MockObject $leadMock */
-                    $leadMock = $this->createMock(Lead::class);
-                    $leadMock->method('getId')
-                        ->willReturn(1);
+                    $leadMock = new Lead();
+                    $leadMock->setId(1);
 
                     $stat->setLead($leadMock);
 
@@ -344,11 +342,11 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturnMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]);
 
-        $emailMock = $this->createMock(Email::class);
-        $emailMock->method('getId')->willReturn(1);
-        $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
-        $emailMock->method('getSubject')->willReturn('Subject');
-        $emailMock->method('getCustomHtml')->willReturn('Hi {contactfield=firstname}');
+        $emailMock = new Email();
+        $emailMock->setId(1);
+        $emailMock->setFromAddress('test@mautic.com');
+        $emailMock->setSubject('Subject');
+        $emailMock->setCustomHtml('Hi {contactfield=firstname}');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(false, 1);
@@ -450,11 +448,11 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     {
         $this->coreParametersHelper->expects($this->atLeast(2))->method('get')->willReturnMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]);
 
-        $emailMock = $this->createMock(Email::class);
-        $emailMock->method('getId')->willReturn(1);
-        $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
-        $emailMock->method('getSubject')->willReturn('Subject');
-        $emailMock->method('getCustomHtml')->willReturn('<html>{unsubscribe_url}</html>');
+        $emailMock = new Email();
+        $emailMock->setId(1);
+        $emailMock->setFromAddress('test@mautic.com');
+        $emailMock->setSubject('Subject');
+        $emailMock->setCustomHtml('<html>{unsubscribe_url}</html>');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(false, 1);
@@ -513,8 +511,8 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     $stat = new Stat();
                     $stat->setEmail($emailMock);
 
-                    $leadMock = $this->createMock(Lead::class);
-                    $leadMock->method('getId')->willReturn(1);
+                    $leadMock = new Lead();
+                    $leadMock->setId(1);
 
                     $stat->setLead($leadMock);
 
@@ -570,11 +568,11 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
     {
         $this->coreParametersHelper->expects($this->atLeast(2))->method('get')->willReturnMap([['mailer_from_email', null, 'nobody@nowhere.com'], ['secret_key', null, 'secret']]);
 
-        $emailMock = $this->createMock(Email::class);
-        $emailMock->method('getId')->willReturn(1);
-        $emailMock->method('getFromAddress')->willReturn('test@mautic.com');
-        $emailMock->method('getSubject')->willReturn(''); // The subject must be empty for the email to fail.
-        $emailMock->method('getCustomHtml')->willReturn('<html>{unsubscribe_url}</html>');
+        $emailMock = new Email();
+        $emailMock->setId(1);
+        $emailMock->setFromAddress('test@mautic.com');
+        $emailMock->setSubject(''); // The subject must be empty for the email to fail.
+        $emailMock->setCustomHtml('<html>{unsubscribe_url}</html>');
 
         // Use our test token transport limiting to 1 recipient per queue
         $transport = new BatchTransport(true, 1);
@@ -632,8 +630,8 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     $stat = new Stat();
                     $stat->setEmail($emailMock);
 
-                    $leadMock = $this->createMock(Lead::class);
-                    $leadMock->method('getId')->willReturn(1);
+                    $leadMock = new Lead();
+                    $leadMock->setId(1);
 
                     $stat->setLead($leadMock);
 
@@ -740,15 +738,13 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
         $dncModel       = $this->createStub(DoNotContact::class);
         $translator     = $this->createStub(TranslatorInterface::class);
         $model          = new SendEmailToContact($mailHelper, $this->statHelper, $dncModel, $translator);
-        $emailMock      = $this->createMock(Email::class);
-        $emailMock->method('getId')->willReturn(1);
-        $emailMock->method('getSubject')->willReturn('subject');
-        $emailMock->method('getCustomHtml')->willReturn('content');
+        $emailMock      = new Email();
+        $emailMock->setId(1);
+        $emailMock->setSubject('subject');
+        $emailMock->setCustomHtml('content');
 
         // Set invalid BCC (should use comma as separator)
-        $emailMock
-            ->method('getBccAddress')
-            ->willReturn('test@mautic.com; test@mautic.com');
+        $emailMock->setBccAddress('test@mautic.com; test@mautic.com');
 
         $model->setEmail($emailMock);
 
@@ -760,5 +756,96 @@ final class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         // Send should trigger the FailedToSendToContactException
         $model->setContact($this->contacts[0])->send();
+    }
+
+    #[TestDox('Test that flush calls getErrors even when flushQueue returns true')]
+    public function testFlushCallsGetErrorsWhenFlushQueueReturnsTrue(): void
+    {
+        $emailMock = $this->createMock(Email::class);
+        $emailMock->method('getId')->willReturn(1);
+
+        $this->mailHelper->method('setEmail')
+            ->willReturn(true);
+
+        // flushQueue returns true (no fatal error)
+        $this->mailHelper->method('flushQueue')
+            ->willReturn(true);
+
+        // getErrors should be called even though flushQueue returned true
+        // This is the key behavior change - previously getErrors was only called when flushQueue returned false
+        $this->mailHelper->expects($this->once())
+            ->method('getErrors')
+            ->willReturn([]);
+
+        $model = new SendEmailToContact($this->mailHelper, $this->statHelper, $this->dncModel, $this->translator);
+        $model->setEmail($emailMock);
+
+        // Flush should call getErrors regardless of flushQueue's return value
+        $model->flush();
+    }
+
+    #[TestDox('Test that flush processes failures even when flushQueue returns true')]
+    public function testFlushProcessesFailuresWhenFlushQueueReturnsTrue(): void
+    {
+        $emailMock = $this->createMock(Email::class);
+        $emailMock->method('getId')->willReturn(1);
+
+        $this->mailHelper->method('setEmail')
+            ->willReturn(true);
+
+        // Create a stat that will be found by statHelper
+        $stat = new Stat();
+        $stat->setEmail($emailMock);
+        $leadMock = $this->createMock(Lead::class);
+        $leadMock->method('getId')->willReturn(123);
+        $stat->setLead($leadMock);
+
+        // Add the stat to statHelper so it can be found during processSendFailures
+        $this->statHelper->storeStat($stat, 'failed@example.com');
+
+        // flushQueue returns true (no fatal error - some emails succeeded)
+        $this->mailHelper->method('flushQueue')
+            ->willReturn(true);
+
+        // But getErrors still returns failures for emails that failed
+        // This is the critical scenario: partial batch failure
+        $sendFailures = [
+            'failures' => ['failed@example.com'],
+            'Error sending to failed@example.com',
+        ];
+        $this->mailHelper->method('getErrors')
+            ->willReturn($sendFailures);
+
+        $model = new SendEmailToContact($this->mailHelper, $this->statHelper, $this->dncModel, $this->translator);
+        $model->setEmail($emailMock);
+
+        // Initialize the email sent count so downEmailSentCount doesn't trigger warnings
+        $reflection = new \ReflectionClass($model);
+        $property = $reflection->getProperty('emailSentCounts');
+        $property->setValue($model, [1 => 1]); // Email ID 1 has 1 sent
+
+        // Before the fix, this would not process the failure because flushQueue returned true
+        // After the fix, failures are processed regardless of flushQueue's return value
+        $model->flush();
+
+        $failedContacts = $model->getFailedContacts();
+        $this->assertCount(1, $failedContacts);
+        $this->assertEquals('failed@example.com', $failedContacts[123]);
+    }
+
+    #[TestDox('Test that flush skips getErrors when emailEntityId is not set')]
+    public function testFlushSkipsGetErrorsWhenNoEmailEntity(): void
+    {
+        // When emailEntityId is null, flushQueue and getErrors should not be called at all
+        $this->mailHelper->expects($this->never())
+            ->method('flushQueue');
+
+        $this->mailHelper->expects($this->never())
+            ->method('getErrors');
+
+        $model = new SendEmailToContact($this->mailHelper, $this->statHelper, $this->dncModel, $this->translator);
+
+        // Don't set an email entity - emailEntityId will remain null
+        $model->flush();
     }
 }

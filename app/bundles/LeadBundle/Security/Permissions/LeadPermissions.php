@@ -96,10 +96,7 @@ final class LeadPermissions extends AbstractPermissions
         return false;
     }
 
-    /**
-     * @return array
-     */
-    protected function getSynonym($name, $level)
+    protected function getSynonym($name, $level): array
     {
         if ('fields' === $name) {
             // set some synonyms

@@ -15,10 +15,10 @@ use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ReportSubscriber implements EventSubscriberInterface
+final readonly class ReportSubscriber
 {
     public const string CONTEXT_FORMS           = 'forms';
 
@@ -38,19 +38,12 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     ) {
     }
 
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ReportBuilderEvent::class   => ['onReportBuilder', 0],
-            ReportGeneratorEvent::class => ['onReportGenerate', 0],
-            ReportGraphEvent::class     => ['onReportGraphGenerate', 0],
-            ReportDataEvent::class      => ['onReportDisplay', 0],
-        ];
-    }
-
     /**
      * Add available tables and columns to the report builder lookup.
      */
+    #[AsEventListener(
+        event: ReportBuilderEvent::class,
+    )]
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION, self::CONTEXT_FORM_RESULT])) {
@@ -149,6 +142,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
             $forms = $this->formRepository->getEntities($args ?? []);
             foreach ($forms as $form) {
+                /** @var Form $formEntity */
                 $formEntity         = $form[0];
 
                 $formResultsColumns = $this->getFormResultsColumns($formEntity);
@@ -174,6 +168,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGeneratorEvent::class,
+    )]
     public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION, self::CONTEXT_FORM_RESULT])) {
@@ -223,6 +220,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
+    #[AsEventListener(
+        event: ReportGraphEvent::class,
+    )]
     public function onReportGraphGenerate(ReportGraphEvent $event): void
     {
         // Context check, we only want to fire for Lead reports
@@ -235,6 +235,8 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
 
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
+            /** @var TranslatorInterface $translator */
+            $translator = $options['translator'];
             $queryBuilder = clone $qb;
             $chartQuery   = clone $options['chartQuery'];
             $chartQuery->applyDateFilters($queryBuilder, 'date_submitted', 'fs');
@@ -244,7 +246,7 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
                     $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
                     $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_submitted', 'fs');
                     $hits = $chartQuery->loadAndBuildTimeData($queryBuilder);
-                    $chart->setDataset($options['translator']->trans($g), $hits);
+                    $chart->setDataset($translator->trans($g), $hits);
                     $data         = $chart->render();
                     $data['name'] = $g;
 
@@ -279,6 +281,9 @@ final readonly class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
+    #[AsEventListener(
+        event: ReportDataEvent::class,
+    )]
     public function onReportDisplay(ReportDataEvent $event): void
     {
         $data = $event->getData();

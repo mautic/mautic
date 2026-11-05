@@ -31,7 +31,7 @@ class SyncIntegrationsHelper
     public function __construct(
         private readonly IntegrationsHelper $integrationsHelper,
         private readonly ObjectProvider $objectProvider,
-        #[AutowireIterator('mautic.sync_integration')]
+        #[AutowireIterator(tag: 'mautic.sync_integration')]
         iterable $integrations = [],
     ) {
         foreach ($integrations as $integration) {
@@ -48,11 +48,9 @@ class SyncIntegrationsHelper
     }
 
     /**
-     * @return SyncInterface
-     *
      * @throws IntegrationNotFoundException
      */
-    public function getIntegration(string $integration)
+    public function getIntegration(string $integration): SyncInterface
     {
         if (!isset($this->integrations[$integration])) {
             throw new IntegrationNotFoundException("{$integration} either doesn't exist or has not been tagged with mautic.sync_integration");

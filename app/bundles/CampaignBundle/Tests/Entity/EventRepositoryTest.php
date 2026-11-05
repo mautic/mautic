@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Mautic\CampaignBundle\Tests\Entity;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -23,7 +25,7 @@ final class EventRepositoryTest extends TestCase
         $emMock           = $this->createMock(EntityManager::class);
         $connMock         = $this->createMock(Connection::class);
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $expressionMock   = $this->createMock(Expr::class);
+        $expressionMock   = $this->createMock(ExpressionBuilder::class);
 
         $queryBuilderMock
             ->method('expr')
@@ -40,7 +42,7 @@ final class EventRepositoryTest extends TestCase
 
         $expressionMock->expects($this->once())
             ->method('gt')
-            ->with('failed_count', 0)
+            ->with('failed_count', '0')
             ->willReturn('failed_count > 0');
 
         $queryBuilderMock->expects($this->once())
@@ -78,12 +80,11 @@ final class EventRepositoryTest extends TestCase
 
         $eventRepository = $this->configureRepository(Event::class, $emMock);
         $this->connection->method('createQueryBuilder')
-            ->willReturnCallback(fn (): \PHPUnit\Framework\MockObject\MockObject => $queryBuilderMock);
+            ->willReturnCallback(fn (): MockObject => $queryBuilderMock);
 
-        $eventMock       = $this->createMock(Event::class);
-        $eventMock->method('getId')
-            ->willReturn(42);
+        $event = new Event();
+        ReflectionHelper::setEntityId($event, 42);
 
-        $eventRepository->decreaseFailedCount($eventMock);
+        $eventRepository->decreaseFailedCount($event);
     }
 }

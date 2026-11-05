@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use DateTime;
+use Exception;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\EmailValidator;
@@ -21,11 +23,11 @@ use Symfony\Contracts\Service\Attribute\Required;
  *
  * @extends CrmAbstractIntegration<HubspotApi>
  */
-class HubspotIntegration extends CrmAbstractIntegration
+final class HubspotIntegration extends CrmAbstractIntegration
 {
     private StageRepository $stageRepository;
 
-    protected UserHelper $userHelper;
+    private UserHelper $userHelper;
 
     private EmailValidator $emailValidator;
 
@@ -49,7 +51,7 @@ class HubspotIntegration extends CrmAbstractIntegration
         return $this->helper;
     }
 
-    public const ACCESS_KEY = 'accessKey';
+    public const string ACCESS_KEY = 'accessKey';
 
     public function getName(): string
     {
@@ -120,20 +122,16 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * Get available company fields for choices in the config UI.
-     *
-     * @return array
      */
-    public function getFormCompanyFields(array $settings = [])
+    public function getFormCompanyFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('company', $settings);
     }
 
     /**
      * @param array<string, mixed> $settings
-     *
-     * @return array|mixed
      */
-    public function getFormLeadFields(array $settings = [])
+    public function getFormLeadFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('contacts', $settings);
     }
@@ -188,7 +186,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
 
             if (!$silenceExceptions) {
@@ -201,10 +199,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $objects
-     *
-     * @return array
      */
-    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null): array
     {
         $objects ??= ['Leads', 'Contacts'];
 
@@ -223,7 +219,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      *
      * @param array $leadData All the lead fields mapped
      */
-    public function formatLeadDataForCreateOrUpdate($leadData, $lead, $updateLink = false): array
+    public function formatLeadDataForCreateOrUpdate(array $leadData, $lead, $updateLink = false): array
     {
         $formattedLeadData = [];
 
@@ -264,7 +260,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      * @param mixed[]              $data
      * @param string               $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('keys' === $formArea) {
             $builder->add(
@@ -376,7 +372,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
                 return $executed;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -422,7 +418,7 @@ class HubspotIntegration extends CrmAbstractIntegration
 
                 return $executed;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -464,10 +460,10 @@ class HubspotIntegration extends CrmAbstractIntegration
             if (isset($stageName)) {
                 $stage = $this->stageRepository->getStageByName($stageName);
 
-                if (null === $stage) {
+                if (!$stage instanceof Stage) {
                     $stage = new Stage();
                     $stage->setName($stageName);
-                    $stages[$stageName] = $stage;
+                    $stages             = [$stageName => $stage];
                 }
                 if (!$lead->getStage() && $lead->getStage() != $stage) {
                     $lead->setStage($stage);
@@ -485,7 +481,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                             ]
                         )
                     );
-                    $log->setDateAdded(new \DateTime());
+                    $log->setDateAdded(new DateTime());
                     $lead->stageChangeLog($log);
                 }
             }
@@ -504,7 +500,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $this->leadModel->addToCompany($lead, $company);
                         $this->em->detach($company);
                     }
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $this->logger->warning($exception->getMessage());
 
                     return;
@@ -517,9 +513,8 @@ class HubspotIntegration extends CrmAbstractIntegration
 
     /**
      * @param Lead  $lead
-     * @param array $config
      */
-    public function pushLead($lead, $config = []): array|bool
+    public function pushLead($lead, array $config = []): array|bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
@@ -593,7 +588,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     private function getReadOnlyFields(string $object): array
     {

@@ -3,9 +3,9 @@
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 
 #[ORM\Entity(repositoryClass: RedirectRepository::class)]
@@ -14,56 +14,43 @@ use Mautic\CoreBundle\Entity\FormEntity;
 class Redirect extends FormEntity
 {
     /**
-     * @var string
+     * @var int|string
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'redirect_id', type: 'string', length: 25)]
     private $redirectId;
 
+    #[ORM\Column(type: 'text')]
     private $url;
 
     /**
      * @var int
      */
+    #[ORM\Column(type: 'integer')]
     private $hits = 0;
 
     /**
      * @var int
      */
+    #[ORM\Column(name: 'unique_hits', type: 'integer')]
     private $uniqueHits = 0;
 
     /**
      * @var ArrayCollection<int, Trackable>
      */
-    #[ORM\OneToMany(mappedBy: 'redirect', targetEntity: Trackable::class, fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(targetEntity: Trackable::class, mappedBy: 'redirect', fetch: 'EXTRA_LAZY')]
     private $trackables;
 
     public function __construct()
     {
         $this->trackables = new ArrayCollection();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->createField('redirectId', 'string')
-            ->columnName('redirect_id')
-            ->length(25)
-            ->build();
-
-        $builder->addField('url', 'text');
-
-        $builder->addField('hits', 'integer');
-
-        $builder->createField('uniqueHits', 'integer')
-            ->columnName('unique_hits')
-            ->build();
     }
 
     /**
@@ -160,17 +147,17 @@ class Redirect extends FormEntity
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection<int, Trackable>
      */
-    public function getTrackableList()
+    public function getTrackableList(): Collection
     {
         return $this->trackables;
     }
 
     /**
-     * @param ArrayCollection $trackables
+     * @param Collection<int, Trackable> $trackables
      */
-    public function setTrackables($trackables): static
+    public function setTrackables(Collection $trackables): static
     {
         $this->trackables = $trackables;
 

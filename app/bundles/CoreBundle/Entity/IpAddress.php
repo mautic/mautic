@@ -7,12 +7,11 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: IpAddressRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['ip_address'], name: 'ip_search')]
+#[ORM\Index(name: 'ip_search', columns: ['ip_address'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -30,7 +29,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 class IpAddress
 {
-    public const TABLE_NAME = 'ip_addresses';
+    public const string TABLE_NAME = 'ip_addresses';
 
     /**
      * Set by factory of configured IPs to not track.
@@ -42,30 +41,17 @@ class IpAddress
      * @var int
      */
     #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var mixed[]
      */
     #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
+    #[ORM\Column(name: 'ip_details', type: 'array', nullable: true)]
     private $ipDetails;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->createField('ipAddress', 'string')
-            ->columnName('ip_address')
-            ->length(45)
-            ->build();
-
-        $builder->createField('ipDetails', 'array')
-            ->columnName('ip_details')
-            ->nullable()
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -91,6 +77,7 @@ class IpAddress
 
     public function __construct(
         #[Groups(['ipaddress:read', 'ipaddress:write', 'download:read'])]
+        #[ORM\Column(name: 'ip_address', type: 'string', length: 45)]
         private ?string $ipAddress = null,
     ) {
     }
@@ -118,7 +105,7 @@ class IpAddress
     /**
      * @param array<string,string> $ipDetails
      */
-    public function setIpDetails($ipDetails): static
+    public function setIpDetails(array $ipDetails): static
     {
         $this->ipDetails = $ipDetails;
 
@@ -128,7 +115,7 @@ class IpAddress
     /**
      * @return array<string,string>|null
      */
-    public function getIpDetails()
+    public function getIpDetails(): ?array
     {
         return $this->ipDetails;
     }

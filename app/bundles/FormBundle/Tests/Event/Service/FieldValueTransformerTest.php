@@ -10,10 +10,11 @@ use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Router;
 
-final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
+final class FieldValueTransformerTest extends TestCase
 {
     public function testTransformValuesAfterSubmitWithNoFieldsNoMatchesAndNoTokens(): void
     {
@@ -43,7 +44,7 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
             {
             }
 
-            public function generate(string $name, mixed $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
+            public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
             {
                 Assert::assertSame('mautic_form_file_download', $name);
                 Assert::assertSame([

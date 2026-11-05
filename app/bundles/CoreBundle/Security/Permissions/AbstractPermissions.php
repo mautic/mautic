@@ -33,10 +33,8 @@ abstract class AbstractPermissions
 
     /**
      * Returns bundle's permissions array.
-     *
-     * @return array
      */
-    public function getPermissions()
+    public function getPermissions(): array
     {
         return $this->permissions;
     }
@@ -146,7 +144,7 @@ abstract class AbstractPermissions
      *
      * @return array<int, string>
      */
-    protected function getSynonym($name, $level)
+    protected function getSynonym($name, $level): array
     {
         if (in_array($level, ['viewown', 'viewother'])) {
             if (isset($this->permissions[$name]['view'])) {
@@ -264,7 +262,7 @@ abstract class AbstractPermissions
      *
      * @return array<int, int>
      */
-    public function getPermissionRatio(array $data)
+    public function getPermissionRatio(array $data): array
     {
         $totalAvailable = $totalGranted = 0;
 
@@ -301,7 +299,7 @@ abstract class AbstractPermissions
     /**
      * Gives the bundle an opportunity to change how JavaScript calculates permissions granted.
      */
-    public function parseForJavascript(array &$perms): void
+    public function parseForJavascript(array $perms): void
     {
     }
 
@@ -319,7 +317,7 @@ abstract class AbstractPermissions
      * @param array<string> $choices
      * @param array<string> $data
      */
-    protected function addCustomFormFields(string $bundle, string $level, FormBuilderInterface &$builder, string $label, array $choices, array $data): void
+    protected function addCustomFormFields(string $bundle, string $level, FormBuilderInterface $builder, string $label, array $choices, array $data): void
     {
         $builder->add("{$bundle}:{$level}", PermissionListType::class, [
             'choices' => $choices,
@@ -333,7 +331,7 @@ abstract class AbstractPermissions
     /**
      * Adds the standard permission set of view, edit, create, delete, publish and full.
      *
-     * @param array $permissionNames
+     * @param string|array $permissionNames
      */
     protected function addStandardPermissions($permissionNames, bool $includePublish = true)
     {
@@ -360,10 +358,9 @@ abstract class AbstractPermissions
      *
      * @param string               $bundle
      * @param string               $level
-     * @param FormBuilderInterface $builder
      * @param array<string, mixed> $data
      */
-    protected function addStandardFormFields($bundle, $level, &$builder, array $data, bool $includePublish = true)
+    protected function addStandardFormFields($bundle, $level, FormBuilderInterface $builder, array $data, bool $includePublish = true)
     {
         $choices = [
             'mautic.core.permissions.view'   => 'view',
@@ -406,7 +403,7 @@ abstract class AbstractPermissions
     /**
      * Add a single full permission.
      *
-     * @param array $permissionNames
+     * @param string|array $permissionNames
      */
     protected function addManagePermission($permissionNames)
     {
@@ -426,10 +423,9 @@ abstract class AbstractPermissions
      *
      * @param string               $bundle
      * @param string               $level
-     * @param FormBuilderInterface $builder
      * @param array<string, mixed> $data
      */
-    protected function addManageFormFields($bundle, $level, &$builder, array $data)
+    protected function addManageFormFields($bundle, $level, FormBuilderInterface $builder, array $data)
     {
         $choices = [
             'mautic.core.permissions.manage' => 'manage',
@@ -487,7 +483,7 @@ abstract class AbstractPermissions
      * @param FormBuilderInterface $builder
      * @param array<string, mixed> $data
      */
-    protected function addExtendedFormFields($bundle, $level, &$builder, array $data, bool $includePublish = true)
+    protected function addExtendedFormFields($bundle, $level, $builder, array $data, bool $includePublish = true)
     {
         $choices = [
             'mautic.core.permissions.viewown'     => 'viewown',

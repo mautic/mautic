@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
-use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Tests\Functional\Fixtures\EmailFixturesHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\DomCrawler\Crawler;
@@ -28,7 +30,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return array{campaign: \Mautic\CampaignBundle\Entity\Campaign, email: \Mautic\EmailBundle\Entity\Email}
+     * @return array{campaign: Campaign, email: Email}
      */
     private function setupEmailCampaignTestData(): array
     {
@@ -248,7 +250,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         // emulate email read and link click
-        $emailStats = $this->em->getRepository(Stat::class)->findBy(['email' => $email]);
+        $emailStats = $this->getContainer()->get(StatRepository::class)->findBy(['email' => $email]);
         $email      = $emailStats[0]->getEmail();
         $this->assertCount(3, $emailStats);
         $this->emailFixturesHelper->emulateEmailRead($emailStats[0], $email);
@@ -278,7 +280,7 @@ final class CampaignMetricsControllerFunctionalTest extends MauticMysqlTestCase
         );
 
         // increment rotation for one of the leads and run the campaign again
-        $campaignLead = $this->em->getRepository(CampaignLead::class)->findOneBy([
+        $campaignLead = $this->getContainer()->get(LeadRepository::class)->findOneBy([
             'campaign' => $campaign->getId(),
             'lead'     => $contacts[1]->getId(),
         ]);

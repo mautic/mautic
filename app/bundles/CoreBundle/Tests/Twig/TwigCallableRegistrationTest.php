@@ -183,7 +183,8 @@ final class TwigCallableRegistrationTest extends TestCase
                 continue;
             }
 
-            if (!preg_match('#^(?:final\s+|readonly\s+|abstract\s+)*class\s+(?<class>\w+)#m', $contents, $classMatch)) {
+            // \s* tolerates the leading space bypass-finals leaves where it strips "final"
+            if (!preg_match('#^\s*(?:final\s+|readonly\s+|abstract\s+)*class\s+(?<class>\w+)#m', $contents, $classMatch)) {
                 continue;
             }
 

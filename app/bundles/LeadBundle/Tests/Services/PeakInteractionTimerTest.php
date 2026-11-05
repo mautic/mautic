@@ -117,9 +117,9 @@ final class PeakInteractionTimerTest extends TestCase
     public function testGetDefaultOptimalTime(string $currentDate, string $expectedDate, ?string $contactTimezone = null): void
     {
         $contactTimezone = $contactTimezone ?: $this->defaultTimezone;
-        $contactMock     = $this->createMock(Lead::class);
+        $contactMock     = new Lead();
         if ($contactTimezone) {
-            $contactMock->method('getTimezone')->willReturn($contactTimezone);
+            $contactMock->setTimezone($contactTimezone);
         }
 
         $this->statRepositoryMock->method('getLeadStats')->willReturn([]);
@@ -163,9 +163,9 @@ final class PeakInteractionTimerTest extends TestCase
     public function testGetDefaultOptimalTimeAndDay(string $currentDate, string $expectedDate, ?string $contactTimezone = null): void
     {
         $contactTimezone = $contactTimezone ?: $this->defaultTimezone;
-        $contactMock     = $this->createMock(Lead::class);
+        $contactMock     = new Lead();
         if ($contactTimezone) {
-            $contactMock->method('getTimezone')->willReturn($contactTimezone);
+            $contactMock->setTimezone($contactTimezone);
         }
 
         $this->statRepositoryMock->method('getLeadStats')->willReturn([]);
@@ -221,7 +221,7 @@ final class PeakInteractionTimerTest extends TestCase
     #[DataProvider('getOptimalTimeDataProvider')]
     public function testGetOptimalTime(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
-        $contactMock = $this->createStub(Lead::class);
+        $contactMock = new Lead();
 
         $this->statRepositoryMock
             ->method('getLeadStats')
@@ -317,7 +317,7 @@ final class PeakInteractionTimerTest extends TestCase
     #[DataProvider('getOptimalTimeAndDayDataProvider')]
     public function testGetOptimalTimeAndDay(string $currentDate, string $expectedDate, array $emailReads, array $pageHits, array $formSubmissions): void
     {
-        $contactMock = $this->createStub(Lead::class);
+        $contactMock = new Lead();
 
         $this->statRepositoryMock
             ->method('getLeadStats')

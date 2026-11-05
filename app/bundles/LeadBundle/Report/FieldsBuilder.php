@@ -8,7 +8,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Model\UserModel;
 
-readonly class FieldsBuilder
+final readonly class FieldsBuilder
 {
     public function __construct(
         private FieldModel $fieldModel,
@@ -28,11 +28,7 @@ readonly class FieldsBuilder
         return array_merge($baseColumns, $fieldColumns);
     }
 
-    /**
-     * @param string $prefix
-     * @param string $segmentPrefix
-     */
-    public function getLeadFilter($prefix, $segmentPrefix): array
+    public function getLeadFilter(string $prefix, string $segmentPrefix): array
     {
         $filters = $this->getLeadFieldsColumns($prefix);
 
@@ -193,7 +189,7 @@ readonly class FieldsBuilder
     /**
      * @param LeadField[] $fields
      */
-    private function getFieldColumns($fields, string $prefix): array
+    private function getFieldColumns(iterable $fields, string $prefix): array
     {
         $prefix = $this->sanitizePrefix($prefix);
 

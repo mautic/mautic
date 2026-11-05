@@ -27,7 +27,9 @@ final class BatchTagController extends AbstractFormController
     {
         $route = $this->generateUrl('mautic_tagmanager_batch_set_action');
 
-        $form = $this->createForm(BatchTagType::class, [],
+        $form = $this->createForm(
+            BatchTagType::class,
+            [],
             [
                 'action' => $route,
             ]

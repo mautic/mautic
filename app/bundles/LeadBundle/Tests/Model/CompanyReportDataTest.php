@@ -11,15 +11,17 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(CompanyReportData::class)]
 #[AllowMockObjectsWithoutExpectations]
-final class CompanyReportDataTest extends \PHPUnit\Framework\TestCase
+final class CompanyReportDataTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&Translator
+     * @var MockObject&Translator
      */
-    private \PHPUnit\Framework\MockObject\MockObject $translator;
+    private MockObject $translator;
 
     protected function setUp(): void
     {

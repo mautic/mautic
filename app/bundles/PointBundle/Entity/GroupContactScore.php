@@ -7,7 +7,6 @@ namespace Mautic\PointBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -16,7 +15,7 @@ use Mautic\LeadBundle\Entity\Lead;
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class GroupContactScore extends CommonEntity
 {
-    public const TABLE_NAME = 'point_group_contact_score';
+    public const string TABLE_NAME = 'point_group_contact_score';
 
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Lead::class, inversedBy: 'groupScores')]
@@ -28,23 +27,13 @@ class GroupContactScore extends CommonEntity
     #[ORM\JoinColumn(name: 'group_id', onDelete: 'CASCADE')]
     private Group $group;
 
+    #[ORM\Column(type: Types::INTEGER)]
     private int $score = 0;
 
     public function __construct()
     {
         $this->contact = new Lead();
         $this->group   = new Group();
-    }
-
-    /**
-     * @param ORM\ClassMetadata<GroupContactScore> $metadata
-     */
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createField('score', Types::INTEGER)
-            ->build();
     }
 
     public static function loadApiMetadata(ApiMetadataDriver $metadata): void

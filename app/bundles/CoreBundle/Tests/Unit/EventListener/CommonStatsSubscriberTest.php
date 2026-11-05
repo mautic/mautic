@@ -14,20 +14,18 @@ use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 #[AllowMockObjectsWithoutExpectations]
-final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
+final class CommonStatsSubscriberTest extends TestCase
 {
     /**
      * @var MockObject&CorePermissions
      */
     private MockObject $security;
 
-    /**
-     * @var MockObject&User
-     */
-    private MockObject $user;
+    private User $user;
 
     /**
      * @var MockObject&CommonRepository
@@ -49,7 +47,7 @@ final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
         $this->security      = $this->createMock(CorePermissions::class);
         $entityManager       = $this->createMock(EntityManager::class);
-        $this->user          = $this->createMock(User::class);
+        $this->user          = new User();
         $this->repository    = $this->createMock(CommonRepository::class);
         $this->statsEvent    = $this->createMock(StatsEvent::class);
         $this->subscirber    = $this->getMockBuilder(CommonStatsSubscriber::class)
@@ -68,9 +66,7 @@ final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
         ReflectionHelper::setValue($this->subscirber, 'repositories', [$this->repository]);
         ReflectionHelper::setValue($this->subscirber, 'permissions', ['emails_stats' => ['lead' => 'lead:leads']]);
 
-        $this->user->expects($this->once())
-            ->method('getId')
-            ->willReturn(9);
+        ReflectionHelper::setEntityId($this->user, 9);
         $matcher = $this->exactly(2);
 
         $this->security->expects($matcher)
@@ -238,6 +234,60 @@ final class CommonStatsSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('setSelect');
 
         $this->expectException(AccessDeniedException::class);
+        $this->subscirber->onStatsFetch($this->statsEvent);
+    }
+
+    public function testOnStatsFetchDeniesUnmappedTableForNonAdmin(): void
+    {
+        ReflectionHelper::setValue($this->subscirber, 'repositories', [$this->repository]);
+        ReflectionHelper::setValue($this->subscirber, 'permissions', []);
+
+        $this->repository->expects($this->once())
+            ->method('getTableName')
+            ->willReturn('audit_log');
+
+        $this->statsEvent->expects($this->once())
+            ->method('isLookingForTable')
+            ->with('audit_log', $this->repository)
+            ->willReturn(true);
+
+        $this->security->expects($this->once())
+            ->method('isAdmin')
+            ->willReturn(false);
+
+        $this->statsEvent->expects($this->never())
+            ->method('setSelect');
+
+        $this->expectException(AccessDeniedException::class);
+        $this->subscirber->onStatsFetch($this->statsEvent);
+    }
+
+    public function testOnStatsFetchAllowsUnmappedTableForAdmin(): void
+    {
+        ReflectionHelper::setValue($this->subscirber, 'repositories', [$this->repository]);
+        ReflectionHelper::setValue($this->subscirber, 'permissions', []);
+
+        $this->repository->expects($this->once())
+            ->method('getTableName')
+            ->willReturn('audit_log');
+
+        $this->statsEvent->expects($this->once())
+            ->method('isLookingForTable')
+            ->with('audit_log', $this->repository)
+            ->willReturn(true);
+
+        $this->security->expects($this->once())
+            ->method('isAdmin')
+            ->willReturn(true);
+
+        $this->statsEvent->expects($this->once())
+            ->method('setSelect')
+            ->willReturnSelf();
+
+        $this->statsEvent->expects($this->once())
+            ->method('setRepository')
+            ->with($this->repository, []);
+
         $this->subscirber->onStatsFetch($this->statsEvent);
     }
 }

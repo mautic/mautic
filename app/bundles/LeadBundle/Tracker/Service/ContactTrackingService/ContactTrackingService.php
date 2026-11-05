@@ -23,10 +23,7 @@ final readonly class ContactTrackingService implements ContactTrackingServiceInt
     ) {
     }
 
-    /**
-     * @return Lead|null
-     */
-    public function getTrackedLead()
+    public function getTrackedLead(): ?Lead
     {
         $request = $this->requestStack->getCurrentRequest();
 

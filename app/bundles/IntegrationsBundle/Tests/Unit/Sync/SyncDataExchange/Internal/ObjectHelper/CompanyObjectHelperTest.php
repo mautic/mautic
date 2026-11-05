@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Test\ReflectionHelper;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
@@ -62,9 +63,7 @@ final class CompanyObjectHelperTest extends TestCase
             ->method('saveEntity')
             ->willReturnCallback(function (Company $company) use ($idMap): void {
                 // Set ID
-                $reflection = new \ReflectionClass($company);
-                $property   = $reflection->getProperty('id');
-                $property->setValue($company, $idMap[$company->getEmail()]);
+                ReflectionHelper::setEntityId($company, $idMap[$company->getEmail()]);
             });
 
         $this->repository
@@ -110,9 +109,7 @@ final class CompanyObjectHelperTest extends TestCase
             ->method('saveEntity')
             ->willReturnCallback(function (Company $company) use ($idMap): void {
                 // Set ID
-                $reflection = new \ReflectionClass($company);
-                $property   = $reflection->getProperty('id');
-                $property->setValue($company, $idMap[$company->getEmail() ?? '']);
+                ReflectionHelper::setEntityId($company, $idMap[$company->getEmail() ?? '']);
             });
 
         $this->repository
@@ -162,12 +159,10 @@ final class CompanyObjectHelperTest extends TestCase
             1 => new ObjectChangeDAO('Test', MauticSyncDataExchange::OBJECT_COMPANY, 1, 'MappedObject', 1, new \DateTime()),
         ];
 
-        $company1 = $this->createMock(Company::class);
-        $company1->expects($this->exactly(2))->method('getId')
-            ->willReturn(0);
-        $company2 = $this->createMock(Company::class);
-        $company2->expects($this->exactly(2))->method('getId')
-            ->willReturn(1);
+        $company1 = new Company();
+        ReflectionHelper::setEntityId($company1, 0);
+        $company2 = new Company();
+        ReflectionHelper::setEntityId($company2, 1);
         $this->model->expects($this->once())
             ->method('getEntities')
             ->willReturn(

@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\StageBundle\Entity\Stage;
 
 #[ORM\Entity(repositoryClass: StagesChangeLogRepository::class)]
 #[ORM\Table(name: 'lead_stages_change_log')]
-#[ORM\Index(columns: ['date_added'], name: 'lead_stages_change_log_date_added')]
+#[ORM\Index(name: 'lead_stages_change_log_date_added', columns: ['date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class StagesChangeLog
 {
     /**
      * @var int
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -26,44 +28,27 @@ class StagesChangeLog
     #[ORM\JoinColumn(name: 'lead_id', nullable: false, onDelete: 'CASCADE')]
     private $lead;
 
-    /**
-     * @var Stage|null
-     */
-    #[ORM\ManyToOne(targetEntity: Stage::class, inversedBy: 'log')]
+    #[ORM\ManyToOne(targetEntity: Stage::class)]
     #[ORM\JoinColumn(name: 'stage_id', onDelete: 'CASCADE')]
-    private $stage;
+    private ?Stage $stage = null;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'event_name', type: 'string', length: 191)]
     private $eventName;
 
     /**
      * @var string
      */
+    #[ORM\Column(name: 'action_name', type: 'string', length: 191)]
     private $actionName;
 
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->createField('eventName', 'string')
-            ->columnName('event_name')
-            ->build();
-
-        $builder->createField('actionName', 'string')
-            ->columnName('action_name')
-            ->build();
-
-        $builder->addDateAdded();
-    }
 
     /**
      * @return int
@@ -149,10 +134,7 @@ class StagesChangeLog
         return $this;
     }
 
-    /**
-     * @return Stage|null
-     */
-    public function getStage()
+    public function getStage(): ?Stage
     {
         return $this->stage;
     }

@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailDraft;
+use Mautic\EmailBundle\Entity\EmailDraftRepository;
 use Symfony\Component\HttpFoundation\Request;
 
 final class EmailDraftFunctionalTest extends MauticMysqlTestCase
@@ -66,8 +67,29 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
 
     public function testDiscardDraftForLegacy(): void
     {
-        $email = $this->createNewEmail();
+        $email       = $this->createNewEmail();
+        $publishUp   = new \DateTime('2031-01-02 03:04:00');
+        $publishDown = new \DateTime('2031-02-03 04:05:00');
+
+        $email->setPlainText('Plain text live');
+        $email->setPublishUp($publishUp);
+        $email->setPublishDown($publishDown);
+        $email->setContinueSending(true);
+        $this->em->flush();
+
         $this->discardDraft($email);
+        $this->em->refresh($email);
+
+        $this->assertSame('Plain text live', $email->getPlainText());
+        $this->assertSame(
+            $publishUp->format('Y-m-d H:i:s'),
+            $email->getPublishUp()?->format('Y-m-d H:i:s')
+        );
+        $this->assertSame(
+            $publishDown->format('Y-m-d H:i:s'),
+            $email->getPublishDown()?->format('Y-m-d H:i:s')
+        );
+        $this->assertTrue($email->getContinueSending());
     }
 
     public function testEmailDeleteCascade(): void
@@ -75,7 +97,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $email = $this->createNewEmail();
         $this->saveDraft($email);
         $this->client->request(Request::METHOD_POST, "/s/emails/delete/{$email->getId()}");
-        $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
+        $emailDraft = $this->getContainer()->get(EmailDraftRepository::class)->findOneBy(['email' => $email]);
         $this->assertNotInstanceOf(EmailDraft::class, $emailDraft);
     }
 
@@ -87,7 +109,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
+        $emailDraft = $this->getContainer()->get(EmailDraftRepository::class)->findOneBy(['email' => $email]);
 
         $this->assertNotInstanceOf(EmailDraft::class, $emailDraft);
         $this->assertSame('Test html Draft', $email->getCustomHtml());
@@ -101,7 +123,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
+        $emailDraft = $this->getContainer()->get(EmailDraftRepository::class)->findOneBy(['email' => $email]);
 
         $this->assertNotInstanceOf(EmailDraft::class, $emailDraft);
         $this->assertSame('Test html', $email->getCustomHtml());
@@ -116,7 +138,7 @@ final class EmailDraftFunctionalTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertResponseIsSuccessful();
 
-        $emailDraft = $this->em->getRepository(EmailDraft::class)->findOneBy(['email' => $email]);
+        $emailDraft = $this->getContainer()->get(EmailDraftRepository::class)->findOneBy(['email' => $email]);
         $this->assertInstanceOf(EmailDraft::class, $emailDraft);
         $this->assertSame('Test html Draft', $emailDraft->getHtml());
         $this->assertSame('Test html', $email->getCustomHtml());

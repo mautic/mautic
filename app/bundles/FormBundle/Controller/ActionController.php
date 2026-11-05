@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController as CommonFormController;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Form\Type\ActionType;
 use Mautic\FormBundle\Model\FormModel;
@@ -24,7 +24,7 @@ final class ActionController extends CommonFormController
     }
 
     #[Route(
-        '/s/forms/action/{objectAction}/{objectId}',
+        path: '/s/forms/action/{objectAction}/{objectId}',
         name: 'mautic_formaction_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],

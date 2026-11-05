@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Event;
 
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -17,6 +18,9 @@ final class InternalObjectCreateEvent extends Event
 
     public function __construct(
         private readonly ObjectInterface $object,
+        /**
+         * @var ObjectChangeDAO[]
+         */
         private readonly array $createObjects,
     ) {
     }
@@ -26,6 +30,9 @@ final class InternalObjectCreateEvent extends Event
         return $this->object;
     }
 
+    /**
+     * @return ObjectChangeDAO[]
+     */
     public function getCreateObjects(): array
     {
         return $this->createObjects;

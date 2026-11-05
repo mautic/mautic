@@ -7,7 +7,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\Attribute\OwnershipParent;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -15,9 +15,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DownloadRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
-#[ORM\Index(columns: ['tracking_id'], name: 'download_tracking_search')]
-#[ORM\Index(columns: ['source', 'source_id'], name: 'download_source_search')]
-#[ORM\Index(columns: ['date_download'], name: 'asset_date_download')]
+#[ORM\Index(name: 'download_tracking_search', columns: ['tracking_id'])]
+#[ORM\Index(name: 'download_source_search', columns: ['source', 'source_id'])]
+#[ORM\Index(name: 'asset_date_download', columns: ['date_download'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 #[ApiResource(
     operations: [
@@ -34,33 +34,36 @@ use Symfony\Component\Serializer\Attribute\Groups;
         'swagger_definition_name' => 'Write',
     ]
 )]
+#[OwnershipParent(association: 'asset')]
 class Download
 {
-    public const TABLE_NAME = 'asset_downloads';
+    public const string TABLE_NAME = 'asset_downloads';
 
     /**
-     * @var string
+     * @var int|string
      */
     #[Groups(['download:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'bigint', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(name: 'date_download', type: 'datetime')]
     private $dateDownload;
 
-    /**
-     * @var Asset|null
-     */
     #[Groups(['download:read', 'download:write'])]
-    private $asset;
+    #[ORM\ManyToOne(targetEntity: Asset::class)]
+    #[ORM\JoinColumn(name: 'asset_id', onDelete: 'CASCADE')]
+    private ?Asset $asset = null;
 
-    /**
-     * @var IpAddress|null
-     */
     #[Groups(['download:read', 'download:write'])]
-    private $ipAddress;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CoreBundle\Entity\IpAddress::class, cascade: ['persist', 'detach'])]
+    #[ORM\JoinColumn(name: 'ip_id', onDelete: 'SET NULL')]
+    private ?IpAddress $ipAddress = null;
 
     #[ORM\ManyToOne(targetEntity: Lead::class)]
     #[ORM\JoinColumn(name: 'lead_id', onDelete: 'SET NULL')]
@@ -71,30 +74,35 @@ class Download
      * @var int
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(type: 'integer')]
     private $code;
 
     /**
      * @var string|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $referer;
 
     /**
      * @var string
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(name: 'tracking_id', type: 'string', length: 191)]
     private $trackingId;
 
     /**
      * @var string|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(type: 'string', length: 191, nullable: true)]
     private $source;
 
     /**
      * @var int|null
      */
     #[Groups(['download:read', 'download:write'])]
+    #[ORM\Column(name: 'source_id', type: 'integer', nullable: true)]
     private $sourceId;
 
     #[Groups(['download:read', 'download:write'])]
@@ -102,77 +110,20 @@ class Download
     #[ORM\JoinColumn(name: 'email_id', onDelete: 'SET NULL')]
     private ?Email $email = null;
 
+    #[ORM\Column(name: 'utm_campaign', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmCampaign = null;
 
+    #[ORM\Column(name: 'utm_content', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmContent = null;
 
+    #[ORM\Column(name: 'utm_medium', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmMedium = null;
 
+    #[ORM\Column(name: 'utm_source', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmSource = null;
 
+    #[ORM\Column(name: 'utm_term', type: Types::STRING, length: 191, nullable: true)]
     private ?string $utmTerm = null;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addBigIntIdField();
-
-        $builder->createField('dateDownload', 'datetime')
-            ->columnName('date_download')
-            ->build();
-
-        $builder->createManyToOne('asset', 'Asset')
-            ->addJoinColumn('asset_id', 'id', true, false, 'CASCADE')
-            ->isOwnershipParent()
-            ->build();
-
-        $builder->addIpAddress(true);
-
-        $builder->addField('code', 'integer');
-
-        $builder->createField('referer', 'text')
-            ->nullable()
-            ->build();
-
-        $builder->createField('trackingId', 'string')
-            ->columnName('tracking_id')
-            ->build();
-
-        $builder->createField('source', 'string')
-            ->nullable()
-            ->build();
-
-        $builder->createField('sourceId', 'integer')
-            ->columnName('source_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmCampaign', Types::STRING)
-            ->columnName('utm_campaign')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmContent', Types::STRING)
-            ->columnName('utm_content')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmMedium', Types::STRING)
-            ->columnName('utm_medium')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmSource', Types::STRING)
-            ->columnName('utm_source')
-            ->nullable()
-            ->build();
-
-        $builder->createField('utmTerm', Types::STRING)
-            ->columnName('utm_term')
-            ->nullable()
-            ->build();
-    }
 
     public function getId(): int
     {
@@ -240,10 +191,7 @@ class Download
         return $this;
     }
 
-    /**
-     * @return Asset|null
-     */
-    public function getAsset()
+    public function getAsset(): ?Asset
     {
         return $this->asset;
     }
@@ -255,10 +203,7 @@ class Download
         return $this;
     }
 
-    /**
-     * @return IpAddress|null
-     */
-    public function getIpAddress()
+    public function getIpAddress(): ?IpAddress
     {
         return $this->ipAddress;
     }

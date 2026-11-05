@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Model;
 
 use Doctrine\ORM\UnitOfWork;
+use Mautic\CoreBundle\Doctrine\ReservedWords;
 use Mautic\CoreBundle\Entity\SkipModifiedInterface;
 use Mautic\CoreBundle\Event\DependencyErrorEventInterface;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
@@ -16,9 +17,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
- * @template T of object
+ * @template TEntity of object
  *
- * @extends AbstractCommonModel<T>
+ * @extends AbstractCommonModel<TEntity>
  */
 class FormModel extends AbstractCommonModel
 {
@@ -37,6 +38,7 @@ class FormModel extends AbstractCommonModel
     }
 
     /**
+     * @param TEntity $entity
      * Lock an entity to prevent multiple people from editing.
      */
     public function lockEntity(object $entity): void
@@ -54,6 +56,7 @@ class FormModel extends AbstractCommonModel
 
     /**
      * Check to see if the entity is locked.
+     * @param TEntity $entity
      */
     public function isLocked(object $entity): bool
     {
@@ -87,10 +90,10 @@ class FormModel extends AbstractCommonModel
     /**
      * Unlock an entity that prevents multiple people from editing.
      *
-     * @param object $entity
+     * @param TEntity $entity
      * @param mixed  $extra  Can be used by model to determine what to unlock
      */
-    public function unlockEntity($entity, $extra = null): void
+    public function unlockEntity(object $entity, $extra = null): void
     {
         // unlock the row if applicable
         if (method_exists($entity, 'setCheckedOut') && method_exists($entity, 'getId') && $entity->getId()) {
@@ -108,9 +111,9 @@ class FormModel extends AbstractCommonModel
     /**
      * Create/edit entity.
      *
-     * @param T $entity
+     * @param TEntity $entity
      */
-    public function saveEntity($entity, bool $unlock = true): void
+    public function saveEntity(object $entity, bool $unlock = true): void
     {
         $isNew = $this->isNewEntity($entity);
 
@@ -123,9 +126,10 @@ class FormModel extends AbstractCommonModel
     }
 
     /**
+     * @param TEntity $entity
      * Create/edit entity then detach to preserve RAM.
      */
-    public function saveAndDetachEntity($entity, bool $unlock = true): void
+    public function saveAndDetachEntity(object $entity, bool $unlock = true): void
     {
         $this->saveEntity($entity, $unlock);
 
@@ -135,9 +139,9 @@ class FormModel extends AbstractCommonModel
     /**
      * Save an array of entities.
      *
-     * @param iterable<T> $entities
+     * @param iterable<TEntity> $entities
      */
-    public function saveEntities($entities, bool $unlock = true): void
+    public function saveEntities(iterable $entities, bool $unlock = true): void
     {
         // iterate over the results so the events are dispatched on each delete
         $batchSize             = 20;
@@ -182,6 +186,7 @@ class FormModel extends AbstractCommonModel
 
     /**
      * Determines if an entity is new or not.
+     * @param TEntity $entity
      */
     public function isNewEntity(object $entity): bool
     {
@@ -199,6 +204,7 @@ class FormModel extends AbstractCommonModel
     /**
      * Toggles entity publish status.
      *
+     * @param TEntity $entity
      * @return bool Force browser refresh
      */
     public function togglePublishStatus(object $entity): bool
@@ -237,10 +243,10 @@ class FormModel extends AbstractCommonModel
     /**
      * Set timestamps and user ids.
      *
-     * @param object $entity
+     * @param TEntity $entity
      * @param bool   $isNew
      */
-    public function setTimestamps(&$entity, $isNew, bool $unlock = true): void
+    public function setTimestamps(object &$entity, $isNew, bool $unlock = true): void
     {
         // unlock the row if applicable
         if ($unlock && method_exists($entity, 'setCheckedOut')) {
@@ -275,6 +281,9 @@ class FormModel extends AbstractCommonModel
         }
     }
 
+    /**
+     * @param TEntity $entity
+     */
     private function setModifiedData(object $entity): void
     {
         if (method_exists($entity, 'setDateModified') && method_exists($entity, 'getDateModified') && !$entity->getDateModified()) {
@@ -292,6 +301,9 @@ class FormModel extends AbstractCommonModel
         }
     }
 
+    /**
+     * @param TEntity $entity
+     */
     public function deleteEntity(object $entity): void
     {
         // take note of ID before doctrine wipes it out
@@ -356,15 +368,14 @@ class FormModel extends AbstractCommonModel
     /**
      * Creates the appropriate form per the model.
      *
-     * @param object      $entity
-     * @param string|null $action
-     * @param array       $options
+     * @param TEntity|array<string, mixed> $entity
+     * @param string|null                  $action
      *
      * @return FormInterface<mixed>
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         throw new NotFoundHttpException('Object does not support edits.');
     }
@@ -372,10 +383,10 @@ class FormModel extends AbstractCommonModel
     /**
      * Dispatches events for child classes.
      *
+     * @param TEntity $entity
      * @param string $action
-     * @param object $entity
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         // ...
 
@@ -395,7 +406,7 @@ class FormModel extends AbstractCommonModel
      *
      * @param array<int, array<string, object|bool|null>>|array<int, array<string, mixed>> $entitiesBatchParams
      */
-    protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, ?Event $event = null): ?Event
+    protected function dispatchBatchEvent(string $action, array $entitiesBatchParams, ?Event $event = null): ?Event
     {
         return $event;
     }
@@ -403,10 +414,10 @@ class FormModel extends AbstractCommonModel
     /**
      * Set default subject for user contact form.
      *
+     * @param TEntity $entity
      * @param string $subject
-     * @param object $entity
      */
-    public function getUserContactSubject($subject, $entity): string
+    public function getUserContactSubject($subject, object $entity): string
     {
         $msg = match ($subject) {
             'locked' => 'mautic.user.user.contact.locked',
@@ -468,10 +479,7 @@ class FormModel extends AbstractCommonModel
         }
 
         // Check that alias is SQL safe since it will be used for the column name
-        $databasePlatform = $this->em->getConnection()->getDatabasePlatform();
-        $reservedWords    = $databasePlatform->getReservedKeywordsList();
-
-        if ($reservedWords->isKeyword($alias) || is_numeric($alias)) {
+        if (ReservedWords::isReserved($alias) || is_numeric($alias)) {
             return $prefix.$alias;
         }
 

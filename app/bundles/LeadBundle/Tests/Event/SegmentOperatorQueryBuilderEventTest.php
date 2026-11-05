@@ -9,9 +9,10 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class SegmentOperatorQueryBuilderEventTest extends \PHPUnit\Framework\TestCase
+final class SegmentOperatorQueryBuilderEventTest extends TestCase
 {
     /**
      * @var MockObject&QueryBuilder
@@ -42,7 +43,7 @@ final class SegmentOperatorQueryBuilderEventTest extends \PHPUnit\Framework\Test
 
         $event = new SegmentOperatorQueryBuilderEvent($this->queryBuilder, $this->filter, 'parameterHolder1');
 
-        $this->assertSame($this->queryBuilder, $event->getQueryBuilder());
+        $this->assertSame($this->queryBuilder, $event->getQueryBuilder()); // @phpstan-ignore method.impossibleType (mock of final class resolves to plain MockObject)
         $this->assertSame($this->filter, $event->getFilter());
         $this->assertSame('parameterHolder1', $event->getParameterHolder());
         $this->assertFalse($event->operatorIsOneOf('like'));

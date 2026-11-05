@@ -57,25 +57,32 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
         'swagger_definition_name' => 'Write',
     ]
 )]
-/**
- * @use TranslationEntityTrait<Sms>
- * @use VariantEntityTrait<Sms>
- */
 #[EntityEvent]
 #[MediaMaxAllowedSize]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'sms_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'sms_projects_xref'),
+)])]
 class Sms extends FormEntity implements UuidInterface, TranslationEntityInterface, VariantEntityInterface
 {
     use UuidTrait;
     use ProjectTrait;
+    /** @use TranslationEntityTrait<Sms> */
     use TranslationEntityTrait;
+    /** @use VariantEntityTrait<Sms> */
     use VariantEntityTrait;
 
-    public const TABLE_NAME = 'sms_messages';
+    public const string TABLE_NAME = 'sms_messages';
 
     /**
      * @var int
      */
     #[Groups(['sms:read'])]
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     private $id;
 
     /**
@@ -83,43 +90,48 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      */
     #[Groups(['sms:read', 'sms:write'])]
     #[NotBlank(message: 'mautic.core.name.required')]
+    #[ORM\Column(type: 'string', length: 191)]
     private $name;
 
     /**
      * @var string|null
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(type: 'text', nullable: true)]
     private $description;
 
     /**
      * @var string
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(type: 'text')]
     private $message;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(name: 'publish_up', type: 'datetime', nullable: true)]
     private $publishUp;
 
     /**
      * @var \DateTimeInterface
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(name: 'publish_down', type: 'datetime', nullable: true)]
     private $publishDown;
 
     /**
      * @var int
      */
     #[Groups(['sms:read'])]
+    #[ORM\Column(name: 'sent_count', type: 'integer')]
     private $sentCount = 0;
 
-    /**
-     * @var Category|null
-     */
     #[Groups(['sms:read', 'sms:write'])]
-    private $category;
+    #[ORM\ManyToOne(targetEntity: \Mautic\CategoryBundle\Entity\Category::class, cascade: ['detach'])]
+    #[ORM\JoinColumn(name: 'category_id', onDelete: 'SET NULL')]
+    private ?Category $category = null;
 
     /**
      * @var ArrayCollection<int, LeadList>
@@ -134,13 +146,14 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     /**
      * @var ArrayCollection<int, Stat>
      */
-    #[ORM\OneToMany(mappedBy: 'sms', targetEntity: Stat::class, cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
+    #[ORM\OneToMany(targetEntity: Stat::class, mappedBy: 'sms', cascade: ['persist'], fetch: 'EXTRA_LAZY', indexBy: 'id')]
     private $stats;
 
     /**
      * @var string|null
      */
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(name: 'sms_type', type: 'text', nullable: true)]
     private $smsType = 'template';
 
     /**
@@ -148,9 +161,11 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
      */
     #[Groups(['sms:read', 'sms:write'])]
     #[Count(max: 10, maxMessage: 'mautic.sms.form.max.media.error')]
+    #[ORM\Column(type: Types::JSON)]
     private array $media = [];
 
     #[Groups(['sms:read', 'sms:write'])]
+    #[ORM\Column(name: 'is_mms', type: Types::BOOLEAN, options: ['default' => 0])]
     private bool $isMms = false;
 
     #[Groups(['sms:read'])]
@@ -184,36 +199,8 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->addIdColumns();
-
-        $builder->createField('message', 'text')
-            ->build();
-
-        $builder->createField('smsType', 'text')
-            ->columnName('sms_type')
-            ->nullable()
-            ->build();
-
-        $builder->addPublishDates();
-
-        $builder->createField('sentCount', 'integer')
-            ->columnName('sent_count')
-            ->build();
-
-        $builder->addCategory();
-
-        $builder->createField('media', Types::JSON)
-            ->columnName('media')
-            ->build();
-
-        $builder->createField('isMms', Types::BOOLEAN)
-            ->columnName('is_mms')
-            ->option('default', 0)
-            ->build();
-
         self::addTranslationMetadata($builder, self::class);
 
-        self::addProjectsField($builder, 'sms_projects_xref', 'sms_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -275,6 +262,8 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         $current = $this->{$getter}();
 
         if ('category' == $prop || 'list' == $prop) {
+            /** @var Category|null $current */
+            /** @var Category|null $val */
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
@@ -293,10 +282,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name): static
+    public function setName(?string $name): static
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -329,15 +315,12 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this->id;
     }
 
-    /**
-     * @return Category|null
-     */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
 
-    public function setCategory($category): static
+    public function setCategory(?Category $category): static
     {
         $this->isChanged('category', $category);
         $this->category = $category;
@@ -409,7 +392,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     /**
      * @return Collection<int, LeadList>
      */
-    public function getLists()
+    public function getLists(): Collection
     {
         return $this->lists;
     }
@@ -427,9 +410,9 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
     }
 
     /**
-     * @return ArrayCollection<int, Stat>
+     * @return Collection<int, Stat>
      */
-    public function getStats()
+    public function getStats(): Collection
     {
         return $this->stats;
     }
@@ -442,10 +425,7 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
         return $this->smsType;
     }
 
-    /**
-     * @param string $smsType
-     */
-    public function setSmsType($smsType): void
+    public function setSmsType(string $smsType): void
     {
         $this->isChanged('smsType', $smsType);
         $this->smsType = $smsType;

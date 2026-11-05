@@ -2,20 +2,17 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
  * @extends CommonRepository<LeadNote>
  */
-class LeadNoteRepository extends CommonRepository
+final class LeadNoteRepository extends CommonRepository
 {
-    /**
-     * {@inhertidoc}.
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
+    public function getEntities(array $args = []): iterable
     {
         $q = $this
             ->createQueryBuilder('n')
@@ -28,8 +25,8 @@ class LeadNoteRepository extends CommonRepository
     /**
      * @param array<int, string>|null $noteTypes
      *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function getNoteCount(int $leadId, ?string $filter = null, ?array $noteTypes = null, ?int $createdBy = null): int
     {
@@ -66,7 +63,7 @@ class LeadNoteRepository extends CommonRepository
         return 'n';
     }
 
-    protected function addCatchAllWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addCatchAllWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         return $this->addStandardCatchAllWhereClause(
             $queryBuilder,
@@ -77,7 +74,7 @@ class LeadNoteRepository extends CommonRepository
         );
     }
 
-    protected function addSearchCommandWhereClause(\Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
+    protected function addSearchCommandWhereClause(QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $queryBuilder, \stdClass $filter): array
     {
         $command                 = $filter->command;
         $string                  = $filter->string;
@@ -150,12 +147,12 @@ class LeadNoteRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      */
-    public function updateLead($fromLeadId, $toLeadId): void
+    public function updateLead(int $fromLeadId, int $toLeadId): void
     {
         $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'lead_notes')
-            ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId)
+            ->set('lead_id', $toLeadId)
+            ->where('lead_id = '.$fromLeadId)
             ->executeStatement();
     }
 }

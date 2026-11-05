@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use MauticPlugin\MauticGmailBundle\Integration\GmailIntegration;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {
@@ -18,5 +19,5 @@ return function (ContainerConfigurator $configurator): void {
     $services->load('MauticPlugin\\MauticGmailBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->alias('mautic.integration.gmail', MauticPlugin\MauticGmailBundle\Integration\GmailIntegration::class);
+    $services->alias('mautic.integration.gmail', GmailIntegration::class);
 };

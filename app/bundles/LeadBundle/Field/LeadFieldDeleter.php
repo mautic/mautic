@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\Dispatcher\FieldDeleteDispatcher;
 use Mautic\LeadBundle\Field\Settings\BackgroundSettings;
 
-readonly class LeadFieldDeleter
+final readonly class LeadFieldDeleter
 {
     public function __construct(
         private LeadFieldRepository $leadFieldRepository,

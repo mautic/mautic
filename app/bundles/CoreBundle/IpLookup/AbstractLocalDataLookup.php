@@ -8,15 +8,9 @@ use Psr\Http\Client\ClientExceptionInterface;
 
 abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLookupFormInterface
 {
-    /**
-     * @var string
-     */
-    public const TAR_CACHE_FOLDER = 'unpack';
+    public const string TAR_CACHE_FOLDER = 'unpack';
 
-    /**
-     * @var string
-     */
-    public const TAR_TEMP_FILE = 'temp.tar.gz';
+    public const string TAR_TEMP_FILE = 'temp.tar.gz';
 
     /**
      * Path to the local data store.
@@ -38,10 +32,7 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
         return IpLookupDownloadDataStoreButtonType::class;
     }
 
-    /**
-     * @return array
-     */
-    public function getConfigFormThemes()
+    public function getConfigFormThemes(): array
     {
         return [];
     }

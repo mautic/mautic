@@ -12,14 +12,15 @@ use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Functional\CreateTestEntitiesTrait;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\EmailRepository;
 use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Event\ListChangeEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Entity\Hit;
@@ -74,7 +75,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         [$sentCount] = $this->emailModel->sendEmailToLists($email, [$segment]);
 
         // Emulate email reads
-        $statRepository = $this->em->getRepository(Stat::class);
+        $statRepository = $this->getContainer()->get(StatRepository::class);
         $stats          = $statRepository->findBy([
             'email' => $email,
             'lead'  => $contacts,
@@ -558,10 +559,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $this->addContactsToSegment(array_slice($contacts, 2, 3), $segment);
 
-        self::getContainer()->get(EventDispatcherInterface::class)->dispatch(
-            new ListChangeEvent($contacts[2], $segment, true),
-            LeadEvents::LEAD_LIST_CHANGE
-        );
+        self::getContainer()->get(EventDispatcherInterface::class)->dispatch(new ListChangeEvent($contacts[2], $segment, true));
 
         $loadedEmail = $this->emailModel->getEntity($email->getId());
         $this->assertInstanceOf(Email::class, $loadedEmail);
@@ -716,7 +714,7 @@ final class EmailModelFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var Email $winnerReloaded */
-        $winnerReloaded = $this->em->getRepository(Email::class)->find($winner->getId());
+        $winnerReloaded = $this->getContainer()->get(EmailRepository::class)->find($winner->getId());
 
         $this->assertInstanceOf(Email::class, $winnerReloaded);
         $this->assertNotInstanceOf(VariantEntityInterface::class, $winnerReloaded->getVariantParent());

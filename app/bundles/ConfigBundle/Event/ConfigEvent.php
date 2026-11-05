@@ -30,10 +30,8 @@ class ConfigEvent extends CommonEvent
 
     /**
      * Data got from build form after update.
-     *
-     * @var array
      */
-    private $normData;
+    private array $normData = [];
 
     /**
      * @param mixed[]|null $config
@@ -46,10 +44,8 @@ class ConfigEvent extends CommonEvent
 
     /**
      * Returns the config array.
-     *
-     * @return array
      */
-    public function getConfig(?string $key = null)
+    public function getConfig(?string $key = null): array
     {
         if ($key) {
             return $this->config[$key] ?? [];
@@ -164,18 +160,12 @@ class ConfigEvent extends CommonEvent
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function getNormData()
+    public function getNormData(): array
     {
         return $this->normData;
     }
 
-    /**
-     * @param array $normData
-     */
-    public function setNormData($normData): void
+    public function setNormData(array $normData): void
     {
         $this->normData = $normData;
     }

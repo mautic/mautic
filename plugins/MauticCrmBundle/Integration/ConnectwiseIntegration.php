@@ -2,7 +2,10 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use DateTime;
+use Exception;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Exception\ApiErrorException;
@@ -16,9 +19,9 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<ConnectwiseApi>
  */
-class ConnectwiseIntegration extends CrmAbstractIntegration
+final class ConnectwiseIntegration extends CrmAbstractIntegration
 {
-    public const PAGESIZE = 200;
+    public const int PAGESIZE = 200;
 
     public function getName(): string
     {
@@ -122,7 +125,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                 $data = ['username' => $this->keys['username'], 'password' => $this->keys['password']];
                 $this->extractAuthKeys($data, 'username');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $e->getMessage();
         }
 
@@ -138,7 +141,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
      *
      * @return array<mixed>
      */
-    public function prepareRequest(string $url, $parameters, string $method, array $settings, $authType): array
+    public function prepareRequest(string $url, array $parameters, string $method, array $settings, $authType): array
     {
         [$parameters,$headers] = parent::prepareRequest($url, $parameters, $method, $settings, $authType);
 
@@ -159,20 +162,16 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * Get available company fields for choices in the config UI.
-     *
-     * @return array
      */
-    public function getFormCompanyFields(array $settings = [])
+    public function getFormCompanyFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('company', $settings);
     }
 
     /**
      * @param array<string, mixed> $settings
-     *
-     * @return array|mixed
      */
-    public function getFormLeadFields(array $settings = [])
+    public function getFormLeadFields(array $settings = []): array
     {
         return $this->getFormFieldsByObject('Contact', $settings);
     }
@@ -186,7 +185,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         if (isset($settings['feature_settings']['objects'])) {
             $cwObjects = $settings['feature_settings']['objects'];
         } else {
-            $cwObjects['Contact'] = 'Contact';
+            $cwObjects            = ['Contact' => 'Contact'];
         }
         if (!$this->isAuthorized()) {
             return [];
@@ -225,10 +224,9 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @param Form|FormBuilder $builder
-     * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(
@@ -289,7 +287,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
                             'data-hide-on' => '{"campaignevent_properties_config_push_activities_0":"checked"}',
                         ],
                         'data' => $data['campaign_task'] ?? [],
-                    ]);
+                    ]
+                );
             }
         }
     }
@@ -470,7 +469,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             }
 
             return $executed;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if (404 !== $e->getCode()) {
                 $this->logIntegrationError($e);
             }
@@ -526,7 +525,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
         return $fieldsValues;
     }
 
-    public function saveSyncedData($entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
+    /**
+     * @param Lead|Company $entity
+     */
+    public function saveSyncedData(object $entity, $object, $mauticObjectReference, $integrationEntityId): IntegrationEntity
     {
         $integrationEntities = $this->integrationEntityRepository->getIntegrationEntities(
             $this->getName(),
@@ -535,12 +537,12 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             [$entity->getId()]
         );
 
-        if ($integrationEntities) {
+        if ($integrationEntities !== []) {
             $integrationEntity = reset($integrationEntities);
-            $integrationEntity->setLastSyncDate(new \DateTime());
+            $integrationEntity->setLastSyncDate(new DateTime());
         } else {
             $integrationEntity = new IntegrationEntity();
-            $integrationEntity->setDateAdded(new \DateTime());
+            $integrationEntity->setDateAdded(new DateTime());
             $integrationEntity->setIntegration($this->getName());
             $integrationEntity->setIntegrationEntity($object);
             $integrationEntity->setIntegrationEntityId($integrationEntityId);
@@ -553,11 +555,10 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @param array|Lead $lead
-     * @param array      $config
      *
      * @throws ApiErrorException
      */
-    public function pushLead($lead, $config = []): bool
+    public function pushLead($lead, array $config = []): bool
     {
         $config      = $this->mergeConfigToFeatureSettings($config);
         $personFound = false;
@@ -575,7 +576,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             $personFound = true;
         }
 
-        $personData = [];
+        $personData          = [];
+        $integrationEntities = [];
 
         try {
             if ($personFound) {
@@ -609,7 +611,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
                 $leadPushed = true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if ($e instanceof ApiErrorException) {
                 $e->setContact($lead);
             }
@@ -653,7 +655,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     /**
      * Match lead data with integration fields.
      */
-    public function populateLeadData($lead, $config = []): array
+    public function populateLeadData($lead, array $config = []): array
     {
         if ($lead instanceof Lead) {
             $fields = $lead->getFields(true);
@@ -757,10 +759,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @param array $objects
-     *
-     * @return array
      */
-    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null)
+    protected function cleanPriorityFields(array $fieldsToUpdate, $objects = null): array
     {
         $objects ??= ['Leads', 'Contacts'];
         if (isset($fieldsToUpdate['leadFields']) && is_array($objects)) {
@@ -775,10 +775,8 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
 
     /**
      * @param string $priorityObject
-     *
-     * @return mixed
      */
-    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic')
+    protected function getPriorityFieldsForMautic(array $config, $object = null, $priorityObject = 'mautic'): array
     {
         if ('company' == $object) {
             $priority = parent::getPriorityFieldsForMautic($config, $object, 'mautic_company');
@@ -791,16 +789,14 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @return array
-     *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getCampaigns()
+    public function getCampaigns(): array
     {
         $campaigns = [];
         try {
             $campaigns = $this->getApiHelper()->getCampaigns();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 
@@ -808,7 +804,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function getCampaignChoices(): array
     {
@@ -867,7 +863,7 @@ class ConnectwiseIntegration extends CrmAbstractIntegration
             }
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             if (404 !== $e->getCode()) {
                 $this->logIntegrationError($e);
             }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller;
 
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Form;
 use Symfony\Component\DomCrawler\Crawler;
@@ -12,8 +14,8 @@ use Symfony\Component\HttpFoundation\Request;
 final class ActionControllerFunctionalTest extends MauticMysqlTestCase
 {
     /**
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws OptimisticLockException
+     * @throws ORMException
      */
     public function testNewActionWithJapanese(): void
     {
@@ -25,7 +27,9 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // Fetch the form
-        $this->client->xmlHttpRequest(Request::METHOD_GET, '/s/forms/action/new',
+        $this->client->xmlHttpRequest(
+            Request::METHOD_GET,
+            '/s/forms/action/new',
             [
                 'formId' => $form->getId(),
                 'type'   => 'form.email',
@@ -33,7 +37,9 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
         );
         $this->assertResponseIsSuccessful();
         $content     = $this->client->getResponse()->getContent();
-        $content     = json_decode($content)->newContent;
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($content);
+        $content     = $decodedContent->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form');
         $this->assertCount(1, $formCrawler);
@@ -56,6 +62,8 @@ final class ActionControllerFunctionalTest extends MauticMysqlTestCase
         // Check the content was not changed
         $this->client->xmlHttpRequest(Request::METHOD_GET, $editPage);
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('&lt;p style=&quot;font-family: メイリオ&quot;&gt;Test&lt;/p&gt;', (string) json_decode($this->client->getResponse()->getContent())->newContent);
+        /** @var \stdClass $decodedContent */
+        $decodedContent = json_decode($this->client->getResponse()->getContent());
+        $this->assertStringContainsString('&lt;p style=&quot;font-family: メイリオ&quot;&gt;Test&lt;/p&gt;', (string) $decodedContent->newContent);
     }
 }

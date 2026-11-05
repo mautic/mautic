@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -132,7 +133,7 @@ final class ListApiController extends CommonApiController
      * Obtains a list of smart lists for the user.
      */
     #[Route(
-        '/api/contacts/list/segments',
+        path: '/api/contacts/list/segments',
         name: 'mautic_api_getcontactsegments',
         defaults: ['_format' => 'json'],
         methods: ['GET']
@@ -151,18 +152,17 @@ final class ListApiController extends CommonApiController
      * Adds a lead to a list.
      *
      * @param int $id     List ID
-     * @param int $leadId Lead ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/segments/{id}/contact/{leadId}/add',
+        path: '/api/segments/{id}/contact/{leadId}/add',
         name: 'mautic_api_segmentaddcontact',
         requirements: ['id' => '\d+', 'leadId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function addLeadAction($id, $leadId): Response
+    public function addLeadAction(int $id, int|string $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -193,16 +193,16 @@ final class ListApiController extends CommonApiController
      *
      * @param int $id segement ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/segments/{id}/contacts/add',
+        path: '/api/segments/{id}/contacts/add',
         name: 'mautic_api_segmentaddcontacts',
         requirements: ['id' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function addLeadsAction(Request $request, $id): Response
+    public function addLeadsAction(Request $request, int $id): Response
     {
         $contactIds = $request->request->all()['ids'] ?? null;
         if (null === $contactIds) {
@@ -241,18 +241,17 @@ final class ListApiController extends CommonApiController
      * Removes given contact from a list.
      *
      * @param int $id     List ID
-     * @param int $leadId Lead ID
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws NotFoundHttpException
      */
     #[Route(
-        '/api/segments/{id}/contact/{leadId}/remove',
+        path: '/api/segments/{id}/contact/{leadId}/remove',
         name: 'mautic_api_segmentremovecontact',
         requirements: ['id' => '\d+', 'leadId' => '\d+'],
         defaults: ['_format' => 'json'],
         methods: ['POST']
     )]
-    public function removeLeadAction($id, $leadId): Response
+    public function removeLeadAction(int $id, int|string $leadId): Response
     {
         $entity = $this->model->getEntity($id);
 
@@ -281,19 +280,18 @@ final class ListApiController extends CommonApiController
     /**
      * Checks if user has permission to access retrieved entity.
      *
-     * @param mixed  $entity
      * @param string $action view|create|edit|publish|delete
-     *
-     * @return bool
      */
-    protected function checkEntityAccess($entity, $action = 'view')
+    protected function checkEntityAccess(?object $entity, $action = 'view'): bool
     {
         if ('create' == $action || 'edit' == $action || 'view' == $action) {
             return $this->security->isGranted(LeadPermissions::LISTS_VIEW_OWN);
         }
         if ('delete' == $action) {
             return $this->security->hasEntityAccess(
-                true, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
+                true,
+                LeadPermissions::LISTS_DELETE_OTHER,
+                $entity->getCreatedBy()
             );
         }
 

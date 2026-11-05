@@ -5,10 +5,21 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticTagManagerBundle\Entity;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository as BaseTagRepository;
 
 final class TagRepository extends BaseTagRepository
 {
+    /**
+     * The plugin has no Tag entity of its own, so the one it reads has to be named:
+     * CommonRepository otherwise derives it from this class's own name.
+     */
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Tag::class);
+    }
+
     /**
      * @return string[][]
      */
@@ -46,7 +57,7 @@ final class TagRepository extends BaseTagRepository
      *
      * @return int|array<int, int>
      */
-    public function countByLeads($tagIds)
+    public function countByLeads($tagIds): int|array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
 

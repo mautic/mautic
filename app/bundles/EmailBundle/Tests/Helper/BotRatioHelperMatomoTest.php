@@ -37,13 +37,13 @@ final class BotRatioHelperMatomoTest extends TestCase
 
         $botRatioHelper = new BotRatioHelper($deviceDetectorFactoryMock);
 
-        $emailStatMock    = $this->createMock(Stat::class);
+        $emailStat = new Stat();
         $emailSent        = new \DateTime('-1 second');
-        $emailStatMock->method('getDateSent')->willReturn($emailSent);
+        $emailStat->setDateSent($emailSent);
         $emailHitDateTime = new \DateTime();
         $ipAddress        = new IpAddress('1.2.3.4');
 
-        $result = $botRatioHelper->isHitByBot($emailStatMock, $emailHitDateTime, $ipAddress, $userAgent);
+        $result = $botRatioHelper->isHitByBot($emailStat, $emailHitDateTime, $ipAddress, $userAgent);
         $this->assertTrue($result, "Expected bot to be detected for user agent: {$userAgent}");
     }
 
@@ -59,14 +59,14 @@ final class BotRatioHelperMatomoTest extends TestCase
         $deviceDetectorFactoryMock->method('create')->willReturn($deviceDetectorMock);
 
         $botRatioHelper = new BotRatioHelper($deviceDetectorFactoryMock, 0.6, 2, [], ['1.2.3.*']);
-        $emailStatMock  = $this->createMock(Stat::class);
+        $emailStat = new Stat();
         $emailSent      = new \DateTime('-1 second');
-        $emailStatMock->method('getDateSent')->willReturn($emailSent);
+        $emailStat->setDateSent($emailSent);
 
         $emailHitDateTime = new \DateTime();
         $ipAddress        = new IpAddress('1.2.3.4');
 
-        $result = $botRatioHelper->isHitByBot($emailStatMock, $emailHitDateTime, $ipAddress, $userAgent);
+        $result = $botRatioHelper->isHitByBot($emailStat, $emailHitDateTime, $ipAddress, $userAgent);
         $this->assertTrue($result, 'Expected bot to be detected via ratio-based logic when Matomo returns false');
     }
 

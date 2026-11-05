@@ -18,6 +18,7 @@ use Mautic\IntegrationsBundle\Auth\Provider\AuthCredentialsInterface;
 use Mautic\IntegrationsBundle\Auth\Provider\AuthProviderInterface;
 use Mautic\IntegrationsBundle\Exception\InvalidCredentialsException;
 use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * Factory for building HTTP clients using basic auth.
@@ -98,7 +99,7 @@ final class HttpFactory implements AuthProviderInterface
 
         $handler->unshift(
             Middleware::mapRequest(
-                fn (Request $request): \Psr\Http\Message\RequestInterface => $request->withUri(
+                fn (Request $request): RequestInterface => $request->withUri(
                     Uri::withQueryValue($request->getUri(), $this->credentials->getKeyName(), $this->credentials->getApiKey())
                 )
             )

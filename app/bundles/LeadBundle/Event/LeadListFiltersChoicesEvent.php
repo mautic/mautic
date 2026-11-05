@@ -58,7 +58,7 @@ final class LeadListFiltersChoicesEvent extends AbstractCustomRequestEvent
      * @param string  $choiceKey
      * @param mixed[] $choiceConfig
      */
-    public function addChoice($object, $choiceKey, $choiceConfig): void
+    public function addChoice($object, $choiceKey, array $choiceConfig): void
     {
         $this->choices[$object] ??= [];
         if (!array_key_exists($choiceKey, $this->choices[$object])) {

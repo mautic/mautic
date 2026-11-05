@@ -11,9 +11,10 @@ use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
 use Mautic\LeadBundle\Segment\Decorator\Date\Week\DateWeekLast;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 #[CoversClass(DateWeekLast::class)]
-final class DateWeekLastTest extends \PHPUnit\Framework\TestCase
+final class DateWeekLastTest extends TestCase
 {
     public function testGetOperatorBetween(): void
     {

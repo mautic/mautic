@@ -36,6 +36,9 @@ final class AssetType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var Asset $asset */
+        $asset = $options['data'];
+
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('asset.asset', $options));
 
@@ -77,7 +80,7 @@ final class AssetType extends AbstractType
                     'tooltip'      => 'mautic.asset.asset.form.disallow.crawlers.descr',
                     'data-show-on' => '{"asset_storageLocation_0":"checked"}',
                 ],
-                'data'=> !empty($options['data']->getDisallow()),
+                'data'=> !empty($asset->getDisallow()),
             ]
         );
 

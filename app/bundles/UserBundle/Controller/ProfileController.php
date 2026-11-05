@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\UserBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ProfileController extends FormController
+final class ProfileController extends AbstractFormController
 {
     private UserModel $userModel;
 
@@ -32,11 +32,15 @@ final class ProfileController extends FormController
      * Generate's account profile.
      */
     #[Route(
-        '/s/account',
+        path: '/s/account',
         name: 'mautic_user_account',
     )]
-    public function indexAction(Request $request, LanguageHelper $languageHelper,
-        TokenStorageInterface $tokenStorage, SAMLHelper $samlHelper): Response|RedirectResponse
+    public function indexAction(
+        Request $request,
+        LanguageHelper $languageHelper,
+        TokenStorageInterface $tokenStorage,
+        SAMLHelper $samlHelper
+    ): Response|RedirectResponse
     {
         // get current user
         $me = $tokenStorage->getToken()->getUser();

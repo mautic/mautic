@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Model;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -25,30 +24,8 @@ final class FieldModelTest extends TestCase
 {
     public function testGenerateAlias(): void
     {
-        $connection = $this->createMock(Connection::class);
-
-        $platform = new class() {
-            public function getReservedKeywordsList(): object
-            {
-                return new class() {
-                    public function isKeyword(): bool
-                    {
-                        return false;
-                    }
-                };
-            }
-
-            public function isKeyword(): bool
-            {
-                return false;
-            }
-        };
-
-        $connection->method('getDatabasePlatform')
-            ->willReturn($platform);
-
         $leadFieldModel = $this->createStub(\Mautic\LeadBundle\Model\FieldModel::class);
-        $entityManager  = $this->createMock(EntityManager::class);
+        $entityManager  = $this->createStub(EntityManager::class);
         $schemaHelper   = $this->createStub(ColumnSchemaHelper::class);
         $fieldModel     = new FieldModel(
             $entityManager,
@@ -66,10 +43,6 @@ final class FieldModelTest extends TestCase
             $schemaHelper,
             $this->createStub(FieldRepository::class)
         );
-
-        $entityManager
-            ->method('getConnection')
-            ->willReturn($connection);
 
         $aliases = [
             'existed_alias',

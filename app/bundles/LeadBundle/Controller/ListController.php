@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Controller\QuickFilterSearchTrait;
 use Mautic\CoreBundle\Exception\DeleteEntitiesDependencyException;
 use Mautic\CoreBundle\Exception\DeleteEntityDependencyException;
@@ -27,7 +27,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Service\Attribute\Required;
 
-final class ListController extends FormController
+final class ListController extends AbstractStandardFormController
 {
     use EntityContactsTrait;
     use QuickFilterSearchTrait;
@@ -56,7 +56,7 @@ final class ListController extends FormController
     private array $listFilters = [];
 
     #[Route(
-        '/s/segments/{objectAction}/{objectId}',
+        path: '/s/segments/{objectAction}/{objectId}',
         name: 'mautic_segment_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -69,17 +69,15 @@ final class ListController extends FormController
     /**
      * Generate's default list view.
      *
-     * @param int $page
-     *
      * @throws \Exception
      */
     #[Route(
-        '/s/segments/{page}',
+        path: '/s/segments/{page}',
         name: 'mautic_segment_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, SegmentSearchScopeProvider $segmentSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, SegmentSearchScopeProvider $segmentSearchScopeProvider, int $page = 1): Response
     {
         $session = $request->getSession();
 
@@ -184,7 +182,8 @@ final class ListController extends FormController
         ];
 
         return $this->delegateView(
-            $this->getViewArguments([
+            $this->getViewArguments(
+                [
                 'viewParameters'  => $parameters,
                 'contentTemplate' => '@MauticLead/List/list.html.twig',
                 'passthroughVars' => [
@@ -322,7 +321,9 @@ final class ListController extends FormController
         }
 
         if (!$this->security->hasEntityAccess(
-            $ownPermission, $otherPermission, $segment->getCreatedBy()
+            $ownPermission,
+            $otherPermission,
+            $segment->getCreatedBy()
         )) {
             throw new AccessDeniedException(sprintf('User has not access on segment with id %d', $segmentId));
         }
@@ -397,10 +398,8 @@ final class ListController extends FormController
      * Create modifying response for segments - edit.
      *
      * @param array<string, mixed> $postActionVars
-     *
-     * @return Response
      */
-    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, bool $ignorePost)
+    private function createSegmentModifyResponse(Request $request, LeadList $segment, SegmentDependencies $segmentDependencies, SegmentCampaignShare $segmentCampaignShare, ListModel $segmentModel, AuditLogModel $auditLogModel, array $postActionVars, string $action, bool $ignorePost): Response
     {
         if ($segmentModel->isLocked($segment)) {
             return $this->isLocked($postActionVars, $segment, 'lead.list');
@@ -536,7 +535,9 @@ final class ListController extends FormController
                     'msgVars' => ['%id%' => $objectId],
                 ];
             } elseif (!$this->security->hasEntityAccess(
-                LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $list->getCreatedBy()
+                LeadPermissions::LISTS_DELETE_OWN,
+                LeadPermissions::LISTS_DELETE_OTHER,
+                $list->getCreatedBy()
             )
             ) {
                 $this->throwAccessDenied();
@@ -605,7 +606,9 @@ final class ListController extends FormController
                         'msgVars' => ['%id%' => $objectId],
                     ];
                 } elseif (!$this->security->hasEntityAccess(
-                    LeadPermissions::LISTS_DELETE_OWN, LeadPermissions::LISTS_DELETE_OTHER, $entity->getCreatedBy()
+                    LeadPermissions::LISTS_DELETE_OWN,
+                    LeadPermissions::LISTS_DELETE_OTHER,
+                    $entity->getCreatedBy()
                 )) {
                     $flashes[] = $this->getAccessDeniedFlash();
                 } elseif ($model->isLocked($entity)) {
@@ -661,10 +664,7 @@ final class ListController extends FormController
         return $this->changeList($request, $objectId, 'add');
     }
 
-    /**
-     * @return Response
-     */
-    protected function changeList(Request $request, $listId, $action)
+    protected function changeList(Request $request, $listId, $action): Response
     {
         $page      = $request->getSession()->get('mautic.lead.page', 1);
         $returnUrl = $this->generateUrl('mautic_contact_index', ['page' => $page]);
@@ -693,7 +693,9 @@ final class ListController extends FormController
                     'msgVars' => ['%id%' => $leadId],
                 ];
             } elseif (!$this->security->hasEntityAccess(
-                LeadPermissions::LISTS_EDIT_OWN, LeadPermissions::LISTS_EDIT_OTHER, $lead->getPermissionUser()
+                LeadPermissions::LISTS_EDIT_OWN,
+                LeadPermissions::LISTS_EDIT_OTHER,
+                $lead->getPermissionUser()
             )) {
                 $this->throwAccessDenied();
             } elseif (null === $list) {
@@ -703,10 +705,12 @@ final class ListController extends FormController
                     'msgVars' => ['%id%' => $listId],
                 ];
             } elseif (!$list->isGlobal() && !$this->security->hasEntityAccess(
-                LeadPermissions::LISTS_VIEW_OWN, LeadPermissions::LISTS_VIEW_OTHER, $list->getCreatedBy()
+                LeadPermissions::LISTS_VIEW_OWN,
+                LeadPermissions::LISTS_VIEW_OTHER,
+                $list->getCreatedBy()
             )) {
                 $this->throwAccessDenied();
-            } elseif ($this->listModel->isLocked($lead)) {
+            } elseif ($this->leadModel->isLocked($lead)) {
                 return $this->isLocked($postActionVars, $lead, 'lead');
             } else {
                 $function = ('remove' == $action) ? 'removeLead' : 'addLead';
@@ -856,6 +860,11 @@ final class ListController extends FormController
         return 'lead.list';
     }
 
+    protected function getRouteBase(): ?string
+    {
+        return null;
+    }
+
     protected function getIndexItems($start, $limit, $filter, $orderBy, $orderByDir, array $args = []): array
     {
         $request        = $this->getCurrentRequest();
@@ -936,7 +945,7 @@ final class ListController extends FormController
         );
     }
 
-    public function getViewArguments(array $args, $action): array
+    protected function getViewArguments(array $args, $action): array
     {
         if ('index' === $action) {
             $args['viewParameters']['filters'] = $this->listFilters;
@@ -947,15 +956,14 @@ final class ListController extends FormController
 
     /**
      * @param int $objectId
-     * @param int $page
      */
     #[Route(
-        '/s/segment/view/{objectId}/contact/{page}',
+        path: '/s/segment/view/{objectId}/contact/{page}',
         name: 'mautic_segment_contacts',
         requirements: ['page' => '\d+', 'objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['page' => 0, 'objectId' => 0],
     )]
-    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, $page = 1): Response
+    public function contactsAction(Request $request, PageHelperFactoryInterface $pageHelperFactory, $objectId, int $page = 1): Response
     {
         $session = $request->getSession();
         $session->set('mautic.segment.contact.page', $page);

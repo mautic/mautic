@@ -35,6 +35,9 @@ final class TriggerType extends AbstractType
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('point', $options));
 
+        /** @var Trigger $trigger */
+        $trigger = $options['data'];
+
         $builder->add(
             'name',
             TextType::class,
@@ -80,7 +83,7 @@ final class TriggerType extends AbstractType
             ]
         );
 
-        $color = $options['data']->getColor();
+        $color = $trigger->getColor();
 
         $builder->add(
             'color',
@@ -118,9 +121,9 @@ final class TriggerType extends AbstractType
             ]
         );
 
-        if (!empty($options['data']) && $options['data']->getId()) {
+        if (!empty($options['data']) && $trigger->getId()) {
             $readonly = !$this->security->isGranted('point:triggers:publish');
-            $data     = $options['data']->isPublished(false);
+            $data     = $trigger->isPublished(false);
         } elseif (!$this->security->isGranted('point:triggers:publish')) {
             $readonly = true;
             $data     = false;

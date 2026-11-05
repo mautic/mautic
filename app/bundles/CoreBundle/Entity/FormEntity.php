@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -32,11 +32,9 @@ class FormEntity extends CommonEntity
         'segment:read', 'segment:write',
         'email:read', 'email:write',
     ])]
+    #[ORM\Column(name: 'is_published', type: 'boolean')]
     private bool $isPublished = true;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups([
         'category:read', 'category:write',
         'notification:read', 'notification:write',
@@ -56,21 +54,21 @@ class FormEntity extends CommonEntity
         'form:read', 'form:write',
         'stage:read', 'stage:write',
     ])]
-    private $dateAdded;
+    #[ORM\Column(name: 'date_added', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $dateAdded = null;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'created_by', type: 'integer', nullable: true)]
     private $createdBy;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'created_by_user', type: 'string', length: 191, nullable: true)]
     private $createdByUser;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
     #[Groups([
         'category:read', 'category:write',
         'notification:read', 'notification:write',
@@ -88,98 +86,42 @@ class FormEntity extends CommonEntity
         'segment:read', 'segment:write',
         'asset:read', 'asset:write',
     ])]
-    private $dateModified;
+    #[ORM\Column(name: 'date_modified', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $dateModified = null;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'modified_by', type: 'integer', nullable: true)]
     private $modifiedBy;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'modified_by_user', type: 'string', length: 191, nullable: true)]
     private $modifiedByUser;
 
-    /**
-     * @var \DateTimeInterface|null
-     */
-    private $checkedOut;
+    #[ORM\Column(name: 'checked_out', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $checkedOut = null;
 
     /**
      * @var int|null
      */
+    #[ORM\Column(name: 'checked_out_by', type: 'integer', nullable: true)]
     private $checkedOutBy;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'checked_out_by_user', type: 'string', length: 191, nullable: true)]
     private $checkedOutByUser;
 
-    /**
-     * @var array
-     */
-    protected $changes = [];
-
-    /**
-     * @var bool
-     */
-    protected $new = false;
+    protected bool $new = false;
 
     /**
      * @var int|null
      */
     public $deletedId;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->createField('isPublished', 'boolean')
-            ->columnName('is_published')
-            ->build();
-
-        $builder->addDateAdded(true);
-
-        $builder->createField('createdBy', 'integer')
-            ->columnName('created_by')
-            ->nullable()
-            ->build();
-
-        $builder->createField('createdByUser', 'string')
-            ->columnName('created_by_user')
-            ->nullable()
-            ->build();
-
-        $builder->createField('dateModified', 'datetime')
-            ->columnName('date_modified')
-            ->nullable()
-            ->build();
-
-        $builder->createField('modifiedBy', 'integer')
-            ->columnName('modified_by')
-            ->nullable()
-            ->build();
-
-        $builder->createField('modifiedByUser', 'string')
-            ->columnName('modified_by_user')
-            ->nullable()
-            ->build();
-
-        $builder->createField('checkedOut', 'datetime')
-            ->columnName('checked_out')
-            ->nullable()
-            ->build();
-
-        $builder->createField('checkedOutBy', 'integer')
-            ->columnName('checked_out_by')
-            ->nullable()
-            ->build();
-
-        $builder->createField('checkedOutByUser', 'string')
-            ->columnName('checked_out_by_user')
-            ->nullable()
-            ->build();
-    }
 
     /**
      * Prepares the metadata for API usage.
@@ -230,7 +172,8 @@ class FormEntity extends CommonEntity
                 // check to see if there is a category to check
                 if ($checkCategoryStatus && method_exists($this, 'getCategory')) {
                     $category = $this->getCategory();
-                    if (null !== $category && !$category->isPublished()) {
+
+                    if ($category instanceof Category && !$category->isPublished()) {
                         return false;
                     }
                 }
@@ -245,17 +188,14 @@ class FormEntity extends CommonEntity
     /**
      * @param \DateTime $dateAdded
      */
-    public function setDateAdded($dateAdded): static
+    public function setDateAdded(?\DateTimeInterface $dateAdded): static
     {
         $this->dateAdded = $dateAdded;
 
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateAdded()
+    public function getDateAdded(): ?\DateTimeInterface
     {
         return $this->dateAdded;
     }
@@ -263,7 +203,7 @@ class FormEntity extends CommonEntity
     /**
      * @param \DateTime $dateModified
      */
-    public function setDateModified($dateModified): static
+    public function setDateModified(?\DateTimeInterface $dateModified): static
     {
         $this->isChanged('dateModified', $dateModified);
         $this->dateModified = $dateModified;
@@ -271,10 +211,7 @@ class FormEntity extends CommonEntity
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getDateModified()
+    public function getDateModified(): ?\DateTimeInterface
     {
         return $this->dateModified;
     }
@@ -282,17 +219,14 @@ class FormEntity extends CommonEntity
     /**
      * @param \DateTime $checkedOut
      */
-    public function setCheckedOut($checkedOut): static
+    public function setCheckedOut(?\DateTimeInterface $checkedOut): static
     {
         $this->checkedOut = $checkedOut;
 
         return $this;
     }
 
-    /**
-     * @return \DateTimeInterface|null
-     */
-    public function getCheckedOut()
+    public function getCheckedOut(): ?\DateTimeInterface
     {
         return $this->checkedOut;
     }

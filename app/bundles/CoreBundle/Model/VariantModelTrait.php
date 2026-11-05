@@ -74,7 +74,7 @@ trait VariantModelTrait
         }
     }
 
-    protected function resetVariants($entity, $relatedIds = null, ?\DateTime $variantStartDate = null): void
+    protected function resetVariants(object $entity, $relatedIds = null, ?\DateTime $variantStartDate = null): void
     {
         $repo = $this->getRepository();
 

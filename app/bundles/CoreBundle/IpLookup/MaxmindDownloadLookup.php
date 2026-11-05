@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\IpLookup;
 
 use GeoIp2\Database\Reader;
+use GeoIp2\Record\Subdivision;
 
 final class MaxmindDownloadLookup extends AbstractLocalDataLookup
 {
@@ -56,14 +57,16 @@ final class MaxmindDownloadLookup extends AbstractLocalDataLookup
             $reader = new Reader($this->getLocalDataStoreFilepath());
             $record = $reader->city($this->ip);
 
-            if (isset($record->subdivisions[0])) {
-                if (count($record->subdivisions) > 1) {
+            /** @var Subdivision[] $subdivisions */
+            $subdivisions = $record->subdivisions;
+            if (isset($subdivisions[0])) {
+                if (count($subdivisions) > 1) {
                     // Use the first listed as the country and second as state
                     // UK -> England -> Winchester
-                    $this->country = $record->subdivisions[0]->name;
-                    $this->region  = $record->subdivisions[1]->name;
+                    $this->country = $subdivisions[0]->name;
+                    $this->region  = $subdivisions[1]->name;
                 } else {
-                    $this->region = $record->subdivisions[0]->name;
+                    $this->region = $subdivisions[0]->name;
                 }
             }
 

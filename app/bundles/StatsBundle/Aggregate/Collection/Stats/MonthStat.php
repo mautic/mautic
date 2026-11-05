@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\StatsBundle\Aggregate\Collection\Stats;
 
 final class MonthStat implements StatInterface
@@ -20,11 +22,9 @@ final class MonthStat implements StatInterface
     /**
      * @param int $day
      *
-     * @return DayStat
-     *
      * @throws \Exception
      */
-    public function getDay($day)
+    public function getDay($day): DayStat
     {
         $key = new \DateTime("{$this->month}-{$day} 00:00:00")->format('Y-m-d');
 

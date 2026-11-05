@@ -6,7 +6,7 @@ namespace Mautic\LeadBundle\Segment\Decorator;
 
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 
-class DateDecorator extends CustomMappedDecorator
+final class DateDecorator extends CustomMappedDecorator
 {
     /**
      * @throws \Exception

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\AssetBundle\Tests\Asset;
 
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;

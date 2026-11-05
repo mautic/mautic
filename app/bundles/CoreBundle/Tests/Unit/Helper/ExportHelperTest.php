@@ -263,7 +263,8 @@ final class ExportHelperTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->translatorInterfaceMock->expects($this->once())->method('trans')
             ->with(
-                'mautic.error.invalid.specific.export.type', [
+                'mautic.error.invalid.specific.export.type',
+                [
                     '%type%'          => 'xls',
                     '%expected_type%' => ExportHelper::EXPORT_TYPE_EXCEL,
                 ]
@@ -311,7 +312,8 @@ final class ExportHelperTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->translatorInterfaceMock->expects($this->once())->method('trans')->with(
-            'mautic.error.invalid.specific.export.type', [
+            'mautic.error.invalid.specific.export.type',
+            [
                 '%type%'          => ExportHelper::EXPORT_TYPE_EXCEL,
                 '%expected_type%' => ExportHelper::EXPORT_TYPE_CSV,
             ]

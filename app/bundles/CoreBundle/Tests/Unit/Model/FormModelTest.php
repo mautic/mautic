@@ -66,14 +66,14 @@ final class FormModelTest extends TestCase
              */
             private array $actions = [];
 
-            protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+            protected function dispatchEvent($action, object &$entity, bool $isNew = false, ?Event $event = null): ?Event
             {
                 $this->actions[] = $action;
 
                 return $event;
             }
 
-            protected function dispatchBatchEvent(string $action, array &$entitiesBatchParams, ?Event $event = null): ?Event
+            protected function dispatchBatchEvent(string $action, array $entitiesBatchParams, ?Event $event = null): ?Event
             {
                 $this->actions[] = $action;
 

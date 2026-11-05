@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -25,6 +26,56 @@ final class UserControllerFunctionalTest extends MauticMysqlTestCase
     {
         $this->client->request(Request::METHOD_GET, '/s/users/edit/1');
         $this->assertResponseIsSuccessful();
+    }
+
+    #[DataProvider('unmatchedActivityProvider')]
+    public function testEditPageWithUnmatchedActivity(string $object, string $action): void
+    {
+        // Non-empty profile values prevent unrelated users matching empty audit details.
+        foreach (self::getContainer()->get(UserRepository::class)->findAll() as $user) {
+            $user->setFirstName('Existing');
+            $user->setLastName('User');
+            $user->setPosition('Existing position');
+            $user->setSignature('Existing signature');
+        }
+        $role = new Role();
+        $role->setName('Activity test role');
+        $role->setDescription('Activity test role description');
+        $this->em->persist($role);
+
+        $actor = $this->userSetter($role);
+        $actor->setPosition('Activity test position');
+        $actor->setSignature('Activity test signature');
+        $this->em->persist($actor);
+        $this->em->flush();
+
+        $log = $this->auditLogSetter($actor->getId(), 'Historical actor', 'user', $object, 999999, $action, [
+            'email'    => ['', 'deleted@example.com'],
+            // Older records may lack a usable username as well as a current target.
+            'username' => ['', ''],
+            'name'     => ['', 'Deleted role'],
+        ]);
+        $this->em->persist($log);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/s/users/edit/'.$actor->getId());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertCount(1, $crawler->filter('form[name="user"]'));
+        $activity = $crawler->filter('.media-list-feed li.media');
+        $this->assertCount(1, $activity);
+        $this->assertCount(1, $activity->filter('a'));
+        $this->assertSame('Historical actor', $activity->filter('a')->text());
+        $this->assertSame('/s/users/edit/'.$actor->getId(), $activity->filter('a')->attr('href'));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function unmatchedActivityProvider(): iterable
+    {
+        yield 'user created' => ['user', 'create'];
+        yield 'user updated' => ['user', 'update'];
     }
 
     public function testRedirectNonExistingUser(): void

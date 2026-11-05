@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 /**
  * @extends CommonRepository<IntegrationEntity>
  */
-class IntegrationEntityRepository extends CommonRepository
+final class IntegrationEntityRepository extends CommonRepository
 {
     /**
      * @param array<int>|int|null               $internalEntityIds
@@ -116,7 +116,7 @@ class IntegrationEntityRepository extends CommonRepository
                 $q->expr()->eq('i.integration', ':integration'),
                 $q->expr()->eq('i.internal_entity', ':internalEntity'),
                 $q->expr()->eq('i.integration_entity', ':integrationEntity'),
-                $q->expr()->eq('i.internal_entity_id', (int) $internalEntityId)
+                $q->expr()->eq('i.internal_entity_id', (string) ((int) $internalEntityId))
             )
         )
             ->setParameter('integration', $integration)
@@ -126,13 +126,13 @@ class IntegrationEntityRepository extends CommonRepository
 
         $results = $q->executeQuery()->fetchAllAssociative();
 
-        return ($results) ? $results[0] : null;
+        return ($results !== []) ? $results[0] : null;
     }
 
     /**
      * @return IntegrationEntity[]
      */
-    public function getIntegrationEntities($integration, $integrationEntity, $internalEntity, $internalEntityIds)
+    public function getIntegrationEntities($integration, $integrationEntity, $internalEntity, $internalEntityIds): array
     {
         $q = $this->createQueryBuilder('i', 'i.internalEntityId');
 
@@ -155,7 +155,6 @@ class IntegrationEntityRepository extends CommonRepository
     /**
      * @param int          $limit
      * @param array|string $integrationEntity
-     * @param array        $excludeIntegrationIds
      *
      * @return mixed[]
      */
@@ -167,7 +166,7 @@ class IntegrationEntityRepository extends CommonRepository
         $fromDate = null,
         $toDate = null,
         $integrationEntity = ['Contact', 'Lead'],
-        $excludeIntegrationIds = [],
+        array $excludeIntegrationIds = [],
     ): array {
         if ('company' == $internalEntity) {
             $joinTable = 'companies';
@@ -196,7 +195,7 @@ class IntegrationEntityRepository extends CommonRepository
             }
             $sub = null;
             foreach ($integrationEntity as $key => $entity) {
-                if (null === $sub) {
+                if (!$sub instanceof CompositeExpression) {
                     $sub = CompositeExpression::or($q->expr()->eq('i.integration_entity', ':entity'.$key));
                     $q->setParameter('entity'.$key, $entity);
                     continue;
@@ -212,7 +211,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integration', $integration)
             ->setParameter('internalEntity', $internalEntity);
 
-        if (!empty($excludeIntegrationIds)) {
+        if ($excludeIntegrationIds !== []) {
             $q->andWhere(
                 $q->expr()->notIn(
                     'i.integration_entity_id',
@@ -240,10 +239,12 @@ class IntegrationEntityRepository extends CommonRepository
 
         if ('lead' == $internalEntity) {
             $q->andWhere(
-                $q->expr()->and($q->expr()->isNotNull('l.email')));
+                $q->expr()->and($q->expr()->isNotNull('l.email'))
+            );
         } else {
             $q->andWhere(
-                $q->expr()->and($q->expr()->isNotNull('l.companyname')));
+                $q->expr()->and($q->expr()->isNotNull('l.companyname'))
+            );
         }
 
         if ($fromDate) {
@@ -402,19 +403,17 @@ class IntegrationEntityRepository extends CommonRepository
     }
 
     /**
-     * @return int
+     * Counts the lead's integration entities, but returns an empty array when no
+     * integration is published or nothing matched - see getIntegrationEntityByLead().
+     *
+     * @return int|array<int, array<string, scalar|null>>
      */
-    public function getIntegrationEntityCount($leadId, $integration = null, $integrationEntity = null, $internalEntity = null)
+    public function getIntegrationEntityCount($leadId, $integration = null, $integrationEntity = null, $internalEntity = null): int|array
     {
         return $this->getIntegrationEntityByLead($leadId, $integration, $integrationEntity, $internalEntity, false);
     }
 
-    /**
-     * @param int|bool $limit
-     *
-     * @return array|int
-     */
-    public function getIntegrationEntityByLead($leadId, $integration = null, $integrationEntity = null, $internalEntity = null, $limit = 100)
+    public function getIntegrationEntityByLead($leadId, $integration = null, $integrationEntity = null, $internalEntity = null, int|bool $limit = 100): array|int
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'integration_entity', 'i');

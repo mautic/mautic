@@ -13,13 +13,14 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * @extends FormModel<MessageQueue>
  */
-class MessageQueueModel extends FormModel
+final class MessageQueueModel extends FormModel
 {
     public static function getName(): string
     {
@@ -29,11 +30,7 @@ class MessageQueueModel extends FormModel
     /**
      * @var string A default message reschedule interval
      */
-    public const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
-
-    protected LeadModel $leadModel;
-
-    protected CompanyModel $companyModel;
+    public const string DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
 
     private MessageQueueRepository $messageQueueRepository;
 
@@ -49,8 +46,6 @@ class MessageQueueModel extends FormModel
         FrequencyRuleRepository $frequencyRuleRepository,
         LeadRepository $leadRepository,
     ): void {
-        $this->leadModel               = $leadModel;
-        $this->companyModel            = $companyModel;
         $this->messageQueueRepository  = $messageQueueRepository;
         $this->frequencyRuleRepository = $frequencyRuleRepository;
         $this->leadRepository = $leadRepository;
@@ -122,31 +117,30 @@ class MessageQueueModel extends FormModel
     /**
      * Adds messages to the queue.
      *
-     * @param array    $leads
      * @param string   $channel
      * @param int      $channelId
      * @param int      $maxAttempts
      * @param int      $priority
      * @param int|null $campaignEventId
-     * @param array    $options
      */
     public function queue(
-        $leads,
+        array $leads,
         $channel,
         $channelId,
         \DateInterval $scheduledInterval,
         $maxAttempts = 1,
         $priority = 1,
         $campaignEventId = null,
-        $options = [],
+        array $options = [],
     ): bool {
         $messageQueues = [];
 
         $scheduledDate = new \DateTime()->add($scheduledInterval);
 
+        /** @var Lead|array<string, mixed> $lead */
         foreach ($leads as $lead) {
             $leadId = (is_array($lead)) ? $lead['id'] : $lead->getId();
-            if (!empty($this->messageQueueRepository->findMessage($channel, $channelId, $leadId))) {
+            if ($this->messageQueueRepository->findMessage($channel, $channelId, $leadId) instanceof MessageQueue) {
                 continue;
             }
 
@@ -195,6 +189,9 @@ class MessageQueueModel extends FormModel
         return $counter;
     }
 
+    /**
+     * @param array<int, MessageQueue>|MessageQueue $queue
+     */
     public function processMessageQueue(array|MessageQueue $queue): int
     {
         if (!is_array($queue)) {
@@ -275,6 +272,9 @@ class MessageQueueModel extends FormModel
         return $counter;
     }
 
+    /**
+     * @param MessageQueue|mixed $message
+     */
     public function reschedule($message, \DateInterval $rescheduleInterval, $leadId = null, $channel = null, $channelId = null, bool $persist = false): void
     {
         if (!$message instanceof MessageQueue && $leadId && $channel && $channelId) {
@@ -286,6 +286,7 @@ class MessageQueueModel extends FormModel
             return;
         }
 
+        /** @var MessageQueue $message */
         $message->setAttempts($message->getAttempts() + 1);
         $message->setLastAttempt(new \DateTime());
         $rescheduleTo = clone $message->getScheduledDate();
@@ -308,11 +309,11 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @param ?object $entity
+     * @param MessageQueue|null $entity
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
+     * @throws MethodNotAllowedHttpException
      */
-    protected function dispatchEvent($action, &$entity, bool $isNew = false, ?Event $event = null): ?Event
+    protected function dispatchEvent($action, ?object &$entity, bool $isNew = false, ?Event $event = null): ?Event
     {
         switch ($action) {
             case 'process_message_queue':
@@ -331,7 +332,6 @@ class MessageQueueModel extends FormModel
         if ($this->dispatcher->hasListeners($name)) {
             if (!$event instanceof Event) {
                 $event = new MessageQueueEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
             }
             $this->dispatcher->dispatch($event);
 

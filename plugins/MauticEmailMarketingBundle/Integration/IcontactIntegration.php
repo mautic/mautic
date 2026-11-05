@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticEmailMarketingBundle\Integration;
 
+use Exception;
+use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticEmailMarketingBundle\Form\Type\IcontactType;
 
 final class IcontactIntegration extends EmailAbstractIntegration
@@ -84,12 +86,11 @@ final class IcontactIntegration extends EmailAbstractIntegration
     }
 
     /**
-     * @param array  $parameters
      * @param string $method
      *
      * @return mixed|string
      */
-    public function makeRequest($url, $parameters = [], $method = 'GET', array $settings = [])
+    public function makeRequest($url, array $parameters = [], $method = 'GET', array $settings = [])
     {
         $settings['headers'] = [
             'Except:',
@@ -169,17 +170,13 @@ final class IcontactIntegration extends EmailAbstractIntegration
         return $leadFields;
     }
 
-    /**
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     * @param array                          $config
-     */
-    public function pushLead($lead, $config = []): bool
+    public function pushLead(Lead $lead, array $config = []): bool
     {
         $config = $this->mergeConfigToFeatureSettings($config);
 
         $mappedData = $this->populateLeadData($lead, $config);
 
-        if (empty($mappedData)) {
+        if ($mappedData === []) {
             return false;
         }
         if (empty($mappedData['email'])) {
@@ -211,7 +208,7 @@ final class IcontactIntegration extends EmailAbstractIntegration
 
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
         }
 

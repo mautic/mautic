@@ -5,22 +5,18 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Entity(repositoryClass: CompanyLeadRepository::class)]
 #[ORM\Table(name: self::TABLE_NAME)]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class CompanyLead
 {
-    public const TABLE_NAME = 'companies_leads';
+    public const string TABLE_NAME = 'companies_leads';
 
-    /**
-     * @var Company
-     */
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: Company::class)]
     #[ORM\JoinColumn(name: 'company_id', nullable: false, onDelete: 'CASCADE')]
-    private $company;
+    private \Mautic\LeadBundle\Entity\Company $company;
 
     /**
      * @var Lead
@@ -33,24 +29,14 @@ class CompanyLead
     /**
      * @var \DateTimeInterface
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     private $dateAdded;
 
     /**
      * @var bool|null
      */
+    #[ORM\Column(name: 'is_primary', type: 'boolean', nullable: true)]
     private $primary = false;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addDateAdded();
-
-        $builder->createField('primary', 'boolean')
-            ->columnName('is_primary')
-            ->nullable()
-            ->build();
-    }
 
     /**
      * @return \DateTimeInterface
@@ -68,10 +54,7 @@ class CompanyLead
         $this->dateAdded = $date;
     }
 
-    /**
-     * @return Lead
-     */
-    public function getLead()
+    public function getLead(): Lead
     {
         return $this->lead;
     }
@@ -84,26 +67,17 @@ class CompanyLead
         $this->lead = $lead;
     }
 
-    /**
-     * @return Company
-     */
-    public function getCompany()
+    public function getCompany(): Company
     {
         return $this->company;
     }
 
-    /**
-     * @return Company
-     */
-    public function getCompanies()
+    public function getCompanies(): Company
     {
         return $this->company;
     }
 
-    /**
-     * @param Company $company
-     */
-    public function setCompany($company): void
+    public function setCompany(Company $company): void
     {
         $this->company = $company;
     }

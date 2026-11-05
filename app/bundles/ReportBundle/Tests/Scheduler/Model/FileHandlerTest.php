@@ -12,9 +12,10 @@ use Mautic\ReportBundle\Exception\FileTooBigException;
 use Mautic\ReportBundle\Scheduler\Model\FileHandler;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FileHandlerTest extends \PHPUnit\Framework\TestCase
+final class FileHandlerTest extends TestCase
 {
     /**
      * @var MockObject&FilePathResolver
@@ -98,11 +99,8 @@ final class FileHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPathToCompressedCsvFileForReport(): void
     {
-        $report = $this->createMock(Report::class);
-
-        $report->expects($this->once())
-            ->method('getId')
-            ->willReturn(33);
+        $report = new Report();
+        $report->setId(33);
 
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
@@ -116,12 +114,9 @@ final class FileHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testMoveZipToPermanentLocation(): void
     {
-        $report   = $this->createMock(Report::class);
+        $report   = new Report();
+        $report->setId(33);
         $filePath = 'file/path.csv';
-
-        $report->expects($this->once())
-            ->method('getId')
-            ->willReturn(33);
 
         $this->coreParametersHelper->expects($this->once())
             ->method('get')

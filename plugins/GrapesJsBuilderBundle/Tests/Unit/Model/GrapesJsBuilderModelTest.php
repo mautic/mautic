@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\GrapesJsBuilderBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -16,13 +17,14 @@ use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
+final class GrapesJsBuilderModelTest extends TestCase
 {
     public function testAddOrEditEntityWithoutMatchingEntityAndNoRequestQuery(): void
     {
@@ -77,7 +79,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             ) {
             }
 
-            public function getRepository($entityName)
+            public function getRepository(string $entityName): EntityRepository
             {
                 Assert::assertSame(GrapesJsBuilder::class, $entityName);
 
@@ -91,7 +93,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             $entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
-            $this->createStub(Router::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $this->getTranslator(),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),
@@ -184,7 +186,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             ) {
             }
 
-            public function getRepository($entityName)
+            public function getRepository(string $entityName): EntityRepository
             {
                 Assert::assertSame(GrapesJsBuilder::class, $entityName);
 
@@ -198,7 +200,7 @@ final class GrapesJsBuilderModelTest extends \PHPUnit\Framework\TestCase
             $entityManager,
             $this->createStub(CorePermissions::class),
             $this->createStub(EventDispatcherInterface::class),
-            $this->createStub(Router::class),
+            $this->createStub(UrlGeneratorInterface::class),
             $this->getTranslator(),
             $this->createStub(UserHelper::class),
             $this->createStub(LoggerInterface::class),

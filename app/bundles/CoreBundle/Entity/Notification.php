@@ -4,21 +4,23 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\UserBundle\Entity\User;
 
 #[ORM\Entity(repositoryClass: NotificationRepository::class)]
 #[ORM\Table(name: 'notifications')]
-#[ORM\Index(columns: ['is_read'], name: 'notification_read_status')]
-#[ORM\Index(columns: ['type'], name: 'notification_type')]
-#[ORM\Index(columns: ['is_read', 'user_id'], name: 'notification_user_read_status')]
-#[ORM\Index(columns: ['deduplicate', 'date_added'], name: 'deduplicate_date_added')]
+#[ORM\Index(name: 'notification_read_status', columns: ['is_read'])]
+#[ORM\Index(name: 'notification_type', columns: ['type'])]
+#[ORM\Index(name: 'notification_user_read_status', columns: ['is_read', 'user_id'])]
+#[ORM\Index(name: 'deduplicate_date_added', columns: ['deduplicate', 'date_added'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
 class Notification
 {
     /**
      * @var int|null
      */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', options: ['unsigned' => true])]
+    #[ORM\GeneratedValue]
     protected $id;
 
     /**
@@ -31,72 +33,44 @@ class Notification
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::STRING, length: 25, nullable: true)]
     protected $type;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::STRING, length: 512, nullable: true)]
     protected $header;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: Types::TEXT)]
     protected $message;
 
     /**
      * @var \DateTimeInterface|null
      */
+    #[ORM\Column(name: 'date_added', type: 'datetime')]
     protected $dateAdded;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(name: 'icon_class', type: Types::STRING, length: 191, nullable: true)]
     protected $iconClass;
 
     /**
      * @var bool
      */
+    #[ORM\Column(name: 'is_read', type: Types::BOOLEAN)]
     protected $isRead = false;
 
     /**
      * @var string|null
      */
+    #[ORM\Column(type: 'string', length: 32, nullable: true)]
     protected $deduplicate;
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
-    {
-        $builder = new ClassMetadataBuilder($metadata);
-
-        $builder->addId();
-
-        $builder->createField('type', Types::STRING)
-            ->nullable()
-            ->length(25)
-            ->build();
-
-        $builder->createField('header', Types::STRING)
-            ->nullable()
-            ->length(512)
-            ->build();
-
-        $builder->addField('message', Types::TEXT);
-
-        $builder->addDateAdded();
-
-        $builder->createField('iconClass', Types::STRING)
-            ->columnName('icon_class')
-            ->nullable()
-            ->build();
-
-        $builder->createField('isRead', Types::BOOLEAN)
-            ->columnName('is_read')
-            ->build();
-
-        $builder->createField('deduplicate', 'string')
-            ->nullable()
-            ->length(32)
-            ->build();
-    }
 
     /**
      * @return int|null

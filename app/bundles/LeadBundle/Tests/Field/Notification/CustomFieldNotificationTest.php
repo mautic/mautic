@@ -9,9 +9,10 @@ use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Notification\CustomFieldNotification;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final class CustomFieldNotificationTest extends \PHPUnit\Framework\TestCase
+final class CustomFieldNotificationTest extends TestCase
 {
     public function testNoUserId(): void
     {

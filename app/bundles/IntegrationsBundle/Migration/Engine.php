@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Migration;
 
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\IntegrationsBundle\Exception\PathNotFoundException;
 
@@ -53,7 +54,7 @@ final readonly class Engine
             if (!$connection instanceof \PDO || $connection->inTransaction()) {
                 $this->entityManager->commit();
             }
-        } catch (\Doctrine\DBAL\Exception $e) {
+        } catch (Exception $e) {
             $this->entityManager->rollback();
 
             throw $e;
@@ -63,7 +64,7 @@ final readonly class Engine
     /**
      * Get migration classes to proceed.
      *
-     * @return string[]
+     * @return array<class-string<AbstractMigration>>
      */
     private function getMigrationClasses(): array
     {

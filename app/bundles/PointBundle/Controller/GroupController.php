@@ -26,7 +26,7 @@ final class GroupController extends AbstractStandardFormController
     }
 
     #[Route(
-        '/s/points/groups/{objectAction}/{objectId}',
+        path: '/s/points/groups/{objectAction}/{objectId}',
         name: 'mautic_point.group_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -36,16 +36,13 @@ final class GroupController extends AbstractStandardFormController
         return parent::executeAction($request, $objectAction, $objectId, $objectSubId, $objectModel);
     }
 
-    /**
-     * @param int $page
-     */
     #[Route(
-        '/s/points/groups/{page}',
+        path: '/s/points/groups/{page}',
         name: 'mautic_point.group_index',
         requirements: ['page' => '\d+'],
         defaults: ['page' => 0],
     )]
-    public function indexAction(Request $request, PointGroupSearchScopeProvider $pointGroupSearchScopeProvider, $page = 1): Response
+    public function indexAction(Request $request, PointGroupSearchScopeProvider $pointGroupSearchScopeProvider, int $page = 1): Response
     {
         $this->indexSearchScopes = $pointGroupSearchScopeProvider->getScopes();
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Utils\PHPStan\Collector;
 
 use PhpParser\Node;
+use PhpParser\Node\Expr;
 use PhpParser\Node\Expr\ClassConstFetch;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Identifier;
@@ -58,7 +59,7 @@ final class ClassNameServiceAliasCollector implements Collector
         return [$className, $args[1]->value->value, $node->getStartLine()];
     }
 
-    private function matchClassName(Node $aliasValue): ?string
+    private function matchClassName(Expr $aliasValue): ?string
     {
         if (!$aliasValue instanceof ClassConstFetch || !$aliasValue->class instanceof Name) {
             return null;

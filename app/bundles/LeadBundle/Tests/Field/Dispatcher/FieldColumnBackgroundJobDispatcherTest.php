@@ -13,9 +13,10 @@ use Mautic\LeadBundle\Field\Event\UpdateColumnBackgroundEvent;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\AbortColumnUpdateException;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class FieldColumnBackgroundJobDispatcherTest extends \PHPUnit\Framework\TestCase
+final class FieldColumnBackgroundJobDispatcherTest extends TestCase
 {
     /**
      * @var MockObject&EventDispatcherInterface

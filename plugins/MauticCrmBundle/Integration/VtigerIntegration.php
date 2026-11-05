@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
+use Exception;
 use MauticPlugin\MauticCrmBundle\Api\VtigerApi;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Form;
@@ -10,7 +11,7 @@ use Symfony\Component\Form\FormBuilder;
 /**
  * @extends CrmAbstractIntegration<VtigerApi>
  */
-class VtigerIntegration extends CrmAbstractIntegration
+final class VtigerIntegration extends CrmAbstractIntegration
 {
     private string $authorzationError = '';
 
@@ -185,7 +186,7 @@ class VtigerIntegration extends CrmAbstractIntegration
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logIntegrationError($e);
 
             if (!$silenceExceptions) {
@@ -199,7 +200,7 @@ class VtigerIntegration extends CrmAbstractIntegration
     /**
      * @return array<mixed>
      */
-    public function getFormNotes($section)
+    public function getFormNotes($section): array
     {
         if ('leadfield_match' == $section) {
             return ['mautic.vtiger.form.field_match_notes', 'info'];
@@ -218,10 +219,9 @@ class VtigerIntegration extends CrmAbstractIntegration
 
     /**
      * @param Form|FormBuilder $builder
-     * @param array            $data
      * @param string           $formArea
      */
-    public function appendToForm(&$builder, $data, $formArea): void
+    public function appendToForm($builder, array $data, $formArea): void
     {
         if ('features' == $formArea) {
             $builder->add(

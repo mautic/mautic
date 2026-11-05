@@ -2,7 +2,7 @@
 
 namespace Mautic\CampaignBundle\Executioner\Scheduler\Mode;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException;
@@ -91,18 +91,19 @@ final class Interval implements ScheduleModeInterface
             $dateTriggered = clone $compareFromDateTime;
         }
 
-        $hour      = $event->getTriggerHour();
-        $startTime = $event->getTriggerRestrictedStartHour();
-        $endTime   = $event->getTriggerRestrictedStopHour();
-        $dow       = $event->getTriggerRestrictedDaysOfWeek();
+        $hour       = $event->getTriggerHour();
+        $startTime  = $event->getTriggerRestrictedStartHour();
+        $endTime    = $event->getTriggerRestrictedStopHour();
+        $daysOfWeek = $event->getTriggerRestrictedDaysOfWeek();
 
-        return $this->getGroupExecutionDateTime($event->getId(), $log->getLead(), $dateTriggered, $hour, $startTime, $endTime, $dow);
+        return $this->getGroupExecutionDateTime($event->getId(), $log->getLead(), $dateTriggered, $hour, $startTime, $endTime, $daysOfWeek);
     }
 
     /**
      * @return GroupExecutionDateDAO[]
+     * @param Collection<int, Lead> $contacts
      */
-    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, ?\DateTimeInterface $compareFromDateTime = null): array
+    public function groupContactsByDate(Event $event, Collection $contacts, \DateTimeInterface $executionDate, ?\DateTimeInterface $compareFromDateTime = null): array
     {
         $groupedExecutionDates = [];
         $hour                  = $event->getTriggerHour();
@@ -218,7 +219,7 @@ final class Interval implements ScheduleModeInterface
         if ([] !== $daysOfWeek) {
             $this->logger->debug(
                 sprintf(
-                    'CAMPAIGN: Scheduling event ID %s for contact ID %s based on DOW restrictions of %s',
+                    'CAMPAIGN: Scheduling event ID %s for contact ID %s based on days-of-week restrictions of %s',
                     $eventId,
                     $contact->getId(),
                     implode(',', $daysOfWeek)
@@ -229,10 +230,18 @@ final class Interval implements ScheduleModeInterface
                 throw new \LogicException('The Mautic accepts only 0-6 as day of week (0 is Sunday).');
             }
 
+            $dayBeforeAdvancement = (int) $groupDateTime->format('w');
+
             // Schedule for the next day of the week if applicable
             while (!in_array((int) $groupDateTime->format('w'), $daysOfWeek)) {
                 /** @var \DateTime $groupDateTime */
                 $groupDateTime->modify('+1 day');
+            }
+
+            // When the days-of-week loop advanced past the original day, "hour already passed today" no longer
+            // applies: we are on a new allowed day and must honour the configured send-hour.
+            if ($groupDateTime instanceof \DateTime && $hour && (int) $groupDateTime->format('w') !== $dayBeforeAdvancement) {
+                $groupDateTime->setTime((int) $hour->format('H'), (int) $hour->format('i'), 0);
             }
         }
 

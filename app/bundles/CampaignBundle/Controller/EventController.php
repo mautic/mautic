@@ -7,7 +7,7 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Form\Type\EventType;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController as CommonFormController;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -49,7 +49,7 @@ final class EventController extends CommonFormController
     }
 
     #[Route(
-        '/s/campaigns/events/{objectAction}/{objectId}',
+        path: '/s/campaigns/events/{objectAction}/{objectId}',
         name: 'mautic_campaignevent_action',
         requirements: ['objectId' => '[a-zA-Z0-9_-]+'],
         defaults: ['objectId' => 0],
@@ -586,6 +586,7 @@ final class EventController extends CommonFormController
         }
 
         // Render the template and store it in the appropriate variable
+        $passThroughVars                  = [];
         $passThroughKey                   = ('edit' === $action) ? 'updateHtml' : 'eventHtml';
         $passThroughVars[$passThroughKey] = $this->renderView($template, $templateVars);
 

@@ -48,6 +48,11 @@ final class BatchIdToEntityHelper
     }
 
     /**
+     * @template TEntity as object
+     *
+     * @param TEntity[] $entities
+     * @return TEntity[]
+     *
      * Reorder the entities based on the original keys
      * BC allowed a request to have associative keys (don't ask why; yes it's terrible implementation but we're keeping BC here)
      * The issue this solves is the response should match the format given by the request. If the request had associative keys, the response
@@ -72,7 +77,7 @@ final class BatchIdToEntityHelper
             if (!isset($entitiesKeyedById[$id])) {
                 $hasPreviousId = array_filter(
                     $entities,
-                    fn ($entity): bool => $id == $entity->getPreviousId()
+                    fn (object $entity): bool => $id == $entity->getPreviousId()
                 );
 
                 if ([] !== $hasPreviousId) {

@@ -71,10 +71,7 @@ trait CustomFieldEntityTrait
         $this->fields = CustomFieldValueHelper::normalizeValues($fields);
     }
 
-    /**
-     * @return array
-     */
-    public function getFields(bool $ungroup = false)
+    public function getFields(bool $ungroup = false): array
     {
         if ($ungroup && isset($this->fields['core'])) {
             $return = [];
@@ -150,10 +147,8 @@ trait CustomFieldEntityTrait
 
     /**
      * Get the array of updated fields.
-     *
-     * @return array
      */
-    public function getUpdatedFields()
+    public function getUpdatedFields(): array
     {
         return $this->updatedFields;
     }
@@ -205,7 +200,7 @@ trait CustomFieldEntityTrait
     /**
      * @return mixed[]
      */
-    public function getProfileFields()
+    public function getProfileFields(): array
     {
         if (isset($this->fields['core'])) {
             $fieldValues = [

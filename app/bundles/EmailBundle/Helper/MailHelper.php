@@ -27,6 +27,7 @@ use Mautic\EmailBundle\Model\EmailStatModel;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Psr\Log\LoggerInterface;
@@ -44,21 +45,21 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
-class MailHelper
+final class MailHelper
 {
-    public const QUEUE_RESET_TO           = 'RESET_TO';
+    public const string QUEUE_RESET_TO           = 'RESET_TO';
 
-    public const QUEUE_FULL_RESET         = 'FULL_RESET';
+    public const string QUEUE_FULL_RESET         = 'FULL_RESET';
 
-    public const QUEUE_DO_NOTHING         = 'DO_NOTHING';
+    public const string QUEUE_DO_NOTHING         = 'DO_NOTHING';
 
-    public const QUEUE_NOTHING_IF_FAILED  = 'IF_FAILED';
+    public const string QUEUE_NOTHING_IF_FAILED  = 'IF_FAILED';
 
-    public const QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
+    public const string QUEUE_RETURN_ERRORS      = 'RETURN_ERRORS';
 
-    public const EMAIL_TYPE_TRANSACTIONAL = 'transactional';
+    public const string EMAIL_TYPE_TRANSACTIONAL = 'transactional';
 
-    public const EMAIL_TYPE_MARKETING     = 'marketing';
+    public const string EMAIL_TYPE_MARKETING     = 'marketing';
 
     private const array DEFAULT_BODY            = [
         'content'     => '',
@@ -69,91 +70,68 @@ class MailHelper
     /**
      * @var TransportInterface
      */
-    protected $transport;
+    private $transport;
 
     /**
      * @var bool|MauticMessage
      */
     public $message;
 
-    protected ?AddressDTO $from = null;
+    private AddressDTO $from;
 
-    protected ?AddressDTO $systemFrom = null;
+    private AddressDTO $systemFrom;
 
-    protected ?string $replyTo = null;
+    private ?string $replyTo;
 
-    protected ?string $systemReplyTo = null;
+    private ?string $systemReplyTo;
 
-    protected int $addressLengthLimit;
+    private readonly int $addressLengthLimit;
 
     /**
      * @var string
      */
-    protected $returnPath;
+    private $returnPath;
 
     /**
      * @var array
      */
-    protected $errors = [];
+    private $errors = [];
 
     /**
      * @var array|Lead
      */
-    protected $lead;
+    private $lead;
 
-    /**
-     * @var bool
-     */
-    protected $internalSend = false;
+    private bool $internalSend = false;
 
-    protected ?string $idHash = null;
+    private ?string $idHash = null;
 
-    /**
-     * @var bool
-     */
-    protected $idHashState = true;
+    private bool $idHashState = true;
 
-    /**
-     * @var bool
-     */
-    protected $appendTrackingPixel = false;
+    private bool $appendTrackingPixel = false;
 
-    /**
-     * @var array
-     */
-    protected $source = [];
+    private array $source = [];
 
-    /**
-     * @var Email|null
-     */
-    protected $email;
+    private ?Email $email = null;
 
-    /**
-     * @var array
-     */
-    protected $globalTokens = [];
+    private array $globalTokens = [];
 
-    /**
-     * @var array
-     */
-    protected $eventTokens = [];
+    private array $eventTokens = [];
 
     /**
      * Tells the helper that the transport supports tokenized emails (likely HTTP API).
      */
-    protected bool $tokenizationEnabled;
+    private readonly bool $tokenizationEnabled;
 
     /**
      * Use queue mode when sending email through this mailer; this requires a transport that supports tokenization and the use of queue/flushQueue.
-     *
-     * @var bool
      */
-    protected $queueEnabled = false;
+    private bool $queueEnabled = false;
 
     /**
      * @var array
      */
-    protected $queuedRecipients = [];
+    private $queuedRecipients = [];
 
     /**
      * @var array
@@ -163,65 +141,40 @@ class MailHelper
     /**
      * @var string
      */
-    protected $subject              = '';
+    private $subject              = '';
 
     private ?string $subjectInitial = null;
 
     /**
      * @var string
      */
-    protected $plainText              = '';
+    private $plainText              = '';
 
     private ?string $plainTextInitial = null;
 
-    /**
-     * @var bool
-     */
-    protected $plainTextSet = false;
+    private bool $plainTextSet = false;
+
+    private array $assets = [];
+
+    private array $attachedAssets = [];
+
+    private array $assetStats = [];
 
     /**
      * @var array
      */
-    protected $assets = [];
+    private $headers = [];
 
-    /**
-     * @var array
-     */
-    protected $attachedAssets = [];
-
-    /**
-     * @var array
-     */
-    protected $assetStats = [];
-
-    /**
-     * @var array
-     */
-    protected $headers = [];
-
-    /**
-     * @var array
-     */
-    protected $body = self::DEFAULT_BODY;
+    private array $body = self::DEFAULT_BODY;
 
     /**
      * @var array<?string>
      */
     private ?array $bodyInitial = null;
 
-    /**
-     * Cache for lead owners.
-     *
-     * @var array
-     */
-    protected static $leadOwners = [];
+    private bool $fatal = false;
 
-    /**
-     * @var bool
-     */
-    protected $fatal = false;
-
-    protected bool $skip = false;
+    private bool $skip = false;
 
     /**
      * Simply a md5 of the content so that event listeners can easily determine if the content has been changed.
@@ -383,9 +336,16 @@ class MailHelper
             /** @var Asset $asset */
             foreach ($this->assets as $asset) {
                 if (!in_array($asset->getId(), $this->attachedAssets)) {
+                    $filePath = $asset->getFilePath();
+
+                    // Null when a local asset resolves outside the upload dir.
+                    if (null === $filePath) {
+                        continue;
+                    }
+
                     $this->attachedAssets[] = $asset->getId();
                     $this->attachFile(
-                        $asset->getFilePath(),
+                        $filePath,
                         $asset->getOriginalFileName(),
                         $asset->getMime()
                     );
@@ -454,7 +414,7 @@ class MailHelper
 
             // Metadata has to be set for each recipient
             foreach ($this->queuedRecipients as $email => $name) {
-                $from        = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $this->email);
+                $from        = $this->fromEmailHelper->getFromAddressConsideringOwner($this->from, $this->lead, $this->email);
                 $fromAddress = $from->getEmail();
                 // Use composite key (email + name) to ensure contacts with same email but different from names are grouped separately
                 $metadataKey = $fromAddress.'|'.($from->getName() ?? '');
@@ -526,7 +486,7 @@ class MailHelper
      *
      * @return bool
      */
-    public function flushQueue($resetEmailTypes = ['To', 'Cc', 'Bcc'])
+    public function flushQueue(array $resetEmailTypes = ['To', 'Cc', 'Bcc'])
     {
         // Assume true unless there was a fatal error configuring the mailer because if tokenizationEnabled is false, the send happened in queue()
         $flushed = empty($this->fatal);
@@ -543,15 +503,18 @@ class MailHelper
 
                 $email = $this->email;
 
+                /** @var AddressDTO $from */
+                $from = $metadatum['from'];
+
                 if (!empty($metadatum['from'])) {
-                    $this->setFrom($metadatum['from']->getEmail(), $metadatum['from']->getName());
-                    $this->setMessageFrom(new AddressDTO($metadatum['from']->getEmail(), $metadatum['from']->getName()));
+                    $this->setFrom($from->getEmail(), $from->getName());
+                    $this->setMessageFrom(new AddressDTO($from->getEmail(), $from->getName()));
                 } else {
                     $this->setMessageFrom($this->fromEmailHelper->getFrom($email));
                 }
                 $this->setReplyToForQueueMessage(
                     $email,
-                    ($email && $email->getUseOwnerAsMailer()) ? $metadatum['from']->getEmail() : null
+                    ($email && $email->getUseOwnerAsMailer()) ? $from->getEmail() : null
                 );
 
                 foreach ($metadatum['contacts'] as $email => $contact) {
@@ -634,11 +597,8 @@ class MailHelper
 
     /**
      * Adapted from \Swift_Plugins_DecoratorPlugin.
-     *
-     * @param array $search
-     * @param array $replace
      */
-    public static function searchReplaceTokens($search, $replace, MauticMessage &$message): void
+    public static function searchReplaceTokens(array $search, array $replace, MauticMessage $message): void
     {
         // Body
         $body         = $message->getHtmlBody();
@@ -775,7 +735,7 @@ class MailHelper
     /**
      * Set plain text for $this->message, replacing if necessary.
      */
-    protected function setMessagePlainText(): void
+    private function setMessagePlainText(): void
     {
         if ($this->tokenizationEnabled && $this->plainTextSet) {
             // No need to find and replace since tokenization happens at the transport level
@@ -1039,12 +999,9 @@ class MailHelper
     }
 
     /**
-     * @param int    $toBeAdded
-     * @param string $type
-     *
      * @throws BatchQueueMaxException
      */
-    protected function checkBatchMaxRecipients($toBeAdded = 1, $type = 'to'): void
+    private function checkBatchMaxRecipients(int $toBeAdded = 1, string $type = 'to'): void
     {
         if ($this->queueEnabled && $this->transport instanceof TokenTransportInterface) {
             // Check if max batching has been hit
@@ -1061,10 +1018,8 @@ class MailHelper
 
     /**
      * Set reply to address(es) for this mailer instance.
-     *
-     * @param string $name
      */
-    public function setReplyTo(?string $addresses, $name = null): void
+    public function setReplyTo(?string $addresses): void
     {
         $this->replyTo = $addresses;
     }
@@ -1170,34 +1125,23 @@ class MailHelper
 
     /**
      * Check if this is not being send directly to the lead.
-     *
-     * @return bool
      */
-    public function isInternalSend()
+    public function isInternalSend(): bool
     {
         return $this->internalSend;
     }
 
-    /**
-     * @return array
-     */
-    public function getSource()
+    public function getSource(): array
     {
         return $this->source;
     }
 
-    /**
-     * @param array $source
-     */
-    public function setSource($source): void
+    public function setSource(array $source): void
     {
         $this->source = $source;
     }
 
-    /**
-     * @return Email|null
-     */
-    public function getEmail()
+    public function getEmail(): ?Email
     {
         return $this->email;
     }
@@ -1209,7 +1153,7 @@ class MailHelper
      *
      * @return bool Returns false if there were errors with the email configuration
      */
-    public function setEmail(Email $email, bool $allowBcc = true, $assetAttachments = [], bool $ignoreTrackingPixel = false): bool
+    public function setEmail(Email $email, bool $allowBcc = true, array $assetAttachments = [], bool $ignoreTrackingPixel = false): bool
     {
         if ($this->coreParametersHelper->get(ConfigType::MINIFY_EMAIL_HTML)) {
             $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
@@ -1253,11 +1197,9 @@ class MailHelper
 
         // Reset attachments
         $this->assets = $this->attachedAssets = [];
-        if (empty($assetAttachments)) {
-            if ($assets = $email->getAssetAttachments()) {
-                foreach ($assets as $asset) {
-                    $this->attachAsset($asset);
-                }
+        if ($assetAttachments === []) {
+            foreach ($email->getAssetAttachments() as $asset) {
+                $this->attachAsset($asset);
             }
         } else {
             foreach ($assetAttachments as $asset) {
@@ -1353,12 +1295,14 @@ class MailHelper
 
             if ($toEmail) {
                 $unsubscribeHash = $this->mailHashHelper->getEmailHash($toEmail);
-                $url             = $this->router->generate('mautic_email_unsubscribe',
+                $url             = $this->router->generate(
+                    'mautic_email_unsubscribe',
                     ['idHash' => $this->idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 );
             } else {
-                $url             = $this->router->generate('mautic_email_unsubscribe',
+                $url             = $this->router->generate(
+                    'mautic_email_unsubscribe',
                     ['idHash' => $this->idHash],
                     UrlGeneratorInterface::ABSOLUTE_URL
                 );
@@ -1410,10 +1354,7 @@ class MailHelper
         return $tokens;
     }
 
-    /**
-     * @return array
-     */
-    public function getGlobalTokens()
+    public function getGlobalTokens(): array
     {
         return $this->globalTokens;
     }
@@ -1473,7 +1414,7 @@ class MailHelper
     /**
      * Log exception.
      */
-    protected function logError($error, $context = null): void
+    private function logError(string|\Exception $error, $context = null): void
     {
         if ($error instanceof \Exception) {
             $exceptionContext = ['exception' => $error];
@@ -1506,10 +1447,8 @@ class MailHelper
      * Get list of errors.
      *
      * @param bool $reset Resets the error array in preparation for the next mail send or else it'll fail
-     *
-     * @return array
      */
-    public function getErrors(bool $reset = true)
+    public function getErrors(bool $reset = true): array
     {
         $errors = $this->errors;
 
@@ -1549,7 +1488,7 @@ class MailHelper
     /**
      * Creates a download stat for the asset.
      */
-    protected function createAssetDownloadEntries(): void
+    private function createAssetDownloadEntries(): void
     {
         // Nothing was sent out so bail
         if ($this->fatal || [] === $this->assetStats) {
@@ -1586,7 +1525,7 @@ class MailHelper
     /**
      * Queues the details to note if a lead received an asset if no errors are generated.
      */
-    protected function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null): void
+    private function queueAssetDownloadEntry($contactEmail = null, ?array $metadata = null): void
     {
         if ($this->internalSend || [] === $this->assets) {
             return;
@@ -1624,7 +1563,7 @@ class MailHelper
     }
 
     /**
-     * @return \Mautic\PageBundle\Entity\Redirect|object|null
+     * @return Redirect|object|null
      */
     public function getTrackableLink($url)
     {
@@ -1687,7 +1626,7 @@ class MailHelper
         }
 
         $stat->setTrackingHash($this->idHash);
-        if (!empty($this->source)) {
+        if ($this->source !== []) {
             $stat->setSource($this->source[0]);
             $stat->setSourceId($this->source[1]);
         }
@@ -1794,7 +1733,7 @@ class MailHelper
     /**
      * Clean the name - if empty, set as null to ensure pretty headers.
      */
-    protected function cleanName(?string $name): ?string
+    private function cleanName(?string $name): ?string
     {
         if (null === $name) {
             return null;
@@ -1855,8 +1794,10 @@ class MailHelper
                 try {
                     if (in_array(strtolower($headerKey), ['from', 'to', 'cc', 'bcc', 'reply-to'])) {
                         // Handling headers that require MailboxListHeader
-                        $headerValue = array_map(fn ($address): Address => new Address($address),
-                            explode(',', $headerValue));
+                        $headerValue = array_map(
+                            fn ($address): Address => new Address($address),
+                            explode(',', $headerValue)
+                        );
                     }
                     if ($messageHeaders->has($headerKey)) {
                         $header = $messageHeaders->get($headerKey);
@@ -1885,14 +1826,14 @@ class MailHelper
         return [
             'name'        => $name,
             'leadId'      => (!empty($this->lead)) ? $this->lead['id'] : null,
-            'emailId'     => (!empty($this->email)) ? $this->email->getId() : null,
-            'emailName'   => (!empty($this->email)) ? $this->email->getName() : null,
+            'emailId'     => ($this->email instanceof Email) ? $this->email->getId() : null,
+            'emailName'   => ($this->email instanceof Email) ? $this->email->getName() : null,
             'hashId'      => $this->idHash,
             'hashIdState' => $this->idHashState,
             'source'      => $this->source,
             'tokens'      => $tokens,
-            'utmTags'     => (!empty($this->email)) ? $this->email->getUtmTags() : [],
-            'includeDnc'  => !empty($this->email) && $this->email->getSendToDnc(),
+            'utmTags'     => ($this->email instanceof Email) ? $this->email->getUtmTags() : [],
+            'includeDnc'  => $this->email instanceof Email && $this->email->getSendToDnc(),
         ];
     }
 
@@ -1918,7 +1859,7 @@ class MailHelper
         if ($this->lead && $this->email && $this->email->getUseOwnerAsMailer()) {
             $this->lead['owner_id'] ??= 0;
 
-            $from = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $this->email);
+            $from = $this->fromEmailHelper->getFromAddressConsideringOwner($this->from, $this->lead, $this->email);
             $this->setMessageFrom($from);
 
             return;
@@ -1929,16 +1870,16 @@ class MailHelper
             $fromName  = $this->email->getFromName();
             if (!empty($fromEmail) || !empty($fromName)) {
                 if (empty($fromName)) {
-                    $fromName = $this->getFrom()->getName();
+                    $fromName = $this->from->getName();
                 } elseif (empty($fromEmail)) {
-                    $fromEmail = $this->getFrom()->getEmail();
+                    $fromEmail = $this->from->getEmail();
                 }
 
                 $this->from = new AddressDTO($fromEmail, $fromName);
             }
         }
 
-        $from = $this->fromEmailHelper->getFromAddressDto($this->getFrom(), $this->lead, $this->email);
+        $from = $this->fromEmailHelper->getFromAddressDto($this->from, $this->lead, $this->email);
 
         $this->setMessageFrom($from);
     }
@@ -2015,21 +1956,15 @@ class MailHelper
     private function getSystemReplyTo(): string
     {
         if (!$this->systemReplyTo) {
-            $fromEmailAddress    = $this->from ? $this->from->getEmail() : null;
-            $this->systemReplyTo = $this->coreParametersHelper->get('mailer_reply_to_email') ?? $fromEmailAddress ?? $this->getSystemFrom()->getEmail();
+            $this->systemReplyTo = $this->coreParametersHelper->get('mailer_reply_to_email') ?? $this->from->getEmail();
         }
 
         return $this->systemReplyTo;
     }
 
-    private function getFrom(): AddressDTO
-    {
-        return $this->from ?? $this->getSystemFrom();
-    }
-
     private function getSystemFrom(): AddressDTO
     {
-        if (!$this->systemFrom || $this->systemFrom->isEmpty()) {
+        if ($this->systemFrom->isEmpty()) {
             $this->systemFrom = new AddressDTO($this->coreParametersHelper->get('mailer_from_email'), $this->coreParametersHelper->get('mailer_from_name'));
             $this->fromEmailHelper->setDefaultFrom($this->systemFrom);
         }

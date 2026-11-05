@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\Filter\ComplexRelationValueFilterQueryBuilder;
 
@@ -65,7 +66,7 @@ final readonly class DateCompanyDecorator implements FilterDecoratorInterface
     }
 
     /**
-     * @return \Doctrine\DBAL\Query\Expression\CompositeExpression|string|null
+     * @return CompositeExpression|string|null
      */
     public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {

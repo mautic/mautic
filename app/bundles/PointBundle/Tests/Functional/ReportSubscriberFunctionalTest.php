@@ -16,12 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        $this->useCleanupRollback = false;
-
-        parent::setUp();
-    }
+    protected $useCleanupRollback = false;
 
     public function testContactPointLogReportWithGroup(): void
     {

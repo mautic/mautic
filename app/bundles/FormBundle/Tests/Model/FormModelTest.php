@@ -31,6 +31,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -38,7 +39,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 #[AllowMockObjectsWithoutExpectations]
-final class FormModelTest extends \PHPUnit\Framework\TestCase
+final class FormModelTest extends TestCase
 {
     /**
      * @var MockObject&FormRepository
@@ -202,7 +203,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityForNotFoundContactField(): void
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $formField  = new Field();
         $formField->setMappedField('contactselect');
@@ -211,9 +212,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $fields->add($formField);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -231,16 +230,14 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityForNotLinkedSelectField(): void
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $formField  = new Field();
         $formField->setProperties(['syncList' => true]);
 
         $fields->add($formField);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -255,7 +252,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityForNotSyncedSelectField(): void
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $formField  = new Field();
         $formField->setMappedField('contactselect');
@@ -264,9 +261,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $fields->add($formField);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -281,7 +276,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityForSyncedBooleanFieldFromNotLeadObject(): void
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $options    = ['no' => 'lunch?', 'yes' => 'dinner?'];
         $formField  = new Field();
@@ -295,9 +290,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $contactField->setType('boolean');
         $contactField->setProperties($options);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -312,7 +305,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityForSyncedBooleanField(): void
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $options    = ['no' => 'lunch?', 'yes' => 'dinner?'];
         $formField  = new Field();
@@ -326,9 +319,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $contactField->setType('boolean');
         $contactField->setProperties($options);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -386,7 +377,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
     #[DataProvider('fieldTypeProvider')]
     public function testSyncListField(string $type): void
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $options    = [
             ['label' => 'label1', 'value' => 'value1'],
@@ -404,9 +395,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $fields->add($formField);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -433,7 +422,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
 
     private function standardSyncListStaticFieldTest(string $type): Field
     {
-        $formEntity = $this->createMock(Form::class);
+        $formEntity = new Form();
         $fields     = new ArrayCollection();
         $formField  = new Field();
         $formField->setMappedField('contactfield');
@@ -445,9 +434,7 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $contactField = new LeadField();
         $contactField->setType($type);
 
-        $formEntity->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn($fields);
+        new \ReflectionProperty($formEntity, 'fields')->setValue($formEntity, $fields);
 
         $this->formRepository->expects($this->once())
             ->method('getEntity')
@@ -624,6 +611,9 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
         $emailField->setIsAutoFill(true);
         $form->addField(123, $emailField);
 
+        $this->primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')
+            ->willReturn([]);
+
         $this->contactTracker->method('getContact')
             ->willReturn($contact);
 
@@ -759,12 +749,106 @@ final class FormModelTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @return \Iterator<string, array{string, string, array<string>, array<string>}>
+     */
+    public static function automaticJavascriptProvider(): \Iterator
+    {
+        yield 'closing_script_tag_is_escaped' => [
+            '<script type="text/javascript">if (typeof MauticSDKLoaded == \'undefined\') { var x = "</script>"; }</script>',
+            '<div class="mauticform_wrapper"><form></form></div>',
+            ['</script>'],
+            [],
+        ];
+        yield 'html_and_script_are_json_encoded' => [
+            '<script type="text/javascript">var msg = "Please wait...";</script>',
+            '<div>"quoted" & \'single\'</div>',
+            ['var html =', 'document.write('],
+            [],
+        ];
+        yield 'external_script_uses_src_attribute' => [
+            '<script type="text/javascript" src="https://example.com/mautic-form.js"></script>',
+            '<div class="mauticform_wrapper"></div>',
+            ["script0.src = 'https://example.com/mautic-form.js'"],
+            ['createTextNode'],
+        ];
+        yield 'inline_script_uses_create_text_node' => [
+            "<script type=\"text/javascript\">\nMauticSDK.onLoad();\n// single line comment\nvar x = 1;\n</script>",
+            '<div></div>',
+            // The JSON-encoded text node content preserves \n so // comments don't swallow subsequent lines
+            ['createTextNode', 'MauticSDK.onLoad();', '\\n// single line comment\\nvar x = 1;'],
+            [],
+        ];
+    }
+
+    /**
+     * @param string[] $assertContains
+     * @param string[] $assertNotContains
+     */
+    #[DataProvider('automaticJavascriptProvider')]
+    public function testGetAutomaticJavascript(
+        string $formScript,
+        string $html,
+        array $assertContains,
+        array $assertNotContains,
+    ): void {
+        $form      = new Form();
+        $formModel = $this->createFormModelPartialMock();
+        $formModel->method('getContent')->willReturn($html);
+        $formModel->method('getFormScript')->willReturn($formScript);
+
+        $script = $formModel->getAutomaticJavascript($form);
+
+        foreach ($assertContains as $expected) {
+            $this->assertStringContainsString($expected, $script);
+        }
+
+        foreach ($assertNotContains as $unexpected) {
+            $this->assertStringNotContainsString($unexpected, $script);
+        }
+    }
+
+    /**
+     * @return FormModel&MockObject
+     */
+    private function createFormModelPartialMock(): FormModel
+    {
+        return $this->getMockBuilder(FormModel::class)
+            ->setConstructorArgs([
+                $this->createStub(RequestStack::class),
+                $this->createStub(Environment::class),
+                $this->createStub(ThemeHelper::class),
+                $this->createStub(ActionModel::class),
+                $this->createStub(FieldModel::class),
+                $this->fieldHelper,
+                $this->primaryCompanyHelper,
+                $this->leadFieldModel,
+                $this->createStub(FormUploader::class),
+                $this->contactTracker,
+                $this->createStub(ColumnSchemaHelper::class),
+                $this->createStub(TableSchemaHelper::class),
+                $this->createStub(MappedObjectCollectorInterface::class),
+                $this->createStub(EntityManager::class),
+                $this->createStub(CorePermissions::class),
+                $this->createStub(EventDispatcher::class),
+                $this->createStub(UrlGeneratorInterface::class),
+                $this->createStub(Translator::class),
+                $this->createStub(UserHelper::class),
+                $this->createStub(LoggerInterface::class),
+                $this->createStub(CoreParametersHelper::class),
+                $this->formRepository,
+            ])
+            ->onlyMethods(['getContent', 'getFormScript'])
+            ->getMock();
+    }
+
+    /**
      * @return mixed[]
      */
     private function getTestFormFields(): array
     {
         $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
         $fieldSession2         = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fields                = [];
         $fields[$fieldSession] = [
             'label'        => 'Email',
             'showLabel'    => 1,

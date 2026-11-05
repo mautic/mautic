@@ -6,7 +6,6 @@ namespace Mautic\DynamicContentBundle\Tests\Unit\Helper;
 
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\DynamicContentBundle\Helper\DynamicContentHelper;
@@ -15,10 +14,11 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 #[AllowMockObjectsWithoutExpectations]
-final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
+final class DynamicContentHelperTest extends TestCase
 {
     /**
      * @var MockObject&DynamicContentModel
@@ -54,7 +54,7 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
     {
         $matcher = $this->exactly(2);
         $this->mockModel->expects($matcher)
-            ->method('getEntities')->willReturnCallback(function (...$parameters) use ($matcher) {
+            ->method('getEntities')->willReturnCallback(function (...$parameters) use ($matcher): iterable {
                 if (1 === $matcher->numberOfInvocations()) {
                     $this->assertSame([
                         'filter' => [
@@ -92,6 +92,8 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
 
                     return [];
                 }
+
+                return [];
             });
 
         // Only get published
@@ -144,7 +146,6 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                         $this->assertSame($slot->getContent(), $event->getContent());
                     };
                     $callback($parameters[0]);
-                    $this->assertSame(DynamicContentEvents::TOKEN_REPLACEMENT, $parameters[1]);
                 }
 
                 return $parameters[0];
@@ -236,7 +237,6 @@ final class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                             $this->assertSame($slot->getContent(), $event->getContent());
                         };
                         $callback($parameters[0]);
-                        $this->assertSame(DynamicContentEvents::TOKEN_REPLACEMENT, $parameters[1]);
                     }
 
                     return $parameters[0];

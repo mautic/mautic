@@ -11,11 +11,12 @@ use Mautic\CoreBundle\Helper\FileUploader;
 use Mautic\CoreBundle\Translation\Translator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\TestDox;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[CoversClass(FileUploader::class)]
-final class FileUploaderTest extends \PHPUnit\Framework\TestCase
+final class FileUploaderTest extends TestCase
 {
     #[TestDox('Uploader uploads files correctly')]
     public function testSuccessfulUpload(): void

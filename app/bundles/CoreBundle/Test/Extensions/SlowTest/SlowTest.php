@@ -14,6 +14,7 @@ use PHPUnit\Event\Telemetry\HRTime;
 use PHPUnit\Event\Telemetry\Info;
 use PHPUnit\Event\Test\Finished;
 use PHPUnit\Event\Test\PreparationStarted;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
@@ -107,7 +108,7 @@ final class SlowTest implements Extension
 
     private function handleFinish(Info $telemetryInfo, TestMethod $test): void
     {
-        assert(null !== $this->time);
+        Assert::assertNotNull($this->time);
 
         $time = $telemetryInfo->time()->duration($this->time)->asFloat();
 

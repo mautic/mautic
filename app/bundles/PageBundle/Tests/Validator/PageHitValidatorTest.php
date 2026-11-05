@@ -10,6 +10,7 @@ use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Validator\PageHitValidator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContext;
@@ -21,7 +22,7 @@ final class PageHitValidatorTest extends TestCase
 {
     private MockObject&CoreParametersHelper $coreParametersHelperMock;
 
-    private \PHPUnit\Framework\MockObject\Stub&Constraint $constraintMock;
+    private Stub&Constraint $constraintMock;
 
     protected function setUp(): void
     {
@@ -58,11 +59,8 @@ final class PageHitValidatorTest extends TestCase
 
     public function testWhenStatusCodeIs404(): void
     {
-        $hitMock = $this->createMock(Hit::class);
-
-        $hitMock->expects($this->once())
-            ->method('getCode')
-            ->willReturn(404);
+        $hitMock = new Hit();
+        $hitMock->setCode(404);
 
         $this->coreParametersHelperMock->expects($this->once())
             ->method('get')
@@ -76,18 +74,12 @@ final class PageHitValidatorTest extends TestCase
 
     public function testWhenPageIsNotNull(): void
     {
-        $pageMock = $this->createMock(Page::class);
+        $pageMock = new Page();
         $pageMock->setTitle('TestPage');
 
-        $hitMock = $this->createMock(Hit::class);
-
-        $hitMock->expects($this->once())
-            ->method('getCode')
-            ->willReturn(200);
-
-        $hitMock->expects($this->once())
-            ->method('getPage')
-            ->willReturn($pageMock);
+        $hitMock = new Hit();
+        $hitMock->setCode(200);
+        $hitMock->setPage($pageMock);
 
         $this->coreParametersHelperMock->expects($this->once())
             ->method('get')
@@ -101,11 +93,8 @@ final class PageHitValidatorTest extends TestCase
 
     public function testWhenRequiredDataIsNull(): void
     {
-        $hitMock = $this->createMock(Hit::class);
-
-        $hitMock->expects($this->once())
-            ->method('getCode')
-            ->willReturn(200);
+        $hitMock = new Hit();
+        $hitMock->setCode(200);
 
         $this->coreParametersHelperMock->expects($this->once())
             ->method('get')
@@ -134,8 +123,6 @@ final class PageHitValidatorTest extends TestCase
 
         $pageHitValidator = new PageHitValidator($this->coreParametersHelperMock);
 
-        $pageHitValidator->initialize($context);
-
-        $pageHitValidator->validate($hitMock, $this->constraintMock);
+        $pageHitValidator->validateInContext($hitMock, $this->constraintMock, $context);
     }
 }

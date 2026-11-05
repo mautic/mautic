@@ -13,7 +13,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 /**
  * @extends CommonFormModel<TriggerEvent>
  */
-class TriggerEventModel extends CommonFormModel
+final class TriggerEventModel extends CommonFormModel
 {
     public static function getName(): string
     {
@@ -49,9 +49,11 @@ class TriggerEventModel extends CommonFormModel
     }
 
     /**
+     * @param TriggerEvent|array<string, mixed> $entity
+     *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $action = null, $options = []): FormInterface
+    public function createForm(object|array $entity, $action = null, array $options = []): FormInterface
     {
         if (!$entity instanceof TriggerEvent) {
             throw new MethodNotAllowedHttpException(['Trigger']);
@@ -81,6 +83,7 @@ class TriggerEventModel extends CommonFormModel
         );
         $dependents = [];
         foreach ($entities as $entity) {
+            /** @var TriggerEvent $entity */
             $retrFilters = $entity->getProperties();
             foreach ($retrFilters as $eachFilter) {
                 if (in_array($segmentId, $eachFilter)) {
@@ -109,6 +112,7 @@ class TriggerEventModel extends CommonFormModel
         );
         $triggerIds = [];
         foreach ($entities as $entity) {
+            /** @var TriggerEvent $entity */
             $properties = $entity->getProperties();
             if (isset($properties['email']) && (int) $properties['email'] === $emailId) {
                 $triggerIds[] = $entity->getTrigger()->getId();
@@ -138,6 +142,7 @@ class TriggerEventModel extends CommonFormModel
         );
         $triggerIds = [];
         foreach ($entities as $entity) {
+            /** @var TriggerEvent $entity */
             $properties = $entity->getProperties();
             foreach ($properties as $property) {
                 if (in_array($tagName, $property)) {

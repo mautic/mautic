@@ -1,23 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\ApiBundle\Form\Type\ConfigType;
-use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Mautic\ConfigBundle\Event\ConfigPreSaveEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 
-final class ConfigSubscriber implements EventSubscriberInterface
+final class ConfigSubscriber
 {
-    public static function getSubscribedEvents(): array
-    {
-        return [
-            ConfigEvents::CONFIG_ON_GENERATE => ['onConfigGenerate', 0],
-            ConfigEvents::CONFIG_PRE_SAVE    => ['onConfigSave', 0],
-        ];
-    }
-
+    #[AsEventListener(
+        event: ConfigBuilderEvent::class,
+    )]
     public function onConfigGenerate(ConfigBuilderEvent $event): void
     {
         $event->addForm([
@@ -29,6 +26,9 @@ final class ConfigSubscriber implements EventSubscriberInterface
         ]);
     }
 
+    #[AsEventListener(
+        event: ConfigPreSaveEvent::class,
+    )]
     public function onConfigSave(ConfigEvent $event): void
     {
         // Symfony craps out with integer for firewall settings
