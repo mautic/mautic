@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Helper;
 
-final class SegmentPublicNameResolver
+final readonly class SegmentPublicNameResolver
 {
-    public function __construct(private readonly SegmentPublicNameLocaleNormalizer $localeNormalizer)
+    public function __construct(private SegmentPublicNameLocaleNormalizer $localeNormalizer)
     {
     }
 

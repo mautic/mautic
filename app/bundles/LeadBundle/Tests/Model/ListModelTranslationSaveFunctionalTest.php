@@ -23,8 +23,8 @@ final class ListModelTranslationSaveFunctionalTest extends MauticMysqlTestCase
             ['locale' => 'fr-CH', 'publicName' => 'Actualités Mautic'],
         ]);
 
-        self::assertNotNull($segment->getId());
-        self::assertSame(['fr_CH' => 'Actualités Mautic'], $this->getTranslations($segment));
+        $this->assertNotNull($segment->getId());
+        $this->assertSame(['fr_CH' => 'Actualités Mautic'], $this->getTranslations($segment));
     }
 
     public function testInvalidTranslationsDoNotSaveNewSegment(): void
@@ -38,8 +38,8 @@ final class ListModelTranslationSaveFunctionalTest extends MauticMysqlTestCase
             ]);
             self::fail('Duplicate locales must be rejected.');
         } catch (\InvalidArgumentException) {
-            self::assertNull($segment->getId());
-            self::assertSame(0, $this->em->getRepository(LeadList::class)->count(['alias' => 'translation-invalid']));
+            $this->assertNull($segment->getId());
+            $this->assertSame(0, $this->em->getRepository(LeadList::class)->count(['alias' => 'translation-invalid']));
         }
     }
 
@@ -51,19 +51,19 @@ final class ListModelTranslationSaveFunctionalTest extends MauticMysqlTestCase
 
         $segment->setIsPreferenceCenter(false);
         $model->saveEntityWithTranslations($segment, []);
-        self::assertSame(['fr' => 'Actualités'], $this->getTranslations($segment));
+        $this->assertSame(['fr' => 'Actualités'], $this->getTranslations($segment));
 
         $segment->setIsPreferenceCenter(true);
         $model->saveEntityWithTranslations($segment, [['locale' => 'fr', 'publicName' => 'Nouvelles']]);
-        self::assertSame(['fr' => 'Nouvelles'], $this->getTranslations($segment));
+        $this->assertSame(['fr' => 'Nouvelles'], $this->getTranslations($segment));
     }
 
     public function testPostSaveFailureRollsBackSegmentAndTranslations(): void
     {
         $segment    = $this->newSegment('Rollback');
         $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
-        self::assertInstanceOf(EventDispatcherInterface::class, $dispatcher);
-        $listener = static function (): void {
+        $this->assertInstanceOf(EventDispatcherInterface::class, $dispatcher);
+        $listener = static function (): never {
             throw new \RuntimeException('Post-save failure');
         };
         $dispatcher->addListener(LeadEvents::LIST_POST_SAVE, $listener, 1000);
@@ -72,13 +72,13 @@ final class ListModelTranslationSaveFunctionalTest extends MauticMysqlTestCase
             $this->getModel()->saveEntityWithTranslations($segment, [['locale' => 'fr', 'publicName' => 'Actualités']]);
             self::fail('The post-save listener must fail.');
         } catch (\RuntimeException $exception) {
-            self::assertSame('Post-save failure', $exception->getMessage());
+            $this->assertSame('Post-save failure', $exception->getMessage());
         } finally {
             $dispatcher->removeListener(LeadEvents::LIST_POST_SAVE, $listener);
         }
 
         $table = $this->em->getClassMetadata(LeadList::class)->getTableName();
-        self::assertSame(0, (int) $this->em->getConnection()->fetchOne('SELECT COUNT(*) FROM '.$table.' WHERE alias = ?', ['translation-rollback']));
+        $this->assertSame(0, (int) $this->em->getConnection()->fetchOne('SELECT COUNT(*) FROM '.$table.' WHERE alias = ?', ['translation-rollback']));
     }
 
     private function newSegment(string $name): LeadList
@@ -95,7 +95,7 @@ final class ListModelTranslationSaveFunctionalTest extends MauticMysqlTestCase
     private function getModel(): ListModel
     {
         $model = self::getContainer()->get(ListModel::class);
-        self::assertInstanceOf(ListModel::class, $model);
+        $this->assertInstanceOf(ListModel::class, $model);
 
         return $model;
     }
@@ -106,7 +106,7 @@ final class ListModelTranslationSaveFunctionalTest extends MauticMysqlTestCase
     private function getTranslations(LeadList $segment): array
     {
         $repository = self::getContainer()->get(LeadListTranslationRepository::class);
-        self::assertInstanceOf(LeadListTranslationRepository::class, $repository);
+        $this->assertInstanceOf(LeadListTranslationRepository::class, $repository);
 
         return $repository->findForSegmentIds([$segment->getId()])[$segment->getId()] ?? [];
     }

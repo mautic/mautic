@@ -29,16 +29,16 @@ final class LeadListTranslationFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
 
         $stored = $this->em->find(LeadListTranslation::class, $translationId);
-        self::assertInstanceOf(LeadListTranslation::class, $stored);
-        self::assertSame('fr_CH', $stored->getLocale());
-        self::assertSame('Actualités', $stored->getPublicName());
-        self::assertSame($segmentId, $stored->getLeadList()->getId());
+        $this->assertInstanceOf(LeadListTranslation::class, $stored);
+        $this->assertSame('fr_CH', $stored->getLocale());
+        $this->assertSame('Actualités', $stored->getPublicName());
+        $this->assertSame($segmentId, $stored->getLeadList()->getId());
 
         $this->em->remove($stored->getLeadList());
         $this->em->flush();
         $this->em->clear();
 
-        self::assertNull($this->em->find(LeadListTranslation::class, $translationId));
+        $this->assertNotInstanceOf(LeadListTranslation::class, $this->em->find(LeadListTranslation::class, $translationId));
     }
 
     public function testLocaleMustBeUniqueWithinEachSegment(): void

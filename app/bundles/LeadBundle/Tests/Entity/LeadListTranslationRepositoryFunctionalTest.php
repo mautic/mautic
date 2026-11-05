@@ -25,9 +25,9 @@ final class LeadListTranslationRepositoryFunctionalTest extends MauticMysqlTestC
         $this->em->clear();
 
         $repository = self::getContainer()->get(LeadListTranslationRepository::class);
-        self::assertInstanceOf(LeadListTranslationRepository::class, $repository);
+        $this->assertInstanceOf(LeadListTranslationRepository::class, $repository);
 
-        self::assertSame([
+        $this->assertSame([
             $first->getId() => ['en' => 'Mautic News', 'fr' => 'Actualités Mautic'],
             $second->getId() => ['fr_CH' => 'Nouvelles Mautic'],
         ], $repository->findForSegmentIds([$first->getId(), $second->getId()]));
@@ -36,9 +36,9 @@ final class LeadListTranslationRepositoryFunctionalTest extends MauticMysqlTestC
     public function testEmptySegmentIdsReturnNoTranslations(): void
     {
         $repository = self::getContainer()->get(LeadListTranslationRepository::class);
-        self::assertInstanceOf(LeadListTranslationRepository::class, $repository);
+        $this->assertInstanceOf(LeadListTranslationRepository::class, $repository);
 
-        self::assertSame([], $repository->findForSegmentIds([]));
+        $this->assertSame([], $repository->findForSegmentIds([]));
     }
 
     private function createSegment(string $name): LeadList

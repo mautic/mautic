@@ -421,7 +421,7 @@ class ListModel extends FormModel implements GlobalSearchInterface
             return $lists;
         }
 
-        $ids = array_map('intval', array_column($lists, 'id'));
+        $ids = array_map(intval(...), array_column($lists, 'id'));
         $translationsBySegmentId = $this->publicNameTranslationRepository->findForSegmentIds($ids);
         foreach ($lists as &$list) {
             $list['publicName'] = $this->publicNameResolver->resolve(

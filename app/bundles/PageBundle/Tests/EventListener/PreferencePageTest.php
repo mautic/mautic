@@ -138,12 +138,12 @@ final class PreferencePageTest extends MauticMysqlTestCase
 
         $form = $this->createForm($locale);
         $choices = $form->createView()['lead_lists']->vars['choices'];
-        self::assertSame($expectedName.' ('.$segment->getId().')', $choices[0]->label);
-        self::assertSame((string) $segment->getId(), $choices[0]->value);
+        $this->assertSame($expectedName.' ('.$segment->getId().')', $choices[0]->label);
+        $this->assertSame((string) $segment->getId(), $choices[0]->value);
 
         $params         = $this->createParams();
         $params['form'] = $form->createView();
-        self::assertStringContainsString($expectedName.' ('.$segment->getId().')', $this->dispatchEvent($this->createPage(), $params));
+        $this->assertStringContainsString($expectedName.' ('.$segment->getId().')', $this->dispatchEvent($this->createPage(), $params));
     }
 
     /**

@@ -10,12 +10,12 @@ use Mautic\LeadBundle\Entity\LeadListTranslation;
 use Mautic\LeadBundle\Entity\LeadListTranslationRepository;
 use Mautic\LeadBundle\Helper\SegmentPublicNameLocaleNormalizer;
 
-final class SegmentPublicNameTranslationManager
+final readonly class SegmentPublicNameTranslationManager
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
-        private readonly LeadListTranslationRepository $translationRepository,
-        private readonly SegmentPublicNameLocaleNormalizer $localeNormalizer,
+        private EntityManagerInterface $entityManager,
+        private LeadListTranslationRepository $translationRepository,
+        private SegmentPublicNameLocaleNormalizer $localeNormalizer,
     ) {
     }
 

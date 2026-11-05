@@ -13,7 +13,7 @@ final class SegmentPublicNameLocaleNormalizerTest extends TestCase
     #[DataProvider('equivalentLocales')]
     public function testNormalizesSupportedLocale(string $input, string $expected): void
     {
-        self::assertSame($expected, (new SegmentPublicNameLocaleNormalizer())->normalize($input));
+        $this->assertSame($expected, (new SegmentPublicNameLocaleNormalizer())->normalize($input));
     }
 
     public static function equivalentLocales(): iterable

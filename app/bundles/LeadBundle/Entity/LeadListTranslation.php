@@ -14,7 +14,7 @@ class LeadListTranslation
     private ?int $id = null;
 
     public function __construct(
-        private LeadList $leadList,
+        private readonly LeadList $leadList,
         private string $locale,
         private string $publicName,
     ) {

@@ -21,16 +21,16 @@ final class SegmentPublicNameTranslationManagerFunctionalTest extends MauticMysq
             ['locale' => 'en', 'publicName' => 'Mautic News'],
         ]);
 
-        self::assertSame([], $this->getTranslations($segment));
+        $this->assertSame([], $this->getTranslations($segment));
         $this->em->flush();
-        self::assertSame(['en' => 'Mautic News', 'fr_CH' => 'Actualités Mautic'], $this->getTranslations($segment));
+        $this->assertSame(['en' => 'Mautic News', 'fr_CH' => 'Actualités Mautic'], $this->getTranslations($segment));
 
         $manager->sync($segment, [
             ['locale' => 'fr_CH', 'publicName' => 'Nouvelles Mautic'],
         ]);
         $this->em->flush();
 
-        self::assertSame(['fr_CH' => 'Nouvelles Mautic'], $this->getTranslations($segment));
+        $this->assertSame(['fr_CH' => 'Nouvelles Mautic'], $this->getTranslations($segment));
     }
 
     public function testRejectsDuplicateNormalizedLocalesBeforeWriting(): void
@@ -63,7 +63,7 @@ final class SegmentPublicNameTranslationManagerFunctionalTest extends MauticMysq
         try {
             $this->getManager()->sync($segment, []);
         } finally {
-            self::assertSame(['fr' => 'Actualités'], $this->getTranslations($segment));
+            $this->assertSame(['fr' => 'Actualités'], $this->getTranslations($segment));
         }
     }
 
@@ -83,7 +83,7 @@ final class SegmentPublicNameTranslationManagerFunctionalTest extends MauticMysq
     private function getManager(): SegmentPublicNameTranslationManager
     {
         $manager = self::getContainer()->get(SegmentPublicNameTranslationManager::class);
-        self::assertInstanceOf(SegmentPublicNameTranslationManager::class, $manager);
+        $this->assertInstanceOf(SegmentPublicNameTranslationManager::class, $manager);
 
         return $manager;
     }
@@ -94,7 +94,7 @@ final class SegmentPublicNameTranslationManagerFunctionalTest extends MauticMysq
     private function getTranslations(LeadList $segment): array
     {
         $repository = self::getContainer()->get(LeadListTranslationRepository::class);
-        self::assertInstanceOf(LeadListTranslationRepository::class, $repository);
+        $this->assertInstanceOf(LeadListTranslationRepository::class, $repository);
 
         return $repository->findForSegmentIds([$segment->getId()])[$segment->getId()] ?? [];
     }

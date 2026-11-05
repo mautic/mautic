@@ -14,13 +14,13 @@ final class SegmentTranslationEditorFunctionalTest extends MauticMysqlTestCase
     {
         $crawler = $this->client->request('GET', '/s/segments/new');
         self::assertResponseIsSuccessful();
-        self::assertCount(1, $crawler->filter('#translations-tab'));
-        self::assertCount(1, $crawler->filter('#leadlist-translation-add'));
-        self::assertStringContainsString('exact locale, then the language, then the default public name', $crawler->filter('#translations')->text());
-        self::assertStringContainsString('Turning off Preference Center availability keeps these translations', $crawler->filter('#translations')->text());
+        $this->assertCount(1, $crawler->filter('#translations-tab'));
+        $this->assertCount(1, $crawler->filter('#leadlist-translation-add'));
+        $this->assertStringContainsString('exact locale, then the language, then the default public name', $crawler->filter('#translations')->text());
+        $this->assertStringContainsString('Turning off Preference Center availability keeps these translations', $crawler->filter('#translations')->text());
         $prototype = $crawler->filter('#leadlist-translation-rows')->attr('data-prototype');
-        self::assertNotNull($prototype);
-        self::assertStringContainsString('name="leadlist[translations][__name__][locale]"', $prototype);
+        $this->assertNotNull($prototype);
+        $this->assertStringContainsString('name="leadlist[translations][__name__][locale]"', $prototype);
 
         $form   = $crawler->selectButton('leadlist_buttons_apply')->form();
         $values = $form->getPhpValues();
@@ -36,12 +36,12 @@ final class SegmentTranslationEditorFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $segment = $this->em->getRepository(LeadList::class)->findOneBy(['alias' => 'multilingual-news']);
-        self::assertInstanceOf(LeadList::class, $segment);
-        self::assertSame(['fr' => 'Actualités Mautic'], $this->getTranslations($segment));
+        $this->assertInstanceOf(LeadList::class, $segment);
+        $this->assertSame(['fr' => 'Actualités Mautic'], $this->getTranslations($segment));
 
         $crawler = $this->client->request('GET', '/s/segments/edit/'.$segment->getId());
         self::assertResponseIsSuccessful();
-        self::assertSame('Actualités Mautic', $crawler->filter('#leadlist_translations_0_publicName')->attr('value'));
+        $this->assertSame('Actualités Mautic', $crawler->filter('#leadlist_translations_0_publicName')->attr('value'));
 
         $form   = $crawler->selectButton('leadlist_buttons_apply')->form();
         $values = $form->getPhpValues();
@@ -50,7 +50,7 @@ final class SegmentTranslationEditorFunctionalTest extends MauticMysqlTestCase
         ];
         $this->client->request('POST', $form->getUri(), $values);
         self::assertResponseIsSuccessful();
-        self::assertSame(['fr' => 'Nouvelles Mautic'], $this->getTranslations($segment));
+        $this->assertSame(['fr' => 'Nouvelles Mautic'], $this->getTranslations($segment));
     }
 
     public function testTurningOffPreferenceCenterRetainsTranslations(): void
@@ -77,20 +77,20 @@ final class SegmentTranslationEditorFunctionalTest extends MauticMysqlTestCase
         $values['leadlist']['translations']       = [['locale' => 'invalid', 'publicName' => '']];
         $this->client->request('POST', $form->getUri(), $values);
         self::assertResponseIsSuccessful();
-        self::assertSame(['fr' => 'Actualités'], $this->getTranslations($segment));
+        $this->assertSame(['fr' => 'Actualités'], $this->getTranslations($segment));
 
         $crawler = $this->client->request('GET', '/s/segments/edit/'.$segment->getId());
-        self::assertNotNull($crawler->filter('#translations-tab')->attr('hidden'));
+        $this->assertNotNull($crawler->filter('#translations-tab')->attr('hidden'));
         $form   = $crawler->selectButton('leadlist_buttons_apply')->form();
         $values = $form->getPhpValues();
         $values['leadlist']['isPreferenceCenter'] = '1';
         $this->client->request('POST', $form->getUri(), $values);
         self::assertResponseIsSuccessful();
-        self::assertSame(['fr' => 'Actualités'], $this->getTranslations($segment));
+        $this->assertSame(['fr' => 'Actualités'], $this->getTranslations($segment));
 
         $crawler = $this->client->request('GET', '/s/segments/edit/'.$segment->getId());
-        self::assertNull($crawler->filter('#translations-tab')->attr('hidden'));
-        self::assertSame('Actualités', $crawler->filter('#leadlist_translations_0_publicName')->attr('value'));
+        $this->assertNull($crawler->filter('#translations-tab')->attr('hidden'));
+        $this->assertSame('Actualités', $crawler->filter('#leadlist_translations_0_publicName')->attr('value'));
     }
 
     public function testDuplicateLocalesLeaveSegmentUnsaved(): void
@@ -108,8 +108,8 @@ final class SegmentTranslationEditorFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('POST', $form->getUri(), $values);
         self::assertResponseIsSuccessful();
-        self::assertStringContainsString('Each locale may be added only once.', (string) $this->client->getResponse()->getContent());
-        self::assertSame(0, $this->em->getRepository(LeadList::class)->count(['alias' => 'duplicate-locale-editor']));
+        $this->assertStringContainsString('Each locale may be added only once.', (string) $this->client->getResponse()->getContent());
+        $this->assertSame(0, $this->em->getRepository(LeadList::class)->count(['alias' => 'duplicate-locale-editor']));
     }
 
     public function testInvalidTranslationKeepsEnteredRowsWithoutSavingSegment(): void
@@ -128,11 +128,11 @@ final class SegmentTranslationEditorFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request('POST', $form->getUri(), $values);
 
         self::assertResponseIsSuccessful();
-        self::assertSame(0, $this->em->getRepository(LeadList::class)->count(['alias' => 'correct-translation']));
-        self::assertStringContainsString('This value should not be blank.', (string) $this->client->getResponse()->getContent());
-        self::assertSame('fr', $crawler->filter('#leadlist_translations_0_locale option:selected')->attr('value'));
-        self::assertSame('it', $crawler->filter('#leadlist_translations_1_locale option:selected')->attr('value'));
-        self::assertSame('Notizie Mautic', $crawler->filter('#leadlist_translations_1_publicName')->attr('value'));
+        $this->assertSame(0, $this->em->getRepository(LeadList::class)->count(['alias' => 'correct-translation']));
+        $this->assertStringContainsString('This value should not be blank.', (string) $this->client->getResponse()->getContent());
+        $this->assertSame('fr', $crawler->filter('#leadlist_translations_0_locale option:selected')->attr('value'));
+        $this->assertSame('it', $crawler->filter('#leadlist_translations_1_locale option:selected')->attr('value'));
+        $this->assertSame('Notizie Mautic', $crawler->filter('#leadlist_translations_1_publicName')->attr('value'));
     }
 
     public function testRemovingLastTranslationDeletesIt(): void
@@ -150,7 +150,7 @@ final class SegmentTranslationEditorFunctionalTest extends MauticMysqlTestCase
         $values  = $form->getPhpValues();
         $values['leadlist']['translations'] = [['locale' => 'fr', 'publicName' => 'Actualités']];
         $this->client->request('POST', $form->getUri(), $values);
-        self::assertSame(['fr' => 'Actualités'], $this->getTranslations($segment));
+        $this->assertSame(['fr' => 'Actualités'], $this->getTranslations($segment));
 
         $crawler = $this->client->request('GET', '/s/segments/edit/'.$segment->getId());
         $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
@@ -158,7 +158,7 @@ final class SegmentTranslationEditorFunctionalTest extends MauticMysqlTestCase
         unset($values['leadlist']['translations']);
         $this->client->request('POST', $form->getUri(), $values);
         self::assertResponseIsSuccessful();
-        self::assertSame([], $this->getTranslations($segment));
+        $this->assertSame([], $this->getTranslations($segment));
     }
 
     /**
@@ -167,7 +167,7 @@ final class SegmentTranslationEditorFunctionalTest extends MauticMysqlTestCase
     private function getTranslations(LeadList $segment): array
     {
         $repository = self::getContainer()->get(LeadListTranslationRepository::class);
-        self::assertInstanceOf(LeadListTranslationRepository::class, $repository);
+        $this->assertInstanceOf(LeadListTranslationRepository::class, $repository);
 
         return $repository->findForSegmentIds([$segment->getId()])[$segment->getId()] ?? [];
     }

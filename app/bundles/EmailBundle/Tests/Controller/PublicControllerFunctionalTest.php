@@ -1015,11 +1015,11 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $labels = $crawler->filter('#contact-segments label[for]')->each(fn ($node): string => trim($node->text()));
-        self::assertSame(['Actualités ('.$first->getId().')', 'Actualités ('.$second->getId().')'], $labels);
+        $this->assertSame(['Actualités ('.$first->getId().')', 'Actualités ('.$second->getId().')'], $labels);
         $values = $crawler->filter('#contact-segments input[type="checkbox"]')->each(fn ($node): string => $node->attr('value'));
-        self::assertSame([(string) $first->getId(), (string) $second->getId()], $values);
-        self::assertNotContains((string) $unpublished->getId(), $values);
-        self::assertNotContains((string) $private->getId(), $values);
+        $this->assertSame([(string) $first->getId(), (string) $second->getId()], $values);
+        $this->assertNotContains((string) $unpublished->getId(), $values);
+        $this->assertNotContains((string) $private->getId(), $values);
     }
 
     public function testContactPreferencesFormFallsBackToLanguageAndDefaultPublicNames(): void
@@ -1036,9 +1036,9 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         self::assertResponseIsSuccessful();
 
         $labels = $crawler->filter('#contact-segments label[for]')->each(fn ($node): string => trim($node->text()));
-        self::assertSame(['Nouvelles ('.$languageFallback->getId().')', 'B default ('.$defaultFallback->getId().')'], $labels);
+        $this->assertSame(['Nouvelles ('.$languageFallback->getId().')', 'B default ('.$defaultFallback->getId().')'], $labels);
         $values = $crawler->filter('#contact-segments input[type="checkbox"]')->each(fn ($node): string => $node->attr('value'));
-        self::assertSame([(string) $languageFallback->getId(), (string) $defaultFallback->getId()], $values);
+        $this->assertSame([(string) $languageFallback->getId(), (string) $defaultFallback->getId()], $values);
     }
 
     public function testPreferenceCenterLoadsTranslationsInOneBatch(): void
@@ -1066,17 +1066,17 @@ final class PublicControllerFunctionalTest extends MauticMysqlTestCase
         }
         $labels = $crawler->filter('#contact-segments label[for]')->each(fn ($node): string => trim($node->text()));
         $values = $crawler->filter('#contact-segments input[type="checkbox"]')->each(fn ($node): string => $node->attr('value'));
-        self::assertSame($expectedLabels, $labels);
-        self::assertSame($expectedValues, $values);
+        $this->assertSame($expectedLabels, $labels);
+        $this->assertSame($expectedValues, $values);
 
         $dbCollector = $this->client->getProfile()->getCollector('db');
-        self::assertInstanceOf(DoctrineDataCollector::class, $dbCollector);
+        $this->assertInstanceOf(DoctrineDataCollector::class, $dbCollector);
         $translationQueries = array_filter(
             $dbCollector->getQueries()['default'],
             static fn (array $query): bool => str_starts_with($query['sql'], 'SELECT')
                 && str_contains($query['sql'], MAUTIC_TABLE_PREFIX.LeadListTranslation::TABLE_NAME),
         );
-        self::assertCount(1, $translationQueries);
+        $this->assertCount(1, $translationQueries);
     }
 
     private function createSegment(

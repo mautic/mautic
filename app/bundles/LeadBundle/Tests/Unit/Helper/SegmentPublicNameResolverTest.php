@@ -16,7 +16,7 @@ final class SegmentPublicNameResolverTest extends TestCase
     {
         $resolver = new SegmentPublicNameResolver(new SegmentPublicNameLocaleNormalizer());
 
-        self::assertSame($expected, $resolver->resolve($locale, $default, 'Internal name', $translations));
+        $this->assertSame($expected, $resolver->resolve($locale, $default, 'Internal name', $translations));
     }
 
     public static function labels(): iterable
