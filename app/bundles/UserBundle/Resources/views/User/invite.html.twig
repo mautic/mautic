@@ -7,18 +7,18 @@
 </div>
 
 {{ form_start(form, {'attr': {'id': 'invite-user-form', 'class': 'd-flex layer-one', 'data-toggle': 'ajax'}}) }}
-    <div class="form-group fg-1">
+    <div class="form-group flex-grow-1">
         {{ form_widget(form.email) }}
         {{ form_errors(form.email) }}
     </div>
-    <div class="form-group fg-1">
+    <div class="form-group flex-grow-1">
         {{ form_widget(form.role) }}
         {{ form_errors(form.role) }}
     </div>
     {% if form._token is defined %}
         {{ form_widget(form._token) }}
     {% endif %}
-    <button type="submit" class="sr-only" tabindex="-1" aria-hidden="true"></button>
+    <button type="submit" class="visually-hidden" tabindex="-1" aria-hidden="true"></button>
 {{ form_end(form, {'render_rest': false}) }}
 {% endset %}
 
