@@ -41,6 +41,30 @@ reviews:
         the database and unit tests for isolated logic. Flag tests that only
         assert mocks were called without checking an outcome, and tests that
         depend on execution order or wall-clock time.
+    - path: "tests/{acceptance,_support}/**"
+      instructions: |
+        Codeception E2E tests must not use fixed delays: `$I->wait()`, PHP
+        `sleep()`/`usleep()`, or `executeJS()`/`executeAsyncJS()` used only to
+        wait with `setTimeout`. A fixed delay always costs its full time in CI
+        and still fails on a slower runner. Ask for a condition-based wait
+        instead: `waitForElementVisible()`, `waitForElementNotVisible()`,
+        `waitForElementClickable()`, `waitForElement()`, `waitForText()`,
+        `waitForElementChange()` or `waitForJS()` (e.g. waiting for
+        `mQuery.active == 0` after an AJAX request).
+        Every `waitFor...()` call must pass `AcceptanceTester::TIMEOUT` as its
+        timeout instead of a number or the Codeception default (10s, or 5s for
+        `waitForJS()`). A waitFor call returns as soon as its condition is met,
+        so the longer shared timeout costs nothing on success and avoids flaky
+        failures on slow CI runners.
+        Also check for:
+        - Shared database: the dump is loaded once and not reset between tests,
+          so each test must create the data it needs, use unique names, and not
+          depend on data or state left by another test.
+        - Clicks done with `executeJS()` (e.g. `document.querySelector(...).click()`)
+          instead of `waitForElementClickable()` + `click()`; JS clicks bypass
+          the visibility checks a real user is subject to.
+        - Prefer selectors defined in the page objects in
+          `tests/_support/Page/Acceptance/` over inline selector strings.
     - path: "app/migrations/*.php"
       instructions: |
         New migrations should follow app/migrations/Migration.template: extend
