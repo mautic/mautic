@@ -107,7 +107,7 @@ Mautic.chartGradientFill = (datasets) => {
 Mautic.chartTickLabel = (scale, value) => scale.getLabelForValue(value);
 
 Mautic.chartYAxisTicks = (scale) => {
-  scale.ticks = [scale.min, (scale.max - scale.min) / 2, scale.max].map((value) => ({value}));
+  scale.ticks = [scale.min, scale.min + (scale.max - scale.min) / 2, scale.max].map((value) => ({value}));
 };
 
 Mautic.chartYAxisTickLabel = (value, index, values) => {
