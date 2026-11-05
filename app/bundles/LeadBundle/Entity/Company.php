@@ -44,6 +44,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     ]
 )]
 #[UniqueCustomField(object: 'company')]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'company_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'company_projects_xref'),
+)])]
 class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
@@ -209,7 +215,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             FieldModel::$coreCompanyFields
         );
 
-        self::addProjectsField($builder, 'company_projects_xref', 'company_id');
     }
 
     /**

@@ -59,6 +59,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 )]
 #[EntityEvent]
 #[MediaMaxAllowedSize]
+#[ORM\AssociationOverrides([new ORM\AssociationOverride(
+    name: 'projects',
+    joinColumns: [new ORM\JoinColumn(name: 'sms_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    inverseJoinColumns: [new ORM\JoinColumn(name: 'project_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')],
+    joinTable: new ORM\JoinTable(name: 'sms_projects_xref'),
+)])]
 class Sms extends FormEntity implements UuidInterface, TranslationEntityInterface, VariantEntityInterface
 {
     use UuidTrait;
@@ -195,7 +201,6 @@ class Sms extends FormEntity implements UuidInterface, TranslationEntityInterfac
 
         self::addTranslationMetadata($builder, self::class);
 
-        self::addProjectsField($builder, 'sms_projects_xref', 'sms_id');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
