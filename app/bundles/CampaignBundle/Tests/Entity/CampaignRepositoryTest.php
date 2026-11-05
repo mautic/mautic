@@ -73,15 +73,11 @@ final class CampaignRepositoryTest extends TestCase
         $filter = (object) ['command' => 'source:segment', 'string' => '', 'not' => false, 'strict' => false];
 
         $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
 
-        self::assertSame(
-            'EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref cl WHERE cl.campaign_id = c.id)',
-            (string) $expr
-        );
-        self::assertSame([], $params);
+        $this->assertSame('EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref cl WHERE cl.campaign_id = c.id)', (string) $expr);
+        $this->assertSame([], $params);
     }
 
     public function testAddSearchCommandWhereClauseHandlesFormSourceFilter(): void
@@ -90,15 +86,11 @@ final class CampaignRepositoryTest extends TestCase
         $filter = (object) ['command' => 'source:form', 'string' => '', 'not' => false, 'strict' => false];
 
         $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         [$expr, $params] = $method->invoke($this->repository, $qb, $filter);
 
-        self::assertSame(
-            'EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_form_xref cf WHERE cf.campaign_id = c.id)',
-            (string) $expr
-        );
-        self::assertSame([], $params);
+        $this->assertSame('EXISTS(SELECT 1 FROM '.MAUTIC_TABLE_PREFIX.'campaign_form_xref cf WHERE cf.campaign_id = c.id)', (string) $expr);
+        $this->assertSame([], $params);
     }
 
     public function testGetSearchCommandsContainsCampaignFilters(): void
