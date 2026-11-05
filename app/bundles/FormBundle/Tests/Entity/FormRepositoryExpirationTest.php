@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Entity;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\FormBundle\Entity\Form;
@@ -37,7 +38,7 @@ final class FormRepositoryExpirationTest extends TestCase
     #[DataProvider('ormSearchCommandDataProvider')]
     public function testAddSearchCommandWhereClauseBuildsFiltersWithOrmQueryBuilder(string $command, string $expected): void
     {
-        $qb     = new OrmQueryBuilder($this->entityManager);
+        $qb     = new OrmQueryBuilder($this->createMock(EntityManagerInterface::class));
         $filter = (object) ['command' => $command, 'string' => '', 'not' => false, 'strict' => false];
 
         $method = new \ReflectionMethod(FormRepository::class, 'addSearchCommandWhereClause');
