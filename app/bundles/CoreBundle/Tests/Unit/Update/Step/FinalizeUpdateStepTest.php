@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Update\Step\FinalizeUpdateStep;
 use PHPUnit\Framework\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -36,6 +37,8 @@ final class FinalizeUpdateStepTest extends AbstractStepTestCase
      */
     private MockObject $appVersion;
 
+    private Filesystem&MockObject $filesystem;
+
     private FinalizeUpdateStep $step;
 
     protected function setUp(): void
@@ -54,7 +57,10 @@ final class FinalizeUpdateStepTest extends AbstractStepTestCase
         $requestStack->method('getSession')->willReturn($this->session);
         $requestStack->method('getCurrentRequest')->willReturn($request);
 
-        $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $requestStack, $this->appVersion);
+        $this->filesystem = $this->createMock(Filesystem::class);
+        $this->pathsHelper->method('getSystemPath')->with('media', true)->willReturn(__DIR__.'/resources');
+
+        $this->step = new FinalizeUpdateStep($this->translator, $this->pathsHelper, $requestStack, $this->appVersion, $this->filesystem);
     }
 
     public function testFinalizationCleansUpFiles(): void
@@ -101,6 +107,21 @@ final class FinalizeUpdateStepTest extends AbstractStepTestCase
         $this->assertFileDoesNotExist(__DIR__.'/resources/lastUpdateCheck.txt');
 
         $this->assertSame($updateSuccessfulKey, trim($this->progressBar->getMessage()));
+    }
+
+    public function testFinalizationInvalidatesCompiledJavascript(): void
+    {
+        $this->pathsHelper->method('getRootPath')->willReturn(__DIR__.'/resources');
+        $this->pathsHelper->method('getCachePath')->willReturn(__DIR__.'/resources');
+
+        $this->filesystem->expects($this->once())
+            ->method('remove')
+            ->with([
+                __DIR__.'/resources/js/libraries.js',
+                __DIR__.'/resources/js/app.js',
+            ]);
+
+        $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
     public function testFinalizationWithPostUpgradeMessage(): void
