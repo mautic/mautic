@@ -30,7 +30,8 @@ class AcceptanceTester extends Codeception\Actor
         // if snapshot exists - skipping login
         if ($I->loadSessionSnapshot('login')) {
             $I->amOnPage('/s/dashboard');
-            if (!str_contains($I->grabPageSource(), 'id="username"')) {
+            $I->waitForJS('return typeof window.LoginUserId !== "undefined";', self::TIMEOUT);
+            if ($I->executeJS('return window.LoginUserId > 0;')) {
                 return;
             }
         }
