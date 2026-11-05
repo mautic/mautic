@@ -19,6 +19,7 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\RoleModel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -194,6 +195,16 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         $downloadButton = $this->client->getCrawler()->filter('[data-mautic-batch-download]');
         $this->assertCount(1, $downloadButton);
         $this->assertNotEmpty($downloadButton->attr('data-csrf-token'));
+    }
+
+    public function testAssetIndexRendersTypeQuickFilterGroup(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/assets');
+
+        $this->assertResponseIsSuccessful();
+        $quickFilters = $this->getQuickFiltersCrawler();
+        $this->assertCount(4, $quickFilters->filter('[data-conflict-group="type"]'));
+        $this->assertCount(1, $quickFilters->filter('[data-filter="is:image"]'));
     }
 
     public function testAssetSizes(): void
@@ -755,5 +766,10 @@ final class AssetControllerFunctionalTest extends AbstractAssetTestCase
         } else {
             $this->assertStringContainsString($message, (string) $content);
         }
+    }
+
+    private function getQuickFiltersCrawler(): Crawler
+    {
+        return new Crawler($this->client->getCrawler()->filter('[data-quick-filter]')->attr('data-content'));
     }
 }
