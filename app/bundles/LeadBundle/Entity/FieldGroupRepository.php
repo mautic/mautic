@@ -83,6 +83,21 @@ final class FieldGroupRepository extends CommonRepository
     }
 
     /**
+     * Returns the first group whose order is strictly greater than $order,
+     * or null when $order is already the last position.
+     */
+    public function findNextByOrder(int $order): ?FieldGroup
+    {
+        return $this->createQueryBuilder('fg')
+            ->where('fg.order > :order')
+            ->setParameter('order', $order)
+            ->orderBy('fg.order', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
      * Returns true when the group (by id) still has fields assigned.
      */
     public function hasFields(int $groupId): bool

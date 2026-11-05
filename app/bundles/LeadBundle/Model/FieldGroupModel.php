@@ -85,9 +85,7 @@ final class FieldGroupModel extends FormModel
      */
     public function getDefaultGroups(string $object = 'lead'): array
     {
-        return 'company' === $object
-            ? FieldGroup::DEFAULT_COMPANY_GROUPS
-            : FieldGroup::DEFAULT_LEAD_GROUPS;
+        return FieldGroup::DEFAULT_GROUPS;
     }
 
     /**
@@ -122,21 +120,35 @@ final class FieldGroupModel extends FormModel
     /**
      * Assigns an order to brand-new groups, then renumbers all groups so the
      * position chosen in the "Group order" dropdown is respected.
+     * Re-slotting is skipped for pure renames so that saving via the API does
+     * not silently move the group to the bottom.
      */
     public function saveEntity($entity, $unlock = true): void
     {
-        if ($entity instanceof FieldGroup) {
-            // Generate a unique ASCII alias from the (possibly Unicode) name on create.
-            $this->aliasHelper->makeAliasUnique($entity);
+        if (!$entity instanceof FieldGroup) {
+            parent::saveEntity($entity, $unlock);
 
-            if (!$entity->getId() && !$entity->getOrder()) {
-                $entity->setOrder($this->fieldGroupRepository->getMaxOrder() + 1);
-            }
+            return;
+        }
+
+        // Generate a unique ASCII alias from the (possibly Unicode) name on create.
+        $this->aliasHelper->makeAliasUnique($entity);
+
+        $isNew         = !$entity->getId();
+        $originalData  = $this->em->getUnitOfWork()->getOriginalEntityData($entity);
+        $originalOrder = $originalData['order'] ?? null;
+
+        if ($isNew && !$entity->getOrder()) {
+            $entity->setOrder($this->fieldGroupRepository->getMaxOrder() + 1);
         }
 
         parent::saveEntity($entity, $unlock);
 
-        $this->reorderGroupsByEntity($entity);
+        // Only re-slot when the position actually changed; a plain rename must
+        // not move the group to the end of the list.
+        if ($isNew || $originalOrder !== $entity->getOrder()) {
+            $this->reorderGroupsByEntity($entity);
+        }
     }
 
     /**
@@ -249,6 +261,26 @@ final class FieldGroupModel extends FormModel
         }
 
         parent::deleteEntity($entity);
+
+        if ($entity instanceof FieldGroup) {
+            $this->renumberGroups();
+        }
+    }
+
+    /**
+     * Closes any gaps in group ordering after a deletion.
+     */
+    public function renumberGroups(): void
+    {
+        $groups   = $this->fieldGroupRepository->findBy([], ['order' => 'ASC']);
+        $position = 1;
+
+        foreach ($groups as $group) {
+            $group->setOrder($position++);
+            $this->em->persist($group);
+        }
+
+        $this->em->flush();
     }
 
     public function canDelete(FieldGroup $entity): bool

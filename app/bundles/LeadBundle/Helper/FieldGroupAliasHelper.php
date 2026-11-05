@@ -45,7 +45,10 @@ final readonly class FieldGroupAliasHelper
 
     private function ensureUnique(string $base): string
     {
-        $existing = $this->fieldGroupRepository->getAliases();
+        $existing = array_merge(
+            $this->fieldGroupRepository->getAliases(),
+            FieldGroup::DEFAULT_GROUPS,
+        );
         $alias    = $base;
         $suffix   = 1;
 

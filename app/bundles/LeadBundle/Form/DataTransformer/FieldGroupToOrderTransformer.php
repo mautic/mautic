@@ -26,8 +26,8 @@ final readonly class FieldGroupToOrderTransformer implements DataTransformerInte
      * (the next group in the order). Null when this group is last, which the
      * dropdown renders as the "Choose one..." (place last) placeholder.
      *
-     * Orders are kept contiguous (1..n) by FieldGroupModel::reorderGroupsByEntity,
-     * so the next group is reliably found at order + 1.
+     * Uses a "first group with order > current" query so that gaps caused by
+     * deletions do not cause the dropdown to silently move the group last.
      */
     public function transform(mixed $order): ?FieldGroup
     {
@@ -35,7 +35,7 @@ final readonly class FieldGroupToOrderTransformer implements DataTransformerInte
             return null;
         }
 
-        return $this->fieldGroupRepository->findOneBy(['order' => (int) $order + 1]);
+        return $this->fieldGroupRepository->findNextByOrder((int) $order);
     }
 
     /**

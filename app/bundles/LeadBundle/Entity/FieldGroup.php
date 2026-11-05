@@ -21,7 +21,7 @@ class FieldGroup extends FormEntity
     /**
      * Default groups for lead object.
      */
-    public const DEFAULT_LEAD_GROUPS = ['core', 'social', 'personal', 'professional'];
+    public const DEFAULT_GROUPS = ['core', 'social', 'personal', 'professional', 'other'];
 
     /**
      * Default groups for company object.
