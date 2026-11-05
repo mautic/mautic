@@ -12266,3 +12266,21 @@ parameters:
 			identifier: argument.type
 			count: 2
 			path: plugins/MauticSocialBundle/Security/Permissions/MauticSocialPermissions.php
+
+		-
+			message: '''
+				#^Call to deprecated method andX\(\) of class Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:
+				Use `and\(\)` instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: app/bundles/CampaignBundle/Entity/CampaignRepository.php
+
+		-
+			message: '''
+				#^Call to deprecated method andX\(\) of class Doctrine\\DBAL\\Query\\Expression\\ExpressionBuilder\:
+				Use `and\(\)` instead\.$#
+			'''
+			identifier: method.deprecated
+			count: 2
+			path: app/bundles/FormBundle/Entity/FormRepository.php
