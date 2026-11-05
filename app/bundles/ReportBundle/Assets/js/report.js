@@ -23,7 +23,7 @@ Mautic.reportOnLoad = function (container) {
         mQuery('#report-shelves .collapse').on('show.bs.collapse', function (e) {
             var actives = mQuery('#report-shelves').find('.show, .collapsing');
             actives.each(function (index, element) {
-                mQuery(element).each((index, element) => bootstrap.Collapse.getInstance(element)?.hide());
+                mQuery(element).each((index, element) => bootstrap.Collapse.getOrCreateInstance(element, {toggle: false}).hide());
                 var id = mQuery(element).attr('id');
                 mQuery('a[aria-controls="' + id + '"]').addClass('collapsed');
             })
@@ -323,7 +323,6 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
                 }
                 const tooltip = bootstrap.Tooltip.getInstance(this);
                 this.removeAttribute('title');
-                this.setAttribute('data-bs-title', message);
                 tooltip.setContent({'.tooltip-inner': message});
                 tooltip.show();
             }
