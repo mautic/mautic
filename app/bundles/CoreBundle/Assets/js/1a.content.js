@@ -2659,6 +2659,7 @@ Mautic.resetFilters = function () {
     const activeFilters = document.querySelectorAll('.label.active');
     activeFilters.forEach(function (filterElement) {
         filterElement.classList.remove('active');
+        filterElement.setAttribute('aria-pressed', 'false');
     });
 
     const selectFields = document.querySelectorAll('.popover-content select');
