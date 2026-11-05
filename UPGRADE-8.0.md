@@ -412,9 +412,11 @@
 - Class `Mautic\PluginBundle\Integration\AbstractSsoFormIntegration` removed. Extend `Mautic\PluginBundle\Integration\AbstractSsoServiceIntegration` instead and reproduce the two overrides the removed class provided, otherwise form authentication breaks: `getSupportedFeatures()` must return `['sso_form']` (so `SsoAuthenticator::authenticate()` still selects the integration), and `getFormSettings()` must return `['requires_callback' => false, 'requires_authorization' => false]`.
 - Trait `Mautic\CoreBundle\Tests\Twig\TwigIntegrationTestTrait` removed; it was never used.
 - Trait `Mautic\IntegrationsBundle\Integration\DefaultConfigFormTrait` removed; each method only returned `null`. Implement `getConfigFormName()` and `getConfigFormContentTemplate()` directly on your integration (return `null` to keep the default).
+- Method `Mautic\CampaignBundle\Entity\CampaignRepository::getCampaignLeads()` removed as dead code. Nothing in Mautic calls it, and its `$limit` parameter was typed `bool`, so any truthy limit (such as `50`) became `setMaxResults(1)`, while `false` or `0` returned every row. `CampaignModel::getCampaignLeads()` is unrelated and unchanged.
 
 ## Changed code
 
+- `Mautic\CategoryBundle\Entity\CategoryRepository::getCategoryList()` now types `$search` as `string|array` (a title prefix, or a list of category ids). Passing `null` or an integer now throws a `TypeError`; pass `''` for no search.
 - Most core event subscribers no longer implement `Symfony\Component\EventDispatcher\EventSubscriberInterface`. Listener methods now carry a `#[AsEventListener]` attribute instead of being declared in `getSubscribedEvents()`, and are registered through service autoconfiguration. Two consequences for plugins:
     - A plugin service that extends an abstract base such as `Mautic\CoreBundle\EventListener\CommonStatsSubscriber` or `Mautic\NotificationBundle\EventListener\CampaignSubscriber` must be an autoconfigured service for its inherited `#[AsEventListener]` methods to register. Services defined with `autoconfigure: true` (the default in Mautic's `config/services.php` loader) get this automatically; a service registered without autoconfiguration no longer receives its events.
     - PHP does not inherit attributes onto an overridden method. A child class that overrides a listener method (e.g. `onStatsFetch()`) loses the `#[AsEventListener]` from the parent, so that override is not registered. Re-add the `#[AsEventListener]` attribute on the overriding method.
@@ -850,6 +852,7 @@
     | `CampaignBundle\Model\CampaignModel` | `getLeadSources()` | `Campaign\|int\|string` |
     | `CampaignBundle\Model\CampaignModel` | `getCampaignsByForm()` | `Form\|int` |
     | `CampaignBundle\Model\CampaignModel` | `getCampaignIdsWithDependenciesOnSegment()` | `int` |
+    | `CampaignBundle\Model\CampaignModel` | `rebuildCampaignLeads()` | `int` (`$limit`), `int` (`$maxLeads`, was `bool`; pass `0` instead of `false`) |
     | `ChannelBundle\Model\MessageModel` | `getMessageChannels()`, `getChannelMessageByChannelId()` | `int` |
     | `ChannelBundle\Model\MessageQueueModel` | `processMessageQueue()` | `array\|MessageQueue` |
     | `ConfigBundle\Model\SysinfoModel` | `getLogTail()` | `int` |
