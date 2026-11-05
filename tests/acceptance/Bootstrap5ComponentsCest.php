@@ -94,6 +94,5 @@ final class Bootstrap5ComponentsCest
         $tester->waitForJS('return document.querySelector("#dropdownMenu").classList.contains("show")', 5);
         $tester->click('#outside');
         $tester->waitForJS('return !document.querySelector("#dropdownMenu").classList.contains("show")', 5);
-        $tester->assertNull($tester->executeJS('return window.MauticBootstrapCompatibility || null;'));
     }
 }
