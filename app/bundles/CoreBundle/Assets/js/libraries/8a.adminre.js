@@ -694,13 +694,13 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                         // toggle hide and show
                         if($(target).hasClass("show")) {
                             // hide the submenu
-                            $(target).each((index, element) => bootstrap.Collapse.getInstance(element)?.hide());
+                            $(target).each((index, element) => bootstrap.Collapse.getOrCreateInstance(element, {toggle: false}).hide());
                             $this.parent().removeClass("open");
                         } else {
                             // hide other showed target if parent is defined
                             if(!!parent) {
                                 $(parent+" .show").each(function () {
-                                    $(this).each((index, element) => bootstrap.Collapse.getInstance(element)?.hide());
+                                    $(this).each((index, element) => bootstrap.Collapse.getOrCreateInstance(element, {toggle: false}).hide());
                                     $(this).parent().removeClass("open");
                                 });
                             }
