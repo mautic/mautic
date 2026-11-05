@@ -813,7 +813,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         )
                     );
 
-                $expr           = $q->expr()->{$filter->not ? 'exists' : 'notExists'}($sq->getSQL());
+                $expr           = $this->getExistsExpression(!$filter->not).'('.$sq->getSQL().')';
                 break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.owner', [], null, 'en_US'):
