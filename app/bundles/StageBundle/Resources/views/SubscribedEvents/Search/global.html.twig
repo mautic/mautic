@@ -6,7 +6,7 @@
 {% else %}
     <a href="{{ url('mautic_stage_action', {'objectAction' : 'edit', 'objectId' : item.getId()}) }}">
         <span class="fw-sb">{{ item.name }}</span>
-        <span class="ml-4 mr-12">#{{ item.getId() }}</span>
+        <span class="ms-4 me-12">#{{ item.getId() }}</span>
         {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
             'entity': item,
             'status': 'active',

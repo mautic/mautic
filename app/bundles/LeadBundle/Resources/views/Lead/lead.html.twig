@@ -11,7 +11,7 @@
 {% set leadName = lead.isAnonymous ? lead.primaryIdentifier|trans : lead.primaryIdentifier %}
 {% set avatar %}
   {% if not isAnonymous %}
-    <span class="float-start img-wrapper rounded mr-12" style="width:33px"><img src="{{ leadGetAvatar(lead) }}" alt="" /></span>
+    <span class="float-start img-wrapper rounded me-12" style="width:33px"><img src="{{ leadGetAvatar(lead) }}" alt="" /></span>
   {% endif %}
 {% endset %}
 
@@ -19,7 +19,7 @@
 {% set groups = fields|keys %}
 
 {% block headerTitle %}
-    {{ avatar }}<div class="float-start mt-5"><span class="span-block">{{ htmlEntityDecode(leadName)|purify }}</span><span class="span-block small ml-12">
+    {{ avatar }}<div class="float-start mt-5"><span class="span-block">{{ htmlEntityDecode(leadName)|purify }}</span><span class="span-block small ms-12">
     {{ htmlEntityDecode(lead.secondaryIdentifier)|purify }}</span></div>
     {{ customContent('lead.name.after', _context) }}
 {% endblock %}
@@ -158,7 +158,7 @@
             <!--/ lead detail header -->
 
             <!-- lead detail collapseable -->
-            <div class="collapse pr-16 pl-16" id="lead-details">
+            <div class="collapse pe-16 ps-16" id="lead-details">
                 <ul class="pt-16 nav nav-tabs nav-tabs-contained" role="tablist">
                     {% for g in groups %}
                         {% if fields[g] is not empty %}
@@ -181,7 +181,7 @@
                 <div class="tab-content pa-16">
                     {% for group in groups %}
                         <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ group }}">
-                            <div class="pr-16 pl-16 pb-16">
+                            <div class="pe-16 ps-16 pb-16">
                                 <div class="panel shd-none mb-0">
                                     <table class="table table-hover mb-0">
                                         <tbody>
@@ -196,7 +196,7 @@
                                                     <td width="20%"><span class="fw-b textTitle">{{ field.label|purify }}</span></td>
                                                     <td>
                                                         {% if 'core' == group and 'country' == field.alias and flag is not empty %}
-                                                            <img class="mr-12" src="{{ flag }}" alt="" style="max-height: 24px;"/>
+                                                            <img class="me-12" src="{{ flag }}" alt="" style="max-height: 24px;"/>
                                                             <span class="mt-1">{{ field.value|purify }}</span>
                                                         {% else %}
                                                             {% if 'multiselect' == field.type %}
@@ -270,7 +270,7 @@
                                         <h3 class="text-white dark-sm"><span class="ri-eye-line"></span></h3>
                                     </div>
                                 </div>
-                                <div class="d-flex flex-column pt-0 pl-16 pb-16 pr-16 min-h-256">
+                                <div class="d-flex flex-column pt-0 ps-16 pb-16 pe-16 min-h-256">
                                     {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': engagementData, 'chartType': 'line', 'chartHeight': 250}) }}
                                 </div>
                             </div>
@@ -285,7 +285,7 @@
             <ul class="nav nav-tabs nav-tabs-contained mt-12">
                 <li class="active">
                     <a href="#timeline-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">
-                        <span size="sm" class="label label-primary mr-12" id="TimelineCount">
+                        <span size="sm" class="label label-primary me-12" id="TimelineCount">
                             {{ events.total }}
                         </span>
                         {{ 'mautic.lead.lead.tab.history'|trans }}
@@ -293,7 +293,7 @@
                 </li>
                 <li class="">
                     <a href="#notes-container" role="tab" data-bs-toggle="tab" class="nav-link">
-                        <span size="sm" class="label label-primary mr-12" id="NoteCount">
+                        <span size="sm" class="label label-primary me-12" id="NoteCount">
                             {{ noteCount }}
                         </span>
                         {{ 'mautic.lead.lead.tab.notes'|trans }}
@@ -302,7 +302,7 @@
                 {% if not isAnonymous %}
                     <li class="">
                         <a href="#social-container" role="tab" data-bs-toggle="tab" class="nav-link">
-                        <span size="sm" class="label label-primary mr-12" id="SocialCount">
+                        <span size="sm" class="label label-primary me-12" id="SocialCount">
                             {{ socialProfiles|length }}
                         </span>
                             {{ 'mautic.lead.lead.tab.social'|trans }}
@@ -311,7 +311,7 @@
                 {% endif %}
                 <li class="">
                     <a href="#integration-container" role="tab" data-bs-toggle="tab" class="nav-link">
-                    <span size="sm" class="label label-primary mr-12" id="IntegrationCount">
+                    <span size="sm" class="label label-primary me-12" id="IntegrationCount">
                         {{ integrations|length }}
                     </span>
                         {{ 'mautic.lead.lead.tab.integration'|trans }}
@@ -319,7 +319,7 @@
                 </li>
                 <li class="">
                     <a href="#auditlog-container" role="tab" data-bs-toggle="tab" class="nav-link">
-                    <span size="sm" class="label label-primary mr-12" id="AuditLogCount">
+                    <span size="sm" class="label label-primary me-12" id="AuditLogCount">
                         {{ auditlog.total }}
                     </span>
                         {{ 'mautic.lead.lead.tab.auditlog'|trans }}
@@ -327,7 +327,7 @@
                 </li>
                     <li class="">
                         <a href="#place-container" role="tab" data-bs-toggle="tab" id="load-lead-map" class="nav-link">
-                        <span size="sm" class="label label-primary mr-12" id="PlaceCount">
+                        <span size="sm" class="label label-primary me-12" id="PlaceCount">
                             {{ places|length }}
                         </span>
                             {{ 'mautic.lead.lead.tab.places'|trans }}

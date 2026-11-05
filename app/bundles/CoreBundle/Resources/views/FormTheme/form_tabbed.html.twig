@@ -10,7 +10,7 @@
                     {% block aboveTabsContent %}{% endblock %}
                     {{ customContent('tabs.above', _context) }}
                     {{- include('@MauticCore/Helper/tabs.html.twig', {'tabs' : formTabs }) -}}
-                    <div class="pr-16 pl-16">
+                    <div class="pe-16 ps-16">
                         {% if block('_content') is defined %}
                             {{ block('_content') }}
                         {% else %}
@@ -25,7 +25,7 @@
         {% set rightContent = block('rightFormContent') %}
         {% if rightContent is not empty %}
         <div class="col-md-3 height-auto bdr-l">
-            <div class="pr-24 pl-24 pt-16 pb-16">
+            <div class="pe-24 ps-24 pt-16 pb-16">
                 {{ rightContent|raw }}
             </div>
         </div>

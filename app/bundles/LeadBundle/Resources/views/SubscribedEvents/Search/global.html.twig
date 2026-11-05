@@ -5,7 +5,7 @@
 {% else %}
 <div class="d-flex align-items-center">
     {% set fields = item.fields %}
-    <span class="float-start mr-12 pt-5">
+    <span class="float-start me-12 pt-5">
         <span class="gsearch--results-profile__img gsearch--results-profile__img--sm img-wrapper"><img src="{{ gravatarGetImage(fields.core.email.value|default(''), '100') }}" /></span>
     </span>
     <a class="flex-grow-1" href="{{ url('mautic_contact_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">

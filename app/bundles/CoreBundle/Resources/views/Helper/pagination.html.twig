@@ -18,7 +18,7 @@
 {% set linkType = inModal is defined and inModal is not empty ? 'ajaxmodal' : 'ajax' %}
 {% set pageClass = paginationClass is defined ? (' pagination-' ~ paginationClass) : '' %}
 {% set menuLink = menuLinkId is defined and menuLinkId is not empty ? (' data-menu-link="' ~ menuLinkId ~ '"') : '' %}
-{% set paginationWrapper = paginationWrapper is defined ? paginationWrapper : 'pagination-wrapper ml-16 mr-16' %}
+{% set paginationWrapper = paginationWrapper is defined ? paginationWrapper : 'pagination-wrapper ms-16 me-16' %}
 {% set queryString = ('?tmpl=' ~ tmpl ~ (queryString is defined ? queryString : '')) %}
 {% set formExit = ignoreFormExit is defined and ignoreFormExit is not empty ? ' data-ignore-formexit="true"' : '' %}
 {% set responsiveViewports = ['desktop', 'mobile'] %}

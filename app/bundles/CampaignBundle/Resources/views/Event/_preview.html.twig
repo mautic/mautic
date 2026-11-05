@@ -29,7 +29,7 @@ data-event-no-percent="{{ event['noPercent'] }}">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.when'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
         {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
-        <span class="campaign-event-name label label-info ml-5 mr-5 ellipsis">{{ idString ~ event['name'] }}</span>
+        <span class="campaign-event-name label label-info ms-5 me-5 ellipsis">{{ idString ~ event['name'] }}</span>
         <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ms-auto campaign-event-icon event-type-color"></i>
         <div class="campaign-event-stat pa-4">
             <span data-bs-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}"><span class="ri-check-line"></span> {{ event.logCountProcessed }}</span>
@@ -42,7 +42,7 @@ data-event-no-percent="{{ event['noPercent'] }}">
 
     {% elseif event['eventType'] == 'action' %}
         <div class="campaign-event-content d-flex flex-nowrap align-items-center gap-12">
-            <div class="campaign-event-icon pa-12 mr-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
+            <div class="campaign-event-icon pa-12 me-5"><i class="{{ getCampaignEventIcon(event['type']) }}"></i></div>
             <div class="d-flex flex-column align-items-start">
                 <span class="fs-18 fw-l">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
                 {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
@@ -62,7 +62,7 @@ data-event-no-percent="{{ event['noPercent'] }}">
         <span class="h5 fw-b event-type-color">{{ 'mautic.campaign.if'|trans }}</span>
         <span>{{ ('mautic.campaign.'~event['type'])|trans }}</span>
             {% set idString = (event['id'] matches '/^\\d+$/') ? "(" ~ 'mautic.campaign.event.id'|trans ~ ": " ~ event['id'] ~ ") " : '' %}
-            <span class="campaign-event-name label label-warning ml-5 mr-5 ellipsis">{{ idString ~ event['name'] }}</span>
+            <span class="campaign-event-name label label-warning ms-5 me-5 ellipsis">{{ idString ~ event['name'] }}</span>
         <i class="{{ getCampaignEventIcon(event['type']) }} ri-lg ms-auto campaign-event-icon event-type-color"></i>
         <div class="campaign-event-stat pa-4">
             <span data-bs-toggle="tooltip" title="{{ 'mautic.report.campaign.completed.actions'|trans }}"><span class="ri-check-line"></span> {{ event.logCountProcessed }}</span>

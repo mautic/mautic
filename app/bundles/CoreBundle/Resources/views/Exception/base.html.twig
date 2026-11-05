@@ -71,7 +71,7 @@
 
             <div class="row mt-24">
                 <div class="col-sm-12">
-                    <h5 class="ml-24 text-danger">{{ exception.class }}</h5>
+                    <h5 class="ms-24 text-danger">{{ exception.class }}</h5>
                     <div class="well well-sm ma-16">
                         {{ include ('@MauticCore/Exception/traces.html.twig', {
                             'traces': exception.trace,
@@ -83,7 +83,7 @@
             {% if previousExceptions and previousExceptions|length > 0 %}
             <div class="row mt-24">
                 <div class="col-sm-12">
-                    <h5 class="ml-24">{{ 'mautic.core.error.previousexceptions' | trans }}</h5>
+                    <h5 class="ms-24">{{ 'mautic.core.error.previousexceptions' | trans }}</h5>
                     <div class="panel-group" id="previous" role="tablist" aria-multiselectable="true">
                     {% for key, e  in previousExceptions %}
                         <div class="panel panel-default">

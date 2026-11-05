@@ -27,10 +27,10 @@
                         </a>
                     </h4>
                     <div class="text-secondary mb-1 ellipsis">
-                        <i class="ri-fw ri-building-2-line mr-5"></i>{{ htmlEntityDecode(fields.core.company.value|default(''))|purify }}
+                        <i class="ri-fw ri-building-2-line me-5"></i>{{ htmlEntityDecode(fields.core.company.value|default(''))|purify }}
                     </div>
                     <div class="text-secondary mb-1 ellipsis">
-                        <i class="ri-fw ri-map-pin-2-line mr-5"></i>
+                        <i class="ri-fw ri-map-pin-2-line me-5"></i>
                         {% set location = [] %}
                         {% if fields.core.city is defined %}
                           {% set location = location|merge([fields.core.city.value]) %}
@@ -43,12 +43,12 @@
                         {{ location|join(', ') }}
                     </div>
                     <div class="text-secondary mb-1 ellipsis">
-                        <i class="ri-earth-line mr-5"></i>{{ fields.core.country.value|default('') }}
+                        <i class="ri-earth-line me-5"></i>{{ fields.core.country.value|default('') }}
                     </div>
                     {% set flag = fields.core.country is defined and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
                     {% if flag is not empty %}
                         <div style="position: absolute; right: 30px; bottom: 30px">
-                            <img src="{{ flag }}" style="max-height: 24px;" class="ml-12" />
+                            <img src="{{ flag }}" style="max-height: 24px;" class="ms-12" />
                         </div>
                     {% endif %}
                     {{ customContent('lead.grid', _context) }}

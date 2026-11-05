@@ -79,8 +79,8 @@
             <!--/ campaign detail header -->
 
             <!-- campaign detail collapseable -->
-            <div class="collapse pr-16 pl-16" id="campaign-details">
-                <div class="pr-16 pl-16 pb-16">
+            <div class="collapse pe-16 ps-16" id="campaign-details">
+                <div class="pe-16 ps-16 pb-16">
                     <div class="panel shd-none mb-0">
                         <table class="table table-hover mb-0">
                             <tbody>
@@ -156,7 +156,7 @@
             {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
             {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
             <!-- some stats -->
-            <div class="stats-menu pl-16 mt-24">
+            <div class="stats-menu ps-16 mt-24">
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs nav-tabs-contained">
                     <li class="active">
@@ -201,7 +201,7 @@
                 <div class="tab-pane bdr-w-0" id="campaign-email-stats">
                     <div class="row">
                         <div class="col-md-6">
-                            <h4 class="text-muted ml-24 mb-16">{{ 'mautic.campaign.email_stats.weekday' | trans }}</h4>
+                            <h4 class="text-muted ms-24 mb-16">{{ 'mautic.campaign.email_stats.weekday' | trans }}</h4>
                             <div data-campaign-email-stats-weekdays="{{ path('mautic_campaign_metrics_email_weekdays', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
                                 <div class="d-flex justify-content-center align-items-center">
                                     <div class="spinner fs-42">
@@ -211,7 +211,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <h4 class="text-muted ml-24 mb-16">{{ 'mautic.campaign.email_stats.hour' | trans }}</h4>
+                            <h4 class="text-muted ms-24 mb-16">{{ 'mautic.campaign.email_stats.hour' | trans }}</h4>
                             <div data-campaign-email-stats-hours="{{ path('mautic_campaign_metrics_email_hours', {'objectId' : campaign.id, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
                                 <div class="d-flex justify-content-center align-items-center">
                                     <div class="spinner fs-42">

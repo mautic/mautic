@@ -2,7 +2,7 @@
     {% set dataValues = chartData.datasets[0].data %}
     {% if dataValues|reduce((carry, v) => carry + v) > 0 %}
         <div class="chart-wrapper">
-            <div class="pt-sd pr-16 pb-16 pl-16">
+            <div class="pt-sd pe-16 pb-16 ps-16">
                 <div{% if fitChartToContainer|default(false) %} class="chart-fit-container"{% elseif chartHeight is defined %} style="height: calc({{ chartHeight }}px - 15px)"{% endif %}>
                     <canvas class="chart {{ chartType }}-chart" {{ disableLegend is defined ? 'data-disable-legend' : '' }}>
                         {{ chartData|json_encode }}

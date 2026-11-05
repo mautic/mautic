@@ -3,7 +3,7 @@
 {% set htmlcode %}
 <pre class="dwc--generator-content-code d-flex flex-column flex-grow-1 gap-16 p-0 fs-16 text-helper">{{ '<div
     data-slot="dwc"
-    data-param-slot-name="' ~ entity.slotName ~ '">'|raw }}<div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 align-items-center ml-24 text-primary"><i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-bs-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{{ '</div>'|escape }}</pre>
+    data-param-slot-name="' ~ entity.slotName ~ '">'|raw }}<div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 align-items-center ms-24 text-primary"><i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-bs-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{{ '</div>'|escape }}</pre>
 {% endset %}
 
 <div class="row mt-24">
@@ -39,7 +39,7 @@
         <div role="tabpanel" class="tab-pane fade show active" id="dwc--generator-html">
             <div class="tile dwc--generator-wrapper">
                 <div class="d-flex flex-grow-1">
-                    <div class="dwc--generator-toolbar pa-5 layer-two d-flex flex-column justify-content-between align-items-start mr-16">
+                    <div class="dwc--generator-toolbar pa-5 layer-two d-flex flex-column justify-content-between align-items-start me-16">
                         {% include '@MauticCore/Helper/button.html.twig' with {
                         buttons: [
                         {
@@ -86,7 +86,7 @@
         <div role="tabpanel" class="tab-pane fade" id="dwc--generator-plugins">
             <div class="tile dwc--generator-wrapper">
                 <div class="d-flex flex-grow-1">
-                    <div class="dwc--generator-toolbar pa-5 layer-two d-flex flex-column justify-content-between align-items-start mr-16">
+                    <div class="dwc--generator-toolbar pa-5 layer-two d-flex flex-column justify-content-between align-items-start me-16">
                         {% include '@MauticCore/Helper/button.html.twig' with {
                         buttons: [
                         {
@@ -120,7 +120,7 @@
 
                     </div>
                     <div class="dwc--generator-content mt-16 mb-12 d-flex flex-column flex-grow-1">
-                        <pre class="dwc--generator-content-code d-flex flex-column flex-grow-1 gap-16 p-0 fs-16 text-helper">{mautic type="content" slot="{{ entity.slotName }}"} <div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 align-items-center ml-24 text-primary"> <i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-bs-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{/mautic}
+                        <pre class="dwc--generator-content-code d-flex flex-column flex-grow-1 gap-16 p-0 fs-16 text-helper">{mautic type="content" slot="{{ entity.slotName }}"} <div class="dwc--generator-content-editable layer-two d-inline-flex gap-4 align-items-center ms-24 text-primary"> <i class="ri-pencil-line ri-sm" title="{{ 'mautic.dynamiccontent.generator.default_content_tooltip'|trans }}" data-bs-toggle="tooltip"></i><input class="form-control dwc--generator-content-input" type="text" placeholder="{{ 'mautic.dynamiccontent.generator.input_placeholder'|trans }}"></div>{/mautic}
 
                         </pre>
                         <div class="dwc--generator-content-help text-helper small">

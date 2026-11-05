@@ -5,7 +5,7 @@
 {% else %}
     <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : item.id}) }}" data-toggle="ajax">
         <span class="fw-sb">{{ item.getName() }}</span>
-        <span class="ml-4 mr-12">#{{ item.getId() }}</span>
+        <span class="ms-4 me-12">#{{ item.getId() }}</span>
         {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
             'entity': item,
             'status': item.getPublishUp() is not null ? 'sending' : 'available',

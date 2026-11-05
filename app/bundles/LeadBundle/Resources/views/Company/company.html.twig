@@ -83,7 +83,7 @@
             <!--/ lead detail header -->
 
             <!-- lead detail collapseable -->
-            <div class="collapse pr-16 pl-16" id="lead-details">
+            <div class="collapse pe-16 ps-16" id="lead-details">
                 <ul class="pt-16 nav nav-tabs nav-tabs-contained" role="tablist">
                     {% for g in fields|keys %}
                         {% if fields[g] is not empty %}
@@ -98,7 +98,7 @@
                 <div class="tab-content pa-16">
                     {% for group in fields|keys %}
                         <div class="tab-pane fade {% if loop.first %}in active{% endif %} bdr-w-0" id="{{ group }}">
-                            <div class="pr-16 pl-16 pb-16">
+                            <div class="pe-16 ps-16 pb-16">
                                 <div class="panel shd-none mb-0">
                                     <table class="table table-hover mb-0">
                                         <tbody>
@@ -108,7 +108,7 @@
                                                     <td width="20%"><span class="fw-b">{{ field.label }}</span></td>
                                                     <td>
                                                         {% if 'core' == group and 'country' == field.alias and flag is defined %}
-                                                          <img class="mr-12" src="{{ flag }}" alt="" style="max-height: 24px;"/>
+                                                          <img class="me-12" src="{{ flag }}" alt="" style="max-height: 24px;"/>
                                                           <span class="mt-1">{{ field.value }}</span>
                                                         {% else %}
                                                           {% if field.value is iterable and 'multiselect' == field.type %}

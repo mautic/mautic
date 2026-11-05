@@ -54,8 +54,8 @@
     <div class="col-md-9 height-auto">
         <div>
             <!-- asset detail collapseable -->
-            <div class="collapse pr-16 pl-16" id="asset-details">
-                <div class="pr-16 pl-16 pb-16">
+            <div class="collapse pe-16 ps-16" id="asset-details">
+                <div class="pe-16 ps-16 pb-16">
                     <div class="panel shd-none mb-0">
                         <table class="table table-hover mb-0">
                             <tbody>
@@ -145,7 +145,7 @@
                                     </h5>
                                 </div>
                             </div>
-                            <div class="d-flex flex-column pt-0 pl-16 pb-16 pr-16 min-h-256">
+                            <div class="d-flex flex-column pt-0 ps-16 pb-16 pe-16 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': item.getRowStatusesPieChart(translatorGetHelper()),
                                       'chartType': 'pie',
@@ -164,7 +164,7 @@
                                     </h5>
                                 </div>
                             </div>
-                            <div class="d-flex flex-column pt-0 pl-16 pb-16 pr-16 min-h-256">
+                            <div class="d-flex flex-column pt-0 ps-16 pb-16 pe-16 min-h-256">
                                 {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': importedRowsChart,
                                       'chartType': 'line',
