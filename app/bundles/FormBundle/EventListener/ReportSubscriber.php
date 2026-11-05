@@ -21,7 +21,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final readonly class ReportSubscriber
 {
     public const string CONTEXT_FORMS           = 'forms';
+
     public const string CONTEXT_FORM_SUBMISSION = 'form.submissions';
+
     public const string CONTEXT_FORM_RESULT     = 'form.results';
 
     public function __construct(

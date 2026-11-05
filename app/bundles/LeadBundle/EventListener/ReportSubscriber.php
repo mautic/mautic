@@ -26,14 +26,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class ReportSubscriber
 {
     public const string CONTEXT_LEADS                     = 'leads';
+
     public const string CONTEXT_LEAD_POINT_LOG            = 'lead.pointlog';
+
     public const string CONTEXT_CONTACT_ATTRIBUTION_MULTI = 'contact.attribution.multi';
+
     public const string CONTEXT_CONTACT_ATTRIBUTION_FIRST = 'contact.attribution.first';
+
     public const string CONTEXT_CONTACT_ATTRIBUTION_LAST  = 'contact.attribution.last';
+
     public const string CONTEXT_CONTACT_FREQUENCYRULES    = 'contact.frequencyrules';
+
     public const string CONTEXT_CONTACT_MESSAGE_FREQUENCY = 'contact.message.frequency';
+
     public const string CONTEXT_COMPANIES                 = 'companies';
+
     public const string GROUP_CONTACTS = 'contacts';
+
     /**
      * @var string[]
      */
@@ -45,11 +54,14 @@ final class ReportSubscriber
         self::CONTEXT_CONTACT_ATTRIBUTION_LAST,
         self::CONTEXT_CONTACT_FREQUENCYRULES,
     ];
+
     /**
      * @var string[]
      */
     private array $companyContexts = [self::CONTEXT_COMPANIES];
+
     private ?array $channels = null;
+
     private ?array $channelActions = null;
 
     public function __construct(

@@ -20,6 +20,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 final class EmailSubscriber
 {
     private string $existingMjml = '';
+
     private string $existingHtml = '';
 
     public function __construct(

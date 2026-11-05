@@ -15,6 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final readonly class ReportSubscriber
 {
     public const string MOBILE_NOTIFICATIONS       = 'mobile_notifications';
+
     public const string MOBILE_NOTIFICATIONS_STATS = 'mobile_notifications.stats';
 
     public function __construct(

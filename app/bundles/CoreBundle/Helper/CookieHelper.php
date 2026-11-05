@@ -14,6 +14,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 final class CookieHelper
 {
     private ?Request $request = null;
+
     /**
      * @var array<string, Cookie>
      */

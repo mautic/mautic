@@ -13,7 +13,9 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 final readonly class ProcessReplySubscriber
 {
     public const string BUNDLE     = 'EmailBundle';
+
     public const string FOLDER_KEY = 'replies';
+
     public const string CACHE_KEY  = self::BUNDLE.'_'.self::FOLDER_KEY;
 
     public function __construct(

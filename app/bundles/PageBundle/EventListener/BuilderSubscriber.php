@@ -30,21 +30,37 @@ use Twig\Environment;
 final class BuilderSubscriber
 {
     private const string pageTokenRegex         = '{pagelink=(.*?)}';
+
     private const string dwcTokenRegex          = '{dwc=(.*?)}';
+
     private const string langBarRegex           = '{langbar}';
+
     private const string shareButtonsRegex      = '{sharebuttons}';
+
     private const string titleRegex             = '{pagetitle}';
+
     private const string descriptionRegex       = '{pagemetadescription}';
+
     public const string brandName                = '{brand=name}';
+
     public const string segmentListRegex         = '{segmentlist}';
+
     public const string categoryListRegex        = '{categorylist}';
+
     public const string channelfrequency         = '{channelfrequency}';
+
     public const string preferredchannel         = '{preferredchannel}';
+
     public const string saveprefsRegex           = '{saveprefsbutton}';
+
     public const string successmessage           = '{successmessage}';
+
     public const string identifierToken          = '{leadidentifier}';
+
     public const string saveButtonContainerClass = 'prefs-saveprefs';
+
     public const string firstSlotAttribute       = ' data-prefs-center-first="1"';
+
     /**
      * @var array<string,string>
      */

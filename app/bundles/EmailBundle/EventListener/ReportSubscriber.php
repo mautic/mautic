@@ -29,15 +29,25 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final readonly class ReportSubscriber
 {
     public const string CONTEXT_EMAILS       = 'emails';
+
     public const string CONTEXT_EMAIL_STATS  = 'email.stats';
+
     public const string EMAILS_PREFIX        = 'e';
+
     public const string EMAIL_STATS_PREFIX   = 'es';
+
     public const string EMAIL_VARIANT_PREFIX = 'vp';
+
     public const string DNC_PREFIX           = 'dnc';
+
     public const string CLICK_PREFIX         = 'cut';
+
     public const string TRACKABLE_PREFIX     = 'tr';
+
     public const string REDIRECT_PREFIX      = 'pr';
+
     public const string CLICK_THROUGH_PREFIX = 'ct';
+
     public const array DNC_COLUMNS = [
         'unsubscribed' => [
             'alias'   => 'unsubscribed',
@@ -73,6 +83,7 @@ final readonly class ReportSubscriber
             'suffix'  => '%',
         ],
     ];
+
     public const array EMAIL_STATS_COLUMNS = [
         self::EMAIL_STATS_PREFIX.'.email_address' => [
             'label' => 'mautic.email.report.stat.email_address',
@@ -113,6 +124,7 @@ final readonly class ReportSubscriber
             'type'  => 'int',
         ],
     ];
+
     public const array EMAIL_VARIANT_COLUMNS = [
         self::EMAIL_VARIANT_PREFIX.'.id' => [
             'label' => 'mautic.email.report.variant_parent_id',
@@ -123,6 +135,7 @@ final readonly class ReportSubscriber
             'type'  => 'string',
         ],
     ];
+
     public const array CLICK_COLUMNS = [
         'hits' => [
             'alias'   => 'hits',

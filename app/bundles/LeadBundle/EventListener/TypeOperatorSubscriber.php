@@ -33,6 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class TypeOperatorSubscriber
 {
     use OperatorListTrait;
+
     private const string EMAIL_ALIAS = 'email';
 
     public function __construct(

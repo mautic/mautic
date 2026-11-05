@@ -43,10 +43,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class LeadSubscriber
 {
     use ChannelTrait;
+
     /**
      * @var string[]
      */
     private array $preventLoop = [];
+
     private ?int $lastContactId = null;
 
     /**

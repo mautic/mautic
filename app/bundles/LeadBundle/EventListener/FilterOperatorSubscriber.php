@@ -20,6 +20,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class FilterOperatorSubscriber
 {
     use SegmentFilterIconTrait;
+
     /**
      * @var array<string, string[]>
      */
