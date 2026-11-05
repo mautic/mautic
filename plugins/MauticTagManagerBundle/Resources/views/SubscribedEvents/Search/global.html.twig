@@ -5,7 +5,7 @@
 {% else %}
     <a href="{{ url('mautic_tagmanager_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
       <span class="fw-sb">{{ item.tag }}</span>
-      <span class="ml-4 mr-sm">#{{ item.id }}</span>
+      <span class="ml-4 mr-12">#{{ item.id }}</span>
     </a>
   <div class="clearfix"></div>
 {% endif %}

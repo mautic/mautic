@@ -16,7 +16,7 @@
     <!-- start: box layout -->
     <div class="box-layout">
         <!-- container -->
-        <div class="col-md-9 height-auto bdr-r pa-md">
+        <div class="col-md-9 height-auto bdr-r pa-16">
             <div class="row">
                 <div class="col-md-6">{{ form_row(form.name) }}</div>
                 <div class="col-md-6">{{ form_row(form.website) }}</div>
@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="col-md-3 height-auto">
-            <div class="pr-lg pl-lg pt-md pb-md">
+            <div class="pr-24 pl-24 pt-16 pb-16">
                 {{ form_row(form.category) }}
                 {{ form_row(form.projects) }}
                 {{ form_row(form.isPublished) }}
@@ -49,7 +49,7 @@
                 <div class="col-xs-9 layer-two">
                     <h4><i class="ri-double-quotes-l"></i> {{ 'mautic.core.noresults.tip'|trans }}
                         <i class="ri-double-quotes-r"></i></h4>
-                    <p class="mt-md">
+                    <p class="mt-16">
                         {{ 'mautic.focus.website_placeholder'|trans }}
                     </p>
                     <div class="input-group">
@@ -136,7 +136,7 @@
                     <div id="focusTypePanel" class="panel-collapse collapse in" role="tabpanel">
                         {{ form_widget(form.type) }}
                         <ul class="list-group mb-0">
-                            <li data-focus-type="form" class="focus-type list-group-item pl-sm pr-sm">
+                            <li data-focus-type="form" class="focus-type list-group-item pl-12 pr-12">
                                 <div class="row">
                                     <div class="col-xs-2">
                                         <i class="ri-2x ri-edit-box-line text-interactive"></i>
@@ -148,9 +148,9 @@
                                 </div>
                             </li>
 
-                            <li class="focus-properties focus-form-properties list-group-item pl-sm pr-sm" style="display: none;"></li>
+                            <li class="focus-properties focus-form-properties list-group-item pl-12 pr-12" style="display: none;"></li>
 
-                            <li data-focus-type="notice" class="focus-type list-group-item pl-sm pr-sm">
+                            <li data-focus-type="notice" class="focus-type list-group-item pl-12 pr-12">
                                 <div class="row">
                                     <div class="col-xs-2">
                                         <i class="ri-2x ri-megaphone-line text-warning"></i>
@@ -162,9 +162,9 @@
                                 </div>
                             </li>
 
-                            <li class="focus-properties focus-notice-properties list-group-item pl-sm pr-sm" style="display: none;"></li>
+                            <li class="focus-properties focus-notice-properties list-group-item pl-12 pr-12" style="display: none;"></li>
 
-                            <li data-focus-type="link" class="focus-type list-group-item pl-sm pr-sm">
+                            <li data-focus-type="link" class="focus-type list-group-item pl-12 pr-12">
                                 <div class="row">
                                     <div class="col-xs-2">
                                         <i class="ri-2x ri-corner-up-right-line text-info"></i>
@@ -176,7 +176,7 @@
                                 </div>
                             </li>
 
-                            <li class="focus-properties focus-link-properties list-group-item pl-sm pr-sm" style="display: none;"></li>
+                            <li class="focus-properties focus-link-properties list-group-item pl-12 pr-12" style="display: none;"></li>
                         </ul>
                     </div>
 
@@ -205,7 +205,7 @@
                     </div>
                     <div id="focusStylePanel" class="panel-collapse collapse" role="tabpanel">
                         <ul class="list-group mb-0">
-                            <li data-focus-style="bar" class="focus-style visible-focus-style-bar list-group-item pl-sm pr-sm">
+                            <li data-focus-style="bar" class="focus-style visible-focus-style-bar list-group-item pl-12 pr-12">
                                 <div class="row">
                                     <div class="col-xs-2">
                                         <i class="pl-2 ri-2x ri-subtract-line text-interactive"></i>
@@ -216,9 +216,9 @@
                                     </div>
                                 </div>
                             </li>
-                            <li class="focus-properties focus-bar-properties list-group-item pl-sm pr-sm" style="display: none;"></li>
+                            <li class="focus-properties focus-bar-properties list-group-item pl-12 pr-12" style="display: none;"></li>
 
-                            <li data-focus-style="modal" class="focus-style visible-focus-style-modal list-group-item pl-sm pr-sm">
+                            <li data-focus-style="modal" class="focus-style visible-focus-style-modal list-group-item pl-12 pr-12">
                                 <div class="row">
                                     <div class="col-xs-2">
                                         <i class="ri-2x ri-file-list-2-line text-warning"></i>
@@ -229,9 +229,9 @@
                                     </div>
                                 </div>
                             </li>
-                            <li class="focus-properties focus-modal-properties list-group-item pl-sm pr-sm" style="display: none;"></li>
+                            <li class="focus-properties focus-modal-properties list-group-item pl-12 pr-12" style="display: none;"></li>
 
-                            <li data-focus-style="notification" class="focus-style visible-focus-style-notification list-group-item pl-sm pr-sm">
+                            <li data-focus-style="notification" class="focus-style visible-focus-style-notification list-group-item pl-12 pr-12">
                                 <div class="row">
                                     <div class="col-xs-2">
                                         <i class="pl-2 ri-2x ri-information-2-line text-info"></i>
@@ -242,9 +242,9 @@
                                     </div>
                                 </div>
                             </li>
-                            <li class="focus-properties focus-notification-properties list-group-item pl-sm pr-sm" style="display: none;"></li>
+                            <li class="focus-properties focus-notification-properties list-group-item pl-12 pr-12" style="display: none;"></li>
 
-                            <li data-focus-style="page" class="focus-style visible-focus-style-page list-group-item pl-sm pr-sm">
+                            <li data-focus-style="page" class="focus-style visible-focus-style-page list-group-item pl-12 pr-12">
                                 <div class="row">
                                     <div class="col-xs-2">
                                         <i class="pl-2 ri-2x ri-square-line text-danger"></i>
@@ -255,7 +255,7 @@
                                     </div>
                                 </div>
                             </li>
-                            <!-- <li class="focus-properties focus-page-properties list-group-item pl-sm pr-sm" style="display: none;"></li> -->
+                            <!-- <li class="focus-properties focus-page-properties list-group-item pl-12 pr-12" style="display: none;"></li> -->
                         </ul>
                     </div>
 
@@ -295,7 +295,7 @@
                         </h4>
                     </div>
                     <div id="focusColorsPanel" class="panel-collapse collapse" role="tabpanel">
-                        <div class="panel-body pa-xs">
+                        <div class="panel-body pa-5">
                             <div class="row">
                                 <div class="form-group col-xs-12 ">
                                     {{ form_label(form.properties.colors.primary) }}
@@ -305,7 +305,7 @@
                                         <button data-dropper="focus_properties_colors_primary" class="btn btn-ghost btn-nospin btn-dropper" type="button"><i class="ri-dropper-line"></i></button>
                                     </span>
                                     </div>
-                                    <div class="mt-xs site-color-list hide" id="primary_site_colors"></div>
+                                    <div class="mt-5 site-color-list hide" id="primary_site_colors"></div>
                                     {{ form_errors(form.properties.colors.primary) }}
                                 </div>
                             </div>
@@ -319,7 +319,7 @@
                                         <button data-dropper="focus_properties_colors_text" class="btn btn-ghost btn-nospin btn-dropper" type="button"><i class="ri-dropper-line"></i></button>
                                     </span>
                                     </div>
-                                    <div class="mt-xs site-color-list hide" id="text_site_colors"></div>
+                                    <div class="mt-5 site-color-list hide" id="text_site_colors"></div>
                                     {{ form_errors(form.properties.colors.text) }}
                                 </div>
                             </div>
@@ -335,7 +335,7 @@
                                         <button data-dropper="focus_properties_colors_button" class="btn btn-ghost btn-nospin btn-dropper" type="button"><i class="ri-dropper-line"></i></button>
                                     </span>
                                         </div>
-                                        <div class="mt-xs site-color-list hide" id="button_site_colors"></div>
+                                        <div class="mt-5 site-color-list hide" id="button_site_colors"></div>
                                         {{ form_errors(form.properties.colors.button) }}
                                     </div>
                                 </div>
@@ -349,7 +349,7 @@
                                         <button data-dropper="focus_properties_colors_button_text" class="btn btn-ghost btn-nospin btn-dropper" type="button"><i class="ri-dropper-line"></i></button>
                                     </span>
                                         </div>
-                                        <div class="mt-xs site-color-list hide" id="button_text_site_colors"></div>
+                                        <div class="mt-5 site-color-list hide" id="button_text_site_colors"></div>
                                         {{ form_errors(form.properties.colors.button_text) }}
                                     </div>
                                 </div>
@@ -369,7 +369,7 @@
                         </h4>
                     </div>
                     <div id="focusContentPanel" class="panel-collapse collapse" role="tabpanel">
-                        <div class="panel-body pa-xs">
+                        <div class="panel-body pa-5">
                             {{ form_row(form.html_mode) }}
                             {{ form_row(form.editor) }}
                             {{ form_row(form.html) }}

@@ -20,14 +20,14 @@
         {% set dateFrom = dateToFullConcat(dateFrom.date, dateFrom.timezone) %}
         {% set dateTo = dateToFullConcat(dateTo.date, dateTo.timezone) %}
     {% endif %}
-    <div class="float-end mr-md mb-md">
+    <div class="float-end mr-16 mb-16">
         <a href="{{ path('mautic_report_action', {'objectId': reportId, 'objectAction': 'view', 'daterange': {'date_to': dateTo, 'date_from': dateFrom}}) }}">
             <span class="label label-success">{{ 'mautic.report.dashboard.widgets.full_report'|trans }}</span>
         </a>
     </div>
     <div class="clearfix"></div>
 {% else %}
-    <div class="ml-20 mr-20 mt-lg px-2 alert alert-danger" role="alert">
+    <div class="ml-24 mr-24 mt-24 px-2 alert alert-danger" role="alert">
         <a href="#" class="alert-link"><i class="ri-alert-line" aria-hidden="true"></i> {{ 'mautic.report.dashboard.widgets.no_report_found'|trans|purify }}</a>
     </div>
     <div class="clearfix"></div>

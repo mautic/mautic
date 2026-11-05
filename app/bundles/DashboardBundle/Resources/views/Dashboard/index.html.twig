@@ -56,17 +56,17 @@
 
 {% block content %}
   {% if true == phpVersion['isOutdated'] %}
-  <div class="pt-md pl-md col-md-12">
-      <div class="pt-md pl-md alert alert-warning">
+  <div class="pt-16 pl-16 col-md-12">
+      <div class="pt-16 pl-16 alert alert-warning">
           <h3>{{ 'mautic.dashboard.phpversionwarning.title'|trans }}</h3>
           <p>{{ 'mautic.dashboard.phpversionwarning.body'|trans({'%phpversion%': phpVersion['version']})|purify }}</p>
       </div>
   </div>
   {% endif %}
 
-  <div class="row pt-md ms-0">
+  <div class="row pt-16 ms-0">
       <div class="col-sm-12">
-        <div class="d-flex flex-row flex-nowrap gap-sm align-items-center justify-content-between">
+        <div class="d-flex flex-row flex-nowrap gap-12 align-items-center justify-content-between">
             {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm}) }}
             <div class="dropdown">
                 <a href="#" class="btn btn-ghost btn-sm btn-nospin" data-bs-toggle="dropdown" aria-expanded="false">
@@ -96,14 +96,14 @@
       </div>
       <div id="cloned-widgets" class="dashboard-widgets cards"></div>
   {% else %}
-      <div class="well well col-md-6 col-md-offset-3 mt-md">
+      <div class="well well col-md-6 col-md-offset-3 mt-16">
           <div class="row">
               <div class="mautibot-image col-xs-3 text-center">
                   <img class="img-fluid" style="max-height: 125px; margin-left: auto; margin-right: auto;" src="{{ mautibotGetImage('wave') }}" />
               </div>
               <div class="col-xs-9">
                   <h4><i class="ri-double-quotes-l"></i> {{ 'mautic.dashboard.nowidgets.tip.header'|trans }} <i class="ri-double-quotes-r"></i></h4>
-                  <p class="mt-md">{{ 'mautic.dashboard.nowidgets.tip'|trans }}</p>
+                  <p class="mt-16">{{ 'mautic.dashboard.nowidgets.tip'|trans }}</p>
                   {% include '@MauticCore/Helper/button.html.twig' with {
                     buttons: [
                         {

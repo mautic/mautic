@@ -8,12 +8,12 @@
         <!-- start: app-wrapper -->
         <section id="app-wrapper">
             <div class="container ms-auto me-auto">
-                <div class="row mt-20">
+                <div class="row mt-24">
                     <div class="text-center">
                         <img src="{{ getOverridableUrl('images/mautic_logo_lb200.png') }}" height="50px" alt="Mautic" />
                     </div>
 
-                    <div class="mt-20 col-lg-6 col-lg-offset-3">
+                    <div class="mt-24 col-lg-6 col-lg-offset-3">
                         <div id="app-content" class="panel panel-default">
                             {{- include('@MauticCore/Notification/flashes.html.twig') -}}
                             {{ block('content') }}

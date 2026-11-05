@@ -7,12 +7,12 @@
                     <i class="ri-more-2-fill"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li class="small fw-sb text-secondary ma-md ellipsis">
+                    <li class="small fw-sb text-secondary ma-16 ellipsis">
                         {% if widget.isCached %}
-                            <i class="ri-history-line mr-xs"></i>
+                            <i class="ri-history-line mr-5"></i>
                             {{ 'mautic.dashboard.widget.data.loaded.from.cache'|trans }}
                         {% else %}
-                            <i class="ri-flashlight-line mr-xs"></i>
+                            <i class="ri-flashlight-line mr-5"></i>
                             {{ 'mautic.dashboard.widget.data.loaded.from.database'|trans }}
                         {% endif %}
                     </li>

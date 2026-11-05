@@ -37,7 +37,7 @@
 			link: {href: path('mautic_user_passwordreset'), label: 'mautic.user.user.passwordreset.link'},
 			attributes: {required: 'required'}
 		} only %}
-		<div class="float-start mb-md">
+		<div class="float-start mb-16">
 			{% include '@MauticCore/Components/checkbox.html.twig' with {
 				inline: true,
 				items: [{ id: 'remember_me', name: '_remember_me', value: 'on', label: 'mautic.user.auth.form.rememberme' }]
@@ -60,7 +60,7 @@
 		<ul class="list-group">
 			{% for sso in integrations %}
 				<a href="{{ path('mautic_sso_login', {'integration' : sso.getName()}) }}" class="list-group-item">
-					<img class="float-start mr-xs" style="height: 16px;" src="{{ getAssetUrl(sso.getIcon()) }}">
+					<img class="float-start mr-5" style="height: 16px;" src="{{ getAssetUrl(sso.getIcon()) }}">
 					<p class="list-group-item-heading">{{ ('mautic.integration.sso.' ~ sso.getName())|trans }}</p>
 				</a>
 			{% endfor %}

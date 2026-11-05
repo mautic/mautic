@@ -4,13 +4,13 @@
 {% block mainFormContent %}
 <div class="box-layout">
     <div class="col-md-{{ hasRightColumn and not modalView ? 9 : 12 }} height-auto bdr-r">
-        <div class="pa-md">
+        <div class="pa-16">
             {{ block('primaryFormContent') }}
         </div>
     </div>
     {% if hasRightColumn %}
     <div class="col-md-{{ modalView ? 12 : 3 }} height-auto">
-        <div class="pr-lg pl-lg pt-md pb-md">
+        <div class="pr-24 pl-24 pt-16 pb-16">
             {{ block('rightFormContent') }}
         </div>
     </div>

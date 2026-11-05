@@ -16,13 +16,13 @@
 <div class="box-layout">
     <!-- container -->
     <div class="col-md-8 col-lg-9 height-auto bdr-r">
-        <div class="pa-md">
+        <div class="pa-16">
 	        <div class="row">
 		        <div class="col-lg-6">
 					<div class="col-md-7 ps-0">
 						{{ form_row(form.storageLocation) }}
 					</div>
-			        <div class="text-start mt-lg mb-lg{% if startOnLocal %}  hide {% endif %}" id="remote-button">
+			        <div class="text-start mt-24 mb-24{% if startOnLocal %}  hide {% endif %}" id="remote-button">
 						{% if integrations %}
 							{% include '@MauticCore/Helper/button.html.twig' with {
 								buttons: [
@@ -91,7 +91,7 @@
 		</div>
 	</div>
  	<div class="col-md-4 col-lg-3 height-auto">
-		<div class="pr-lg pl-lg pt-md pb-md">
+		<div class="pr-24 pl-24 pt-16 pb-16">
 			{{ form_row(form.category) }}
 			{{ form_row(form.projects) }}
 			{{ form_row(form.language) }}
