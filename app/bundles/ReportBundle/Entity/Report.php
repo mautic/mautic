@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\CoreBundle\Entity\UuidInterface;
 use Mautic\CoreBundle\Entity\UuidTrait;
 use Mautic\EmailBundle\Validator as EmailAssert;
@@ -46,7 +47,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     ]
 )]
 #[ReportAssert\ScheduleIsValid]
-class Report extends FormEntity implements SchedulerInterface, UuidInterface
+class Report extends FormEntity implements SchedulerInterface, UuidInterface, IdentifierInterface
 {
     use UuidTrait;
 
