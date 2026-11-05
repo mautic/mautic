@@ -29,7 +29,7 @@
                     {{ event.logCountForPending }}
                 </span>
                 </div>
-                    <div class="col-md-5 va-m">
+                    <div class="col-md-5 align-middle">
                     <h5 class="fw-sb text-interactive mb-xs">
                         {{ event.name }}
                         {% if event.eventType is defined and 'action' != event.eventType %}
@@ -41,7 +41,7 @@
                     </h5>
                     <h6 class="text-white dark-sm">{{ event.description }}</h6>
                 </div>
-                <div class="col-md-3 va-m text-right">
+                <div class="col-md-3 align-middle text-right">
                     <em class="text-white dark-sm">{{ ('mautic.campaign.'~event.type)|trans }}</em>
                 </div>
             </div>

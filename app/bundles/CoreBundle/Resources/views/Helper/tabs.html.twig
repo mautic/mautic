@@ -7,7 +7,7 @@
 {% if vertical is not empty %}
 <div class="box-layout">
 {% endif %}
-<div class="tab-container {{ overflow }}{{ vertical is not empty ? ' height-auto col-xs-' ~ verticalTabColWidth ~ ' pr-0 bdr-r' : '' }}">
+<div class="tab-container {{ overflow }}{{ vertical is not empty ? ' height-auto col-xs-' ~ verticalTabColWidth ~ ' pe-0 bdr-r' : '' }}">
     {% if button is not empty %}
     <div class="tab-button{{ (vertical is not empty) ? ' tab-button-' ~ vertical : '' }}">
         <a href="javascript:void(0);"
@@ -53,7 +53,7 @@
         {% endfor %}
     </ul>
 </div>
-<div class="tab-content{{ vertical is not empty ? ' col-xs-' ~ verticalContentColWidth ~' pl-0 pt-0 height-auto' : ' pa-md' }}">
+<div class="tab-content{{ vertical is not empty ? ' col-xs-' ~ verticalContentColWidth ~' ps-0 pt-0 height-auto' : ' pa-md' }}">
     {% for tab in tabs %}
         {% set containerClass = (tab.containerClass is defined and tab['containerClass'] is not empty) ? ' ' ~ tab['containerClass'] : '' %}
         {% if tab['containerAttr'] is defined and tab['containerAttr'] is iterable %}

@@ -10,7 +10,7 @@
 {% set isCurrent = translation.id is same as activeEntity.id %}
 <li class="list-group-item bg-{% if isCurrent %}dark{% else %}light{% endif %}-xs">
     <div class="box-layout">
-        <div class="col-md-1 va-m">
+        <div class="col-md-1 align-middle">
             <h3>
                 {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {
                         'item': translation,
@@ -20,7 +20,7 @@
                 }) }}
             </h3>
         </div>
-        <div class="col-md-7 va-m">
+        <div class="col-md-7 align-middle">
             <h5 class="fw-sb text-interactive">
                 <a href="{{ path(actionRoute, {'objectAction': 'view', 'objectId': translation.id}) }}" data-toggle="ajax">
                     <span>{{ attribute(translation, nameGetter) }}</span>
@@ -36,7 +36,7 @@
                 <span class="text-white dark-sm">{{ translation.alias }}</span>
             {% endif %}
         </div>
-        <div class="col-md-4 va-m text-right">
+        <div class="col-md-4 align-middle text-right">
             <em class="text-white dark-sm">{{ translation.language }}</em>
         </div>
     </div>

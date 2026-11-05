@@ -175,17 +175,17 @@
                       <div class="col-sm-12">
                           <div class="panel">
                               <div class="panel-body box-layout">
-                                  <div class="col-md-3 va-m">
+                                  <div class="col-md-3 align-middle">
                                       <h5 class="text-white dark-md fw-sb mb-xs">
                                           <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.page.pageviews'|trans }}
                                       </h5>
                                   </div>
-                                  <div class="col-md-9 va-m">
+                                  <div class="col-md-9 align-middle">
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
-                              <div class="d-flex fd-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                              <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats.pageviews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
@@ -263,7 +263,7 @@
       <div class="col-md-3 bdr-l height-auto">
           <!-- preview URL -->
           {% if not activePage.isPreferenceCenter %}
-          <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+          <div class="panel shd-none rounded-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-body pt-xs">
                   {% include '@MauticCore/Components/card.html.twig' with {
                       type: 'link',
@@ -277,7 +277,7 @@
               </div>
           </div>
           {% endif %}
-          <div class="panel shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+          <div class="panel shd-none rounded-0 bdr-w-0 mt-sm mb-0">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.page.preview.url'|trans }}</div>
               </div>
@@ -348,7 +348,7 @@
               </div>
           </div>
           {% if draftPreviewUrl is not empty %}
-              <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+              <div class="panel bg-transparent shd-none rounded-0 bdr-w-0 mt-sm mb-0">
                   <div class="panel-heading">
                       <div class="panel-title">{{ 'mautic.email.draft.preview.url'|trans }}</div>
                   </div>

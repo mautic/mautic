@@ -68,6 +68,7 @@ jobs:
     - name: Build release files
       run: |
         php build/package_release.php -b=${{ steps.get-mautic-version.outputs.version }}
+        unzip -Z1 build/packages/${{ steps.get-mautic-version.outputs.version }}.zip | grep -Fxq 'vendor/symfony/dom-crawler/Crawler.php'
         unzip -Z1 build/packages/${{ steps.get-mautic-version.outputs.version }}-update.zip | grep -Fxq 'assets/build/manifest.json'
         unzip -Z1 build/packages/${{ steps.get-mautic-version.outputs.version }}-update.zip | grep -Fxq 'var/sass/app.output.css'
         echo 'MAUTIC_SHA1_CONTENTS<<EOF' >> $GITHUB_ENV

@@ -286,7 +286,7 @@ final readonly class DynamicContentSubscriber implements EventSubscriberInterfac
             // Replace tokens ANYWHERE inside href/src attribute values with escaped plain text
             // Pattern matches href="...{token}..." or src='...{token}...'
             $content = preg_replace_callback(
-                '/((?:href|src)\s*=\s*)(["\'])([^"\']*'.preg_quote($token, '/').'[^"\']*)\2/i',
+                '/((?:href|src|action)\s*=\s*)(["\'])(.*?)\2/i'.preg_quote($token, '/').'[^"\']*)\2/i',
                 fn (array $matches): string => $matches[1].$matches[2].str_replace($token, $escapedContent, $matches[3]).$matches[2],
                 $content
             );
