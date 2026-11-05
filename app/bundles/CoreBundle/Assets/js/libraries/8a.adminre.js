@@ -711,14 +711,14 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                     // default click event handler
                     if(e.type === "click") {
                         // toggle hide and show
-                        if($(target).hasClass("in")) {
+                        if($(target).hasClass("show")) {
                             // hide the submenu
                             $(target).collapse("hide");
                             $this.parent().removeClass("open");
                         } else {
                             // hide other showed target if parent is defined
                             if(!!parent) {
-                                $(parent+" .in").each(function () {
+                                $(parent+" .show").each(function () {
                                     $(this).collapse("hide");
                                     $(this).parent().removeClass("open");
                                 });
