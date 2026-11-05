@@ -37,14 +37,14 @@
 
                 <div class="panel-body box-layout">
                     <div class="col-xs-12 align-middle">
-                        <h5 class="text-white dark-md fw-sb mb-xs">
+                        <h5 class="text-white dark-md fw-sb mb-5">
                             <span class="ri-mail-line"></span>
                             {{ label|trans }}
                         </h5>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="pt-0 pl-15 pb-15 pr-15 col-xs-6 min-h-256">
+                    <div class="pt-0 pl-16 pb-16 pr-16 col-xs-6 min-h-256">
                         {{- include('@MauticCore/Helper/chart.html.twig', {
                             'chartData' : stats,
                             'chartType' : type,
@@ -52,7 +52,7 @@
                         })
                         -}}
                     </div>
-                    <div class="pt-0 pl-15 pb-15 pr-15 col-xs-6 min-h-256">
+                    <div class="pt-0 pl-16 pb-16 pr-16 col-xs-6 min-h-256">
                         {{- include('@MauticCore/Helper/chart.html.twig', {
                             'chartData' : statsDevices,
                             'chartType' : 'horizontal-bar',

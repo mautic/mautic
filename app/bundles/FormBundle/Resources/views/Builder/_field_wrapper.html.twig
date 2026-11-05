@@ -20,7 +20,7 @@
     {% set fieldWidthClass = 'mauticform-' ~ field.fieldWidth ~ '-width' %}
 {% endif %}
 <div class="form-field-wrapper" data-sortable-id="mauticform_{{ field.id }}">
-    <div class="{% if isConditional is not defined or (isConditional is defined and false == isConditional) %}panel mt-40{% else %}panel2 tile ml-sm mt-sm{% endif %} mb-0">
+    <div class="{% if isConditional is not defined or (isConditional is defined and false == isConditional) %}panel mt-40{% else %}panel2 tile ml-12 mt-12{% endif %} mb-0">
             {{ include('@MauticForm/Builder/_actions.html.twig', {
                     'id': field.id,
                     'formId': formId,
@@ -42,7 +42,7 @@
             </div>
 
             {% if (field.conditions|default(null) is not empty) %}
-            <div class="mr-sm ml-sm">
+            <div class="mr-12 ml-12">
                 {% if field.conditions.expr is defined and field.conditions.expr is not empty %}
                     <span class="inline-spacer">
                     <span style="text-transform: none">{{ 'mautic.form.field.form.condition.show.on'|trans }}</span>
@@ -68,11 +68,11 @@
 
 
             {% if (isConditional is not defined or (isConditional is defined and isConditional is same as false)) and fields is defined and field.type in enumConditionalFieldTypes() %}
-                <div class="row ml-15 me-0 pb-15">
-                    <div class="float-start mt-15">
+                <div class="row ml-16 me-0 pb-16">
+                    <div class="float-start mt-16">
                     <a class="add-new-conditional-field" href=""><i class="ri-add-line"></i> {{ 'mautic.form.form.component.fields.conditional'|trans }}</a>
                     </div>
-                    <div class="mt-10 col-sm-4 col-xs-12" style="display:none">
+                    <div class="mt-12 col-sm-4 col-xs-12" style="display:none">
                         <select class="chosen form-builder-new-component" data-placeholder="{{ 'mautic.form.form.component.fields'|trans }}">
                             <option value=""></option>
                             {% for conditionalField, conditionalFieldType in fields %}

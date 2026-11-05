@@ -3,17 +3,17 @@
     {% set isCollapsed = description|striptags|length > 110 %}
     {% set isLongDescription = description|striptags|length > 750 %}
 
-    <div class="row-no-gutters ml-md">
+    <div class="row-no-gutters ml-16">
         <div class="well description p-0 {{ isLongDescription ? 'description--full-width' }}">
-            <a href="javascript:void(0)" class="d-flex justify-content-between gap-sm pa-sm text-secondary pr-xs {{ isCollapsed ? 'collapsed' }}" data-bs-toggle="collapse" data-bs-target="#description">
+            <a href="javascript:void(0)" class="d-flex justify-content-between gap-12 pa-12 text-secondary pr-5 {{ isCollapsed ? 'collapsed' }}" data-bs-toggle="collapse" data-bs-target="#description">
                 <div class="small fw-b text-secondary">{{ 'mautic.core.description'|trans }}</div>
                 <i class="arrow ri-arrow-up-wide-line ri-sm text-secondary"></i>
             </a>
             <div id="description" class="collapse {{ not isCollapsed ? 'in' }}">
-                <div class="well layer-two description-content mb-sm ml-sm mr-sm mt-0 pa-sm">
+                <div class="well layer-two description-content mb-12 ml-12 mr-12 mt-0 pa-12">
                     {{ description|purify|raw }}
                     {% if extra_content is defined and extra_content is not empty %}
-                        <hr class="mt-xs mb-xs">
+                        <hr class="mt-5 mb-5">
                         {{ extra_content }}
                     {% endif %}
                 </div>

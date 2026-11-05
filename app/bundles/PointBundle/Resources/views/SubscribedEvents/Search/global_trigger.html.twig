@@ -5,7 +5,7 @@
 {% else %}
     <a href="{{ url('mautic_pointtrigger_action', {'objectAction': 'edit', 'objectId': item.id}) }}">
         <span class="fw-sb">{{ item.name }}</span>
-        <span class="ml-4 mr-sm">#{{ item.id }}</span>
+        <span class="ml-4 mr-12">#{{ item.id }}</span>
         {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
             'entity': item,
             'status': 'active',

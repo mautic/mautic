@@ -3,7 +3,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content gsearch--toolbar">
 
-			<div aria-hidden="false" class="gsearch--field d-flex align-items-center gap-3 pr-md pl-md pt-sm pb-sm">
+			<div aria-hidden="false" class="gsearch--field d-flex align-items-center gap-3 pr-16 pl-16 pt-12 pb-12">
 				<i class="gsearch--search-magnifier ri-search-2-line ri-xl" tabindex="-1"></i>
 				<input type="search" value="{{ searchString|escape }}"
 					class="gsearch--field__input form-control search fs-16" id="globalSearchInput" name="global_search"
@@ -19,8 +19,8 @@
 		</div>
 		<!-- end modal content -->
 		<!-- start results -->
-		<div class="modal-content gsearch--results hide mt-xs">
-			<div class="pt-0 pb-xs ps-0 pe-0">
+		<div class="modal-content gsearch--results hide mt-5">
+			<div class="pt-0 pb-5 ps-0 pe-0">
 				<div class="gsearch--results-scroll scroll-content slimscroll" id="globalSearchResults">
 					{{ include('@MauticCore/GlobalSearch/results.html.twig', {results: results}) }}
 				</div>

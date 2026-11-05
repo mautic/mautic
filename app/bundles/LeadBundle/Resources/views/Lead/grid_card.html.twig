@@ -21,16 +21,16 @@
                     {% if contact.id in noContactList|keys %}
                         <div class="float-end label label-danger"><i class="ri-prohibited-line"></i></div>
                     {% endif %}
-                    <h4 class="fw-sb mb-xs ellipsis">
+                    <h4 class="fw-sb mb-5 ellipsis">
                         <a href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': contact.id}) }}" data-toggle="ajax">
                             <span>{% if contact.isAnonymous %}{{ contact.primaryIdentifier|trans }}{% else %}{{ htmlEntityDecode(contact.primaryIdentifier)|purify }}{% endif %}</span>
                         </a>
                     </h4>
                     <div class="text-secondary mb-1 ellipsis">
-                        <i class="ri-fw ri-building-2-line mr-xs"></i>{{ htmlEntityDecode(fields.core.company.value|default(''))|purify }}
+                        <i class="ri-fw ri-building-2-line mr-5"></i>{{ htmlEntityDecode(fields.core.company.value|default(''))|purify }}
                     </div>
                     <div class="text-secondary mb-1 ellipsis">
-                        <i class="ri-fw ri-map-pin-2-line mr-xs"></i>
+                        <i class="ri-fw ri-map-pin-2-line mr-5"></i>
                         {% set location = [] %}
                         {% if fields.core.city is defined %}
                           {% set location = location|merge([fields.core.city.value]) %}
@@ -43,12 +43,12 @@
                         {{ location|join(', ') }}
                     </div>
                     <div class="text-secondary mb-1 ellipsis">
-                        <i class="ri-earth-line mr-xs"></i>{{ fields.core.country.value|default('') }}
+                        <i class="ri-earth-line mr-5"></i>{{ fields.core.country.value|default('') }}
                     </div>
                     {% set flag = fields.core.country is defined and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
                     {% if flag is not empty %}
                         <div style="position: absolute; right: 30px; bottom: 30px">
-                            <img src="{{ flag }}" style="max-height: 24px;" class="ml-sm" />
+                            <img src="{{ flag }}" style="max-height: 24px;" class="ml-12" />
                         </div>
                     {% endif %}
                     {{ customContent('lead.grid', _context) }}

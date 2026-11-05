@@ -34,7 +34,7 @@
             }) }}
         {% endif %}
         
-        <div class="ml-xs">
+        <div class="ml-5">
             {% include '@MauticCore/Helper/button.html.twig' with {
                 buttons: [
                     {
@@ -87,7 +87,7 @@
         {% endif %}
     </a>
     {% else %}
-    <span class="pa-md"{% if headerTooltip is not empty %} data-bs-toggle="tooltip" title="" data-bs-placement="top" data-bs-title="{{ headerTooltip|e('html_attr') }}"{% endif %}>{{ text|trans }}</span>
+    <span class="pa-16"{% if headerTooltip is not empty %} data-bs-toggle="tooltip" title="" data-bs-placement="top" data-bs-title="{{ headerTooltip|e('html_attr') }}"{% endif %}>{{ text|trans }}</span>
     {% endif %}
 
     <div class="thead-filter">

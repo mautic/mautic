@@ -51,8 +51,8 @@
               {% include '@MauticCore/Helper/description--expanded.html.twig' with {'description': activeMonitoring.description} %}
               <!--/ monitoring detail header -->
               <!-- monitoring detail collapseable -->
-              <div class="collapse pr-md pl-md" id="asset-details">
-                  <div class="pr-md pl-md pb-md">
+              <div class="collapse pr-16 pl-16" id="asset-details">
+                  <div class="pr-16 pl-16 pb-16">
                       <div class="panel shd-none mb-0">
                           <table class="table table-hover mb-0">
                               <tbody>
@@ -67,13 +67,13 @@
 
           <div>
               <!-- stats -->
-              <div class="pa-md">
+              <div class="pa-16">
                   <div class="row">
                       <div class="col-sm-12">
                           <div class="panel">
                               <div class="panel-body box-layout">
                                   <div class="col-md-3 align-middle">
-                                      <h5 class="text-white dark-md fw-sb mb-xs">
+                                      <h5 class="text-white dark-md fw-sb mb-5">
                                           <span class="ri-twitter-x-line"></span>
                                           {{ ('mautic.social.monitoring.' ~ activeMonitoring.networkType ~ '.popularity')|trans }}
                                       </h5>
@@ -82,7 +82,7 @@
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'float-end'}) }}
                                   </div>
                               </div>
-                              <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                              <div class="d-flex flex-column pt-0 pl-16 pb-16 pr-16 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': leadStats, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
@@ -105,7 +105,7 @@
           </div>
 
           <!-- start: tab-content -->
-          <div class="tab-content pa-md">
+          <div class="tab-content pa-16">
               <!-- #events-container -->
               <div class="tab-pane active fade in bdr-w-0 page-list" id="leads-container">
                   {{ monitorLeads|raw }}

@@ -145,8 +145,8 @@
               <!--/ form detail header -->
 
               <!-- form detail collapseable -->
-              <div class="collapse pr-md pl-md" id="focus-details">
-                  <div class="pr-md pl-md pb-md">
+              <div class="collapse pr-16 pl-16" id="focus-details">
+                  <div class="pr-16 pl-16 pb-16">
                       <div class="panel shd-none mb-0">
                           <table class="table table-hover mb-0" data-view-table data-entity-id="{{ item.id }}">
                               <tbody>
@@ -171,7 +171,7 @@
               <!--/ form detail collapseable toggler -->
 
               <!-- stats -->
-              <div class="pa-md">
+              <div class="pa-16">
                   <div class="row">
                       <div class="col-sm-12">
                         {{ include('@MauticCore/Modules/stat--icon.html.twig', {'stats': [
@@ -193,7 +193,7 @@
                           <div class="panel">
                               <div class="panel-body box-layout">
                                   <div class="col-xs-4 align-middle">
-                                      <h5 class="text-white dark-md fw-sb mb-xs">
+                                      <h5 class="text-white dark-md fw-sb mb-5">
                                           <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.focus.graph.stats'|trans }}
                                       </h5>
@@ -202,7 +202,7 @@
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'float-end'}) }}
                                   </div>
                               </div>
-                              <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                              <div class="d-flex flex-column pt-0 pl-16 pb-16 pr-16 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
@@ -225,7 +225,7 @@
                   <!--/ tabs controls -->
 
                   <!-- start: tab-content -->
-                  <div class="tab-content pa-md">
+                  <div class="tab-content pa-16">
                       <div class="tab-pane active bdr-w-0" id="clicks-container">
                           {{ include('@MauticPage/Trackable/click_counts.html.twig', {
                                   'trackables': trackables,
@@ -244,9 +244,9 @@
       <!-- right section -->
       <div class="col-md-3 bdr-l height-auto">
           <!-- form HTML -->
-          <div class="pa-md">
+          <div class="pa-16">
               {% set aboveFoldContent %}
-                  <h4 class="mb-lg fw-b">{{ 'mautic.focus.install.header'|trans }}</h4>
+                  <h4 class="mb-24 fw-b">{{ 'mautic.focus.install.header'|trans }}</h4>
                   {% include '@MauticCore/Components/pictogram.html.twig' with {
                       pictogram: 'embed',
                       size: 64,
@@ -255,7 +255,7 @@
               {% endset %}
 
               {% set belowFoldContent %}
-                  <p class="mt-lg mb-lg">{{ 'mautic.focus.install.description'|trans }}</p>
+                  <p class="mt-24 mb-24">{{ 'mautic.focus.install.description'|trans }}</p>
                   <div class="alert alert-warning" role="alert">
                       {{ 'mautic.focus.install.tracking.warning'|trans }}
                   </div>
