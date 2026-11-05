@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\PointBundle\Tests\Unit\Entity;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Mautic\PointBundle\Entity\PointRepository;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -19,8 +17,8 @@ final class PointRepositoryTest extends TestCase
 
         [$expr, $params] = $repository->exposeAddSearchCommandWhereClause(new DummyQueryBuilder(), $filter);
 
-        self::assertSame(['gt', 'p.delta', '0'], $expr);
-        self::assertSame([], $params);
+        $this->assertSame(['gt', 'p.delta', '0'], $expr);
+        $this->assertSame([], $params);
     }
 
     public function testTypeLossCommandBuildsNegativeDeltaExpression(): void
@@ -30,8 +28,8 @@ final class PointRepositoryTest extends TestCase
 
         [$expr, $params] = $repository->exposeAddSearchCommandWhereClause(new DummyQueryBuilder(), $filter);
 
-        self::assertSame(['lt', 'p.delta', '0'], $expr);
-        self::assertSame([], $params);
+        $this->assertSame(['lt', 'p.delta', '0'], $expr);
+        $this->assertSame([], $params);
     }
 
     public function testNegatedTypeGainCommandBuildsNonPositiveDeltaExpression(): void
@@ -42,8 +40,8 @@ final class PointRepositoryTest extends TestCase
 
         [$expr, $params] = $repository->exposeAddSearchCommandWhereClause(new DummyQueryBuilder(), $filter);
 
-        self::assertSame(['lte', 'p.delta', '0'], $expr);
-        self::assertSame([], $params);
+        $this->assertSame(['lte', 'p.delta', '0'], $expr);
+        $this->assertSame([], $params);
     }
 
     public function testCommandListIncludesTypeOptions(): void
@@ -52,15 +50,13 @@ final class PointRepositoryTest extends TestCase
 
         $commands = $repository->exposeGetSearchCommands();
 
-        self::assertContains('mautic.point.searchcommand.type_gain.filter', $commands);
-        self::assertContains('mautic.point.searchcommand.type_loss.filter', $commands);
+        $this->assertContains('mautic.point.searchcommand.type_gain.filter', $commands);
+        $this->assertContains('mautic.point.searchcommand.type_loss.filter', $commands);
     }
 
     private function createRepository(): TestPointRepository
     {
-        /** @var ManagerRegistry&MockObject $registry */
-        $registry   = $this->createMock(ManagerRegistry::class);
-        $repository = new TestPointRepository($registry);
+        $repository = new TestPointRepository();
 
         $translator = $this->createTranslator();
         $repository->autowireCommonRepository($translator);
@@ -79,9 +75,7 @@ final class PointRepositoryTest extends TestCase
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(
-            static function (string $id, array $parameters = [], ?string $domain = null, ?string $locale = null) use ($translations): string {
-                return $translations[$id] ?? $id;
-            }
+            static fn (string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string => $translations[$id] ?? $id
         );
 
         return $translator;
@@ -100,11 +94,11 @@ final class PointRepositoryTest extends TestCase
 
 final class TestPointRepository extends PointRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct()
     {
     }
 
-    public function exposeAddSearchCommandWhereClause($q, $filter): array
+    public function exposeAddSearchCommandWhereClause(object $q, object $filter): array
     {
         return parent::addSearchCommandWhereClause($q, $filter);
     }
@@ -115,7 +109,7 @@ final class TestPointRepository extends PointRepository
     }
 }
 
-final class DummyQueryBuilder
+final readonly class DummyQueryBuilder
 {
     private DummyQueryExpr $expr;
 

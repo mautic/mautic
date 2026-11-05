@@ -19,10 +19,10 @@ final class PointRepositoryTest extends TestCase
     private function getRepository(): PointRepository
     {
         $repository = $this->configureRepository(Point::class);
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->connection));
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(fn ($id) => match ($id) {
+        $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
             'mautic.project.searchcommand.name'              => 'project',
             'mautic.point.searchcommand.isrepeatable'        => 'is:repeatable',
             default                                          => $id,
@@ -53,16 +53,16 @@ final class PointRepositoryTest extends TestCase
 
         [$expr, $params] = $method->invoke($repository, $qb, $filter);
 
-        self::assertNotEmpty($params);
+        $this->assertNotEmpty($params);
         $paramName = array_key_first($params);
 
         $expectedExpression = $expectsNegation
             ? sprintf('p.repeatable <> :%s', $paramName)
             : sprintf('p.repeatable = :%s', $paramName);
 
-        self::assertSame($expectedExpression, (string) $expr);
+        $this->assertSame($expectedExpression, (string) $expr);
 
-        self::assertSame($expectedValue, $params[$paramName]);
+        $this->assertSame($expectedValue, $params[$paramName]);
     }
 
     /**
