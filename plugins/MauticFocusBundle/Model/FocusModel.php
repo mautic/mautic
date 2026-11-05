@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticFocusBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
 use MatthiasMullie\Minify;
+use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
@@ -21,6 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\TokenHelper as LeadTokenHelper;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
@@ -64,6 +66,8 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         CoreParametersHelper $coreParametersHelper,
         private readonly FocusRepository $focusRepository,
         private readonly StatRepository $statRepository,
+        private readonly PageTokenHelper $pageTokenHelper,
+        private readonly AssetTokenHelper $assetTokenHelper,
     ) {
         $this->dispatcher     = $dispatcher;
 
@@ -201,7 +205,7 @@ class FocusModel extends FormModel implements GlobalSearchInterface
             $this->dispatcher->dispatch($tokenEvent, FocusEvents::TOKEN_REPLACEMENT);
             $focusContent = $tokenEvent->getContent();
         } else {
-            $focusContent = $this->replaceContactTokensWithDefaults($focusContent);
+            $focusContent = $this->replaceLinkTokensWithUrls($this->replaceContactTokensWithDefaults($focusContent));
             $data['form'] = $this->replaceContactTokensWithDefaults($data['form']);
         }
 
@@ -490,6 +494,16 @@ class FocusModel extends FormModel implements GlobalSearchInterface
         }
 
         return $this->replaceContactTokensWithDefaults($url);
+    }
+
+    private function replaceLinkTokensWithUrls(string $content): string
+    {
+        $tokens = array_merge(
+            $this->pageTokenHelper->findPageTokens($content),
+            $this->assetTokenHelper->findAssetTokens($content)
+        );
+
+        return str_replace(array_keys($tokens), $tokens, $content);
     }
 
     private function replaceContactTokensWithDefaults(string $content): string

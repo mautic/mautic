@@ -156,6 +156,8 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertMatchesRegularExpression('/ignoreConverted:(?:true|!0)/', $onContent);
     }
 
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
     public function testTrackingActivationRuntime(): void
     {
         /** @var FocusModel $focusModel */

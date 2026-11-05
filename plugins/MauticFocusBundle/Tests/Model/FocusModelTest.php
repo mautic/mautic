@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticFocusBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -12,6 +13,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\PageBundle\Helper\TokenHelper as PageTokenHelper;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Entity\FocusRepository;
@@ -65,6 +67,8 @@ final class FocusModelTest extends TestCase
             $this->createStub(CoreParametersHelper::class),
             $this->createStub(FocusRepository::class), // $focusRepository
             $this->createStub(StatRepository::class), // $statRepository
+            $this->createStub(PageTokenHelper::class),
+            $this->createStub(AssetTokenHelper::class),
         );
         $focus = [
             'form' => 'xxx',
@@ -110,6 +114,8 @@ final class FocusModelTest extends TestCase
             $this->createStub(CoreParametersHelper::class),
             $this->createStub(FocusRepository::class),
             $this->createStub(StatRepository::class),
+            $this->createStub(PageTokenHelper::class),
+            $this->createStub(AssetTokenHelper::class),
         );
         $focus = new Focus();
         $focus->setName('Anonymous display');
@@ -125,6 +131,52 @@ final class FocusModelTest extends TestCase
 
         $this->assertStringContainsString($expectedClickUrl, $content);
         $this->assertStringNotContainsString('Anonymous datetime', $content);
+    }
+
+    public function testDisplayGenerationReplacesPageAndAssetLinks(): void
+    {
+        $trackableModel = $this->createMock(TrackableModel::class);
+        $trackableModel->expects($this->never())->method('generateTrackableUrl');
+        $formModel = $this->createStub(FormModel::class);
+        $formModel->method('getPages')->willReturn([[], false]);
+        $twig = new Environment(new ArrayLoader([
+            '@MauticFocus/Builder/generate.js.twig' => 'var content = "{focus_content}";',
+            '@MauticFocus/Builder/content.html.twig'  => '<a href="{pagelink=1}">Page</a><a href="{assetlink=2}">Asset</a>',
+        ]));
+        $pageTokenHelper = $this->createStub(PageTokenHelper::class);
+        $pageTokenHelper->method('findPageTokens')->willReturn(['{pagelink=1}' => 'https://example.com/page']);
+        $assetTokenHelper = $this->createStub(AssetTokenHelper::class);
+        $assetTokenHelper->method('findAssetTokens')->willReturn(['{assetlink=2}' => 'https://example.com/asset']);
+        $focusModel = new FocusModel(
+            $formModel,
+            $trackableModel,
+            $twig,
+            $this->createStub(FieldModel::class),
+            $this->createStub(ContactTracker::class),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CorePermissions::class),
+            $this->createStub(EventDispatcherInterface::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(Translator::class),
+            $this->createStub(UserHelper::class),
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(CoreParametersHelper::class),
+            $this->createStub(FocusRepository::class),
+            $this->createStub(StatRepository::class),
+            $pageTokenHelper,
+            $assetTokenHelper,
+        );
+        $focus = new Focus();
+        $focus->setName('Display links');
+        $focus->setType('notice');
+        $focus->setStyle('modal');
+
+        $content = $focusModel->generateJavascript($focus, false, [FocusJsScope::RUNTIME, FocusJsScope::DISPLAY]);
+
+        $this->assertStringContainsString('example.com\\/page', $content);
+        $this->assertStringContainsString('example.com\\/asset', $content);
+        $this->assertStringNotContainsString('{pagelink=1}', $content);
+        $this->assertStringNotContainsString('{assetlink=2}', $content);
     }
 
     /**

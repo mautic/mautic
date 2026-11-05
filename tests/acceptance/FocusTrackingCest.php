@@ -27,6 +27,7 @@ final class FocusTrackingCest
     {
         foreach ($this->focusFixtures() as $focus) {
             $id = $focus['id'];
+            $I->deleteFromDatabase('test_focus_stats', ['focus_id' => $id]);
             if (0 === $I->grabNumRecords('test_focus', ['id' => $id])) {
                 $I->haveInDatabase('test_focus', $focus);
             } else {

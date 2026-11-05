@@ -87,11 +87,11 @@ MauticJS.enhanceDynamicContent = function(dwcContent) {
     // form load library
     MauticJS.initializeForms(dwcContent);
 
-    var container = document.createElement('div');
+    var container = document.createElement('template');
     var mauticBaseUrl = new URL({$mauticBaseUrl});
     var focusBasePath = mauticBaseUrl.pathname.replace(/\/$/, '') + '/focus/';
     container.innerHTML = dwcContent;
-    var focusScripts = container.querySelectorAll('script[src]');
+    var focusScripts = container.content.querySelectorAll('script[src]');
 
     MauticJS.iterateCollection(focusScripts)(function(script) {
         try {
