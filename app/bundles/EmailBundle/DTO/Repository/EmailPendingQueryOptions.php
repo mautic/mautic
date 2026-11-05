@@ -62,10 +62,14 @@ final class EmailPendingQueryOptions
     }
 
     /**
-     * @param int[]|null $listIds
+     * @param int[]|int|null $listIds
      */
     public function setListIds($listIds): self
     {
+        if (null !== $listIds) {
+            $listIds = (array) $listIds;
+        }
+
         return $this->copy('listIds', $listIds);
     }
 
