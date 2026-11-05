@@ -6,6 +6,7 @@ namespace Mautic\CampaignBundle\Tests\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
@@ -74,7 +75,9 @@ final class CampaignRepositoryTest extends TestCase
     #[DataProvider('ormSearchCommandDataProvider')]
     public function testAddSearchCommandWhereClauseBuildsFiltersWithOrmQueryBuilder(string $command, string $expected): void
     {
-        $qb     = new OrmQueryBuilder($this->createMock(EntityManagerInterface::class));
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->method('getExpressionBuilder')->willReturn(new Expr());
+        $qb            = new OrmQueryBuilder($entityManager);
         $filter = (object) ['command' => $command, 'string' => '', 'not' => false, 'strict' => false];
 
         $method = new \ReflectionMethod(CampaignRepository::class, 'addSearchCommandWhereClause');
