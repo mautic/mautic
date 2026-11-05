@@ -37,7 +37,7 @@ class DynamicContentHelper
         protected RealTimeExecutioner $realTimeExecutioner,
         protected EventDispatcherInterface $dispatcher,
         protected LeadModel $leadModel,
-        private readonly LeadListRepository $segmentRepository, // @phpstan-ignore-line Used by MatchFilterForLeadTrait via property_exists()
+        private readonly LeadListRepository $segmentRepository,
         private readonly CompanyLeadRepository $companyLeadRepository,
         private readonly TagRepository $tagRepository,
     ) {
