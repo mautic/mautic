@@ -60,7 +60,7 @@
                 color: 'high-contrast',
                 attributes: {
                     title: ('mautic.lead.tag.' ~ segmentType ~ '_segment.tooltip')|trans,
-                    'data-toggle': 'tooltip',
+                    'data-bs-toggle': 'tooltip',
                     'tooltip-placement': 'top'
                 }
             }
@@ -133,8 +133,8 @@
         <!--/ segment detail collapseable toggler -->
         <div>
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-toggle="collapse" data-target="#segment-details">
+                <span data-bs-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-secondary collapsed" data-bs-toggle="collapse" data-bs-target="#segment-details">
                         <span class="caret"></span> {{ 'mautic.core.details'|trans }}
                     </a>
                 </span>
@@ -173,7 +173,7 @@
                                 <div class="col-md-9 align-middle">
                                     {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
                                           'dateRangeForm': dateRangeForm,
-                                          'class': 'pull-right',
+                                          'class': 'float-end',
                                     }) }}
                                 </div>
                             </div>
@@ -210,15 +210,15 @@
             <!--/ search bar -->
             <ul class="nav nav-tabs nav-tabs-contained">
                 <li class="active">
-                    <a href="#contacts-container" role="tab" data-toggle="tab">{{ 'mautic.lead.leads'|trans }}</a>
+                    <a href="#contacts-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">{{ 'mautic.lead.leads'|trans }}</a>
                 </li>
                 {% if hasSegmentMembershipFilter %}
                   <li>
-                      <a id="segment-dependencies" href="#segment-dependencies-container" role="tab" data-toggle="tab">{{ 'mautic.lead.segment.dependencies'|trans }}</a>
+                      <a id="segment-dependencies" href="#segment-dependencies-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.lead.segment.dependencies'|trans }}</a>
                   </li>
                 {% endif %}
                 <li>
-                    <a id="campaign-share-tab" href="#campaign-container" role="tab" data-toggle="tab">{{ 'mautic.lead.campaign.share'|trans }}</a>
+                    <a id="campaign-share-tab" href="#campaign-container" role="tab" data-bs-toggle="tab" class="nav-link">{{ 'mautic.lead.campaign.share'|trans }}</a>
                 </li>
             </ul>
             <!--/ tabs controls -->
