@@ -28,6 +28,12 @@ final class PhoneCountryValidationHelper
         }
     }
 
+    public static function isSupportedCountry(string $countryCode): bool
+    {
+        return Countries::exists($countryCode)
+            && in_array($countryCode, PhoneNumberUtil::getInstance()->getSupportedRegions(), true);
+    }
+
     /**
      * Returns list of available countries for form choices, keyed by display
      * name and valued by the stable ISO region code.

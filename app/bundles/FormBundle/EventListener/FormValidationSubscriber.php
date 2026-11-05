@@ -120,7 +120,7 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
             return;
         }
 
-        $validation = $field->getValidation();
+        $validation = $field->getValidation() ?? [];
 
         if ($this->validatePhoneCountry($event, $validation)) {
             return;
@@ -142,7 +142,7 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
 
         // Unknown/legacy value (e.g. a display name saved before this stored the ISO code):
         // skip validation rather than crash or reject every submission.
-        if (!Countries::exists($countryCode)) {
+        if (!PhoneCountryValidationHelper::isSupportedCountry($countryCode)) {
             return false;
         }
 
@@ -150,7 +150,7 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
             return false;
         }
 
-        $message = !empty($validation['country_validationmsg'])
+        $message = isset($validation['country_validationmsg']) && '' !== $validation['country_validationmsg']
             ? $validation['country_validationmsg']
             : $this->translator->trans('mautic.form.submission.phone.invalid_country', ['%country%' => Countries::getName($countryCode)], 'validators');
         $event->failedValidation($message);

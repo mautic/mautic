@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormFieldTelTypeTest extends TypeTestCase
 {
-    private const COUNTRY_UNITED_STATES = 'United States';
+    private const COUNTRY_UNITED_STATES = 'US';
 
     private MockObject&TranslatorInterface $translator;
 
@@ -71,7 +71,7 @@ final class FormFieldTelTypeTest extends TypeTestCase
         $this->assertSame('mautic.form.field.type.tel.country_validation', $countryField->getConfig()->getOption('label'));
         $this->assertSame('mautic.core.none', $countryField->getConfig()->getOption('placeholder'));
         $this->assertSame(self::COUNTRY_UNITED_STATES, $countryField->getData());
-        $this->assertArrayHasKey(self::COUNTRY_UNITED_STATES, $countryField->getConfig()->getOption('choices'));
+        $this->assertContains(self::COUNTRY_UNITED_STATES, $countryField->getConfig()->getOption('choices'));
     }
 
     public function testCountryValidationMessageFieldConfiguration(): void
