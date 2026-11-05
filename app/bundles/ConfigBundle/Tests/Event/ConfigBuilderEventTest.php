@@ -6,6 +6,7 @@ namespace Mautic\ConfigBundle\Tests\Event;
 
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\CoreBundle\Tests\CommonMocks;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 
 final class ConfigBuilderEventTest extends CommonMocks
 {
@@ -34,6 +35,7 @@ final class ConfigBuilderEventTest extends CommonMocks
         $this->assertTrue($result);
     }
 
+    #[RunInSeparateProcess]
     public function testGetParametersFromConfigHandlesIncompleteBundleMetadata(): void
     {
         $bundleHelper = $this->getBundleHelperMock();
