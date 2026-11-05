@@ -261,6 +261,8 @@ parameters:
 			path: app/bundles/EmailBundle/Helper/PlainTextHelper.php
 
 	scanDirectories:
+		# Locate Horde's PSR-0 classes without invoking Symfony's debug autoloader.
+		- vendor/horde/imap_client/lib
 		# the kernel boot reflects these classes, so PHPStan can no longer locate them by autoloading
 		- vendor/javer/sp-bundle/src
 		- vendor/javer/symfony-bridge/src
