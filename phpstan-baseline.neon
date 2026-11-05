@@ -49,12 +49,6 @@ parameters:
 			path: app/bundles/ApiBundle/Event/ClientEvent.php
 
 		-
-			message: '#^Access to an undefined property Mautic\\ApiBundle\\Entity\\oAuth2\\Client\:\:\$deletedId\.$#'
-			identifier: property.notFound
-			count: 1
-			path: app/bundles/ApiBundle/EventListener/ClientSubscriber.php
-
-		-
 			message: '#^Method Mautic\\ApiBundle\\Model\\ClientModel\:\:revokeAccess\(\) has parameter \$entity with no type specified\.$#'
 			identifier: missingType.parameter
 			count: 1
