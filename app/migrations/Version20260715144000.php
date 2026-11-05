@@ -33,7 +33,7 @@ final class Version20260715144000 extends PreUpAssertionMigration
 
         while ([] !== $logIds) {
             $this->connection->executeStatement(
-                sprintf('UPDATE %s SET non_action_path_taken = 0 WHERE id IN (?)', $this->getPrefixedTableName(LeadEventLog::TABLE_NAME)),
+                sprintf('UPDATE %s SET non_action_path_taken = 0 WHERE id IN (?) AND non_action_path_taken IS NULL', $this->getPrefixedTableName(LeadEventLog::TABLE_NAME)),
                 [$logIds],
                 [ArrayParameterType::INTEGER]
             );

@@ -23,7 +23,7 @@ final class CampaignEventLogBackfillMigrationTest extends TestCase
         $connection->expects($this->exactly(3))->method('fetchFirstColumn')->willReturn(range(1, 1000), [1001], []);
         $connection->expects($this->exactly(2))->method('executeStatement')->willReturnCallback(
             function (string $sql, array $params, array $types): int {
-                $this->assertSame('UPDATE test_campaign_lead_event_log SET non_action_path_taken = 0 WHERE id IN (?)', $sql);
+                $this->assertSame('UPDATE test_campaign_lead_event_log SET non_action_path_taken = 0 WHERE id IN (?) AND non_action_path_taken IS NULL', $sql);
                 $this->assertLessThanOrEqual(1000, count($params[0]));
                 $this->assertSame([ArrayParameterType::INTEGER], $types);
 
