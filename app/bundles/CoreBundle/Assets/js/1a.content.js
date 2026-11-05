@@ -2580,12 +2580,14 @@ Mautic.toggleFilter = function (element) {
         filtersInGroup.forEach(function (filterElement) {
             if (filterElement !== element) {
                 filterElement.classList.remove('active');
+                filterElement.setAttribute('aria-pressed', 'false');
             }
         });
     }
 
     // Toggle active class on the clicked element
     element.classList.toggle('active');
+    element.setAttribute('aria-pressed', element.classList.contains('active'));
 };
 
 /**

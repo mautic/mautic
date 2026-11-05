@@ -8,18 +8,19 @@
                 <div class="dropdown-header{% if loop.first %} mt-0{% endif %}">{{ groupKey|trans }}</div>
                 <div class="d-flex gap-xs pi-md flex-wrap">
                     {% for filter in groupData.filters %}
-                        <a class="label label-outline label-selectable"
+                        <button type="button" class="label label-outline label-selectable"
                         data-filter="{{ filter.search|trans }}"
                         {% if conflictGroupName %}
                             data-conflict-group="{{ conflictGroupName }}"
                         {% endif %}
                         data-filter-action="toggle"
+                        aria-pressed="false"
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
                         data-bs-title="{{ filter.tooltip|trans }}">
                             <i class="{{ filter.icon }}"></i>
                             {{ filter.label|trans }}
-                        </a>
+                        </button>
                     {% endfor %}
                 </div>
             {% endif %}
@@ -54,7 +55,7 @@
                 <div class="dropdown-header{% if loop.first or visibleGroups|length == 1 %} mt-0{% endif %}">{{ header|trans }}</div>
                 <div class="d-flex gap-xs pi-md flex-wrap">
                     {% for filter in groupFilters %}
-                        <a class="label label-outline label-selectable"
+                        <button type="button" class="label label-outline label-selectable"
                         data-filter="{{ filter.search|trans }}"
                         {% if header == 'mautic.core.quick_filters.status' %}
                             data-conflict-group="status"
@@ -62,12 +63,13 @@
                             data-conflict-group="ownership"
                         {% endif %}
                         data-filter-action="toggle"
+                        aria-pressed="false"
                         data-bs-toggle="tooltip"
                         data-bs-placement="top"
                         data-bs-title="{{ filter.tooltip|trans }}">
                             <i class="{{ filter.icon }}"></i>
                             {{ filter.label|trans }}
-                        </a>
+                        </button>
                     {% endfor %}
                 </div>
             {% endif %}
