@@ -108,9 +108,26 @@ final class AssetRepositoryTest extends TestCase
         $values = array_values($parameters);
         $this->assertContains('application/pdf', $values);
         $this->assertContains('application/vnd.openxmlformats-officedocument.wordprocessingml.document', $values);
-        $this->assertContains('text/%', $values);
+        $this->assertContains('text/plain', $values);
+        $this->assertContains('text/csv', $values);
+        $this->assertNotContains('application/%', $values);
         $this->assertNotContains('application/zip', $values);
         $this->assertNotContains('application/octet-stream', $values);
         $this->assertStringStartsWith('(', (string) $expr);
+        $this->assertStringNotContainsString('LIKE', (string) $expr);
+    }
+
+    public function testNegatedMimeCommandKeepsRowsWithoutMime(): void
+    {
+        $repository = $this->getRepository();
+        $qb         = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
+        $qb->method('expr')->willReturn(new \Doctrine\ORM\Query\Expr());
+        $filter     = (object) ['command' => 'is:image', 'string' => '', 'not' => true, 'strict' => false];
+
+        $method = new \ReflectionMethod(AssetRepository::class, 'addSearchCommandWhereClause');
+
+        [$expr] = $method->invoke($repository, $qb, $filter);
+
+        $this->assertStringContainsString('a.mime IS NULL', (string) $expr);
     }
 }

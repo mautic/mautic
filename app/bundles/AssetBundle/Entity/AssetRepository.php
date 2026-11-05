@@ -92,6 +92,7 @@ class AssetRepository extends CommonRepository
         $command         = $field         = $filter->command;
         $unique          = $this->generateRandomParameterName();
         $returnParameter = false; // returning a parameter that is not used will lead to a Doctrine error
+        $negationMatchesNullMime = false;
         $mimeCommandMap  = [
             'mautic.asset.asset.searchcommand.isimage' => 'image/%',
             'mautic.asset.asset.searchcommand.isvideo' => 'video/%',
@@ -135,8 +136,9 @@ class AssetRepository extends CommonRepository
                         $this->translator->trans($key),
                         $this->translator->trans($key, [], null, 'en_US'),
                     ], true)) {
-                        $expr            = $q->expr()->like('a.mime', ":$unique");
-                        $forceParameters = [$unique => $pattern];
+                        $expr                    = $q->expr()->like('a.mime', ":$unique");
+                        $forceParameters         = [$unique => $pattern];
+                        $negationMatchesNullMime = true;
                         break;
                     }
                 }
@@ -155,7 +157,8 @@ class AssetRepository extends CommonRepository
                     'application/vnd.oasis.opendocument.spreadsheet',
                     'application/vnd.oasis.opendocument.presentation',
                     'application/rtf',
-                    'text/%',
+                    'text/plain',
+                    'text/csv',
                 ];
                 $documentExpressions = [];
                 $forceParameters     = [];
@@ -166,7 +169,8 @@ class AssetRepository extends CommonRepository
                         : $q->expr()->eq('a.mime', ":$documentUnique");
                     $forceParameters[$documentUnique] = $mime;
                 }
-                $expr = '('.implode(' OR ', $documentExpressions).')';
+                $expr                    = '('.implode(' OR ', $documentExpressions).')';
+                $negationMatchesNullMime = true;
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):
@@ -182,6 +186,9 @@ class AssetRepository extends CommonRepository
 
         if ($expr && $filter->not) {
             $expr = $q->expr()->not($expr);
+            if ($negationMatchesNullMime) {
+                $expr = $q->expr()->orX($expr, $q->expr()->isNull('a.mime'));
+            }
         }
 
         if (!empty($forceParameters)) {
