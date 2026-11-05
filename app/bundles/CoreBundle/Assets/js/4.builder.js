@@ -17,6 +17,18 @@ Mautic.inBuilderSubmissionOn = function(form) {
             const selector = '#page_version, #emailform_version';
             const version = mQuery(data.newContent).find(selector).val();
             mQuery(this).find(selector).val(version);
+
+            const csrfTokenField = this.querySelector('input[name$="[_token]"]');
+            if (csrfTokenField) {
+                const refreshedCsrfTokenField = mQuery(data.newContent)
+                    .find('input[name$="[_token]"]')
+                    .get()
+                    .find((field) => field.name === csrfTokenField.name);
+
+                if (refreshedCsrfTokenField) {
+                    csrfTokenField.value = refreshedCsrfTokenField.value;
+                }
+            }
         }
         applyButton.css('pointer-events', 'auto');
     });
