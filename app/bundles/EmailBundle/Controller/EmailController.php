@@ -1691,7 +1691,12 @@ final class EmailController extends FormController
                     $flashes[] = $this->getAccessDeniedFlash();
                 } else {
                     $email->setSubject(sprintf('%s %s', self::EXAMPLE_EMAIL_SUBJECT_PREFIX, $email->getSubject()));
-                    $errors = $this->emailModel->sendSampleEmailToUser($email, $users, $fields, [], [], false);
+
+                    try {
+                        $errors = $this->emailModel->sendSampleEmailToUser($email, $users, $fields, [], [], false);
+                    } catch (\Exception $exception) {
+                        $errors = [$exception->getMessage()];
+                    }
 
                     if ([] === $errors) {
                         ++$sent;
