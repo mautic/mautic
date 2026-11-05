@@ -187,7 +187,7 @@ class AssetRepository extends CommonRepository
         if ($expr && $filter->not) {
             $expr = $q->expr()->not($expr);
             if ($negationMatchesNullMime) {
-                $expr = $q->expr()->orX($expr, $q->expr()->isNull('a.mime'));
+                $expr = '('.$expr.' OR '.$q->expr()->isNull('a.mime').')';
             }
         }
 
