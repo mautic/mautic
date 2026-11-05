@@ -26,7 +26,6 @@ use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Form\Type\FilterPropertiesType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -375,27 +374,6 @@ final class AjaxController extends CommonAjaxController
         }
 
         $dataArray['success'] = 1;
-
-        return $this->sendJsonResponse($dataArray);
-    }
-
-    public function toggleCompanyLeadAction(Request $request, LeadModel $leadModel, CompanyModel $companyModel): JsonResponse
-    {
-        $dataArray = ['success' => 0];
-        $leadId    = (int) $request->request->get('leadId');
-        $companyId = (int) $request->request->get('companyId');
-        $action    = InputHelper::clean($request->request->get('companyAction'));
-
-        if (!empty($leadId) && !empty($companyId) && in_array($action, ['remove', 'add'])) {
-            $lead    = $leadModel->getEntity($leadId);
-            $company = $companyModel->getEntity($companyId);
-
-            if (null !== $lead && null !== $company) {
-                $class = 'add' == $action ? 'addLeadToCompany' : 'removeLeadFromCompany';
-                $companyModel->{$class}($company, $lead);
-                $dataArray['success'] = 1;
-            }
-        }
 
         return $this->sendJsonResponse($dataArray);
     }

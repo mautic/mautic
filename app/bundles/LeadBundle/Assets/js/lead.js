@@ -1138,12 +1138,6 @@ Mautic.setPreferredChannel = function(channel) {
     }
 };
 
-Mautic.toggleCompanyLead = function(toggleId, leadId, companyId) {
-    var action = mQuery('#' + toggleId).hasClass('ri-toggle-fill') ? 'remove' : 'add';
-    var query = "action=lead:toggleCompanyLead&leadId=" + leadId + "&companyId=" + companyId + "&companyAction=" + action;
-    Mautic.toggleLeadSwitch(toggleId, query, action);
-};
-
 Mautic.toggleLeadCampaign = function(toggleId, leadId, campaignId) {
     var action = mQuery('#' + toggleId).hasClass('ri-toggle-fill') ? 'remove' : 'add';
     var query  = "action=lead:toggleLeadCampaign&leadId=" + leadId + "&campaignId=" + campaignId + "&campaignAction=" + action;

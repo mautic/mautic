@@ -44,7 +44,6 @@ use Mautic\LeadBundle\Form\Type\MergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\Helper\LeadSearchScopeProvider;
-use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -93,8 +92,6 @@ final class LeadController extends AbstractFormController
 
     private ContactExportSchedulerModel $contactExportSchedulerModel;
 
-    private CompanyModel $companyModel;
-
     private ListModel $leadListModel;
 
     private LeadModel $leadModel;
@@ -116,7 +113,6 @@ final class LeadController extends AbstractFormController
         LeadModel $leadModel,
         ListModel $leadListModel,
         StageModel $stageModel,
-        CompanyModel $companyModel,
         ContactExportSchedulerModel $contactExportSchedulerModel,
         CampaignModel $campaignModel,
         NoteModel $noteModel,
@@ -134,7 +130,6 @@ final class LeadController extends AbstractFormController
         $this->leadModel = $leadModel;
         $this->stageModel = $stageModel;
         $this->leadListModel = $leadListModel;
-        $this->companyModel = $companyModel;
         $this->contactExportSchedulerModel = $contactExportSchedulerModel;
         $this->campaignModel = $campaignModel;
         $this->noteModel = $noteModel;
@@ -1358,43 +1353,6 @@ final class LeadController extends AbstractFormController
                     'lead'       => $lead,
                 ],
                 'contentTemplate' => '@MauticLead/LeadLists/index.html.twig',
-            ]
-        );
-    }
-
-    /**
-     * Add/remove lead from a company.
-     */
-    public function companyAction($objectId): Response
-    {
-        $lead  = $this->leadModel->getEntity($objectId);
-
-        if (null != $lead
-            && $this->security->hasEntityAccess(
-                'lead:leads:editown',
-                'lead:leads:editother',
-                $lead->getOwner()
-            )
-        ) {
-            $companies = $this->companyModel->getUserCompanies();
-
-            // Get a list of lists for the lead
-            $companyLeads = $lead->getCompanies();
-            foreach ($companyLeads as $cl) {
-                $companyLead[$cl->getId()] = $cl->getId();
-            }
-        } else {
-            $companies = $companyLead = [];
-        }
-
-        return $this->delegateView(
-            [
-                'viewParameters' => [
-                    'companies'   => $companies,
-                    'companyLead' => $companyLead,
-                    'lead'        => $lead,
-                ],
-                'contentTemplate' => '@MauticLead/Lead/company.html.twig',
             ]
         );
     }
