@@ -125,6 +125,59 @@ final class PreferencePageTest extends MauticMysqlTestCase
         $this->assertStringContainsString($segment->getName(), $content);
     }
 
+    public function testDoctypeIsPreserved(): void
+    {
+        $page = new Page();
+        $page->setIsPreferenceCenter(true);
+        $page->setCustomHtml('<!DOCTYPE html><html><body><div>{segmentlist}</div><div>{saveprefsbutton}</div></body></html>');
+
+        $form                = $this->createForm()->createView();
+        $params              = $this->createParams();
+        $params['form']      = $form;
+        $params['startform'] = '<form name="lead_contact_frequency_rules" method="post">';
+
+        $content = $this->dispatchEvent($page, $params, false);
+
+        // Should have exactly one DOCTYPE
+        Assert::assertSame(1, substr_count($content, '<!DOCTYPE'), 'DOCTYPE should not be duplicated');
+    }
+
+    public function testFormDoesNotWrapBodyWhenElementsAreDirectChildren(): void
+    {
+        $page = new Page();
+        $page->setIsPreferenceCenter(true);
+        $page->setCustomHtml('
+            <!DOCTYPE html>
+            <html lang="en">
+            <body>
+                <h1>My Preference Center</h1>
+                <div>{segmentlist}</div>
+                <div>{channelfrequency}</div>
+                <div>{saveprefsbutton}</div>
+                <div>{form=1}</div>
+            </body>
+            </html>
+        ');
+
+        $form                = $this->createForm()->createView();
+        $params              = $this->createParams();
+        $params['form']      = $form;
+        $params['startform'] = '<form name="lead_contact_frequency_rules" method="post">';
+
+        $content = $this->dispatchEvent($page, $params, false);
+
+        // The body should NOT be wrapped in the preference center form
+        Assert::assertStringNotContainsString('<body><form', $content, 'Body should not be wrapped in form');
+        Assert::assertStringNotContainsString('</form></body>', $content, 'Body should not be wrapped in form');
+
+        // A wrapper div should be created instead
+        Assert::assertStringContainsString('preference-center-form-wrapper', $content, 'Wrapper div should be created');
+
+        // The preference center form should still exist
+        Assert::assertStringContainsString('<form name="lead_contact_frequency_rules"', $content, 'Preference center form should exist');
+        Assert::assertStringContainsString('</form>', $content, 'Preference center form should be closed');
+    }
+
     private function createCategory(): Category
     {
         $category = new Category();
@@ -199,12 +252,12 @@ final class PreferencePageTest extends MauticMysqlTestCase
     /**
      * @param mixed[] $params
      */
-    private function dispatchEvent(Page $page, array $params): string
+    private function dispatchEvent(Page $page, array $params, bool $stripTags = true): string
     {
         $event = new PageDisplayEvent($page->getCustomHtml(), $page, $params);
         $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
 
-        return strip_tags($event->getContent());
+        return $stripTags ? strip_tags($event->getContent()) : $event->getContent();
     }
 
     private function assertDefaultLabels(string $content): void
