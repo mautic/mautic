@@ -37,7 +37,7 @@
         }
     ]
 } %}
-<div class="input-group d-flex fg-1">
+<div class="input-group d-flex flex-grow-1">
     {% if searchScopes is defined and searchScopes is not empty %}
         {{ include('@MauticCore/Helper/search_scope.html.twig', {
             id: id,
@@ -53,16 +53,16 @@
 {% if (filters is defined and filters is not empty) or (quickFilters is defined and quickFilters is not empty) %}
 {% set filtering %}
 <div class="row">
-    <div class="{% if filters is defined and filters is not empty %}col-xs-6 pa-0{% endif %}">
-        {% if quickFilters is defined and quickFilters is not empty %}
+    {% if quickFilters is defined and quickFilters is not empty %}
+    <div class="{% if filters is defined and filters is not empty %}col-xs-6 p-0{% endif %}">
         {{ include('@MauticCore/Helper/list_quickfilters.html.twig', {
             'quickFilters': quickFilters
         }) }}
-        {% endif %}
     </div>
+    {% endif %}
     {% if filters is defined and filters is not empty %}
-    <div class="col-xs-6 pa-0">
-        <div class="dropdown-header mt-0">{{ 'mautic.core.quick_filters.more'|trans }}</div>
+    <div class="{{ quickFilters is defined and quickFilters is not empty ? 'col-xs-6' : 'col-xs-12' }} p-0">
+        <div class="dropdown-header mt-0">{{ filtersLabel|default('mautic.core.quick_filters.more')|trans }}</div>
         <div class="pi-md">
             {{- include('@MauticCore/Helper/list_filters.html.twig', {
                 filters: filters,
@@ -74,19 +74,19 @@
     {% endif %}
 </div>
 <div class="row">
-    <div class="footer-buttons d-flex fw-nowrap gap-1 mt-lg">
+    <div class="footer-buttons d-flex flex-nowrap gap-1 mt-lg">
         {% include '@MauticCore/Helper/button.html.twig' with {
             buttons: [
                 {
                     label: 'mautic.core.reset_filter',
                     variant: 'secondary',
-                    onclick: 'Mautic.resetFilters()',
+                    attributes: {'type': 'button', 'data-filter-action': 'reset'},
                     size: 'lg'
                 },
                 {
                     label: 'mautic.core.apply_filter',
                     variant: 'primary',
-                    onclick: 'Mautic.applyFilters()',
+                    attributes: {'type': 'button', 'data-filter-action': 'apply'},
                     size: 'lg'
                 }
             ]
@@ -105,6 +105,7 @@
             'type': 'button',
             'data-container': 'body',
             'data-toggle': 'popover',
+            'data-quick-filter': '',
             'data-html': 'true',
             'data-placement': 'left',
             'data-content': filtering|escape('html_attr')

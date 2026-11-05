@@ -42,7 +42,7 @@ final class FormType extends AbstractType
         // details
         $builder->add('name', TextType::class, [
             'label'      => 'mautic.core.name',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => ['class' => 'form-control'],
         ]);
 
@@ -63,7 +63,7 @@ final class FormType extends AbstractType
 
         $builder->add('formAttributes', TextType::class, [
             'label'      => 'mautic.form.field.form.form_attr',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'   => 'form-control',
                 'tooltip' => 'mautic.form.field.form.form_attr.tooltip',
@@ -73,7 +73,7 @@ final class FormType extends AbstractType
 
         $builder->add('description', TextareaType::class, [
             'label'      => 'mautic.core.description',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => ['class' => 'form-control editor'],
             'required'   => false,
         ]);
@@ -196,7 +196,7 @@ final class FormType extends AbstractType
                 'mautic.form.form.postaction.hideform' => 'hideform',
             ],
             'label'             => 'mautic.form.form.postaction',
-            'label_attr'        => ['class' => 'control-label'],
+            'label_attr'        => ['class' => 'form-label'],
             'attr'              => [
                 'class'    => 'form-control',
                 'onchange' => 'Mautic.onPostSubmitActionChange(this.value);',
@@ -209,7 +209,7 @@ final class FormType extends AbstractType
         $required   = in_array($postAction, ['redirect', 'message', 'hideform']);
         $builder->add('postActionProperty', TextType::class, [
             'label'      => 'mautic.form.form.postactionproperty',
-            'label_attr' => ['class' => 'control-label'],
+            'label_attr' => ['class' => 'form-label'],
             'attr'       => [
                 'class'         => 'form-control',
                 'tooltip'       => 'mautic.form.form.postactionproperty.tooltip',

@@ -64,7 +64,7 @@ final class FieldType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.lead.field.label',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control', 'length' => 191],
             ]
         );
@@ -155,7 +155,7 @@ final class FieldType extends AbstractType
                 [
                     'choices'    => $choices,
                     'label'      => 'mautic.core.defaultvalue',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => ['class' => 'form-control not-chosen'],
                     'required'   => false,
                     'mapped'     => false,
@@ -168,7 +168,7 @@ final class FieldType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.defaultvalue',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
                 'mapped'     => false,
@@ -180,7 +180,7 @@ final class FieldType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.core.defaultvalue',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
                 'required'   => false,
                 'mapped'     => false,
@@ -192,7 +192,7 @@ final class FieldType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'       => 'mautic.core.defaultvalue',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => ['class' => 'form-control'],
                 'required'    => false,
                 'mapped'      => false,
@@ -216,7 +216,7 @@ final class FieldType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.defaultvalue',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.lead.field.help.defaultvalue',
@@ -274,7 +274,7 @@ final class FieldType extends AbstractType
                         ChoiceType::class,
                         [
                             'label'       => 'mautic.core.defaultvalue',
-                            'label_attr'  => ['class' => 'control-label is-chosen'],
+                            'label_attr'  => ['class' => 'form-label is-chosen'],
                             'attr'        => ['class' => 'form-control'],
                             'required'    => false,
                             'choices'     => array_flip($list),
@@ -295,7 +295,7 @@ final class FieldType extends AbstractType
                         [
                             'choices'    => $listChoices[$type],
                             'label'      => 'mautic.core.defaultvalue',
-                            'label_attr' => ['class' => 'control-label'],
+                            'label_attr' => ['class' => 'form-label'],
                             'attr'       => ['class' => 'form-control'],
                             'required'   => false,
                             'disabled'   => $disableDefaultValue,
@@ -323,7 +323,7 @@ final class FieldType extends AbstractType
                         YesNoButtonGroupType::class,
                         [
                             'label'       => 'mautic.core.defaultvalue',
-                            'label_attr'  => ['class' => 'control-label'],
+                            'label_attr'  => ['class' => 'form-label'],
                             'attr'        => ['class' => 'form-control'],
                             'required'    => false,
                             'data'        => $value,
@@ -391,7 +391,7 @@ final class FieldType extends AbstractType
                         TextType::class,
                         [
                             'label'       => 'mautic.core.defaultvalue',
-                            'label_attr'  => ['class' => 'control-label'],
+                            'label_attr'  => ['class' => 'form-label'],
                             'attr'        => [
                                 'class'       => 'form-control',
                                 'data-toggle' => $type,
@@ -412,7 +412,7 @@ final class FieldType extends AbstractType
                         TextType::class,
                         [
                             'label'      => 'mautic.core.defaultvalue',
-                            'label_attr' => ['class' => 'control-label'],
+                            'label_attr' => ['class' => 'form-label'],
                             'attr'       => [
                                 'class' => 'form-control',
                                 'type'  => $type,
@@ -437,7 +437,7 @@ final class FieldType extends AbstractType
                 'label'         => 'mautic.core.order.field',
                 'class'         => LeadField::class,
                 'choice_label'  => 'label',
-                'label_attr'    => ['class' => 'control-label'],
+                'label_attr'    => ['class' => 'form-label'],
                 'attr'          => [
                     'class'   => 'form-control',
                     'tooltip' => $disabled ? 'mautic.core.order.field.tooltip.disabled' : 'mautic.core.order.field.tooltip',
@@ -506,7 +506,7 @@ final class FieldType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.alias',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'length'  => 25,
@@ -590,7 +590,7 @@ final class FieldType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label'      => 'mautic.lead.field.indexable',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'yes_label'  => 'mautic.lead.field.indexable.yes',
                 'no_label'   => 'mautic.lead.field.indexable.no',
                 'attr'       => [
@@ -721,7 +721,7 @@ final class FieldType extends AbstractType
             NumberType::class,
             [
                 'label'       => 'mautic.lead.field.form.maximum.character.length',
-                'label_attr'  => ['class' => 'control-label'],
+                'label_attr'  => ['class' => 'form-label'],
                 'attr'        => [
                     'class'        => 'form-control',
                     'data-show-on' => '{

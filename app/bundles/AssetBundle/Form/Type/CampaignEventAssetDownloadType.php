@@ -19,7 +19,7 @@ final class CampaignEventAssetDownloadType extends AbstractType
             AssetListType::class,
             [
                 'label'      => 'mautic.asset.campaign.event.assets',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.asset.campaign.event.assets.descr',

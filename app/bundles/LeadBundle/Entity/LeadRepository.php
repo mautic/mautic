@@ -53,11 +53,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         LeadListRepository $leadListRepository,
         DoNotContactRepository $doNotContactRepository,
     ): void {
-        $this->companyRepository = $companyRepository;
+        $this->companyRepository       = $companyRepository;
         $this->frequencyRuleRepository = $frequencyRuleRepository;
-        self::$leadFieldRepository = $leadFieldRepository;
-        $this->leadListRepository = $leadListRepository;
-        $this->doNotContactRepository = $doNotContactRepository;
+        self::$leadFieldRepository     = $leadFieldRepository;
+        $this->leadListRepository      = $leadListRepository;
+        $this->doNotContactRepository  = $doNotContactRepository;
     }
 
     /**
@@ -149,7 +149,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     protected function buildQueryForGetLeadsByFieldValue($field, $value, $ignoreId = null)
     {
-        $col = 'l.'.$field;
+        $col = $this->getEntityManager()->getConnection()->quoteIdentifier('l.'.$field);
 
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')
@@ -167,7 +167,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
              * @see https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/query-builder.html#line-number-0a267d5a2c69797a7656aae33fcc140d16b0a566-72
              */
             $valueParams = [];
-            $counter = count($value);
+            $counter     = count($value);
             for ($i = 0; $i < $counter; ++$i) {
                 $valueParams[':'.$this->generateRandomParameterName()] = $value[$i];
             }
@@ -504,7 +504,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
             if ($withPreferences) {
                 $frequencyRules = $this->frequencyRuleRepository->getFrequencyRules(null, $contactIds);
-                $dncRules = $this->doNotContactRepository->getChannelList(null, $contactIds);
+                $dncRules       = $this->doNotContactRepository->getChannelList(null, $contactIds);
             }
 
             foreach ($contactIds as $id) {
@@ -948,6 +948,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.stage_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.stage_id', [], null, 'en_US'):
+                $expr            = $this->generateFilterExpression($q, 'l.stage_id', $eqExpr, $unique, null);
+                $filter->strict  = true;
+                $returnParameter = true;
+                break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.dnc'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.dnc', [], null, 'en_US'):
                 $anyKeyword   = $this->translator->trans('mautic.lead.lead.searchcommand.dnc.any');
@@ -1034,6 +1040,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.core.searchcommand.ip',
             'mautic.lead.lead.searchcommand.tag',
             'mautic.lead.lead.searchcommand.stage',
+            'mautic.lead.lead.searchcommand.stage_id',
             'mautic.lead.lead.searchcommand.duplicate',
             'mautic.lead.lead.searchcommand.email_sent',
             'mautic.lead.lead.searchcommand.email_read',

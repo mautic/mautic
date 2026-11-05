@@ -267,7 +267,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                 TextType::class,
                 [
                     'label'       => 'mautic.hubspot.form.accessKey',
-                    'label_attr'  => ['class' => 'control-label'],
+                    'label_attr'  => ['class' => 'form-label'],
                     'attr'        => [
                         'class'    => 'form-control',
                     ],
@@ -280,7 +280,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                 TextType::class,
                 [
                     'label'       => 'mautic.hubspot.form.apikey',
-                    'label_attr'  => ['class' => 'control-label'],
+                    'label_attr'  => ['class' => 'form-label'],
                     'attr'        => [
                         'class'    => 'form-control',
                         'readonly' => true,

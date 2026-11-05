@@ -18,13 +18,27 @@
                 </div>
                 <div class="{{ propsCol }}">
                     <div class="message_channel_properties_{{ channel }}{% if not enabled %} hide{% endif %}">
-                        {% if form.children.channelId is defined %}
-                            {{ form_row(form.children.channelId) }}
-                        {% endif %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                {% if form.children.channelId is defined %}
+                                    {{ form_row(form.children.channelId) }}
+                                {% endif %}
 
-                        {% if form.children.properties is defined and form.children.properties is not empty %}
-                            {{ form_row(form.children.properties) }}
-                        {% endif %}
+                                {% if form.children.properties is defined and form.children.properties is not empty %}
+                                    {{ form_row(form.children.properties) }}
+                                {% endif %}
+                            </div>
+
+                            {% if 'email' === channel %}
+                            <div class="col-md-12 hide" id="marketing_message_email_channel_send_to_dnc_status">
+                                <span class="control-label" data-toggle="tooltip" data-container="body" data-placement="top" data-original-title="{{ 'mautic.email.send.dnc.tooltip.info'|trans }}">
+                                    {{ 'mautic.email.send.dnc.label'|trans }}
+                                    <i class="ri-question-line" aria-hidden="true"></i>
+                                </span>
+                                <span class="dnc-status-text label"></span>
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

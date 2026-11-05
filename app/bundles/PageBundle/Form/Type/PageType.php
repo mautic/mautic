@@ -63,7 +63,7 @@ final class PageType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.title',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control'],
             ]
         );
@@ -161,7 +161,7 @@ final class PageType extends AbstractType
                 PageListType::class,
                 [
                     'label'      => 'mautic.core.form.translation_parent',
-                    'label_attr' => ['class' => 'control-label'],
+                    'label_attr' => ['class' => 'form-label'],
                     'attr'       => [
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.core.form.translation_parent.help',
@@ -217,7 +217,7 @@ final class PageType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.page.form.metadescription',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => ['class' => 'form-control', 'maxlength' => 160],
                 'required'   => false,
             ]
@@ -228,7 +228,7 @@ final class PageType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.page.form.headscript',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'rows'    => '8',
@@ -243,7 +243,7 @@ final class PageType extends AbstractType
             TextareaType::class,
             [
                 'label'      => 'mautic.page.form.footerscript',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'rows'    => '8',
@@ -273,7 +273,7 @@ final class PageType extends AbstractType
                 'required'   => true,
                 'label'      => 'mautic.page.form.redirecturl',
                 'label_attr' => [
-                    'class' => 'control-label',
+                    'class' => 'form-label',
                 ],
                 'attr' => [
                     'class'        => 'form-control',
@@ -294,7 +294,7 @@ final class PageType extends AbstractType
             TextType::class,
             [
                 'label'      => 'mautic.core.alias',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.page.help.alias',
@@ -319,7 +319,7 @@ final class PageType extends AbstractType
             LocaleType::class,
             [
                 'label'      => 'mautic.core.language',
-                'label_attr' => ['class' => 'control-label'],
+                'label_attr' => ['class' => 'form-label'],
                 'attr'       => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.page.form.language.help',

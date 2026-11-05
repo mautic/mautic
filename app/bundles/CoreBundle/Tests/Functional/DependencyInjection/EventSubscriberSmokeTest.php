@@ -10,8 +10,10 @@ use Mautic\ApiBundle\EventListener\PreAuthorizationEventListener;
 use Mautic\CampaignBundle\EventListener\CampaignActionChangeMembershipSubscriber;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CoreBundle\EventListener\AssetsSubscriber;
+use Mautic\CoreBundle\EventListener\ConfigPrivacySubscriber;
 use Mautic\CoreBundle\EventListener\ConfigThemeSubscriber;
 use Mautic\CoreBundle\EventListener\CoreSubscriber;
+use Mautic\CoreBundle\EventListener\ElFinderSubscriber;
 use Mautic\CoreBundle\EventListener\EnvironmentSubscriber;
 use Mautic\CoreBundle\EventListener\ErrorHandlingListener;
 use Mautic\CoreBundle\EventListener\ExceptionListener;
@@ -37,6 +39,7 @@ use Mautic\SmsBundle\EventListener\CampaignSendSubscriber;
 use Mautic\UserBundle\Controller\SecurityController;
 use Mautic\UserBundle\EventListener\ApiUserSubscriber;
 use Mautic\UserBundle\EventListener\LogoutListener;
+use Mautic\UserBundle\EventListener\OidcRequestSubscriber;
 use Mautic\UserBundle\EventListener\PasswordStrengthSubscriber;
 use Mautic\UserBundle\EventListener\PasswordSubscriber;
 use MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber;
@@ -78,6 +81,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             RequestSubscriber::class,
             RouterSubscriber::class,
             SecurityController::class,
+            OidcRequestSubscriber::class,
         ],
         'kernel.response' => [
             ApiSubscriber::class,
@@ -88,6 +92,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             ExceptionListener::class,
         ],
         'kernel.controller' => [
+            ElFinderSubscriber::class,
             ControllerSubscriber::class,
         ],
         OAuthEvent::PRE_AUTHORIZATION_PROCESS => [
@@ -146,6 +151,7 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\AssetBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
+            ConfigPrivacySubscriber::class,
             \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
             ConfigThemeSubscriber::class,
             \Mautic\EmailBundle\EventListener\ConfigSubscriber::class,

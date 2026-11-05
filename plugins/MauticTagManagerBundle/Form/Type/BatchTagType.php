@@ -37,7 +37,7 @@ final class BatchTagType extends AbstractType
                 'save_text'      => 'mautic.core.form.save',
                 'cancel_onclick' => 'javascript:void(0);',
                 'cancel_attr'    => [
-                    'data-dismiss' => 'modal',
+                    'data-bs-dismiss' => 'modal',
                 ],
             ]
         );

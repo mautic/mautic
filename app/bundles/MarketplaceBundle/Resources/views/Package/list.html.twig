@@ -1,5 +1,10 @@
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
+{% set packageTypes = {
+    'mautic-plugin': 'marketplace.package.type.plugin',
+    'mautic-theme': 'marketplace.package.type.theme',
+    'mautic-resource': 'marketplace.package.type.resource'
+} %}
 
 {% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 {% block mauticContent %}Package{% endblock %}
@@ -37,7 +42,21 @@
         <div id="page-list-wrapper" class="panel panel-default">
             {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
-                'action'      : currentRoute,
+                'action'      : listRoute,
+                'filtersLabel': 'marketplace.package.type',
+                'filters': {
+                    'marketplace-package-type': {
+                        'options': {
+                            '': 'marketplace.package.type.all',
+                            'type:mautic-plugin': 'marketplace.package.type.plugin',
+                            'type:mautic-theme': 'marketplace.package.type.theme',
+                            'type:mautic-resource': 'marketplace.package.type.resource'
+                        },
+                        'values': [packageType ? 'type:' ~ packageType : ''],
+                        'placeholder': 'marketplace.package.type'|trans,
+                        'translateLabels': true
+                    }
+                },
             }) -}}
             <div class="page-list">
                 {{ block('listResults') }}
@@ -68,6 +87,12 @@
                     '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'text'       : 'mautic.core.name',
+                    }
+                ) -}}
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'text'       : 'marketplace.package.type',
                     }
                 ) -}}
                 {{- include(
@@ -130,6 +155,7 @@
                             'description': item.description
                         }) }}
                     </td>
+                    <td class="package-type">{{ packageTypes[item.type] is defined ? packageTypes[item.type]|trans : item.type|default('—') }}</td>
                     <td class="vendor-name">{{ item.getVendorName()|escape }}</td>
                     <td class="downloads">{{ item.downloads|escape }}</td>
                     <td class="favers">{{ item.favers|escape }}</td>
@@ -150,6 +176,7 @@
                 'limit'      : limit,
                 'baseUrl'    : path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')),
                 'sessionVar' : 'marketplace.package',
+                'queryString': '&' ~ {'search': searchValue}|url_encode,
                 'routeBase'  : constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST'),
             }
         ) -}}

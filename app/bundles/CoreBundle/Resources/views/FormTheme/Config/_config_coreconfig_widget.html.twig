@@ -3,8 +3,7 @@
 {% set fieldKeys = fields|keys %}
 
 {# General Configuration #}
-{% if fieldKeys|filter(k => k in ['site_url', 'webroot', '404_page', 'cache_path', 'log_path', 'theme', 'image_path',
-'last_shown_tab'])|length > 0 %}
+{% if fieldKeys|filter(k => k in ['site_url', 'webroot', '404_page', 'cache_path', 'log_path', 'theme', 'image_path'])|length > 0 %}
     <h4 class="fw-sb mt-48 mb-xs">{{ 'mautic.core.config.header.general'|trans }}</h4>
     <div class="text-muted small pb-md">{{ 'mautic.core.config.header.general.description'|trans }}</div>
     <div class="row">
@@ -40,13 +39,10 @@
                     {% if form.image_path is defined %}
                         {{ formRowIfExists(form, 'image_path') }}
                     {% endif %}
-
-                    {% if form.last_shown_tab is defined %}
-                        {{ formRowIfExists(form, 'last_shown_tab') }}
-                    {% endif %}
                 {% endset %}
 
                 {% include '@MauticCore/Helper/accordion.html.twig' with {
+                    'accordionId': 'coreconfig-technical-paths',
                     'items': [
                         {
                             'title': 'mautic.core.config.technical_paths',
@@ -115,6 +111,7 @@
                         {% endset %}
 
                         {% include '@MauticCore/Helper/accordion.html.twig' with {
+                            'accordionId': 'coreconfig-pagination-display',
                             'items': [
                                 {
                                     'title': 'mautic.core.config.pagination_and_display',
@@ -183,6 +180,7 @@
                     {% endset %}
 
                     {% include '@MauticCore/Helper/accordion.html.twig' with {
+                        'accordionId': 'coreconfig-trust-settings',
                         'items': [
                             {
                                 'title': 'mautic.core.config.trust_settings',
@@ -286,6 +284,7 @@
                     {% endset %}
 
                     {% include '@MauticCore/Helper/accordion.html.twig' with {
+                        'accordionId': 'coreconfig-ip-lookup',
                         'items': [
                             {
                                 'title': 'mautic.core.config.ip_lookup',

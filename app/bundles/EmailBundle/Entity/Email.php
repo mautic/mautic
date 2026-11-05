@@ -745,6 +745,13 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         return $this->isCloned;
     }
 
+    public function setIsClone(bool $isCloned): self
+    {
+        $this->isCloned = $isCloned;
+
+        return $this;
+    }
+
     /**
      * @return int
      */
@@ -1441,6 +1448,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     }
 
                     if ($this->pendingCount) {
+                        if (null === $this->getPublishUp()) {
+                            return 'ready_to_send';
+                        }
+
                         return 'sending';
                     }
                 }
