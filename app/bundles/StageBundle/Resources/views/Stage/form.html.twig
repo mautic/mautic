@@ -15,28 +15,28 @@
         <div class="col-md-9 height-auto bdr-r">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="pa-md">
+                    <div class="pa-16">
                         {{ form_row(form.name) }}
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-xs-12">
-                    <div class="pa-md">
+                    <div class="pa-16">
                         {{ form_row(form.description) }}
                     </div>
                 </div>
             </div>
         </div>
         <div class="col-md-3 height-auto">
-            <div class="pr-lg pl-lg pt-md pb-md">
+            <div class="pe-24 ps-24 pt-16 pb-16">
                 {{ form_row(form.weight) }}
                 {% if stageWeights|length %}
-                    <div class="table-responsive mt-sm mb-32" id="stage-weight-sequence"
+                    <div class="table-responsive mt-12 mb-32" id="stage-weight-sequence"
                          data-weights='{{ stageWeights|json_encode|escape('html_attr') }}'
                          data-weight-field-id="{{ form.weight.vars.id }}"
                          data-entity-id="{% if entity.getId() %}{{ entity.getId() }}{% endif %}">
-                        <div class="text-muted mb-xs">{{ 'mautic.stage.weight.current_sequence'|trans }}</div>
+                        <div class="text-muted mb-5">{{ 'mautic.stage.weight.current_sequence'|trans }}</div>
                         <table class="table table-sm mb-0">
                             <thead>
                                 <tr>

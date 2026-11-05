@@ -144,8 +144,8 @@
               <!--/ page detail header -->
 
               <!-- page detail collapseable -->
-              <div class="collapse pr-md pl-md" id="page-details">
-                  <div class="pr-md pl-md pb-md">
+              <div class="collapse pe-16 ps-16" id="page-details">
+                  <div class="pe-16 ps-16 pb-16">
                       <div class="panel shd-none mb-0">
                           <table class="table table-hover mb-0">
                               <tbody>
@@ -170,13 +170,13 @@
               <!--/ page detail collapseable toggler -->
 
               <!-- some stats -->
-              <div class="pa-md">
+              <div class="pa-16">
                   <div class="row">
                       <div class="col-sm-12">
                           <div class="panel">
                               <div class="panel-body box-layout">
                                   <div class="col-md-3 align-middle">
-                                      <h5 class="text-white dark-md fw-sb mb-xs">
+                                      <h5 class="text-white dark-md fw-sb mb-5">
                                           <span class="ri-line-chart-fill"></span>
                                           {{ 'mautic.page.pageviews'|trans }}
                                       </h5>
@@ -185,7 +185,7 @@
                                       {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'float-end'}) }}
                                   </div>
                               </div>
-                              <div class="d-flex flex-column pt-0 pl-15 pb-15 pr-15 min-h-256">
+                              <div class="d-flex flex-column pt-0 ps-16 pb-16 pe-16 min-h-256">
                                   {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats.pageviews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
@@ -218,7 +218,7 @@
 
           {% if showVariants or showTranslations %}
           <!-- start: tab-content -->
-          <div class="tab-content pa-md">
+          <div class="tab-content pa-16">
               {% if showVariants %}
               <!-- #variants-container -->
               <div class="tab-pane active bdr-w-0" id="variants-container">
@@ -263,8 +263,8 @@
       <div class="col-md-3 bdr-l height-auto">
           <!-- preview URL -->
           {% if not activePage.isPreferenceCenter %}
-          <div class="panel shd-none rounded-0 bdr-w-0 mt-sm mb-0">
-              <div class="panel-body pt-xs">
+          <div class="panel shd-none rounded-0 bdr-w-0 mt-12 mb-0">
+              <div class="panel-body pt-5">
                   {% include '@MauticCore/Components/card.html.twig' with {
                       type: 'link',
                       href: pageUrl,
@@ -277,11 +277,11 @@
               </div>
           </div>
           {% endif %}
-          <div class="panel shd-none rounded-0 bdr-w-0 mt-sm mb-0">
+          <div class="panel shd-none rounded-0 bdr-w-0 mt-12 mb-0">
               <div class="panel-heading">
                   <div class="panel-title">{{ 'mautic.page.preview.url'|trans }}</div>
               </div>
-              <div class="panel-body pt-xs">
+              <div class="panel-body pt-5">
                   {% if previewSettingsForm.translation is defined %}
                       <div class="row">
                           <div class="form-group col-xs-12 ">
@@ -348,11 +348,11 @@
               </div>
           </div>
           {% if draftPreviewUrl is not empty %}
-              <div class="panel bg-transparent shd-none rounded-0 bdr-w-0 mt-sm mb-0">
+              <div class="panel bg-transparent shd-none rounded-0 bdr-w-0 mt-12 mb-0">
                   <div class="panel-heading">
                       <div class="panel-title">{{ 'mautic.email.draft.preview.url'|trans }}</div>
                   </div>
-                  <div class="panel-body pt-xs">
+                  <div class="panel-body pt-5">
                       <div class="input-group">
                           <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                                  readonly

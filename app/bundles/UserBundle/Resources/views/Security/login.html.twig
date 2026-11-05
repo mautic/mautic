@@ -19,7 +19,7 @@
 		{% include '@MauticUser/Security/oidc_login_top.html.twig' with {parameters: oidcSettings} %}
 	{% endif %}
 	<form class="form-group login-form" name="login" data-toggle="ajax" role="form" action="{{ path('mautic_user_logincheck') }}" method="post">
-		<div class="input-group mb-md">
+		<div class="input-group mb-16">
 
 			<span class="input-group-addon">
 				<i class="ri-user-6-fill"></i>
@@ -27,7 +27,7 @@
 			<label for="username" class="visually-hidden">{% trans %}mautic.user.auth.form.loginusername{% endtrans %}</label>
 			<input type="text" id="username" name="_username" class="form-control form-control-lg" value="{{ last_username|escape }}" required autofocus placeholder="{% trans %}mautic.user.auth.form.loginusername{% endtrans %}"/>
 		</div>
-		<div class="input-group mb-md">
+		<div class="input-group mb-16">
 			<span class="input-group-addon">
 				<i class="ri-key-2-line"></i>
 			</span>
@@ -35,7 +35,7 @@
 			<input type="password" id="password" name="_password" class="form-control form-control-lg" required placeholder="{% trans %}mautic.core.password{% endtrans %}"/>
 		</div>
 
-		<div class="float-start mb-md">
+		<div class="float-start mb-16">
 			{% include '@MauticCore/Components/checkbox.html.twig' with {
 				inline: true,
 				items: [{ id: 'remember_me', name: '_remember_me', value: 'on', label: 'mautic.user.auth.form.rememberme' }]
@@ -54,7 +54,7 @@
 			]
 		} %}
 
-		<div class="mt-sm text-end">
+		<div class="mt-12 text-end">
 			<a href="{{ path('mautic_user_passwordreset') }}">{% trans %}mautic.user.user.passwordreset.link{% endtrans %}</a>
 		</div>
 	</form>
@@ -62,7 +62,7 @@
 		<ul class="list-group">
 			{% for sso in integrations %}
 				<a href="{{ path('mautic_sso_login', {'integration' : sso.getName()}) }}" class="list-group-item">
-					<img class="float-start mr-xs" style="height: 16px;" src="{{ getAssetUrl(sso.getIcon()) }}">
+					<img class="float-start me-5" style="height: 16px;" src="{{ getAssetUrl(sso.getIcon()) }}">
 					<p class="list-group-item-heading">{{ ('mautic.integration.sso.' ~ sso.getName())|trans }}</p>
 				</a>
 			{% endfor %}
