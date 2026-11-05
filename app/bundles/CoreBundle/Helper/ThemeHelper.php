@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Configurator\Step\StepInterface;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Twig\Helper\ThemeHelper as twigThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\ThemeHelper as TwigThemeHelper;
 use Mautic\CoreBundle\Twig\Sandbox\ThemeSandboxPolicy;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
@@ -39,13 +39,10 @@ final class ThemeHelper implements ThemeHelperInterface
      */
     private array $steps = [];
 
-    /**
-     * @var string
-     */
-    private $defaultTheme;
+    private ?string $defaultTheme = null;
 
     /**
-     * @var twigThemeHelper[]
+     * @var TwigThemeHelper[]
      */
     private array $themeHelpers = [];
 
@@ -137,18 +134,18 @@ final class ThemeHelper implements ThemeHelperInterface
         $this->defaultThemes = array_merge($this->defaultThemes, $themes);
     }
 
-    public function setDefaultTheme($defaultTheme): void
+    public function setDefaultTheme(string $defaultTheme): void
     {
         $this->defaultTheme = $defaultTheme;
     }
 
-    public function createThemeHelper($themeName): twigThemeHelper
+    public function createThemeHelper(string $themeName): TwigThemeHelper
     {
         if ('current' === $themeName) {
             $themeName = $this->defaultTheme;
         }
 
-        return new twigThemeHelper($this->pathsHelper, $themeName);
+        return new TwigThemeHelper($this->pathsHelper, $themeName);
     }
 
     private function getDirectoryName(string $newName): string
@@ -206,7 +203,7 @@ final class ThemeHelper implements ThemeHelperInterface
         $this->updateConfig($root.$theme, $dirName);
     }
 
-    public function delete($theme): void
+    public function delete(string $theme): void
     {
         $root   = $this->pathsHelper->getSystemPath('themes', true).'/';
         $themes = $this->getInstalledThemes();
@@ -260,7 +257,7 @@ final class ThemeHelper implements ThemeHelperInterface
         return $minors;
     }
 
-    public function checkForTwigTemplate($template): string
+    public function checkForTwigTemplate(string $template): string
     {
         if ($this->twig->getLoader()->exists($template)) {
             return $template;
@@ -270,7 +267,7 @@ final class ThemeHelper implements ThemeHelperInterface
         return $this->findThemeWithTemplate($template);
     }
 
-    public function getInstalledThemes($specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true): array
+    public function getInstalledThemes(string $specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true): array
     {
         // Use a concatenated key since $includeDirs changes what's returned ($includeDirs used by API controller to prevent from exposing file paths)
         $key = $specificFeature.(int) $includeDirs;
@@ -285,7 +282,7 @@ final class ThemeHelper implements ThemeHelperInterface
         return $this->themes[$key];
     }
 
-    public function getTheme($theme = 'current', bool $throwException = false)
+    public function getTheme(string $theme = 'current', bool $throwException = false): TwigThemeHelper
     {
         if (empty($this->themeHelpers[$theme])) {
             try {
@@ -638,7 +635,7 @@ final class ThemeHelper implements ThemeHelperInterface
         };
     }
 
-    public function zip($themeName): string
+    public function zip(string $themeName): string
     {
         $themePath = $this->pathsHelper->getSystemPath('themes', true).'/'.$themeName;
         $tmpPath   = $this->pathsHelper->getSystemPath('tmp', true).'/tmp_'.$themeName.'.zip';

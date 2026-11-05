@@ -7,7 +7,7 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Twig\Helper\ThemeHelper as twigThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\ThemeHelper as TwigThemeHelper;
 
 interface ThemeHelperInterface
 {
@@ -18,20 +18,13 @@ interface ThemeHelperInterface
      */
     public function getDefaultThemes(): array;
 
-    /**
-     * @param string $defaultTheme
-     */
-    public function setDefaultTheme($defaultTheme): void;
+    public function setDefaultTheme(string $defaultTheme): void;
 
     /**
-     * @param string $themeName
-     *
-     * @return twigThemeHelper
-     *
      * @throws BadConfigurationException
      * @throws FileNotFoundException
      */
-    public function createThemeHelper($themeName);
+    public function createThemeHelper(string $themeName): TwigThemeHelper;
 
     /**
      * @param string $theme
@@ -60,11 +53,9 @@ interface ThemeHelperInterface
     public function rename($theme, $newName): void;
 
     /**
-     * @param string $theme
-     *
      * @throws FileNotFoundException
      */
-    public function delete($theme): void;
+    public function delete(string $theme): void;
 
     /**
      * Fetches the optional settings from the defined steps.
@@ -74,31 +65,24 @@ interface ThemeHelperInterface
     public function getOptionalSettings(): array;
 
     /**
-     * @param string $template
-     *
      * @return string The logical name for the template
      */
-    public function checkForTwigTemplate($template);
+    public function checkForTwigTemplate(string $template);
 
     /**
-     * @param string $specificFeature
      * @param bool   $extended        returns extended information about the themes
      * @param bool   $ignoreCache     true to get the fresh info
      * @param bool   $includeDirs     true to get the theme dir details
      *
      * @return array<string[]>|string[]
      */
-    public function getInstalledThemes($specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true): array;
+    public function getInstalledThemes(string $specificFeature = 'all', bool $extended = false, bool $ignoreCache = false, bool $includeDirs = true): array;
 
     /**
-     * @param string $theme
-     *
-     * @return twigThemeHelper
-     *
      * @throws FileNotFoundException
      * @throws BadConfigurationException
      */
-    public function getTheme($theme = 'current', bool $throwException = false);
+    public function getTheme(string $theme = 'current', bool $throwException = false): TwigThemeHelper;
 
     /**
      * Install a theme from a zip package.
@@ -124,13 +108,9 @@ interface ThemeHelperInterface
     /**
      * Creates a zip file from a theme and returns the path where it's stored.
      *
-     * @param string $themeName
-     *
-     * @return string
-     *
      * @throws \Exception
      */
-    public function zip($themeName);
+    public function zip(string $themeName): string;
 
     public function getCurrentTheme(string $template, string $specificFeature): string;
 

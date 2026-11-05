@@ -59,14 +59,53 @@ final class ReturnDocblockToNativeTypeRuleTest extends RuleTestCase
                 'Method "nullableUnionReturn()" has an "@return Utils\PHPStan\Tests\Rule\Fixture\SomeReturnObject|Utils\PHPStan\Tests\Rule\Fixture\AnotherReturnObject|null" docblock but no native return type. Declare ": Utils\PHPStan\Tests\Rule\Fixture\SomeReturnObject|Utils\PHPStan\Tests\Rule\Fixture\AnotherReturnObject|null" and drop the "@return" tag.',
                 72,
             ],
+            [
+                'Method "intersectionReturn()" has an "@return Countable&Traversable" docblock but no native return type. Declare ": Countable&Traversable" and drop the "@return" tag.',
+                97,
+            ],
+            [
+                'Method "iterableReturn()" has an "@return iterable" docblock but no native return type. Declare ": iterable" and drop the "@return" tag.',
+                105,
+            ],
+            [
+                'Method "generatorReturn()" has an "@return iterable" docblock but no native return type. Declare ": iterable" and drop the "@return" tag.',
+                113,
+            ],
         ]);
     }
 
-    public function testSkipOverrideFamily(): void
+    public function testSelfIntersectionKeepsClassName(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/SelfIntersectionReturn.php'], [
+            [
+                'Method "build()" has an "@return Utils\PHPStan\Tests\Rule\Fixture\SelfIntersectionReturn&Countable" docblock but no native return type. Declare ": Utils\PHPStan\Tests\Rule\Fixture\SelfIntersectionReturn&Countable" and drop the "@return" tag.',
+                12,
+            ],
+        ]);
+    }
+
+    public function testPromoteWholeFamily(): void
     {
         $this->analyse([
             __DIR__.'/Fixture/ReturnFamily/BaseWithObjectReturn.php',
             __DIR__.'/Fixture/ReturnFamily/ChildOverridingObjectReturn.php',
+        ], [
+            [
+                'Method "build()" has an "@return Utils\PHPStan\Tests\Rule\Fixture\SomeReturnObject" docblock but no native return type. Declare ": Utils\PHPStan\Tests\Rule\Fixture\SomeReturnObject" and drop the "@return" tag.',
+                14,
+            ],
+            [
+                'Method "build()" has an "@return Utils\PHPStan\Tests\Rule\Fixture\SomeReturnObject" docblock but no native return type. Declare ": Utils\PHPStan\Tests\Rule\Fixture\SomeReturnObject" and drop the "@return" tag.',
+                14,
+            ],
+        ]);
+    }
+
+    public function testSkipBlockedFamily(): void
+    {
+        $this->analyse([
+            __DIR__.'/Fixture/ReturnFamilyBlocked/BaseBlocked.php',
+            __DIR__.'/Fixture/ReturnFamilyBlocked/ChildBlocked.php',
         ], []);
     }
 

@@ -430,7 +430,7 @@ final class PublicController extends CommonFormController
 
         // Ensure template still exists
         $theme = $themeHelper->getTheme($template);
-        if (empty($theme) || $theme->getTheme() !== $template) {
+        if ($theme->getTheme() !== $template) {
             $template = $this->coreParametersHelper->get('theme');
         }
 

@@ -16,9 +16,10 @@ use Utils\PHPStan\Collector\ReturnObjectDocblockCollector;
  * A method with an object-type return docblock but no native return type must declare that object as a native
  * return type and drop the redundant return tag.
  *
- * Adding a native return type changes the whole override family at once, so it is only reported when the method
- * neither overrides a parent nor is overridden by a child in the analysed code. That leaves the loose,
- * polymorphic signatures of base classes alone.
+ * Adding a native return type to a method whose parent is untyped is legal, but removing one a typed parent
+ * declares is a fatal error. So a method is reported only when every subclass that also declares it is promoted
+ * to the same native type in this run; the whole downward family moves together or not at all. A parent or
+ * interface left untyped is no obstacle.
  *
  * @implements Rule<CollectedDataNode>
  *
@@ -46,17 +47,14 @@ final class ReturnDocblockToNativeTypeRule implements Rule
         /** @var array<string, list<array{class: string, method: string, line: int, candidate: array{type: string}|null}>> $collected */
         $collected = $node->get(ReturnObjectDocblockCollector::class);
 
-        // method name => list of classes that declare it, to spot override families
+        // method name => list of classes that declare it, to walk the downward family
         $classesByMethod = [];
+        // class => method => native type an emittable candidate would promote to
+        $emittableType = [];
         foreach ($collected as $entries) {
             foreach ($entries as $entry) {
                 $classesByMethod[$entry['method']][] = $entry['class'];
-            }
-        }
 
-        $ruleErrors = [];
-        foreach ($collected as $filePath => $entries) {
-            foreach ($entries as $entry) {
                 if (null === $entry['candidate']) {
                     continue;
                 }
@@ -65,11 +63,22 @@ final class ReturnDocblockToNativeTypeRule implements Rule
                     continue;
                 }
 
-                if ($this->isInOverrideFamily($entry['class'], $entry['method'], $classesByMethod[$entry['method']] ?? [])) {
+                $emittableType[$entry['class']][$entry['method']] = $entry['candidate']['type'];
+            }
+        }
+
+        $ruleErrors = [];
+        foreach ($collected as $filePath => $entries) {
+            foreach ($entries as $entry) {
+                $type = $emittableType[$entry['class']][$entry['method']] ?? null;
+                if (null === $type) {
                     continue;
                 }
 
-                $type = $entry['candidate']['type'];
+                if (!$this->subtreeFullyPromoted($entry['class'], $entry['method'], $type, $classesByMethod[$entry['method']] ?? [], $emittableType)) {
+                    continue;
+                }
+
                 $ruleErrors[] = RuleErrorBuilder::message(sprintf(
                     'Method "%s()" has an "@return %s" docblock but no native return type. Declare ": %s" and drop the "@return" tag.',
                     $entry['method'],
@@ -95,27 +104,20 @@ final class ReturnDocblockToNativeTypeRule implements Rule
     }
 
     /**
-     * @param string[] $declaringClasses
+     * True when every subclass that also declares this method is promoted to the same native type, so the whole
+     * downward family can move together. A subclass left untyped (or typed differently) would lose a return type
+     * its now-typed parent declares, which is a fatal error, so that blocks the promotion.
+     *
+     * @param string[]                           $declaringClasses
+     * @param array<string, array<string, string>> $emittableType
      */
-    private function isInOverrideFamily(string $className, string $methodName, array $declaringClasses): bool
+    private function subtreeFullyPromoted(string $className, string $methodName, string $type, array $declaringClasses, array $emittableType): bool
     {
         if (!$this->reflectionProvider->hasClass($className)) {
-            return true;
+            return false;
         }
 
         $classReflection = $this->reflectionProvider->getClass($className);
-
-        foreach ($classReflection->getParents() as $parentReflection) {
-            if ($parentReflection->hasNativeMethod($methodName)) {
-                return true;
-            }
-        }
-
-        foreach ($classReflection->getInterfaces() as $interfaceReflection) {
-            if ($interfaceReflection->hasNativeMethod($methodName)) {
-                return true;
-            }
-        }
 
         foreach ($declaringClasses as $declaringClass) {
             if ($declaringClass === $className) {
@@ -123,14 +125,18 @@ final class ReturnDocblockToNativeTypeRule implements Rule
             }
 
             if (!$this->reflectionProvider->hasClass($declaringClass)) {
+                return false;
+            }
+
+            if (!$this->reflectionProvider->getClass($declaringClass)->isSubclassOfClass($classReflection)) {
                 continue;
             }
 
-            if ($this->reflectionProvider->getClass($declaringClass)->isSubclassOfClass($classReflection)) {
-                return true;
+            if (($emittableType[$declaringClass][$methodName] ?? null) !== $type) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 }

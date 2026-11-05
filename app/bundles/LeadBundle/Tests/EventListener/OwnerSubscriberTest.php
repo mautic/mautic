@@ -291,10 +291,7 @@ final class OwnerSubscriberTest extends TestCase
         return $mailerHelper;
     }
 
-    /**
-     * @return Translator&MockObject
-     */
-    protected function getMockTranslator()
+    protected function getMockTranslator(): Translator&MockObject
     {
         /** @var Translator&MockObject $translator */
         $translator = $this->createMock(Translator::class);
