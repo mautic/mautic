@@ -223,6 +223,8 @@ class ExportHelper
 
     /**
      * @return array<string, string>
+     *
+     * @deprecated since Mautic 7.2, will be removed in 8.0. Pass 'fieldValuesOnly' and 'withStage' to LeadModel::getEntities() instead.
      */
     public function parseLeadToExport(Lead $lead): array
     {
