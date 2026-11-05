@@ -8,6 +8,7 @@ use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Utils\Rector\UnserializeToSerializerDecodeRector;
 
 return RectorConfig::configure()
+    ->withParallel(timeoutSeconds: 300)
     ->withPaths([
         __DIR__.'/app/bundles',
         __DIR__.'/plugins',
