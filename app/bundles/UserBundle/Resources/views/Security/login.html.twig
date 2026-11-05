@@ -60,7 +60,7 @@
 		<ul class="list-group">
 			{% for sso in integrations %}
 				<a href="{{ path('mautic_sso_login', {'integration' : sso.getName()}) }}" class="list-group-item">
-					<img class="float-start mr-5" style="height: 16px;" src="{{ getAssetUrl(sso.getIcon()) }}">
+					<img class="float-start me-5" style="height: 16px;" src="{{ getAssetUrl(sso.getIcon()) }}">
 					<p class="list-group-item-heading">{{ ('mautic.integration.sso.' ~ sso.getName())|trans }}</p>
 				</a>
 			{% endfor %}

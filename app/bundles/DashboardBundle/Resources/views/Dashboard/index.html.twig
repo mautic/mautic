@@ -56,8 +56,8 @@
 
 {% block content %}
   {% if true == phpVersion['isOutdated'] %}
-  <div class="pt-16 pl-16 col-md-12">
-      <div class="pt-16 pl-16 alert alert-warning">
+  <div class="pt-16 ps-16 col-md-12">
+      <div class="pt-16 ps-16 alert alert-warning">
           <h3>{{ 'mautic.dashboard.phpversionwarning.title'|trans }}</h3>
           <p>{{ 'mautic.dashboard.phpversionwarning.body'|trans({'%phpversion%': phpVersion['version']})|purify }}</p>
       </div>

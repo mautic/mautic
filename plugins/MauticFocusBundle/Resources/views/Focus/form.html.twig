@@ -26,7 +26,7 @@
             </div>
         </div>
         <div class="col-md-3 height-auto">
-            <div class="pr-24 pl-24 pt-16 pb-16">
+            <div class="pe-24 ps-24 pt-16 pb-16">
                 {{ form_row(form.category) }}
                 {{ form_row(form.projects) }}
                 {{ form_row(form.isPublished) }}
@@ -136,7 +136,7 @@
                     <div id="focusTypePanel" class="panel-collapse collapse in" role="tabpanel">
                         {{ form_widget(form.type) }}
                         <ul class="list-group mb-0">
-                            <li data-focus-type="form" class="focus-type list-group-item pl-12 pr-12">
+                            <li data-focus-type="form" class="focus-type list-group-item ps-12 pe-12">
                                 <div class="row">
                                     <div class="col-xs-2">
                                         <i class="ri-2x ri-edit-box-line text-interactive"></i>
@@ -148,9 +148,9 @@
                                 </div>
                             </li>
 
-                            <li class="focus-properties focus-form-properties list-group-item pl-12 pr-12" style="display: none;"></li>
+                            <li class="focus-properties focus-form-properties list-group-item ps-12 pe-12" style="display: none;"></li>
 
-                            <li data-focus-type="notice" class="focus-type list-group-item pl-12 pr-12">
+                            <li data-focus-type="notice" class="focus-type list-group-item ps-12 pe-12">
                                 <div class="row">
                                     <div class="col-xs-2">
                                         <i class="ri-2x ri-megaphone-line text-warning"></i>
@@ -162,9 +162,9 @@
                                 </div>
                             </li>
 
-                            <li class="focus-properties focus-notice-properties list-group-item pl-12 pr-12" style="display: none;"></li>
+                            <li class="focus-properties focus-notice-properties list-group-item ps-12 pe-12" style="display: none;"></li>
 
-                            <li data-focus-type="link" class="focus-type list-group-item pl-12 pr-12">
+                            <li data-focus-type="link" class="focus-type list-group-item ps-12 pe-12">
                                 <div class="row">
                                     <div class="col-xs-2">
                                         <i class="ri-2x ri-corner-up-right-line text-info"></i>
@@ -176,7 +176,7 @@
                                 </div>
                             </li>
 
-                            <li class="focus-properties focus-link-properties list-group-item pl-12 pr-12" style="display: none;"></li>
+                            <li class="focus-properties focus-link-properties list-group-item ps-12 pe-12" style="display: none;"></li>
                         </ul>
                     </div>
 
@@ -205,10 +205,10 @@
                     </div>
                     <div id="focusStylePanel" class="panel-collapse collapse" role="tabpanel">
                         <ul class="list-group mb-0">
-                            <li data-focus-style="bar" class="focus-style visible-focus-style-bar list-group-item pl-12 pr-12">
+                            <li data-focus-style="bar" class="focus-style visible-focus-style-bar list-group-item ps-12 pe-12">
                                 <div class="row">
                                     <div class="col-xs-2">
-                                        <i class="pl-2 ri-2x ri-subtract-line text-interactive"></i>
+                                        <i class="ps-2 ri-2x ri-subtract-line text-interactive"></i>
                                     </div>
                                     <div class="col-xs-10">
                                         <h4 class="list-group-heading">{{ 'mautic.focus.style.bar'|trans }}</h4>
@@ -216,9 +216,9 @@
                                     </div>
                                 </div>
                             </li>
-                            <li class="focus-properties focus-bar-properties list-group-item pl-12 pr-12" style="display: none;"></li>
+                            <li class="focus-properties focus-bar-properties list-group-item ps-12 pe-12" style="display: none;"></li>
 
-                            <li data-focus-style="modal" class="focus-style visible-focus-style-modal list-group-item pl-12 pr-12">
+                            <li data-focus-style="modal" class="focus-style visible-focus-style-modal list-group-item ps-12 pe-12">
                                 <div class="row">
                                     <div class="col-xs-2">
                                         <i class="ri-2x ri-file-list-2-line text-warning"></i>
@@ -229,12 +229,12 @@
                                     </div>
                                 </div>
                             </li>
-                            <li class="focus-properties focus-modal-properties list-group-item pl-12 pr-12" style="display: none;"></li>
+                            <li class="focus-properties focus-modal-properties list-group-item ps-12 pe-12" style="display: none;"></li>
 
-                            <li data-focus-style="notification" class="focus-style visible-focus-style-notification list-group-item pl-12 pr-12">
+                            <li data-focus-style="notification" class="focus-style visible-focus-style-notification list-group-item ps-12 pe-12">
                                 <div class="row">
                                     <div class="col-xs-2">
-                                        <i class="pl-2 ri-2x ri-information-2-line text-info"></i>
+                                        <i class="ps-2 ri-2x ri-information-2-line text-info"></i>
                                     </div>
                                     <div class="col-xs-10">
                                         <h4 class="list-group-heading">{{ 'mautic.focus.style.notification'|trans }}</h4>
@@ -242,12 +242,12 @@
                                     </div>
                                 </div>
                             </li>
-                            <li class="focus-properties focus-notification-properties list-group-item pl-12 pr-12" style="display: none;"></li>
+                            <li class="focus-properties focus-notification-properties list-group-item ps-12 pe-12" style="display: none;"></li>
 
-                            <li data-focus-style="page" class="focus-style visible-focus-style-page list-group-item pl-12 pr-12">
+                            <li data-focus-style="page" class="focus-style visible-focus-style-page list-group-item ps-12 pe-12">
                                 <div class="row">
                                     <div class="col-xs-2">
-                                        <i class="pl-2 ri-2x ri-square-line text-danger"></i>
+                                        <i class="ps-2 ri-2x ri-square-line text-danger"></i>
                                     </div>
                                     <div class="col-xs-10">
                                         <h4 class="list-group-heading">{{ 'mautic.focus.style.page'|trans }}</h4>
@@ -255,7 +255,7 @@
                                     </div>
                                 </div>
                             </li>
-                            <!-- <li class="focus-properties focus-page-properties list-group-item pl-12 pr-12" style="display: none;"></li> -->
+                            <!-- <li class="focus-properties focus-page-properties list-group-item ps-12 pe-12" style="display: none;"></li> -->
                         </ul>
                     </div>
 

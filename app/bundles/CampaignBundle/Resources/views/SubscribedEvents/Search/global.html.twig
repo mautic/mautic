@@ -6,7 +6,7 @@
 {% else %}
 <a href="{{ url('mautic_campaign_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
     <span class="fw-sb">{{ item.name }}</span>
-    <span class="ml-4 mr-12">#{{ item.id }}</span>
+    <span class="ms-4 me-12">#{{ item.id }}</span>
     {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {
         'entity': item,
         'status': 'active',

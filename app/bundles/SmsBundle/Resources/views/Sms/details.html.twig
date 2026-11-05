@@ -100,8 +100,8 @@
         <div>
             <!-- page detail header -->
             <!-- sms detail collapseable toggler -->
-            <div class="collapse pr-16 pl-16" id="sms-details">
-                <div class="pr-16 pl-16 pb-16">
+            <div class="collapse pe-16 ps-16" id="sms-details">
+                <div class="pe-16 ps-16 pb-16">
                     <div class="panel shd-none mb-0">
                         <table class="table table-hover mb-0">
                             <tbody>
@@ -159,7 +159,7 @@
                                     {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'float-end'}) -}}
                                 </div>
                             </div>
-                            <div class="d-flex flex-column pt-0 pl-16 pb-16 pr-16 min-h-256">
+                            <div class="d-flex flex-column pt-0 ps-16 pb-16 pe-16 min-h-256">
                                 {{- include('@MauticCore/Helper/chart.html.twig', {'chartData' : entityViews, 'chartType' : 'line', 'chartHeight' : 300}) -}}
                             </div>
                         </div>

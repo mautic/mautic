@@ -51,7 +51,7 @@
 					<div class="box-layout">
 						<!-- step container -->
 						<div class="col-md-5 height-auto">
-							<div class="pr-24 pl-24 pt-16 pb-16">
+							<div class="pe-24 ps-24 pt-16 pb-16">
 
 								<!-- Nav tabs -->
 								<ul class="list-group list-group-tabs" role="tablist">
@@ -78,7 +78,7 @@
 											</div>{{ "\n" }}</div>{{ "\n" }}
 										{% endif %}
 										<div role="tabpanel" class="tab-pane fade{{ 0 is same as(loop.index0) ? ' show active' : '' }} bdr-w-0" id="{{ child.vars.name }}PermissionTab">{{ "\n" }}
-										<div class="pt-16 pr-16 pl-16 pb-16"> {{ "\n" }}
+										<div class="pt-16 pe-16 ps-16 pb-16"> {{ "\n" }}
 										{% do child.setRendered() %}
 									{% else %}
 										{{ form_row(child) }}

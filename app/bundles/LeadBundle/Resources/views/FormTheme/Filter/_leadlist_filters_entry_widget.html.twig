@@ -29,7 +29,7 @@
 
             <div class="filter--panel panel">
                 <div class="d-flex flex-nowrap">
-                    <div class="filter--field-name d-flex align-items-center pr-24 pl-24" size="lg">
+                    <div class="filter--field-name d-flex align-items-center pe-24 ps-24" size="lg">
                         {% set objectLabel = translatorHasId('mautic.lead_list.filter.' ~ object) ? ('mautic.lead_list.filter.' ~ object)|trans : object|trans  %}
                         <i class="object-icon {{ filterTypeIconClass }}" aria-hidden="true"></i>
                         <span> {% if isPrototype %}__label__{% else %}{{ 'mautic.lead_list.filter.field.label'|trans({'%object%': objectLabel, '%field%': fields[object][filterType]['label'] })|raw}}{% endif %}</span>

@@ -13,10 +13,10 @@
         <!-- brand -->
          <li>
             <a class="p-0" href="{{ path('mautic_dashboard_index') }}">
-                <div class="brand-logo--desktop mautic-brand hidden-xs pl-16 pr-24">
+                <div class="brand-logo--desktop mautic-brand hidden-xs ps-16 pe-24">
                     {{ source('@MauticCore/Assets/images/logo--expanded.svg') }}
                 </div>
-                <div class="brand-logo--mobile mautic-brand visible-xs pr-12">
+                <div class="brand-logo--mobile mautic-brand visible-xs pe-12">
                     {{ source('@MauticCore/Assets/images/logo--minimized.svg') }}
                 </div>
             </a>
@@ -50,7 +50,7 @@
         {{ menuRender('admin') }}
         {{ include('@MauticCore/Menu/profile.html.twig') }}
     </ul>
-    <div class="navbar-toolbar float-end mt-16 mr-12">
+    <div class="navbar-toolbar float-end mt-16 me-12">
     {{ buttonReset(constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_NAVBAR')) }}
     {{ buttonsRender() }}
     </div>

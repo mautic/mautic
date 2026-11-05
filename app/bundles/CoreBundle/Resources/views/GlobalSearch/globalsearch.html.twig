@@ -3,7 +3,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content gsearch--toolbar">
 
-			<div aria-hidden="false" class="gsearch--field d-flex align-items-center gap-3 pr-16 pl-16 pt-12 pb-12">
+			<div aria-hidden="false" class="gsearch--field d-flex align-items-center gap-3 pe-16 ps-16 pt-12 pb-12">
 				<i class="gsearch--search-magnifier ri-search-2-line ri-xl" tabindex="-1"></i>
 				<input type="search" value="{{ searchString|escape }}"
 					class="gsearch--field__input form-control search fs-16" id="globalSearchInput" name="global_search"
@@ -12,7 +12,7 @@
 					data-action="{{ path('mautic_core_ajax', {action: 'globalSearch'}) }}" data-overlay="true"
 					data-overlay-text="{% trans %}mautic.core.search.livesearch{% endtrans %}" />
 				<span class="gsearch--field-addon">
-					<kbd class="mr-2">f</kbd><kbd>/</kbd>
+					<kbd class="me-2">f</kbd><kbd>/</kbd>
 				</span>
 			</div>
 

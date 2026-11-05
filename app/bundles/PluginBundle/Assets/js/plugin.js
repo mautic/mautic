@@ -330,7 +330,7 @@ Mautic.initPluginEvents = function () {
             const $modalLabel = mQuery('#IntegrationEditModal-label');
             if ($modalLabel.find('.plugin-version-badge').length === 0) {
                 const $badge = mQuery('<span>')
-                    .addClass('plugin-version-badge label label-default ml-5')
+                    .addClass('plugin-version-badge label label-default ms-5')
                     .text('v' + String(response.pluginVersion));
 
                 $modalLabel.append(' ').append($badge);
