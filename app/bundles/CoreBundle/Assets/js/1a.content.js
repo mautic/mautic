@@ -2766,6 +2766,7 @@ Mautic.initializePopoverFilters = function (popoverElement) {
         const label = popoverElement.querySelector(`.label[data-filter="${filterCommand}"]`);
         if (label) {
             label.classList.add('active');
+            label.setAttribute('aria-pressed', 'true');
         }
     });
 
