@@ -12,7 +12,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PointRepositoryTest extends TestCase
+final class PointRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
@@ -27,7 +27,7 @@ class PointRepositoryTest extends TestCase
             'mautic.point.searchcommand.isrepeatable'        => 'is:repeatable',
             default                                          => $id,
         });
-        $repository->setTranslator($translator);
+        $repository->autowireCommonRepository($translator);
 
         return $repository;
     }
@@ -50,7 +50,6 @@ class PointRepositoryTest extends TestCase
         ];
 
         $method = new \ReflectionMethod(PointRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         [$expr, $params] = $method->invoke($repository, $qb, $filter);
 
@@ -71,11 +70,7 @@ class PointRepositoryTest extends TestCase
      */
     public static function repeatableFilters(): iterable
     {
-        yield 'explicit true' => ['is:repeatable', 'true', false, true, false];
-        yield 'explicit false' => ['is:repeatable', 'false', false, false, false];
-        yield 'default true' => ['is:repeatable', '', false, true, false];
-        yield 'whitespace defaults true' => ['is:repeatable', "  \t\n", false, true, false];
-        yield 'negated default true' => ['is:repeatable', '', true, true, true];
-        yield 'negated explicit false' => ['is:repeatable', 'false', true, false, true];
+        yield 'repeatable' => ['is:repeatable', '', false, true, false];
+        yield 'negated repeatable' => ['is:repeatable', '', true, true, true];
     }
 }

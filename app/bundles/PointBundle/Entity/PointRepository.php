@@ -5,7 +5,6 @@ namespace Mautic\PointBundle\Entity;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
 
 /**
@@ -157,24 +156,18 @@ class PointRepository extends CommonRepository
             return $this->addRepeatableWhereClause($q, $filter);
         }
 
-        $expr  = null;
-        $value = $filter->string;
-
+        $typeValue = null;
         if ($command === $typeCommand || $command === $typeCommandEn) {
-            $expr = $this->buildDeltaTypeExpression($q, $value, $gainValues, $lossValues);
+            $typeValue = $filter->string;
         } elseif (str_contains($command, ':')) {
             [$baseCommand, $subCommand] = explode(':', $command, 2);
             if ($baseCommand === $typeCommand || $baseCommand === $typeCommandEn) {
-                $expr = $this->buildDeltaTypeExpression($q, $subCommand, $gainValues, $lossValues);
+                $typeValue = $subCommand;
             }
         }
 
-        if (null !== $expr) {
-            if ($filter->not) {
-                $expr = $q->expr()->not($expr);
-            }
-
-            return [$expr, []];
+        if (null !== $typeValue) {
+            return [$this->buildDeltaTypeExpression($q, $typeValue, $filter->not, $gainValues, $lossValues), []];
         }
 
         return $this->addStandardSearchCommandWhereClause($q, $filter);
@@ -187,7 +180,8 @@ class PointRepository extends CommonRepository
     {
         return array_merge(
             [
-                'mautic.point.searchcommand.type',
+                'mautic.point.searchcommand.type_gain.filter',
+                'mautic.point.searchcommand.type_loss.filter',
                 'mautic.project.searchcommand.name',
                 'mautic.point.searchcommand.isrepeatable',
             ],
@@ -205,9 +199,6 @@ class PointRepository extends CommonRepository
     {
         $column    = $this->getTableAlias().'.repeatable';
         $parameter = $this->generateRandomParameterName();
-        $rawString = trim((string) $filter->string);
-        $value     = '' === $rawString ? null : InputHelper::boolean($rawString);
-        $value     = null === $value ? true : $value;
 
         $expr = $filter->not
             ? $q->expr()->neq($column, ":$parameter")
@@ -215,7 +206,7 @@ class PointRepository extends CommonRepository
 
         return [
             $expr,
-            [$parameter => $value],
+            [$parameter => true],
         ];
     }
 
@@ -224,18 +215,18 @@ class PointRepository extends CommonRepository
      * @param string[]                      $gainValues
      * @param string[]                      $lossValues
      */
-    private function buildDeltaTypeExpression($q, string $value, array $gainValues, array $lossValues): mixed
+    private function buildDeltaTypeExpression($q, string $value, bool $not, array $gainValues, array $lossValues): mixed
     {
         $field = $this->getTableAlias().'.delta';
 
         if (in_array($value, $gainValues, true)) {
-            return $q->expr()->gt($field, '0');
+            return $not ? $q->expr()->lte($field, '0') : $q->expr()->gt($field, '0');
         }
 
         if (in_array($value, $lossValues, true)) {
-            return $q->expr()->lt($field, '0');
+            return $not ? $q->expr()->gte($field, '0') : $q->expr()->lt($field, '0');
         }
 
-        return null;
+        return $q->expr()->eq(1, $not ? 1 : 0);
     }
 }

@@ -34,7 +34,7 @@ class PointRepositoryTest extends TestCase
         self::assertSame([], $params);
     }
 
-    public function testNegatedTypeGainCommandWrapsExpressionInNot(): void
+    public function testNegatedTypeGainCommandBuildsNonPositiveDeltaExpression(): void
     {
         $repository      = $this->createRepository();
         $filter          = $this->createFilter('type', 'gain');
@@ -42,7 +42,7 @@ class PointRepositoryTest extends TestCase
 
         [$expr, $params] = $repository->exposeAddSearchCommandWhereClause(new DummyQueryBuilder(), $filter);
 
-        self::assertSame(['not', ['gt', 'p.delta', '0']], $expr);
+        self::assertSame(['lte', 'p.delta', '0'], $expr);
         self::assertSame([], $params);
     }
 
@@ -52,14 +52,8 @@ class PointRepositoryTest extends TestCase
 
         $commands = $repository->exposeGetSearchCommands();
 
-        self::assertArrayHasKey('mautic.point.searchcommand.type', $commands);
-        self::assertSame(
-            [
-                'mautic.point.searchcommand.type_gain',
-                'mautic.point.searchcommand.type_loss',
-            ],
-            $commands['mautic.point.searchcommand.type']
-        );
+        self::assertContains('mautic.point.searchcommand.type_gain.filter', $commands);
+        self::assertContains('mautic.point.searchcommand.type_loss.filter', $commands);
     }
 
     private function createRepository(): TestPointRepository
@@ -69,7 +63,7 @@ class PointRepositoryTest extends TestCase
         $repository = new TestPointRepository($registry);
 
         $translator = $this->createTranslator();
-        $repository->setTranslator($translator);
+        $repository->autowireCommonRepository($translator);
 
         return $repository;
     }
@@ -149,8 +143,13 @@ class DummyQueryExpr
         return ['lt', $field, $value];
     }
 
-    public function not(array $expr): array
+    public function lte(string $field, string $value): array
     {
-        return ['not', $expr];
+        return ['lte', $field, $value];
+    }
+
+    public function gte(string $field, string $value): array
+    {
+        return ['gte', $field, $value];
     }
 }
