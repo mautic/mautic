@@ -50,7 +50,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testScopedEndpointContracts(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get(FocusModel::class);
+        $focusModel = self::getContainer()->get(FocusModel::class);
         $focus      = $this->createFocus('scoped');
         $focus->setStyle('bar');
         $focusModel->saveEntity($focus);
@@ -124,7 +124,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testYesNoIntegerFlagsRenderCorrectBooleans(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get(FocusModel::class);
+        $focusModel = self::getContainer()->get(FocusModel::class);
 
         $focusOff = $this->createFocus('flags-off');
         $focusOff->setProperties(array_merge($focusOff->getProperties(), [
@@ -159,7 +159,7 @@ final class FocusPublicControllerFunctionalTest extends MauticMysqlTestCase
     public function testTrackingActivationRuntime(): void
     {
         /** @var FocusModel $focusModel */
-        $focusModel = static::getContainer()->get(FocusModel::class);
+        $focusModel = self::getContainer()->get(FocusModel::class);
         $focus      = $this->createFocus('tracking-runtime');
         $properties = $focus->getProperties();
         $properties['when']            = 'leave';

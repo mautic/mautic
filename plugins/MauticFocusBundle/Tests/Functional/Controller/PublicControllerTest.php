@@ -57,7 +57,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var ContactTracker $contactTracker */
-        $contactTracker = static::getContainer()->get(ContactTracker::class);
+        $contactTracker = self::getContainer()->get(ContactTracker::class);
         $contactTracker->setSystemContact($contact);
 
         $this->client->request(Request::METHOD_GET, sprintf('/focus/%s/display.js', $focus->getId()));
@@ -154,7 +154,7 @@ final class PublicControllerTest extends MauticMysqlTestCase
         $this->em->clear();
 
         /** @var ContactTracker $contactTracker */
-        $contactTracker = static::getContainer()->get(ContactTracker::class);
+        $contactTracker = self::getContainer()->get(ContactTracker::class);
         $contactTracker->setSystemContact($firstContact);
 
         $this->client->request(Request::METHOD_GET, sprintf('/focus/%s/tracking.js', $focus->getId()));
