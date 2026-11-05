@@ -6,8 +6,10 @@ namespace Mautic\LeadBundle\Services;
 
 use Mautic\CoreBundle\Helper\Tree\IntNode;
 use Mautic\CoreBundle\Helper\Tree\NodeInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Security\Permissions\LeadPermissions;
 use Symfony\Component\Routing\RouterInterface;
 
 final class SegmentDependencyTreeFactory
@@ -20,6 +22,8 @@ final class SegmentDependencyTreeFactory
     public function __construct(
         private readonly RouterInterface $router,
         private readonly LeadListRepository $leadListRepository,
+        // @phpstan-ignore-next-line mautic.noNullableServiceInConstructor
+        private readonly ?CorePermissions $corePermissions = null,
     ) {
     }
 
@@ -75,7 +79,14 @@ final class SegmentDependencyTreeFactory
             }
         }
 
-        return $this->leadListRepository->findBy(['id' => $childSegmentIds]);
+        return array_values(array_filter(
+            $this->leadListRepository->findBy(['id' => $childSegmentIds]),
+            fn (LeadList $childSegment): bool => null !== $this->corePermissions && $this->corePermissions->hasEntityAccess(
+                LeadPermissions::LISTS_VIEW_OWN,
+                LeadPermissions::LISTS_VIEW_OTHER,
+                $childSegment->getCreatedBy()
+            )
+        ));
     }
 
     private function generateSegmentDetailRoute(LeadList $segment): string
