@@ -32,19 +32,39 @@
             'mautic.core.quick_filters.status': {
                 'conflictGroup': true,
                 'filters': [
-                    { 'search': 'mautic.core.searchcommand.ispublished', 'label': 'mautic.core.form.available', 'tooltip': 'mautic.core.searchcommand.ispublished.description', 'icon': 'ri-check-line' },
-                    { 'search': 'mautic.core.searchcommand.isunpublished', 'label': 'mautic.core.form.unavailable', 'tooltip': 'mautic.core.searchcommand.isunpublished.description', 'icon': 'ri-close-line' }
+                    {
+                        'search': 'mautic.core.searchcommand.ispublished',
+                        'label': 'mautic.core.form.available',
+                        'tooltip': 'mautic.core.searchcommand.ispublished.description',
+                        'icon': 'ri-check-line'
+                    },
+                    {
+                        'search': 'mautic.core.searchcommand.isunpublished',
+                        'label': 'mautic.core.form.unavailable',
+                        'tooltip': 'mautic.core.searchcommand.isunpublished.description',
+                        'icon': 'ri-close-line'
+                    }
                 ]
             },
             'mautic.core.quick_filters.ownership': {
                 'conflictGroup': true,
                 'filters': [
-                    { 'search': 'mautic.core.searchcommand.ismine', 'label': 'mautic.core.searchcommand.ismine.label', 'tooltip': 'mautic.core.searchcommand.ismine.description', 'icon': 'ri-user-line' }
+                    {
+                        'search': 'mautic.core.searchcommand.ismine',
+                        'label': 'mautic.core.searchcommand.ismine.label',
+                        'tooltip': 'mautic.core.searchcommand.ismine.description',
+                        'icon': 'ri-user-line'
+                    }
                 ]
             },
             'mautic.core.quick_filters.others': {
                 'filters': [
-                    { 'search': 'mautic.report.report.searchcommand.isscheduled', 'label': 'mautic.report.report.searchcommand.isscheduled.label', 'tooltip': 'mautic.report.report.searchcommand.isscheduled.description', 'icon': 'ri-calendar-schedule-line' }
+                    {
+                        'search': 'mautic.report.report.searchcommand.isscheduled',
+                        'label': 'mautic.report.report.searchcommand.isscheduled.label',
+                        'tooltip': 'mautic.report.report.searchcommand.isscheduled.description',
+                        'icon': 'ri-calendar-schedule-line'
+                    }
                 ]
             }
         },
