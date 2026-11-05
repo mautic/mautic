@@ -98,16 +98,16 @@ final class LeadListSearchFunctionalTest extends MauticMysqlTestCase
         $this->assertContains('mautic.lead.lead.searchcommand.source', $leadRepository->getSearchCommands());
         $this->client->enableProfiler();
 
-        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20source%3Amanually_added', [$leadTwo], [$leadOne, $leadThree]);
-        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20source%3Afilter_added', [$leadOne, $leadThree], [$leadTwo]);
-        $this->assertSearchResult('source%3Amanually_added%20segment%3A'.$list->getAlias(), [$leadTwo], [$leadOne, $leadThree]);
-        $this->assertSearchResult('source%3Afilter_added%20segment%3A'.$list->getAlias(), [$leadOne, $leadThree], [$leadTwo]);
+        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20segment_source%3Amanually_added', [$leadTwo], [$leadOne, $leadThree]);
+        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20segment_source%3Afilter_added', [$leadOne, $leadThree], [$leadTwo]);
+        $this->assertSearchResult('segment_source%3Amanually_added%20segment%3A'.$list->getAlias(), [$leadTwo], [$leadOne, $leadThree]);
+        $this->assertSearchResult('segment_source%3Afilter_added%20segment%3A'.$list->getAlias(), [$leadOne, $leadThree], [$leadTwo]);
         $this->assertSearchUsesSingleSegmentMembershipLookup();
-        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20!source%3Amanually_added', [$leadOne, $leadThree], [$leadTwo]);
-        $this->assertSearchResult('!source%3Amanually_added%20segment%3A'.$list->getAlias(), [$leadOne, $leadThree], [$leadTwo]);
-        $this->assertSearchResult('source%3Amanually_added', [], [$leadOne, $leadTwo, $leadThree]);
-        $this->assertSearchResult('!segment%3A'.$list->getAlias().'%20source%3Amanually_added', [], [$leadOne, $leadTwo, $leadThree]);
-        $this->assertSearchResult('source%3Amanually_added%20!segment%3A'.$list->getAlias(), [], [$leadOne, $leadTwo, $leadThree]);
+        $this->assertSearchResult('segment%3A'.$list->getAlias().'%20!segment_source%3Amanually_added', [$leadOne, $leadThree], [$leadTwo]);
+        $this->assertSearchResult('!segment_source%3Amanually_added%20segment%3A'.$list->getAlias(), [$leadOne, $leadThree], [$leadTwo]);
+        $this->assertSearchResult('segment_source%3Amanually_added', [], [$leadOne, $leadTwo, $leadThree]);
+        $this->assertSearchResult('!segment%3A'.$list->getAlias().'%20segment_source%3Amanually_added', [], [$leadOne, $leadTwo, $leadThree]);
+        $this->assertSearchResult('segment_source%3Amanually_added%20!segment%3A'.$list->getAlias(), [], [$leadOne, $leadTwo, $leadThree]);
     }
 
     /**

@@ -822,6 +822,10 @@ final class ListController extends FormController
 
     public function segmentStatsAction(int $objectId): Response
     {
+        if (!$this->security->isGranted('lead:leads:viewown')) {
+            $this->throwAccessDenied();
+        }
+
         $segment = $this->getSegment(
             $objectId,
             LeadPermissions::LISTS_VIEW_OWN,
