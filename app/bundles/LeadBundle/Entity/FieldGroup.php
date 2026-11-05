@@ -23,11 +23,6 @@ class FieldGroup extends FormEntity
      */
     public const DEFAULT_GROUPS = ['core', 'social', 'personal', 'professional', 'other'];
 
-    /**
-     * Default groups for company object.
-     */
-    public const DEFAULT_COMPANY_GROUPS = ['core', 'professional', 'other'];
-
     private ?int $id = null;
 
     #[Assert\NotBlank(message: 'mautic.core.name.required')]
