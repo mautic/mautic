@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\Client as BaseClient;
+use Mautic\CoreBundle\Entity\IdentifierInterface;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use OAuth2\OAuth2;
@@ -15,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: 'oauth2_clients')]
 #[ORM\Index(name: 'client_id_search', columns: ['random_id'])]
 #[ORM\ChangeTrackingPolicy('DEFERRED_EXPLICIT')]
-class Client extends BaseClient
+class Client extends BaseClient implements IdentifierInterface
 {
     /**
      * @var int

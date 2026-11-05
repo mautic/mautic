@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Twig\Extension;
 
+use Mautic\CoreBundle\Entity\IdentifierInterface;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -84,7 +86,7 @@ final readonly class ButtonExtension
      * @param array<string,string> $query
      * @param array<string,string> $editAttr
      * @param array<string,string> $routeVars
-     * @param mixed                $item
+     * @param IdentifierInterface|null $item
      */
     #[AsTwigFunction(name: 'buttonsAddFromTemplate', isSafe: ['all'])]
     public function addButtonsFromTemplate(
@@ -111,9 +113,10 @@ final readonly class ButtonExtension
             switch ($action) {
                 case 'clone':
                 case 'abtest':
-                    $actionQuery = [
-                        'objectId' => ('abtest' === $action && method_exists($item, 'getVariantParent') && $item->getVariantParent())
-                            ? $item->getVariantParent()->getId() : $item->getId(),
+                    $variantParent = $item instanceof VariantEntityInterface ? $item->getVariantParent() : null;
+                    $actionQuery   = [
+                        'objectId' => ('abtest' === $action && $variantParent)
+                            ? $variantParent->getId() : $item?->getId(),
                     ];
                     $icon = ('clone' === $action) ? 'file-copy-line' : 'a-b';
                     $path = $this->router->generate($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
@@ -127,7 +130,7 @@ final readonly class ButtonExtension
                     break;
                 case 'new':
                 case 'edit':
-                    $actionQuery = ('edit' === $action) ? ['objectId' => $item->getId()] : [];
+                    $actionQuery = ('edit' === $action) ? ['objectId' => $item?->getId()] : [];
                     $icon        = ('edit' === $action) ? 'edit-line' : 'add-line';
                     $path        = $this->router->generate($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));
                     $primary     = true;
@@ -138,11 +141,11 @@ final readonly class ButtonExtension
                             'confirm' => [
                                 'message' => $this->translator->trans(
                                     'mautic.'.$langVar.'.form.confirmdelete',
-                                    ['%name%' => $item->{$nameGetter}().' ('.$item->getId().')']
+                                    ['%name%' => $item?->{$nameGetter}().' ('.$item?->getId().')']
                                 ),
                                 'confirmAction' => $this->router->generate(
                                     $actionRoute,
-                                    array_merge(['objectAction' => 'delete', 'objectId' => $item->getId()], $query)
+                                    array_merge(['objectAction' => 'delete', 'objectId' => $item?->getId()], $query)
                                 ),
                                 'template' => 'delete',
                                 'btnClass' => false,
