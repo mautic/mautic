@@ -101,6 +101,21 @@ final class Oauth2Test extends MauticMysqlTestCase
         $this->assertSame('{"errors":[{"message":"The access token provided is invalid.","code":401,"type":"invalid_grant"}]}', $response->getContent());
     }
 
+    public function testApiAccessControlRequiresPathSegmentBoundary(): void
+    {
+        $this->client->enableReboot();
+
+        // Disable the default logging in via username and password.
+        $this->clientServer = [];
+        $this->setUpSymfony($this->configParams);
+
+        $this->client->request(Request::METHOD_GET, '/api-keys');
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+
+        $this->client->request(Request::METHOD_GET, '/api/users');
+        self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+    }
+
     public function testAuthWorkflow(): void
     {
         $this->client->disableReboot();
