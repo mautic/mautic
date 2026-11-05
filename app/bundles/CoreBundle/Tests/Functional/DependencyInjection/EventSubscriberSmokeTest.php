@@ -54,8 +54,6 @@ use Mautic\UserBundle\EventListener\PasswordSubscriber;
 use MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber;
 use MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber;
 use MauticPlugin\MauticFocusBundle\EventListener\ReportSubscriber;
-use MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber;
-use MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
@@ -118,7 +116,6 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
         ],
         CampaignBuilderEvent::class => [
             CampaignSubscriber::class,
-            \MauticPlugin\MauticSocialBundle\EventListener\CampaignSubscriber::class,
             \Mautic\AssetBundle\EventListener\CampaignSubscriber::class,
             CampaignActionChangeMembershipSubscriber::class,
             CampaignActionJumpToEventSubscriber::class,
@@ -159,7 +156,6 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\PointBundle\EventListener\ReportSubscriber::class,
         ],
         ConfigBuilderEvent::class => [
-            ConfigSubscriber::class,
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\AssetBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
@@ -177,7 +173,6 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\WebhookBundle\EventListener\ConfigSubscriber::class,
         ],
         ConfigPreSaveEvent::class => [
-            ConfigSubscriber::class,
             \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CampaignBundle\EventListener\ConfigSubscriber::class,
             \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
@@ -200,7 +195,6 @@ final class EventSubscriberSmokeTest extends AbstractContainerSmokeTestCase
             \Mautic\PageBundle\EventListener\BuilderSubscriber::class,
         ],
         FormBuilderEvent::class => [
-            FormSubscriber::class,
             \Mautic\AssetBundle\EventListener\FormSubscriber::class,
             \Mautic\EmailBundle\EventListener\FormSubscriber::class,
             \Mautic\FormBundle\EventListener\FormSubscriber::class,

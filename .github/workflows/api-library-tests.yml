@@ -79,6 +79,12 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Adapt api-library expectations to Mautic 8
+      # The library still tests older Mautic versions. Keep the rest of its suite
+      # unchanged, but assert 404 for the removed Tweets API and omit tweet_stats.
+      # Remove this patch once upstream tests support Mautic 8's social removal.
+      run: git -C "$HOME/api-library" apply "$GITHUB_WORKSPACE/.github/ci-files/api-library-mautic8.patch"
+
     - name: Move Mautic to the web root
       run: |
         shopt -s dotglob

@@ -7,9 +7,9 @@ namespace Mautic\CoreBundle\Tests\Functional\DependencyInjection;
 final class ControllerSmokeTest extends AbstractContainerSmokeTestCase
 {
     /**
-     * There are 157 controllers in the container, keep a small reserve for removed ones.
+     * There are 153 controllers in the container, keep a small reserve for removed ones.
      */
-    private const int MINIMAL_CONTROLLER_COUNT = 154;
+    private const int MINIMAL_CONTROLLER_COUNT = 150;
 
     public function testAllControllersCanBeCreated(): void
     {

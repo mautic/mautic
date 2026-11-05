@@ -6,6 +6,22 @@
 
 ## Removed code
 
+### Social media integrations
+
+`MauticSocialBundle` and the bundled `mautic/plugin-social` package have been removed. This removes the Facebook, Twitter/X, Instagram and Foursquare integrations, Social Monitoring, tweets, the `twitter.tweet` campaign action and the `plugin.loginSocial` form field. CRM integrations in `MauticCrmBundle` are unaffected, as are contact social-profile fields and social links in emails.
+
+Before upgrading:
+
+- Remove Twitter actions from campaigns and review/reconnect the subsequent campaign steps. A retained `twitter.tweet` action is no longer registered and can interrupt execution of the rest of that campaign.
+- Remove Social Login fields from forms, then save the forms to regenerate their HTML. Update any externally embedded static form HTML. A retained `plugin.loginSocial` field cannot be rendered after the bundle is removed.
+- Remove scheduled `mautic:social:monitoring`, `social:monitor:twitter:hashtags` and `social:monitor:twitter:mentions` commands. Remove custom code that depends on this bundle's classes, services, routes or Twig templates.
+- For Composer-managed installations, remove any explicit `mautic/plugin-social` requirement from the project's `composer.json` as part of the upgrade.
+
+After upgrading, clear the application cache and run `bin/console mautic:plugins:reload` to mark the removed plugin as missing. Existing integration settings and social tables are retained; this removal does not delete historical data or automatically rewrite campaigns and forms.
+
+### Other removed code
+
+- Unused service aliases `mautic.integration.gmail.config` and `mautic.integration.tagmanager.config` were removed. Inject the corresponding bundle’s `Integration\Support\ConfigSupport` class instead; the services and integrations remain available.
 - The ClearbitBundle was removed as the service was sunset.
 - Constant `ON_AFTER_EVENTS_DELETE` removed from `Mautic\CampaignBundle\CampaignEvents`. The after-events-delete event is now dispatched by its own event class `Mautic\CampaignBundle\Event\AfterEventsDeleteEvent`, dispatched by the event object alone (Symfony 4.3+), so its name is the event class. Subscribe to `AfterEventsDeleteEvent::class` instead of the constant. The pre-existing `Mautic\CampaignBundle\Event\DeleteEvent` (dispatched when event logs are deleted) is unchanged.
 - Constants `EMAIL_PARSE` and `EMAIL_PRE_FETCH` removed from `Mautic\EmailBundle\EmailEvents`. These two events used to share one `Mautic\EmailBundle\Event\ParseEmailEvent` object dispatched under both names; the pre-fetch phase (setting search criteria) is now a dedicated `Mautic\EmailBundle\Event\PreFetchEmailEvent` and the parse phase keeps `ParseEmailEvent` (messages only). Both are dispatched by the event object alone (Symfony 4.3+), so their names are the event classes. The criteria methods (`setCriteriaRequest`, `getCriteriaRequests`, `getMarkAsSeenInstructions`) moved from `ParseEmailEvent` to `PreFetchEmailEvent`. Subscribe to the event class instead of the constant.
@@ -129,8 +145,6 @@
 
 - Events behind `LeadEvents::LEAD_POST_SAVE`, `LEAD_POST_DELETE`, `LEAD_POINTS_CHANGE`, `LEAD_COMPANY_CHANGE`, `LEAD_LIST_CHANGE`, `COMPANY_POST_SAVE` and `COMPANY_POST_DELETE` are now dispatched as `LeadPostSaveEvent`, `LeadPostDeleteEvent`, `PointsChangeEvent`, `LeadChangeCompanyEvent`, `ListChangeEvent`, `CompanyPostSaveEvent`, `CompanyPostDeleteEvent`. The constants stay, as they are still used as webhook event type identifiers, but listeners must key on the event class.
 - `Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher::dispatchEvent()` now takes the `LeadFieldEvent` to dispatch instead of an event name, entity and `isNew` flag.
-- Class `MauticPlugin\MauticSocialBundle\Event\SocialEvent` removed as unused, the monitor lifecycle events now extend `MauticPlugin\MauticSocialBundle\Event\AbstractMonitorEvent`.
-- Constants `MONITOR_PRE_SAVE`, `MONITOR_POST_SAVE`, `MONITOR_PRE_DELETE`, `MONITOR_POST_DELETE`, `MONITOR_POST_PROCESS`, `TWEET_PRE_SAVE`, `TWEET_POST_SAVE`, `TWEET_PRE_DELETE` and `TWEET_POST_DELETE` removed from `MauticPlugin\MauticSocialBundle\SocialEvents`. These events are now dispatched as dedicated event classes: `MonitorPreSaveEvent`, `MonitorPostSaveEvent`, `MonitorPreDeleteEvent`, `MonitorPostDeleteEvent`, `SocialMonitorEvent` (already dispatched by class), `TweetPreSaveEvent`, `TweetPostSaveEvent`, `TweetPreDeleteEvent` and `TweetPostDeleteEvent` (all under `MauticPlugin\MauticSocialBundle\Event`; monitor events extend `AbstractMonitorEvent`, tweet events extend `AbstractTweetEvent`). Subscribe to the event class instead of the constant, e.g. `TweetPostSaveEvent::class => 'onTweetPostSave'`.
 - Constants `USER_PRE_SAVE`, `USER_POST_SAVE`, `USER_PRE_DELETE`, `USER_POST_DELETE`, `ROLE_PRE_SAVE`, `ROLE_POST_SAVE`, `ROLE_PRE_DELETE` and `ROLE_POST_DELETE` removed from `Mautic\UserBundle\UserEvents`. These lifecycle events are now dispatched as dedicated event classes: `PreSaveUserEvent`, `PostSaveUserEvent`, `PreDeleteUserEvent`, `PostDeleteUserEvent`, `PreSaveRoleEvent`, `PostSaveRoleEvent`, `PreDeleteRoleEvent` and `PostDeleteRoleEvent` (all under `Mautic\UserBundle\Event`, extending `UserEvent` / `RoleEvent`, which are now `abstract`). Subscribe to the event class instead of the constant, e.g. `PostSaveUserEvent::class => 'onUserPostSave'`.
 - Classes `Mautic\UserBundle\Event\UserEvent` and `Mautic\UserBundle\Event\RoleEvent` are now `abstract` and can no longer be instantiated directly. Dispatch one of the concrete `Pre*/Post*` subclasses listed above instead.
 - Method `setEntityManager()` and the `protected $em` property removed from `Mautic\CoreBundle\Event\CommonEvent`. The entity manager was set on the event by every model but never read. `Mautic\LeadBundle\Event\LeadListFilteringEvent` was the only reader; it now holds its own `$em` property (unchanged constructor and `getEntityManager()`). Remove any `$event->setEntityManager(...)` calls.
@@ -146,7 +160,6 @@
 - Deprecated constant `Mautic\PageBundle\PageEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.page.on_campaign_trigger_action`) removed, replaced by `ON_CAMPAIGN_BATCH_ACTION` (`mautic.page.on_campaign_batch_action`). The `tracking.pixel.send` action now runs on `PendingEvent`. Switch to `'batchEventName' => PageEvents::ON_CAMPAIGN_BATCH_ACTION` and a `PendingEvent` listener.
 - Deprecated constant `Mautic\PluginBundle\PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.plugin.on_campaign_trigger_action`) removed, replaced by `ON_CAMPAIGN_BATCH_ACTION` (`mautic.plugin.on_campaign_batch_action`). The `plugin.leadpush` action now runs on `PendingEvent`. Switch to `'batchEventName' => PluginEvents::ON_CAMPAIGN_BATCH_ACTION` and a `PendingEvent` listener.
 - Deprecated constant `MauticPlugin\MauticFocusBundle\FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.focus.on_campaign_trigger_action`) removed, replaced by `ON_CAMPAIGN_BATCH_ACTION` (`mautic.focus.on_campaign_batch_action`). The `focus.show` action now runs on `PendingEvent`. Switch to `'batchEventName' => FocusEvents::ON_CAMPAIGN_BATCH_ACTION` and a `PendingEvent` listener.
-- Deprecated constant `MauticPlugin\MauticSocialBundle\SocialEvents::ON_CAMPAIGN_TRIGGER_ACTION` (`mautic.social.on_campaign_trigger_action`) removed, replaced by `ON_CAMPAIGN_BATCH_ACTION` (`mautic.social.on_campaign_batch_action`). The `twitter.tweet` action now runs on `PendingEvent`. Switch to `'batchEventName' => SocialEvents::ON_CAMPAIGN_BATCH_ACTION` and a `PendingEvent` listener. `MauticPlugin\MauticSocialBundle\Helper\CampaignEventHelper::sendTweetAction()` now takes the `Mautic\CampaignBundle\Entity\Event` entity instead of the legacy event array.
 - Deprecated form type removed from `Mautic\FormBundle\Entity\Form`. Form types were no longer used, so the `$formType` property, the `getFormType()` method, the `form_type` ORM mapping and the `formType` API field are gone. The `form_type` database column is dropped by a migration. The `formType`/`form_type` key is no longer read from or written to the API, and is dropped from form export payloads.
 - Deprecated Mautic v1 theme fallback removed from `Mautic\PageBundle\Controller\PublicController::indexAction()`. Public pages are now rendered solely from `Page::getCustomHtml()`; the legacy path that rendered `Page::getContent()` through a `@themes/<template>/html/page.html.twig` theme template (used when `customHtml` was empty) is gone. The unused `ThemeHelper` argument was dropped from `indexAction()`.
 - Deprecated method `Mautic\LeadBundle\Model\LeadModel::isContactable()` removed. Use `Mautic\LeadBundle\Model\DoNotContact::isContactable()` instead.
@@ -890,7 +903,6 @@
     | `SmsBundle\Model\SmsModel` | `getSmsClickStats()` | `int` |
     | `WebhookBundle\Model\WebhookModel` | `getEventWebooksByType()`, `queueWebhooksByType()` (first parameter) | `string` |
     | `WebhookBundle\Model\WebhookModel` | `processWebhooks()` | `array\|Paginator` |
-    | `MauticPlugin\MauticSocialBundle\Model\MonitoringModel` | `getFormByType()` | `string` |
 - The `Mautic\CoreBundle\DependencyInjection\Compiler\ServicePass` compiler pass was removed. It used to read the `services > menus` array from a bundle's `Config/config.php` and wire the menu item (`knp_menu.menu`) and its renderer (`knp_menu.renderer`) automatically. A bundle that registered its own menu must now declare both services explicitly in its `Config/services.php`.
 
     Before — `Config/config.php`:
@@ -1115,13 +1127,12 @@
     | `LeadBundle\Controller\FrequencyRuleTrait` | `getFrequencyRuleForm()` (`&$viewParameters`) | `array` |
     | `LeadBundle\Controller\Api\CustomFieldsApiControllerTrait` | `setCustomFieldValues()` (`$parameters`) | `array` |
 
-- Methods in `Mautic\PluginBundle\Integration\AbstractIntegration`, `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration` and `MauticPlugin\MauticSocialBundle\Integration\SocialIntegration` that documented `@return array` now declare a native `array` return type. Most third-party integrations extend one of these classes, so if yours overrides one of the methods below, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with AbstractIntegration::method(): array":
+- Methods in `Mautic\PluginBundle\Integration\AbstractIntegration` and `MauticPlugin\MauticCrmBundle\Integration\CrmAbstractIntegration` that documented `@return array` now declare a native `array` return type. Most third-party integrations extend one of these classes, so if yours overrides one of the methods below, add the `array` return type to the override, otherwise PHP fails with "Declaration of X::method() must be compatible with AbstractIntegration::method(): array":
 
     | Class | Methods |
     | --- | --- |
     | `AbstractIntegration` | `encryptApiKeys()`, `decryptApiKeys()`, `getSecretKeys()`, `getRefreshTokenKeys()`, `getRequiredKeyFields()`, `prepareRequest()`, `cleanUpFields()`, `getRequiredFields()`, `populateLeadData()`, `populateCompanyData()`, `populateMauticLeadData()`, `matchUpData()`, `getFormNotes()`, `getFormDisplaySettings()`, `getFormLeadFields()`, `getFormCompanyFields()`, `dispatchIntegrationKeyEvent()`, `formatMatchedFields()` |
     | `CrmAbstractIntegration` | `getFormFieldsByObject()`, `getPriorityFieldsForMautic()`, `getPriorityFieldsForIntegration()`, `getFieldsByPriority()`, `cleanPriorityFields()`, `prepareFieldsForPush()` |
-    | `SocialIntegration` | `getFormLeadFields()`, `getFormCompanyFields()`, `getRequiredKeyFields()`, `getFormNotes()` |
 
 - Further methods that documented `@return array` now declare a native `array` (or `?array`) return type. If you extend one of these classes or implement the interface and override the method, add the matching return type to the override, otherwise PHP fails with an incompatible-declaration error:
 

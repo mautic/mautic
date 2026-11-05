@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 final class CommandSmokeTest extends AbstractContainerSmokeTestCase
 {
     /**
-     * There are 63 local commands in the container, keep a small reserve for removed ones.
+     * There are 60 local commands in the container.
      */
     private const int MINIMAL_COMMAND_COUNT = 60;
 
