@@ -22,7 +22,7 @@ final class ReportRepositoryTest extends TestCase
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(
-            fn (string $id, array $parameters = [], ?string $domain = null, ?string $locale = null) => match ($id) {
+            fn (string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string => match ($id) {
                 'mautic.report.report.searchcommand.source'  => 'source',
                 default                                      => $id,
             }
@@ -46,11 +46,11 @@ final class ReportRepositoryTest extends TestCase
 
         $parameterName = array_key_first($params);
 
-        self::assertNotFalse($expr);
-        self::assertNotNull($parameterName);
-        self::assertStringStartsWith('par', $parameterName);
-        self::assertSame('leads', $params[$parameterName]);
-        self::assertSame(sprintf('r.source = :%s', $parameterName), (string) $expr);
+        $this->assertNotFalse($expr);
+        $this->assertNotNull($parameterName);
+        $this->assertStringStartsWith('par', $parameterName);
+        $this->assertSame('leads', $params[$parameterName]);
+        $this->assertSame(sprintf('r.source = :%s', $parameterName), (string) $expr);
     }
 
     public function testAddSearchCommandWhereClauseSupportsNegation(): void
@@ -65,11 +65,11 @@ final class ReportRepositoryTest extends TestCase
 
         $parameterName = array_key_first($params);
 
-        self::assertNotFalse($expr);
-        self::assertNotNull($parameterName);
-        self::assertStringStartsWith('par', $parameterName);
-        self::assertSame('campaign_lead_event_log', $params[$parameterName]);
-        self::assertSame(sprintf('NOT(r.source = :%s)', $parameterName), (string) $expr);
+        $this->assertNotFalse($expr);
+        $this->assertNotNull($parameterName);
+        $this->assertStringStartsWith('par', $parameterName);
+        $this->assertSame('campaign_lead_event_log', $params[$parameterName]);
+        $this->assertSame(sprintf('NOT(r.source = :%s)', $parameterName), (string) $expr);
     }
 
     public function testAddSearchCommandWhereClauseSupportsDelimitedSources(): void
@@ -84,17 +84,17 @@ final class ReportRepositoryTest extends TestCase
 
         $parameterName = array_key_first($params);
 
-        self::assertNotFalse($expr);
-        self::assertNotNull($parameterName);
-        self::assertStringStartsWith('par', $parameterName);
-        self::assertSame('segment.log', $params[$parameterName]);
-        self::assertSame(sprintf('r.source = :%s', $parameterName), (string) $expr);
+        $this->assertNotFalse($expr);
+        $this->assertNotNull($parameterName);
+        $this->assertStringStartsWith('par', $parameterName);
+        $this->assertSame('segment.log', $params[$parameterName]);
+        $this->assertSame(sprintf('r.source = :%s', $parameterName), (string) $expr);
     }
 
     public function testGetSearchCommandsContainsSourceFilter(): void
     {
         $repository = $this->getRepository();
 
-        self::assertContains('mautic.report.report.searchcommand.source', $repository->getSearchCommands());
+        $this->assertContains('mautic.report.report.searchcommand.source', $repository->getSearchCommands());
     }
 }
