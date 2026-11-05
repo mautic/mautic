@@ -8,7 +8,7 @@
     {
         'title': 'mautic.lead.segments.active.contacts'|trans,
         'value': activeSegmentCount,
-        'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias ~ ' !' ~ ('mautic.lead.lead.searchcommand.dnc'|trans) ~ ':' ~ ('mautic.lead.lead.searchcommand.dnc.any'|trans)}),
+        'link': path('mautic_contact_index', {'search': ('mautic.lead.lead.searchcommand.list'|trans) ~ ':' ~ list.alias ~ ' !' ~ ('mautic.lead.lead.searchcommand.dnc'|trans) ~ ':email'}),
         'icon': 'ri-user-follow-line',
         'tooltip': 'mautic.lead.segments.active.contacts.tooltip'|trans
     },
