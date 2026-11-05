@@ -8,10 +8,6 @@ final class MailboxException extends \Exception
     {
         if (null === $message) {
             $message = 'Error communicating with the IMAP server';
-
-            if (function_exists('imap_last_error')) {
-                $message .= ': '.imap_last_error();
-            }
         }
 
         parent::__construct($message, $code, $previous);
