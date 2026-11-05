@@ -61,7 +61,7 @@ final class FocusControllerTest extends MauticMysqlTestCase
         $translator     = self::getContainer()->get(TranslatorInterface::class);
         $displayUrl     = $router->generate('mautic_focus_generate_display', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         $legacyUrl      = $router->generate('mautic_focus_generate', ['id' => $focus->getId()], UrlGeneratorInterface::ABSOLUTE_PATH);
-        $configUrl      = $router->generate('mautic_config_action', ['objectAction' => 'edit', 'tab' => 'trackingconfig'], UrlGeneratorInterface::ABSOLUTE_PATH);
+        $configUrl      = $router->generate('mautic_config_edit', ['activeTabId' => 'trackingconfig'], UrlGeneratorInterface::ABSOLUTE_PATH);
         $implementation = $crawler->filter('.focus-implementation');
         $landingPages   = $crawler->filter('#focus-implementation-landing-pages');
         $external       = $crawler->filter('#focus-implementation-external-websites');
