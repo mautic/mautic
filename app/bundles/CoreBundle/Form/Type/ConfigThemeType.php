@@ -105,6 +105,22 @@ final class ConfigThemeType extends AbstractType
                 ]
             )->addViewTransformer(new ArrayStringTransformer())
         );
+
+        $builder->add(
+            'theme_custom_tab_enabled',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.core.config.form.theme_custom_tab_enabled',
+                'label_attr' => [
+                    'class' => 'form-label',
+                ],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.theme_custom_tab_enabled.tooltip',
+                ],
+                'data'       => (bool) ($options['data']['theme_custom_tab_enabled'] ?? false),
+            ]
+        );
     }
 
     public function getBlockPrefix(): string

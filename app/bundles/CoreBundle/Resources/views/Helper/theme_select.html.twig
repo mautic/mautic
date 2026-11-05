@@ -3,15 +3,24 @@
     - type
     - themes
     - active
+    - themeGroup (optional)
+        'all'      (default) every theme, and the code mode card
+        'standard' the themes which are not custom themes, and the code mode card
+        'custom'   only the custom themes
 #}
 {% set codeMode = 'mautic_code_mode' %}
 {% set isCodeMode = active == codeMode %}
-{% if themes %}
+{% set themeGroup = themeGroup|default('all') %}
+{% if themeGroup == 'custom' and (themes|default([])|filter(themeData => themeData.custom|default(false))|length) == 0 %}
+  <div class="alert alert-info" id="custom-theme-empty">{{ 'mautic.core.theme.custom.empty'|trans }}</div>
+{% elseif themes %}
   <div class="row">
 
       {% for themeKey, themeInfo in themes %}
           {% set isSelected = active is same as themeKey %}
-          {% if not isSelected or themeInfo.config.features is not defined or type in themeInfo.config.features %}
+          {% set isCustomTheme = themeInfo.custom|default(false) %}
+          {% set inGroup = themeGroup == 'all' or (themeGroup == 'custom' and isCustomTheme) or (themeGroup == 'standard' and not isCustomTheme) %}
+          {% if inGroup and (not isSelected or themeInfo.config.features is not defined or type in themeInfo.config.features) %}
             {% if (themeInfo.dir ~ '/thumbnail_' ~ type ~ '.png') is file %}
                 {% set thumbnailName, hasThumbnail = 'thumbnail_' ~ type ~ '.png', true %}
             {% else %}
@@ -97,6 +106,7 @@
             </div>
           {% endif %}
       {% endfor %}
+    {% if themeGroup != 'custom' %}
     <div class="col-md-3 theme-list">
         <div class="panel panel-default {% if isCodeMode %}theme-selected{% endif %}">
             <div class="panel-body text-center">
@@ -131,6 +141,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
     <div class="clearfix"></div>
   </div>
 {% endif %}

@@ -20,6 +20,8 @@
     'locales'   : 'locale-template',
 } %}
 {% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
+{% set customThemeTabEnabled = configGetParameter('theme_custom_tab_enabled', false) ? true : false %}
+{% set activeThemeIsCustom = customThemeTabEnabled and (themes[form.template.vars.value]['custom']|default(false)) %}
 {% set previewUrl = previewUrl|default('') %}
 {% set draftPreviewUrl = draftPreviewUrl|default('') %}
 {% set advancedTabHasErrors =
@@ -58,9 +60,14 @@
 
                     <!-- tabs controls -->
                     <ul class="nav nav-tabs nav-tabs-contained">
-                        <li class="active">
-                            <a href="#email-container" role="tab" data-bs-toggle="tab" class="nav-link active" aria-selected="true">{{ 'mautic.core.form.theme'|trans }}</a>
+                        <li{{ activeThemeIsCustom ? '' : ' class="active"' }}>
+                            <a href="#email-container" role="tab" data-bs-toggle="tab" class="nav-link{{ activeThemeIsCustom ? '' : ' active' }}" aria-selected="{{ activeThemeIsCustom ? 'false' : 'true' }}">{{ 'mautic.core.form.theme'|trans }}</a>
                         </li>
+                        {% if customThemeTabEnabled %}
+                        <li{{ activeThemeIsCustom ? ' class="active"' : '' }}>
+                            <a href="#custom-theme-container" role="tab" data-bs-toggle="tab" class="nav-link{{ activeThemeIsCustom ? ' active' : '' }}" aria-selected="{{ activeThemeIsCustom ? 'true' : 'false' }}">{{ 'mautic.core.theme.custom'|trans }}</a>
+                        </li>
+                        {% endif %}
                         <li>
                             <a href="#advanced-container" role="tab" data-bs-toggle="tab" class="nav-link">
                                 {% if advancedTabHasErrors %}
@@ -79,16 +86,27 @@
                     <!--/ tabs controls -->
 
                     <div class="tab-content pa-md">
-                        <div class="tab-pane fade show active bdr-w-0" id="email-container">
+                        <div class="tab-pane fade{{ activeThemeIsCustom ? '' : ' show active' }} bdr-w-0" id="email-container">
                             <div class="row">
                                 <div class="col-md-12">{{ form_row(form.template) }}</div>
                             </div>
                             {{- include('@MauticCore/Helper/theme_select.html.twig', {
-                                'type'   : 'email',
-                                'themes' : themes,
-                                'active' : form.template.vars.value,
+                                'type'       : 'email',
+                                'themes'     : themes,
+                                'active'     : form.template.vars.value,
+                                'themeGroup' : customThemeTabEnabled ? 'standard' : 'all',
                             }) -}}
                         </div>
+                        {% if customThemeTabEnabled %}
+                        <div class="tab-pane fade{{ activeThemeIsCustom ? ' show active' : '' }} bdr-w-0" id="custom-theme-container">
+                            {{- include('@MauticCore/Helper/theme_select.html.twig', {
+                                'type'       : 'email',
+                                'themes'     : themes,
+                                'active'     : form.template.vars.value,
+                                'themeGroup' : 'custom',
+                            }) -}}
+                        </div>
+                        {% endif %}
                         <div class="tab-pane fade bdr-w-0" id="advanced-container">
                             <div class="row">
                                 <div class="col-md-6">

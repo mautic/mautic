@@ -19,9 +19,11 @@ use Twig\Error\RuntimeError;
 use Twig\Extension\SandboxExtension;
 use Twig\RuntimeLoader\RuntimeLoaderInterface;
 
-class ThemeHelper implements ThemeHelperInterface
+class ThemeHelper implements ThemeHelperInterface, CustomThemeHelperInterface
 {
     public const HIDDEN_THEMES_TXT = 'hidden-themes.txt';
+
+    public const CUSTOM_THEMES_TXT = 'custom-themes.txt';
 
     /**
      * @var array<string, mixed[]>
@@ -106,6 +108,13 @@ class ThemeHelper implements ThemeHelperInterface
      * @var array<int, string>
      */
     private array $hiddenThemes = [];
+
+    /**
+     * Names of the themes marked as custom. Null until the list is read from the file.
+     *
+     * @var array<int, string>|null
+     */
+    private ?array $customThemes = null;
 
     public function __construct(
         private readonly PathsHelper $pathsHelper,
@@ -219,6 +228,11 @@ class ThemeHelper implements ThemeHelperInterface
         }
 
         $this->filesystem->remove($root.$theme);
+
+        // Do not keep the name of a removed theme in the list of custom themes.
+        if (in_array($theme, $this->getCustomThemes(), true)) {
+            $this->saveCustomThemes(array_values(array_diff($this->getCustomThemes(), [$theme])));
+        }
     }
 
     /**
@@ -275,7 +289,7 @@ class ThemeHelper implements ThemeHelperInterface
         }
 
         if ($extended) {
-            return $this->themesInfo[$key];
+            return $this->addCustomFlag($this->themesInfo[$key]);
         }
 
         return $this->themes[$key];
@@ -850,6 +864,95 @@ class ThemeHelper implements ThemeHelperInterface
         } else {
             $this->addToHidden($themeName);
         }
+    }
+
+    /**
+     * Marks a theme as custom. If the theme is already custom, the mark is removed.
+     * This works for every installed theme, not only for the default themes.
+     *
+     * @return bool true if the theme is custom after the change
+     *
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public function toggleCustom(string $themeName): bool
+    {
+        if (!isset($this->getInstalledThemes()[$themeName])) {
+            throw new FileNotFoundException($themeName.' not found!');
+        }
+
+        $customThemes = $this->getCustomThemes();
+
+        if (in_array($themeName, $customThemes, true)) {
+            $customThemes = array_values(array_diff($customThemes, [$themeName]));
+            $isCustom     = false;
+        } else {
+            $customThemes[] = $themeName;
+            $isCustom       = true;
+        }
+
+        $this->saveCustomThemes($customThemes);
+
+        return $isCustom;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getCustomThemes(): array
+    {
+        if (null !== $this->customThemes) {
+            return $this->customThemes;
+        }
+
+        $file = $this->getCustomThemesFilePath();
+
+        if (!$this->filesystem->exists($file)) {
+            return $this->customThemes = [];
+        }
+
+        $names = array_map(trim(...), explode('|', $this->filesystem->readFile($file)));
+
+        return $this->customThemes = array_values(array_unique(array_filter($names, static fn (string $name): bool => '' !== $name)));
+    }
+
+    /**
+     * @param array<int, string> $themes
+     *
+     * @throws IOException
+     */
+    private function saveCustomThemes(array $themes): void
+    {
+        $file = $this->getCustomThemesFilePath();
+
+        if ([] === $themes) {
+            $this->filesystem->remove($file);
+        } else {
+            $this->filesystem->dumpFile($file, implode('|', $themes));
+        }
+
+        $this->customThemes = $themes;
+    }
+
+    /**
+     * @param array<string, mixed[]> $themesInfo
+     *
+     * @return array<string, mixed[]>
+     */
+    private function addCustomFlag(array $themesInfo): array
+    {
+        $customThemes = $this->getCustomThemes();
+
+        foreach (array_keys($themesInfo) as $themeName) {
+            $themesInfo[$themeName]['custom'] = in_array((string) $themeName, $customThemes, true);
+        }
+
+        return $themesInfo;
+    }
+
+    private function getCustomThemesFilePath(): string
+    {
+        return $this->pathsHelper->getThemesPath().'/'.self::CUSTOM_THEMES_TXT;
     }
 
     private function sortThemesInfo(string $key): void

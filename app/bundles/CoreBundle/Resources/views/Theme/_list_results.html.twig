@@ -60,6 +60,28 @@
                         } %}
                     {% endif %}
 
+                    {% set isCustomTheme = item.custom|default(false) %}
+                    {% set customThemeButton = {} %}
+
+                    {% if permissions['core:themes:edit'] %}
+                        {% set customBtnText = isCustomTheme ? 'mautic.core.theme.custom.button.unset' : 'mautic.core.theme.custom.button.set' %}
+                        {% set customMessage = isCustomTheme ? 'mautic.core.theme.form.confirm.custom.unset' : 'mautic.core.theme.form.confirm.custom.set' %}
+
+                        {% set customThemeButton = {
+                            'attr': {
+                                'data-toggle': 'confirmation',
+                                'href': path('mautic_themes_action', {'objectAction': 'custom', 'objectId': k}),
+                                'data-message': customMessage|trans({'%theme%': item.name ~ ' (' ~ k ~ ')'}),
+                                'data-confirm-text': customBtnText|trans,
+                                'data-confirm-callback': 'executeAction',
+                                'data-cancel-text': 'mautic.core.form.cancel'|trans,
+                                'data-confirm-btn-class': '',
+                            },
+                            'btnText': customBtnText|trans,
+                            'iconClass': isCustomTheme ? 'ri-eraser-line' : 'ri-brush-line',
+                        } %}
+                    {% endif %}
+
                     <tr>
                         <td>
                             {% set item = item|merge({id: item.key}) %}
@@ -91,6 +113,9 @@
                                 'iconClass': 'ri-download-line',
                             } %}
                             {% set customButtons = customButtons|merge([downloadButton]) %}
+                            {% if customThemeButton is not empty %}
+                                {% set customButtons = customButtons|merge([customThemeButton]) %}
+                            {% endif %}
                             {% if visibilityButton is not empty %}
                                 {% set customButtons = customButtons|merge([visibilityButton]) %}
                             {% endif %}
@@ -125,6 +150,18 @@
                         <td class="{{ visibilityCss }}">
                             <div>
                                 {{ item['name']|e }} ({{ item['key']|e }})
+                                {% if isCustomTheme %}
+                                    {% include '@MauticCore/Helper/_tag.html.twig' with {
+                                        tags: [{
+                                            'label': 'mautic.core.theme.custom',
+                                            'icon': 'ri-brush-line',
+                                            'icon_only': true,
+                                            'color': 'brand',
+                                            'size': 'sm',
+                                            'attributes': {'id': 'custom-theme-icon-' ~ k}
+                                        }]
+                                    } %}
+                                {% endif %}
                             </div>
                         </td>
                         <td class="{{ visibilityCss }}">

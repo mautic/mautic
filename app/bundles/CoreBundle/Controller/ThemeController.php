@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Controller;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Form\Type\ThemeUploadType;
+use Mautic\CoreBundle\Helper\CustomThemeHelperInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
@@ -324,6 +325,78 @@ final class ThemeController extends FormController
                 'flashes' => $flashes,
             ])
         );
+    }
+
+    /**
+     * Sets a theme as custom theme, or removes the custom theme mark.
+     */
+    public function customAction(string $objectId, Request $request, CorePermissions $corePermissions, ThemeHelperInterface $themeHelper, CustomThemeHelperInterface $customThemeHelper): Response
+    {
+        if (!$corePermissions->isGranted('core:themes:edit')) {
+            $this->throwAccessDenied();
+        }
+
+        $flashes = [];
+
+        if (Request::METHOD_POST === $request->getMethod()) {
+            // The request subscriber checks the CSRF token only for AJAX requests, so this action checks it as well.
+            if (!$this->isCsrfTokenValid('mautic_ajax_post', $request->headers->get('X-CSRF-Token'))) {
+                $this->throwAccessDenied();
+            }
+
+            $flashes = $this->custom($objectId, $themeHelper, $customThemeHelper);
+        }
+
+        return $this->postActionRedirect(
+            array_merge($this->getIndexPostActionVars(), [
+                'flashes' => $flashes,
+            ])
+        );
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function custom(string $themeName, ThemeHelperInterface $themeHelper, CustomThemeHelperInterface $customThemeHelper): array
+    {
+        try {
+            // toggleCustom() compares the exact name with the installed themes.
+            // Do not use exists() here: it changes the name to lowercase, so it does not find a theme like "ThemeCreative".
+            $isCustom = $customThemeHelper->toggleCustom($themeName);
+            $theme    = $themeHelper->getTheme($themeName);
+
+            return [
+                [
+                    'type'    => 'notice',
+                    'msg'     => $isCustom ? 'mautic.core.theme.custom.set' : 'mautic.core.theme.custom.unset',
+                    'msgVars' => ['%theme%' => $theme->getName()],
+                ],
+            ];
+        } catch (FileNotFoundException) {
+            return [
+                [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.core.theme.error.notfound',
+                    'msgVars' => ['%theme%' => $themeName],
+                ],
+            ];
+        } catch (IOException) {
+            return [
+                [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.core.theme.custom.error',
+                    'msgVars' => ['%error%' => 'Failed to save the custom theme setting'],
+                ],
+            ];
+        } catch (BadConfigurationException) {
+            return [
+                [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.core.theme.custom.error',
+                    'msgVars' => ['%error%' => sprintf('Theme %s is not configured properly', $themeName)],
+                ],
+            ];
+        }
     }
 
     /**
