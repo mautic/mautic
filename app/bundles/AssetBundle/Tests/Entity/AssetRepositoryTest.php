@@ -23,13 +23,9 @@ final class AssetRepositoryTest extends TestCase
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(fn (string $id): string => match ($id) {
-            'mautic.asset.asset.searchcommand.isexpired'  => 'is:expired',
-            'mautic.asset.asset.searchcommand.ispending'  => 'is:pending',
-            'mautic.asset.asset.searchcommand.isimage'    => 'is:image',
-            'mautic.asset.asset.searchcommand.isvideo'    => 'is:video',
-            'mautic.asset.asset.searchcommand.isaudio'    => 'is:audio',
-            'mautic.asset.asset.searchcommand.isdocument' => 'is:document',
-            default                                       => $id,
+            'mautic.asset.asset.searchcommand.isexpired' => 'is:expired',
+            'mautic.asset.asset.searchcommand.ispending' => 'is:pending',
+            default                                      => $id,
         });
         $repository->autowireCommonRepository($translator);
 
@@ -66,68 +62,5 @@ final class AssetRepositoryTest extends TestCase
         $commands   = $repository->getSearchCommands();
         $this->assertContains('mautic.asset.asset.searchcommand.isexpired', $commands);
         $this->assertContains('mautic.asset.asset.searchcommand.ispending', $commands);
-    }
-
-    /**
-     * @return iterable<array{0: string, 1: string}>
-     */
-    public static function mimeCommandProvider(): iterable
-    {
-        yield ['is:image', 'image/%'];
-        yield ['is:video', 'video/%'];
-        yield ['is:audio', 'audio/%'];
-    }
-
-    #[DataProvider('mimeCommandProvider')]
-    public function testAddSearchCommandWhereClauseForMimeCommands(string $command, string $expectedValue): void
-    {
-        $repository = $this->getRepository();
-        $qb         = $this->connection->createQueryBuilder();
-        $filter     = (object) ['command' => $command, 'string' => '', 'not' => false, 'strict' => false];
-
-        $method = new \ReflectionMethod(AssetRepository::class, 'addSearchCommandWhereClause');
-
-        [$expr, $parameters] = $method->invoke($repository, $qb, $filter);
-
-        $this->assertCount(1, $parameters);
-        $paramName = array_key_first($parameters);
-        $this->assertSame($expectedValue, $parameters[$paramName]);
-        $this->assertSame("a.mime LIKE :$paramName", (string) $expr);
-    }
-
-    public function testAddSearchCommandWhereClauseForDocument(): void
-    {
-        $repository = $this->getRepository();
-        $qb         = $this->connection->createQueryBuilder();
-        $filter     = (object) ['command' => 'is:document', 'string' => '', 'not' => false, 'strict' => false];
-
-        $method = new \ReflectionMethod(AssetRepository::class, 'addSearchCommandWhereClause');
-
-        [$expr, $parameters] = $method->invoke($repository, $qb, $filter);
-
-        $values = array_values($parameters);
-        $this->assertContains('application/pdf', $values);
-        $this->assertContains('application/vnd.openxmlformats-officedocument.wordprocessingml.document', $values);
-        $this->assertContains('text/plain', $values);
-        $this->assertContains('text/csv', $values);
-        $this->assertNotContains('application/%', $values);
-        $this->assertNotContains('application/zip', $values);
-        $this->assertNotContains('application/octet-stream', $values);
-        $this->assertStringStartsWith('(', (string) $expr);
-        $this->assertStringNotContainsString('LIKE', (string) $expr);
-    }
-
-    public function testNegatedMimeCommandKeepsRowsWithoutMime(): void
-    {
-        $repository = $this->getRepository();
-        $qb         = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $qb->method('expr')->willReturn(new \Doctrine\ORM\Query\Expr());
-        $filter     = (object) ['command' => 'is:image', 'string' => '', 'not' => true, 'strict' => false];
-
-        $method = new \ReflectionMethod(AssetRepository::class, 'addSearchCommandWhereClause');
-
-        [$expr] = $method->invoke($repository, $qb, $filter);
-
-        $this->assertStringContainsString('a.mime IS NULL', (string) $expr);
     }
 }

@@ -163,10 +163,8 @@ class AssetRepository extends CommonRepository
                 $documentExpressions = [];
                 $forceParameters     = [];
                 foreach ($documentMimeTypes as $mime) {
-                    $documentUnique = $this->generateRandomParameterName();
-                    $documentExpressions[] = str_contains($mime, '%')
-                        ? $q->expr()->like('a.mime', ":$documentUnique")
-                        : $q->expr()->eq('a.mime', ":$documentUnique");
+                    $documentUnique                   = $this->generateRandomParameterName();
+                    $documentExpressions[]            = $q->expr()->eq('a.mime', ":$documentUnique");
                     $forceParameters[$documentUnique] = $mime;
                 }
                 $expr                    = '('.implode(' OR ', $documentExpressions).')';
