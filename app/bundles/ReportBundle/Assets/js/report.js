@@ -21,7 +21,7 @@ Mautic.reportOnLoad = function (container) {
         }
     } else {
         mQuery('#report-shelves .collapse').on('show.bs.collapse', function (e) {
-            var actives = mQuery('#report-shelves').find('.in, .collapsing');
+            var actives = mQuery('#report-shelves').find('.show, .collapsing');
             actives.each(function (index, element) {
                 mQuery(element).collapse('hide');
                 var id = mQuery(element).attr('id');
