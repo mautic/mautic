@@ -284,7 +284,6 @@ class CampaignRepository extends CommonRepository
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('c.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('c.publishDown'),
-                    $q->expr()->neq('c.publishDown', $q->expr()->literal('')),
                     $q->expr()->lt('c.publishDown', 'CURRENT_TIMESTAMP()')
                 );
                 $forceParameters = [$unique => true];
@@ -294,7 +293,6 @@ class CampaignRepository extends CommonRepository
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('c.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('c.publishUp'),
-                    $q->expr()->neq('c.publishUp', $q->expr()->literal('')),
                     $q->expr()->gt('c.publishUp', 'CURRENT_TIMESTAMP()')
                 );
                 $forceParameters = [$unique => true];

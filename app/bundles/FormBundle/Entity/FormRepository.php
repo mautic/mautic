@@ -121,7 +121,6 @@ class FormRepository extends CommonRepository
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('f.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('f.publishDown'),
-                    $q->expr()->neq('f.publishDown', $q->expr()->literal('')),
                     $q->expr()->lt('f.publishDown', 'CURRENT_TIMESTAMP()')
                 );
                 $forceParameters = [$unique => true];
@@ -131,7 +130,6 @@ class FormRepository extends CommonRepository
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('f.isPublished', ":{$unique}"),
                     $q->expr()->isNotNull('f.publishUp'),
-                    $q->expr()->neq('f.publishUp', $q->expr()->literal('')),
                     $q->expr()->gt('f.publishUp', 'CURRENT_TIMESTAMP()')
                 );
                 $forceParameters = [$unique => true];
