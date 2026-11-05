@@ -83,7 +83,6 @@ final class CampaignType extends AbstractType
                 'data-confirm-callback'  => 'dismissConfirmation',
                 'data-cancel-text'       => $this->translator->trans('mautic.campaign.form.confirmation.cancel_text'),
                 'data-cancel-callback'   => 'setPublishedButtonToYes',
-                'data-enable-schedule-when-inactive' => 'true',
                 'class'                  => 'btn btn-ghost',
             ];
         } elseif (!$this->security->isGranted('campaign:campaigns:publish')) {
@@ -92,10 +91,10 @@ final class CampaignType extends AbstractType
         } else {
             $readonly = false;
             $data     = false;
-            $attr['data-enable-schedule-when-inactive'] = 'true';
         }
 
         $attr['readonly'] = $readonly;
+        $attr['data-enable-schedule-when-inactive'] = 'true';
 
         $builder->add('isPublished', YesNoButtonGroupType::class, [
             'data' => $data,
