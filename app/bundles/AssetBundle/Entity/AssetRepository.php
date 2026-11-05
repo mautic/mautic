@@ -143,13 +143,30 @@ class AssetRepository extends CommonRepository
                 break;
             case $this->translator->trans('mautic.asset.asset.searchcommand.isdocument'):
             case $this->translator->trans('mautic.asset.asset.searchcommand.isdocument', [], null, 'en_US'):
-                $docUnique1      = $this->generateRandomParameterName();
-                $docUnique2      = $this->generateRandomParameterName();
-                $expr            = '('.$q->expr()->like('a.mime', ":$docUnique1").' OR '.$q->expr()->like('a.mime', ":$docUnique2").')';
-                $forceParameters = [
-                    $docUnique1 => 'application/%',
-                    $docUnique2 => 'text/%',
+                $documentMimeTypes = [
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/vnd.ms-excel',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    'application/vnd.ms-powerpoint',
+                    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+                    'application/vnd.oasis.opendocument.text',
+                    'application/vnd.oasis.opendocument.spreadsheet',
+                    'application/vnd.oasis.opendocument.presentation',
+                    'application/rtf',
+                    'text/%',
                 ];
+                $documentExpressions = [];
+                $forceParameters     = [];
+                foreach ($documentMimeTypes as $mime) {
+                    $documentUnique = $this->generateRandomParameterName();
+                    $documentExpressions[] = str_contains($mime, '%')
+                        ? $q->expr()->like('a.mime', ":$documentUnique")
+                        : $q->expr()->eq('a.mime', ":$documentUnique");
+                    $forceParameters[$documentUnique] = $mime;
+                }
+                $expr = '('.implode(' OR ', $documentExpressions).')';
                 break;
             case $this->translator->trans('mautic.project.searchcommand.name'):
             case $this->translator->trans('mautic.project.searchcommand.name', [], null, 'en_US'):

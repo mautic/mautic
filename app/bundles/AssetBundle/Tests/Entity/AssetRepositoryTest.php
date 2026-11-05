@@ -105,13 +105,12 @@ final class AssetRepositoryTest extends TestCase
 
         [$expr, $parameters] = $method->invoke($repository, $qb, $filter);
 
-        $this->assertCount(2, $parameters);
-        $keys = array_keys($parameters);
-        $this->assertSame('application/%', $parameters[$keys[0]]);
-        $this->assertSame('text/%', $parameters[$keys[1]]);
-        $this->assertSame(
-            sprintf('(a.mime LIKE :%s OR a.mime LIKE :%s)', $keys[0], $keys[1]),
-            (string) $expr
-        );
+        $values = array_values($parameters);
+        $this->assertContains('application/pdf', $values);
+        $this->assertContains('application/vnd.openxmlformats-officedocument.wordprocessingml.document', $values);
+        $this->assertContains('text/%', $values);
+        $this->assertNotContains('application/zip', $values);
+        $this->assertNotContains('application/octet-stream', $values);
+        $this->assertStringStartsWith('(', (string) $expr);
     }
 }
