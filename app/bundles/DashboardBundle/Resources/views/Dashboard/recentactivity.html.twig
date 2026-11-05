@@ -5,7 +5,7 @@
         <ul class="media-list media-list-feed">
             {% for log in logs %}
                 <li class="media">
-                    <div class="media-object pull-left">
+                    <div class="media-object float-start">
                         <span class="figure featured {% if 'create' == log.action %}bg-success{% endif %}">
                             <span class="fa {{ icons[log.bundle]|default('') }}"></span>
                         </span>
