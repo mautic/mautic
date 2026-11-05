@@ -61,7 +61,7 @@ class DoNotContactRepository extends CommonRepository
 
         if ($listId) {
             if (!$combined) {
-                $q->innerJoin('dnc', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = dnc.lead_id');
+                $q->innerJoin('dnc', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'cs', 'cs.lead_id = dnc.lead_id AND cs.manually_removed = 0');
 
                 if (true === $listId) {
                     $q->addSelect('cs.leadlist_id')
@@ -85,7 +85,8 @@ class DoNotContactRepository extends CommonRepository
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'list')
                     ->andWhere(
                         $q->expr()->in('list.leadlist_id', ':segmentIds')
-                    );
+                    )
+                    ->andWhere('list.manually_removed = 0');
 
                 $q->setParameter('segmentIds', array_map(intval(...), $listId), ArrayParameterType::INTEGER);
 
