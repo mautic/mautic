@@ -376,11 +376,10 @@ final class LeadFieldRepositoryTest extends TestCase
     public function testSearchCommandsGenerateSystemAndCustomExpressions(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(static fn ($id) => $id);
+        $translator->method('trans')->willReturnCallback(static fn (string $id): string => $id);
         $this->repository->autowireCommonRepository($translator);
 
         $method = new \ReflectionMethod(LeadFieldRepository::class, 'addSearchCommandWhereClause');
-        $method->setAccessible(true);
 
         $filter = (object) [
             'command' => 'mautic.lead.field.searchcommand.issystemdefault',
@@ -396,7 +395,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $systemQueryBuilder = $this->createMock(QueryBuilder::class);
         $systemQueryBuilder->method('expr')->willReturn(new ExpressionBuilder($this->connection));
-        $systemQueryBuilder->expects(self::once())
+        $systemQueryBuilder->expects($this->once())
             ->method('setParameter')
             ->with(
                 self::callback(static fn (string $name): bool => str_starts_with($name, 'par')),
@@ -411,14 +410,14 @@ final class LeadFieldRepositoryTest extends TestCase
 
         [$systemExpr, $systemParameters] = $method->invoke($this->repository, $systemQueryBuilder, $filter);
 
-        self::assertSame([], $systemParameters);
-        self::assertStringContainsString('f.alias IN', $systemExpr);
+        $this->assertSame([], $systemParameters);
+        $this->assertStringContainsString('f.alias IN', (string) $systemExpr);
 
         $customFilter          = clone $filter;
         $customFilter->command = 'mautic.lead.field.searchcommand.isusercreated';
         $customQueryBuilder    = $this->createMock(QueryBuilder::class);
         $customQueryBuilder->method('expr')->willReturn(new ExpressionBuilder($this->connection));
-        $customQueryBuilder->expects(self::once())
+        $customQueryBuilder->expects($this->once())
             ->method('setParameter')
             ->with(
                 self::callback(static fn (string $name): bool => str_starts_with($name, 'par')),
@@ -433,8 +432,8 @@ final class LeadFieldRepositoryTest extends TestCase
 
         [$customExpr, $customParameters] = $method->invoke($this->repository, $customQueryBuilder, $customFilter);
 
-        self::assertSame([], $customParameters);
-        self::assertStringContainsString('NOT', $customExpr);
+        $this->assertSame([], $customParameters);
+        $this->assertStringContainsString('NOT', (string) $customExpr);
     }
 
     private function createQueryMock(): MockObject

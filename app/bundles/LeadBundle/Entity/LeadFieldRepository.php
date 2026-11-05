@@ -606,11 +606,7 @@ class LeadFieldRepository extends CommonRepository
         $parameter = $this->generateRandomParameterName();
         $expr      = $q->expr()->in($column, ":$parameter");
 
-        if ($q instanceof OrmQueryBuilder) {
-            $q->setParameter($parameter, $aliases, ArrayParameterType::STRING);
-        } else {
-            $q->setParameter($parameter, $aliases, ArrayParameterType::STRING);
-        }
+        $q->setParameter($parameter, $aliases, ArrayParameterType::STRING);
 
         return [$expr, []];
     }
@@ -630,7 +626,7 @@ class LeadFieldRepository extends CommonRepository
      * @param OrmQueryBuilder|DbalQueryBuilder $q
      * @param mixed                            $expr
      */
-    private function negateExpression($q, $expr)
+    private function negateExpression($q, $expr): object|string
     {
         if ($q instanceof OrmQueryBuilder) {
             return $q->expr()->not($expr);
