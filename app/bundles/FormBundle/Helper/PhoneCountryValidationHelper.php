@@ -10,6 +10,8 @@ use Symfony\Component\Intl\Countries;
 
 final class PhoneCountryValidationHelper
 {
+    private const PHONE_NUMBER_FORMAT = '/^\+?[\d\s\p{Zs}().\-\x{2010}-\x{2015}\/~\[\]]+\z/u';
+
     /**
      * Validates a phone number for a specific country using libphonenumber.
      *
@@ -17,6 +19,12 @@ final class PhoneCountryValidationHelper
      */
     public static function isValidForCountry(string $phoneNumber, string $countryCode): bool
     {
+        $phoneNumber = trim($phoneNumber);
+
+        if (1 !== preg_match(self::PHONE_NUMBER_FORMAT, $phoneNumber)) {
+            return false;
+        }
+
         $phoneUtil = PhoneNumberUtil::getInstance();
 
         try {
@@ -56,6 +64,8 @@ final class PhoneCountryValidationHelper
                 $result[$allCountries[$regionCode]] = $regionCode;
             }
         }
+
+        ksort($result);
 
         return $result;
     }

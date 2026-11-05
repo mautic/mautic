@@ -324,4 +324,119 @@ final class FormValidationSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($event->isValid());
     }
+
+    public function testCountryPhoneValidationFailsForZeroValue(): void
+    {
+        $this->translator
+            ->method('trans')
+            ->with('mautic.form.submission.phone.invalid_country', ['%country%' => 'United States'], 'validators')
+            ->willReturn('Please enter a valid United States phone number.');
+
+        $field = new Field();
+        $field->setType('tel');
+        $field->setValidation(['country' => 'US']);
+
+        $event = new ValidationEvent($field, '0');
+        $this->subscriber->onFormValidate($event);
+
+        $this->assertFalse($event->isValid());
+        $this->assertSame('Please enter a valid United States phone number.', $event->getInvalidReason());
+    }
+
+    public function testCountryPhoneValidationPreservesZeroCustomMessage(): void
+    {
+        $field = new Field();
+        $field->setType('tel');
+        $field->setValidation([
+            'country'               => 'US',
+            'country_validationmsg' => '0',
+        ]);
+
+        $event = new ValidationEvent($field, '+5511999999999');
+        $this->subscriber->onFormValidate($event);
+
+        $this->assertFalse($event->isValid());
+        $this->assertSame('0', $event->getInvalidReason());
+    }
+
+    public function testCountryPhoneValidationRejectsTextContainingPhoneNumber(): void
+    {
+        $this->translator
+            ->method('trans')
+            ->with('mautic.form.submission.phone.invalid_country', ['%country%' => 'United States'], 'validators')
+            ->willReturn('Please enter a valid United States phone number.');
+
+        $field = new Field();
+        $field->setType('tel');
+        $field->setValidation(['country' => 'US']);
+
+        $event = new ValidationEvent($field, 'Call me at +12025550123');
+        $this->subscriber->onFormValidate($event);
+
+        $this->assertFalse($event->isValid());
+    }
+
+    public function testCountryPhoneValidationSkippedForUnsupportedPhoneRegion(): void
+    {
+        $field = new Field();
+        $field->setType('tel');
+        $field->setValidation(['country' => 'AQ']);
+
+        $event = new ValidationEvent($field, '+5511999999999');
+        $this->subscriber->onFormValidate($event);
+
+        $this->assertTrue($event->isValid());
+    }
+
+    public function testTelValidationSkipsEmptyValueWhenCountryIsSet(): void
+    {
+        $field = new Field();
+        $field->setType('tel');
+        $field->setValidation(['country' => 'US', 'international' => 1]);
+
+        $event = new ValidationEvent($field, '');
+        $this->subscriber->onFormValidate($event);
+
+        $this->assertTrue($event->isValid());
+    }
+
+    public function testTelValidationHandlesNullValidationSettings(): void
+    {
+        $field = new Field();
+        $field->setType('tel');
+        $field->setValidation(null);
+
+        $event = new ValidationEvent($field, '+12025550123');
+        $this->subscriber->onFormValidate($event);
+
+        $this->assertTrue($event->isValid());
+    }
+
+    public function testTelValidationSkipsWhitespaceOnlyValueWhenCountryIsSet(): void
+    {
+        $field = new Field();
+        $field->setType('tel');
+        $field->setValidation(['country' => 'US']);
+
+        $event = new ValidationEvent($field, '   ');
+        $this->subscriber->onFormValidate($event);
+
+        $this->assertTrue($event->isValid());
+    }
+
+    public function testInternationalPhoneValidationUsesZeroCustomMessage(): void
+    {
+        $field = new Field();
+        $field->setType('tel');
+        $field->setValidation([
+            'international'               => 1,
+            'international_validationmsg' => '0',
+        ]);
+
+        $event = new ValidationEvent($field, 'not a phone');
+        $this->subscriber->onFormValidate($event);
+
+        $this->assertFalse($event->isValid());
+        $this->assertSame('0', $event->getInvalidReason());
+    }
 }

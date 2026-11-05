@@ -76,10 +76,10 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
         $value = $event->getValue();
 
         if (!empty($value)) {
-            $this->fieldTelValidation($event);
             $this->fieldEmailValidation($event);
         }
 
+        $this->fieldTelValidation($event);
         $this->fieldCheckboxGroupValidation($event);
     }
 
@@ -116,37 +116,28 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
     {
         $field = $event->getField();
 
-        if ('tel' !== $field->getType()) {
+        if ('tel' !== $field->getType() || '' === trim((string) $event->getValue())) {
             return;
         }
 
         $validation = $field->getValidation() ?? [];
 
-        if ($this->validatePhoneCountry($event, $validation)) {
-            return;
+        if (!$this->failsCountryValidation($event, $validation)) {
+            $this->validateInternationalPhone($event, $validation);
         }
-
-        $this->validateInternationalPhone($event, $validation);
     }
 
     /**
      * @param array<string, mixed> $validation
      */
-    private function validatePhoneCountry(Events\ValidationEvent $event, array $validation): bool
+    private function failsCountryValidation(Events\ValidationEvent $event, array $validation): bool
     {
-        if (empty($validation['country'])) {
-            return false;
-        }
+        $countryCode = (string) ($validation['country'] ?? '');
 
-        $countryCode = (string) $validation['country'];
-
-        // Unknown/legacy value (e.g. a display name saved before this stored the ISO code):
-        // skip validation rather than crash or reject every submission.
-        if (!PhoneCountryValidationHelper::isSupportedCountry($countryCode)) {
-            return false;
-        }
-
-        if (PhoneCountryValidationHelper::isValidForCountry((string) $event->getValue(), $countryCode)) {
+        // Not a supported phone region: skip rather than block every submission.
+        if (!PhoneCountryValidationHelper::isSupportedCountry($countryCode)
+            || PhoneCountryValidationHelper::isValidForCountry((string) $event->getValue(), $countryCode)
+        ) {
             return false;
         }
 
@@ -172,7 +163,7 @@ final readonly class FormValidationSubscriber implements EventSubscriberInterfac
         try {
             $phoneUtil->parse((string) $event->getValue(), PhoneNumberUtil::UNKNOWN_REGION);
         } catch (NumberParseException) {
-            if (!empty($validation['international_validationmsg'])) {
+            if (isset($validation['international_validationmsg']) && '' !== $validation['international_validationmsg']) {
                 $event->failedValidation($validation['international_validationmsg']);
 
                 return;
