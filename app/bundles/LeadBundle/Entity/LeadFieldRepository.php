@@ -5,7 +5,6 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Order;
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
@@ -608,7 +607,7 @@ class LeadFieldRepository extends CommonRepository
         $expr      = $q->expr()->in($column, ":$parameter");
 
         if ($q instanceof OrmQueryBuilder) {
-            $q->setParameter($parameter, $aliases, Connection::PARAM_STR_ARRAY);
+            $q->setParameter($parameter, $aliases, ArrayParameterType::STRING);
         } else {
             $q->setParameter($parameter, $aliases, ArrayParameterType::STRING);
         }

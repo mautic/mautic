@@ -377,7 +377,7 @@ final class LeadFieldRepositoryTest extends TestCase
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(static fn ($id) => $id);
-        $this->repository->setTranslator($translator);
+        $this->repository->autowireCommonRepository($translator);
 
         $method = new \ReflectionMethod(LeadFieldRepository::class, 'addSearchCommandWhereClause');
         $method->setAccessible(true);
