@@ -1209,8 +1209,13 @@ window.MauticInstallLegacyAffix = function (jQuery) {
         if (!container || !container.querySelectorAll || !window.bootstrap || !window.bootstrap.Popover) {
             return;
         }
-        container.querySelectorAll('[data-bs-toggle="popover"]:not([data-toggle="popover"]):not([data-quick-filter])').forEach(function (element) {
-            window.bootstrap.Popover.getOrCreateInstance(element);
+        var popoverSelector = '[data-bs-toggle="popover"]:not([data-toggle="popover"]):not([data-quick-filter])';
+        var elements = Array.from(container.querySelectorAll(popoverSelector));
+        if (container.matches && container.matches(popoverSelector)) {
+            elements.unshift(container);
+        }
+        elements.forEach(function (element) {
+            window.bootstrap.Popover.getOrCreateInstance(element, {sanitize: false});
         });
     }
 
