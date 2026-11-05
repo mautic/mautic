@@ -33,6 +33,7 @@ use Mautic\LeadBundle\Helper\FakeContactHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\PageBundle\Exception\InvalidRenderedHtmlException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -1648,7 +1649,7 @@ final class EmailController extends FormController
         );
     }
 
-    public function batchSendExampleAction(Request $request, FakeContactHelper $fakeLeadHelper): Response
+    public function batchSendExampleAction(Request $request, FakeContactHelper $fakeLeadHelper, LoggerInterface $logger): Response
     {
         $page      = $request->getSession()->get('mautic.email.page', 1);
         $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
@@ -1695,6 +1696,7 @@ final class EmailController extends FormController
                     try {
                         $errors = $this->emailModel->sendSampleEmailToUser($email, $users, $fields, [], [], false);
                     } catch (\Exception $exception) {
+                        $logger->error('Batch test send failed for email', ['emailId' => $email->getId(), 'exception' => $exception]);
                         $errors = [$exception->getMessage()];
                     }
 
