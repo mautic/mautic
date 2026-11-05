@@ -2622,7 +2622,7 @@ Mautic.applyFilters = function () {
 
     // Properly destroy and reinitialize popover
     const popoverTrigger = mQuery('[data-quick-filter]');
-    popoverTrigger.popover('destroy');
+    popoverTrigger.each((index, element) => bootstrap.Popover.getInstance(element)?.dispose());
     popoverTrigger.popover(Mautic.getQuickFilterPopoverOptions());
 
     const enterKeyEvent = new KeyboardEvent('keyup', {
@@ -2675,7 +2675,7 @@ Mautic.resetFilters = function () {
 
     // Properly destroy the popover instead of hiding it
     const popoverTrigger = mQuery('[data-quick-filter]');
-    popoverTrigger.popover('destroy');
+    popoverTrigger.each((index, element) => bootstrap.Popover.getInstance(element)?.dispose());
 
     const enterKeyEvent = new KeyboardEvent('keyup', {
         key: 'Enter',
