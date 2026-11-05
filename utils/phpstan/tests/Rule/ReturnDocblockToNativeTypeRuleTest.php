@@ -74,6 +74,16 @@ final class ReturnDocblockToNativeTypeRuleTest extends RuleTestCase
         ]);
     }
 
+    public function testSelfIntersectionKeepsClassName(): void
+    {
+        $this->analyse([__DIR__.'/Fixture/SelfIntersectionReturn.php'], [
+            [
+                'Method "build()" has an "@return Utils\PHPStan\Tests\Rule\Fixture\SelfIntersectionReturn&Countable" docblock but no native return type. Declare ": Utils\PHPStan\Tests\Rule\Fixture\SelfIntersectionReturn&Countable" and drop the "@return" tag.',
+                12,
+            ],
+        ]);
+    }
+
     public function testPromoteWholeFamily(): void
     {
         $this->analyse([

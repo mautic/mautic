@@ -24,8 +24,8 @@ use PHPStan\Type\UnionType;
  * way.
  *
  * A plain single class, "self", "static"/"$this", a nullable object, a union of objects, an intersection of
- * objects, the "iterable" keyword and a generator (promoted to "iterable") are promoted; generics, arrays and
- * scalars are left alone.
+ * objects and the bare "iterable"/"Traversable" keyword (including a generator so documented) are promoted;
+ * generics, a "Generator" tag, arrays and scalars are left alone.
  *
  * @phpstan-type ReturnCandidate array{type: string}
  *
@@ -75,10 +75,13 @@ final readonly class ReturnObjectDocblockCollector implements Collector
         // the declared return type, which with no native type is the "@return" docblock type
         $docType = $node->getMethodReflection()->getVariants()[0]->getReturnType();
 
-        // a generator always yields a Generator at runtime, so "iterable" is a safe native supertype when the
-        // docblock already documents an iterable-family "@return"; the body-truth check below does not apply
+        $rawReturnTag = $this->rawReturnTag($node);
+
+        // a generator yields a Generator at runtime, so "iterable" is a safe native supertype, but only when
+        // the docblock is the bare "iterable"/"Traversable" keyword: a "Generator" or generic tag carries a
+        // contract (send/return, key/value types) that a native "iterable" would silently drop
         if ($node->isGenerator()) {
-            if ($docType->isIterable()->yes()) {
+            if ($docType->isIterable()->yes() && $this->isPlainIterableKeyword($rawReturnTag)) {
                 $entry['candidate'] = ['type' => 'iterable'];
             }
 
@@ -89,11 +92,10 @@ final readonly class ReturnObjectDocblockCollector implements Collector
 
         // "static" and "$this" map to a native "static" return; in a final class "static" resolves to a plain
         // object type, so the raw tag is read to tell it apart from "self"
-        $rawReturnTag = $this->rawReturnTag($node);
         if ($docType instanceof StaticType || 'static' === $rawReturnTag || '$this' === $rawReturnTag) {
             $typeString = 'static';
         } else {
-            $typeString = $this->buildNativeType($docType, $classReflection->getName());
+            $typeString = $this->buildNativeType($docType, $classReflection->getName(), $rawReturnTag);
             if (null === $typeString) {
                 return $entry;
             }
@@ -117,11 +119,16 @@ final readonly class ReturnObjectDocblockCollector implements Collector
      * and the "iterable" keyword are promoted; a nullable union renders as "A|B|null" because PHP forbids the
      * "?" shorthand alongside a union.
      */
-    private function buildNativeType(Type $docType, string $declaringClass): ?string
+    private function buildNativeType(Type $docType, string $declaringClass, ?string $rawReturnTag): ?string
     {
         // the "iterable" keyword: iterable but neither a definite array nor a definite object (a concrete
         // Traversable object is handled as a plain object below)
         if ($docType->isIterable()->yes() && !$docType->isArray()->yes() && !$docType->isObject()->yes()) {
+            // a generic tag (iterable<int, string>) carries key/value types a bare "iterable" would drop
+            if (null !== $rawReturnTag && str_contains($rawReturnTag, '<')) {
+                return null;
+            }
+
             return 'iterable';
         }
 
@@ -192,7 +199,8 @@ final readonly class ReturnObjectDocblockCollector implements Collector
                 return null;
             }
 
-            $names[] = $className === $declaringClass ? 'self' : $className;
+            // PHP forbids "self" inside an intersection type, so the declaring class keeps its full name here
+            $names[] = $className;
         }
 
         return implode('&', $names);
@@ -293,6 +301,25 @@ final readonly class ReturnObjectDocblockCollector implements Collector
                 : $returnStatement->getScope()->getType($returnNode->expr);
         }
 
+        // a body that can fall off the end returns null implicitly; fold that in so a non-null native type
+        // (": iterable", ": Foo") is never suggested for a method that can return null at runtime
+        if (!$node->getStatementResult()->isAlwaysTerminating()) {
+            $types[] = new NullType();
+        }
+
         return [] === $types ? new NeverType() : TypeCombinator::union(...$types);
+    }
+
+    // the bare "iterable"/"Traversable" keyword, with no generics; anything more specific (a "Generator"
+    // class or a generic tag) would lose meaning as a native "iterable"
+    private function isPlainIterableKeyword(?string $rawReturnTag): bool
+    {
+        if (null === $rawReturnTag) {
+            return false;
+        }
+
+        $normalized = strtolower(ltrim($rawReturnTag, '\\'));
+
+        return 'iterable' === $normalized || 'traversable' === $normalized;
     }
 }
