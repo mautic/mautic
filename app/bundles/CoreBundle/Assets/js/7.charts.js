@@ -87,7 +87,7 @@ Mautic.chartAxisBorder = {display: false, dash: [3, 3]};
 Mautic.chartGradientFill = (datasets) => {
   datasets.forEach((dataset) => {
     const color = String(dataset.borderColor);
-    if (!/^rgba\(/.test(color)) {
+    if (!color.startsWith('rgba(')) {
       return;
     }
     dataset.pointBackgroundColor = color;
@@ -97,8 +97,9 @@ Mautic.chartGradientFill = (datasets) => {
         return;
       }
       const gradient = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
-      gradient.addColorStop(0, color.replace(/[\d.]+\)$/, '0.35)'));
-      gradient.addColorStop(1, color.replace(/[\d.]+\)$/, '0)'));
+      const colorWithoutAlpha = color.slice(0, color.lastIndexOf(','));
+      gradient.addColorStop(0, `${colorWithoutAlpha},0.35)`);
+      gradient.addColorStop(1, `${colorWithoutAlpha},0)`);
       return gradient;
     };
   });
