@@ -84,7 +84,9 @@ final class JsControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('/mtc/event', $content);
         $this->assertStringContainsString('/mtracking.gif', $content);
         $this->assertStringContainsString('setTrackedEvents', $content);
+        $this->assertStringContainsString('mautic:tracking-enabled', $content);
         $this->assertStringContainsString('focus_item', $content);
+        $this->assertGreaterThan(strpos($content, 'focus_item'), strpos($content, 'mautic:tracking-enabled'));
         $this->assertStringContainsString('https://connect.facebook.net/en_US/fbevents.js', $content);
         $this->assertStringNotContainsString('serialize=function', $content);
         $this->assertStringNotContainsString('setCookie=function', $content);

@@ -666,6 +666,9 @@ code:hover > .copy-icon {
   }
 
   &--single {
+    display: inline-flex;
+    vertical-align: middle;
+
     code {
       min-height: 24px;
       display: flex;
@@ -688,9 +691,17 @@ code:hover > .copy-icon {
       }
     }
     button {
+      width: var(--spacing-06);
+      height: 100%;
+      min-height: 0;
+      background-color: var(--layer-02);
       border-top-right-radius: clamp(4px, var(--border-radius-sm), 6px);
       border-bottom-right-radius: clamp(4px, var(--border-radius-sm), 6px);
     }
+  }
+
+  &__code--contrast {
+    background-color: var(--layer-accent);
   }
   &--multi {
     pre:before {
@@ -711,6 +722,34 @@ code:hover > .copy-icon {
       cursor: pointer;
     }
   }
+}
+
+.focus-implementation {
+  overflow: hidden;
+  outline: 1px solid var(--border-tile);
+}
+
+.focus-implementation__pictogram {
+  position: absolute;
+  inset-block-start: var(--layout-density-padding-inline-local);
+  inset-inline-end: var(--layout-density-padding-inline-local);
+  opacity: 0.08;
+  pointer-events: none;
+  transform: translate(15%, -15%);
+
+  svg {
+    stroke: var(--icon-interactive);
+    stroke-width: 2;
+  }
+}
+
+.focus-implementation__content {
+  position: relative;
+}
+
+.focus-implementation .code-snippet--single,
+.focus-implementation .code-snippet--single code {
+  inline-size: 100%;
 }
 
 .asset-preview {

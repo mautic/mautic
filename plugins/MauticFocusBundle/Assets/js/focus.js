@@ -173,6 +173,10 @@ Mautic.focusOnLoad = function () {
         Mautic.focusInitViewportSwitcher();
     } else {
         Mautic.initDateRangePicker();
+
+        mQuery('#focus-installation-tabs').closest('.collapse').one('shown.bs.collapse', function () {
+            mQuery(window).trigger('resize');
+        });
     }
 
     if (mQuery('[data-conversion-rate-table]').length) {
