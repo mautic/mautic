@@ -1,0 +1,22 @@
+name: JavaScript unit tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - '[0-9].*'
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  javascript-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24'
+      - name: Run JavaScript unit tests
+        run: npm test

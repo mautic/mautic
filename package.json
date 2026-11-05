@@ -71,6 +71,7 @@
     "vimeo-froogaloop2": "^0.1.1"
   },
   "scripts": {
+    "test": "node --test app/bundles/CoreBundle/Tests/Unit/Assets/*.test.cjs",
     "build": "webpack --mode production  --config webpack.config.js",
     "postinstall": "npm run build"
   }
