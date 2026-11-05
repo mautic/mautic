@@ -111,7 +111,8 @@
     "wikimedia/less.php": "^5.5"
   },
   "conflict": {
-    "psr/simple-cache": ">=3.0.0"
+    "psr/simple-cache": ">=3.0.0",
+    "symfony/error-handler": "<7.4.19"
   },
   "repositories": [
     {
