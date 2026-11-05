@@ -11,6 +11,21 @@ use Psr\Log\LoggerInterface;
 
 final class MaxmindDownloadLookupTest extends TestCase
 {
+    // MaxMind DB data types, see https://maxmind.github.io/MaxMind-DB/
+    private const TYPE_UTF8_STRING = 2;
+
+    private const TYPE_DOUBLE = 3;
+
+    private const TYPE_UINT16 = 5;
+
+    private const TYPE_UINT32 = 6;
+
+    private const TYPE_MAP = 7;
+
+    private const TYPE_UINT64 = 9;
+
+    private const TYPE_ARRAY = 11;
+
     #[DataProvider('provideMissingOrWrongAuth')]
     public function testNoOrWrongAuth(?string $auth): void
     {
@@ -98,36 +113,48 @@ final class MaxmindDownloadLookupTest extends TestCase
             .str_repeat("\0", 16)
             .$this->encode($record)
             ."\xAB\xCD\xEFMaxMind.com"
-            .$this->encode([
-                'binary_format_major_version' => 2,
-                'binary_format_minor_version' => 0,
-                'build_epoch'                 => 0,
-                'database_type'               => 'GeoLite2-City',
-                'description'                 => ['en' => 'Test database'],
-                'ip_version'                  => 4,
-                'languages'                   => ['en'],
-                'node_count'                  => 1,
-                'record_size'                 => 24,
-            ]);
+            .$this->encodeMetadata();
+    }
+
+    private function encodeMetadata(): string
+    {
+        // The maxminddb C extension rejects metadata integers that do not have the type the spec gives them
+        $integers = [
+            'binary_format_major_version' => [2, self::TYPE_UINT16],
+            'binary_format_minor_version' => [0, self::TYPE_UINT16],
+            'build_epoch'                 => [1_700_000_000, self::TYPE_UINT64],
+            'ip_version'                  => [4, self::TYPE_UINT16],
+            'node_count'                  => [1, self::TYPE_UINT32],
+            'record_size'                 => [24, self::TYPE_UINT16],
+        ];
+        $others = [
+            'database_type' => 'GeoLite2-City',
+            'description'   => ['en' => 'Test database'],
+            'languages'     => ['en'],
+        ];
+
+        $encoded = '';
+        foreach ($integers as $key => [$value, $type]) {
+            $encoded .= $this->encode($key).$this->encodeUnsigned($value, $type);
+        }
+        foreach ($others as $key => $value) {
+            $encoded .= $this->encode($key).$this->encode($value);
+        }
+
+        return $this->controlByte(self::TYPE_MAP, count($integers) + count($others)).$encoded;
     }
 
     /**
-     * @param array<array-key, mixed>|string|int|float $value
+     * @param array<array-key, mixed>|string|float $value
      */
-    private function encode(array|string|int|float $value): string
+    private function encode(array|string|float $value): string
     {
         if (is_string($value)) {
-            return $this->controlByte(2, strlen($value)).$value;
+            return $this->controlByte(self::TYPE_UTF8_STRING, strlen($value)).$value;
         }
 
         if (is_float($value)) {
-            return $this->controlByte(3, 8).pack('E', $value);
-        }
-
-        if (is_int($value)) {
-            $bytes = ltrim(pack('N', $value), "\0");
-
-            return $this->controlByte(6, strlen($bytes)).$bytes;
+            return $this->controlByte(self::TYPE_DOUBLE, 8).pack('E', $value);
         }
 
         $encoded = '';
@@ -135,7 +162,14 @@ final class MaxmindDownloadLookupTest extends TestCase
             $encoded .= (array_is_list($value) ? '' : $this->encode((string) $key)).$this->encode($item);
         }
 
-        return $this->controlByte(array_is_list($value) ? 11 : 7, count($value)).$encoded;
+        return $this->controlByte(array_is_list($value) ? self::TYPE_ARRAY : self::TYPE_MAP, count($value)).$encoded;
+    }
+
+    private function encodeUnsigned(int $value, int $type): string
+    {
+        $bytes = ltrim(pack('J', $value), "\0");
+
+        return $this->controlByte($type, strlen($bytes)).$bytes;
     }
 
     private function controlByte(int $type, int $size): string
