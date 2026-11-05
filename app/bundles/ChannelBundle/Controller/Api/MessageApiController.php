@@ -78,9 +78,15 @@ final class MessageApiController extends CommonApiController
      */
     protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
-        $event = $this->dispatcher->dispatch(new ChannelEvent());
+        $event    = $this->dispatcher->dispatch(new ChannelEvent());
+        $channels = $event->getChannelConfigs();
 
         foreach ($entity->getChannels() as $channel) {
+            // Preserve historical channels without resolving entities from removed plugins.
+            if (!isset($channels[$channel->getChannel()])) {
+                continue;
+            }
+
             $repository = $event->getRepositoryName($channel->getChannel());
             $nameColumn = $event->getNameColumn($channel->getChannel());
             $name       = $this->model->getChannelName($channel->getChannelId(), $repository, $nameColumn);

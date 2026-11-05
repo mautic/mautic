@@ -7,11 +7,60 @@ namespace Mautic\ChannelBundle\Tests\Controller\Api;
 use Mautic\ChannelBundle\Entity\Channel;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Entity\Email;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
 
 final class MessageApiControllerTest extends MauticMysqlTestCase
 {
+    public function testReadAndEditMessageWithRemovedTweetChannel(): void
+    {
+        $email = new Email();
+        $email->setName('Retained email');
+        $email->setSubject('Retained email subject');
+        $email->setEmailType('template');
+        $this->em->persist($email);
+        $this->em->flush();
+
+        $message = new Message();
+        $message->setName('Message with a removed channel');
+
+        foreach (['tweet' => 123, 'email' => $email->getId()] as $type => $channelId) {
+            $channel = new Channel();
+            $channel->setChannel($type);
+            $channel->setChannelId($channelId);
+            $channel->setIsEnabled(true);
+            $message->addChannel($channel);
+            $this->em->persist($channel);
+        }
+
+        $this->em->persist($message);
+        $this->em->flush();
+        $messageId = $message->getId();
+        $emailId   = $email->getId();
+        $this->em->clear();
+
+        foreach ([Request::METHOD_GET, Request::METHOD_PATCH] as $method) {
+            $url = '/api/messages/'.$messageId;
+            if (Request::METHOD_PATCH === $method) {
+                $url .= '/edit';
+            }
+
+            $this->client->request($method, $url, Request::METHOD_PATCH === $method ? ['name' => 'Updated message'] : []);
+            self::assertResponseIsSuccessful();
+            $payload  = json_decode($this->client->getResponse()->getContent(), true);
+            $channels = array_column($payload['message']['channels'], null, 'channel');
+
+            self::assertCount(2, $channels);
+            self::assertSame(123, $channels['tweet']['channelId']);
+            self::assertTrue($channels['tweet']['isEnabled']);
+            self::assertNull($channels['tweet']['channelName']);
+            self::assertSame($emailId, $channels['email']['channelId']);
+            self::assertSame('Retained email', $channels['email']['channelName']);
+            self::assertSame(Request::METHOD_PATCH === $method ? 'Updated message' : 'Message with a removed channel', $payload['message']['name']);
+        }
+    }
+
     public function testCreateMessage(): void
     {
         $payloadJson = <<<'JSON'
