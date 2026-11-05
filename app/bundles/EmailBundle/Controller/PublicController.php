@@ -216,7 +216,6 @@ final class PublicController extends CommonFormController
         $stat                   = $model->getEmailStatus($idHash);
         $hasStat                = $stat instanceof Stat;
         $message                = '';
-        $defaultPreferenceCenter = false;
         $email                  = null;
         $lead                   = null;
         $template               = null;
@@ -358,7 +357,6 @@ final class PublicController extends CommonFormController
 
                 if (empty($html)) {
                     $html                    = $this->getHtml($formView, $lead, $viewParameters);
-                    $defaultPreferenceCenter = true;
                 }
                 $message = $html;
             }
@@ -382,7 +380,6 @@ final class PublicController extends CommonFormController
             'template'                 => $template,
             'message'                  => $message,
             'message_type'             => $messageType,
-            'default_preference_center' => $defaultPreferenceCenter,
         ];
 
         return $this->renderUnsubscribeResponse(
