@@ -25,7 +25,7 @@ final class FormRepositoryTest extends TestCase
         $this->repository = $this->configureRepository(Form::class);
 
         $this->entityManager->method('getExpressionBuilder')->willReturn(new Expr());
-        $this->entityManager->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->entityManager));
+        $this->entityManager->method('createQueryBuilder')->willReturnCallback(fn (): QueryBuilder => new QueryBuilder($this->entityManager));
 
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(
@@ -48,16 +48,13 @@ final class FormRepositoryTest extends TestCase
 
         [$expr] = $method->invoke($this->repository, $qb, $filter);
 
-        self::assertSame(
-            '(SELECT count(a.id) FROM Mautic\\FormBundle\\Entity\\Action a WHERE a.form = f) > 0',
-            (string) $expr
-        );
+        $this->assertSame('(SELECT count(a.id) FROM Mautic\\FormBundle\\Entity\\Action a WHERE a.form = f) > 0', (string) $expr);
     }
 
     public function testGetSearchCommandsContainsHasActions(): void
     {
         $commands = $this->repository->getSearchCommands();
 
-        self::assertContains('mautic.form.form.searchcommand.hasactions', $commands);
+        $this->assertContains('mautic.form.form.searchcommand.hasactions', $commands);
     }
 }
