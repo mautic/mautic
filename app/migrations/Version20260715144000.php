@@ -14,6 +14,11 @@ final class Version20260715144000 extends PreUpAssertionMigration
 {
     private const BATCH_SIZE = 1000;
 
+    public function isTransactional(): bool
+    {
+        return false;
+    }
+
     protected function preUpAssertions(): void
     {
         $this->skipAssertion(
