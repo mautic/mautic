@@ -1,9 +1,9 @@
 {% if quickFilters is defined and quickFilters is not empty %}
-{% if quickFilters|first.filters is defined %}
+{% if quickFilters|filter(group => group.filters is defined)|length > 0 %}
     <div class="d-flex flex-column gap-xs">
         {% for groupKey, groupData in quickFilters %}
             {% if groupData.filters is defined and groupData.filters is not empty %}
-                {% set conflictGroupName = (groupData.conflictGroup is defined and groupData.conflictGroup) ? groupKey|split('.')|last : null %}
+                {% set conflictGroupName = (groupData.conflictGroup is defined and groupData.conflictGroup) ? groupKey : null %}
 
                 <div class="dropdown-header{% if loop.first %} mt-0{% endif %}">{{ groupKey|trans }}</div>
                 <div class="d-flex gap-xs pi-md flex-wrap">
