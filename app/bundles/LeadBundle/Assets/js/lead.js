@@ -1739,7 +1739,7 @@ Mautic.listOnLoad = function(container, response) {
 
     if (segmentDependenciesTab.length) {
         mQuery(document).on('shown.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
-            if (!mQuery(e.target).attr('id') === 'segment-dependencies') {
+            if (mQuery(e.target).attr('id') !== 'segment-dependencies') {
                 return;
             }
 
@@ -1769,7 +1769,7 @@ Mautic.listOnLoad = function(container, response) {
         });
 
         mQuery(document).on('hide.bs.tab', 'a[data-bs-toggle="tab"]', function (e) {
-            if (!mQuery(e.target).attr('id') !== 'segment-dependencies') {
+            if (mQuery(e.target).attr('id') === 'segment-dependencies') {
                 Mautic.cleanSegmentDependencies();
             }
         });
