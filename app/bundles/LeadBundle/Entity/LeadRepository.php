@@ -948,6 +948,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.stage_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.stage_id', [], null, 'en_US'):
+                $expr            = $this->generateFilterExpression($q, 'l.stage_id', $eqExpr, $unique, null);
+                $filter->strict  = true;
+                $returnParameter = true;
+                break;
             case $this->translator->trans('mautic.lead.lead.searchcommand.dnc'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.dnc', [], null, 'en_US'):
                 $anyKeyword   = $this->translator->trans('mautic.lead.lead.searchcommand.dnc.any');
@@ -1034,6 +1040,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.core.searchcommand.ip',
             'mautic.lead.lead.searchcommand.tag',
             'mautic.lead.lead.searchcommand.stage',
+            'mautic.lead.lead.searchcommand.stage_id',
             'mautic.lead.lead.searchcommand.duplicate',
             'mautic.lead.lead.searchcommand.email_sent',
             'mautic.lead.lead.searchcommand.email_read',
