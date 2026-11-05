@@ -64,6 +64,13 @@ parameters:
     bootstrapFiles:
         - phpstan-bootstrap.php
     ignoreErrors:
+        # Public integration hooks let third-party plugins populate the social cache by reference.
+        # Keep their contract after removing the bundled social integrations.
+        -
+            identifier: mautic.noUselessReferenceParam
+            path: app/bundles/PluginBundle/Integration/AbstractIntegration.php
+            count: 2
+
         # newly enabled sets flag existing code wholesale, ignored for now to land the bump; fixed incrementally in follow-ups
         -
             identifiers:

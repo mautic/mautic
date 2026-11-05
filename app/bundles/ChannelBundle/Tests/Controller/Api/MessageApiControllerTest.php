@@ -51,13 +51,13 @@ final class MessageApiControllerTest extends MauticMysqlTestCase
             $payload  = json_decode($this->client->getResponse()->getContent(), true);
             $channels = array_column($payload['message']['channels'], null, 'channel');
 
-            self::assertCount(2, $channels);
-            self::assertSame(123, $channels['tweet']['channelId']);
-            self::assertTrue($channels['tweet']['isEnabled']);
-            self::assertNull($channels['tweet']['channelName']);
-            self::assertSame($emailId, $channels['email']['channelId']);
-            self::assertSame('Retained email', $channels['email']['channelName']);
-            self::assertSame(Request::METHOD_PATCH === $method ? 'Updated message' : 'Message with a removed channel', $payload['message']['name']);
+            $this->assertCount(2, $channels);
+            $this->assertSame(123, $channels['tweet']['channelId']);
+            $this->assertTrue($channels['tweet']['isEnabled']);
+            $this->assertNull($channels['tweet']['channelName']);
+            $this->assertSame($emailId, $channels['email']['channelId']);
+            $this->assertSame('Retained email', $channels['email']['channelName']);
+            $this->assertSame(Request::METHOD_PATCH === $method ? 'Updated message' : 'Message with a removed channel', $payload['message']['name']);
         }
     }
 
