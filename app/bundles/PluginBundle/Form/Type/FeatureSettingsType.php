@@ -3,6 +3,7 @@
 namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -31,6 +32,7 @@ final class FeatureSettingsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var AbstractIntegration $integrationObject */
         $integrationObject = $options['integration_object'];
 
         // add custom feature settings
