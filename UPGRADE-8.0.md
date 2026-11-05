@@ -154,6 +154,24 @@ After upgrading, clear the application cache and run `bin/console mautic:plugins
 - Column mappings moved from `loadMetadata()` to native Doctrine attributes across 106 entities, so 82 entities (including `Mautic\CoreBundle\Entity\FormEntity`) no longer declare a public `loadMetadata()`. Code that called `loadMetadata()` to read an entity's column mappings now sees only the fields still declared that way and will miss the attribute-mapped columns. Read mappings through `Doctrine\ORM\EntityManagerInterface::getClassMetadata()` instead. The resolved mappings are otherwise unchanged; column order may differ, which only affects freshly created tables.
 - Method `addProjectsField()` removed from `Mautic\ProjectBundle\Entity\ProjectTrait`. The 14 entities using the trait now map their `projects` many-to-many association with a native `#[ORM\ManyToMany]` on the trait plus a per-entity `#[ORM\AssociationOverrides]` for the join table and columns (all `*_projects_xref` tables and join columns unchanged). Any custom entity using `ProjectTrait` and calling `self::addProjectsField(...)` in `loadMetadata()` must declare the mapping with Doctrine attributes instead.
 - Method `addFiltersMetadata()` removed from `Mautic\CoreBundle\Entity\FiltersEntityTrait`. The `$filters` property now declares its mapping with a native `#[ORM\Column(type: 'array', nullable: true)]` attribute on the trait (column `filters`, unchanged). Any custom entity using `FiltersEntityTrait` and calling `self::addFiltersMetadata(...)` in `loadMetadata()` must remove that call and rely on the attribute mapping instead.
+- Method `addTranslationMetadata()` removed from `Mautic\CoreBundle\Entity\TranslationEntityTrait`. The trait now maps its `translationChildren` / `translationParent` associations and the `language` column (column `lang`, unchanged) with native Doctrine attributes, which Mautic loads automatically. Any custom entity using `TranslationEntityTrait` and calling `self::addTranslationMetadata(...)` in `loadMetadata()` must remove that call. If a plugin passed a custom language column name to the removed helper, use a class-level `#[ORM\AttributeOverrides]` instead of redeclaring `$language`, keeping the string type and length 191 - this preserves the trait property's serialization groups. If the entity already redeclares `$language`, remove that declaration when possible; otherwise explicitly preserve its ORM column mapping and the required serialization groups.
+
+    ```php
+    use Doctrine\ORM\Mapping as ORM;
+
+    #[ORM\AttributeOverrides([
+        new ORM\AttributeOverride(
+            name: 'language',
+            column: new ORM\Column(
+                name: 'custom_language',
+                type: 'string',
+                length: 191,
+            ),
+        ),
+    ])]
+    ```
+
+    `language` is the PHP property name; replace `custom_language` with the plugin's existing database column name.
 - Deprecated entity `Mautic\CoreBundle\Entity\Cache` removed with no replacement. It mapped the `cache_items` table but was never read or written anywhere in the codebase.
 - Deprecated methods `getResult()` and `setResult()` removed from `Mautic\CampaignBundle\Event\ConditionEvent` and `Mautic\CampaignBundle\Event\DecisionEvent`. Campaign condition/decision listeners must type their event argument as `ConditionEvent` / `DecisionEvent` (not the deprecated parent `CampaignExecutionEvent`) and use the real API: conditions call `pass()` / `fail()` (read back with `wasConditionSatisfied()`), decisions call `setAsApplicable()` (read back with `wasDecisionApplicable()`). The broken `setChannel()` overrides on both events were also removed; they now inherit the working `CampaignExecutionEvent::setChannel()`. The executioners already read the applicability via `wasConditionSatisfied()` / `wasDecisionApplicable()`, so behaviour is unchanged.
 - Deprecated class `Mautic\CampaignBundle\Executioner\Dispatcher\LegacyEventDispatcher` removed. It dispatched the per-contact, deprecated `CampaignExecutionEvent` for campaign actions registered with the legacy `'eventName'`/`'callback'` config keys. `Mautic\CampaignBundle\Executioner\Dispatcher\ActionDispatcher` no longer takes it as a constructor argument and only dispatches the batch `Mautic\CampaignBundle\Event\PendingEvent` for actions declaring `'batchEventName'`. Campaign actions must register `'batchEventName'` and listen on a `PendingEvent` — the `'eventName'`/`'callback'` action path no longer runs.
