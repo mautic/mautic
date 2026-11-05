@@ -72,7 +72,7 @@ mQuery(document).ajaxComplete(function(event, xhr, settings) {
     mQuery('[data-bs-toggle="popover"]:not([data-quick-filter])').popover({
         sanitize: false,
         content: function() {
-            return mQuery(this).data('content');
+            return mQuery(this).attr('data-bs-content') || mQuery(this).data('content');
         }
     });
     mQuery('[data-quick-filter]').popover(Mautic.getQuickFilterPopoverOptions());
