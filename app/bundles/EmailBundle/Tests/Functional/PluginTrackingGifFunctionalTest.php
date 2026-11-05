@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Entity\Stat;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
@@ -35,6 +36,11 @@ final class PluginTrackingGifFunctionalTest extends MauticMysqlTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertInstanceOf(Lead::class, $this->em->getRepository(Lead::class)->findOneBy(['email' => self::EMAIL]));
+
+        $stat = $this->em->getRepository(Stat::class)->findOneBy(['emailAddress' => self::EMAIL]);
+        $this->assertInstanceOf(Stat::class, $stat);
+        $this->assertSame('email.client', $stat->getSource());
+        $this->assertTrue($stat->isRead());
     }
 
     #[DataProvider('integrationProvider')]
