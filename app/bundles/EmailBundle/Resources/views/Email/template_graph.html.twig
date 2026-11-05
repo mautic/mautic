@@ -6,7 +6,7 @@ delete if it is not require
     <div class="row">
         <div class="col-sm-12">
             {% if showVariants %}
-            <div class="text-right small">
+            <div class="text-end small">
                 <span>
                     {% if isVariant %}
                         <span data-chart="variant">{% trans %}mautic.email.variant.graph.variant{% endtrans %}</span>
@@ -35,7 +35,7 @@ delete if it is not require
                     <div class="col-xs-8 align-middle">
                         {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {
                             'dateRangeForm'     : dateRangeForm,
-                            'class'             : 'pull-right'
+                            'class'             : 'float-end'
                         })
                         -}}
                     </div>
