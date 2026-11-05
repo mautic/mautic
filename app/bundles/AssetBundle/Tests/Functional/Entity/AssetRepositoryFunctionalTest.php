@@ -74,12 +74,13 @@ final class AssetRepositoryFunctionalTest extends MauticMysqlTestCase
      */
     private function getTitles(string $searchString): array
     {
+        $assets = $this->assetRepository->getEntities([
+            'filter'           => ['string' => $searchString, 'force' => []],
+            'ignore_paginator' => true,
+        ]);
         $titles = array_map(
             static fn (Asset $asset): string => $asset->getTitle(),
-            $this->assetRepository->getEntities([
-                'filter'           => ['string' => $searchString, 'force' => []],
-                'ignore_paginator' => true,
-            ])
+            is_array($assets) ? $assets : iterator_to_array($assets)
         );
         sort($titles);
 
