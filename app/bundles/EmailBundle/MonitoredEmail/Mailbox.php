@@ -17,6 +17,7 @@ use Horde\Mime\MimeParser;
 use Horde\Mime\Part;
 use Horde\Sasl\Credentials\PasswordCredentials;
 use Horde\Sasl\Credentials\PlainSecret;
+use IMAP\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Exception\MailboxException;
@@ -154,15 +155,29 @@ class Mailbox
      */
     public const CRITERIA_UNREAD = 'UNSEEN';
 
-    private $imapFolder = 'INBOX';
+    protected $imapPath;
 
-    private string $serverEncoding = 'UTF-8';
+    protected $imapFullPath;
 
-    private $attachmentsDir;
+    protected $imapStream;
 
-    private $settings;
+    protected $imapFolder     = 'INBOX';
 
-    private $mailboxes;
+    protected $imapOptions    = 0;
+
+    protected $imapRetriesNum = 0;
+
+    protected $imapParams     = [];
+
+    protected $serverEncoding = 'UTF-8';
+
+    protected $attachmentsDir;
+
+    protected $settings;
+
+    protected $isGmail = false;
+
+    protected $mailboxes;
 
     private ?ImapClient $client = null;
 
@@ -189,8 +204,15 @@ class Mailbox
         }
 
         $this->createAttachmentsDir($pathsHelper);
+
+        if ('imap.gmail.com' == $this->settings['host']) {
+            $this->isGmail = true;
+        }
     }
 
+    /**
+     * Returns if a mailbox is configured.
+     */
     public function isConfigured($bundleKey = null, $folderKey = null): bool
     {
         if (null !== $bundleKey) {
@@ -207,6 +229,8 @@ class Mailbox
     }
 
     /**
+     * Switch to another configured monitored mailbox.
+     *
      * @param string $mailbox
      *
      * @throws MailboxException
@@ -219,19 +243,71 @@ class Mailbox
             $this->settings           = (!empty($this->mailboxes[$key]['override_settings'])) ? $this->mailboxes[$key] : $this->mailboxes['general'];
             $this->imapFolder         = $this->mailboxes[$key]['folder'];
             $this->settings['folder'] = $this->mailboxes[$key]['folder'];
+            // Disconnect so that new mailbox settings are used
             $this->disconnect();
+            // Setup new connection
+            $this->setImapPath();
         } else {
             throw new MailboxException($key.' not found');
         }
     }
 
+    /**
+     * Returns if this is a Gmail connection.
+     *
+     * @return mixed
+     *
+     * @depreacated
+     */
+    public function isGmail()
+    {
+        return $this->isGmail;
+    }
+
+    /**
+     * Set imap path based on mailbox settings.
+     */
+    public function setImapPath($settings = null): void
+    {
+        if (null == $settings) {
+            $settings = $this->settings;
+        }
+        $paths              = $this->getImapPath($settings);
+        $this->imapPath     = $paths['path'];
+        $this->imapFullPath = $paths['full'];
+    }
+
+    public function getImapPath(array $settings): array
+    {
+        if (!isset($settings['encryption'])) {
+            $settings['encryption'] = (!empty($settings['ssl'])) ? '/ssl' : '';
+        }
+        $path     = "{{$settings['host']}:{$settings['port']}/imap{$settings['encryption']}}";
+        $fullPath = $path;
+
+        if (isset($settings['folder'])) {
+            $fullPath .= $settings['folder'];
+        }
+
+        return ['path' => $path, 'full' => $fullPath];
+    }
+
+    /**
+     * Override mailbox settings.
+     */
     public function setMailboxSettings(array $settings): void
     {
         $this->settings = array_merge($this->settings, $settings);
+
+        $this->isGmail = ('imap.gmail.com' == $this->settings['host']);
+
+        $this->setImapPath();
         $this->disconnect();
     }
 
     /**
+     * Get settings.
+     *
      * @param string $mailbox
      *
      * @return mixed
@@ -249,8 +325,11 @@ class Mailbox
         if (isset($this->mailboxes[$key])) {
             $settings = (!empty($this->mailboxes[$key]['override_settings'])) ? $this->mailboxes[$key] : $this->mailboxes['general'];
 
-            $settings['folder']    = $this->mailboxes[$key]['folder'];
-            $settings['imap_path'] = $this->buildImapPath($settings);
+            $settings['folder'] = $this->mailboxes[$key]['folder'];
+            $this->setImapPath($settings);
+
+            $imapPath              = $this->getImapPath($settings);
+            $settings['imap_path'] = $imapPath['full'];
         } else {
             throw new MailboxException($key.' not found');
         }
@@ -259,6 +338,140 @@ class Mailbox
     }
 
     /**
+     * Set custom connection arguments of imap_open method. See http://php.net/imap_open.
+     *
+     * @param int $options
+     * @param int $retriesNum
+     *
+     * @depreacated
+     */
+    public function setConnectionArgs($options = 0, $retriesNum = 0, ?array $params = null): void
+    {
+        $this->imapOptions    = $options;
+        $this->imapRetriesNum = $retriesNum;
+        $this->imapParams     = $params;
+    }
+
+    /**
+     * Switch to another box.
+     */
+    public function switchFolder($folder): void
+    {
+        if ($folder != $this->imapFolder) {
+            $this->imapFullPath = $this->imapPath.$folder;
+            $this->imapFolder   = $folder;
+        }
+
+        $this->getImapStream();
+    }
+
+    /**
+     * Get IMAP mailbox connection stream.
+     *
+     * @return Connection
+     */
+    public function getImapStream()
+    {
+        if (!$this->isConnected()) {
+            $this->imapStream = $this->initImapStream();
+        } else {
+            @imap_reopen($this->imapStream, $this->imapFullPath);
+        }
+
+        return $this->imapStream;
+    }
+
+    /**
+     * @return Connection
+     *
+     * @throws MailboxException
+     */
+    protected function initImapStream()
+    {
+        imap_timeout(IMAP_OPENTIMEOUT, 15);
+        imap_timeout(IMAP_CLOSETIMEOUT, 15);
+        imap_timeout(IMAP_READTIMEOUT, 15);
+        imap_timeout(IMAP_WRITETIMEOUT, 15);
+
+        $imapStream = @imap_open(
+            $this->imapFullPath,
+            $this->settings['user'],
+            $this->settings['password'],
+            $this->imapOptions,
+            $this->imapRetriesNum,
+            $this->imapParams
+        );
+        if (!$imapStream) {
+            throw new MailboxException();
+        }
+
+        return $imapStream;
+    }
+
+    /**
+     * Check if the stream is connected.
+     */
+    protected function isConnected(): bool
+    {
+        if (!$this->isConfigured() || !$this->imapStream) {
+            return false;
+        }
+
+        try {
+            return @imap_ping($this->imapStream);
+        } catch (\ValueError|\TypeError) {
+            return false;
+        }
+    }
+
+    /**
+     * Get information about the current mailbox.
+     *
+     * Returns the information in an object with following properties:
+     *  Date - current system time formatted according to RFC2822
+     *  Driver - protocol used to access this mailbox: POP3, IMAP, NNTP
+     *  Mailbox - the mailbox name
+     *  Nmsgs - number of mails in the mailbox
+     *  Recent - number of recent mails in the mailbox
+     *
+     * @return \stdClass
+     *
+     * @depreacated
+     */
+    public function checkMailbox(): \stdClass|bool
+    {
+        return imap_check($this->getImapStream());
+    }
+
+    /**
+     * Creates a new mailbox specified by mailbox.
+     *
+     * @depreacated
+     */
+    public function createMailbox(): bool
+    {
+        return imap_createmailbox($this->getImapStream(), imap_utf7_encode($this->imapFullPath));
+    }
+
+    /**
+     * Gets status information about the given mailbox.
+     *
+     * This function returns an object containing status information.
+     * The object has the following properties: messages, recent, unseen, uidnext, and uidvalidity.
+     *
+     * @return \stdClass if the box doesn't exist
+     *
+     * @depreacated
+     */
+    public function statusMailbox(): \stdClass|bool
+    {
+        return imap_status($this->getImapStream(), $this->imapFullPath, SA_ALL);
+    }
+
+    /**
+     * This function returns an object containing listing the folders.
+     * The object has the following properties: messages, recent, unseen, uidnext, and uidvalidity.
+     *
      * @return array listing the folders
      */
     public function getListingFolders()
@@ -274,6 +487,18 @@ class Mailbox
         }
 
         return $this->folders[$cacheKey];
+    }
+
+    /**
+     * @depreacated
+     */
+    public function fetchUnread($folder = null): array
+    {
+        if (null !== $folder) {
+            $this->switchFolder($folder);
+        }
+
+        return $this->searchMailBox(self::CRITERIA_UNSEEN);
     }
 
     /**
@@ -313,7 +538,6 @@ class Mailbox
      */
     public function searchMailbox($criteria = self::CRITERIA_ALL): array
     {
-        $client = $this->getClient();
         $searchQuery = new ImapSearchQuery();
 
         if (preg_match('/'.self::CRITERIA_UID.' ((\d+):(\d+|\*))/', $criteria, $matches)) {
@@ -325,7 +549,7 @@ class Mailbox
         }
 
         try {
-            $results = $client->search(
+            $results = $this->getClient()->search(
                 $this->imapFolder,
                 $searchQuery,
             );
@@ -337,19 +561,291 @@ class Mailbox
     }
 
     /**
+     * Save mail body.
+     *
+     * @param string $filename
+     *
+     * @depreacated
+     */
+    public function saveMail($mailId, $filename = 'email.eml'): bool
+    {
+        return imap_savebody($this->getImapStream(), $filename, $mailId, '', FT_UID);
+    }
+
+    /**
+     * Marks mails listed in mailId for deletion.
+     *
+     * @depreacated
+     */
+    public function deleteMail($mailId): bool
+    {
+        return imap_delete($this->getImapStream(), $mailId, FT_UID);
+    }
+
+    /**
+     * Move mail to another box.
+     *
+     * @depreacated
+     */
+    public function moveMail($mailId, $mailBox): bool
+    {
+        return imap_mail_move($this->getImapStream(), $mailId, $mailBox, CP_UID) && $this->expungeDeletedMails();
+    }
+
+    /**
+     * Deletes all the mails marked for deletion by imap_delete(), imap_mail_move(), or imap_setflag_full().
+     *
+     * @depreacated
+     */
+    public function expungeDeletedMails(): bool
+    {
+        return imap_expunge($this->getImapStream());
+    }
+
+    /**
+     * Add the flag \Seen to a mail.
+     *
+     * @depreacated
+     */
+    public function markMailAsRead($mailId): bool
+    {
+        return $this->setFlag([$mailId], '\\Seen');
+    }
+
+    /**
+     * Remove the flag \Seen from a mail.
+     *
+     * @depreacated
+     */
+    public function markMailAsUnread($mailId): bool
+    {
+        return $this->clearFlag([$mailId], '\\Seen');
+    }
+
+    /**
+     * Add the flag \Flagged to a mail.
+     *
+     * @depreacated
+     */
+    public function markMailAsImportant($mailId): bool
+    {
+        return $this->setFlag([$mailId], '\\Flagged');
+    }
+
+    /**
+     * Add the flag \Seen to a mails.
+     *
+     * @depreacated
+     */
+    public function markMailsAsRead(array $mailIds): bool
+    {
+        return $this->setFlag($mailIds, '\\Seen');
+    }
+
+    /**
+     * Remove the flag \Seen from some mails.
+     *
+     * @depreacated
+     */
+    public function markMailsAsUnread(array $mailIds): bool
+    {
+        return $this->clearFlag($mailIds, '\\Seen');
+    }
+
+    /**
+     * Add the flag \Flagged to some mails.
+     *
+     * @depreacated
+     */
+    public function markMailsAsImportant(array $mailIds): bool
+    {
+        return $this->setFlag($mailIds, '\\Flagged');
+    }
+
+    /**
+     * Causes a store to add the specified flag to the flags set for the mails in the specified sequence.
+     *
+     * @depreacated
+     *
+     * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
+     */
+    public function setFlag(array $mailsIds, $flag): bool
+    {
+        return imap_setflag_full($this->getImapStream(), implode(',', $mailsIds), $flag, ST_UID);
+    }
+
+    /**
+     * Cause a store to delete the specified flag to the flags set for the mails in the specified sequence.
+     *
+     * @param string $flag which you can set are \Seen, \Answered, \Flagged, \Deleted, and \Draft as defined by RFC2060
+     *
+     * @depreacated
+     */
+    public function clearFlag(array $mailsIds, $flag): bool
+    {
+        return imap_clearflag_full($this->getImapStream(), implode(',', $mailsIds), $flag, ST_UID);
+    }
+
+    /**
+     * Fetch mail headers for listed mails ids.
+     *
+     * Returns an array of objects describing one mail header each. The object will only define a property if it exists. The possible properties are:
+     *  subject - the mails subject
+     *  from - who sent it
+     *  to - recipient
+     *  date - when was it sent
+     *  message_id - Mail-ID
+     *  references - is a reference to this mail id
+     *  in_reply_to - is a reply to this mail id
+     *  size - size in bytes
+     *  uid - UID the mail has in the mailbox
+     *  msgno - mail sequence number in the mailbox
+     *  recent - this mail is flagged as recent
+     *  flagged - this mail is flagged
+     *  answered - this mail is flagged as answered
+     *  deleted - this mail is flagged for deletion
+     *  seen - this mail is flagged as already read
+     *  draft - this mail is flagged as being a draft
+     *
+     * @return array
+     *
+     * @depreacated
+     */
+    public function getMailsInfo(array $mailsIds): array|false
+    {
+        $mails = imap_fetch_overview($this->getImapStream(), implode(',', $mailsIds), FT_UID);
+        if (is_array($mails) && count($mails)) {
+            foreach ($mails as &$mail) {
+                if (isset($mail->subject)) {
+                    $mail->subject = $this->decodeMimeStr($mail->subject);
+                }
+                if (isset($mail->from)) {
+                    $mail->from = $this->decodeMimeStr($mail->from);
+                }
+                if (isset($mail->to)) {
+                    $mail->to = $this->decodeMimeStr($mail->to);
+                }
+            }
+        }
+
+        return $mails;
+    }
+
+    /**
+     * Get information about the current mailbox.
+     *
+     * Returns an object with following properties:
+     *  Date - last change (current datetime)
+     *  Driver - driver
+     *  Mailbox - name of the mailbox
+     *  Nmsgs - number of messages
+     *  Recent - number of recent messages
+     *  Unread - number of unread messages
+     *  Deleted - number of deleted messages
+     *  Size - mailbox size
+     *
+     * @depreacated
+     */
+    public function getMailboxInfo(): \stdClass
+    {
+        return imap_mailboxmsginfo($this->getImapStream());
+    }
+
+    /**
+     * Gets mails ids sorted by some criteria.
+     *
+     * Criteria can be one (and only one) of the following constants:
+     *  SORTDATE - mail Date
+     *  SORTARRIVAL - arrival date (default)
+     *  SORTFROM - mailbox in first From address
+     *  SORTSUBJECT - mail subject
+     *  SORTTO - mailbox in first To address
+     *  SORTCC - mailbox in first cc address
+     *  SORTSIZE - size of mail in octets
+     *
+     * @param int  $criteria
+     * @param bool $reverse
+     *
+     * @return array Mails ids
+     *
+     * @depreacated
+     */
+    public function sortMails($criteria = SORTARRIVAL, $reverse = true): array|bool
+    {
+        return imap_sort($this->getImapStream(), $criteria, $reverse, SE_UID);
+    }
+
+    /**
+     * Get mails count in mail box.
+     *
+     * @depreacated
+     */
+    public function countMails(): int|bool
+    {
+        return imap_num_msg($this->getImapStream());
+    }
+
+    /**
+     * Retrieve the quota settings per user.
+     *
+     * @return array - FALSE in the case of call failure
+     *
+     * @depreacated
+     */
+    protected function getQuota(): array|bool
+    {
+        return imap_get_quotaroot($this->getImapStream(), 'INBOX');
+    }
+
+    /**
+     * Return quota limit in KB.
+     *
+     * @return int - FALSE in the case of call failure
+     *
+     * @depreacated
+     */
+    public function getQuotaLimit()
+    {
+        $quota = $this->getQuota();
+        if (is_array($quota)) {
+            $quota = $quota['STORAGE']['limit'];
+        }
+
+        return $quota;
+    }
+
+    /**
+     * Return quota usage in KB.
+     *
+     * @return int - FALSE in the case of call failure
+     *
+     * @depreacated
+     */
+    public function getQuotaUsage()
+    {
+        $quota = $this->getQuota();
+        if (is_array($quota)) {
+            $quota = $quota['STORAGE']['usage'];
+        }
+
+        return $quota;
+    }
+
+    /**
+     * Get mail data.
+     *
      * @param bool $markAsSeen
      */
     public function getMail($mailId, $markAsSeen = true): Message
     {
-        $client = $this->getClient();
-        $ids    = new ImapIdSet([$mailId], false);
+        $ids = new ImapIdSet([$mailId], false);
 
         $fetchQuery = new ImapFetchQuery();
         $fetchQuery->fullMsg(peek: !$markAsSeen);
         $fetchQuery->headerText(peek: !$markAsSeen);
 
         $fetchData = null;
-        foreach ($client->fetch($this->imapFolder, $ids, $fetchQuery) as $result) {
+        foreach ($this->getClient()->fetch($this->imapFolder, $ids, $fetchQuery) as $result) {
             $fetchData = $result;
             break;
         }
@@ -432,22 +928,6 @@ class Mailbox
         return $mail;
     }
 
-    public function __destruct()
-    {
-        $this->disconnect();
-    }
-
-    private function disconnect(): void
-    {
-        if (null !== $this->client) {
-            try {
-                $this->client->logout();
-            } catch (\Exception) {
-            }
-            $this->client = null;
-        }
-    }
-
     /**
      * @throws MailboxException
      */
@@ -483,18 +963,6 @@ class Mailbox
             'tls', 'starttls' => SecureMode::Tls,
             default    => SecureMode::Ssl,
         };
-    }
-
-    private function buildImapPath(array $settings): string
-    {
-        $encryption = $settings['encryption'] ?? '';
-        $path       = "{{$settings['host']}:{$settings['port']}/imap{$encryption}}";
-
-        if (isset($settings['folder'])) {
-            $path .= $settings['folder'];
-        }
-
-        return $path;
     }
 
     private function parseBody(Message $mail, string $rawMessage): void
@@ -628,10 +1096,10 @@ class Mailbox
     /**
      * @return string Converted string if conversion was successful, or the original string if not
      */
-    private function convertStringEncoding(string $string, string $fromEncoding, string $toEncoding)
+    protected function convertStringEncoding($string, $fromEncoding, $toEncoding)
     {
         $convertedString = null;
-        if ($string && $fromEncoding !== $toEncoding) {
+        if ($string && $fromEncoding != $toEncoding) {
             $convertedString = @iconv($fromEncoding, $toEncoding.'//IGNORE', $string);
             if (!$convertedString && extension_loaded('mbstring')) {
                 $convertedString = @mb_convert_encoding($string, $toEncoding, $fromEncoding);
@@ -639,6 +1107,25 @@ class Mailbox
         }
 
         return $convertedString ?: $string;
+    }
+
+    protected function disconnect(): void
+    {
+        if (null !== $this->client) {
+            try {
+                $this->client->logout();
+            } catch (\Exception) {
+            }
+            $this->client = null;
+        }
+
+        if ($this->imapStream) {
+            // Prevent these from throwing notices such as "SECURITY PROBLEM: insecure server advertised"
+            imap_errors();
+            imap_alerts();
+
+            @imap_close($this->imapStream, CL_EXPUNGE);
+        }
     }
 
     private function createAttachmentsDir(PathsHelper $pathsHelper): void
@@ -657,5 +1144,13 @@ class Mailbox
         if (!file_exists($this->attachmentsDir)) {
             mkdir($this->attachmentsDir);
         }
+    }
+
+    /**
+     * Disconnect on destruct.
+     */
+    public function __destruct()
+    {
+        $this->disconnect();
     }
 }
