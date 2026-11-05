@@ -17,6 +17,7 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
+use Mautic\UserBundle\Model\RoleModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Request;
@@ -198,36 +199,11 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentDependencyTree(): void
     {
-        $segmentA = new LeadList();
-        $segmentA->setName('Segment A');
-        $segmentA->setPublicName('Segment A');
-        $segmentA->setAlias('segment-a');
-
-        $segmentB = new LeadList();
-        $segmentB->setName('Segment B');
-        $segmentB->setPublicName('Segment B');
-        $segmentB->setAlias('segment-b');
-
-        $segmentC = new LeadList();
-        $segmentC->setName('Segment C');
-        $segmentC->setPublicName('Segment C');
-        $segmentC->setAlias('segment-c');
-
-        $segmentD = new LeadList();
-        $segmentD->setName('Segment D');
-        $segmentD->setPublicName('Segment D');
-        $segmentD->setAlias('segment-d');
-
-        $segmentE = new LeadList();
-        $segmentE->setName('Segment E');
-        $segmentE->setPublicName('Segment E');
-        $segmentE->setAlias('segment-e');
-
-        $this->em->persist($segmentA);
-        $this->em->persist($segmentB);
-        $this->em->persist($segmentC);
-        $this->em->persist($segmentD);
-        $this->em->persist($segmentE);
+        $segmentA = $this->createSegment('Segment A');
+        $segmentB = $this->createSegment('Segment B');
+        $segmentC = $this->createSegment('Segment C');
+        $segmentD = $this->createSegment('Segment D');
+        $segmentE = $this->createSegment('Segment E');
         $this->em->flush();
 
         $segmentA->setFilters(
@@ -302,36 +278,11 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testSegmentDependencyTreeWithLoop(): void
     {
-        $segmentA = new LeadList();
-        $segmentA->setName('Segment A');
-        $segmentA->setPublicName('Segment A');
-        $segmentA->setAlias('segment-a');
-
-        $segmentB = new LeadList();
-        $segmentB->setName('Segment B');
-        $segmentB->setPublicName('Segment B');
-        $segmentB->setAlias('segment-b');
-
-        $segmentC = new LeadList();
-        $segmentC->setName('Segment C');
-        $segmentC->setPublicName('Segment C');
-        $segmentC->setAlias('segment-c');
-
-        $segmentD = new LeadList();
-        $segmentD->setName('Segment D');
-        $segmentD->setPublicName('Segment D');
-        $segmentD->setAlias('segment-d');
-
-        $segmentE = new LeadList();
-        $segmentE->setName('Segment E');
-        $segmentE->setPublicName('Segment E');
-        $segmentE->setAlias('segment-e');
-
-        $this->em->persist($segmentA);
-        $this->em->persist($segmentB);
-        $this->em->persist($segmentC);
-        $this->em->persist($segmentD);
-        $this->em->persist($segmentE);
+        $segmentA = $this->createSegment('Segment A');
+        $segmentB = $this->createSegment('Segment B');
+        $segmentC = $this->createSegment('Segment C');
+        $segmentD = $this->createSegment('Segment D');
+        $segmentE = $this->createSegment('Segment E');
         $this->em->flush();
 
         $segmentA->setFilters(
@@ -533,15 +484,8 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testCompanyListActionSuggestionsByAdminUser(): void
     {
-        $userRepository = $this->em->getRepository(User::class);
-        $this->assertInstanceOf(UserRepository::class, $userRepository);
-
-        $adminUser = $userRepository->findOneBy(['username' => 'admin']);
-        $this->assertInstanceOf(User::class, $adminUser);
-
-        $salesUser = $userRepository->findOneBy(['username' => 'sales']);
-        $this->assertInstanceOf(User::class, $salesUser);
-
+        $adminUser = $this->getUser('admin');
+        $salesUser = $this->getUser('sales');
         $companies = [];
 
         // Create 4 companies with two owned by admin and sales users respectively.
@@ -980,6 +924,79 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('data-model="category.category"', (string) $response['viewParameters']['form']);
     }
 
+    public static function dataSegmentAction(): iterable
+    {
+        yield 'getLeadCount' => ['getLeadCount'];
+        yield 'getSegmentDependencyTree' => ['getSegmentDependencyTree'];
+    }
+
+    #[DataProvider('dataSegmentAction')]
+    public function testSegmentActionWithAdminUser(string $action): void
+    {
+        $segment = $this->createSegment();
+        $this->em->flush();
+
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_GET, sprintf('/s/ajax?action=lead:%s&id=%s', $action, $segment->getId()));
+        $this->assertResponseIsSuccessful(sprintf('The admin user should always be able to access the "%s" action.', $action));
+    }
+
+    #[DataProvider('dataSegmentAction')]
+    public function testSegmentActionWithUserHavingViewOtherPermission(string $action): void
+    {
+        $user = $this->createUserWithPermissions(['lead:lists' => ['viewother']]);
+        $segment = $this->createSegment();
+        $segment->setCreatedBy($this->getUser('admin'));
+        $this->em->flush();
+
+        $this->loginUser($user);
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_GET, sprintf('/s/ajax?action=lead:%s&id=%s', $action, $segment->getId()));
+        $this->assertResponseIsSuccessful(sprintf('The user with view other permission should always be able to access the "%s" action.', $action));
+    }
+
+    #[DataProvider('dataSegmentAction')]
+    public function testSegmentActionWithUserHavingViewOwnPermissionAccessingOwnSegment(string $action): void
+    {
+        $user = $this->createUserWithPermissions(['lead:lists' => ['viewown']]);
+        $segment = $this->createSegment();
+        $segment->setCreatedBy($user);
+        $this->em->flush();
+
+        $this->loginUser($user);
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_GET, sprintf('/s/ajax?action=lead:%s&id=%s', $action, $segment->getId()));
+        $this->assertResponseIsSuccessful(sprintf('The user with view own permission owning the segment should be able to access the "%s" action.', $action));
+    }
+
+    #[DataProvider('dataSegmentAction')]
+    public function testSegmentActionWithUserHavingViewOwnPermissionAccessingForeignSegment(string $action): void
+    {
+        $user = $this->createUserWithPermissions(['lead:lists' => ['viewown']]);
+        $segment = $this->createSegment();
+        $segment->setCreatedBy($this->getUser('sales'));
+        $this->em->flush();
+
+        $this->loginUser($user);
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_GET, sprintf('/s/ajax?action=lead:%s&id=%s', $action, $segment->getId()));
+        $this->assertResponseStatusCodeSame(403, sprintf('The user with view own permission not owning the segment should not be able to access the "%s" action.', $action));
+    }
+
+    #[DataProvider('dataSegmentAction')]
+    public function testSegmentActionWithUserHavingNoListPermissions(string $action): void
+    {
+        $user = $this->createUserWithPermissions(['lead:lists' => []]);
+        $segment = $this->createSegment();
+        $segment->setCreatedBy($user);
+        $this->em->flush();
+
+        $this->loginUser($user);
+        $this->setCsrfHeader();
+        $this->client->xmlHttpRequest(Request::METHOD_GET, sprintf('/s/ajax?action=lead:%s&id=%s', $action, $segment->getId()));
+        $this->assertResponseStatusCodeSame(403, sprintf('The user without view own/others permission should never be able to access the "%s" action.', $action));
+    }
+
     /**
      * @return array<int, array<string, mixed>>
      */
@@ -1054,5 +1071,53 @@ final class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $category;
+    }
+
+    private function createSegment(string $name = 'Segment'): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName($name);
+        $segment->setPublicName($name);
+        $segment->setAlias($name);
+        $this->em->persist($segment);
+
+        return $segment;
+    }
+
+    private function createUserWithPermissions(array $permissions): User
+    {
+        $roleModel = self::getContainer()->get(RoleModel::class);
+        $this->assertInstanceOf(RoleModel::class, $roleModel);
+
+        $hasherFactory = self::getContainer()->get(PasswordHasherFactoryInterface::class);
+        $this->assertInstanceOf(PasswordHasherFactoryInterface::class, $hasherFactory);
+
+        $role = new Role();
+        $role->setName('Role');
+        $roleModel->setRolePermissions($role, $permissions);
+        $this->em->persist($role);
+
+        $user = new User();
+        $user->setFirstName('Test');
+        $user->setLastName('User');
+        $user->setUsername('testUser');
+        $user->setEmail('testuser@example.com');
+        $user->setRole($role);
+        $user->setPassword($hasherFactory->getPasswordHasher($user)->hash('Maut1cR0cks!'));
+        $this->em->persist($user);
+        $this->em->flush();
+
+        return $user;
+    }
+
+    private function getUser(string $username): User
+    {
+        $userRepository = $this->em->getRepository(User::class);
+        $this->assertInstanceOf(UserRepository::class, $userRepository);
+
+        $admin = $userRepository->findOneBy(['username' => $username]);
+        $this->assertInstanceOf(User::class, $admin);
+
+        return $admin;
     }
 }
